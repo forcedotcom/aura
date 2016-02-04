@@ -84,6 +84,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this._ilSize = il_container.offsetHeight; //relayout
         },
         _setState: function (loading) {
+            this._loading = loading;
             if (loading) {
                 this.ilDOM.classList.add(CLASS_LOADING);
                 this.ilLabel.textContent = this.opts.infiniteLoadingConfig.labelLoading;
@@ -135,6 +136,14 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
                 if (payload === 'nomoredata' || payload.noMoreData) {
                     this.lockFetchData();
+                }
+
+                if (payload.labelIdle) {
+                    this.opts.infiniteLoadingConfig.labelIdle = payload.labelIdle;
+                }
+
+                if (payload.labelLoading) {
+                    this.opts.infiniteLoadingConfig.labelLoading = payload.labelLoading;
                 }
             }
 
@@ -202,6 +211,16 @@ function lib(w) { //eslint-disable-line no-unused-vars
         },
         lockFetchData: function () {
             this._ilNoMoreData = true;
+        },
+        updateLabels:function(payload) {
+            if (typeof (payload.labelIdle) !== "undefined") {
+                this.opts.infiniteLoadingConfig.labelIdle = payload.labelIdle;
+            }
+            if (typeof (payload.labelLoading) !== "undefined") {
+                this.opts.infiniteLoadingConfig.labelLoading = payload.labelLoading;
+            }
+            // in order to redraw the label we have to call _setState
+            this._setState(this._loading);
         }
     };
 

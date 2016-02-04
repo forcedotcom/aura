@@ -27,32 +27,15 @@
 	},
 
     fetchData: function(component, event) {
-        // Show loading indicator
-        var listCmp = component.find("list");
+        var listCmp = this.getListComponent(component);
         if (listCmp) {
-            var listHelper = listCmp.getDef().getHelper();
-            listHelper.showLoading(listCmp.getSuper(), true);
+            var options = event.getParam("parameters");
+            var index = event.getParam("index");
+            if (!index) {
+                index = 0;
+            }
+            listCmp.fetchData(options, index);
         }
-
-        // set keyword to list component
-        var options = event.getParam("parameters");
-        if (listCmp) {
-            listCmp.set("v.keyword", options.keyword);
-        }
-        
-        // fire dataProvide event
-        var dataProviders = component.get("v.dataProvider");
-        var index = event.getParam("index");
-        if (!index) {
-            index = 0;
-        }
-        
-        var provideEvent = dataProviders[index].get("e.provide");
-        provideEvent.setParams({
-            parameters: options
-        });
-        
-        provideEvent.fire();
     },
     
     fireInputChangeEvent: function(component) {
@@ -77,14 +60,14 @@
     },
     
     hideList: function(component) {
-        var list = component.find("list");
+        var list = this.getListComponent(component);
         if (list && list.get("v.visible") === true) {
             list.set("v.visible", false);
         }
     },
 
     handleEnterkey: function(component) {
-        var list = component.find("list");
+        var list = this.getListComponent(component);
         if (list.get("v.visible") === true) {
             this.handleEnterkeyOnList(component, list);
         } else {
@@ -93,24 +76,15 @@
     },
 
     handleEnterkeyOnList: function(component, list) {
-        var optionSelectEvt = component.get("e.selectListOption");
-        if (list.get("v.headerSelected")) {
-            optionSelectEvt.setParams({ option:  component.get("v.listHeader"), isHeader: true  });
-            optionSelectEvt.fire();
-        } else if (list.get("v.footerSelected")) {
-            optionSelectEvt.setParams({ option:  component.get("v.listFooter"), isFooter: true  });
-            optionSelectEvt.fire();
-        } else {
-            var pEvent = list.get("e.pressOnHighlighted");
-            pEvent.fire();
-        }
+        var pEvent = list.get("e.pressOnHighlighted");
+        pEvent.fire();
     },
 
     handleEnterKeyOnInput: function() {
     },
 
     handleEsckey: function(component) {
-    this.hideList(component);
+        this.hideList(component);
     },
     
     handleKeyAction: function(component, event) {
@@ -142,7 +116,7 @@
     },
     
     highlightNextItem: function(component) {
-        var list = component.find("list");
+        var list = this.getListComponent(component);
         if (list.get("v.visible") === true) {
             var highlightEvent = list.get("e.listHighlight");
             highlightEvent.setParams({
@@ -153,7 +127,7 @@
     },
     
     highlightPrevItem: function(component) {
-        var list = component.find("list");
+        var list = this.getListComponent(component);
         if (list.get("v.visible") === true) {
             var highlightEvent = list.get("e.listHighlight");
             highlightEvent.setParams({
@@ -185,7 +159,7 @@
      */
     setIgnoredElements: function(component) {
         var inputCmp = component.find("input");
-        var listCmp = component.find("list");
+        var listCmp = this.getListComponent(component);
         if (inputCmp && listCmp) {
             var elems = inputCmp.getElements();
             listCmp.set("v.ignoredElements", elems);
@@ -193,7 +167,7 @@
     },
 
     addIgnoredElement: function(component, element) {
-        var listCmp = component.find("list");
+        var listCmp = this.getListComponent(component);
         if (listCmp) {
             var ignoreElements = listCmp.get("v.ignoredElements");
             ignoreElements.push(element);
@@ -213,5 +187,19 @@
     },
 
     handleListExpand: function() {
+    },
+
+    getListComponent: function(component) {
+        var listCmp = component.find("list");
+        if (!listCmp) {
+            listCmp = component.get("v.autocompleteList")[0];
+        }
+        return listCmp;
+    },
+
+    isDefaultList: function(component) {
+        var listCmp = this.getListComponent(component);
+        return (listCmp && listCmp.isInstanceOf("ui:autocompleteList"));
     }
+
 })// eslint-disable-line semi

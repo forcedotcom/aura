@@ -630,11 +630,14 @@
             }
 
             function sendQueuedPostMessagesCallback() {
-                window.postMessage({
-                    "action": PUBLISH_BATCH_KEY,
-                    "data": postMessagesQueue
-                }, window.location.href);
-
+                try {
+                    window.postMessage({
+                        "action": PUBLISH_BATCH_KEY,
+                        "data": postMessagesQueue
+                    }, window.location.href);
+                } catch(e) {
+                    console.error("AuraInspector: Failed to communicate to inspector", e);
+                }
                 postMessagesQueue = [];
                 batchPostId = null;
             }
@@ -716,13 +719,12 @@
 
             var event = config["scope"];
             var source = event.getSource();
-            var parameters = output(event.getParams());
 
             data = {
                 "id": eventId,
                 "caller": arguments.callee.caller.caller.caller+"",
                 "name": event.getDef().getDescriptor().getQualifiedName(),
-                "parameters": parameters,
+                "parameters": output(event.getParams()),
                 "sourceId": source ? source.getGlobalId() : "",
                 "startTime": startTime,
                 "endTime": performance.now(),
@@ -990,7 +992,7 @@
 
             var data =  {
                 "id"         : action.getId(),
-                "params"     : action.getParams(),
+                "params"     : $Aura.Inspector.safeStringify(action.getParams()),
                 "abortable"  : action.isAbortable(),
                 "storable"   : action.isStorable(),
                 "background" : action.isBackground(),
@@ -1151,7 +1153,7 @@
                 setTimeout(function (){
                     // We do a timeout to give a chance to
                     // other transactionEnd handlers to modify the transaction
-                    $Aura.Inspector.publish("Transactions:OnTransactionEnd", t);
+                    $Aura.Inspector.publish("Transactions:OnTransactionEnd", $Aura.Inspector.safeStringify(t));
                 }, 0);
             },
 

@@ -299,7 +299,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
         }
 
         var action = actions.get(actionId);
-        var params = JSON.stringify(action.params);
+        var params = action.params;
 
         var card = document.createElement("aurainspector-actionCard");
             card.id = "action_card_" + action.id;

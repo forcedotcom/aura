@@ -27,11 +27,11 @@ function LockerService() {
 	var keyToEnvironmentMap = {};
 
 	var validSymbolNameRegEx = /^[a-z$_][a-z0-9$_]*$/i;
-	
+
 	function getShadows(imports) {
 		var globalKeys = Object.getOwnPropertyNames(window).concat(
 			Object.getOwnPropertyNames(Object)).concat(Object.getOwnPropertyNames(Object.prototype));
-			
+
 		var candidates = [ "$A", "document", "window", "self", "top", "console", "Error", "Function" ].concat(globalKeys);
 
 		function getInitialWhitelist(symbols) {
@@ -83,8 +83,8 @@ function LockerService() {
 		if (code.indexOf("__proto__") >= 0 || code.indexOf("__defineGetter__") >= 0 || code.indexOf("__defineSetter__") >= 0) {
 			throw Error("Security violation: use of __proto__, __defineGetter__, and __defineSetter__ is not permitted!");
 		}
-				
-		// Rewrite references to eval to avoid implicit calls leaking global state 
+
+		// Rewrite references to eval to avoid implicit calls leaking global state
 		// NOTE: strict mode does not allow the symbol eval to be redefined, passed as parameter, so a simple regex can rewrite this during lockering
 		return code.replace(/\beval\b/g, "_lsSafeEval");
 	}
@@ -108,15 +108,15 @@ function LockerService() {
 			if (!isSafeModeEnabled()) {
 				throw new Error("$A.lockerService.create() is only supported in strict mode capable browsers!");
 			}
-			
+
 			return (function() {
 				var shadows = getShadows(imports);
 
 				var shadowingIIFESource = "function(" + shadows.toString() + ") {\n\"use strict\";\n";
-				
+
 				// DCHASMAN TODO W-2837788 Figure out the scoping issues here (e.g. component, helper, etc is not visible and maybe that is ok???)
 				shadowingIIFESource += "var that = this; function _lsSafeEval(code) { return eval(\"'use strict';\" + that.secureSource(code)); }\n";
-				
+
 				shadowingIIFESource += preprocessSource(code) + "\n}";
 
 				var locker;
@@ -149,7 +149,7 @@ function LockerService() {
 								value : function(globalId) {
 									var c = $A.getComponent(globalId);
 									$A.lockerService.util.verifyAccess(key, c);
-									return service.wrapComponent(c);
+									return service.wrapComponent(c, key);
 								}
 							},
 
@@ -159,7 +159,7 @@ function LockerService() {
 								}
 							}
 						}),
-						
+
 						sUtils : Object.create(Object.prototype, {
 							"secureSource" : {
 								value : preprocessSource
@@ -187,9 +187,9 @@ function LockerService() {
 					args[args.length - 1] = "'use strict'; " + args[args.length - 1];
 					return Function.apply(undefined, args);
 				}
-				
+
 				// function getCtor(o) { if (o.constructor === Function.constructor) { throw new Error("You cannot get Function.ctor!") } return o.constructor; }
-				
+
 				// We pass in SecureUtils as this to provide an object that cannot be replaced/spoofed
 				var sWindow = env.sWindow;
 				var result = locker.call(env.sUtils, env.sAura, env.sDocument, sWindow, sWindow, sWindow, console, Error, sFunction);
@@ -257,22 +257,29 @@ function LockerService() {
 			return sc;
 		},
 
-		unwrap : function(elements) {
-			if (!$A.lockerService.util.isKeyed(elements)) {
-				return elements;
+		wrapComponentEvent : function(component, event) {
+			if (!event || !component) {
+				return event;
 			}
 
-			if ($A.util.isArray(elements)) {
+			var key = $A.lockerService.util._getKey(component, $A.lockerService.masterKey);
+			if (!key) {
+				return event;
+			}
+
+			return new SecureAuraEvent(event, key);
+		},
+
+		unwrap : function(elements) {
+			if (Array.isArray(elements)) {
 				for (var n = 0; n < elements.length; n++) {
 					var value = elements[n];
 					if (value && value.unwrap) {
 						elements[n] = value.unwrap($A.lockerService.masterKey);
 					}
 				}
-			} else {
-				if (elements && elements.unwrap) {
-					elements = elements.unwrap($A.lockerService.masterKey);
-				}
+			} else if (elements && elements.unwrap && $A.lockerService.util.isKeyed(elements)) {
+				elements = elements.unwrap($A.lockerService.masterKey);
 			}
 
 			return elements;
@@ -297,13 +304,13 @@ function LockerService() {
 				showLockedNodes(children[i]);
 			}
 		},
-		
+
 		// Master key will be hidden by both locker shadowing and scope
 		masterKey : Object.freeze({
 			name : "master"
 		})
 	};
-	
+
 	service.util = (function() {
 		var lockerNamespaceKeys = {};
 
@@ -321,22 +328,22 @@ function LockerService() {
 		    			namespace: namespace
 		    		});
 				}
-				
+
 				return key;
 			},
-			
+
 			_getKey : function(thing, mk) {
 				if (mk !== $A.lockerService.masterKey) {
 					throw Error("Access denied");
 				}
-				
-				return getKey(thing); 
+
+				return getKey(thing);
 			},
-			
+
 			isKeyed : function(thing) {
 				return getKey(thing) !== undefined;
 			},
-			
+
 			hasAccess : function(from, to) {
 				var fromKey = getKey(from);
 				var toKey = getKey(to);
@@ -375,9 +382,9 @@ function LockerService() {
 				}
 			}
 		};
-		
+
 		Object.freeze(util);
-		
+
 		return util;
 	})();
 
@@ -391,4 +398,3 @@ function LockerService() {
 }
 
 Aura.Services.LockerService = LockerService;
-

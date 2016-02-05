@@ -1288,9 +1288,6 @@ Component.prototype.getAttributeValueProvider = function() {
  */
 Component.prototype.setAttributeValueProvider = function (avp) {
     this.attributeValueProvider = avp;
-
-	// Add this component to the new AVP's index
-    this.doIndex(this);
 };
 
 /**

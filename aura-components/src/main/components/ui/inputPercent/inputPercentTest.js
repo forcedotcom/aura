@@ -84,8 +84,8 @@
         attributes : {value : 30, format: ',,'},
         test: function(component){
         	var value = component.getElement().value;
-        	$A.test.assertEquals(30, component.get("v.value"), "Expected error message");
-            $A.test.assertEquals('Invalid format attribute', value, "Expected error message");
+        	$A.test.assertEquals(30, component.get("v.value"), "Cmp: Expected value to use default format");
+            $A.test.assertEquals('30', value, "Element: Expected value to use default format");
         }
     },
 

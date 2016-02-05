@@ -834,4 +834,220 @@ Test.Aura.Util.UtilTest = function() {
             });
         }
     }
+
+    [Fixture]
+    function isArray() {
+        [Fact]
+        function ReturnsTrueForEmptyArray() {
+            var array = [];
+
+            var actual = targetUtil.isArray(array);
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueForArrayConstructed() {
+            var array = new Array();
+
+            var actual = targetUtil.isArray(array);
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForUndefined() {
+            var array = undefined;
+
+            var actual = targetUtil.isArray(array);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForNull() {
+            var array = null;
+
+            var actual = targetUtil.isArray(array);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForObject() {
+            var array = {};
+
+            var actual = targetUtil.isArray(array);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForArrayLikeObject() {
+            var array = arguments;
+
+            var actual = targetUtil.isArray(array);
+
+            Assert.False(actual);
+        }
+        
+        [Fact]
+        function RetrunsFalseForFunction() {
+            var array = function(){};
+            
+            var actual = targetUtil.isArray(array);
+            
+            Assert.False(actual);
+        }
+    }
+
+    [Fixture]
+    function isObject() {
+        [Fact]
+        function ReturnsTrueForEmptyObject() {
+            var object = {};
+
+            var actual = targetUtil.isObject(object);
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueForConstructedObject() {
+            var object = new Object();
+
+            var actual = targetUtil.isObject(object);
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForArray() {
+            var object = [];
+
+            var actual = targetUtil.isObject(object);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForUndefined() {
+            var object = undefined;
+
+            var actual = targetUtil.isObject(object);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForNull() {
+            var object = null;
+
+            var actual = targetUtil.isObject(object);
+
+            Assert.False(actual);
+        }
+        
+        [Fact]
+        function ReturnsTrueForArrayLikeObject() {
+            var object = arguments;
+
+            var actual = targetUtil.isObject(object);
+
+            Assert.True(actual);
+        }
+        
+        [Fact]
+        function ReturnsFalseForFunction() {
+            var object = function(){};
+
+            var actual = targetUtil.isObject(object);
+
+            Assert.False(actual);
+        }
+        
+        [Fact]
+        function ReturnsTrueForCustomObject() {
+            var object = targetUtil;
+
+            var actual = targetUtil.isObject(object);
+
+            Assert.True(actual);
+        }
+    }
+
+    [Fixture]
+    function isPlainObject() {
+        [Fact]
+        function ReturnsTrueForEmptyObject() {
+            var object = {};
+
+            var actual = targetUtil.isPlainObject(object);
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueForConstructedObject() {
+            var object = new Object();
+
+            var actual = targetUtil.isPlainObject(object);
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForArray() {
+            var object = [];
+
+            var actual = targetUtil.isPlainObject(object);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForUndefined() {
+            var object = undefined;
+
+            var actual = targetUtil.isPlainObject(object);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForNull() {
+            var object = null;
+
+            var actual = targetUtil.isPlainObject(object);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForArrayLikeObject() {
+            var object = arguments;
+
+            var actual = targetUtil.isPlainObject(object);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForFunction() {
+            var object = function(){};
+
+            var actual = targetUtil.isPlainObject(object);
+
+            Assert.False(actual);
+        }
+        
+        [Fact]
+        function ReturnsFalseForCustomObject() {
+            var object = targetUtil;
+
+            var actual = targetUtil.isPlainObject(object);
+
+            Assert.False(actual);
+        }
+    }
 };

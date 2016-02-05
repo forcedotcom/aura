@@ -178,34 +178,14 @@
                     target = target.evaluate();
                 }
 
-                this.addNamedClickHandler(element, function (event) {
+                this.addNamedClickHandler(element, function () {
                     if (isString && value.indexOf("#") === 0) {
                         $A.run(function () {
                             $A.historyService.set(value.substring(1));
                         });
-                    } else {
-                        // prevent default action for anchors on IE11.
-                        if ($A.get("$Browser").isDesktop &&
-                            window.location.href.indexOf("one.app") !== -1 &&
-                            event.pointerType === "touch") {
-                            return;
-                        }
-
-                        // Make sure that non-hash style hrefs work fine even
-                        // when fast clicking is engaged
-                        window.open(value, target ? target : "_self");
                     }
                 }, this.NAMES.hashHandler);
 
-                /*eslint-disable no-script-url*/
-                var href = "javascript:void(0";
-                if ($A.getContext().getMode() !== "PROD") {
-                    // for testing we need to be able to easily identify
-                    // links from their hrefs
-                    href += "/*" + value + "*/";
-                }
-                href += ");";
-                element.setAttribute("href", href);
             } else if (!$A.util.isUndefinedOrNull(value) && (lowerName === "role" || lowerName.lastIndexOf("aria-", 0) === 0)) {
                 // use setAttribute to render accessibility attributes to markup
                 // do not set the property on the HTMLElement if value is null or undefined to avoid accessibility confusion.

@@ -15,25 +15,37 @@
  */
 package org.auraframework.integration.test.http;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
-import org.auraframework.http.*;
-import org.auraframework.http.services.AuraResourceServletService;
-import org.auraframework.http.services.AuraResourceServletServiceImpl;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.SVGDef;
+import org.auraframework.http.AuraBaseServlet;
+import org.auraframework.http.AuraResourceRewriteFilter;
+import org.auraframework.http.AuraResourceServlet;
+import org.auraframework.http.ManifestUtil;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Client;
 import org.auraframework.system.Client.Type;
+import org.auraframework.system.SourceListener;
 import org.auraframework.test.client.UserAgent;
-import org.auraframework.test.util.*;
+import org.auraframework.test.util.AuraTestCase;
+import org.auraframework.test.util.DummyHttpServletRequest;
+import org.auraframework.test.util.DummyHttpServletResponse;
+import org.auraframework.util.test.util.AuraPrivateAccessor;
 
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
@@ -51,9 +63,10 @@ public class AuraResourceServletTest extends AuraTestCase {
         super(AuraResourceServletTest.class.getName());
     }
 
-//    private void doGet(AuraResourceServlet servlet,  HttpServletRequest request, HttpServletResponse response) throws Exception {
-//        AuraPrivateAccessor.invoke(servlet, "doGet", request, response, null);
-//    }
+    private void doGet(AuraResourceServlet servlet,  HttpServletRequest request, HttpServletResponse response) throws Exception {
+        AuraPrivateAccessor.invoke(servlet, "doGet", request, response);
+    }
+
     
     /**
      * verify we response SC_NOT_FOUND when getting app.manifest where manifest is not enabled
@@ -89,9 +102,8 @@ public class AuraResourceServletTest extends AuraTestCase {
                 return status;
             }
         };
-        //AuraResourceServlet servlet = new AuraResourceServlet();
-        AuraResourceServletService servlet = new AuraResourceServletServiceImpl(Aura.getServletUtilAdapter());
-        servlet.doGet(request, response, null);
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        doGet(servlet, request, response);
         assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
     }
 
@@ -170,9 +182,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         };
         request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, cmporapp);
         HttpServletResponse response = new DummyHttpServletResponse();
-
-        AuraResourceServletService servlet = new AuraResourceServletServiceImpl(Aura.getServletUtilAdapter());
-        servlet.doGet(request, response, null);
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        doGet(servlet, request, response);
 
         final String key = "CSS:" + context.getClient().getType().name().toLowerCase() + "$" + mKey + uid;
         // Verify something was actually added to cache
@@ -213,8 +224,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         };
         request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "app");
         HttpServletResponse response = new DummyHttpServletResponse();
-        AuraResourceServletService servlet = new AuraResourceServletServiceImpl(Aura.getServletUtilAdapter());
-        servlet.doGet(request, response, null);
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        doGet(servlet, request, response);
 
         final String key = "CSS:" + context.getClient().getType().name().toLowerCase() + "$" + mKey + uid;
 
@@ -253,8 +264,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         };
         request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "app");
         HttpServletResponse response = new DummyHttpServletResponse();
-        AuraResourceServletService servlet = new AuraResourceServletServiceImpl(Aura.getServletUtilAdapter());
-        servlet.doGet(request, response, null);
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        doGet(servlet, request, response);
 
         final String key = "JS:" + mKey + uid;
 
@@ -289,8 +300,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         };
         request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
         HttpServletResponse response = new DummyHttpServletResponse();
-        AuraResourceServletService servlet = new AuraResourceServletServiceImpl(Aura.getServletUtilAdapter());
-        servlet.doGet(request, response, null);
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        doGet(servlet, request, response);
 
         final String key = "SVG:" + context.getClient().getType() + "$" + uid;
 
@@ -348,8 +359,8 @@ public class AuraResourceServletTest extends AuraTestCase {
                 return headers.get(name.toLowerCase());
             }
         };
-        AuraResourceServletService servlet = new AuraResourceServletServiceImpl(Aura.getServletUtilAdapter());
-        servlet.doGet(request, response, null);
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        doGet(servlet, request, response);
 
         String etagResponce = response.getHeader("etag");
         assertEquals(etag, etagResponce);
@@ -405,8 +416,8 @@ public class AuraResourceServletTest extends AuraTestCase {
                 status = sc;
             }
         };
-        AuraResourceServletService servlet = new AuraResourceServletServiceImpl(Aura.getServletUtilAdapter());
-        servlet.doGet(request, response, null);
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        doGet(servlet, request, response);
 
         assertEquals(304, response.getStatus());
     }
@@ -445,9 +456,8 @@ public class AuraResourceServletTest extends AuraTestCase {
                 return headers.get(name.toLowerCase());
             }
         };
-        
-        AuraResourceServletService servlet = new AuraResourceServletServiceImpl(Aura.getServletUtilAdapter());
-        servlet.doGet(request, response, null);
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        doGet(servlet, request, response);
 
         assertNotNull("Expected content disposition", response.getHeader("Content-Disposition"));
         assertTrue(response.getHeader("Content-Disposition").contains("attachment; filename"));
@@ -471,8 +481,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         context.addLoaded(appDesc, uid);
         DummyHttpServletRequest request = new DummyHttpServletRequest("app.manifest");
         DummyHttpServletResponse response = new MyDummyHttpServletResponse();
-        AuraResourceServletService servlet = new AuraResourceServletServiceImpl(Aura.getServletUtilAdapter());
-        servlet.doGet(request, response, null);
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        doGet(servlet, request, response);
 
         String content = response.getContentType();
         Pattern pattern = Pattern.compile("/auraFW|/l/");
@@ -503,10 +513,10 @@ public class AuraResourceServletTest extends AuraTestCase {
         context.addLoaded(appDesc, uid);
         DummyHttpServletRequest request = new DummyHttpServletRequest("app.manifest");
         DummyHttpServletResponse response = new MyDummyHttpServletResponse();
-        AuraResourceServletService servlet = new AuraResourceServletServiceImpl(Aura.getServletUtilAdapter());
+        AuraResourceServlet servlet = new AuraResourceServlet();
 
         // Act
-        servlet.doGet(request, response, null);
+        doGet(servlet, request, response);
 
         // Assert
         String content = response.getContentType();

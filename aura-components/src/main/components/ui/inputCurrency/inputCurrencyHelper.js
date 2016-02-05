@@ -67,7 +67,7 @@
         cmp.set('v.lastValue', value);
     },
     getElementInput: function (cmp) {
-        return cmp.getElement().getElementsByTagName('input')[0];
+        return cmp.find("input").getElement();
     },
     setInvalidValueError: function (cmp, value) {
         cmp.set('v.errors', [{

@@ -26,6 +26,52 @@ var SecureThing = (function() {
 		return $A.lockerService.util._getKey(st, $A.lockerService.masterKey);
 	}
 
+	function isDOMElementOrNode(o) {
+		return typeof o === "object" &&
+			((typeof HTMLElement === "object" && o instanceof HTMLElement) ||
+			(typeof Node === "object" && o instanceof Node) ||
+			(typeof o.nodeType === "number" && typeof o.nodeName === "string"));
+  }
+
+	function filterEverything(st, originalValue) {
+		var swallowed;
+		var mutated = false;
+		if (!originalValue) {
+			return originalValue;
+		}
+		if (Array.isArray(originalValue)) {
+			swallowed = [];
+			for (var n = 0; n < originalValue.length; n++) {
+				var newValue = filterEverything(st, originalValue[n]);
+				// TODO: NaN !== NaN
+				swallowed.push(newValue);
+				mutated = mutated || (newValue !== originalValue[n]);
+			}
+		} else if (typeof originalValue === 'object') {
+			if ($A.util.isComponent(originalValue)) {
+				if (!$A.lockerService.util.hasAccess(st, originalValue)) {
+					throw Error("Access denied");
+				}
+				swallowed = $A.lockerService.wrapComponent(originalValue, getKey(st));
+				mutated = originalValue !== swallowed;
+			} else if (isDOMElementOrNode(originalValue)) {
+				swallowed = ($A.lockerService.util.hasAccess(st, originalValue) ? new SecureElement(originalValue, getKey(st)) : new ObscureThing(originalValue, getKey(st)));
+				mutated = true;
+			} else if (getKey(originalValue)) {
+				if (!$A.lockerService.util.hasAccess(st, originalValue)) {
+					throw Error("Access denied");
+				}
+			} else {
+				swallowed = {};
+				for (var prop in originalValue) {
+					swallowed[prop] = filterEverything(st, originalValue[prop]);
+					mutated = mutated || (originalValue[prop] !== swallowed[prop]);
+				}
+			}
+		}
+		return mutated ? swallowed : originalValue;
+	}
+
 	/**
 	 * Construct a new SecureThing.
 	 *
@@ -83,7 +129,8 @@ var SecureThing = (function() {
 		return {
 			value : function() {
 				var thing = primaryThing(this);
-				return this.filterNodes(thing[methodName].apply(thing, arguments));
+				var raw = thing[methodName].apply(thing, arguments);
+				return filterEverything(this, raw);
 			}
 		};
 	};
@@ -93,10 +140,7 @@ var SecureThing = (function() {
 			get : function() {
 				var thing = primaryThing(this);
 				var raw = thing[propertyName];
-				$A.lockerService.util.verifyAccess(this, raw);
-
-				var key = getKey(this);
-				return new SecureElement(raw, key);
+				return filterEverything(this, raw);
 			}
 		};
 	};
@@ -121,29 +165,7 @@ var SecureThing = (function() {
 		};
 	};
 
-	SecureThing.prototype = {
-		filterNodes: function(raw) {
-			if (!raw) {
-				return undefined;
-			}
-
-			var key = getKey(this);
-			if (raw.length !== undefined) {
-				var filtered = [];
-				for (var n = 0; n < raw.length; n++) {
-					var e = raw[n];
-					if ($A.lockerService.util.hasAccess(this, e)) {
-						filtered.push(new SecureElement(e, key));
-					}
-				}
-
-				return filtered;
-			} else {
-				return $A.lockerService.util.hasAccess(this, raw) ? new SecureElement(raw, key) : undefined;
-			}
-		}
-	};
-
+	SecureThing.prototype = {};
 	SecureThing.prototype.constructor = SecureThing;
 
 	return SecureThing;

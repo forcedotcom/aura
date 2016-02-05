@@ -25,8 +25,8 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
-import org.auraframework.def.ImportDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -53,21 +53,21 @@ public class ClientComponentClass {
         superClassName = getFullyQualifiedName(superDescriptor);
     }
 
-    final private String getClassName(DefDescriptor<? extends BaseComponentDef> descriptor) {
+    public static String getClassName(DefDescriptor<? extends BaseComponentDef> descriptor) {
     	if (descriptor == null) {
     		return "$A.Component";
     	}
         return (descriptor.getNamespace() + "$" + descriptor.getName()).replaceAll("-", "_");
     }
 
-    final private String getFullyQualifiedName(DefDescriptor<? extends BaseComponentDef> descriptor) {
+    private String getFullyQualifiedName(DefDescriptor<? extends BaseComponentDef> descriptor) {
     	if (descriptor == null) {
     		return null;
     	}
     	return descriptor.getQualifiedName();
     }
 
-    final private void writeObjects(Appendable out) throws IOException, QuickFixException {
+    private void writeObjects(Appendable out) throws IOException, QuickFixException {
 
     	JsonEncoder json = new JsonEncoder(out, true, false);
         json.writeMapBegin();
@@ -86,12 +86,12 @@ public class ClientComponentClass {
         // and we need to detect those conflicts earlier in the process.
         // At the very least, an intermediary object "ImportDefSet" should
         // encapsulate the collection's peculiarities.
-        List<ImportDef> importDefs = componentDef.getImportDefs();
-        if (importDefs != null && !importDefs.isEmpty()) {
+        List<LibraryDefRef> imports = componentDef.getImports();
+        if (imports != null && !imports.isEmpty()) {
             json.writeMapKey("imports");
             json.writeMapBegin();
-            for (ImportDef importDef : importDefs) {
-            	json.writeMapEntry(importDef.getProperty(), importDef.getLibraryDescriptor().getDescriptorName());
+            for (LibraryDefRef ref : imports) {
+            	json.writeMapEntry(ref.getProperty(), ref.getReferenceDescriptor().getQualifiedName());
             }
             json.writeMapEnd();
         }
@@ -157,7 +157,8 @@ public class ClientComponentClass {
     	out.append("}");
     }
 
-    final public void writeComponentClass(Appendable out) throws QuickFixException, IOException {
+    final public void writeClass(Appendable out) throws QuickFixException, IOException {
+
         String name = getFullyQualifiedName(descriptor);
 
         out.append("$A.componentService.addComponentClass(");

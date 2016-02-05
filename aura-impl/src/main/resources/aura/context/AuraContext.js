@@ -60,7 +60,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
         if(config["libraryDefs"]) {
             defs = config["libraryDefs"];
             for (i = 0; i < defs.length; i++) {
-                $A.componentService.createLibraryDef(defs[i]);
+                $A.componentService.saveLibraryConfig(defs[i]);
             }
         }
 
@@ -261,7 +261,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     if (otherContext["libraryDefs"]) {
         defs = otherContext["libraryDefs"];
         for (i = 0; i < defs.length; i++) {
-            $A.componentService.createLibraryDef(defs[i]);
+            $A.componentService.saveLibraryConfig(defs[i]);
         }
     }
 

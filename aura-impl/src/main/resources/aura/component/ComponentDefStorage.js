@@ -210,39 +210,26 @@ ComponentDefStorage.prototype.restoreAll = function() {
             function(items) {
                 // if any decode fails the dependency graph may be broken. therefore decode all items
                 // prior to inserting them.
-                var libConfigs = [];
-                var cmpConfigs = [];
-                var i;
+                var libCount = 0;
+                var cmpCount = 0;
 
                 // decode all items
-                for (i = 0; i < items.length; i++) {
-                    var value = items[i]["value"];
-                    if (value["includes"]) {
-                        var includesEncoded = {};
-                        for (var key in value["includes"]) {
-                           includesEncoded[key] = $A.util.json.decode(value["includes"][key]);
-                           if (includesEncoded[key] === null) {
-                               throw new Error("Error decoding library definition from storage: " + value["descriptor"]);
-                           }
+                for (var i = 0; i < items.length; i++) {
+                    var config = items[i]["value"];
+                    if (config["includes"]) {
+                        if (!$A.componentService.hasLibrary(config["descriptor"])) {
+                            $A.componentService.saveLibraryConfig(config);
                         }
-                        value["includes"] = includesEncoded;
-                        libConfigs.push(value);
+                        libCount++;
                     } else {
-                        cmpConfigs.push(value);
+                        if (!$A.componentService.hasDefinition(config["descriptor"])) {
+                            $A.componentService.saveComponentConfig(config);
+                        }
+                        cmpCount++;
                     }
                 }
 
-                // decode successful for all items so insert definitions
-                for (i = 0; i < libConfigs.length; i++) {
-                    $A.componentService.createLibraryDef(libConfigs[i]);
-                }
-                for (i = 0; i < cmpConfigs.length; i++) {
-                    if (!$A.componentService.hasDefinition(cmpConfigs[i]["descriptor"])) {
-                        $A.componentService.saveComponentConfig(cmpConfigs[i]);
-                    }
-                }
-
-                $A.log("ComponentDefStorage: restored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries from storage into registry");
+                $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries from storage into registry");
                 defRegistry.currentPromise = null;
             }
         ).then(

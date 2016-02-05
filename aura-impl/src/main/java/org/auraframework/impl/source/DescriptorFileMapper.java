@@ -223,25 +223,27 @@ public class DescriptorFileMapper {
             name = AuraTextUtil.splitSimple("$", name).get(0);
             return String.format("%s/%s.%s", namespace.replace(".", separator), name, descriptor.getPrefix());
         }
-        switch (ei.nameFormat) {
-        case BUNDLED_EXTRA:
-            if (bundle == null) {
-                // whoops.
-                throw new AuraRuntimeException("Invalid " + descriptor + "@" + descriptor.getDefType() + " with ei="
-                        + ei);
-            }
-            return String.format("%s%s%s%s%s%s", namespace, separator, bundle.getName(), separator, name,
-                    ei.extension);
-        case BUNDLE:
-            if (bundle != null) {
-                // whoops.
-                throw new AuraRuntimeException("Invalid " + descriptor + "@" + descriptor.getDefType() + " with ei="
-                        + ei);
-            }
-            // Alongside knowing the extension, we also know that namespace+name is a directory,
-            // and name+ext is the file inside that directory:
-            return String.format("%s%s%s%s%s%s", namespace, separator, name, separator, name, ei.extension);
-        }
+    	if (ei != null) {
+	        switch (ei.nameFormat) {
+	        case BUNDLED_EXTRA:
+	            if (bundle == null) {
+	                // whoops.
+	                throw new AuraRuntimeException("Invalid " + descriptor + "@" + descriptor.getDefType() + " with ei="
+	                        + ei);
+	            }
+	            return String.format("%s%s%s%s%s%s", namespace, separator, bundle.getName(), separator, name,
+	                    ei.extension);
+	        case BUNDLE:
+	            if (bundle != null) {
+	                // whoops.
+	                throw new AuraRuntimeException("Invalid " + descriptor + "@" + descriptor.getDefType() + " with ei="
+	                        + ei);
+	            }
+	            // Alongside knowing the extension, we also know that namespace+name is a directory,
+	            // and name+ext is the file inside that directory:
+	            return String.format("%s%s%s%s%s%s", namespace, separator, name, separator, name, ei.extension);
+	        }
+    	}
         throw new AuraRuntimeException("Could not get path for " + descriptor + "@" + descriptor.getDefType()
                 + " with ei=" + ei);
     }

@@ -18,17 +18,27 @@ package org.auraframework.def;
 import java.util.List;
 
 public interface IncludeDefRef extends Definition {
-    /**
-     * Gets the included library's dependencies.
-     * @return the imported dependency list.
+
+	DefDescriptor<IncludeDef> getReferenceDescriptor();
+
+	/**
+     * Gets the list of imports.
+     * 
+     * @return the client descriptor.
      */
-    List<DefDescriptor<IncludeDef>> getImports();
-    
-    /**
-     * Gets the variable wrapped and exported by the library.
-     * @return the exported variable name.
+	List<DefDescriptor<IncludeDef>> getImports();
+
+	/**
+     * Gets the list of JavaScript identifiers to alias the imports inside the module.
+     * 
+     * @return the list of aliases identifiers.
      */
-    String getExport();
-    
-    DefDescriptor<IncludeDef> getIncludeDescriptor();
+	List<String> getAliases();
+
+	/**
+     * Gets the JavaScript identifier return from the module.
+     * 
+     * @return the export identifier.
+     */
+	String getExport();
 }

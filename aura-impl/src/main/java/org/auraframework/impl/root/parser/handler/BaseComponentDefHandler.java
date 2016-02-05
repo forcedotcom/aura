@@ -193,8 +193,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             builder.events.put(regDef.getAttributeName(), regDef);
         } else if (EventHandlerDefHandler.TAG.equalsIgnoreCase(tag)) {
             builder.eventHandlers.add(new EventHandlerDefHandler(this, xmlReader, source).getElement());
-        } else if (ImportDefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.imports.add(new ImportDefHandler(this, xmlReader, source).getElement());
+        } else if (LibraryDefRefHandler.TAG.equalsIgnoreCase(tag)) {
+            builder.imports.add(new LibraryDefRefHandler(this, xmlReader, source).getElement());
         } else if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
             builder.facets.add(new AttributeDefRefHandler<>(this, xmlReader, source).getElement());
         } else if (DependencyDefHandler.TAG.equalsIgnoreCase(tag)) {

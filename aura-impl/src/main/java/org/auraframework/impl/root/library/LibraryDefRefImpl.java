@@ -20,28 +20,25 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDef;
-import org.auraframework.def.ImportDef;
-import org.auraframework.def.RootDefinition;
-import org.auraframework.impl.root.parser.handler.ImportDefHandler;
+import org.auraframework.def.LibraryDefRef;
+import org.auraframework.impl.root.parser.handler.LibraryDefRefHandler;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
-public class ImportDefImpl extends DefinitionImpl<LibraryDef> implements ImportDef {
+public class LibraryDefRefImpl extends DefinitionImpl<LibraryDef> implements LibraryDefRef {
     private static final long serialVersionUID = 8916829297107001915L;
-    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
     private final String property;
 
-    protected ImportDefImpl(Builder builder) {
+    protected LibraryDefRefImpl(Builder builder) {
         super(builder);
-        this.parentDescriptor = builder.parentDescriptor;
         this.property = builder.property;
     }
 
     @Override
-    public DefDescriptor<LibraryDef> getLibraryDescriptor() {
+    public DefDescriptor<LibraryDef> getReferenceDescriptor() {
         return descriptor;
     }
 
@@ -60,18 +57,13 @@ public class ImportDefImpl extends DefinitionImpl<LibraryDef> implements ImportD
     @Override
     public void validateDefinition() throws QuickFixException {
         if (AuraTextUtil.isNullEmptyOrWhitespace(property)) {
-            throw new InvalidDefinitionException(String.format("%s missing property attribute", ImportDefHandler.TAG),
+            throw new InvalidDefinitionException(String.format("%s missing property attribute", LibraryDefRefHandler.TAG),
                     getLocation());
         }
         if(!AuraTextUtil.isValidJsIdentifier(property)){
             throw new InvalidDefinitionException(String.format(
-                    "%s 'property' attribute must be valid javascript identifier", ImportDefHandler.TAG), getLocation());
+                    "%s 'property' attribute must be valid javascript identifier", LibraryDefRefHandler.TAG), getLocation());
         }
-    }
-
-    @Override
-    public void validateReferences() throws QuickFixException {
-        assert (parentDescriptor != null);
     }
 
     @Override
@@ -86,28 +78,23 @@ public class ImportDefImpl extends DefinitionImpl<LibraryDef> implements ImportD
         }
     }
 
-    public static class Builder extends DefinitionImpl.RefBuilderImpl<LibraryDef, ImportDefImpl> {
+    public static class Builder extends DefinitionImpl.RefBuilderImpl<LibraryDef, LibraryDefRef> {
+
+        private String property;
 
         public Builder() {
             super(LibraryDef.class);
-        }
-
-        private DefDescriptor<? extends RootDefinition> parentDescriptor;
-        private String property;
-
-        @Override
-        public ImportDefImpl build() {
-            return new ImportDefImpl(this);
-        }
-
-        public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
-            this.parentDescriptor = parentDescriptor;
-            return this;
         }
 
         public Builder setProperty(String property) {
             this.property = property;
             return this;
         }
+
+        @Override
+        public LibraryDefRefImpl build() {
+            return new LibraryDefRefImpl(this);
+        }
+
     }
 }

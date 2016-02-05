@@ -22,9 +22,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.LibraryDef;
+import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.impl.root.library.ImportDefImpl;
+import org.auraframework.impl.root.library.LibraryDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -33,7 +35,7 @@ import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
-public class ImportDefHandler extends XMLHandler<ImportDefImpl> {
+public class LibraryDefRefHandler extends XMLHandler<LibraryDefRef> {
 
     public static final String TAG = "aura:import";
 
@@ -44,32 +46,33 @@ public class ImportDefHandler extends XMLHandler<ImportDefImpl> {
             RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
     private RootTagHandler<? extends RootDefinition> parentHandler;
-    private final ImportDefImpl.Builder builder = new ImportDefImpl.Builder();
+    private final LibraryDefRefImpl.Builder builder = new LibraryDefRefImpl.Builder();
 
-    public ImportDefHandler() {
+    public LibraryDefRefHandler() {
         super();
     }
 
-    public ImportDefHandler(RootTagHandler<? extends RootDefinition> parentHandler, XMLStreamReader xmlReader,
+    public LibraryDefRefHandler(RootTagHandler<? extends RootDefinition> parentHandler, XMLStreamReader xmlReader,
             Source<?> source) {
         super(xmlReader, source);
         this.parentHandler = parentHandler;
     }
 
     @Override
-    public ImportDefImpl getElement() throws XMLStreamException, QuickFixException {
+    public LibraryDefRef getElement() throws XMLStreamException, QuickFixException {
         validateAttributes();
 
-        DefDescriptor<? extends RootDefinition> defDescriptor = parentHandler.getDefDescriptor();
-        builder.setParentDescriptor(defDescriptor);
+        DefDescriptor<? extends RootDefinition> parentDescriptor = parentHandler.getDefDescriptor();
+        if (parentDescriptor.getDefType() != DefType.APPLICATION && parentDescriptor.getDefType() != DefType.COMPONENT) {
+            throw new InvalidDefinitionException("aura:import may only be set in an application or a component.", getLocation());
+        }
         builder.setLocation(getLocation());
 
         String library = getAttributeValue(ATTRIBUTE_LIBRARY);
         if (AuraTextUtil.isNullEmptyOrWhitespace(library)) {
             throw new InvalidDefinitionException(String.format("%s missing library attribute", TAG), getLocation());
         }
-        DefDescriptor<LibraryDef> descriptor = DefDescriptorImpl.getInstance(library.trim(), LibraryDef.class);
-        builder.setDescriptor(descriptor);
+        builder.setDescriptor(DefDescriptorImpl.getInstance(library.trim(), LibraryDef.class));
 
         String property = getAttributeValue(ATTRIBUTE_PROPERTY);
         if (AuraTextUtil.isNullEmptyOrWhitespace(property)) {

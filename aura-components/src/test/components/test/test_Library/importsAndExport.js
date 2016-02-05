@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var imports = Array.prototype.slice.call(arguments, 0);
 var anExport = function() {
 	var ret = "EXPORTED_IMPORT:";
-	for(var i=0; i<imports.length; i++){
-		ret = ret + (imports[i] && imports[i]()) + "|";
-	}
+	ret = ret + (importedBasicFirst && importedBasicFirst()) + "|";
 	return ret;
 }

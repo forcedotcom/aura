@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 function lib() {
-	var imports = Array.prototype.slice.call(arguments, 0);
-    return function() {
+	return function() {
     	var ret = "MULTIPLE:";
-    	for(var i=0; i<imports.length; i++){
-    		ret = ret + (imports[i] && imports[i]()) + "|";
-    	}
+    	ret = ret + (importedBasicFirst && importedBasicFirst()) + "|";
+    	ret = ret + (importedBasicSecond && importedBasicSecond()) + "|";
+    	ret = ret + (importedUndefined && importedUndefined()) + "|";
     	return ret;
     }
-}
+};
+
+var anExport = new lib();

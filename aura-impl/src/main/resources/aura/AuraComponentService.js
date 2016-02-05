@@ -26,8 +26,9 @@ function AuraComponentService () {
     this.controllerDefRegistry  = {};
     this.actionDefRegistry      = {};
     this.modelDefRegistry       = {};
-    this.libraryDefRegistry     = new Aura.Library.LibraryDefRegistry(); // To abstract lib logic
-    this.componentClassRegistry = new Aura.Component.ComponentClassRegistry(); // To abstract class logic
+    this.libraryRegistry        = new Aura.Library.LibraryRegistry();
+    this.libraryIncludeRegistry = new Aura.Library.LibraryIncludeRegistry();
+    this.componentClassRegistry = new Aura.Component.ComponentClassRegistry();
     this.componentDefStorage    = new Aura.Component.ComponentDefStorage();
 
     // holds ComponentDef configs to be created
@@ -1026,23 +1027,57 @@ AuraComponentService.prototype.createModelDef = function(config) {
 };
 
 /**
- * Gets library from the registry.
- * @param {String} descriptor library descriptor
- * @returns {Object} library from registry
- * @private
+ * Detects if the library exists without actually defining it.
+ * @param {String} descriptor The qualified name of the library in the form markup://namespace:library
  */
-AuraComponentService.prototype.getLibraryDef = function(descriptor) {
-    return this.libraryDefRegistry.getDef(descriptor);
+AuraComponentService.prototype.hasLibrary = function(descriptor) {
+    return this.libraryRegistry.hasLibrary(descriptor);
 };
 
 /**
- * Creates and returns library
- * @param {Object} config config for library
- * @returns {Object} library from registry
+ * Stores a library definition.
+ * @param {Object} config component definition config
+ * @export
+ */
+AuraComponentService.prototype.saveLibraryConfig = function(config) {
+    this.libraryRegistry.addLibrary(config["descriptor"], config["includes"]);
+
+    // Initialize the concrete include classes if provided
+    if (config.hasOwnProperty("includeClasses")) {
+        var includeClasses = $A.util.json.decode(config["includeClasses"]);
+        includeClasses();
+    }
+};
+
+/**
+ * Get a library from the registry.
+ * @param {String} descriptor library descriptor.
+ * @returns {Object} library from registry.
  * @private
  */
-AuraComponentService.prototype.createLibraryDef = function(config) {
-    return this.libraryDefRegistry.createDef(config);
+AuraComponentService.prototype.getLibrary = function(descriptor) {
+    return this.libraryRegistry.getLibrary(descriptor);
+};
+
+/**
+ * Store a library include.
+ * @param {String} descriptor name of the include.
+ * @param {Array} dependencies The list of dependencies (other includes).
+ * @param {Function} exporter A function that when executed will return the include object.
+ * @export
+ */
+AuraComponentService.prototype.addLibraryInclude = function(descriptor, dependencies, exporter) {
+    this.libraryIncludeRegistry.addLibraryInclude(descriptor, dependencies, exporter);
+};
+
+/**
+ * Get a library include from the registry.
+ * @param {String} descriptor in the form markup://namespace:include.
+ * @returns Either the instance of the include you are requesting, or undefined if not found.
+ * @private
+ */
+AuraComponentService.prototype.getLibraryInclude = function(descriptor) {
+    return this.libraryIncludeRegistry.getLibraryInclude(descriptor);
 };
 
 /**

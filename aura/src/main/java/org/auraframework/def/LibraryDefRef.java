@@ -15,7 +15,13 @@
  */
 package org.auraframework.def;
 
-public interface ImportDef extends Definition {
-    DefDescriptor<LibraryDef> getLibraryDescriptor();
+public interface LibraryDefRef extends Definition {
+	
+    DefDescriptor<LibraryDef> getReferenceDescriptor();
+
+    /**
+     * Returns the property name declared on the helper to link the library.
+     * @return {@link String} the property name.
+     */
 	String getProperty();
 }

@@ -47,7 +47,7 @@ import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.HelperDef;
-import org.auraframework.def.ImportDef;
+import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.MethodDef;
 import org.auraframework.def.ModelDef;
@@ -114,7 +114,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     private final Map<String, RegisterEventDef> events;
     private final List<EventHandlerDef> eventHandlers;
     private final Map<DefDescriptor<MethodDef>,MethodDef> methodDefs;
-    private final List<ImportDef> imports;
+    private final List<LibraryDefRef> imports;
     private final List<AttributeDefRef> facets;
     private final Set<PropertyReference> expressionRefs;
 
@@ -223,7 +223,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             def.validateDefinition();
         }
 
-        for (ImportDef def : imports) {
+        for (LibraryDefRef def : imports) {
             def.validateDefinition();
         }
 
@@ -478,7 +478,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             def.validateReferences();
         }
 
-        for (ImportDef def : imports) {
+        for (LibraryDefRef def : imports) {
             def.validateReferences();
         }
 
@@ -624,7 +624,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
 
         if (imports != null && !imports.isEmpty()) {
-            for (ImportDef imported : imports) {
+            for (LibraryDefRef imported : imports) {
                 dependencies.add(imported.getDescriptor());
             }
         }
@@ -710,7 +710,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
      * @throws QuickFixException
      */
     @Override
-    public List<ImportDef> getImportDefs() throws QuickFixException {
+    public List<LibraryDefRef> getImports() throws QuickFixException {
         return imports;
     }
 
@@ -951,36 +951,23 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     /**
-     * Gets all the component class definitions for this component definition.
-     * Returns a string of all the client component classes wrapped in a closure for later execution.
+     * Gets the component class for this component definition and all its parents, except for aura:component.
      */
     @Override
     public String getComponentClass() throws QuickFixException, IOException {
 
-        if(this.clientComponentClass == null) {
+        if(clientComponentClass == null) {
             final StringBuilder sb = new StringBuilder();
-            BaseComponentDef descriptor = this;
-            String name = null;
-            ClientComponentClass clientClass;
 
             sb.append("function(){");
-            while(!"markup://aura:component".equals(name)) {
-                clientClass = new ClientComponentClass(descriptor);
-                clientClass.writeComponentClass(sb);
-
-                if(descriptor.getExtendsDescriptor() == null) {
-                    break;
-                }
-
-                descriptor = descriptor.getExtendsDescriptor().getDef();
-                name = descriptor.getDescriptor().getQualifiedName();
-            }
+        	ClientComponentClass clientClass = new ClientComponentClass(this);
+            clientClass.writeClass(sb);
             sb.append('}');
 
-            this.clientComponentClass = sb.toString();
+            clientComponentClass = sb.toString();
         }
 
-        return this.clientComponentClass;
+        return clientComponentClass;
     }
 
     public boolean hasServerAction(ControllerDef controllerDef) {
@@ -1058,7 +1045,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                     json.writeMapEntry("handlerDefs", handlers);
                 }
 
-                Collection<ImportDef> imports = getImportDefs();
+                Collection<LibraryDefRef> imports = getImports();
                 if (!imports.isEmpty()) {
                     json.writeMapEntry("imports", imports);
                 }
@@ -1098,23 +1085,8 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                     json.writeMapEntry("dynamicallyFlavorable", dynamicallyFlavorable);
                 }
 
-                if(!context.getDefRegistry().getComponentClassLoaded(descriptor)) {
-                    // KRIS:
-                    // This needs to be conditional. We can't just return the component class each time.
-                    // We do still return this componentdef object even if we already have the component class.
-                    // This is because this still has a lot of logic not genereated as part of the component class.
-                    // I see no reason we can't do that, but we just haven't yet.
-
-                    // we don't want componentClass component def returned ever.
-                    // stash the current context containing mdr without componentClass component def
-                    Aura.getContextService().pushSystemContext();
-                    try {
-                        // this will add componentClass def to temp context
-                        json.writeMapEntry("componentClass", getComponentClass());
-                    } finally {
-                        // retrieve our original context without componentClass
-                        Aura.getContextService().popSystemContext();
-                    }
+                if(!context.getDefRegistry().getClientClassLoaded(descriptor)) {
+                    json.writeMapEntry("componentClass", getComponentClass());
                 }
 
                 serializeFields(json);
@@ -1336,7 +1308,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         public Map<DefDescriptor<MethodDef>, MethodDef> methodDefs;
         public Map<String, RegisterEventDef> events;
         public List<EventHandlerDef> eventHandlers;
-        public List<ImportDef> imports;
+        public List<LibraryDefRef> imports;
         public Set<PropertyReference> expressionRefs;
         public String render;
         public WhitespaceBehavior whitespaceBehavior;

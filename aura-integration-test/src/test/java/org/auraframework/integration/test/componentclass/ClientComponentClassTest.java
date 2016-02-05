@@ -26,7 +26,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
-import org.auraframework.def.ImportDef;
+import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
@@ -53,7 +53,7 @@ public class ClientComponentClassTest extends AuraImplTestCase {
         when(mockCmpDescriptor.getQualifiedName()).thenReturn("markup://test:testComponent");
     }
 
-    public void testWriteComponentClassForPlainComponent() throws Exception {
+    public void testwriteClassForPlainComponent() throws Exception {
         DefDescriptor<ComponentDef> cmpDescriptor =
                 addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
 
@@ -65,12 +65,12 @@ public class ClientComponentClassTest extends AuraImplTestCase {
         StringBuilder sb = new StringBuilder();
         ClientComponentClass componentClass = new ClientComponentClass(spyCmpDef);
 
-        componentClass.writeComponentClass(sb);
+        componentClass.writeClass(sb);
 
         this.goldFileText(sb.toString());
     }
 
-    public void testWriteComponentClassForComponentWithClientController() throws Exception {
+    public void testwriteClassForComponentWithClientController() throws Exception {
         DefDescriptor<ComponentDef> cmpDescriptor =
                 addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
         DefDescriptor<ControllerDef> controllerDescriptor =
@@ -89,12 +89,12 @@ public class ClientComponentClassTest extends AuraImplTestCase {
         StringBuilder sb = new StringBuilder();
         ClientComponentClass componentClass = new ClientComponentClass(spyCmpDef);
 
-        componentClass.writeComponentClass(sb);
+        componentClass.writeClass(sb);
 
         this.goldFileText(sb.toString());
     }
 
-    public void testWriteComponentClassForComponentWithHelper() throws Exception {
+    public void testwriteClassForComponentWithHelper() throws Exception {
         DefDescriptor<ComponentDef> cmpDescriptor =
                 addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
         DefDescriptor<HelperDef> helperDescriptor =
@@ -113,12 +113,12 @@ public class ClientComponentClassTest extends AuraImplTestCase {
         StringBuilder sb = new StringBuilder();
         ClientComponentClass componentClass = new ClientComponentClass(spyCmpDef);
 
-        componentClass.writeComponentClass(sb);
+        componentClass.writeClass(sb);
 
         this.goldFileText(sb.toString());
     }
 
-    public void testWriteComponentClassForComponentWithClientProvider() throws Exception {
+    public void testwriteClassForComponentWithClientProvider() throws Exception {
         DefDescriptor<ComponentDef> cmpDescriptor =
                 getAuraTestingUtil().createStringSourceDescriptor(null, ComponentDef.class, null);
         DefDescriptor<?> providerDesc =
@@ -140,12 +140,12 @@ public class ClientComponentClassTest extends AuraImplTestCase {
         StringBuilder sb = new StringBuilder();
         ClientComponentClass componentClass = new ClientComponentClass(spyCmpDef);
 
-        componentClass.writeComponentClass(sb);
+        componentClass.writeClass(sb);
 
         this.goldFileText(sb.toString());
     }
 
-    public void testWriteComponentClassForComponentWithClientRenderer() throws Exception {
+    public void testwriteClassForComponentWithClientRenderer() throws Exception {
         DefDescriptor<ComponentDef> cmpDescriptor =
                 addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
         DefDescriptor<RendererDef> rendererDescriptor =
@@ -164,12 +164,12 @@ public class ClientComponentClassTest extends AuraImplTestCase {
         StringBuilder sb = new StringBuilder();
         ClientComponentClass componentClass = new ClientComponentClass(spyCmpDef);
 
-        componentClass.writeComponentClass(sb);
+        componentClass.writeClass(sb);
 
         this.goldFileText(sb.toString());
     }
 
-    public void testWriteComponentClassForComponentWithClientEmptyRenderer() throws Exception {
+    public void testwriteClassForComponentWithClientEmptyRenderer() throws Exception {
         DefDescriptor<ComponentDef> cmpDescriptor =
                 addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
         DefDescriptor<RendererDef> rendererDescriptor =
@@ -183,44 +183,44 @@ public class ClientComponentClassTest extends AuraImplTestCase {
         StringBuilder sb = new StringBuilder();
         ClientComponentClass componentClass = new ClientComponentClass(spyCmpDef);
 
-        componentClass.writeComponentClass(sb);
+        componentClass.writeClass(sb);
 
         this.goldFileText(sb.toString());
     }
 
     @SuppressWarnings("unchecked")
-    public void testWriteComponentClassForComponentImportsLib() throws Exception {
+    public void testwriteClassForComponentImportsLib() throws Exception {
         DefDescriptor<ComponentDef> cmpDescriptor =
                 addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
         DefDescriptor<LibraryDef> libraryDescriptor = mock(DefDescriptor.class);
         when(libraryDescriptor.getDescriptorName()).thenReturn("test:testLibrary");
 
         // so far, we only add library's meta info to component class. Mock the ImportDefs.
-        List<ImportDef> importDefs = new ArrayList<>();
-        ImportDef mockImportDef1 = mock(ImportDef.class);
+        List<LibraryDefRef> importDefs = new ArrayList<>();
+        LibraryDefRef mockImportDef1 = mock(LibraryDefRef.class);
         when(mockImportDef1.getProperty()).thenReturn("myLib1");
-        when(mockImportDef1.getLibraryDescriptor()).thenReturn(libraryDescriptor);
+        when(mockImportDef1.getReferenceDescriptor()).thenReturn(libraryDescriptor);
         importDefs.add(mockImportDef1);
 
-        ImportDef mockImportDef2 = mock(ImportDef.class);
+        LibraryDefRef mockImportDef2 = mock(LibraryDefRef.class);
         when(mockImportDef2.getProperty()).thenReturn("myLib2");
-        when(mockImportDef2.getLibraryDescriptor()).thenReturn(libraryDescriptor);
+        when(mockImportDef2.getReferenceDescriptor()).thenReturn(libraryDescriptor);
         importDefs.add(mockImportDef2);
 
         ComponentDef spyCmpDef =spy(definitionService.getDefinition(cmpDescriptor));
         when(spyCmpDef.getDescriptor()).thenReturn(mockCmpDescriptor);
-        when(spyCmpDef.getImportDefs()).thenReturn(importDefs);
+        when(spyCmpDef.getImports()).thenReturn(importDefs);
 
         StringBuilder sb = new StringBuilder();
         ClientComponentClass componentClass = new ClientComponentClass(spyCmpDef);
 
-        componentClass.writeComponentClass(sb);
+        componentClass.writeClass(sb);
 
         this.goldFileText(sb.toString());
     }
 
     @SuppressWarnings("unchecked")
-    public void testWriteComponentClassForComponentExtendingOtherComponent() throws Exception {
+    public void testwriteClassForComponentExtendingOtherComponent() throws Exception {
         DefDescriptor<ComponentDef> cmpDescriptor =
                 addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
 
@@ -235,7 +235,7 @@ public class ClientComponentClassTest extends AuraImplTestCase {
         StringBuilder sb = new StringBuilder();
         ClientComponentClass componentClass = new ClientComponentClass(spyCmpDef);
 
-        componentClass.writeComponentClass(sb);
+        componentClass.writeClass(sb);
 
         this.goldFileText(sb.toString());
     }

@@ -78,7 +78,6 @@ AuraRenderingService.prototype.render = function(components, parent) {
             // a non-opt when trying to unwrap.
             renderedElements=$A.lockerService.unwrap(renderedElements);
             renderedElements=this.finishRender(cmp, renderedElements);
-
             elements = elements.concat(renderedElements);
         }
     }

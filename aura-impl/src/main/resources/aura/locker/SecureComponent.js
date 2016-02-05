@@ -32,39 +32,48 @@ var SecureComponent = (function() {
     SecureThing.call(this, referencingKey, "component");
 
     this._set("component", component, $A.lockerService.masterKey);
+
+    // The shape of the component depends on the methods exposed in the definitions:
+    var defs = component.getDef().methodDefs;
+    if (defs) {
+      defs.forEach(function (method) {
+        Object.defineProperty(this, method.name, SecureThing.createFilteredMethod(method.name));
+      }, this);
+    }
   }
 
   SecureComponent.prototype = Object.create(SecureThing.prototype, {
     toString: {
       value : function() {
-        return "SecureComponent: " + getComponent(this) + "{ referencingKey: " + JSON.stringify($A.lockerService.util._getKey(this, $A.lockerService.masterKey)) + " }";
+        return "SecureComponent: " + getComponent(this) + "{ referencingKey: " + getKey(this) + " }";
       }
     },
 
-		"superRender": SecureThing.createFilteredMethod("superRender"),
-		"superAfterRender": SecureThing.createPassThroughMethod("superAfterRender"),
-		"superRerender": SecureThing.createFilteredMethod("superRerender"),
-		"superUnrender": SecureThing.createFilteredMethod("superUnrender"),
+    // these four super* methods are exposed as a temporary solution until we figure how to re-arrange the render flow
+    "superRender": SecureThing.createFilteredMethod("superRender"),
+    "superAfterRender": SecureThing.createPassThroughMethod("superAfterRender"),
+    "superRerender": SecureThing.createFilteredMethod("superRerender"),
+    "superUnrender": SecureThing.createFilteredMethod("superUnrender"),
 
     "isValid": SecureThing.createPassThroughMethod("isValid"),
-		"isInstanceOf": SecureThing.createPassThroughMethod("isInstanceOf"),
-		"addHandler": SecureThing.createPassThroughMethod("addHandler"),
-		"destroy": SecureThing.createPassThroughMethod("destroy"),
-		"isRendered": SecureThing.createPassThroughMethod("isRendered"),
-		"getGlobalId": SecureThing.createPassThroughMethod("getGlobalId"),
-		"getLocalId": SecureThing.createPassThroughMethod("getLocalId"),
-		"getSuper": SecureThing.createFilteredMethod('getSuper'),
+    "isInstanceOf": SecureThing.createPassThroughMethod("isInstanceOf"),
+    "addHandler": SecureThing.createPassThroughMethod("addHandler"),
+    "destroy": SecureThing.createPassThroughMethod("destroy"),
+    "isRendered": SecureThing.createPassThroughMethod("isRendered"),
+    "getGlobalId": SecureThing.createPassThroughMethod("getGlobalId"),
+    "getLocalId": SecureThing.createPassThroughMethod("getLocalId"),
+    "getSuper": SecureThing.createFilteredMethod('getSuper'),
     "getReference": SecureThing.createFilteredMethod("getReference"),
-		"clearReference": SecureThing.createPassThroughMethod("clearReference"),
-		"autoDestroy": SecureThing.createPassThroughMethod("autoDestroy"),
-		"isConcrete": SecureThing.createPassThroughMethod("isConcrete"),
-		"addValueProvider": SecureThing.createPassThroughMethod("addValueProvider"),
+    "clearReference": SecureThing.createPassThroughMethod("clearReference"),
+    "autoDestroy": SecureThing.createPassThroughMethod("autoDestroy"),
+    "isConcrete": SecureThing.createPassThroughMethod("isConcrete"),
+    "addValueProvider": SecureThing.createPassThroughMethod("addValueProvider"),
     "getConcreteComponent": SecureThing.createFilteredMethod('getConcreteComponent'),
-		"find": SecureThing.createFilteredMethod('find'),
-		"set": SecureThing.createFilteredMethod("set"),
+    "find": SecureThing.createFilteredMethod('find'),
+    "set": SecureThing.createFilteredMethod("set"),
     "get": SecureThing.createFilteredMethod("get"),
     "getElement": SecureThing.createFilteredMethod("getElement"),
-		"getElements": SecureThing.createFilteredMethod("getElements"),
+    "getElements": SecureThing.createFilteredMethod("getElements"),
     "getEvent": {
       value: function(name) {
         // system call to collect the low level aura event

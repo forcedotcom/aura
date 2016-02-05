@@ -45,6 +45,12 @@ Test.Components.Ui.PanelPositioning.panelPositioningTest=function(){
 		return Mocks.GetMock(Object.Global(),'Constraint', cb);
 	}
 
+	var mockUtils = {
+		getScrollableParent: function() {
+			return null;
+		}
+	};
+
 	// just return it for inspection
 	var elementProxyFactory =  {
 		getElement: function(el) {
@@ -72,7 +78,7 @@ Test.Components.Ui.PanelPositioning.panelPositioningTest=function(){
 				constMock(function() {
 					constraint.Constraint = Constraint;
 					var myLib;
-					myLib = lib(constraint, elementProxyFactory, mockWindow);
+					myLib = lib(constraint, elementProxyFactory, mockUtils, mockWindow);
 
 					var actual = myLib.createRelationship({
 						element:{
@@ -103,7 +109,7 @@ Test.Components.Ui.PanelPositioning.panelPositioningTest=function(){
 				constMock(function() {
 					constraint.Constraint = Constraint;
 					var myLib;
-					myLib = lib(constraint, elementProxyFactory, mockWindow);
+					myLib = lib(constraint, elementProxyFactory, mockUtils, mockWindow);
 					
 					var actual=Record.Exception(function(){
 						var retObj = myLib.createRelationship({
@@ -135,7 +141,7 @@ Test.Components.Ui.PanelPositioning.panelPositioningTest=function(){
 				constMock(function() {
 					constraint.Constraint = Constraint;
 					var myLib;
-					myLib = lib(constraint, elementProxyFactory, mockWindow);
+					myLib = lib(constraint, elementProxyFactory, mockUtils, mockWindow);
 					
 					var actual=Record.Exception(function(){
 						var retObj = myLib.createRelationship({

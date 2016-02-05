@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function lib(constraint, elementProxyFactory, win) { //eslint-disable-line no-unused-vars
+function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-line no-unused-vars
     'use strict';
 
     var ALIGN_REGEX = /^(left|right|center)\s(top|bottom|center)$/;
@@ -29,6 +29,7 @@ function lib(constraint, elementProxyFactory, win) { //eslint-disable-line no-un
     var constraints = [];
 
     var timeoutHandler = null;
+    
 
     var directionMap = {
         vert: {
@@ -47,6 +48,7 @@ function lib(constraint, elementProxyFactory, win) { //eslint-disable-line no-un
     function isDomNode(obj) {
         return obj.nodeType && (obj.nodeType === 1 || obj.nodeType === 11);
     }
+
 
 
 
@@ -96,7 +98,6 @@ function lib(constraint, elementProxyFactory, win) { //eslint-disable-line no-un
         if(!timeoutHandler) {
             timeoutHandler = setTimeout(reposition, 10);
         }
-
     }
 
     function bindEvents() {
@@ -146,7 +147,28 @@ function lib(constraint, elementProxyFactory, win) { //eslint-disable-line no-un
             }
 
             var constraintList = [];
+            var handleWheel;
+            var scrollableParent = utils.getScrollableParent(config.target, win);
 
+            if(scrollableParent) {
+                // because this always uses the same listener function
+                // it will not be added multiple times to the same element
+                scrollableParent.addEventListener('scroll', handleRepositionEvents);
+
+                // if the target element is inside a 
+                // scrollable element, we need to make sure
+                // scroll events move that element,
+                // not the parent, also we need to reposition on scroll
+                handleWheel = function(e) {
+                    if(scrollableParent && typeof scrollableParent.scrollTop !== 'undefined') {
+                        scrollableParent.scrollTop += e.deltaY;
+                    }
+                };
+
+                config.element.addEventListener('wheel', handleWheel);
+            }
+        
+            
             $A.assert(config.element && isDomNode(config.element), 'Element is undefined or missing');
             $A.assert(config.target && (config.target === w || isDomNode(config.target)), 'Target is undefined or missing');
 
@@ -160,6 +182,8 @@ function lib(constraint, elementProxyFactory, win) { //eslint-disable-line no-un
             if(!config.type && config.targetAlign) {
                 $A.assert(!!config.targetAlign.match(ALIGN_REGEX), 'Invalid targetAlign string');
             }
+
+
 
             config.element = elementProxyFactory.getElement(config.element);
             config.target = elementProxyFactory.getElement(config.target);
@@ -204,6 +228,10 @@ function lib(constraint, elementProxyFactory, win) { //eslint-disable-line no-un
                     },
 
                     destroy: function() {
+                        if(scrollableParent) {
+                            scrollableParent.removeEventListener('scroll', handleRepositionEvents);
+                        }
+                        
                         while(constraintList.length > 0) {
                             constraintList.pop().destroy();
                         }

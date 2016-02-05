@@ -52,37 +52,6 @@
         shortName: "Dec"
     }],
 
-    /**
-     * If any parent element is scrollable with the wheel
-     * (overflow-y), return that
-     * @param  {HTMLElement} elem The element to check
-     * @return {Mixed}      Returns an HTMLElement if one is found, otherwise null
-     */
-    _getScrollableParent: function(elem) {
-
-        // memoize
-        if(this._scrollableParent) {
-            return this._scrollableParent;
-        }
-
-        // if overflow is auto overflow-y is also auto,
-        // however in firefox the opposite is not true
-        var overflow = getComputedStyle(elem)['overflow-y'];
-
-        //
-        if(overflow === 'auto') {
-            this._scrollableParent = elem;
-            return elem;
-        }
-
-        if(elem === document.body) {
-            this._scrollableParent = null;
-            return null;
-        }
-
-        return this._getScrollableParent(elem.parentNode);
-
-    },
 
     attachToDocumentBody: function(component) {
         var body = document.getElementsByTagName("body")[0];
@@ -347,27 +316,6 @@
             // Scoping this to desktop to prevent regressions
             } else if (!$A.util.isUndefinedOrNull(referenceElem) && $A.get("$Browser.formFactor") === "DESKTOP") {
 
-                var scrollableParent = this._getScrollableParent(elem);
-                this._handleScroll = function() {
-                    self.lib.panelPositioning.reposition();
-                };
-
-                this._handleWheel = function(e) {
-                    var elScrollableParent = self._getScrollableParent(elem);
-                    if(elScrollableParent && elScrollableParent.scrollTop) {
-                        elScrollableParent.scrollTop += e.deltaY;
-                    }
-
-                };
-
-                // if the target element is inside a
-                // scrollable element, we need to make sure
-                // scroll events move that element,
-                // not the parent, also we need to reposition on scroll
-                if(scrollableParent) {
-                    scrollableParent.addEventListener('scroll', this._handleScroll);
-                    elem.addEventListener('wheel', this._handleWheel);
-                }
 
                 if(!component.positionConstraint) {
                     var referenceElementAlign = 'left bottom';
@@ -624,15 +572,6 @@
 
     hide: function(component, shouldFocusReferenceElem) {
         component.set("v.visible", false);
-        var divCmp = component.find("datePicker");
-        var elem = divCmp ? divCmp.getElement() : null;
-        var scrollableParent = this._getScrollableParent(elem);
-
-        if(scrollableParent) {
-            scrollableParent.removeEventListener('scroll', this._handleScroll);
-            elem.removeEventListener('wheel', this._handleWheel);
-            this._scrollableParent = null;
-        }
 
         if(component.positionConstraint) {
             component.positionConstraint.destroy();

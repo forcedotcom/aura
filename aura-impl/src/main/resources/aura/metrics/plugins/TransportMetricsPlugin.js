@@ -120,7 +120,7 @@ TransportMetricsPlugin.prototype.postProcess = function (transportMarks) {
         } else if (phase === 'end' && queue[id]){
             var mark = $A.util.apply({}, queue[id], true, true);
             mark["context"]  = $A.util.apply(mark["context"], transportMarks[i]["context"]);
-            mark["duration"] = transportMarks[i]["ts"] - mark["ts"];
+            mark["duration"] = Math.round((transportMarks[i]["ts"] - mark["ts"]) * 100) / 100;
             mark["phase"]    = 'processed';
             procesedMarks.push(mark);
             delete queue[id];

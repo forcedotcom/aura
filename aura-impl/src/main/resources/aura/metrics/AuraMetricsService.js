@@ -162,7 +162,7 @@ Aura.Services.MetricsService.prototype.applicationReady = function () {
         var bootstrapStart = Aura.Services.MetricsService.PERFTIME ? 0 : transaction["pageStartTime"];
         transaction["marks"]["bootstrap"] = bootstrap;
         transaction["ts"] = bootstrapStart;
-        transaction["duration"] = now - bootstrapStart;
+        transaction["duration"] = Math.round((now - bootstrapStart) * 100) / 100;
     });
 
     // #if {"modes" : ["PRODUCTION"]}
@@ -314,7 +314,6 @@ Aura.Services.MetricsService.prototype.transactionStart = function (ns, name, co
  * @export
 **/
 Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, config, postProcess) {
-    //console.time('>>>> TRANSACTIONPROCESSING > ' + ns + ':' + name);
     var id             = (ns || Aura.Services.MetricsService.DEFAULT) + ':' + name,
         transaction    = this.transactions[id],
         transactionCfg = $A.util.apply((transaction && transaction["config"]) || {}, config, true, true),
@@ -327,7 +326,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
             parsedTransaction = {
                 "id"            : id,
                 "ts"            : transaction["ts"],
-                "duration"      : this.time() - transaction["ts"],
+                "duration"      : Math.round((this.time() - transaction["ts"]) * 100) / 100,
                 "pageStartTime" : this.pageStartTime,
                 "marks"         : {},
                 "context"       : transactionCfg["context"] || {},
@@ -371,7 +370,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
         // Cleanup transaction
         if (!this.clearCompleteTransactions) {
             // Only for non-prod, to keep the transactions stored
-            var newId = id + ':' + Math.floor(parsedTransaction["ts"]);
+            var newId = id + ':' + Math.round(parsedTransaction["ts"]);
             this.transactions[newId] = parsedTransaction;
             parsedTransaction["id"] = newId;
         }
@@ -454,7 +453,7 @@ Aura.Services.MetricsService.prototype.defaultPostProcessing = function (customM
         } else if (phase === 'end' && queue[id]) {
             var mark = queue[id];
             mark["context"]  = $A.util.apply(mark["context"] || {}, customMarks[i]["context"] || {});
-            mark["duration"] = customMarks[i]["ts"] - mark["ts"];
+            mark["duration"] = Math.round((customMarks[i]["ts"] - mark["ts"]) * 100) / 100;
             procesedMarks.push(mark);
             delete mark["phase"];
             delete queue[id];
@@ -489,7 +488,7 @@ Aura.Services.MetricsService.prototype.getTransaction = function (ns, id) {
     // Loop, dont do a direct match on the object key.
     // Because we augment the id with the timestamp ex: s1:foo:123
     // so consecuent transactions dont collision
-    var key = id.indexOf(':') === -1  ? (ns + ':' + name) : id;
+    var key = id.indexOf(':') === -1  ? (ns + ':' + id) : id;
     for (var i in this.transactions) {
         var t = this.transactions[i];
         if (t["id"].indexOf(key) === 0) {
@@ -532,7 +531,7 @@ Aura.Services.MetricsService.prototype.createTransaction = function (ns, name, c
         transaction = {
             "id"            : id,
             "offsets"       : {},
-            "ts"            : this.time(),
+            "ts"            : Math.round(this.time() * 100) / 100,
             "config"        : config || {}
         },
         offsets = transaction["offsets"];

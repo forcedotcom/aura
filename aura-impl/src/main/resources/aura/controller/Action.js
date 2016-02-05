@@ -588,9 +588,7 @@ Action.prototype.runDeprecated = function(evt) {
     this.state = "RUNNING";
     $A.getContext().setCurrentAccess(this.cmp);
     try {
-        var secureCmp = $A.lockerService.wrapComponent(this.cmp);
-        var secureEvt = $A.lockerService.wrapComponentEvent(secureCmp, evt);
-        this.returnValue = this.meth.call(undefined, secureCmp, secureEvt, this.cmp['helper']);
+        this.returnValue = this.meth.call(this, $A.lockerService.wrapComponent(this.cmp), evt, this.cmp['helper']);
         this.state = "SUCCESS";
     } catch (e) {
         this.markException(e);

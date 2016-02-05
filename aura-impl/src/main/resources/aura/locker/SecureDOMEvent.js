@@ -66,6 +66,25 @@ var SecureDOMEvent = (function() {
     };
   }
 
+  function filterTargetDescriptor(propName) {
+    // descriptor to produce a new target
+    return {
+      get: function() {
+        // perf hard-wired in case there is not a target to wrap
+        var event = getEvent(this);
+        var target = event[propName];
+        if (!target) {
+          return target;
+        }
+        if (isDOMElementOrNode(target)) {
+          $A.lockerService.util.verifyAccess(event, target);
+          return SecureDocument.wrap(target);
+        }
+        return target;
+      }
+    };
+  }
+
   function throwAccessViolation(propName) {
     return {
       get: function() {
@@ -77,9 +96,9 @@ var SecureDOMEvent = (function() {
   var DOMEventSecureDescriptors = {
     // Events properties that are DOM Elements were compiled from
     // https://developer.mozilla.org/en-US/docs/Web/Events
-    target: SecureThing.createFilteredProperty("target"),
-    curretTarget: SecureThing.createFilteredProperty("currentTarget"),
-    relatedTarget: SecureThing.createFilteredProperty("relatedTarget"),
+    target: filterTargetDescriptor("target"),
+    curretTarget: filterTargetDescriptor("currentTarget"),
+    relatedTarget: filterTargetDescriptor("relatedTarget"),
 
     // Touch Events are special on their own:
     // https://developer.mozilla.org/en-US/docs/Web/API/Touch
@@ -92,9 +111,9 @@ var SecureDOMEvent = (function() {
     view: throwAccessViolation("view"),
 
     // non-standard properties and aliases
-    srcElement: SecureThing.createFilteredProperty("srcElement"),
-    explicitOriginalTarget: SecureThing.createFilteredProperty("explicitOriginalTarget"),
-    originalTarget: SecureThing.createFilteredProperty("originalTarget")
+    srcElement: filterTargetDescriptor("srcElement"),
+    explicitOriginalTarget: filterTargetDescriptor("explicitOriginalTarget"),
+    originalTarget: filterTargetDescriptor("originalTarget")
   };
 
   function SecureDOMEvent(event, key) {

@@ -39,13 +39,31 @@ var SecureAuraEvent = (function() {
         return "SecureAuraEvent: " + getEvent(this).getName() + " { key: " + JSON.stringify(getKey(this)) + " }";
       }
     },
+    "source": {
+      get: function () {
+        var event = getEvent(this);
+        var source = event.source;
+        $A.lockerService.util.verifyAccess(event, source);
+        return $A.lockerService.wrapComponent(source, getKey(this));
+      }
+    },
     "fire": SecureThing.createPassThroughMethod("fire"),
+    "getDef": SecureThing.createPassThroughMethod("getDef"),
     "getName": SecureThing.createPassThroughMethod("getName"),
-    "getParam": SecureThing.createFilteredMethod("getParam"),
-    "getParams": SecureThing.createFilteredMethod("getParams"),
-    "getSource": SecureThing.createFilteredMethod('getSource'),
+    "getParam": SecureThing.createPassThroughMethod("getParam"),
+    "getParams": SecureThing.createPassThroughMethod("getParams"),
+    "getSource": {
+      get: function () {
+        var that = this;
+        // this getter returns a method that resolves to secure source
+        return function () {
+          return that.source;
+        };
+      }
+    },
     "setParam": SecureThing.createPassThroughMethod("setParam"),
-    "setParams": SecureThing.createPassThroughMethod("setParams")
+    "setParams": SecureThing.createPassThroughMethod("setParams"),
+    "stopPropagation": SecureThing.createPassThroughMethod("stopPropagation")
   });
 
   SecureAuraEvent.prototype.constructor = SecureAuraEvent;

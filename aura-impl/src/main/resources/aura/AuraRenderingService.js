@@ -70,15 +70,12 @@ AuraRenderingService.prototype.render = function(components, parent) {
         // JBUCH: HALO: TODO: END REMOVE ME
 
         if (cmp.isValid()) {
-            $A.getContext().setCurrentAccess(cmp);
+            $A.getContext().setCurrentAccess(cmp);    
             var renderedElements = cmp["render"]();
             $A.getContext().releaseCurrentAccess();
-            // Locker: anytime framework receive DOM elements from a locked down component
-            // it should unwrap them before using them. For regular components, this is
-            // a non-opt when trying to unwrap.
-            renderedElements=$A.lockerService.unwrap(renderedElements);
+            
             renderedElements=this.finishRender(cmp, renderedElements);
-
+            
             elements = elements.concat(renderedElements);
         }
     }
@@ -143,10 +140,7 @@ AuraRenderingService.prototype.rerender = function(components) {
                     throw new $A.auraError("rerender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
                 } finally {
                     if(rerenderedElements!=undefined){//eslint-disable-line eqeqeq
-                        // Locker: anytime framework receive DOM elements from a locked down component
-                        // it should unwrap them before using them. For regular components, this is
-                        // a non-opt when trying to unwrap.
-                        renderedElements=renderedElements.concat($A.lockerService.unwrap(rerenderedElements));
+                        renderedElements=renderedElements.concat(rerenderedElements);
                     }else{
                         addExistingElements=true;
                     }

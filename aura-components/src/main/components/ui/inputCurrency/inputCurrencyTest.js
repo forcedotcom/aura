@@ -20,7 +20,6 @@
     testCurrency: {
         attributes: {value: 1234 },
         test: function (component) {
-            debugger;
             var value = component.getElement().value;
             $A.test.assertEquals(1234, component.get("v.value"), "Cmp value does not equal expected");
             $A.test.assertEquals("$1,234.00", value, "Element value does not equal expected");

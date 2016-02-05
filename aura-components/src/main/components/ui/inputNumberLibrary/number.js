@@ -55,10 +55,9 @@ function lib() { //eslint-disable-line no-unused-vars
             }
             return $A.localizationService.getDefaultNumberFormat();
         },
-        unFormatNumber: function (string, formatter) {
-            //var numberFormat     = this.getNumberFormat(formatter);
-            var decimalSeparator = $A.get("$Locale.decimal"); //numberFormat.$symbols$.decimalSeparator;
-            var currencySymbol   = $A.get("$Locale.currency"); //numberFormat.$symbols$.currency;
+        unFormatNumber: function (string ) {
+            var decimalSeparator = $A.get("$Locale.decimal");
+            var currencySymbol   = $A.get("$Locale.currency");
 
             var stringOriginal = string,
                 thousandRegExp,

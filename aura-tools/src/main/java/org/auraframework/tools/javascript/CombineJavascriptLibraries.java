@@ -15,12 +15,6 @@
  */
 package org.auraframework.tools.javascript;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.ibm.icu.util.TimeZone;
-import org.auraframework.impl.util.AuraImplFiles;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +26,13 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.auraframework.impl.util.AuraImplFiles;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.ibm.icu.util.TimeZone;
 
 public class CombineJavascriptLibraries {
 
@@ -123,6 +124,9 @@ public class CombineJavascriptLibraries {
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(walltimeLocaleDirectory)) {
             for (Path path : directoryStream) {
                 String fileName = path.getFileName().toString();
+                if (!fileName.endsWith(".js")) {
+                	continue;
+                }
                 String ending = fileName.substring(fileName.indexOf("_"), fileName.length());
                 int extIndex = ending.lastIndexOf(".");
                 String timezone = ending.substring(1, extIndex);

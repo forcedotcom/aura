@@ -59,4 +59,5 @@ var ObscureThing = (function() {
   ObscureThing.prototype.constructor = ObscureThing;
 
   return ObscureThing;
+
 })();

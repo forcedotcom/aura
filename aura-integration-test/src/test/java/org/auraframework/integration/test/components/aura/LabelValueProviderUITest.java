@@ -20,6 +20,7 @@ import java.util.Map;
 import org.auraframework.test.controller.TestLoggingAdapterController;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 
 /**
@@ -40,6 +41,8 @@ public class LabelValueProviderUITest extends WebDriverTestCase {
      * @throws Exception
      */
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
+    @UnAdaptableTest
     public void testEfficientActionRequests() throws Exception {
         TestLoggingAdapterController.beginCapture();
         open(URL);

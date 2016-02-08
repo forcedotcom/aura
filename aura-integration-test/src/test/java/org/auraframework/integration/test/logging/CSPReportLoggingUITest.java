@@ -74,6 +74,8 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
         super.tearDown();
     }
 
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
+    @UnAdaptableTest
     public void testReportCSPViolationForClientRenderedCSS() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -94,6 +96,8 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
         assertThat("Could not find expected violated directive", cspReport, containsString(exptectedViolatedDirective));
     }
 
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
+    @UnAdaptableTest
     public void testReportCSPViolationForServerRenderedCSS() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "",
@@ -187,6 +191,8 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
         assertThat("Could not find expected violated directive, perhaps fonts wasn't allowed", cspReport, containsString(exptectedViolatedDirective));
     }
 
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
+    @UnAdaptableTest
     public void testReportJavaScript() throws Exception {
         // This test loads script via its template, since <script> is not allowed in component markup
         DefDescriptor<ComponentDef> templateDesc = addSourceAutoCleanup(
@@ -221,6 +227,7 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
      * Automation for the connect-src CSP policy. With connect-src set to 'self' and http://invalid.salesforce.com,
      * a report should be generated when an XHR is sent to invalid origin.
      */
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
     @UnAdaptableTest
     public void testReportXHRConnect() throws Exception {
         String externalUri = "http://www.example.com";

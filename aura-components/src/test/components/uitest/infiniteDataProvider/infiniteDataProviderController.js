@@ -59,7 +59,7 @@
 			    
 	        	helper.fireDataChangeEvent(component, data); 
 	    	});
-	    	this.runAfter(action);
+	    	$A.enqueueAction(action);
 	    	
 			// this should be all that's needed...        
 	        //helper.fireDataChangeEvent(component, data);

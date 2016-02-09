@@ -106,13 +106,15 @@ public class IncludeDirectiveTest extends UnitTestCase {
      * Positive test case for INCLUDE directive
      */
     public void testIncludeDirective() throws Exception {
-        getResourceFile("/testdata/javascript/includeDirective/testIncludeDirective.js");
+        File file = getResourceFile("/testdata/javascript/includeDirective/testIncludeDirective.js");
         getResourceFile("/testdata/javascript/includeDirective/testIncludeDirective1.js");
         getResourceFile("/testdata/javascript/includeDirective/testIncludeDirective2.js");
         getResourceFile("/testdata/javascript/includeDirective/nestedInclude/testIncludeDirective3.js");
+        // There will be classpath issues with getResourceFile("/testdata/") if another module has a testdata folder
+        File testDataFolder = file.getParentFile().getParentFile().getParentFile();
         DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy",
-                getResourceFile("/testdata/"), "javascript/includeDirective/testIncludeDirective.js",
-                ImmutableList.<DirectiveType<?>> of(DirectiveTypes.includeType, DirectiveTypes.ifType),
+                testDataFolder, "javascript/includeDirective/testIncludeDirective.js",
+                ImmutableList.of(DirectiveTypes.includeType, DirectiveTypes.ifType),
                 EnumSet.of(JavascriptGeneratorMode.TESTING));
         DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
         dp.parseFile();

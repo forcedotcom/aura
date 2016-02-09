@@ -15,6 +15,19 @@
  */
 package org.auraframework.util.test.util;
 
+import com.google.common.collect.Sets;
+import junit.framework.TestCase;
+import org.auraframework.util.IOUtil;
+import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.json.JsonSerializationContext;
+import org.auraframework.util.test.annotation.AuraTestLabels;
+import org.auraframework.util.test.annotation.UnitTest;
+import org.auraframework.util.test.diff.GoldFileUtils;
+import org.auraframework.util.test.perf.metrics.PerfMetrics;
+import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,21 +40,6 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Logger;
-
-import junit.framework.TestCase;
-
-import org.auraframework.util.IOUtil;
-import org.auraframework.util.json.JsonEncoder;
-import org.auraframework.util.json.JsonSerializationContext;
-import org.auraframework.util.test.annotation.AuraTestLabels;
-import org.auraframework.util.test.annotation.UnitTest;
-import org.auraframework.util.test.diff.GoldFileUtils;
-import org.auraframework.util.test.perf.metrics.PerfMetrics;
-import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-
-import com.google.common.collect.Sets;
 
 /**
  * Base class for all aura tests.
@@ -247,7 +245,7 @@ public abstract class UnitTestCase extends TestCase {
         if (!File.separator.equals("/")) {
             resourceName = resourceName.replace('/', File.separatorChar);
         }
-        String fileName = System.getProperty("java.io.tmpdir") + resourceName;
+        String fileName = IOUtil.getDefaultTempDir() + File.separator + resourceName;
         File tempFile = new File(fileName);
 
         // if it didn't exist on classpath, then return ref to non-existant file

@@ -26,7 +26,7 @@
                           secure="false"
                           persistent="true" />
 
-        <script>
+        <script nonce="LockerServiceTemporaryNonce">
             <!-- Do not use bootstrap cache so we drop into the promise of the INCOMPLETE callback for loadComponent -->
             $A.clientService.setUseBootstrapCache(false);
         </script>
@@ -36,7 +36,7 @@
     <aura:set attribute="autoInitializeSync" value="false" />
 
     <aura:set attribute="auraInitBlock">
-        <script>
+        <script nonce="LockerServiceTemporaryNonce">
             var auraInit = {!v.auraInit}
             if(location.hash.indexOf('launchOffline') > 0) {
                 auraInit.host = '//offline';

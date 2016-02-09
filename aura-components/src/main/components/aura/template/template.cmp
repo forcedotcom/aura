@@ -98,7 +98,7 @@
             <div aura:id="auraErrorMask" class="{! 'auraMsgMask' + ( v.forceError ? ' auraForcedErrorBox' : '' )}" >
                 <div class="auraMsgBox auraErrorBox" aura:id="auraError">
                     <h2>
-                        <a class="close" onclick="dismissError();" href="javascript:void(0);">&times;</a>
+                        <a class="close" id="dismissError" href="javascript:void(0);">&times;</a>
                         {!v.errorTitle}
                     </h2>
                     <div id="auraErrorMessage">{!v.errorMessage}</div>
@@ -121,14 +121,15 @@
                     $A.initConfig({!v.auraInitSync});
                 }
 
-                function dismissError() {
-                    if (window['$A']) {
+                document.getElementById('dismissError').onclick = function() {
+                if (window['$A']) {
                         $A.util.removeClass(document.body, 'auraError');
                         $A.util.removeClass(auraErrorMask, 'auraForcedErrorBox');
                     } else {
                         document.body.removeChild(document.getElementById("auraErrorMask"));
                     }
                 }
+
                 // We explicitly disable IE as there are issues with it and fastclick.
                 // Instead, "touch-action: manipulation;" (IE11) and "-ms-touch-action: manipulation" (IE10)
                 // should be used on the components that we want no touch-delay on.

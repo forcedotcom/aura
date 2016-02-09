@@ -24,7 +24,7 @@
                           debugLoggingEnabled="true"
                           secure="false"
                           persistent="true" />
-       <script>
+       <script nonce='LockerServiceTemporaryNonce'>
             $A.clientService.setUseBootstrapCache(false);
             
             window._storageGets = [];
@@ -40,7 +40,7 @@
     <aura:set attribute="autoInitializeSync" value="false" />
 
     <aura:set attribute="auraInitBlock">
-        <script>
+        <script nonce='LockerServiceTemporaryNonce'>
             var auraInit = {!v.auraInit}
             if(location.hash.indexOf('launchOffline') > 0) {
                 auraInit.host = '//offline';

@@ -121,7 +121,7 @@
                     $A.initConfig({!v.auraInitSync});
                 }
 
-                var dismissError = function() {
+                function dismissError() {
                     if (window['$A']) {
                         $A.util.removeClass(document.body, 'auraError');
                         $A.util.removeClass(auraErrorMask, 'auraForcedErrorBox');
@@ -133,7 +133,7 @@
                 if (dismissErrorEl) {
                     if (dismissErrorEl.addEventListener) {
                         dismissErrorEl.addEventListener("click", dismissError);
-                    } else {
+                    } else if (dismissErrorEl.attachEvent) {
                         dismissErrorEl.attachEvent("onclick", dismissError);
                     }
                 }

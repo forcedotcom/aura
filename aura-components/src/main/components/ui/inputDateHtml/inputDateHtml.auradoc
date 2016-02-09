@@ -18,15 +18,16 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			A <code>ui:inputDate</code> component represents a date input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code> on desktop.
-			It displays a native date picker on mobile and tablet form factors using an input field of type <code>date</code>.
-			The value is displayed based on the locale of the browser, for example, <code>MMM d, yyyy</code>, which is returned by <code>$Locale.dateFormat</code>. 
+			A <code>ui:inputDateHtml</code> component represents a date input field  of type <code>date</code> for mobile and tablet form factors, which uses the native date picker on those devices.
+			Use the <code>ui:inputDate</code> component to render this component automatically on target devices. 
 		</p>
 		<p>This is a basic set up of a date field with a date picker, which displays the field value <code>Jan 30, 2014</code> based on the locale format. 
 		On desktop, the <code>input</code> tag is wrapped in a <code>form</code> tag.</p>
 		<pre>&lt;ui:inputDate aura:id="dateField" label="Birthday" value="2014-01-30" displayDatePicker="true"/></pre>
+		<p>When viewed on a mobile or tablet, the <code>ui:inputDate</code> component renders as <code>ui:inputDateHtml</code> and uses the native date picker.</p>
 	</aura:description>		
 	<aura:example name="inputExample" ref="uiExamples:date" label="Using ui:inputDate">
     		This example sets today's date on a <code>ui:inputDate</code> component, retrieves its value, and displays it using <code>ui:outputDate</code>. The <code>init</code> handler initializes and sets the date on the component.
+    		When viewed on a mobile or tablet device, this component renders a native date picker using the <code>ui:inputDateHtml</code> component.
     </aura:example>
 </aura:documentation>

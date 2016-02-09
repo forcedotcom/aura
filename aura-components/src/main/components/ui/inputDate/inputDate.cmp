@@ -17,13 +17,13 @@
 -->
 <aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateComponent" extensible="true"
                 provider="js://ui.inputDate" defaultFlavor="default, input, datetime" description="An input field for entering a date.">
-    <aura:attribute name="placeholder" type="String" description="The hint for the date input format. Set during init based on the 'format' value."/>
-    <aura:attribute name="loadDatePicker" type="Boolean" default="true" description="Set to true to load the date picker. Defaults to 'true'."/>
+    <aura:attribute name="placeholder" type="String" description="The hint for the date input format, displayed in the field if a date picker is not used. The placeholder is set during init based on the custom or locale format."/>
+    <aura:attribute name="loadDatePicker" type="Boolean" default="true" description="Set to true to load the date picker. The default is true."/>
 
     <aura:dependency resource="markup://ui:inputDateHtml" type="COMPONENT"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-    <aura:registerEvent name="openPicker" type="ui:openPicker"/>
+    <aura:registerEvent name="openPicker" type="ui:openPicker" description="The event fired when the date picker is opened."/>
     <aura:handler name="openPicker" action="{!c.openDatePicker}"/>
 
     <aura:if isTrue="{!$Browser.isPhone || $Browser.isTablet}">

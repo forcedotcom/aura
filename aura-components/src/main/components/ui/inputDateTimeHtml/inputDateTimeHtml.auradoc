@@ -18,12 +18,10 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			A <code>ui:inputDateTime</code> component represents a date and time input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code> on desktop.
-			It displays a native date time picker on mobile and tablet form factors using an input field of type <code>datetime-local</code>.
-			The value is displayed based on the locale of the browser, for example, <code>MMM d, yyyy</code> and <code>h:mm:ss a</code>, which is returned by <code>$Locale.dateFormat</code>
-			and <code>$Locale.timeFormat</code>. 
+			A <code>ui:inputDateTimeHtml</code> component represents a date and time input field of type <code>datetime-local</code> for mobile and tablet form factors, which uses the native
+			date and time picker on those devices. Use the <code>ui:inputDateTime</code> component to render this component automatically on target devices. 
 		</p>
-		<p>This is a basic set up of a date and time field with a date picker, which displays the current date and time.
+		<p>This is a basic set up of a date and time field with a date and time picker, which displays the current date and time.
 		On desktop, the <code>input</code> tag is wrapped in a <code>form</code> tag; the date and time fields display as two separate fields. 
 	The time picker displays a list of time in 30-minute increments.</p>
 		<pre>&lt;!-- Component markup -->
@@ -34,9 +32,10 @@
 /** Client-Side Controller **/
  var today = new Date(); 
 component.set("v.today", today);</pre>
-		
+	<p>When viewed on a mobile or tablet, the <code>ui:inputDateTime</code> component renders as <code>ui:inputDateTimeHtml</code> and uses the native date and time picker.</p>	
 	</aura:description>		
 	<aura:example name="datetime" ref="uiExamples:datetime" label="Using ui:inputDateTime">
     	This example retrieves the value of a <code>ui:inputDateTime</code> component and displays it using <code>ui:outputDateTime</code>.
+    	When viewed on a mobile or tablet device, this component renders a native date and time picker using the <code>ui:inputDateTimeHtml</code> component.
     </aura:example>
 </aura:documentation>

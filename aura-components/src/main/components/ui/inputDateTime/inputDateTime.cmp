@@ -27,7 +27,7 @@
     <aura:dependency resource="markup://ui:inputDateTimeHtml" type="COMPONENT"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-    <aura:registerEvent name="openPicker" type="ui:openPicker"/>
+    <aura:registerEvent name="openPicker" type="ui:openPicker" description="The event fired when the date picker is opened."/>
     <aura:handler name="openPicker" action="{!c.openDatePicker}"/>
 
     <aura:if isTrue="{!and($Browser.formFactor == 'DESKTOP', !v.useSingleInput)}">

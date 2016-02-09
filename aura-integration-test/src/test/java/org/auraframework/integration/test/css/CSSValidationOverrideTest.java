@@ -16,12 +16,13 @@
 package org.auraframework.integration.test.css;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.parser.StyleParser;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.system.Parser.Format;
+import org.auraframework.system.Source;
+import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.StyleParserException;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 
@@ -32,66 +33,41 @@ import org.auraframework.util.test.annotation.ThreadHostileTest;
  */
 
 public class CSSValidationOverrideTest extends AuraImplTestCase {
-    DefDescriptor<StyleDef> styleDefDesc;
-
     public CSSValidationOverrideTest(String name) {
         super(name);
     }
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "", ""));
-        assertNotNull(cmp.getDef());
-        styleDefDesc = Aura.getDefinitionService().getDefDescriptor(
-                String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX,
-                    cmp.getNamespace(), cmp.getName()),
-                StyleDef.class);
-        addSourceAutoCleanup(styleDefDesc,
-                ".xyErrorText {" +
-                        "color: #808080;" +
-                        "padding-bottom: 5px;" +
-                        "}" +
-                        ".xyLabel {" +
-                        "padding-right: 5px;" +
-                        "}");
+    private Source<StyleDef> getInvalidStyleSource() {
+        DefDescriptor<StyleDef> styleDefDesc = Aura.getDefinitionService().getDefDescriptor("css://fake.name", StyleDef.class);
+        return new StringSource<StyleDef>(styleDefDesc, 
+                ".xyErrorText { color: #808080; padding-bottom: 5px; } .xyLabel { padding-right: 5px; }",
+                "fake:name", Format.CSS);
     }
 
     /**
      * By default all component CSS is validated by StyleParser.
      */
-    public void testDefaultProps() {
+    public void testDefaultProps() throws Exception {
         assertTrue("By default all component CSS should be validated",
                 Aura.getConfigAdapter().validateCss());
-        getInvalidStyleDef(true);
+        Source<StyleDef> source = getInvalidStyleSource();
+        try {
+            new StyleParser(true).parse(source.getDescriptor(), source);
+            fail("Expected CSS validation to be turned on and catch the invalid CSS");
+        } catch (StyleParserException expected) {
+            assertTrue("Unexpected error message in StyleParserException",
+                       expected.getMessage().contains("CSS selector must begin with"));
+        }
     }
 
     /**
      * Override the validateCss flag on configAdapter and make sure validations are skipped
      */
     @ThreadHostileTest("disables CSS validation")
-    public void testOverrideCSSValidation() {
+    public void testOverrideCSSValidation() throws Exception {
         getMockConfigAdapter().setValidateCss(false);
         assertFalse("Expected CSS validation to be overriden.", Aura.getConfigAdapter().validateCss());
-        getInvalidStyleDef(false);
-    }
-
-    private void getInvalidStyleDef(boolean expectException) {
-        try {
-            new StyleParser(true).parse(styleDefDesc, getSource(styleDefDesc));
-            if (expectException) {
-                fail("Expected CSS validation to be turned on and catch the invalid CSS");
-            }
-        } catch (StyleParserException expected) {
-            if (!expectException) {
-                fail("Did not expect to encounter CSS validation exception.");
-            } else {
-                assertTrue("Unexpected error message in StyleParserException",
-                           expected.getMessage().contains("CSS selector must begin with"));
-            }
-        } catch (QuickFixException e) {
-            fail("Test setup failed. Looking for component test.testInValidCSS with invalid CSS");
-        }
+        Source<StyleDef> source = getInvalidStyleSource();
+        new StyleParser(true).parse(source.getDescriptor(), source);
     }
 }

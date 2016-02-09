@@ -9,8 +9,6 @@
     },
 
     accessDocumentBody: function(cmp){
-        // This line should throw an Exception to be caught by the test. Log the return if we happen to get one for
-        // easier debugging
         var body = document.body;
         cmp.set("v.log", body);
     },

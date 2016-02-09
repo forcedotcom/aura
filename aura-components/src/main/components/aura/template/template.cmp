@@ -121,14 +121,14 @@
                     $A.initConfig({!v.auraInitSync});
                 }
 
-                document.getElementById('dismissError').onclick = function() {
-                if (window['$A']) {
+                document.getElementById('dismissError').addEventListener('click', function() {
+                    if (window['$A']) {
                         $A.util.removeClass(document.body, 'auraError');
                         $A.util.removeClass(auraErrorMask, 'auraForcedErrorBox');
                     } else {
                         document.body.removeChild(document.getElementById("auraErrorMask"));
                     }
-                }
+                });
 
                 // We explicitly disable IE as there are issues with it and fastclick.
                 // Instead, "touch-action: manipulation;" (IE11) and "-ms-touch-action: manipulation" (IE10)

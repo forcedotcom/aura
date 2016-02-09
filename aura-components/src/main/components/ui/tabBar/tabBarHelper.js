@@ -48,7 +48,7 @@
      * Add new tab item to the tabBar
      * TODO: overflow integration
      */
-    addTab: function (cmp, index, tab) {
+    addTab: function (cmp, index, tab, callback) {
         var self = this, items = cmp.get("v.tabHeaders");
         if ($A.util.isNumber(index) && index >= 0 && index <= items.length) {
             var tabValues = [tab];
@@ -57,6 +57,9 @@
                 cmp.set("v.tabHeaders", items);
                 if (newItems[0].get("v.active")) {
                     self.activateTab(cmp, index);
+                }
+                if (typeof callback === "function" && newItems[0]) {
+                    callback(newItems[0]);
                 }
             });
         }

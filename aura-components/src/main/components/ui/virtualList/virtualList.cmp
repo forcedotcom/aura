@@ -26,7 +26,15 @@
 
     <aura:method name="rerenderList"/>
     <aura:method name="appendItems">
-        <aura:attribute name="items" type="Object"/>
+        <aura:attribute name="items" type="Object" required="true" description="Items to be appended to the list"/>
+    </aura:method>
+    <aura:method name="updateItem">
+        <aura:attribute name="item" type="Object" required="true" description="Updated item to be placed in the list"/>
+        <aura:attribute name="index" type="Integer" description="Optional. Index of the item within the list"/>
+    </aura:method>
+    <aura:method name="getComponentByIndex">
+        <aura:attribute name="index" type="Integer" required="true" description="Index within the list"/>
+        <aura:attribute name="callback" type="Function" required="true" description="Callback which takes the component as its first parameter"/>
     </aura:method>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>

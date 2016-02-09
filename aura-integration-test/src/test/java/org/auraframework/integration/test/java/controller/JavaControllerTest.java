@@ -49,6 +49,7 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
@@ -413,6 +414,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
+    @UnAdaptableTest("W-2928878, we don't have test logging adapter in core")
     public void testParamLogging_NoParams() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.TestController");
         Map<String, Object> params = Maps.newHashMap();
@@ -427,6 +429,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
+    @UnAdaptableTest("W-2928878, we don't have test logging adapter in core")
     public void testParamLogging_SelectParameters() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
@@ -443,6 +446,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
+    @UnAdaptableTest("W-2928878, we don't have test logging adapter in core")
     public void testParamLogging_MultipleIdenticalActions() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.JavaTestController");
         Map<String, Object> params1 = Maps.newHashMap();
@@ -470,6 +474,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
+    @UnAdaptableTest("W-2928878, we don't have test logging adapter in core")
     public void testParamLogging_MultipleParameters() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
@@ -486,6 +491,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
+    @UnAdaptableTest("W-2928878, we don't have test logging adapter in core")
     public void testParamLogging_NullValuesForParameters() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
@@ -500,6 +506,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
+    @UnAdaptableTest("W-2928878, we don't have test logging adapter in core")
     public void testParamLogging_ParametersOfCustomDataType() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
@@ -515,6 +522,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
+    @UnAdaptableTest("W-2928878, we don't have test logging adapter in core")
     public void testParamLogging_ChainingActions() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.ActionChainingController");
         Map<String, Object> params = Maps.newHashMap();
@@ -537,6 +545,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
+    @UnAdaptableTest("W-2928878, we don't have test logging adapter in core")
     public void testParamLogging_ChainingIdenticalActions() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.ActionChainingController");
         List<Action> actions = Lists.newArrayList();

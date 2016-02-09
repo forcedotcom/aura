@@ -172,9 +172,11 @@ ComponentClassRegistry.prototype.buildConstructor = function(componentProperties
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     var className = componentProperties["meta"]["name"];
 
+    /*eslint-disable no-redeclare*/
     var componentConstructor = $A.util.globalEval("(function " + className + "() { Component.apply(this, arguments); });", {
         "Component": Component
     });
+    /*eslint-enable no-redeclare*/
     //#end
 
     // Extends from Component (and restore constructor).

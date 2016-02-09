@@ -30,6 +30,7 @@ import org.auraframework.adapter.DefaultContentSecurityPolicy;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.http.CSP;
+import org.auraframework.system.AuraContext;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.adapter.MockConfigAdapter;
@@ -71,17 +72,23 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         @Override
         public Collection<String> getScriptSources() {
             List<String> list = (List<String>) baseline.getScriptSources();
-            list = removeNonceCspEntry(list);
-            list.add(CSP.UNSAFE_EVAL);
-            list.add(CSP.UNSAFE_INLINE);
+            AuraContext context = Aura.getContextService().getCurrentContext();
+            if (context != null && context.isTestMode()) {
+                list = removeNonceCspEntry(list);
+                list.add(CSP.UNSAFE_EVAL);
+                list.add(CSP.UNSAFE_INLINE);
+            }
             return list;
         }
 
         @Override
         public Collection<String> getStyleSources() {
             List<String> list = (List<String>) baseline.getStyleSources();
-            list = removeNonceCspEntry(list);
-            list.add(CSP.UNSAFE_INLINE);
+            AuraContext context = Aura.getContextService().getCurrentContext();
+            if (context != null && context.isTestMode()) {
+                list = removeNonceCspEntry(list);
+                list.add(CSP.UNSAFE_INLINE);
+            }
             return list;
         }
 

@@ -52,6 +52,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.EncodingStyle;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -115,10 +116,20 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             if (guarded) {
                 Map<String, String> csp = getCSP(response);
                 assertEquals("frame-ancestors is wrong", "'self'", csp.get("frame-ancestors"));
-                // Test modes always allow unsafe-eval and unsafe-inline
-                assertEquals("script-src is wrong", "'self' chrome-extension: 'unsafe-eval' 'unsafe-inline'",
-                        csp.get("script-src"));
-                assertEquals("style-src is wrong", "'self' chrome-extension: 'unsafe-inline'", csp.get("style-src"));
+
+                AuraContext context = Aura.getContextService().getCurrentContext();
+                boolean testMode = context != null && context.isTestMode();
+                if (testMode || allowInline) {
+                    assertEquals("script-src is wrong", "'self' chrome-extension: 'unsafe-eval' 'unsafe-inline'",
+                            csp.get("script-src"));
+                    assertEquals("style-src is wrong", "'self' chrome-extension: 'unsafe-inline'",
+                            csp.get("style-src"));
+                } else {
+                    assertEquals("script-src is wrong", "'self' chrome-extension: 'nonce-LockerServiceTemporaryNonce'",
+                            csp.get("script-src"));
+                    assertEquals("style-src is wrong", "'self' chrome-extension: 'nonce-LockerServiceTemporaryNonce'",
+                            csp.get("style-src"));
+                }
 
                 // These maybe aren't strictly "anti-clickjacking", but since
                 // we're testing the rest of the default CSP:

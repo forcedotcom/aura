@@ -41,6 +41,7 @@ import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.FreshBrowserInstance;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -135,6 +136,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * BrowserType.SAFARI is disabled: W-2367702
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
+    @UnAdaptableTest
     public void testNoChanges() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -155,6 +158,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
     @Flapper
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
+    @UnAdaptableTest
     public void testCacheError() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -192,6 +197,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * BrowserType.SAFARI is disabled: W-2367702
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
+    @UnAdaptableTest
     public void testCacheErrorWithEmptyCache() throws Exception {
         openNoAura("/aura/application.app"); // just need a domain page to set cookie from
 
@@ -224,6 +231,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * BrowserType.SAFARI is disabled: W-2367702
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
+    @UnAdaptableTest
     // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
     @Flapper
     public void testManifestRequestLimitExceeded() throws Exception {
@@ -261,6 +270,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      */
     @ThreadHostileTest("NamespaceDef modification affects namespace")
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
+    @UnAdaptableTest
     public void testComponentCssChange() throws Exception {
         createDef(StyleDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, namespace, cmpName),
                 ".THIS {background-image: url('/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@');}");
@@ -288,6 +299,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * Opening cached app after namespace controller change will trigger cache update.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
+    @UnAdaptableTest
     public void testComponentJsChange() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -315,6 +328,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * Opening cached app after component markup change will trigger cache update.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
+    @UnAdaptableTest
     public void testComponentMarkupChange() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -338,6 +353,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * Persistent storage (IndexedDB) is disabled in Safari so only run in Chrome.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME })
+    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
+    @UnAdaptableTest
     public void testStoragesClearedOnAppcacheUpdate() throws Exception {
         // Override app we load in the test with a custom one that uses a template to setup persistent storage and an
         // inner component to interact with storages.

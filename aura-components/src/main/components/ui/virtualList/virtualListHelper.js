@@ -162,6 +162,22 @@
             container.addEventListener(events[i].type, delegate, events[i].useCapture);
         }
     },
+    appendVirtualRows: function (cmp, items) {
+        $A.metricsService.markStart(this.NS, this.NAME + ".appendVirtualRows", {auraid : cmp.getGlobalId()});
+        this.ignorePTVChanges(cmp, true);
+        var fragment  = document.createDocumentFragment(),
+            container = this.getListBody(cmp);
+
+        for (var i = 0; i < items.length; i++) {
+            var virtualItem = this._generateVirtualItem(cmp, items[i]);
+            cmp._virtualItems.push(virtualItem);
+            fragment.appendChild(virtualItem);
+        }
+        container.appendChild(fragment);
+        cmp.set('v.items', (cmp.get('v.items') || []).concat(items), true);
+        this.ignorePTVChanges(cmp, false);
+        $A.metricsService.markEnd(this.NS, this.NAME + ".appendVirtualRows");
+    },
     _findVirtualElementPosition: function (virtualElements, item, element) {
         for (var i = 0; i < virtualElements.length; i++) {
             var ve = virtualElements[i];
@@ -228,7 +244,7 @@
         }
 
         if (!handlers.length > 0) {
-        	return;
+            return;
         }
         
         if (item) {

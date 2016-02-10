@@ -1,4 +1,10 @@
 ({
+    // IndexedDB has problems in Safari and is not supported in older IE
+    browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
+
+    // Test modifies/deletes the persistent database
+    labels : [ "threadHostile" ],
+
     /**
      * These tests verify components are still successfully created when the component def storage is in a state of
      * permanent failure (i.e. all operations on it error out). The app should be smart enough to catch and handle the

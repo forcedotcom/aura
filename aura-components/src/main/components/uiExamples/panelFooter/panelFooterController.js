@@ -16,7 +16,7 @@
 
 ({
     openNewPanel: function(cmp, evt) {
-        var body = $A.newCmp({componentDef: 'uiExamples:panelContent'});
+        var body = $A.createComponentFromConfig({ descriptor : 'uiExamples:panelContent' });
 
         $A.get('e.ui:createPanel').setParams({
             panelType   :'modal',

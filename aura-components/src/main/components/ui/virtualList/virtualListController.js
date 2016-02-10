@@ -43,5 +43,18 @@
     },
     rerenderList: function (cmp, evt, helper) {
         helper.createVirtualList(cmp);
+    },
+    appendItems: function (cmp, event, helper) {
+        var superCmp   = cmp.getSuper(),
+            isExtended = superCmp.getDef().getDescriptor().getName() !== 'component',
+            items      = event.getParam('arguments').items;
+
+        if (isExtended) {
+            cmp = superCmp;
+        }
+
+        if (items && items.length) {
+            helper.appendVirtualRows(cmp, items);
+        }
     }
 })// eslint-disable-line semi

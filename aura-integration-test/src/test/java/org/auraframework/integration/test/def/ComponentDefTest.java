@@ -26,6 +26,7 @@ import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
 
@@ -74,6 +75,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         }
     }
 
+    @UnAdaptableTest("W-2929438")
     public void testNoErrorWhenDefaultFlavorExistsOnParent() throws Exception {
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component extensible='true'><div aura:flavorable='true'>{!v.body}</div></aura:component>");
@@ -86,6 +88,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         desc.getDef().validateReferences(); // no exception
     }
 
+    @UnAdaptableTest("W-2929438")
     public void testNoErrorWhenDefaultFlavorExistsOnDistantParent() throws Exception {
         // hierarchy two levels deep, up one level doesn't not have flavorable but above that does
         DefDescriptor<ComponentDef> distant = addSourceAutoCleanup(ComponentDef.class,
@@ -110,6 +113,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         desc.getDef().validateReferences(); // no exception
     }
 
+    @UnAdaptableTest("W-2929438")
     public void testValidatesMultipleDefaultFlavorNamesFromParent() throws Exception {
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component extensible='true'><div aura:flavorable='true'>{!v.body}</div></aura:component>");
@@ -163,6 +167,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         desc.getDef().validateReferences(); // no exception
     }
 
+    @UnAdaptableTest("W-2929438")
     public void testValidatesComponentIsFlavorableFromDistantParent() throws Exception {
         // hierarchy two levels deep, up one level doesn't not have flavorable but above that does
         DefDescriptor<ComponentDef> distant = addSourceAutoCleanup(ComponentDef.class,
@@ -181,6 +186,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         desc.getDef().validateReferences(); // no exception
     }
 
+    @UnAdaptableTest("W-2929438, this one is passing, but it's only because we are expecting exception anyway")
     public void testValidatesComponentNotFlavorableFromAnyParent() throws Exception {
         DefDescriptor<ComponentDef> distant = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component extensible='true'><div>{!v.body}</div></aura:component>");

@@ -18,20 +18,31 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-		    <code>ui:autocomplete</code> displays suggestions as users type in a text field. Data for this component is provided by a server-side model. This component provides its own text field and text area component.
-		    The default is a text field but you can change it to a text area by setting <code>inputType="inputTextArea"</code>.
+		    <code>ui:autocomplete</code> displays suggestions as users type in a text field. This component provides its own text field and text area component.
+		    The default is a text field but you can change it to a text area by setting <code>inputType="inputTextArea"</code>. This example shows a basic implementation of <code>ui:autocomplete</code> using a data provider.
 		</p>
+		<pre>&lt;ui:autocomplete aura:id="autoComplete" optionVar="row" 
+    matchDone="{!c.handleMatchDone}"
+    inputChange="{!c.handleInputChange}" 
+    selectListOption="{!c.handleSelectOption}">
+    &lt;aura:set attribute="dataProvider">
+        &lt;auradocs:demoAutocompleteProvider/>
+    &lt;/aura:set>
+    &lt;aura:set attribute="listOption">
+        &lt;ui:autocompleteOption label="{!row.label}" keyword="{!row.keyword}" value="{!row.value}" visible="{!row.visible}"/>
+    &lt;/aura:set>
+&lt;/ui:autocomplete></pre>
 		<p>
 			To set the list options, use the <code>ui:autocompleteOption</code> component in the <code>listOption</code> attribute. 
 			The behaviors for a text match, input change, and option display can be customized using the <code>matchText</code>, <code>inputChange</code>, and <code>selectListOption</code> events respectively.
-		</p>
-		<p>
 			Clicking a list option fires the <code>selectListOption</code> event. You can retrieve the number of matches by using the <code>size</code> parameter in the <code>matchDone</code> event. The number of matches
-			is displayed after <code>matchDone</code> is fired.
-		</p>
+			is displayed after <code>matchDone</code> is fired.</p>
 		<p>
-			
-    	</p>
+			By default, the list of options (lookup menu) appears directly below the input field. To attach the lookup menu to a different element or component, use the <code>listReferenceComponent</code> attribute.
+			For example, you can attach it to a button next to the input field.
+		</p>
+		<pre>var autocomplete = cmp.find("autocomplete");
+autocomplete.set("v.listReferenceComponent",cmp.find(buttonId));</pre>
 	</aura:description>	
 		<aura:example name="autocomplete" ref="auradocs:demoAutocomplete" label="Using ui:autocomplete">
     	<p>This example shows how to use <code>ui:autocomplete</code> with a data provider and events like <code>matchDone</code>, <code>inputChange</code>, and <code>selectListOption</code>.</p>

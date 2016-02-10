@@ -21,6 +21,36 @@
         }
     },
 
+    fetchData: function (component, event, helper) {
+        var superCmp   = component.getSuper(),
+            isExtended = superCmp.getDef().getDescriptor().getName() !== 'component',
+            argumentsParam  = event.getParam('arguments'),
+            options    = argumentsParam.options,
+            index      = argumentsParam.index;
+
+        if (isExtended) {
+            component = superCmp;
+        }
+
+        // Show loading indicator
+        helper.showLoading(component.getSuper(), true);
+        if (options) {
+            component.set("v.keyword", options.keyword);
+        }
+
+        // fire dataProvide event
+        var dataProviders = component.get("v.dataProvider");
+        if (!index) {
+            index = 0;
+        }
+        var provideEvent = dataProviders[index].get("e.provide");
+        provideEvent.setParams({
+            parameters: options
+        });
+        provideEvent.fire();
+
+    },
+
     handleClick: function(component, event, helper) {
         var targetCmp = helper.getEventSourceOptionComponent(component, event);
         if (targetCmp) {

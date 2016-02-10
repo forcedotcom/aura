@@ -419,17 +419,29 @@
 
 
     handlePressOnHighlighted: function (component) {
-        var iterCmp = component.find("iter");
-        if (iterCmp) {
-            var iters = iterCmp.get("v.body");
-            var highlightedIndex = this.findHighlightedOptionIndex(iters);
-            if (highlightedIndex >= 0) {
-                var targetCmp = iters[highlightedIndex];
-                var selectEvt = component.get("e.selectListOption");
-                selectEvt.setParams({
-                    option: targetCmp
-                });
-                selectEvt.fire();
+        var optionSelectEvt;
+        if (component.get("v.headerSelected")) {
+            optionSelectEvt = component.get("e.selectListOption");
+            optionSelectEvt.setParams({ option:  component.get("v.listHeader"), isHeader: true  });
+            optionSelectEvt.fire();
+        } else if (component.get("v.footerSelected")) {
+            optionSelectEvt = component.get("e.selectListOption");
+            optionSelectEvt.setParams({option: component.get("v.listFooter"), isFooter: true});
+            optionSelectEvt.fire();
+        }
+        else {
+            var iterCmp = component.find("iter");
+            if (iterCmp) {
+                var iters = iterCmp.get("v.body");
+                var highlightedIndex = this.findHighlightedOptionIndex(iters);
+                if (highlightedIndex >= 0) {
+                    var targetCmp = iters[highlightedIndex];
+                    var selectEvt = component.get("e.selectListOption");
+                    selectEvt.setParams({
+                        option: targetCmp
+                    });
+                    selectEvt.fire();
+                }
             }
         }
     },

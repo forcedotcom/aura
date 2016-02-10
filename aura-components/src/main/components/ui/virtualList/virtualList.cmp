@@ -25,6 +25,9 @@
     <aura:attribute name="dataProvider" type="Aura.Component[]"/>
 
     <aura:method name="rerenderList"/>
+    <aura:method name="appendItems">
+        <aura:attribute name="items" type="Object"/>
+    </aura:method>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.items}" action="{!c.handleItemsChange}"/>

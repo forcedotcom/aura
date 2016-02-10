@@ -1288,9 +1288,6 @@ Component.prototype.getAttributeValueProvider = function() {
  */
 Component.prototype.setAttributeValueProvider = function (avp) {
     this.attributeValueProvider = avp;
-
-	// Add this component to the new AVP's index
-    this.doIndex(this);
 };
 
 /**
@@ -1958,7 +1955,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 value = value.evaluate();
             }
             if($A.util.isString(value)){
-                value=[$A.newCmp({"componentDef":"aura:text", "attributes":{"values":{"value":value}}})];
+                value=[$A.componentService.createComponentPriv({ "componentDef": { "descriptor" :"markup://aura:text" }, "attributes": {"values": { "value":value } }})];
             }
             var facetStack = this.createComponentStack([{"descriptor": attribute, value: value}], attributeValueProvider, localCreation);
             // JBUCH: HALO: TODO: DEDUPE THIS AGAINST lines 462 - 467 AFTER CONFIRMING IT WORKS

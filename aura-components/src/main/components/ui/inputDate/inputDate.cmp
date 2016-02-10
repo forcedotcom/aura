@@ -16,9 +16,11 @@
 
 -->
 <aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateComponent" extensible="true"
-                defaultFlavor="default, input, datetime" description="An input field for entering a date.">
+                provider="js://ui.inputDate" defaultFlavor="default, input, datetime" description="An input field for entering a date.">
     <aura:attribute name="placeholder" type="String" description="The hint for the date input format. Set during init based on the 'format' value."/>
     <aura:attribute name="loadDatePicker" type="Boolean" default="true" description="Set to true to load the date picker. Defaults to 'true'."/>
+
+    <aura:dependency resource="markup://ui:inputDateHtml" type="COMPONENT"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:registerEvent name="openPicker" type="ui:openPicker"/>

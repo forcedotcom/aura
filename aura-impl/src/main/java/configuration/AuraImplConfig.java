@@ -32,7 +32,6 @@ import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.impl.BuilderServiceImpl;
 import org.auraframework.impl.CachingServiceImpl;
-import org.auraframework.impl.ClientServiceImpl;
 import org.auraframework.impl.ContextAdapterImpl;
 import org.auraframework.impl.DefinitionServiceImpl;
 import org.auraframework.impl.ExceptionAdapterImpl;
@@ -96,7 +95,6 @@ import org.auraframework.impl.java.type.converter.LocalizedStringToLongConverter
 import org.auraframework.impl.metricsservice.MetricsServiceImpl;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.CachingService;
-import org.auraframework.service.ClientService;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
@@ -144,11 +142,6 @@ public class AuraImplConfig {
     @Impl
     public static MetricsService metricsService() {
         return new MetricsServiceImpl();
-    }
-
-    @Impl
-    public static ClientService clientService() {
-        return new ClientServiceImpl();
     }
 
     @Impl

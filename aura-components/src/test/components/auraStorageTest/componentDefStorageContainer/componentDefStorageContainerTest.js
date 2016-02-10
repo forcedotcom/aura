@@ -1,4 +1,10 @@
 ({
+    // IndexedDB has problems in Safari and is not supported in older IE
+    browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
+
+    // Test modifies/deletes the persistent database
+    labels : [ "threadHostile" ],
+
     testComponentDefsPersisted: {
         test: [
             function loadIframe(cmp) {
@@ -68,7 +74,7 @@
             },
             function fetchComponentFromServer(cmp) {
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                iframeCmp.set("v.load", "ui:scroller");
+                iframeCmp.set("v.load", "markup://ui:scroller");
                 iframeCmp.fetchCmp();
                 cmp.helper.lib.iframeTest.waitForStatus("Fetching", "Done Fetching");
             },
@@ -109,7 +115,7 @@
             },
             function fetchOriginalComponentAgain(cmp) {
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                iframeCmp.set("v.load", "ui:scroller");
+                iframeCmp.set("v.load", "markup://ui:scroller");
                 iframeCmp.fetchCmp();
                 cmp.helper.lib.iframeTest.waitForStatus("Fetching", "Done Fetching");
             },

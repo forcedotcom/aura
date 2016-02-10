@@ -30,7 +30,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.auraframework.system.AuraContext;
-import org.auraframework.test.ComponentJSTest.ComponentTestCase;
+import org.auraframework.test.ComponentJSTestSuite.ComponentTestCase;
 import org.auraframework.test.perf.util.PerfExecutorTest;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.util.TestInventory;

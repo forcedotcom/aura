@@ -15,66 +15,6 @@
  */
 ({
 
-	 /**
-     * If any parent element is scrollable with the wheel
-     * (overflow-y), return that
-     * 
-     * @param  {HTMLElement} elem The element to check
-     * @return {Mixed}      Returns an HTMLElement if one is found, otherwise null
-     */
-    _getScrollableParent: function(elem) {
-        // TODO this is copypasta from datePickerHelper W-2727472
-        if(!elem || elem === window || (elem.tagName && elem.tagName.toUpperCase() === 'BODY')) {
-            return null;
-        }
-
-        // memoize
-        if(this._scrollableParent) {
-            return this._scrollableParent;
-        }
-
-        // if overflow is auto overflow-y is also auto, 
-        // however in firefox the opposite is not true
-        try { 
-            // getComputedStyle throws an exception
-            // if elem is not an element
-            // (can happen during unrender)
-            var computedStyle = getComputedStyle(elem);
-        } catch (e) {
-            return null;
-        }
-
-        if(!computedStyle) {
-            return null;
-        }
-
-        var overflow = computedStyle['overflow-y'];
-
-        //
-        if(overflow === 'auto') {
-            this._scrollableParent = elem;
-            return elem;
-        }
-
-        if(elem === document.body) {
-            this._scrollableParent = null;
-            return null;
-        }
-
-        return this._getScrollableParent(elem.parentNode);
-
-    },
-
-    cleanEvents: function (cmp) {
-        var elem = cmp.getElement();
-    	var scrollableParent = this._getScrollableParent(cmp.get('v.referenceElement'));
-
-        if(scrollableParent) {
-            scrollableParent.removeEventListener('scroll', this._handleScroll);
-            elem.removeEventListener('wheel', this._handleWheel);
-            this._scrollableParent = null;
-        }
-    },
 
 	handleReferenceElement: function (cmp) {
 		var elem = cmp.getElement();
@@ -102,30 +42,6 @@
 	            targetAlign: 'left bottom'
         	});
 		}
-
-        var scrollableParent = this._getScrollableParent(referenceElem);
-        var self = this;
-        this._handleScroll = function() {
-            self.lib.panelPositioning.reposition(); 
-        };
-
-        this._handleWheel = function(e) {
-            var elScrollableParent = self._getScrollableParent(referenceElem);
-            if(elScrollableParent && typeof elScrollableParent.scrollTop !== 'undefined') {
-                elScrollableParent.scrollTop += e.deltaY;
-            }
-            
-        };
-        
-        // if the target element is inside a 
-        // scrollable element, we need to make sure
-        // scroll events move that element,
-        // not the parent, also we need to reposition on scroll
-        if(scrollableParent) {
-            scrollableParent.addEventListener('scroll', this._handleScroll);
-            elem.addEventListener('wheel', this._handleWheel);
-        }
-
 		
 		this.lib.panelPositioning.reposition(function() {
 			elem.style.opacity = 1;

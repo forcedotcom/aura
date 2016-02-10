@@ -16,7 +16,7 @@
 
 -->
 <aura:application template="auraStorageTest:componentDefStorageTemplate">
-    <aura:attribute name="load" type="String" default="ui:scroller"/>
+    <aura:attribute name="load" type="String" default="markup://ui:scroller"/>
     <aura:attribute name="status" type="String" default="Waiting" />
     <aura:attribute name="defStorageContents" type="String[]" default=""/>
     <aura:attribute name="output" type="Aura.Component" />

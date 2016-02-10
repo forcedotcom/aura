@@ -206,8 +206,10 @@
         var id  = $A.util.getDataAttribute(domElement, 'auraRenderedBy');
         return id && $A.componentService.get(id);
     },
-    _dispatchAction: function (actionHandler, event) {
-        actionHandler.evaluate().runDeprecated(event);
+
+    // NOTE: Do not rename this function (instrumentation reliying on it)
+    _dispatchAction: function (action, event) {
+        action.runDeprecated(event);
     },
     _getItemAttached: function (dom) {
         return dom._data;
@@ -262,7 +264,7 @@
             // Execute the collected handlers in order
             while ((actionHandler = handlers.shift())) {
                 if ($A.util.isExpression(actionHandler)) {
-                    this._dispatchAction(actionHandler, e);
+                    this._dispatchAction(actionHandler.evaluate(), e, targetCmp);
                 }
             }
             

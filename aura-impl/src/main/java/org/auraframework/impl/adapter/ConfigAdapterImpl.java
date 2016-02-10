@@ -636,9 +636,13 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         if ("HTML".equals(format)) {
             String defType = request.getParameter("aura.deftype");
             if ("APPLICATION".equals(defType) || "COMPONENT".equals(defType)) {
-                inlineStyle = true;  // apps and components allow inlines.  Sigh.
+                inlineStyle = !isLockerServiceEnabled();
             }
+        } else {
+        	// Look for /auraFW/resources/lockerservice/safeEval.html
+        	inlineStyle = isSafeEvalWorkerURI(request.getRequestURI());
         }
+        
         return new DefaultContentSecurityPolicy(inlineStyle);
     }
 
@@ -652,5 +656,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 	@Override
 	public boolean isLockerServiceEnabled() {
 		return true;
+	}
+	
+	protected boolean isSafeEvalWorkerURI(String uri) {
+		return uri.equals("/auraFW/resources/lockerservice/safeEval.html");
 	}
 }

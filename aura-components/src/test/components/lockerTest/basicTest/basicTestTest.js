@@ -17,6 +17,14 @@
         }
     },
 
+    testAlertExposed: {
+        test: function(cmp) {
+            cmp.getAlert();
+            var alert = cmp.get("v.log");
+            $A.test.assertStartsWith("function alert() {", alert, "alert() not exposed");
+        }
+    },
+
     testAuraLockerInController: {
         test: function(cmp) {
             cmp.getWrappersFromController();
@@ -42,6 +50,7 @@
                     + "to be a SecureAura");
         }
     },
+    
     testComponentLockerInController: {
         test: function(cmp) {
             cmp.getWrappersFromController();
@@ -160,25 +169,12 @@
 
     testAttemptToEvalToWindow: {
         test: function(cmp) {
-            // eval attempts that return a SecureWindow object
-            this.doTestEvalForSecureWindow(cmp, "self");
-            this.doTestEvalForSecureWindow(cmp, "top");
+        	cmp.testEvalBlocking($A.test);
 
-            // eval attempts that return undefined
-            this.doTestEvalForUndefined(cmp, "parent");
-            this.doTestEvalForUndefined(cmp, "(function () { return this }())");
-            this.doTestEvalForUndefined(cmp, "Function('return this')()");
-            this.doTestEvalForUndefined(cmp, "var evil = ev" + "al; (\"indirect\", evil)(\"this\")");
-            this.doTestEvalForUndefined(cmp, "(\"indirect\", ev" + "al )(\"(new Function('return this'))()\")");
-
-            // These still return real window
-            // this.doTestEvalForSecureWindow(cmp, "({}).constructor.constructor('return this')()");
-            // this.doTestEvalForSecureWindow(cmp, "({ dummy: 1 }).constructor.constructor('return this')()");
-            // this.doTestEvalForSecureWindow(cmp, "(1.2).constructor.constructor('return this')()");
-            // this.doTestEvalForSecureWindow(cmp, "(new Date()).constructor.constructor('return this')()");
-
+        	// DCHASMAN TOOD Port these to cmp.testEvalBlocking()
+        	
             // eval attempts that result in an error
-            try {
+            /*try {
                 var symbol = "toString.constructor.prototype";
                 cmp.testSymbol(symbol);
                 $A.test.fail("eval'ing [" + symbol + "] should throw an error");
@@ -195,19 +191,7 @@
             } catch(e) {
                 var error = e.toString();
                 $A.test.assertStartsWith("Error: Security violation: use of __proto__", error);
-            }
+            }*/
         }
-    },
-
-    doTestEvalForUndefined: function(cmp, symbol) {
-        cmp.testSymbol(symbol);
-        var log = cmp.get("v.log");
-        $A.test.assertStartsWith("Global window via " + symbol + ": undefined", log);
-    },
-
-    doTestEvalForSecureWindow: function(cmp, symbol) {
-        cmp.testSymbol(symbol);
-        var log = cmp.get("v.log");
-        $A.test.assertStartsWith("Global window via " + symbol + ": SecureWindow", log);
     }
 })

@@ -24,9 +24,10 @@
     <aura:method name="getSecureElementFromMarkup" action="{!c.getSecureElementFromMarkup}"/>
     <aura:method name="appendDiv" action="{!c.appendDiv}"/>
     <aura:method name="createScriptTags" action="{!c.createScriptTags}"/>
-    <aura:method name="testSymbol" action="{!c.testSymbol}">
-	    <aura:attribute name="symbol" type="String"/>
+    <aura:method name="getAlert" action="{!c.getAlert}"/>
+    <aura:method name="testEvalBlocking" action="{!c.testEvalBlocking}">
+	    <aura:attribute name="testUtils" type="Object"/>
     </aura:method>
-
+    
     <div aura:id="content"/>
 </aura:component>

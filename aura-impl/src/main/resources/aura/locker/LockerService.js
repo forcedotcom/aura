@@ -17,7 +17,6 @@
 /*jslint sub: true */
 
 //#include aura.locker.SecureWindow
-//#include aura.locker.SecureDocument
 //#include aura.locker.SecureComponent
 
 function LockerService() {
@@ -25,73 +24,6 @@ function LockerService() {
 
 	var lockers = [];
 	var keyToEnvironmentMap = {};
-
-	var validSymbolNameRegEx = /^[a-z$_][a-z0-9$_]*$/i;
-	
-	function getShadows(imports) {
-		var globalKeys = Object.getOwnPropertyNames(window).concat(
-			Object.getOwnPropertyNames(Object)).concat(Object.getOwnPropertyNames(Object.prototype));
-			
-		var candidates = [ "$A", "document", "window", "self", "top", "console", "Error", "Function" ].concat(globalKeys);
-
-		function getInitialWhitelist(symbols) {
-			var skip = {};
-
-			for (var i = 0; i < symbols.length; i++) {
-				var symbol = symbols[i];
-				skip["#" + symbol] = true;
-			}
-
-			return skip;
-		}
-
-		// eval and arguments keywords are protected by strict mode
-		var used = getInitialWhitelist([ "eval", "arguments", "undefined", "NaN", "Date", "Number", "Boolean", "alert" ]);
-
-		var shadows = [];
-		for (var n = 0; n < candidates.length; n++) {
-			var candidate = candidates[n];
-			var usedKey = "#" + candidate;
-			if (!used[usedKey]) {
-				if (!imports || !imports[candidate]) {
-					// Skip over non-viable names
-					if (validSymbolNameRegEx.test(candidate)) {
-						shadows.push(candidate);
-					}
-				}
-
-				used[usedKey] = true;
-			}
-		}
-
-		return shadows;
-	}
-
-	function verifyShadows(expectedShadows, imports) {
-		var shadows = getShadows(imports);
-		if (shadows.length !== expectedShadows.length) {
-			return false;
-		}
-
-		// DCHASMAN TODO W-2837786 Scan shadows and expected shadows for equality
-
-		return undefined;
-	}
-
-	function preprocessSource(code) {
-		// Block use of __proto__
-		if (code.indexOf("__proto__") >= 0 || code.indexOf("__defineGetter__") >= 0 || code.indexOf("__defineSetter__") >= 0) {
-			throw Error("Security violation: use of __proto__, __defineGetter__, and __defineSetter__ is not permitted!");
-		}
-				
-		// Rewrite references to eval to avoid implicit calls leaking global state 
-		// NOTE: strict mode does not allow the symbol eval to be redefined, passed as parameter, so a simple regex can rewrite this during lockering
-		return code.replace(/\beval\b/g, "_lsSafeEval");
-	}
-
-	function isSafeModeEnabled() {
-		return $A.util.globalEval("(function() { 'use strict'; return this === undefined; })()");
-	}
 
 	var service = {
 		createForDef : function(code, def) {
@@ -104,117 +36,29 @@ function LockerService() {
 			return this.create(code, key);
 		},
 
-		create : function(code, key, imports) {
-			if (!isSafeModeEnabled()) {
-				throw new Error("$A.lockerService.create() is only supported in strict mode capable browsers!");
+		getEnv : function(key) {
+			var psuedoKeySymbol = JSON.stringify(key);
+			var env = keyToEnvironmentMap[psuedoKeySymbol];
+			if (!env) {
+				env = keyToEnvironmentMap[psuedoKeySymbol] = new SecureWindow(window, key);
 			}
-			
-			return (function() {
-				var shadows = getShadows(imports);
-
-				var shadowingIIFESource = "function(" + shadows.toString() + ") {\n\"use strict\";\n";
-				
-				// DCHASMAN TODO W-2837788 Figure out the scoping issues here (e.g. component, helper, etc is not visible and maybe that is ok???)
-				shadowingIIFESource += "var that = this; function _lsSafeEval(code) { return eval(\"'use strict';\" + that.secureSource(code)); }\n";
-				
-				shadowingIIFESource += preprocessSource(code) + "\n}";
-
-				var locker;
-				try {
-					locker = $A.util.globalEval(shadowingIIFESource);
-				} catch (x) {
-					throw new Error("Unable to create locker IIFE: " + x);
-				}
-
-				locker.verifyShadows = function() {
-					return verifyShadows(shadows, imports);
-				};
-
-				// For debugging purposes only. We return a copy to avoid leaking a mutatable reference that would allow hacking of verifyShadows()!
-				Object.defineProperty(locker, "$shadows", {
-					get : function() {
-						return shadows.slice(0);
-					}
-				});
-
-				// DCHASMAN TODO W-2837795 reuse of environments uses JSON.stringify(key) as the index into the key to environment map - is this OK or do we need something stronger
-				var psuedoKeySymbol = JSON.stringify(key);
-				var env = keyToEnvironmentMap[psuedoKeySymbol];
-				if (!env) {
-					env = keyToEnvironmentMap[psuedoKeySymbol] = {
-						sWindow : new SecureWindow(window, key),
-
-						sAura : Object.create($A, {
-							getComponent : {
-								value : function(globalId) {
-									var c = $A.getComponent(globalId);
-									$A.lockerService.util.verifyAccess(key, c);
-									return service.wrapComponent(c);
-								}
-							},
-
-							toString : {
-								value : function() {
-									return "SecureAura: { key: " + JSON.stringify(key) + " }";
-								}
-							}
-						}),
-						
-						sUtils : Object.create(Object.prototype, {
-							"secureSource" : {
-								value : preprocessSource
-							},
-
-							toString : {
-								value : function() {
-									return "SecureUtils: { key: " + JSON.stringify(key) + " }";
-								}
-							}
-						}),
-
-						sDocument : new SecureDocument(document, key)
-					};
-
-					$A.lockerService.util.applyKey(env.sAura, key);
-					$A.lockerService.util.applyKey(env.sWindow, key);
-
-					Object.freeze(env.sAura);
-				}
-
-				function sFunction() {
-					/*jslint evil: true */
-					var args = Array.prototype.slice.call(arguments);
-					args[args.length - 1] = "'use strict'; " + args[args.length - 1];
-					return Function.apply(undefined, args);
-				}
-				
-				// function getCtor(o) { if (o.constructor === Function.constructor) { throw new Error("You cannot get Function.ctor!") } return o.constructor; }
-				
-				// We pass in SecureUtils as this to provide an object that cannot be replaced/spoofed
-				var sWindow = env.sWindow;
-				var result = locker.call(env.sUtils, env.sAura, env.sDocument, sWindow, sWindow, sWindow, console, Error, sFunction);
-
-				Object.defineProperty(locker, "$result", {
-					value : result
-				});
-
-				lockers.push(locker);
-
-				Object.freeze(locker);
-
-				return locker;
-			})();
+			return env;
 		},
 
-		verifyAll : function() {
-			for (var n = 0; n < lockers.length; n++) {
-				var locker = lockers[n];
-				if (!locker.verifyShadows()) {
-					return false;
-				}
+		create : function(code, key, imports) {
+			var envRec = this.getEnv(key);
+			var locker;
+			try {
+				locker = {
+					"$envRec": envRec,
+					"$result": window['$$safe-eval$$'](code, envRec, imports)
+				};
+			} catch (x) {
+				throw new Error("Unable to create locker IIFE: " + x);
 			}
-
-			return true;
+			Object.freeze(locker);
+			lockers.push(locker);
+			return locker;
 		},
 
 		destroy : function(locker) {
@@ -226,6 +70,7 @@ function LockerService() {
 
 		destroyAll : function() {
 			lockers = [];
+			keyToEnvironmentMap = [];
 		},
 
 		wrapComponent : function(component, referencingKey) {
@@ -288,6 +133,10 @@ function LockerService() {
 		},
 
 		showLockedNodes : function showLockedNodes(root) {
+			if (!root) {
+				root = document;
+			}
+			
 			if ($A.lockerService.util.isKeyed(root)) {
 				$A.util.addClass(root, "lockerizedNode");
 			}
@@ -297,17 +146,21 @@ function LockerService() {
 				showLockedNodes(children[i]);
 			}
 		},
-		
+
 		// Master key will be hidden by both locker shadowing and scope
 		masterKey : Object.freeze({
 			name : "master"
 		})
 	};
-	
+
 	service.util = (function() {
 		var lockerNamespaceKeys = {};
 
 		function getKey(thing) {
+			if (!thing) {
+				return undefined;
+			}
+			
 			var f = thing["$lsKey"];
 			return f ? f($A.lockerService.masterKey) : undefined;
 		}
@@ -321,22 +174,22 @@ function LockerService() {
 		    			namespace: namespace
 		    		});
 				}
-				
+
 				return key;
 			},
-			
+
 			_getKey : function(thing, mk) {
 				if (mk !== $A.lockerService.masterKey) {
 					throw Error("Access denied");
 				}
-				
-				return getKey(thing); 
+
+				return getKey(thing);
 			},
-			
+
 			isKeyed : function(thing) {
 				return getKey(thing) !== undefined;
 			},
-			
+
 			hasAccess : function(from, to) {
 				var fromKey = getKey(from);
 				var toKey = getKey(to);
@@ -375,9 +228,9 @@ function LockerService() {
 				}
 			}
 		};
-		
+
 		Object.freeze(util);
-		
+
 		return util;
 	})();
 
@@ -391,4 +244,3 @@ function LockerService() {
 }
 
 Aura.Services.LockerService = LockerService;
-

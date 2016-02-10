@@ -66,23 +66,12 @@ Aura.Utils.Util.prototype.isIOSWebView = function() {
  *
  * @private
  */
-Aura.Utils.Util.prototype.globalEval = function(src, globals) {
-    if (window["$$safe-eval-compat$$"]) {
-        return window["$$safe-eval-compat$$"](src, window, globals);
-    }
-    // --- backward compatibility ---
-    // If the worker is not ready, we have to fallback to the old mechanism of evaluation.
-    // This is mostly due to `$A.initConfig()` calls on AuraElement from Aloha and VF, which is due to be removed.
-    // The protection mechanism here is that if CSP is in place, and the worker is not, the evaluation will be prevented,
-    // but if CSP is off, and the worker was initialized, the system still behaves.
-    // This block can be removed as part of that work is described here: @W-2900324
-    if (Aura.Utils.Util.prototype.isIE) {
-        // use assignment to variable so that the newlines in src are not actually treated as the end of the line
-        return new Function("var a = " + src + "; return a;")();
-    } else {
-        // normal indirect eval call
-        return window.eval("false||" + src);
-    }
+Aura.Utils.Util.prototype.globalEval = Aura.Utils.Util.prototype.isIE ? function(src) {
+    // use assignment to variable so that the newlines in src are not actually treated as the end of the line
+    return new Function("var a = " + src + "; return a;")();
+} : function(src) {
+    // normal indirect eval call
+    return window.eval("false||" + src);
 };
 
 /**

@@ -21,6 +21,9 @@ import org.auraframework.test.util.MockBean;
 
 /**
  * Provide a configurable ConfigAdapter for tests.
+ * 
+ * 
+ * @since 0.0.178
  */
 public interface MockConfigAdapter extends ConfigAdapter, MockBean {
     void setIsClientAppcacheEnabled(boolean isClientAppcacheEnabled);
@@ -38,6 +41,4 @@ public interface MockConfigAdapter extends ConfigAdapter, MockBean {
     void setCSRFToken(String token);
 
     void setUnprivilegedNamespace(String namespace);
-
-    void setLockerServiceEnabled(boolean isLockerServiceEnabled);
 }

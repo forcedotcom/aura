@@ -163,27 +163,6 @@ AuraClientService = function AuraClientService () {
         }
     });
 
-    // safe eval worker enables the page to run arbitrary evaluation,
-    // this iframe is hidden, and not accessible via keyboard navigation, and
-    // it adds two new globals: `$$safe-eval` and `$$safe-eval-compat$$`
-    // this block adds some basic error checks on the iframe while specific
-    // routines could opt-in to wait for the iframe to be ready as well.
-    var safeEvalWorker = document.getElementById("safeEvalWorker");
-    if (!safeEvalWorker) {
-        // note: the locker worker is required to be inserted before aura fw script tag.
-        throw new $A.auraError("Aura(): Failed to locate the locker worker.");
-    }
-    if (!window['$$safe-eval$$']) {
-        Aura.Utils.Util.prototype.on(safeEvalWorker, "load", function () {
-            if (!window["$$safe-eval$$"]) {
-                throw new $A.auraError("Aura(): Failed to initialize locker worker.");
-            }
-        });
-        Aura.Utils.Util.prototype.on(safeEvalWorker, 'error', function () {
-            throw new $A.auraError("Aura(): Failed to load locker worker.");
-        });
-    }
-
     var auraXHR = new Aura.Services.AuraClientService$AuraXHR();
     this.availableXHRs = [ auraXHR ];
     this.allXHRs = [ auraXHR ];

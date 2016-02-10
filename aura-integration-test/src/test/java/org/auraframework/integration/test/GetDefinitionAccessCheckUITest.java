@@ -22,20 +22,14 @@ import org.openqa.selenium.By;
 
 @ThreadHostileTest("Tests modify what namespaces are privileged or not")
 public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
-
+    
     public GetDefinitionAccessCheckUITest(String name) {
         super(name);
     }
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        // TODO: remove when $A.createComponent is exposed in the locker
-        getMockConfigAdapter().setLockerServiceEnabled(false);
-    }
-
     /*
-     * TODO: (W-2799335) Disabled this test since $A.getDeifinition() doesn't do access check for Event
+     * TODO: (W-2799335)
+     * Disabled this test since $A.getDeifinition() doesn't do access check for Event
      */
     public void _testGetEventDefinitionWithoutAccess() throws Exception {
         getMockConfigAdapter().setUnprivilegedNamespace("clientApiTest");
@@ -58,7 +52,8 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
     }
 
     /*
-     * TODO: (W-2799335) Disabled this test since $A.getDeifinitions() doesn't do access check for Event
+     * TODO: (W-2799335)
+     * Disabled this test since $A.getDeifinitions() doesn't do access check for Event
      */
     public void _testGetMutilpleDefinitionsWithoutAccess() throws Exception {
         getMockConfigAdapter().setUnprivilegedNamespace("clientApiTest");

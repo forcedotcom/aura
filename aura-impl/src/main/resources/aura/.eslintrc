@@ -90,7 +90,6 @@
     "valueFactory": true,
     "ValueDef": true,
     "WallTime": true,
-    "SecureAura": true,
     "SecureThing": true,
     "SecureComponent": true,
     "SecureWindow": true,

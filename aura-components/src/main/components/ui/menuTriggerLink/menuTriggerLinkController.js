@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 ({
+    init: function (component, event, helper) {
+        helper.initializeHandlers(component);
+    },
     onblur: function(component) {
         component.get("e.blur").fire();
     },

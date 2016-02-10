@@ -38,7 +38,7 @@
         var dispatcher = cmp.getConcreteComponent().getEventDispatcher();
 
         for (var e in this.EVENT_DISPATCH) {
-            if (dispatcher[e]) {
+            if (dispatcher[e] && dispatcher[e].length) {
                 htmlAttr[this.EVENT_DISPATCH[e]] = cmp.getReference('c.' + e);
             }
         }

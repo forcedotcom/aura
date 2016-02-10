@@ -15,6 +15,56 @@
  */
 
 ({
+    EVENT_DISPATCH: {
+        'onTabHover'   : ['onfocus', 'onmouseover'],
+        'onTabUnhover' : ['onblur', 'onmouseout']
+    },
+    initializeHandlers: function (cmp) {
+        var htmlItem   = cmp.find('tabItem');
+        var htmlAttr   = htmlItem.get('v.HTMLAttributes');
+        var dispatcher = cmp.getConcreteComponent().getEventDispatcher();
+
+        for (var e in this.EVENT_DISPATCH) {
+            if (dispatcher[e] && dispatcher[e].length) {
+                var events = this.EVENT_DISPATCH[e];
+                for (var i in events) {
+                    htmlAttr[events[i]] = cmp.getReference('c.' + e);
+                }
+            }
+        }
+    },
+    /*
+    * See initializeHandlers comments, then:
+    * In order to add handlers dynamically, we need to override the original function.
+    * We need to programatically add the aura handler and the DOM event.
+    */
+    addHandler: function (cmp, handlerParams) {
+        var eventName = handlerParams.eventName;
+        var htmlEventNames = this.EVENT_DISPATCH[eventName];
+        $A.assert(htmlEventNames, 'Type of event not supported');
+
+        var valueProvider = handlerParams.valueProvider;
+        var actionExpression = handlerParams.actionExpression;
+
+        var tmp = cmp;
+        while (!(tmp.getDef().getDescriptor().getQualifiedName() === "markup://ui:tabItem")) {
+            tmp = tmp.getSuper();
+        }
+
+        var htmlAnchor = tmp.find('tabItem');
+        var originalAddHandler = htmlAnchor.addHandler;
+        var htmlAttr = htmlAnchor.get('v.HTMLAttributes');
+
+        for (var i in htmlEventNames) {
+            htmlAttr[htmlEventNames[i]] = cmp.getReference('c.' + eventName);
+        }
+        // Set the attribute back so if the button is render will attach the handlers correctly
+        htmlAnchor.set('v.HTMLAttributes', htmlAttr);
+
+        // Call the origin addHandler method  with the given attributes
+        originalAddHandler.call(cmp, eventName, valueProvider, actionExpression);
+
+    },
     setActive: function (cmp, active, focus) {
         cmp.set("v.active", active);
 
@@ -38,13 +88,9 @@
     },
 
     handleHoverEvent: function (cmp, eventName) {
-        var event = cmp.getEvent(eventName);
-        // Set this tabItem component as a param in the event
-        var params = {
-            tabComponent: cmp
-        };
-        event.setParams(params);
-        event.fire();
+        cmp.getEvent(eventName)
+        .setParams({ tabComponent: cmp })
+        .fire();
     },
 
     initWidth: function (cmp) {

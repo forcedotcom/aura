@@ -14,6 +14,23 @@
  * limitations under the License.
  */
 ({
+    /*
+     * In order to not attach all declared dom handlers automatically, we just
+     * attach the ones that have an action to be dispatched
+    */
+    initializeHandlers: function (cmp) {
+        var html       = cmp.find('link');
+        var htmlAttr   = html.get('v.HTMLAttributes');
+        var dispatcher = cmp.getConcreteComponent().getEventDispatcher();
+
+        if (dispatcher.focus && dispatcher.focus.length) {
+            htmlAttr.onfocus = cmp.getReference('c.onfocus');
+        }
+
+        if (dispatcher.blur && dispatcher.blur.length) {
+            htmlAttr.blur = cmp.getReference('c.onblur');
+        }
+    },
     focus: function(component) {
         var linkCmp = this.getAnchorElement(component);
         var elem = linkCmp ? linkCmp.getElement() : null;

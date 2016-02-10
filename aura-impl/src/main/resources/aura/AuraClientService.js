@@ -639,6 +639,15 @@ AuraClientService.prototype.countAvailableXHRs = function(/*isBackground*/) {
 };
 
 /**
+ * release the current thread from 'in aura collections'
+ *
+ * @export
+ */
+AuraClientService.prototype.inFlightXHRs = function(/*isBackground*/) {
+    return this.allXHRs.length - this.availableXHRs.length;
+};
+
+/**
  * Get an available XHR, possibly aborting others.
  *
  * Used for instrumentation

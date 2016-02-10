@@ -367,7 +367,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
             postProcess(parsedTransaction);
         }
         // 2. execute any beacon middleware
-        if (beacon["middleware"]) {
+        if (beacon && beacon["middleware"]) {
             beacon["middleware"](parsedTransaction);
         }
         // 3. Notify all the global transactionEnd handlers
@@ -376,7 +376,9 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
         }
 
         // 4. Send to beacon
-        beacon["sendData"](parsedTransaction["id"], parsedTransaction);
+        if (beacon) {
+            beacon["sendData"](parsedTransaction["id"], parsedTransaction);
+        }
 
         // Cleanup transaction
         if (!this.clearCompleteTransactions) {

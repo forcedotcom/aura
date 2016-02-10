@@ -58,6 +58,7 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -221,6 +222,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertFalse("A BaseComponentDef shouldn't be equal with different registered events", bcd1.equals(bcd2));
     }
 
+    @UnAdaptableTest("no locker service in core yet W-2930725")
     public void testSerialize() throws Exception {
         Map<DefDescriptor<AttributeDef>, AttributeDef> testAttributeDefs = ImmutableMap.of(
                 DefDescriptorImpl.getInstance("testAttributeDescriptorName", AttributeDef.class),
@@ -238,6 +240,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 null, null, null, null, null, null, false, false));
     }
 
+    @UnAdaptableTest("no locker service in core yet W-2930725")
     public void testSerialize2() throws Exception {
         serializeAndGoldFile(vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "fake:component", null, null, null, vendor.makeLocation("filename2", 10, 10, 0), null,

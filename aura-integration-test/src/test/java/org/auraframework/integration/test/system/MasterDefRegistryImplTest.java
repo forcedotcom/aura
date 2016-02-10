@@ -70,6 +70,7 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -1118,6 +1119,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertFalse("nsCmp is not in cache", isInDefsCache(nsCmpDef, mdri2));
     }
 
+    @UnAdaptableTest("namesapce start with c means something special in core")
     public void testDescriptorFilterCache() throws Exception {
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
         MasterDefRegistry mdr = getAuraMDR();
@@ -1407,6 +1409,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      *
      * @return List of DefDescriptors that have been added to the mdr caches.
      */
+    @UnAdaptableTest("namesapce start with c means something special in core")
     private Map<DefType, DefDescriptor<?>> addNonPriveledgedDefsToMDR(MasterDefRegistryImpl mdr) throws Exception {
         DefDescriptor<ComponentDef> cmpDef = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component>"

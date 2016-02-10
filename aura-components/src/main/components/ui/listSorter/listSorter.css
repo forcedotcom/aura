@@ -26,6 +26,8 @@
 
 .THIS .open.PHONE.listSorterContainer, .THIS .open.TABLET.listSorterContainer {
 	margin: 0;
+	box-shadow: none;
+	width: 100% !important;
 }
 
 .THIS .hidden {
@@ -105,13 +107,19 @@
  
 .THIS .listSorterContainer .body {
 	position: relative;
-	top: 42px;
-} 
+}
+
+.THIS .open.PHONE.listSorterContainer div.uiMenuList {
+	width: 100%;
+	border-radius: 0;
+	max-width: none;
+}
 
 .THIS div.uiMenuList {
 	position: relative;	
 	box-shadow: none;
-	background-color: #f0f1f2;		
+	background-color: #f0f1f2;
+	top: 42px;
 }
 
 .THIS div.uiMenuList li a {

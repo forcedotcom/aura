@@ -19,11 +19,6 @@ Function.RegisterNamespace("Test.Aura");
 Test.Aura.AuraClientServiceTest = function() {
     var $A = {};
     var Aura = {Services: {}, Controller: {}, Utils: {Util:{prototype:{on:function(){}}}}};
-    var document = {
-    	getElementById : function(id) { 
-    		return id === "safeEvalWorker" ? {} : undefined;
-    	}
-    };
 
     var Importer = Mocks.GetMocks(Object.Global(), {
         "$A": $A,
@@ -69,7 +64,7 @@ Test.Aura.AuraClientServiceTest = function() {
             mark : function() {}
         },
         window:{},
-        document:document,
+        document:{},
         Aura: Aura
     });
 
@@ -86,9 +81,8 @@ Test.Aura.AuraClientServiceTest = function() {
     		// Act
             var actual;
             mockGlobal(function() {
-        		actual = target.shouldSendOutForegroundActions([], 1);
+                actual = target.shouldSendOutForegroundActions([], 1);
             });
-            
             // Assert : we send out caboose action if it has been longer then 60s since last send
             Assert.Equal(true, actual);
     	}
@@ -437,8 +431,7 @@ Test.Aura.AuraClientServiceTest = function() {
                         then: function(suc, err) { func(suc, err); }
                     };
                 },
-                window : Object.Global(),
-                document : document
+                window: Object.Global()
             })(function() {
                 mockActionStorage.clear()
                     .then(function() { delegate(new Aura.Services.AuraClientService(), mockActionStorage); });
@@ -907,7 +900,6 @@ Test.Aura.AuraClientServiceTest = function() {
                 "localStorage": mockStorage,
                 "sessionStorage": mockStorage
             },
-            document: document,
             Aura: Aura,
             Action : {
                 getStorage: function () {
@@ -1079,7 +1071,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 }
             },
             window : {},
-            document : document,
+            document : {},
             Aura : Aura
         });
 

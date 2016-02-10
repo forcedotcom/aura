@@ -16,7 +16,8 @@
 
 -->
 <aura:component>
+    <aura:attribute name="addl" type="String"/>
     <aura:attribute name="count" type="Integer" default="0"/>
-    <aura:method name="addInputDate" action="{!c.addInputDate}"/>
+    <ui:button label="Add New InputDate" press="{!c.addInputDate}" />
     <div aura:id="additionalHolder" />
 </aura:component>

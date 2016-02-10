@@ -19,19 +19,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.auraframework.Aura;
 import org.auraframework.http.CSP;
 import org.auraframework.http.CSPReporterServlet;
 
 /**
- * A default, fairly strict security policy, allowing no framing and only same-origin script.
+ * A default, fairly strict security policy, allowing no framing and only same-origin
+ * script.
  *
  * @since 194
  */
 public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
 
     private static final String[] ARRAY_NONE = { CSP.NONE };
-    private static final String[] ARRAY_ANY = { CSP.ALL };
+    private static final String[] ARRAY_ANY = {CSP.ALL };
     private static final String[] ARRAY_SELF_ONLY = { CSP.SELF };
 
     private static String inlineHeader = null;
@@ -52,15 +52,16 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
     /**
      * Creates a default policy.
      *
-     * @param inline whether to allow inline script and style. It's better not to, but legacy is what legacy is.
+     * @param inline whether to allow inline script and style.  It's better not to, but legacy is what
+     *     legacy is.
      */
     public DefaultContentSecurityPolicy(boolean inline) {
         inlineStyle = inline;
     }
 
     /**
-     * We don't like framing, by default. Not even same-origin. Except that our tests require same-origin framing, so
-     * we'll allow that anyway.
+     * We don't like framing, by default.  Not even same-origin.  Except that our
+     * tests require same-origin framing, so we'll allow that anyway.
      */
     @Override
     public Collection<String> getFrameAncestors() {
@@ -75,41 +76,28 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         return getSameOrigin();
     }
 
-    /**
-     * We allow script from same origin and chrome extensions. And sometimes, sadly, inline and eval.
-     */
+    /** We allow script from same origin and chrome extensions.  And sometimes, sadly, inline and eval. */
     @Override
     public Collection<String> getScriptSources() {
-        List<String> list = new ArrayList<>(inlineStyle ? 4 : 3);
-        list.add(null); // Same origin allowed
+        List<String> list = new ArrayList<>(inlineStyle ? 4 : 2);
+        list.add(null);  // Same origin allowed
         list.add("chrome-extension:");
         if (inlineStyle) {
+            list.add(CSP.UNSAFE_EVAL);
             list.add(CSP.UNSAFE_INLINE);
-
-            if (!Aura.getConfigAdapter().isLockerServiceEnabled()) {
-                list.add(CSP.UNSAFE_EVAL);
-            }
-        } else {
-            list.add("'nonce-LockerServiceTemporaryNonce'");
         }
-
         return list;
     }
 
-    /**
-     * We allow style from same origin and chrome extensions. And sometimes, sadly, inline.
-     */
+    /** We allow style from same origin and chrome extensions.  And sometimes, sadly, inline. */
     @Override
     public Collection<String> getStyleSources() {
-        List<String> list = new ArrayList<>(3);
-        list.add(null); // Same origin allowed
+        List<String> list = new ArrayList<>(inlineStyle ? 3 : 2);
+        list.add(null);  // Same origin allowed
         list.add("chrome-extension:");
         if (inlineStyle) {
             list.add(CSP.UNSAFE_INLINE);
-        } else {
-            list.add("'nonce-LockerServiceTemporaryNonce'");
         }
-
         return list;
     }
 
@@ -139,9 +127,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         return null;
     }
 
-    /**
-     * We can connect only to the same origin. Which should be default by the browser anyway.
-     */
+    /** We can connect only to the same origin.  Which should be default by the browser anyway. */
     @Override
     public Collection<String> getConnectSources() {
         return getSameOrigin();
@@ -164,7 +150,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
             if (inlineStyle) {
                 inlineHeader = header;
             } else {
-                defaultHeader = header;
+                defaultHeader= header;
             }
         }
         return header;

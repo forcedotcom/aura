@@ -68,19 +68,18 @@
     <html manifest="{!v.manifest}">
         <head>
             <title>{!v.title}</title>
-            <script nonce="LockerServiceTemporaryNonce">
-            var pageStartTime = (new Date()).getTime();</script>
+            <script>var pageStartTime = (new Date()).getTime();</script>
             {!v.extraMetaTags}
 
             <!-- ====== Styles ====== -->
             {!v.auraResetTags}
-            <style nonce="LockerServiceTemporaryNonce">
+            <style>
                 {!v.inlineStyle}
                 {!v.appcacheProgressBarStyle}
             </style>
             {!v.auraStyleTags}
             {!v.extraStyleTags}
-            <style nonce="LockerServiceTemporaryNonce">{!v.auraInlineStyle}</style>
+            <style>{!v.auraInlineStyle}</style>
         <!-- ==================== -->
         </head>
 
@@ -94,17 +93,16 @@
 	            <div class="logo"/>
 	            <div class="spinner"/>
 	            <h2>{!v.loadingText}</h2>
-	          </div>
+	        </div>
             <div aura:id="auraErrorMask" class="{! 'auraMsgMask' + ( v.forceError ? ' auraForcedErrorBox' : '' )}" >
                 <div class="auraMsgBox auraErrorBox" aura:id="auraError">
                     <h2>
-                        <a class="close" id="dismissError" href="javascript:void(0);">&times;</a>
+                        <a class="close" onclick="dismissError();" href="javascript:void(0);">&times;</a>
                         {!v.errorTitle}
                     </h2>
                     <div id="auraErrorMessage">{!v.errorMessage}</div>
                 </div>
             </div>
-            <iframe id="safeEvalWorker" src="/auraFW/resources/lockerservice/safeEval.html" width="0" height="0" tabindex="-1" class="invisible" aria-hidden="true" title="scripts">&nbsp;</iframe>
 
             {!v.body}
 
@@ -114,7 +112,7 @@
 
             {!v.auraPreInitBlock}
 
-            <script nonce="LockerServiceTemporaryNonce">
+            <script>
                 if ({!v.autoInitialize}) {
                     $A.initAsync({!v.auraInit});
                 } else if ({!v.autoInitializeSync}){
@@ -128,16 +126,7 @@
                     } else {
                         document.body.removeChild(document.getElementById("auraErrorMask"));
                     }
-                };
-                var dismissErrorEl = document.getElementById('dismissError');
-                if (dismissErrorEl) {
-                    if (dismissErrorEl.addEventListener) {
-                        dismissErrorEl.addEventListener("click", dismissError);
-                    } else if (dismissErrorEl.attachEvent) {
-                        dismissErrorEl.attachEvent("onclick", dismissError);
-                    }
                 }
-
                 // We explicitly disable IE as there are issues with it and fastclick.
                 // Instead, "touch-action: manipulation;" (IE11) and "-ms-touch-action: manipulation" (IE10)
                 // should be used on the components that we want no touch-delay on.

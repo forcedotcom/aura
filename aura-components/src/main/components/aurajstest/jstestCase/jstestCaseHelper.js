@@ -62,7 +62,7 @@
             cmp.set("v.status", "fail");
             var msg = "";
             /*eslint-disable no-eval*/
-            var errorsInCallbackFunc = $A.util.globalEval("(" + win.aura.test.getErrors() + ")");
+            var errorsInCallbackFunc = eval("(" + win.aura.test.getErrors() + ")");
             var error = null;
             for (var i = 0; i < errorsInCallbackFunc.length; i++) {
                 error = errorsInCallbackFunc[i];

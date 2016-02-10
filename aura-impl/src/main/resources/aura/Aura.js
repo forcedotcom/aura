@@ -328,7 +328,7 @@ function AuraInstance () {
          * @memberOf AuraInstance.prototype
          */
         style: this.styleService,
-
+        
         /**
          * Metrics Service
          *
@@ -346,7 +346,7 @@ function AuraInstance () {
          * @memberOf AuraInstance.prototype
          */
         locker: this.lockerService,
-
+        
         get : function(key) {
             var ret = $A.services[key];
             if (!ret && key === "root") {
@@ -539,28 +539,17 @@ function AuraInstance () {
  */
 AuraInstance.prototype.initAsync = function(config) {
 
-    function createAuraContext() {
-        // Context is created async because of the GVPs go though async storage checks
-        $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
+    // Context is created async because of the GVPs go though async storage checks
+    $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
 
-            $A.context = context;
-            $A.clientService.initHost(config["host"]);
-            $A.setLanguage();
+        $A.context = context;
+        $A.clientService.initHost(config["host"]);
+        $A.setLanguage();
 
-            $A.metricsService.initialize();
+        $A.metricsService.initialize();
 
-            $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
-        });
-    }
-
-    // safe eval worker is an iframe that enables the page to run arbitrary evaluation,
-    // if this iframe is still loading, we should wait for it before continue with
-    // initialization.
-    if (!window['$$safe-eval$$']) {
-        $A.util.on(document.getElementById('safeEvalWorker'), 'load', createAuraContext);
-    } else {
-        createAuraContext();
-    }
+        $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
+    });
 };
 
 /**
@@ -625,7 +614,7 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
                 $A.finishInit(doNotInitializeServices);
             });
         }
-
+        
     }
 };
 

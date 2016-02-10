@@ -416,6 +416,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         Aura.getContextService().registerGlobal(name, writable, defaultValue);
     }
 
+    @UnAdaptableTest("Browser in context's GVP is different in OSS")
     public void testSerializeWithRegisteredGlobal() throws Exception {
         final String name = "someNewValue";
         registerGlobal(name, true, "some default value");

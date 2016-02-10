@@ -45,6 +45,7 @@ import org.auraframework.test.client.UserAgent;
 import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.test.util.DummyHttpServletRequest;
 import org.auraframework.test.util.DummyHttpServletResponse;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 
 /**
@@ -246,6 +247,7 @@ public class AuraResourceServletTest extends AuraTestCase {
      *
      * FIXME: this test should not be here.... it should be on MDR.
      */
+    @UnAdaptableTest("W-2929438")
     public void testJsCacheClearedOnSourceChange() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload", ApplicationDef.class);
         AuraContext context = Aura.getContextService()
@@ -283,6 +285,7 @@ public class AuraResourceServletTest extends AuraTestCase {
     /**
      * Verify cache of SVG definitions is cleared on source change in DEV mode.
      */
+    @UnAdaptableTest("W-2929438")
     public void testSvgCacheClearedOnSourceChange() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload", ApplicationDef.class);
         AuraContext context = Aura.getContextService()
@@ -466,6 +469,7 @@ public class AuraResourceServletTest extends AuraTestCase {
     /**
      * Verify that context path is prepended on all Aura urls in appcache manifest
      */
+    @UnAdaptableTest("W-2929438")
     public void testManifestContentWithContextPath() throws Exception {
         if (Aura.getContextService().isEstablished()) {
             Aura.getContextService().endContext();
@@ -500,6 +504,7 @@ public class AuraResourceServletTest extends AuraTestCase {
     /**
      * Verify framework UID exists in auraFW javascript urls in appcache manifest
      */
+    @UnAdaptableTest("W-2929438")
     public void testManifestFwJsUrlContainsFWId() throws Exception {
         // Arrange
         if (Aura.getContextService().isEstablished()) {

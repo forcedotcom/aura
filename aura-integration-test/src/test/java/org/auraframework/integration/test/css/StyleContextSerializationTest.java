@@ -34,6 +34,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
@@ -46,6 +47,7 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
         super(name);
     }
 
+    @UnAdaptableTest("core add info about if we are on desktop, we don't")
     /** test that the css url includes the client/browser, no extra true conditions */
     public void testCssUrlWithClient() throws Exception {
         AuraContext ctx = setupContext();
@@ -69,12 +71,14 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
 //        goldFileAppCssUrl();
 //    }
 
+    @UnAdaptableTest("core add info about if we are on desktop, we don't")
     /** test that the css url includes multiple app-specified tokens and in the correct order */
     public void testCssUrlWithMultipleAppTokensDefs() throws Exception {
         setupContext("test:fakeTokens2", "test:fakeTokens", "test:fakeTokens3");
         goldFileAppCssUrl();
     }
 
+    @UnAdaptableTest("core add info about if we are on desktop, we don't")
     /** test that the css url uses the concrete (provided) tokens descriptors */
     public void testCssUrlWithProvidedTokens() throws Exception {
         String name = "test:fakeTokensWithDescriptorProvider";
@@ -83,6 +87,7 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
         goldFileAppCssUrl();
     }
 
+    @UnAdaptableTest("core add info about if we are on desktop, we don't")
     /** test that the css url includes a hash when a map-provided tokens is used */
     public void testSerializeWithMapProvidedTokens() throws Exception {
         setupContext("test:fakeTokensWithMapProvider", "test:fakeTokens3");

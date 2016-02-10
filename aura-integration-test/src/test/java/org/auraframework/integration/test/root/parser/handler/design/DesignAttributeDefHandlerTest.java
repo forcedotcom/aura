@@ -23,6 +23,7 @@ import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
 
@@ -90,6 +91,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @UnAdaptableTest("namespace cxxx means something special in core")
     public void testDesignFileWithInvalidAttributeTypesExposed() throws Exception {
         String cmp = "<aura:attribute name=\"invalidAttribute\" type=\"String[]\" />";
         String design = "<design:component><design:attribute name=\"invalidAttribute\" /> </design:component>";
@@ -104,6 +106,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @UnAdaptableTest("namespace cxxx means something special in core")
     public void testDesignFileWithInvalidAttributeTypeForDataSource() throws Exception {
         String cmp = "<aura:attribute name=\"invalidAttribute\" type=\"Integer\" />";
         String design = "<design:component><design:attribute name=\"invalidAttribute\" datasource=\"1,2,3\" /> </design:component>";
@@ -135,6 +138,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @UnAdaptableTest("namespace cxxx means something special in core")
     public void testDesignWithDefaultBlockNonPriviledgedFails() throws Exception {
         final String attr = "attr";
         String cmp = "<aura:attribute name=\"" + attr +"\" type=\"String\" />";

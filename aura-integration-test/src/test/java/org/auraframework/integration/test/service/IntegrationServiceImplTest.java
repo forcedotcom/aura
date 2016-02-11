@@ -26,10 +26,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.integration.Integration;
-import org.auraframework.integration.IntegrationServiceObserver;
 import org.auraframework.integration.UnsupportedUserAgentException;
 import org.auraframework.service.IntegrationService;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -38,7 +36,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Ignore;
-import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -399,19 +396,6 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         }catch(QuickFixException e){
             fail("Failed to get definition of noDefaultPreloads interface. IntegrationService may suffer performance degredation.");
         }
-    }
-    
-    /**
-     * Verify IntegrationServiceObserver invoked during integration service component injection.
-     * 
-     * @throws Exception
-     */
-    public void testObserverInvoked() throws Exception {
-        IntegrationServiceObserver mockObserver = Mockito.mock(IntegrationServiceObserver.class);
-        AuraContext cntx = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
-        Integration integration = service.createIntegration("", Mode.UTEST, true, null, getNoDefaultPreloadsApp().getQualifiedName(), mockObserver);
-        injectSimpleComponent(integration);
-        Mockito.verify(mockObserver, Mockito.times(2)).contextEstablished(integration, cntx);
     }
 
     /**

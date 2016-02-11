@@ -69,8 +69,6 @@ import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends RootDefinitionTest<T> {
 
-    protected final String interfaceTag = "<aura:interface provider='%s'>%s</aura:interface>";
-
     public BaseComponentDefTest(String name, Class<T> defClass, String tag) {
         super(name, defClass, tag);
     }
@@ -391,7 +389,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         Set<DefDescriptor<?>> dependencies = new HashSet<>();
         Aura.getDefinitionService().getDefinition(cmpDesc).appendDependencies(dependencies);
 
-        @SuppressWarnings("unchecked")
         Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, providerDesc, modelDesc,
                 controllerDesc, eventDesc, styleDesc, renderDesc, helperDesc);
         if (!dependencies.containsAll(expected)) {

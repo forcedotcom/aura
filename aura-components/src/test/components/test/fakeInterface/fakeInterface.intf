@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:interface provider="java://org.auraframework.impl.java.provider.FakeProvider" extends="test:fakeParentInterface">
+<aura:interface extends="test:fakeParentInterface">
 </aura:interface>

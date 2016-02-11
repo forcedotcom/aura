@@ -747,7 +747,7 @@ AuraInstance.prototype.handleError = function(message, e) {
 AuraInstance.prototype.reportError = function(message, error) {
     $A.handleError(message, error);
     if ($A.initialized) {
-        $A.logger.reportError(error);
+        $A.logger.reportError(error || new Error("[NoErrorObjectAvailable] " + message));
         $A.services.client.postProcess();
     }
 };

@@ -15,180 +15,716 @@
  */
 package org.auraframework.integration.test.root.parser.handler;
 
-import java.util.ArrayList;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.EventDef;
+import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
-import org.auraframework.impl.root.parser.handler.BaseAccessAttributeEnforcementTest;
+@UnAdaptableTest("namespace start with c means something special in core")
+public class EventAccessAttributeEnforcementTest extends AuraImplTestCase {
+    public EventAccessAttributeEnforcementTest(String name) {
+        super(name);
+    }
 
-public class EventAccessAttributeEnforcementTest extends BaseAccessAttributeEnforcementTest { 
-	public EventAccessAttributeEnforcementTest(String name) {
-		super(name);
-		testResource = TestResource.Event;
-	}
-	
-	/**
-	 * Verify Creating a events of different types works
-	 * @throws Exception
-	 */
-	public void testCreateAuraEventTypes() throws Exception {
-		ArrayList<String> failures = new ArrayList<>();
-		verifyCreateAuraEventTypes("APPLICATION", failures);
-		verifyCreateAuraEventTypes("COMPONENT", failures);
-		verifyCreateAuraEventTypes("VALUE", failures);
-		
-		if (!failures.isEmpty()) {
-			String message = "\n";
-			for (int i = 0; i < failures.size(); i++) {
-				message += failures.get(i);
-				if (i != failures.size() - 1) {
-					message += ",\n";
-				}
-			}
+    
+    /**
+     * Default Access Tests for one event extends another start
+     */
+    /**
+     * Verify Default access enforcement
+     * verifyAccess for Event,System,System
+     */
+    @Test
+    public void testEventWithSystemNamespaceExtendsEventWithSameSystemNamespace() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent2", true);
+        descriptor.getDef();
+    }
+    /**
+     * Verify Default access enforcement
+     * verifyAccess for Event,System,SystemOther
+     */
+    @Test
+    public void testEventWithSystemNamespaceExtendsEventWithOtherSystemNamespace() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testevent2", true);
+        descriptor.getDef();
+    }
+    /**
+     * Verify Default access enforcement
+     * verifyAccess for Event,System,Custom
+     */
+    @Test
+    public void testEventWithCustomNamespaceExtendsEventWithSystemNamespace() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent2", false);
+        try {
+        	descriptor.getDef();
+         	fail("event of custom namespace shouldn't be able to extends event of system namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+    		//Access to event 'string:testevent1' from namespace 'cstring' in 'markup://cstring:testevent22(EVENT)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    /**
+     * Verify Default access enforcement
+     * verifyAccess for Event,Custom,Custom
+     */
+    @Test
+    public void testEventWithCustomNamespaceExtendsEventWithSameCustomNamespace() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent2", false);
+        descriptor.getDef();
+    }
+    /**
+     * Verify Default access enforcement
+     * verifyAccess for Event,Custom,CustomOther
+     */
+    @Test
+    public void testEventWithCustomNamespaceExtendsEventWithOtherCustomNamespace() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testevent2", false);
+        try {
+        	descriptor.getDef();
+         	fail("event of custom namespace shouldn't be able to extends event of system namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+    		//Access to event 'cstring:testevent1' from namespace 'cstring1' in 'markup://cstring1:testevent22(EVENT)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    /**
+     * Verify Default access enforcement
+     * verifyAccess for Event,Custom,System
+     */
+    @Test
+    public void testEventWithSystemNamespaceExtendsEventWithCustomNamespace() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent2", true);
+        	descriptor.getDef();
+    }
+    
+    
 
-			fail("Test failed with " + failures.size() + " errors:" + message);
-		}
-	}
-	
-	private void verifyCreateAuraEventTypes(String type, ArrayList<String> failures) throws Exception {
-		String resourceSource = "<aura:event type='"+type+"' />";
+    
+    
+ 
+    /**
+     * Default Public Tests for one event extends another start
+     */
+    /**
+     * Verify PUBLIC access enforcement
+     * verifyAccess for Event,System,System
+     */
+    @Test
+    public void testEventWithSystemNamespaceExtendsEventWithSameSystemNamespaceAccessPublic() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent2", true);
+        descriptor.getDef();
+    }
+    /**
+     * Verify PUBLIC access enforcement
+     * verifyAccess for Event,System,SystemOther
+     */
+    @Test
+    public void testEventWithSystemNamespaceExtendsEventWithOtherSystemNamespaceAccessPublic() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testevent2", true);
+        descriptor.getDef();
+    }
+    /**
+     * Verify PUBLIC access enforcement
+     * verifyAccess for Event,System,Custom
+     */
+    @Test
+    public void testEventWithCustomNamespaceExtendsEventWithSystemNamespaceAccessPublic() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent2", false);
+        try {
+        	descriptor.getDef();
+         	fail("event of custom namespace shouldn't be able to extends event of system namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+    		//Access to event 'string:testevent1' from namespace 'cstring' in 'markup://cstring:testevent22(EVENT)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    /**
+     * Verify PUBLIC access enforcement
+     * verifyAccess for Event,Custom,Custom
+     */
+    @Test
+    public void testEventWithCustomNamespaceExtendsEventWithSameCustomNamespaceAccessPublic() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent2", false);
+        descriptor.getDef();
+    }
+    /**
+     * Verify PUBLIC access enforcement
+     * verifyAccess for Event,Custom,CustomOther
+     */
+    @Test
+    public void testEventWithCustomNamespaceExtendsEventWithOtherCustomNamespaceAccessPublic() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testevent2", false);
+        try {
+        	descriptor.getDef();
+         	fail("event of custom namespace shouldn't be able to extends event of system namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+    		//Access to event 'cstring:testevent1' from namespace 'cstring1' in 'markup://cstring1:testevent22(EVENT)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    /**
+     * Verify PUBLIC access enforcement
+     * verifyAccess for Event,Custom,System
+     */
+    @Test
+    public void testEventWithSystemNamespaceExtendsEventWithCustomNamespaceAccessPublic() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent2", true);
+        	descriptor.getDef();
+    }
+    
+    
+    
+    
+    
+    
 
-		for (TestNamespace targetNamespace : TestNamespace.values()) {
-			testResourceNamespace = targetNamespace;
-			
-			try {
-				runSimpleTestCase(resourceSource);
-			} catch (Throwable e) {
-				failures.add(e.getMessage());
-			}	
-			
-		}
-		
+    /**
+     * Default Global Tests for one event extends another start
+     */
+    /**
+     * Verify GLOBAL access enforcement
+     * verifyAccess for Event,System,System
+     */
+    @Test
+    public void testEventWithSystemNamespaceExtendsEventWithSameSystemNamespaceAccessGlobal() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent2", true);
+        descriptor.getDef();
     }
-	
-	/**
-	 * Verify Extending an Application Event works
-	 * @throws Exception
-	 */
-	public void testExtendsAuraApplicationEvents() throws Exception {
-		ArrayList<String> failures = new ArrayList<>();
-		verifyExtendsAuraEvents("APPLICATION", "aura:doneRendering", failures);
-		verifyExtendsAuraEvents("APPLICATION", "aura:doneWaiting", failures);
-		verifyExtendsAuraEvents("APPLICATION", "aura:locationChange", failures);
-		verifyExtendsAuraEvents("APPLICATION", "aura:noAccess", failures);
-		verifyExtendsAuraEvents("APPLICATION", "aura:systemError", failures);
-		verifyExtendsAuraEvents("APPLICATION", "aura:waiting", failures);
-		
-		if (!failures.isEmpty()) {
-			String message = "\n";
-			for (int i = 0; i < failures.size(); i++) {
-				message += failures.get(i);
-				if (i != failures.size() - 1) {
-					message += ",\n";
-				}
-			}
+    /**
+     * Verify GLOBAL access enforcement
+     * verifyAccess for Event,System,SystemOther
+     */
+    @Test
+    public void testEventWithSystemNamespaceExtendsEventWithOtherSystemNamespaceAccessGlobal() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testevent2", true);
+        descriptor.getDef();
+    }
+    /**
+     * Verify GLOBAL access enforcement
+     * verifyAccess for Event,System,Custom
+     */
+    @Test
+    public void testEventWithCustomNamespaceExtendsEventWithSystemNamespaceAccessGlobal() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent2", false);
+        	descriptor.getDef();
+    }
+    /**
+     * Verify GLOBAL access enforcement
+     * verifyAccess for Event,Custom,Custom
+     */
+    @Test
+    public void testEventWithCustomNamespaceExtendsEventWithSameCustomNamespaceAccessGlobal() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent2", false);
+        descriptor.getDef();
+    }
+    /**
+     * Verify GLOBAL access enforcement
+     * verifyAccess for Event,Custom,CustomOther
+     */
+    @Test
+    public void testEventWithCustomNamespaceExtendsEventWithOtherCustomNamespaceAccessGlobal() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testevent2", false);
+        	descriptor.getDef();
+    }
+    /**
+     * Verify GLOBAL access enforcement
+     * verifyAccess for Event,Custom,System
+     */
+    @Test
+    public void testEventWithSystemNamespaceExtendsEventWithCustomNamespaceAccessGlobal() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create event extends the event above
+        String source = "<aura:event type='COMPONENT' extends='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent2", true);
+        	descriptor.getDef();
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
-			fail("Test failed with " + failures.size() + " errors:" + message);
-		}
-		
-	}
-	
-	/**
-	 * Verify Extending a Value Event works
-	 * @throws Exception
-	 */
-	public void testExtendsAuraValueEvents() throws Exception {
-		ArrayList<String> failures = new ArrayList<>();
-		
-		verifyExtendsAuraEvents("VALUE", "aura:valueChange", failures);		
-		verifyExtendsAuraEvents("VALUE", "aura:valueInit", failures);
-		
-		if (!failures.isEmpty()) {
-			String message = "\n";
-			for (int i = 0; i < failures.size(); i++) {
-				message += failures.get(i);
-				if (i != failures.size() - 1) {
-					message += ",\n";
-				}
-			}
+    
+    
+    /**
+     * Default Access Tests for event is registered by aura:registerEvent
+     */
+    /**
+     * Verify Default Access Enforcement
+     * verifyAccess for Component,System,System
+     */
+    @Test
+    public void testComponentWithSystemNamespaceRegistEventWithSameSystemNamespaceInMarkup() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        descriptor.getDef();
+    }
+    /**
+     * Verify Default Access Enforcement
+     * verifyAccess for Component,System,SystemOther
+     */
+    @Test
+    public void testComponentWithSystemNamespaceRegistEventWithOtherSystemNamespaceInMarkup() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponent", true);
+        descriptor.getDef();
+    }
+    /**
+     * Verify Default Access Enforcement
+     * verifyAccess for Component,System,Custom
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegistEventWithSystemNamespaceInMarkup() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        try {
+        	descriptor.getDef();
+          	fail("component of custom namespace shouldn't be able to register event of system namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+    		//Access to event 'string:testevent1' from namespace 'cstring' in 'markup://cstring:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    /**
+     * Verify Default Access Enforcement
+     * verifyAccess for Component,Custom,Custom
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegistEventWithSameCustomNamespaceInMarkup() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        	descriptor.getDef();
+    }
+    /**
+     * Verify Default Access Enforcement
+     * verifyAccess for Component,Custom,CustomOhter
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegistEventWithOtherCustomNamespaceInMarkup() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponent", false);
+        try {
+        	descriptor.getDef();
+          	fail("component of custom namespace shouldn't be able to register event of other custom namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+    		//Access to event 'string:testevent1' from namespace 'cstring' in 'markup://cstring:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    /**
+     * Verify Default Access Enforcement
+     * verifyAccess for Component,Custom,System
+     */
+    @Test
+    public void testComponentWithSystemNamespaceRegistEventWithCustomNamespaceInMarkup() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        	descriptor.getDef();
+    }
+    
+    
+    
+    
+    
+    
+    
 
-			fail("Test failed with " + failures.size() + " errors:" + message);
-		}
+ 
+    /**
+     * Default Access Tests for event is registered by aura:registerEvent
+     */
+    /**
+     * Verify PUBLIC Access Enforcement
+     * verifyAccess for Component,System,System
+     */
+    @Test
+    public void testComponentWithSystemNamespaceRegistEventWithSameSystemNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        descriptor.getDef();
+    }
+    /**
+     * Verify PUBLIC Access Enforcement
+     * verifyAccess for Component,System,SystemOther
+     */
+    @Test
+    public void testComponentWithSystemNamespaceRegistEventWithOtherSystemNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponent", true);
+        descriptor.getDef();
+    }
+    /**
+     * Verify PUBLIC Access Enforcement
+     * verifyAccess for Component,System,Custom
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegistEventWithSystemNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        try {
+        	descriptor.getDef();
+          	fail("component of custom namespace shouldn't be able to register event of system namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+    		//Access to event 'string:testevent1' from namespace 'cstring' in 'markup://cstring:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    /**
+     * Verify PUBLIC Access Enforcement
+     * verifyAccess for Component,Custom,Custom
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegistEventWithSameCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        	descriptor.getDef();
+    }
+    /**
+     * Verify PUBLIC Access Enforcement
+     * verifyAccess for Component,Custom,CustomOhter
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegistEventWithOtherCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponent", false);
+        try {
+        	descriptor.getDef();
+          	fail("component of custom namespace shouldn't be able to register event of other custom namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+    		//Access to event 'string:testevent1' from namespace 'cstring' in 'markup://cstring:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    /**
+     * Verify PUBLIC Access Enforcement
+     * verifyAccess for Component,Custom,System
+     */
+    @Test
+    public void testComponentWithSystemNamespaceRegistEventWithCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        	descriptor.getDef();
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
-	}
-	
-	private void verifyExtendsAuraEvents(String type, String baseEvent, ArrayList<String> failures) throws Exception {
-		String resourceSource = "<aura:event type='"+type+"' extends='"+baseEvent+"' />";
-		
-		for (TestNamespace targetNamespace : TestNamespace.values()) {
-			testResourceNamespace = targetNamespace;
-			
-			try {
-				runSimpleTestCase(resourceSource);
-			} catch (Throwable e) {
-				failures.add(e.getMessage());
-			}	
-			
-		}
+    /**
+     * Default Access Tests for event is registered by aura:registerEvent
+     */
+    /**
+     * Verify GLOBAL Access Enforcement
+     * verifyAccess for Component,System,System
+     */
+    @Test
+    public void testComponentWithSystemNamespaceRegistEventWithSameSystemNamespaceInMarkupAccessGlobal() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        descriptor.getDef();
     }
-	
-	/**
-	 * Verify Creating a Component works
-	 * @throws Exception
-	 */
-	public void testAccess() throws Exception {
-		verifyAccess();
+    /**
+     * Verify GLOBAL Access Enforcement
+     * verifyAccess for Component,System,SystemOther
+     */
+    @Test
+    public void testComponentWithSystemNamespaceRegistEventWithOtherSystemNamespaceInMarkupAccessGlobal() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponent", true);
+        descriptor.getDef();
     }
-		
-	/**
-	 * Verify Default access enforcement
-	 * @throws Exception
-	 */
-	public void testDefaultAccessForExtends() throws Exception {
-		testCase = TestCase.DEFAULT;
-		verifyAccess(new TestResource[]{TestResource.Event});
+    /**
+     * Verify GLOBAL Access Enforcement
+     * verifyAccess for Component,System,Custom
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegistEventWithSystemNamespaceInMarkupAccessGlobal() throws QuickFixException {
+        //create event with system namespace
+        String eventSource = "<aura:event type='COMPONENT' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testevent", true);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        	descriptor.getDef();
     }
-	
-	/**
-	 * Verify Public access enforcement
-	 * @throws Exception
-	 */
-	public void testPublicAccessForExtends() throws Exception {
-		testCase = TestCase.PUBLIC;
-		verifyAccess(new TestResource[]{TestResource.Event});
+    /**
+     * Verify GLOBAL Access Enforcement
+     * verifyAccess for Component,Custom,Custom
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegistEventWithSameCustomNamespaceInMarkupAccessGlobal() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        	descriptor.getDef();
     }
-	
-	/**
-	 * Verify Global access enforcement
-	 * @throws Exception
-	 */
-	public void testGlobalAccessForExtends() throws Exception {
-		testCase = TestCase.GLOBAL;
-		verifyAccess(new TestResource[]{TestResource.Event});
+    /**
+     * Verify GLOBAL Access Enforcement
+     * verifyAccess for Component,Custom,CustomOhter
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegistEventWithOtherCustomNamespaceInMarkupAccessGlobal() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponent", false);
+        	descriptor.getDef();
     }
-	
-	/**
-	 * Verify Default access enforcement when event is used in aura:registerEvent
-	 * @throws Exception
-	 */	
-	public void testDefaultAccessForRegisterEvent() throws Exception {
-		testCase = TestCase.DEFAULT;
-		verifyAccess(new TestResource[]{TestResource.Component});
-    }
-	
-	/**
-	 * Verify Public access enforcement when event is used in aura:registerEvent
-	 * @throws Exception
-	 */	
-	public void testPublicAccessForRegisterEvent() throws Exception {
-		testCase = TestCase.PUBLIC;
-		verifyAccess(new TestResource[]{TestResource.Component});
-    }
-	
-	/**
-	 * Verify Global access enforcement when event is used in aura:registerEvent
-	 * @throws Exception
-	 */	
-	public void testGlobalAccessForRegisterEvent() throws Exception {
-		testCase = TestCase.GLOBAL;
-		verifyAccess(new TestResource[]{TestResource.Component});
+    /**
+     * Verify GLOBAL Access Enforcement
+     * verifyAccess for Component,Custom,System
+     */
+    @Test
+    public void testComponentWithSystemNamespaceRegistEventWithCustomNamespaceInMarkupAccessGlobal() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='COMPONENT' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent", false);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        	descriptor.getDef();
     }
 }

@@ -272,6 +272,8 @@ function AuraInspectorActionsView(devtoolsPanel) {
             case "ERROR":
                 _completed.insertBefore(card, _completed.querySelector(".action-card"));
                 break;
+            case "INCOMPLETE":
+                _completed.insertBefore(card, _completed.querySelector(".action-card"));
             default://"SUCCESS"
                 _completed.insertBefore(card, _completed.querySelector(".action-card"));
                 break;

@@ -17,12 +17,23 @@ package org.auraframework.integration.test;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
-import org.auraframework.def.*;
-import org.auraframework.test.util.*;
-import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
-import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.IncludeDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LibraryDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.TokensDef;
+import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import com.google.common.base.Function;
@@ -30,8 +41,6 @@ import com.google.common.base.Function;
 /**
  * Tests to verify that the client gets updated when we want it to get updated.
  */
-@ExcludeBrowsers({ BrowserType.IPAD })
-// W-2572170: exclude from IPAD for now, there are issues in autobuild
 public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
     public ClientOutOfSyncUITest(String name) {
@@ -144,7 +153,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         addSourceAutoCleanup(styleDesc, String.format(".%s {font-size:t(fsize);}", className));
         DefDescriptor<?> tokensDesc = Aura.getDefinitionService().getDefDescriptor(
                 String.format("%s://%s:%sNamespace", DefDescriptor.MARKUP_PREFIX, cmpDesc.getNamespace(),
-                        cmpDesc.getNamespace()), TokensDef.class);
+                        cmpDesc.getNamespace()),
+                TokensDef.class);
         addSourceAutoCleanup(tokensDesc,
                 "<aura:tokens><aura:token name='fsize' value='8px'/></aura:tokens>");
         open(cmpDesc);
@@ -152,7 +162,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         updateStringSource(tokensDesc,
                 "<aura:tokens><aura:token name='fsize' value='66px'/></aura:tokens>");
         open(cmpDesc);
-        assertEquals("66px", auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-size"));
+        assertEquals("66px",
+                auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-size"));
     }
 
     public void testGetClientRenderingAfterJsControllerChange() throws Exception {
@@ -355,7 +366,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         addSourceAutoCleanup(styleDesc, String.format(".%s {font-size:t(fsize);}", className));
         DefDescriptor<?> tokensDesc = Aura.getDefinitionService().getDefDescriptor(
                 String.format("%s://%s:%sNamespace", DefDescriptor.MARKUP_PREFIX, cmpDesc.getNamespace(),
-                        cmpDesc.getNamespace()), TokensDef.class);
+                        cmpDesc.getNamespace()),
+                TokensDef.class);
         addSourceAutoCleanup(tokensDesc,
                 "<aura:tokens><aura:token name='fsize' value='8px'/></aura:tokens>");
         open(cmpDesc);
@@ -556,7 +568,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 ComponentDef.class,
                 String.format(baseComponentTag,
                         String.format("render='client' helper='%s'", helperDesc.getQualifiedName()),
-                        String.format("<aura:import library='%s' property='mylib'/>", libraryDesc.getDescriptorName())));
+                        String.format("<aura:import library='%s' property='mylib'/>",
+                                libraryDesc.getDescriptorName())));
 
         open(cmpDesc);
         assertEquals("initialized", auraUITestingUtil.getEval(String.format(
@@ -584,7 +597,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 ComponentDef.class,
                 String.format(baseComponentTag,
                         String.format("render='client' helper='%s'", helperDesc.getQualifiedName()),
-                        String.format("<aura:import library='%s' property='mylib'/>", libraryDesc.getDescriptorName())));
+                        String.format("<aura:import library='%s' property='mylib'/>",
+                                libraryDesc.getDescriptorName())));
 
         open(cmpDesc);
         assertEquals("firstpick", auraUITestingUtil.getEval(String.format(

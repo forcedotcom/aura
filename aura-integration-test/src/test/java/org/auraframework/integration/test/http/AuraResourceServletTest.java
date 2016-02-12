@@ -291,7 +291,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraContext context = Aura.getContextService()
                 .startContext(Mode.DEV, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
-        DefDescriptor<SVGDef> svgDesc = appDesc.getDef().getSVGDefDescriptor();
+        DefDescriptor<SVGDef> svgDesc = Aura.getDefinitionService().getDefinition(appDesc).getSVGDefDescriptor();
         final String uid = context.getDefRegistry().getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
 
@@ -328,8 +328,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraContext context = Aura.getContextService()
                 .startContext(Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
-        DefDescriptor<SVGDef> svgDesc = appDesc.getDef().getSVGDefDescriptor();
-        String etag = svgDesc.getDef().getOwnHash();
+        DefDescriptor<SVGDef> svgDesc = Aura.getDefinitionService().getDefinition(appDesc).getSVGDefDescriptor();
+        String etag = Aura.getDefinitionService().getDefinition(svgDesc).getOwnHash();
 
         final String uid = context.getDefRegistry().getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
@@ -383,8 +383,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraContext context = Aura.getContextService()
                 .startContext(Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
-        DefDescriptor<SVGDef> svgDesc = appDesc.getDef().getSVGDefDescriptor();
-        final String etag = svgDesc.getDef().getOwnHash();
+        DefDescriptor<SVGDef> svgDesc = Aura.getDefinitionService().getDefinition(appDesc).getSVGDefDescriptor();
+        final String etag = Aura.getDefinitionService().getDefinition(svgDesc).getOwnHash();
 
         final String uid = context.getDefRegistry().getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
@@ -435,7 +435,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraContext context = Aura.getContextService()
                 .startContext(Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
-        DefDescriptor<SVGDef> svgDesc = appDesc.getDef().getSVGDefDescriptor();
+        DefDescriptor<SVGDef> svgDesc = Aura.getDefinitionService().getDefinition(appDesc).getSVGDefDescriptor();
 
         final String uid = context.getDefRegistry().getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);

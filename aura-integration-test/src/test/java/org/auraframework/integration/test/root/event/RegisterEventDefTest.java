@@ -18,6 +18,7 @@ package org.auraframework.integration.test.root.event;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
@@ -110,7 +111,7 @@ public class RegisterEventDefTest extends AuraImplTestCase {
                 "<aura:registerevent name='eventName' type='aura:valueEvent'/>");
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
         try {
-            cmpDesc.getDef();
+        	Aura.getDefinitionService().getDefinition(cmpDesc);
             fail("Should have thrown exception when registering for an event of type Value");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,

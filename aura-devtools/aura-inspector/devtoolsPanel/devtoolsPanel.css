@@ -110,9 +110,9 @@ header.tabs button {
 }
 header.tabs button:hover {
   border: 1px solid #DADEE2;
-  border-bottom: 0 none;
   background: #fff;
   background: #F5F6F7;
+  margin-bottom: -1px;
 }
 header.tabs button:focus {
   outline: 1px solid #FF9F05;
@@ -120,7 +120,6 @@ header.tabs button:focus {
 header.tabs button.selected {
   background: #fff;
   border: 1px solid #DADEE2;
-  border-bottom:1px solid #fff;
   margin-bottom:-1px;
 }
 header.tabs div.dropdown#help {
@@ -155,12 +154,13 @@ section.tab-body {
   display: none;
   width: 100%;
   overflow: hidden;
-  height: calc(100% - 28px);
 }
 section.selected {
   display: block;
+  height: calc(100% - 28px);
 }
-body.sidebar-visible section.tab-body {
+body.sidebar-visible section.tab-body,
+body.sidebar-visible header.tabs {
   width: 75%;
 }
 body .sidebar {
@@ -178,6 +178,8 @@ body.sidebar-visible .sidebar {
 }
 .tree-view li > span {
   cursor: pointer;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 .component-tree .tree-view li > span:hover {
   background-color: rgba(56, 121, 217, 0.1);
@@ -439,12 +441,12 @@ button.toggle:focus {
   background: #fff;
   border-left: 1px solid #e0e5ee;
   bottom: 0;
-  opacity: .8;
   overflow: auto;
   position: absolute;
   right: 0;
   width: 25%;
   top: 0;
+  z-index: 11;
 }
 .component-view ul li {
   list-style: none;

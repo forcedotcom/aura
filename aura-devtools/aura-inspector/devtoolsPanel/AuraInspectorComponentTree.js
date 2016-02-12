@@ -13,25 +13,23 @@ function AuraInspectorComponentTree(devtoolsPanel) {
 
     var markup = `
         <div class="grid grid-columns scroll-wrapper">
-        <menu type="toolbar" class="flex no-flex">
-            <li>
-              <button id="refresh-button" class="refresh-status-bar-item status-bar-item" title="Refresh">
-                <div class="glyph toolbar-button-theme"></div>
-                <div class="glyph shadow"></div>
-              </button>
-            </li>
-            <li>
-              <button id="expandall-button" class="text-button">
-                <span>Expand All</span>
-              </button>
-            </li>
-            <li class="divider"></li>
-            <li><input type="checkbox" id="showglobalids-checkbox"><label for="showglobalids-checkbox">Show Global IDs</label></li>
-        </menu>
+          <menu type="toolbar" class="flex no-flex">
+              <li>
+                <button id="refresh-button" class="refresh-status-bar-item status-bar-item" title="Refresh">
+                  <div class="glyph toolbar-button-theme"></div>
+                  <div class="glyph shadow"></div>
+                </button>
+              </li>
+              <li>
+                <button id="expandall-button" class="text-button">
+                  <span>Expand All</span>
+                </button>
+              </li>
+              <li class="divider"></li>
+              <li><input type="checkbox" id="showglobalids-checkbox"><label for="showglobalids-checkbox">Show Global IDs</label></li>
+          </menu>
           <div class="flex scroll">
-            <div class="">
-              <div class="component-tree source-code" id="tree"></div>
-            </div>
+            <div class="component-tree source-code" id="tree"></div>
           </div>
         </di>
     `;

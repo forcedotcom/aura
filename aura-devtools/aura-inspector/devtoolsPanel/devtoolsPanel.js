@@ -182,7 +182,7 @@
          */
         this.showPanel = function(key, options) {
             if(!key) { return; }
-            var buttons = document.querySelectorAll("header.tabs button");
+            var buttons = document.querySelectorAll("header.tabs button:not(.trigger)");
             var sections = document.querySelectorAll("section.tab-body:not(.sidebar)");
             var panelKey = key.indexOf("tabs-")==0?key.substring(5):key;
             var buttonKey = "tabs-"+panelKey;
@@ -195,6 +195,7 @@
                     buttons[c].classList.remove("selected");
                     sections[c].classList.remove("selected");
                 }
+                this.hideSidebar();
             }
 
             // Render the output. Panel is responsible for not redrawing if necessary.

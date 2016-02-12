@@ -27,7 +27,6 @@ Aura.Services.AuraClientService$AuraXHR = function AuraXHR() {
     this.marker = 0;
     this.request = undefined;
     this.actions = {};
-    this.transactionId = undefined;
 };
 
 /**
@@ -92,11 +91,6 @@ Aura.Services.AuraClientService$AuraActionCollector = function AuraActionCollect
  * There be dragons here.
  *
  * Manage the queue of actions sent to the server.
- *
- * Abortable actions are handled via three variables:
- *  (1) lastTransactionId - The abortable transaction that should be executed
- *  (2) nextTransactionId - used to track the next abortable group to be created.
- *  (3) currentTransactionId - if we are executing in context of an abortable group, this is the group to use.
  *
  * Queue Processing Notes:
  *  * The queue is processed synchronously, but almost all of the interesting functionily occurs asynchronously.
@@ -183,17 +177,6 @@ AuraClientService = function AuraClientService () {
 
     this._disconnected = undefined;
 
-    //
-    // Transactions
-    //
-    this.nextTransactionId = 1;
-    this.currentTransactionId = undefined;
-    this.lastTransactionId = 1;
-
-    //
-    // Option to send stored actions after the XHR send. version 33 behaviour is false
-    //
-    this.optionStoredAfterSend = false;
     //
     // Run client actions synchronously. This is the previous behaviour.
     //
@@ -435,7 +418,6 @@ AuraClientService.prototype.fireDoneWaiting = function() {
  */
 AuraClientService.prototype.setInCollection = function() {
     this.auraStack.push("AuraClientService$collection");
-    this.setCurrentTransactionId(this.collector.transactionId);
 };
 
 /**
@@ -444,7 +426,6 @@ AuraClientService.prototype.setInCollection = function() {
  * @private
  */
 AuraClientService.prototype.clearInCollection = function() {
-    this.setCurrentTransactionId(undefined);
     var name = this.auraStack.pop();
     $A.assert(name === "AuraClientService$collection");
 };
@@ -464,43 +445,6 @@ AuraClientService.prototype.isDisconnectedOrCancelled = function(response) {
 };
 
 /**
- * Get the current transaction ID.
- *
- * This routine selects the transaction id that should be assigned by first selecting currentTransactionId if it
- * is defined, otherwise, we fall back to using nextTransactionId.
- *
- * @private
- */
-AuraClientService.prototype.getCurrentTransactionId = function() {
-    $A.assert(this.inAuraLoop(), "AuraClientService.getCurrentTransasctionId(): Unable to get transaction ID outside aura loop");
-    return this.currentTransactionId;
-};
-
-/**
- * Set the current transaction ID.
- *
- * This routine sets the currentTransactionId, and it should always be a previous transaction ID, or things
- * may well go very wrong.
- *
- * @private
- */
-AuraClientService.prototype.setCurrentTransactionId = function(abortableId) {
-    var tid = undefined;
-
-    if (abortableId !== undefined) {
-        $A.assert(this.inAuraLoop(), "AuraClientService.setCurrentTransasctionId(): Unable to set abortable ID outside aura loop");
-
-        tid = parseInt(abortableId, 10);
-        $A.assert(tid <= this.nextTransactionId, "AuraClientService.setCurrentTransactionId(): invalid transaction id: "+tid);
-        if (tid > this.lastTransactionId) {
-            this.lastTransactionId = tid;
-        }
-    }
-    this.currentTransactionId = tid;
-};
-
-
-/**
  * Process a single action/response.
  *
  * Note that it does this inside an $A.run to provide protection against error returns, and to notify the user if an
@@ -514,24 +458,20 @@ AuraClientService.prototype.setCurrentTransactionId = function(abortableId) {
  * @private
  */
 AuraClientService.prototype.singleAction = function(action, actionResponse, key, store) {
-    var storage, toStore, needUpdate, errorHandler, tid = this.currentTransactionId, newTid;
+    var storage, toStore, needUpdate, errorHandler, needsRefresh;
 
     try {
         // Force the transaction id to 'this' action, so that we maintain chains.
-        if (action.getAbortableId() !== undefined) {
-            this.setCurrentTransactionId(action.getAbortableId());
-        }
-        newTid = this.currentTransactionId;
         needUpdate = action.updateFromResponse(actionResponse);
-        if (action.getAbortableId() === this.lastTransactionId || !action.isAbortable()) {
+        needsRefresh = action.isRefreshAction();
+        
+        if (!action.abortIfComponentInvalid(false)) {
             if (needUpdate) {
                 action.finishAction($A.getContext());
             }
-            if (action.isRefreshAction()) {
+            if (needsRefresh) {
                 action.fireRefreshEvent("refreshEnd", needUpdate);
             }
-        } else {
-            action.abort();
         }
         if (store) {
             storage = action.getStorage();
@@ -573,10 +513,6 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
     } catch (e) {
         $A.logger.auraErrorHelper(e, action);
         throw e;
-    } finally {
-        if (newTid === this.currentTransactionId || tid) {
-            this.currentTransactionId = tid;
-        }
     }
 };
 
@@ -595,25 +531,9 @@ AuraClientService.prototype.isManifestPresent = function() {
 };
 
 /**
- * Check to see if an action should be aborted.
- *
- * @param {Action} the action to check.
- * @returns true if the action was aborted
- */
-AuraClientService.prototype.maybeAbortAction = function(action) {
-    if (action.isAbortable() && action.getAbortableId() !== this.lastTransactionId) {
-        // whoops, action is already aborted.
-        action.abort();
-        return true;
-    }
-    return false;
-};
-
-/**
- * Count the available XHRs, including abortable ones.
+ * Count the available XHRs.
  */
 AuraClientService.prototype.countAvailableXHRs = function(/*isBackground*/) {
-    // FIXME : this needs to figure out what XHRs can be aborted.
     return this.availableXHRs.length;
 };
 
@@ -627,20 +547,17 @@ AuraClientService.prototype.inFlightXHRs = function(/*isBackground*/) {
 };
 
 /**
- * Get an available XHR, possibly aborting others.
+ * Get an available XHR.
  *
  * Used for instrumentation
- *
- * This function MUST be called after a call to countAvailableXHRs().
  *
  * @param {Boolean} isBackground is the XHR for a background action.
  */
 AuraClientService.prototype.getAvailableXHR = function(isBackground) {
-    //FIXME : this needs to abort XHRs.
     if (isBackground && this.availableXHRs.length === 1) {
         // FIXME: this is bogus and will change.
         return null;
-                }
+    }
     var auraXHR = this.availableXHRs.pop();
     return auraXHR;
 };
@@ -1026,6 +943,15 @@ AuraClientService.prototype.idle = function() {
 };
 
 /**
+ * This function is used by the test service to determine if there are outstanding actions queued.
+ *
+ * @private
+ */
+AuraClientService.prototype.areActionsWaiting = function() {
+    return !(this.actionsQueued.length === 0 && this.actionsDeferred.length === 0);
+};
+
+/**
  * Initialize definitions.
  *
  * FIXME: why is this exported
@@ -1145,14 +1071,6 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
 
             // we've respected the value so clear it
             acs.clearDisableBootstrapCacheOnNextLoad();
-
-            //
-            // No, really, do not abort this. The setStorable above defaults this
-            // to be abortable, but, even though nothing should ever trigger an action
-            // that could be abortable here (we haven't loaded the app yet, so it shouldn't
-            // be possible), we want to avoid any confusion.
-            //
-            action.setAbortable(false);
 
             action.setParams({ "name": tag, "attributes": attributes, "chainLoadLabels": true });
             //
@@ -1332,8 +1250,6 @@ AuraClientService.prototype.postProcess = function() {
             throw (e instanceof $A.auraError) ? e : new $A.auraError("AuraClientService.popStack: error in processing", e);
         }
         this.auraStack.pop();
-        this.nextTransactionId += 1;
-        this.currentTransactionId = undefined;
     }
 };
 
@@ -1350,7 +1266,6 @@ AuraClientService.prototype.process = function() {
         return;
     }
     this.collector = new Aura.Services.AuraClientService$AuraActionCollector();
-    this.collector.transactionId = this.currentTransactionId;
     this.continueProcessing();
 };
 
@@ -1375,8 +1290,9 @@ AuraClientService.prototype.continueProcessing = function() {
     for (i = 0; i < actionList.length; i++) {
         action = actionList[i];
         try {
-            if (this.maybeAbortAction(action)) {
+            if (action.abortIfComponentInvalid(true)) {
                 // action alrealy aborted.
+                // this will only occur if the component is no longer valid.
                 continue;
             }
             if (action.getDef().isServerAction()) {
@@ -1424,11 +1340,7 @@ AuraClientService.prototype.getStoredResult = function(action, storage, index) {
     storage.get(key).then(
         function(value) {
             if (value && value.value) {
-                if (that.optionStoredAfterSend) {
-                    that.enqueueStoredAction(action, value.value);
-                } else {
-                    that.executeStoredAction(action, value.value, that.collector.collected, index);
-                }
+                that.executeStoredAction(action, value.value, that.collector.collected, index);
                 that.collector.actionsToCollect -= 1;
                 that.finishCollection();
             } else {
@@ -1460,7 +1372,7 @@ AuraClientService.prototype.executeStoredAction = function(action, response, col
 
     this.setInCollection();
     try {
-        if (!this.maybeAbortAction(action)) {
+        if (!action.abortIfComponentInvalid(false)) {
             try {
                 action.updateFromResponse(response);
                 action.finishAction($A.getContext());
@@ -1536,7 +1448,7 @@ AuraClientService.prototype.runClientActions = function() {
  */
 AuraClientService.prototype.executeClientAction = function(action) {
     try {
-        if (!this.maybeAbortAction(action)) {
+        if (!action.abortIfComponentInvalid(false)) {
             action.runDeprecated();
             action.finishAction($A.getContext());
         }
@@ -1612,7 +1524,6 @@ AuraClientService.prototype.sendActionXHRs = function() {
     var background = [];
     var action, auraXHR;
     var caboose = 0;
-    var transactionId = this.collector.transactionId;
     var i;
 
     //
@@ -1622,11 +1533,8 @@ AuraClientService.prototype.sendActionXHRs = function() {
     this.actionsDeferred = [];
     for (i = 0; i < processing.length; i++) {
         action = processing[i];
-        if (this.maybeAbortAction(action)) {
+        if (action.abortIfComponentInvalid(true)) {
             continue;
-        }
-        if (action.isAbortable()) {
-            transactionId = action.getAbortableId();
         }
         if (action.isBackground()) {
             background.push(action);
@@ -1637,16 +1545,12 @@ AuraClientService.prototype.sendActionXHRs = function() {
             }
         }
     }
-    if (transactionId === undefined) {
-        transactionId = this.lastTransactionId;
-    }
 
     // either group caboose with at least one non-caboose foreground
     // or send all caboose after 60s since last send
     if( this.shouldSendOutForegroundActions(foreground, caboose) ) {
         auraXHR = this.getAvailableXHR(false);
         if (auraXHR) {
-            auraXHR.transactionId = transactionId;
             if (!this.send(auraXHR, foreground, "POST")) {
                 this.releaseXHR(auraXHR);
             }
@@ -1662,7 +1566,6 @@ AuraClientService.prototype.sendActionXHRs = function() {
             action = background[i];
             auraXHR = this.getAvailableXHR(true);
             if (auraXHR) {
-                auraXHR.transactionId = transactionId;
                 if (!this.send(auraXHR, [ action ], "POST")) {
                     this.releaseXHR(auraXHR);
                 }
@@ -1965,9 +1868,6 @@ AuraClientService.prototype.buildParams = function(map) {
 AuraClientService.prototype.receive = function(auraXHR) {
     var responseMessage;
     this.auraStack.push("AuraClientService$receive");
-    if (auraXHR.transactionId) {
-        this.setCurrentTransactionId(auraXHR.transactionId);
-    }
     try {
         responseMessage = this.decode(auraXHR.request);
 
@@ -1985,7 +1885,6 @@ AuraClientService.prototype.receive = function(auraXHR) {
         this.auraStack.pop();
         this.releaseXHR(auraXHR);
         this.process();
-        this.setCurrentTransactionId(undefined);
     }
 
     return responseMessage;
@@ -2057,10 +1956,6 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             if (action) {
                 if (response["storable"] && !action.isStorable()) {
                     action.setStorable();
-                    // the action started as non-abortable on the client
-                    if(action.getAbortableId() === undefined) {
-                        action.setAbortable(false);
-                    }
                 }
             } else {
                 // the client didn't request the action response but the server sent it so
@@ -2111,7 +2006,6 @@ AuraClientService.prototype.buildStorableServerAction = function(response) {
         action = actionDef.newInstance();
         action.setStorable();
         action.setParams(response["params"]);
-        action.setAbortable(false);
         action.updateFromResponse(response);
     }
     return action;
@@ -2124,20 +2018,12 @@ AuraClientService.prototype.processIncompletes = function(auraXHR) {
     for (id in actions) {
         if (actions.hasOwnProperty(id)) {
             action = actions[id];
-            if ((action.getAbortableId() === this.lastTransactionId) || !action.isAbortable()) {
-                action.incomplete($A.getContext());
-            } else {
-                action.abort();
-            }
+            action.incomplete($A.getContext());
             key = this.actionStoreMap[action.getId()];
             dupes = this.getAndClearDupes(key);
             if (dupes) {
                 for (var i = 0; i < dupes.length; i++) {
-                    if ((dupes[i].getAbortableId() === this.lastTransactionId) || !dupes[i].isAbortable()) {
-                        dupes[i].incomplete($A.getContext());
-                    } else {
-                        dupes[i].abort();
-                    }
+                    dupes[i].incomplete($A.getContext());
                 }
             }
         }
@@ -2185,9 +2071,7 @@ AuraClientService.prototype.resetToken = function(newToken) {
  *
  * This function effectively attempts to submit all pending actions immediately (if
  * there is room in the outgoing request queue). If there is no way to immediately queue
- * the actions, they are submitted via the normal mechanism. Note that this does not change
- * the 'transaction' associated with the current aura stack, so abortable actions might go
- * out in two separate requests without cancelling each other.
+ * the actions, they are submitted via the normal mechanism.
  *
  * @param {Array.<Action>}
  *            actions an array of Action objects
@@ -2434,25 +2318,6 @@ AuraClientService.prototype.isConnected = function() {
     return !this._isDisconnected;
 };
 
-AuraClientService.prototype.clearPreviousAbortableActions = function() {
-    var actions = this.actionsQueued;
-    var i;
-
-    this.actionsQueued = [];
-    for (i = 0; i < actions.length; i++) {
-        if (!this.maybeAbortAction(actions[i])) {
-            this.actionsQueued.push(actions[i]);
-        }
-    }
-    actions = this.actionsDeferred;
-    this.actionsDeferred = [];
-    for (i = 0; i < actions.length; i++) {
-        if (!this.maybeAbortAction(actions[i])) {
-            this.actionsDeferred.push(actions[i]);
-        }
-    }
-};
-
 /**
  * This function must be called from within an event loop.
  *
@@ -2469,23 +2334,6 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
 
     if (background) {
         $A.warning("Do not use the deprecated background parameter");
-    }
-    if (action.isAbortable()) {
-        if (action.getAbortableId() === undefined) {
-            if (!this.currentTransactionId && this.nextTransactionId !== this.lastTransactionId) {
-                this.lastTransactionId = this.nextTransactionId;
-                this.actions = this.clearPreviousAbortableActions();
-            }
-            action.setAbortableId(this.currentTransactionId || this.nextTransactionId);
-            if (this.currentTransactionId && this.currentTransactionId !== this.lastTransactionId) {
-                action.abort();
-                return;
-            }
-        } else if (this.maybeAbortAction(action)) {
-            // whoops, action is already aborted.
-            return;
-        }
-        this.currentTransactionId = action.getAbortableId();
     }
     this.actionsQueued.push(action);
 };

@@ -14,9 +14,27 @@
  * limitations under the License.
  */
 ({
-	client : function(cmp) {
-		var log = cmp.get("v.log"); 
-		log.push(this._toLog || "client");
-		cmp.set("v.log", log);
-	}
+    client : function(cmp) {
+        var log = cmp.get("v.log"); 
+        log.push(this._toLog || "client");
+        cmp.set("v.log", log);
+    },
+
+    runAction : function(cmp, event, helper) {
+        var args = event.getParam("arguments");
+        var path = args["path"];
+        var parent = args["parent"];
+        var commands = args["commands"];
+        var label = args["label"];
+        var options = args["options"];
+
+        if (path && path.length) {
+            var first = path.shift();
+            var child = cmp.find(first);
+            child.runAction(path, parent, commands, label, options);
+            return;
+        }
+        var a = helper.getAction(cmp, parent, commands, label, options);
+        $A.enqueueAction(a);
+    }
 })

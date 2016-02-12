@@ -181,8 +181,6 @@ window['$A'] = {};
  * @borrows Aura.Services.AuraComponentService#newComponentDeprecated as newCmpDeprecated
  * @borrows Aura.Services.AuraComponentService#newComponentAsync as newCmpAsync
  * @borrows Aura.Services.AuraEventService.newEvent as getEvt
- * @borrows Aura.Services.AuraClientService#getCurrentTransactionId as getCurrentTransactionId
- * @borrows Aura.Services.AuraClientService#setCurrentTransactionId as setCurrentTransactionId
  */
 function AuraInstance () {
     this.globalValueProviders = {};
@@ -362,8 +360,6 @@ function AuraInstance () {
 
     this.enqueueAction             = this.clientService.enqueueAction.bind(this.clientService);
     this.deferAction               = this.clientService.deferAction.bind(this.clientService);
-    this.getCurrentTransactionId   = this.clientService.getCurrentTransactionId.bind(this.clientService);
-    this.setCurrentTransactionId   = this.clientService.setCurrentTransactionId.bind(this.clientService);
 
     this.render                    = this.renderingService.render.bind(this.renderingService);
     this.rerender                  = this.renderingService.rerender.bind(this.renderingService);
@@ -437,8 +433,6 @@ function AuraInstance () {
     };
 
     //	Google Closure Compiler Symbol Exports
-    this["getCurrentTransactionId"] = this.getCurrentTransactionId;
-    this["setCurrentTransactionId"] = this.setCurrentTransactionId;
     this["clientService"] = this.clientService;
     this["componentService"] = this.componentService;
     this["renderingService"] = this.renderingService;
@@ -524,6 +518,23 @@ function AuraInstance () {
     });
 
 }
+
+/**
+ * Does nothing.
+ *
+ * @public
+ * @deprecated
+ */
+AuraInstance.prototype.setCurrentTransactionId = function() { };
+
+/**
+ * Does nothing.
+ *
+ * @returns undefined
+ * @public
+ * @deprecated
+ */
+AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; };
 
 /**
  * Initializes Aura with context info about the app that should be loaded.
@@ -797,20 +808,16 @@ AuraInstance.prototype.message = function(msg) {
 AuraInstance.prototype.getCallback = function(callback) {
     $A.assert($A.util.isFunction(callback),"$A.getCallback(): 'callback' must be a valid Function");
     var context=$A.getContext().getCurrentAccess();
-    var transactionId = $A.getCurrentTransactionId();
     return function(){
         var nested = $A.clientService.inAuraLoop();
         $A.getContext().setCurrentAccess(context);
         $A.clientService.pushStack(name);
-        var savedTid = $A.getCurrentTransactionId();
-        if (transactionId) {
-            $A.setCurrentTransactionId(transactionId);
-        }
         try {
             return callback.apply(this,Array.prototype.slice.call(arguments));
         } catch (e) {
             // Should we even allow 'nested'?
-            // no need to wrap AFE with auraError as customers who throw AFE would want to handle it with their own custom experience.
+            // no need to wrap AFE with auraError as customers who throw AFE would want to handle it with their
+            // own custom experience.
             if (nested || e instanceof $A.auraFriendlyError) {
                 throw e;
             } else {
@@ -819,9 +826,6 @@ AuraInstance.prototype.getCallback = function(callback) {
         } finally {
             $A.clientService.popStack(name);
             $A.getContext().releaseCurrentAccess();
-            if (nested) {
-                $A.setCurrentTransactionId(savedTid);
-            }
         }
     };
 };

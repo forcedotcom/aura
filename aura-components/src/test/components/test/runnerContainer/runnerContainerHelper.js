@@ -596,7 +596,7 @@
             pollTime   = this.POLL_TIME,
             dom        = containerDOM || cmp.getElement();
         
-        pollAction.setAbortable(true);
+        pollAction.setAbortable();
         pollAction.setParams({scope: cmp.get('v.scope')});
 
         pollAction.setCallback(this, function (action) {

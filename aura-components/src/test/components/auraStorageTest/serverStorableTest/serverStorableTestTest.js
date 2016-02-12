@@ -384,7 +384,7 @@
                         // Verify action's callback gets called.
                         $A.test.assertEquals("SUCCESS", primingAction.getState());
                         $A.test.assertEquals("Marking my self as storable", returnValue);
-                        $A.test.assertFalse(primingAction.isAbortable(), "The action should be still non-abortable.");
+                        $A.test.assertTrue(primingAction.isAbortable(), "The action should now be abortable.");
                     });
             },
             function(cmp){

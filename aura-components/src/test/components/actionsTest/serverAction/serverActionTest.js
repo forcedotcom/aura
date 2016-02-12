@@ -23,11 +23,9 @@
 		    	   //let's tap into transit and modify the response
 		    	   var decode_done = false;
 		    	   var cb_handle;
-		           
 			       var modifyResponse = function (oldResponse) {
 			        	var response = oldResponse["response"];
-			        	//Dangerous : executeInForegroundWithReturn is part of response because perf metrics add it, if they decide to remove it in the future, we need to modify condition below
-			        	if( response.indexOf("testModifyResponseFromServer") >= 0 && response.indexOf("executeInForegroundWithReturn") >= 0 && response.indexOf("recordObjCounter") >= 0) {
+			        	if( response.indexOf("testModifyResponseFromServer") >= 0 && response.indexOf("recordObjCounter") >= 0) {
 				        	var newResponse = {};
 				    		//copy everything from oldResponse
 				    		var responseText = oldResponse["responseText"];

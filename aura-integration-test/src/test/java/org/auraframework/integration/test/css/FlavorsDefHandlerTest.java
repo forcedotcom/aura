@@ -15,6 +15,7 @@
  */
 package org.auraframework.integration.test.css;
 
+import org.auraframework.Aura;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
@@ -35,7 +36,7 @@ public class FlavorsDefHandlerTest extends StyleTestCase {
 
     public void testWithTextBetweenTag() throws Exception {
         try {
-            addFlavorAssortment("<aura:flavors>Test</aura:flavors>").getDef();
+        	Aura.getDefinitionService().getDefinition(addFlavorAssortment("<aura:flavors>Test</aura:flavors>"));
             fail("Should have thrown AuraException because text is between aura:flavors tags");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "No literal text");

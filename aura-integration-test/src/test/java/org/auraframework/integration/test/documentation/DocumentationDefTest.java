@@ -68,7 +68,7 @@ public class DocumentationDefTest extends AuraImplTestCase {
 				"</aura:documentation>";
 
 		DefDescriptor<DocumentationDef> dd= addSourceAutoCleanup(DocumentationDef.class, docDefSource);
-		ComponentDef cd = dd.getDef().getExampleDefs().get(0).getRef().getDef();
+		ComponentDef cd = Aura.getDefinitionService().getDefinition(Aura.getDefinitionService().getDefinition(dd).getExampleDefs().get(0).getRef());
 		assertEquals("Unable to get to the ComponentDef referenced in example!", exampleCmp, cd.getDescriptor().getNamespace()+":"+cd.getName());
 	}
 

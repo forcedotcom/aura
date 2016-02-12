@@ -18,6 +18,7 @@ package org.auraframework.integration.test.renderer;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Renderer;
@@ -71,7 +72,7 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component renderer='java://ClassNotFound'></aura:component>");
         try {
-            cmpDesc.getDef();
+            Aura.getDefinitionService().getDefinition(cmpDesc);
             fail("Should not be able to retrieve component definition when specified renderer is invalid.");
         } catch (Exception e) {
             checkExceptionStart(e, DefinitionNotFoundException.class,
@@ -107,8 +108,8 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
         DefDescriptor<RendererDef> descriptor = DefDescriptorImpl.getInstance(
                 "java://org.auraframework.impl.renderer.sampleJavaRenderers.TestAbstractRenderer", RendererDef.class);
         try {
-            descriptor.getDef();
-            fail("JavaRenderers that extend Renderer interface cannot be abstract.");
+        	Aura.getDefinitionService().getDefinition(descriptor);
+        	fail("JavaRenderers that extend Renderer interface cannot be abstract.");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
                     "Cannot instantiate org.auraframework.impl.renderer.sampleJavaRenderers.TestAbstractRenderer",
@@ -124,7 +125,7 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
                 "java://org.auraframework.impl.renderer.sampleJavaRenderers.TestPrivateConstructorInRendererExtension",
                 RendererDef.class);
         try {
-            descriptor.getDef();
+        	Aura.getDefinitionService().getDefinition(descriptor);
             fail("JavaRenderers that implement Renderer interface cannot hide their constructor.");
         } catch (Exception e) {
             checkExceptionFull(

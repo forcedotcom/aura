@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 ({
-
-    afterRender: function(component, helper) {
+    afterRender : function (cmp, helper) {
+        var element = helper.getInputElement(cmp);
         this.superAfterRender();
-        if (component.get("v.doFormat")) {
-            helper.inputNumberLibrary.number.formatValue( component, helper, $A.localizationService.getDefaultCurrencyFormat());
-        }
+        $A.util.on(element,'focus', function () {
+            helper.removeErrors(cmp);
+        });
     }
-
-})// eslint-disable-line semi
+});

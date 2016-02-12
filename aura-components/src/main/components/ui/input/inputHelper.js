@@ -124,15 +124,16 @@
             }
         }
 
-        var updateOn = this.getUpdateOn(component);
-        if (updateOn) {
-            var handledEvents = this.lib.interactive.getHandledDOMEvents(component);
-            for (var j=0, lenj=updateOn.length; j < lenj; j++) {
-                if (handledEvents[updateOn[j]] !== true) {
-                    this.addDomHandler(component, updateOn[j]);
+        if (!component.get('v.updateOnDisabled')) {
+            var updateOn = this.getUpdateOn(component);
+            if (updateOn) {
+                var handledEvents = this.lib.interactive.getHandledDOMEvents(component);
+                for (var j = 0, lenj = updateOn.length; j < lenj; j++) {
+                    if (handledEvents[updateOn[j]] !== true) {
+                        this.addDomHandler(component, updateOn[j]);
+                    }
                 }
             }
-
         }
     },
 

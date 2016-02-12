@@ -154,6 +154,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
     }
 
     /** if extending from a component with a flavorable element, the validation should pass */
+    @UnAdaptableTest("W-2929438")
     public void testValidatesComponentIsFlavorableFromParent() throws Exception {
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component extensible='true'><div aura:flavorable='true'>{!v.body}</div></aura:component>");

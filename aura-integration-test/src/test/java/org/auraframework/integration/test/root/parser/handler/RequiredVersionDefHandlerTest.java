@@ -16,6 +16,7 @@
 
 package org.auraframework.integration.test.root.parser.handler;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
@@ -31,7 +32,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
         String markup = "<aura:require namespace='auratest' version='1.0'/>";
         DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
 
-        assertEquals("1.0", desc.getDef().getRequiredVersion("auratest").getVersion());
+        assertEquals("1.0", Aura.getDefinitionService().getDefinition(desc).getRequiredVersion("auratest").getVersion());
     }
 
     //test when namespace is missing, same thing apply to version
@@ -39,7 +40,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
         String markup = "<aura:require version='1.0'/>";
         try {
             DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
-            desc.getDef();
+            Aura.getDefinitionService().getDefinition(desc);
             fail("we are suppose to error out when namespace is missing");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class,
@@ -52,7 +53,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
         String markup = "<aura:require namespace='' version='1.0'/>";
         try {
             DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
-            desc.getDef();
+            Aura.getDefinitionService().getDefinition(desc);
             fail("we are suppose to error out when namespace is empty");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class,
@@ -65,7 +66,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
         String markup = "<aura:require namespace='auratest'/>";
         try {
                 DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
-                desc.getDef();
+                Aura.getDefinitionService().getDefinition(desc);
                 fail("we are suppose to error out when version is missing");
         } catch (Exception e) {
                 checkExceptionContains(e, InvalidDefinitionException.class,
@@ -78,7 +79,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
         String markup = "<aura:require namespace='auratest' version=''/>";
         try {
             DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
-            desc.getDef();
+            Aura.getDefinitionService().getDefinition(desc);
             fail("we are suppose to error out when version is empty");
         } catch (Exception e) {
                 checkExceptionContains(e, InvalidDefinitionException.class,
@@ -92,7 +93,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
                         "<aura:require namespace='auratest' version='2.0'/>";
         try {
             DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
-            desc.getDef();
+            Aura.getDefinitionService().getDefinition(desc);
             fail("It should error out when aura:require is defined multi times in one component.");
         } catch (Exception e) {
                 checkExceptionContains(e, InvalidDefinitionException.class,
@@ -106,9 +107,9 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
 
         DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
  
-        assertEquals(2, desc.getDef().getRequiredVersionDefs().size());
-        assertEquals("1.0", desc.getDef().getRequiredVersion("auratest").getVersion());
-        assertEquals("2.0", desc.getDef().getRequiredVersion("test").getVersion());
+        assertEquals(2, Aura.getDefinitionService().getDefinition(desc).getRequiredVersionDefs().size());
+        assertEquals("1.0", Aura.getDefinitionService().getDefinition(desc).getRequiredVersion("auratest").getVersion());
+        assertEquals("2.0", Aura.getDefinitionService().getDefinition(desc).getRequiredVersion("test").getVersion());
     }
 
     //test when namespace doesn't exsit -- there is currently no check for that.
@@ -118,7 +119,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
         String markup = "<aura:require namespace='I do not exist' version='1.0'/>";
         try {
             DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
-            desc.getDef();
+            Aura.getDefinitionService().getDefinition(desc);
             fail("we should error out when namespace doesn't exist");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class,

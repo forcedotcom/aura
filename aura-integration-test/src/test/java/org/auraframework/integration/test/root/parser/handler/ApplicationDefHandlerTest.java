@@ -17,6 +17,7 @@ package org.auraframework.integration.test.root.parser.handler;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorsDef;
@@ -109,8 +110,8 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                 desc.getDescriptorName());
 
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(1, app.getDef().getTokenOverrides().size());
-        assertEquals(desc, app.getDef().getTokenOverrides().get(0));
+        assertEquals(1, Aura.getDefinitionService().getDefinition(app).getTokenOverrides().size());
+        assertEquals(desc, Aura.getDefinitionService().getDefinition(app).getTokenOverrides().get(0));
     }
 
     public void testReadTokensAttributeMultiple() throws QuickFixException {
@@ -122,10 +123,10 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                 t1.getDescriptorName(), t2.getDescriptorName(), t3.getDescriptorName());
 
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(3, app.getDef().getTokenOverrides().size());
-        assertEquals(t1, app.getDef().getTokenOverrides().get(0));
-        assertEquals(t2, app.getDef().getTokenOverrides().get(1));
-        assertEquals(t3, app.getDef().getTokenOverrides().get(2));
+        assertEquals(3, Aura.getDefinitionService().getDefinition(app).getTokenOverrides().size());
+        assertEquals(t1, Aura.getDefinitionService().getDefinition(app).getTokenOverrides().get(0));
+        assertEquals(t2, Aura.getDefinitionService().getDefinition(app).getTokenOverrides().get(1));
+        assertEquals(t3, Aura.getDefinitionService().getDefinition(app).getTokenOverrides().get(2));
     }
 
     public void testReadFlavorOverridesAttribute() throws QuickFixException {
@@ -135,7 +136,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                 fa.getDescriptorName());
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
 
-        assertEquals(fa, app.getDef().getFlavorOverrides());
+        assertEquals(fa, Aura.getDefinitionService().getDefinition(app).getFlavorOverrides());
     }
 
     public void testFindsDefaultFlavorOverridesInBundleNoAttributeSpecified() throws QuickFixException {
@@ -145,6 +146,6 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                 DefDescriptor.MARKUP_PREFIX);
         addSourceAutoCleanup(app, String.format("<aura:application></aura:application>"));
 
-        assertEquals(fa, app.getDef().getFlavorOverrides());
+        assertEquals(fa, Aura.getDefinitionService().getDefinition(app).getFlavorOverrides());
     }
 }

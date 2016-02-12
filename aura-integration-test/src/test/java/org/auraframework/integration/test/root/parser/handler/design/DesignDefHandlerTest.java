@@ -30,14 +30,14 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testGetElement() throws Exception {
-        DesignDef element = setupSimpleDesignDef("<design:component label=\"some label\" />").getDef();
+        DesignDef element = Aura.getDefinitionService().getDefinition(setupSimpleDesignDef("<design:component label=\"some label\" />"));
         assertEquals("some label", element.getLabel());
     }
 
     public void testRetrieveSingleAttributeDesign() throws Exception {
-        DesignDef element = setupSimpleDesignDef(
+        DesignDef element = Aura.getDefinitionService().getDefinition(setupSimpleDesignDef(
                 "<design:component><design:attribute name=\"mystring\" required=\"true\"/></design:component>")
-                .getDef();
+                );
         DesignAttributeDef child = element.getAttributeDesignDef("mystring");
         assertNotNull("Expected one AttributeDesignDef", child);
         assertTrue(child.isRequired());
@@ -45,9 +45,9 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
 
     public void testMultipleDesignTemplatesFailure() throws Exception {
         try {
-            setupSimpleDesignDef(
+        	Aura.getDefinitionService().getDefinition(setupSimpleDesignDef(
                     "<design:component><design:template /><design:template /></design:component>")
-                    .getDef();
+                    );
             fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
@@ -57,7 +57,7 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
 
     public void testInvalidSystemAttributeName() throws Exception {
         try {
-            setupSimpleDesignDef("<design:component foo=\"bar\" />").getDef();
+        	Aura.getDefinitionService().getDefinition(setupSimpleDesignDef("<design:component foo=\"bar\" />"));
             fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class, "Invalid attribute \"foo\"");
@@ -66,7 +66,7 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
 
     public void testInvalidSystemAttributePrefix() throws Exception {
         try {
-            setupSimpleDesignDef("<design:component other:label=\"some label\" />").getDef();
+        	Aura.getDefinitionService().getDefinition(setupSimpleDesignDef("<design:component other:label=\"some label\" />"));
             fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,

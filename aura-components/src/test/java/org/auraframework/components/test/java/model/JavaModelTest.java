@@ -140,12 +140,12 @@ public class JavaModelTest extends AuraImplTestCase {
     public void testClassLevelAnnotationForJavaModel() throws Exception {
         DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
                 "java://org.auraframework.components.test.java.model.TestModel", ModelDef.class);
-        assertNotNull(javaModelDefDesc.getDef());
+        assertNotNull(Aura.getDefinitionService().getDefinition(javaModelDefDesc));
 
         DefDescriptor<ModelDef> javaModelWOAnnotationDefDesc = DefDescriptorImpl.getInstance(
                 "java://org.auraframework.components.test.java.model.TestModelWithoutAnnotation", ModelDef.class);
         try {
-            javaModelWOAnnotationDefDesc.getDef();
+        	Aura.getDefinitionService().getDefinition(javaModelWOAnnotationDefDesc);
             fail("Expected InvalidDefinitionException");
         } catch (Exception e) {
             checkExceptionStart(e, InvalidDefinitionException.class, "@Model annotation is required on all Models.",
@@ -159,7 +159,7 @@ public class JavaModelTest extends AuraImplTestCase {
     public void testModelSubclass() throws Exception {
         DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
                 "java://org.auraframework.components.test.java.model.TestModelSubclass", ModelDef.class);
-        ModelDef def = javaModelDefDesc.getDef();
+        ModelDef def = Aura.getDefinitionService().getDefinition(javaModelDefDesc);
         assertNotNull(def);
         Model model = def.newInstance();
         ValueDef vd = def.getMemberByName("nextThing");
@@ -247,7 +247,7 @@ public class JavaModelTest extends AuraImplTestCase {
     public void testNonExistingPropertiesOnModel() throws Exception {
         DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
                 "java://org.auraframework.components.test.java.model.TestModel", ModelDef.class);
-        ModelDef mDef = javaModelDefDesc.getDef();
+        ModelDef mDef = Aura.getDefinitionService().getDefinition(javaModelDefDesc);
         assertNotNull(mDef);
         Model model = mDef.newInstance();
         try {

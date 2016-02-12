@@ -60,7 +60,7 @@ public class DesignOptionDefHandlerTest extends AuraImplTestCase {
         addSourceAutoCleanup(designDesc,
                 "<design:component><design:option name=\"name\"><aura:attribute name=\"test\"/></design:option></design:component>");
         try {
-            designDesc.getDef();
+        	Aura.getDefinitionService().getDefinition(designDesc);
             fail("Design option should not allow child tags");
         } catch (Exception e) {
             //success
@@ -89,6 +89,6 @@ public class DesignOptionDefHandlerTest extends AuraImplTestCase {
         }
         addSourceAutoCleanup(designDesc, String.format("<design:component>%s</design:component>", des));
 
-        return designDesc.getDef();
+        return Aura.getDefinitionService().getDefinition(designDesc);
     }
 }

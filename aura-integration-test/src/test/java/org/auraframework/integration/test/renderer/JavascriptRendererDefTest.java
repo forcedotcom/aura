@@ -72,7 +72,7 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
                 "    unrender: function() {}\n" +
                 "})";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
-        RendererDef rendererDef = rendererDesc.getDef();
+        RendererDef rendererDef = Aura.getDefinitionService().getDefinition(rendererDesc);
 
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
         serializeAndGoldFile(rendererDef, "_JSRendererDef");
@@ -81,7 +81,7 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
     public void testSerializeJavascriptRendererDefHasNoFunction() throws Exception {
         String rendererJs = "({ })";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
-        RendererDef rendererDef = rendererDesc.getDef();
+        RendererDef rendererDef = Aura.getDefinitionService().getDefinition(rendererDesc);
 
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
         serializeAndGoldFile(rendererDef, "_JSRendererDef");

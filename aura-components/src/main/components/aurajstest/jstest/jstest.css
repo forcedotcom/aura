@@ -93,7 +93,6 @@
     border: 0;
     margin: 0;
     border-radius: 0;
-    display: block;
     width: 200px;
 }
 
@@ -101,6 +100,9 @@
     .THIS ul {
         position: absolute;
         width: 200px;
+    }
+    .THIS ul li.uiTabItem {
+        display: block;
     }
     .THIS .tabs__content, .THIS.suiteCode {
         margin-top: 0;

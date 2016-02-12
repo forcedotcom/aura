@@ -971,7 +971,7 @@ Aura.Utils.Util.prototype.trim = function(value){
  * @export
  */
 Aura.Utils.Util.prototype.format=function(formatString,arg1,arg2,argN){//eslint-disable-line no-unused-vars
-    $A.assert(formatString&&formatString.toString,"$A.util.format(): 'formatString' must be convertible to String.");
+    $A.assert(!!(formatString&&formatString.toString),"$A.util.format(): 'formatString' must be convertible to String.");
     var formatArguments=Array.prototype.slice.call(arguments,1);
     return formatString.toString().replace(/\{(\d+)\}/gm,function(match,index){
         var substitution=formatArguments[index];
@@ -1296,7 +1296,7 @@ Aura.Utils.Util.prototype.addValueToMap = function(inputMap, key, value) {
     var oldVal = inputMap[key];
     if(!oldVal){
         inputMap[key] = value;
-    }else if (oldVal.constructor !== Array){
+    }else if (!this.isArray(oldVal)){
         var valArray = [];
         valArray[0] = oldVal;
         valArray[1] = value;
@@ -1383,13 +1383,10 @@ Aura.Utils.Util.prototype.apply = function(/* Object|Function */ baseObject, /* 
                 value=members[property];
                 if(deepCopy&&value!=undefined) {//eslint-disable-line eqeqeq
                     var branchValue = null;
-                    switch (value.constructor) {
-                        case Array:
-                            branchValue = baseObject[property] || [];
-                            break;
-                        case Object:
-                            branchValue = baseObject[property] || {};
-                            break;
+                    if (this.isArray(value)) {
+                    	branchValue = baseObject[property] || [];
+                    } else if (this.isPlainObject(value)) {
+                    	branchValue = baseObject[property] || {};
                     }
                     if (branchValue) {
                         baseObject[property] = this.apply(branchValue, value, forceCopy, deepCopy);

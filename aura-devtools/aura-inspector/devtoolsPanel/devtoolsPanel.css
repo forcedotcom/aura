@@ -536,7 +536,7 @@ button.toggle:focus {
   border-radius:.125rem;
 }
 .actions-tab{
-  height: calc(100% - 63px);
+  height: 100%;
   /* .slds-grid  { */
   display: -webkit-box;
   display: -webkit-flex;

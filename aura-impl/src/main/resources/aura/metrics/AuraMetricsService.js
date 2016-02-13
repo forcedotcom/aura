@@ -384,6 +384,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
         if (!this.clearCompleteTransactions) {
             // Only for non-prod, to keep the transactions stored
             var newId = id + ':' + Math.round(parsedTransaction["ts"]);
+            parsedTransaction["config"] = transactionCfg;
             this.transactions[newId] = parsedTransaction;
             parsedTransaction["id"] = newId;
         }

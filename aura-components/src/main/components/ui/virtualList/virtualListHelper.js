@@ -207,8 +207,8 @@
         return id && $A.componentService.get(id);
     },
 
-    // NOTE: Do not rename this function (instrumentation reliying on it)
-    _dispatchAction: function (action, event) {
+    // NOTE: Do not rename this function not change its signature(instrumentation reliying on it)
+    _dispatchAction: function (action, event /*cmp*/) {
         action.runDeprecated(event);
     },
     _getItemAttached: function (dom) {
@@ -226,7 +226,8 @@
             handlers  = [],
             shape     = cmp._shape,
             ptv       = cmp._ptv,
-            item, targetCmp, actionHandler;
+            getElmt   = function (t) { return t; },
+            item, targetCmp, actionHandler, actionHandlerScope;
 
         while (target) {
             targetCmp = this._getRenderingComponentForElement(target);
@@ -235,7 +236,11 @@
             if (targetCmp) { 
                 actionHandler = this._getActionHandler(targetCmp, type);
                 if (actionHandler) {
-                    handlers.push(actionHandler);
+                    targetCmp.getElement = getElmt.bind(targetCmp, target);
+                    handlers.push({
+                        "handler" : actionHandler,
+                        "cmp"     : targetCmp
+                    });
                 }
             }
 
@@ -253,7 +258,7 @@
             // Seting up the event with some custom properties
             e.templateItem = item;
             e.templateElement = target;
-            shape.getElement = function () {return target;};
+            shape.getElement = getElmt.bind(null, target);
 
             // Setting up the component with the current item
             ptv.sync  = true;
@@ -262,9 +267,10 @@
             ptv.dirty = false;
 
             // Execute the collected handlers in order
-            while ((actionHandler = handlers.shift())) {
+            while ((actionHandlerScope = handlers.shift())) {
+                actionHandler = actionHandlerScope["handler"];
                 if ($A.util.isExpression(actionHandler)) {
-                    this._dispatchAction(actionHandler.evaluate(), e, targetCmp);
+                    this._dispatchAction(actionHandler.evaluate(), e, actionHandlerScope["cmp"]);
                 }
             }
             

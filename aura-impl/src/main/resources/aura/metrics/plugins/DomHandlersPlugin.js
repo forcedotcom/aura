@@ -59,18 +59,23 @@ DomHandlersPlugin.prototype.disable = function () {
 };
 
 DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
-    var localCmpId = cmp.getLocalId();
+    // We want to get the localId of the component with the handler 
+    // and the component who owns the action (its lexical scope)
+    var localCmpId = cmp.getLocalId(); 
     var dispatchCmpId = action.getComponent().getConcreteComponent().getLocalId();
 
-    if (localCmpId && dispatchCmpId) {
+    // Only if we have a uniquely identier send the interaction
+    if (localCmpId && dispatchCmpId) { 
         var contextId = localCmpId + ':' + dispatchCmpId;
-        var target = cmp.getElement();
-        var meta = target && target.getAttribute('data-meta-state');
+        var target = cmp["getElement"]();
+        var meta = target && target.getAttribute('data-meta-state'); // optional metadata
 
         var context = {
             "id" : contextId,
             "type" : event.type,
-            "action" : action.getDef().getDescriptor().toString()
+            "action" : action.getDef().getDescriptor().toString(),
+            "selector" : target.nodeName + ' ' + target.className,
+            "cmpId" : cmp.getGlobalId()
         };
 
         if (meta) {
@@ -83,10 +88,10 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
     }
 };
 
-DomHandlersPlugin.prototype.dispatchVirtualActionHook = function (action, event, cmp) {
+DomHandlersPlugin.prototype.dispatchVirtualActionHook = function (action, event, virtualCmp) {
     // For virtualActions we want to capture only clicks for now
     if (event.type === 'click') {
-        this.dispatchActionHook(action, event, cmp);
+        this.dispatchActionHook(action, event, virtualCmp);
     }
 };
 

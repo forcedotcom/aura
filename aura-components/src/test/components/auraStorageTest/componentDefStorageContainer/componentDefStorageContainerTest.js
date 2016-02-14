@@ -25,7 +25,7 @@
                 cmp.helper.lib.iframeTest.waitForStatus("Fetching", "Done Fetching");
             },
             function createComponentOnClient(cmp) {
-                cmp.helper.lib.iframeTest.getIframeRootCmp().createComponentDeprecated();
+                cmp.helper.lib.iframeTest.getIframeRootCmp().createComponentFromConfig();
                 cmp.helper.lib.iframeTest.waitForStatus("Creating Component", "Done Creating Component - Success!");
             },
             function waitForAllDefsStored(cmp) {
@@ -46,7 +46,7 @@
             },
             function createOriginalComponentAndVerify(cmp) {
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                iframeCmp.createComponentDeprecated();
+                iframeCmp.createComponentFromConfig();
                 $A.test.addWaitFor(true, function() {
                     return $A.util.getText(iframeCmp.find("status").getElement()) === "Done Creating Component - Success!";
                 }, function() {
@@ -80,7 +80,7 @@
             },
             function createComponentOnClient(cmp) {
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                iframeCmp.createComponentDeprecated();
+                iframeCmp.createComponentFromConfig();
                 cmp.helper.lib.iframeTest.waitForStatus("Creating Component", "Done Creating Component - Success!");
             },
             function verifyFirstCmpStored(cmp) {
@@ -121,7 +121,7 @@
             },
             function createOriginalComponentOnClient(cmp) {
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                iframeCmp.createComponentDeprecated();
+                iframeCmp.createComponentFromConfig();
                 cmp.helper.lib.iframeTest.waitForStatus("Creating Component", "Done Creating Component - Success!");
             },
         ]

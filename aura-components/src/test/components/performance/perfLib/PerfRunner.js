@@ -169,7 +169,8 @@ function PerfRunner(COQL, Memory) {
                 this.results.transaction = transaction;
             },
             _runComponentTest: function (cmpConfig, done) {
-                this.component = $A.newCmp(cmpConfig, this.containerComponent);
+                cmpConfig["valueProvider"] = this.containerComponent;
+                this.component = $A.createComponentFromConfig(cmpConfig);
                 $A.render(this.component, this.getContainerDOM());
                 done.immediate();
             },

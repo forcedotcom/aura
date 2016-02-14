@@ -67,10 +67,11 @@
             ptv         = this._createPassthroughValue(cmp, itemVar);
 
         for (var i = 0; i < columnsDefs.length; i++) {
-            templates.push($A.newCmp(columnsDefs[i], ptv));
-            
+            columnsDefs[i]["attributes"]["valueProvider"] = ptv;
+            templates.push($A.createComponentFromConfig(columnsDefs[i]));
+
             if (templates[i].isInstanceOf("ui:hasGridEvents")) {
-            	templates[i].addHandler("gridAction", cmp, "c.handleGridAction");
+                templates[i].addHandler("gridAction", cmp, "c.handleGridAction");
             }
         }
 

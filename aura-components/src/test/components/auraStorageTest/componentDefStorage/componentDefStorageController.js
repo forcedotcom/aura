@@ -18,24 +18,20 @@
         $A.enqueueAction(action);
     },
 
-    createComponentDeprecated: function(cmp) {
+    createComponentFromConfig: function(cmp) {
         cmp.set("v.status", "Creating Component");
         var load = cmp.get("v.load");
         try {
             var newCmp = $A.componentService.createComponentFromConfig({descriptor: load});
             if (newCmp) {
-                var type = " - Success!";
-                if (newCmp.getDef().getDescriptor().getQualifiedName().indexOf("placeholder") !== -1) {
-                    type = " - Placeholder";
-                }
-                cmp.set("v.status", "Done Creating Component" + type);
+                cmp.set("v.status", "Done Creating Component - Success!");
                 cmp.set("v.output", newCmp);
             }
         } catch (e) {
             cmp.set("v.status", "Error: " + e);
         }
     },
-
+    
     clearActionAndDefStorage: function(cmp) {
         cmp.set("v.status", "Clearing Action and Def Storage");
         $A.storageService.getStorage('ComponentDefStorage').clear()

@@ -37,10 +37,17 @@
     initializeBody: function (cmp) {
         var body = cmp.get('v.body');
         if (!body.length) {
-            var bodyCmp = $A.newCmp({
-                componentDef: 'aura:html',
-                attributes: { values: { tag: 'section' } }
-            }, cmp);
+            var bodyCmp = $A.createComponentFromConfig({
+                componentDef: {
+                    descriptor: 'markup://aura:html'
+                },
+                attributes: {
+                    valueProvider: cmp,
+                    values: {
+                        tag: 'section'
+                    }
+                }
+            });
             cmp.set('v.body', [bodyCmp]);
         }
     },
@@ -77,10 +84,11 @@
         return container;
     },
     initializeTemplate: function (cmp) {
-        var tmpl  = cmp.get('v.itemTemplate')[0],
-            ref   = cmp.get('v.itemVar'),
-            ptv   = this._createPassthroughValue(cmp, ref),
-            shape = $A.newCmp(tmpl, ptv);
+        var tmpl  = cmp.get('v.itemTemplate')[0];
+        var ref   = cmp.get('v.itemVar');
+        var ptv   = this._createPassthroughValue(cmp, ref);
+        tmpl["attributes"]["valueProvider"] = ptv;
+        var shape = $A.createComponentFromConfig(tmpl);
 
         // Initialize internal setup
         cmp._shape             = shape;

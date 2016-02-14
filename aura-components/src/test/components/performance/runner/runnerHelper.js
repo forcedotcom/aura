@@ -10,7 +10,7 @@
         perfConfig.options = this.queryStringToJson(historyConfig.queryString) || {};
 
         if (perfConfig.options.componentDef) {
-            perfConfig.componentConfig = { componentDef: perfConfig.options.componentDef };
+            perfConfig.componentConfig = { descriptor: perfConfig.options.componentDef };
         }
 
         return perfConfig;

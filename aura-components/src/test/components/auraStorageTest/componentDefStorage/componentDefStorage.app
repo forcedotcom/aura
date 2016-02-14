@@ -22,7 +22,7 @@
     <aura:attribute name="output" type="Aura.Component" />
 
     <aura:method name="fetchCmp" action="c.fetchCmp" />
-    <aura:method name="createComponentDeprecated" action="c.createComponentDeprecated" />
+    <aura:method name="createComponentFromConfig" action="c.createComponentFromConfig" />
     <aura:method name="clearActionAndDefStorage" action="c.clearActionAndDefStorage" />
     <aura:method name="verifyDefsRestored" action="c.verifyDefsRestored" />
 

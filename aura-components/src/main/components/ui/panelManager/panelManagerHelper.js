@@ -44,12 +44,10 @@
 
     // for panelOverlay, create a 'Cancel' button to close the panel
     createCancelButton: function(cmp) {
-        var button = $A.newCmp({
-            componentDef: 'markup://ui:button',
+        var button = $A.createComponentFromConfig({
+            descriptor: 'markup://ui:button',
             attributes: {
-                values: {
-                    label: cmp.get("v.cancelButtonLabel")
-                }
+                label: cmp.get("v.cancelButtonLabel")
             }
         });
         button.addHandler('press', cmp, 'c.closePanel');

@@ -17,7 +17,6 @@ package org.auraframework.impl.root.parser.handler;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -29,13 +28,11 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.MethodDef;
-import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -44,18 +41,18 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.collect.ImmutableSet;
 
 /**
+ * Handler for XML interface def.
  */
 public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
 
     public static final String TAG = "aura:interface";
 
-    private static final String ATTRIBUTE_PROVIDER = "provider";
     private static final String ATTRIBUTE_EXTENDS = "extends";
 
     protected static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_EXTENDS,
             RootTagHandler.ATTRIBUTE_DESCRIPTION, RootTagHandler.ATTRIBUTE_API_VERSION, ATTRIBUTE_ACCESS);
     private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-            RootTagHandler.ATTRIBUTE_SUPPORT, ATTRIBUTE_PROVIDER).addAll(ALLOWED_ATTRIBUTES).build();
+            RootTagHandler.ATTRIBUTE_SUPPORT).addAll(ALLOWED_ATTRIBUTES).build();
 
     private final InterfaceDefImpl.Builder builder = new InterfaceDefImpl.Builder();
 
@@ -130,23 +127,6 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
                     builder.extendsDescriptors.add(getDefDescriptor(extendsName.trim(), InterfaceDef.class));
                 }
             }
-
-            String providerName = getAttributeValue(ATTRIBUTE_PROVIDER);
-            if (providerName != null) {
-                List<String> providerNames = AuraTextUtil.splitSimpleAndTrim(providerName, ",", 0);
-                for (String provider : providerNames) {
-                    builder.addProvider(provider);
-                }
-            } else {
-                String apexProviderName = String.format("apex://%s.%sProvider", defDescriptor.getNamespace(),
-                        AuraTextUtil.initCap(defDescriptor.getName()));
-                DefDescriptor<ProviderDef> apexDescriptor = DefDescriptorImpl.getInstance(apexProviderName,
-                        ProviderDef.class);
-                if (apexDescriptor.exists()) {
-                    builder.addProvider(apexDescriptor.getQualifiedName());
-                }
-            }
-
             builder.setAccess(readAccessAttribute());
         } finally {
             context.popCallingDescriptor();

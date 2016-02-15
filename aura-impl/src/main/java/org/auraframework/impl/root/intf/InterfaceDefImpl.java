@@ -47,8 +47,6 @@ import com.google.common.collect.Lists;
  */
 public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implements InterfaceDef {
 
-    /**
-     */
     private static final long serialVersionUID = 2253697052585693264L;
     private final Set<DefDescriptor<InterfaceDef>> extendsDescriptors;
     private final Map<String, RegisterEventDef> events;

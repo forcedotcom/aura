@@ -32,5 +32,4 @@ public interface InterfaceDef extends RootDefinition {
     Set<DefDescriptor<org.auraframework.def.InterfaceDef>> getExtendsDescriptors();
 
     Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() throws QuickFixException;
-
 }

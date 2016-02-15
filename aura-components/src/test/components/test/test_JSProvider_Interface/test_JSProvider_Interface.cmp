@@ -15,9 +15,9 @@
     limitations under the License.
 
 -->
-<aura:interface provider="js://test.test_JSProvider_Interface">
+<aura:component provider="js://test.test_JSProvider_Interface">
 
-</aura:interface>
+</aura:component>
 
 <!--
     Tests using this component:

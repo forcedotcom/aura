@@ -30,7 +30,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDefRefArray;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RootDefinition;
@@ -39,7 +38,6 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.model.JavaModel;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeSetImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.AuraValueProviderType;
@@ -163,7 +161,6 @@ BaseComponent<D, I> {
         instanceStack.pushInstance(this, descriptor);
 
         if (def == null) {
-            try {
                 def = descriptor.getDef();
                 if (extender == null && def.isAbstract() && def.getProviderDescriptor() == null) {
                     throw new InvalidDefinitionException(String.format("%s cannot be instantiated directly.",
@@ -174,21 +171,6 @@ BaseComponent<D, I> {
                 }
 
                 desc = descriptor;
-            } catch (DefinitionNotFoundException e) {
-                if (!e.getDescriptor().equals(descriptor)) {
-                    throw e;
-                }
-
-                DefDescriptor<InterfaceDef> intfDescriptor = DefDescriptorImpl.getInstance(descriptor.getQualifiedName(), InterfaceDef.class);
-                InterfaceDef intfDef = intfDescriptor.getDef();
-                if (intfDef != null) {
-                    this.intfDescriptor = intfDescriptor;
-                    desc = intfDescriptor;
-                } else {
-                    // def not found
-                    throw new DefinitionNotFoundException(descriptor);
-                }
-            }
         } else {
             desc = descriptor;
         }

@@ -141,7 +141,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "extends", "apiVersion");
-            privilegedAttrs = Sets.newHashSet("support", "provider");
+            privilegedAttrs = Sets.newHashSet("support");
             super.setUp();
         }
 

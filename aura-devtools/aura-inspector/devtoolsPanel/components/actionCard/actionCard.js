@@ -212,6 +212,8 @@
 			addEventListener('click',  saveNextResponse.bind(this));
 			this.shadowRoot.querySelector("#button_cancelChangeActionResult").
 			addEventListener('click',  cancelNextResponse.bind(this));
+			this.shadowRoot.querySelector("#button_editActionResult").
+			addEventListener('click',  editNextResponse.bind(this));
 		} else if (dropOrModify === "errorResponseNextTime") {
 			this.shadowRoot.querySelector(".div_editActionResult").style.display = "none";
 			this.shadowRoot.querySelector(".div_errorResponse").style.display = "block";
@@ -219,6 +221,8 @@
 			addEventListener('click',  saveErrorResponse.bind(this));
 			this.shadowRoot.querySelector("#button_cancelError").
 			addEventListener('click',  cancelErrorResponse.bind(this));
+			this.shadowRoot.querySelector("#button_editError").
+			addEventListener('click',  editErrorResponse.bind(this));
 		} else {
 			console.log("unknown choice for dropOrModify, we need a handler for it !!!");
 		}
@@ -257,11 +261,27 @@
 		        this.shadowRoot.querySelector("#textarea_actionErrorMessage").setAttribute('readonly','readonly');
 		        this.shadowRoot.querySelector("#textarea_actionErrorStack").setAttribute('readonly','readonly');
 		        //hide save/cancel button
-		        this.shadowRoot.querySelector("#button_saveError").style.display="none";
-		        this.shadowRoot.querySelector("#button_cancelError").style.display="none";
+		        this.shadowRoot.querySelector("#button_saveError").classList.add("hidden");
+		        this.shadowRoot.querySelector("#button_cancelError").classList.add("hidden");
+		        //display the edit button
+		        this.shadowRoot.querySelector("#button_editError").classList.remove("hidden");
 			} else {
 				console.log("nextErrorMsg cannot be empty");
 			}
+		}
+	}
+
+	function editErrorResponse() {
+		var actionId = this.getAttribute("id");
+		if(actionId) {
+			//make the textara readonly
+		    this.shadowRoot.querySelector("#textarea_actionErrorMessage").removeAttribute('readonly');
+		    this.shadowRoot.querySelector("#textarea_actionErrorStack").removeAttribute('readonly');
+		    //show save/cancel button
+		    this.shadowRoot.querySelector("#button_saveError").classList.remove("hidden");
+		    this.shadowRoot.querySelector("#button_cancelError").classList.remove("hidden");
+		    //hide the edit button
+		    this.shadowRoot.querySelector("#button_editError").classList.add("hidden");
 		}
 	}
 
@@ -312,6 +332,15 @@
 		}
 	}
 
+	function editNextResponse() {
+		//make the textara writable
+	    this.shadowRoot.querySelector("#textarea_actionResultValue").removeAttribute('readonly');
+	    //show save/cancel button
+	    this.shadowRoot.querySelector("#button_saveActionResult").classList.remove("hidden");
+	    this.shadowRoot.querySelector("#button_cancelChangeActionResult").classList.remove("hidden");
+	    //hide edit button
+	    this.shadowRoot.querySelector("#button_editActionResult").classList.add("hidden");
+	}
 
 	function saveNextResponse() {
 		var actionId = this.getAttribute("id");//necessary
@@ -362,9 +391,10 @@
 	        //make the textara readonly
 	        this.shadowRoot.querySelector("#textarea_actionResultValue").setAttribute('readonly','readonly');
 	        //hide save/cancel button
-	        this.shadowRoot.querySelector("#button_saveActionResult").style.display="none";
-	        this.shadowRoot.querySelector("#button_cancelChangeActionResult").style.display="none";
-	        
+	        this.shadowRoot.querySelector("#button_saveActionResult").classList.add("hidden");
+	        this.shadowRoot.querySelector("#button_cancelChangeActionResult").classList.add("hidden");
+	        //show edit button
+	        this.shadowRoot.querySelector("#button_editActionResult").classList.remove("hidden");
 		} else {
 			console.log("saveNextResponse, either actionId is bogus, or bad value of key/value in nextResponse", 
 				actionId, nextResponseKey, nextResponseValue);

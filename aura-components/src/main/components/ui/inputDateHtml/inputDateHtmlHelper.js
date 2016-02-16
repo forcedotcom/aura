@@ -21,8 +21,10 @@
         if (value && inputElement) {
             // v.value could be in UTC format like "2015-08-10T04:00:00.000Z",
             // we DON'T need the time portion
-            var displayValue = value.split("T", 1)[0] || value;
-            inputElement.value = displayValue;
+            var dateValue = value.split("T", 1)[0] || value;
+
+            // HTML5 date input requires a full date format equal to YYYY-MM-DD.
+            inputElement.value = $A.localizationService.formatDate(dateValue, "YYYY-MM-DD");
         }
     }
 });

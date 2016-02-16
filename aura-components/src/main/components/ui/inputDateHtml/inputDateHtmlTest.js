@@ -22,6 +22,14 @@
         }
     },
 
+    testInitialValueWithoutPad: {
+        attributes : {value: "2016-1-2"},
+        test: function(cmp){
+            var inputDateStr = cmp.find("inputDateHtml").getElement().value;
+            $A.test.assertEquals("2016-01-02", inputDateStr, "Dates are not the same and they should be");
+        }
+    },
+
     testInitialValueInUTC: {
         attributes : {value: "2016-01-22T01:00:00.000Z"},
         test: function(cmp){

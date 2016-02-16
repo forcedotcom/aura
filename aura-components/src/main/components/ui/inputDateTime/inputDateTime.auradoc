@@ -19,7 +19,7 @@
 	<aura:description>
 		<p>
 			A <code>ui:inputDateTime</code> component represents a date and time input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code> on desktop.
-			It displays a native date time picker on mobile and tablet form factors using an input field of type <code>datetime-local</code>.
+			Web apps running on mobiles and tablets use an input field of type <code>datetime-local</code> for all browsers except Internet Explorer.
 			The value is displayed based on the locale of the browser, for example, <code>MMM d, yyyy</code> and <code>h:mm:ss a</code>, which is returned by <code>$Locale.dateFormat</code>
 			and <code>$Locale.timeFormat</code>. 
 		</p>

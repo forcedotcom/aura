@@ -40,6 +40,7 @@ TestInstance = function() {
     this.prePostSendConfigs = [];
     this.prePostDecodeConfigs = [];
     this.installOverride();
+    this.name = undefined;
 };
 
 /**
@@ -310,9 +311,9 @@ TestInstance.prototype.enqueueAction = function(action, background) {
  *
  * @example
  * $A.test.getExternalAction(cmp, "aura://ComponentController/ACTION$getComponent",
- * 			{name:"aura:text", attributes:{value:"valuable"}},
- * 			"java://org.auraframework.instance.component",
- * 			function(action){alert(action.getReturnValue().attributes.values.value)})
+ *          {name:"aura:text", attributes:{value:"valuable"}},
+ *          "java://org.auraframework.instance.component",
+ *          function(action){alert(action.getReturnValue().attributes.values.value)})
  *
  * @param {Component} component
  *            The scope to run the action with, even if the action is not visible to it
@@ -381,6 +382,20 @@ TestInstance.prototype.clearAndAssertComponentConfigs = function(a) {
  */
 TestInstance.prototype.isActionPending = function() {
     return !$A.clientService.idle();
+};
+
+/**
+ * Peek if there are any queued server actions.
+ *
+ * NOTE: this is used as a predicate and does not have access to 'this'. If this function changes to require 'this',
+ * either the uses will need to be refactored, or isActionQueued will need to be auto-bound.
+ *
+ * @returns {Boolean} Returns true if there are pending server actions, or false otherwise.
+ * @export
+ * @function Test#isActionQueued
+ */
+TestInstance.prototype.isActionQueued = function() {
+    return $A.clientService.areActionsWaiting();
 };
 
 /**
@@ -1650,41 +1665,41 @@ TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method,
         return false;
     }
     if(processing) {
-    	this.prePostSendConfigs = [];
-	    for (i = 0; i < processing.length; i++) {
-	        cb_config = processing[i];
-	        // If this action has been refreshed, track that one instead.
-	        if (cb_config.action && cb_config.action.refreshAction) {
-	            cb_config.action = cb_config.action.refreshAction;
-	        }
-	        if (cb_config.action && !( actions.indexOf(cb_config.action) >= 0)) {
-	            if (cb_config.action.getState() === 'NEW') {
-	                this.prePostSendConfigs.push(cb_config);//push it back, we will check in the next send
-	            } else {
-	                // whoops, removing without call, warn the user
-	                $A.warning("Callback never called for "+config.action.getId()+" in state "+config.action.getState());
-	            }
-	            continue;//move on to the next cb_config
-	        }
-	        //at this point either we find the action we are watching for, or we are watching _any_ action.
-	        //if we are watching _any_ action, push it back, user should remove the cb_config in the callback once they are done
-	        if (!cb_config.action) {
-	            this.prePostSendConfigs.push(cb_config);
-	        }
-	        if (cb_config.preSendCallback) {
-	        	cb_config.preSendCallback(actions, cb_config.action);
-	        }
-	        if (cb_config.postSendCallback) {
-	            post_callbacks.push(cb_config);//save the callback to post_callbacks so we can go through them after the real send call
-	        }
-	    }
+        this.prePostSendConfigs = [];
+        for (i = 0; i < processing.length; i++) {
+            cb_config = processing[i];
+            // If this action has been refreshed, track that one instead.
+            if (cb_config.action && cb_config.action.refreshAction) {
+                cb_config.action = cb_config.action.refreshAction;
+            }
+            if (cb_config.action && !( actions.indexOf(cb_config.action) >= 0)) {
+                if (cb_config.action.getState() === 'NEW') {
+                    this.prePostSendConfigs.push(cb_config);//push it back, we will check in the next send
+                } else {
+                    // whoops, removing without call, warn the user
+                    $A.warning("Callback never called for "+config.action.getId()+" in state "+config.action.getState());
+                }
+                continue;//move on to the next cb_config
+            }
+            //at this point either we find the action we are watching for, or we are watching _any_ action.
+            //if we are watching _any_ action, push it back, user should remove the cb_config in the callback once they are done
+            if (!cb_config.action) {
+                this.prePostSendConfigs.push(cb_config);
+            }
+            if (cb_config.preSendCallback) {
+                cb_config.preSendCallback(actions, cb_config.action);
+            }
+            if (cb_config.postSendCallback) {
+                post_callbacks.push(cb_config);//save the callback to post_callbacks so we can go through them after the real send call
+            }
+        }
     }
     var value = config["fn"].call(config["scope"], auraXHR, actions, method, options);
     if (value) {
         this.sentXHRCount += 1;
     }
     for (i = 0; i < post_callbacks.length; i++) {
-    		post_callbacks[i].postSendCallback(actions, post_callbacks[i].action);
+            post_callbacks[i].postSendCallback(actions, post_callbacks[i].action);
     }
     return value;
 };
@@ -1710,24 +1725,24 @@ TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
     var oldResponse = response;
     var newResponse; var i;
     if(processing) {
-    	for (i = 0; i < processing.length; i++) {
-	        cb_config = processing[i];
-	        if (cb_config) {
-	        	if(cb_config.preDecodeCallback) {
-		        	newResponse = cb_config.preDecodeCallback(oldResponse);
-		        	oldResponse = newResponse;
-	        	}
-	        	if(cb_config.postDecodeCallback) {
-	        		post_callbacks.push(cb_config);
-	        	}
-	        }
-	    }
+        for (i = 0; i < processing.length; i++) {
+            cb_config = processing[i];
+            if (cb_config) {
+                if(cb_config.preDecodeCallback) {
+                    newResponse = cb_config.preDecodeCallback(oldResponse);
+                    oldResponse = newResponse;
+                }
+                if(cb_config.postDecodeCallback) {
+                    post_callbacks.push(cb_config);
+                }
+            }
+        }
 
     }
     //now feed decode() with our copy of response
     var res = config["fn"].call(config["scope"], oldResponse, noStrip);
     for (i = 0; i < post_callbacks.length; i++) {
-    	post_callbacks[i].postDecodeCallback(res);
+        post_callbacks[i].postDecodeCallback(res);
     }
 
     return res;
@@ -1763,9 +1778,9 @@ TestInstance.prototype.PrePostConfig = function (action, preSendCallback, postSe
  *
  */
 TestInstance.prototype.addPrePostSendCallback = function (action, preSendCallback, postSendCallback) {
-	if ( (!preSendCallback)&&(!postSendCallback) ) {
-		throw new Error("TestInstance.addPrePostSendCallback: one of the callback must be not-null");
-	}
+    if ( (!preSendCallback)&&(!postSendCallback) ) {
+        throw new Error("TestInstance.addPrePostSendCallback: one of the callback must be not-null");
+    }
     if (preSendCallback !== null && preSendCallback !== undefined) {
         if (!(preSendCallback instanceof Function)) {
             throw new Error("TestInstance.addPrePostSendCallback: preSendCallback must be a function"
@@ -1798,10 +1813,10 @@ TestInstance.prototype.addPrePostSendCallback = function (action, preSendCallbac
  * @function Test#addPreSendCallback
  */
 TestInstance.prototype.addPreSendCallback = function (action, preSendCallback) {
-	if (!preSendCallback) {
-		throw new Error("TestInstance.addPreSendCallback: callback must be not-null");
-	}
-	return this.addPrePostSendCallback(action, preSendCallback, null);
+    if (!preSendCallback) {
+        throw new Error("TestInstance.addPreSendCallback: callback must be not-null");
+    }
+    return this.addPrePostSendCallback(action, preSendCallback, null);
 };
 
 /**
@@ -1820,10 +1835,10 @@ TestInstance.prototype.addPreSendCallback = function (action, preSendCallback) {
  * @function Test#addPostSendCallback
  */
 TestInstance.prototype.addPostSendCallback = function (action, postSendCallback) {
-	if (!postSendCallback) {
-		throw new Error("TestInstance.addPostSendCallback: callback must be not-null");
-	}
-	return this.addPrePostSendCallback(action, null, postSendCallback);
+    if (!postSendCallback) {
+        throw new Error("TestInstance.addPostSendCallback: callback must be not-null");
+    }
+    return this.addPrePostSendCallback(action, null, postSendCallback);
 };
 
 /**
@@ -1861,7 +1876,7 @@ TestInstance.prototype.removePreSendCallback = function (handle) {
  * @function Test#removePostSendCallback
  */
 TestInstance.prototype.removePostSendCallback = function (handle) {
-	this.removePrePostSendCallback(handle);
+    this.removePrePostSendCallback(handle);
 };
 
 
@@ -1871,10 +1886,10 @@ TestInstance.prototype.removePostSendCallback = function (handle) {
  * @function Test#addPreDecodeCallback
  */
 TestInstance.prototype.addPreDecodeCallback = function (preDecodeCallback) {
-	if(!preDecodeCallback) {
-		throw new Error("addPreDecodeCallback: callback cannot be null");
-	}
-	return this.addPrePostDecodeCallback(preDecodeCallback, null);
+    if(!preDecodeCallback) {
+        throw new Error("addPreDecodeCallback: callback cannot be null");
+    }
+    return this.addPrePostDecodeCallback(preDecodeCallback, null);
 };
 
 /**
@@ -1883,10 +1898,10 @@ TestInstance.prototype.addPreDecodeCallback = function (preDecodeCallback) {
  * @function Test#addPostDecodeCallback
  */
 TestInstance.prototype.addPostDecodeCallback = function (postDecodeCallback) {
-	if(!postDecodeCallback) {
-		throw new Error("addPostDecodeCallback: callback cannot be null");
-	}
-	return this.addPrePostDecodeCallback(null, postDecodeCallback);
+    if(!postDecodeCallback) {
+        throw new Error("addPostDecodeCallback: callback cannot be null");
+    }
+    return this.addPrePostDecodeCallback(null, postDecodeCallback);
 };
 
 
@@ -1894,9 +1909,9 @@ TestInstance.prototype.addPostDecodeCallback = function (postDecodeCallback) {
  * Add a callback before/after decode response
  */
 TestInstance.prototype.addPrePostDecodeCallback = function (preDecodeCallback, postDecodeCallback) {
-	var config = new TestInstance.prototype.PrePostConfig(null, null, null, preDecodeCallback, postDecodeCallback);
-	this.prePostDecodeConfigs.push(config);
-	return config;
+    var config = new TestInstance.prototype.PrePostConfig(null, null, null, preDecodeCallback, postDecodeCallback);
+    this.prePostDecodeConfigs.push(config);
+    return config;
 };
 
 /**
@@ -1926,7 +1941,7 @@ TestInstance.prototype.removePostDecodeCallback = function (handle) {
  * @function Test#removePreDecodeCallback
  */
 TestInstance.prototype.removePreDecodeCallback = function (handle) {
-	this.removePrePostDecodeCallback(handle);
+    this.removePrePostDecodeCallback(handle);
 };
 
 /**
@@ -1963,6 +1978,7 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
         return;
     }
     this.inProgress = 2;
+    this.name = name;
 
     if (quickFixException) {
         this.logError(quickFixException);
@@ -1983,6 +1999,15 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
 
     var continueRun = this.runInternal.bind(this, name);
     setTimeout(this.waitForRoot.bind(this, continueRun), 1);
+};
+
+/**
+ * Get the test name.
+ *
+ * @export
+ */
+TestInstance.prototype.getTestName = function () {
+    return this.name;
 };
 
 /**

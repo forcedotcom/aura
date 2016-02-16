@@ -269,8 +269,8 @@ Test.Aura.AuraClientServiceTest = function() {
         this.runDeprecated = Stubs.GetMethod();
         this.addCallbackGroup = Stubs.GetMethod();
         this.abortableId = undefined;
-        this.getAbortableId = function () { return this.abortableId; };
-        this.setAbortableId = function (nid) { this.abortableId = nid; };
+        this.getAbortableId = function () { return undefined; };
+        this.setAbortableId = function (nid) { };
         this.abort = Stubs.GetMethod();
         this.getDef = Stubs.GetMethod({
             isClientAction : Stubs.GetMethod(true),

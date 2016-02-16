@@ -385,7 +385,6 @@ Test.Aura.LoggerTest = function() {
         var clientStackLength = -1;
         var mockAction = {
         		params : {},
-                setAbortable: function() {},
                 setParams: function(config) { 
                     if(config) {
                     	for ( var key in config) {

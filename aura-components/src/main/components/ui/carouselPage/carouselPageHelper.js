@@ -119,9 +119,7 @@
 
                 serverAction.setStorable(storableConfig);
             }
-
-            // Only clobber the action, if there's another request for the exact tab:
-            serverAction.setAbortable(false);
+            serverAction.setAbortable();
         } else {
             serverAction.setAbortable();
         }

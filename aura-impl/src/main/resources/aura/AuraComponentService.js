@@ -1290,7 +1290,7 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
     }
 
     action = this.requestComponent(this, callback, config);
-    action.setAbortable(true);
+    action.setAbortable();
     $A.enqueueAction(action);
     return action;
 };

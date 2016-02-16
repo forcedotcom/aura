@@ -94,50 +94,6 @@
                     var teamActionNum =  that.getActionNumberFromPage(cmp)[0];
                     that.verifyTeamFacet(cmp,teamActionNum);
                 });
-        },function(cmp){
-            this.resetCounter(cmp, "testActionScopedGlobalID");
-            /**
-             * Group of actions with one of them aborted. So the sequence of replay changes
-             */
-            cmp._testCounter = 2; 
-            var action1 = cmp.get("c.getBaseball");
-            action1.setParams({testName : "testActionScopedGlobalID"});
-            action1.setAbortable();
-            action1.setCallback(cmp, function(action) {
-                    //Clear the old facet in players div
-                    cmp.find("Team").set("v.body", []);
-                });
-            
-            var action2 = cmp.get("c.getBaseball");
-            action2.setParams({testName : "testActionScopedGlobalID"});
-            action2.setAbortable();
-            action2.setCallback(cmp, function(action) {
-                    var teamFacet = $A.createComponentFromConfig(action.getReturnValue()[0]);
-                    //Clear the old facet in team div & insert newly fetched components
-                    cmp.find("Team").set("v.body", [teamFacet]);
-                    //Update the page with action number
-                    cmp.find("Actions").getElement().innerHTML = action.getId();
-                });
-            var a = cmp.get("c.resetCounter");
-            a.setParams({ testName: "testActionScopedGlobalID" }),
-            $A.test.enqueueAction(a);
-            $A.test.runAfterIf(function() { return $A.test.areActionsComplete([a]); },
-                function() {
-                    $A.test.assertEquals("SUCCESS", a.getState());
-                    $A.test.blockRequests();
-                    $A.run(function() { $A.enqueueAction(action1); });
-                    $A.run(function() { $A.enqueueAction(action2); });
-                    $A.test.releaseRequests();
-                });
-            cmp.test = this;
-            $A.test.runAfterIf(function() {
-                    return $A.test.areActionsComplete([action1, action2]);
-                }, function(){
-                    $A.test.assertEquals("ABORTED", action1.getState());
-                    $A.test.assertEquals("SUCCESS", action2.getState());
-                    var teamActionNum = cmp.test.getActionNumberFromPage(cmp)[0];
-                    cmp.test.verifyTeamFacet(cmp, teamActionNum);
-                });
         } ]
     },
     testActionScopedGlobalIDUsingStorageService:{

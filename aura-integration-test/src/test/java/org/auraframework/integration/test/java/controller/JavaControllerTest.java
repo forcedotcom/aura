@@ -291,6 +291,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     /**
      * Verify controller can not be accessed in custom namespace
      */
+    @UnAdaptableTest("namespace start with c means something special in core")
     public void testControllerInCustomNamespace() throws Exception {
         String resourceSource = "<aura:component controller='java://org.auraframework.components.test.java.controller.TestController'>Hello World!</aura:component>";
 

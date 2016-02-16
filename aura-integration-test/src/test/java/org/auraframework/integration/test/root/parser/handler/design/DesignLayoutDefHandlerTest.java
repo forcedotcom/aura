@@ -22,8 +22,10 @@ import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 
+@UnAdaptableTest("namespace start with c means something special in core")
 public class DesignLayoutDefHandlerTest extends AuraImplTestCase {
     private final static String LAYOUT = "<design:layout> </design:layout>";
     private final static String LAYOUT_NAME = "<design:layout name=\"%s\"> </design:layout>";

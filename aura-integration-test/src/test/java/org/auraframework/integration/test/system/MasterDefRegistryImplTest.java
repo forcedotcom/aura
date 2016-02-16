@@ -53,7 +53,6 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -64,7 +63,6 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.SourceListener;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.util.AuraTestingUtil;
-import org.auraframework.throwable.AuraException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -1067,6 +1065,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertFalse("nsCmp is not in cache", isInExistsCache(nsCmpDef, mdri3));
     }
 
+    @UnAdaptableTest("namespace start with 'c' means something special in core")
     public void testDefsCache() throws Exception {
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
         MasterDefRegistry mdr = getAuraMDR();

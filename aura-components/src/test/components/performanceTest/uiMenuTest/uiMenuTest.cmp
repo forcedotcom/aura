@@ -2,7 +2,7 @@
     <!-- tests ui:menu by using a combination of 1. adding many menu items and 2.toggling the menu's initial visibility -->
     
 	<!-- perf test params -->
-    <aura:attribute name="testManyItems" type="Boolean" default="false"/>
+    <aura:attribute name="testManyItems" type="Boolean" default="true"/>
     <aura:attribute name="testVisible" type="Boolean" default="false"/>
     
 	<ui:menu>
@@ -10,10 +10,10 @@
 	    
 	     <!--Need the `manualPosition` attribute to test menu with more items than fit the browser window-->
         <ui:menuList class="actionMenu" aura:id="actionMenu" manualPosition="{!v.testManyItems}">
-                      
+
               <!-- Needs to be toggled by the perf. framework if testing `visible` attribute-->
         	  <aura:set attribute="visible" value="{!v.testVisible}"/>
-        	
+
               <ui:actionMenuItem aura:id="item1" label="A1"/>
               <ui:actionMenuItem aura:id="item2" label="A2" disabled="true"/>
               <ui:actionMenuItem aura:id="item3" label="A3" />

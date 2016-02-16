@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 ({
-    handleMouseover: function(component, event, helper) {
-        helper.setFocus(component);
+    focus: function(component, event, helper) {
+        helper.focus(component);
     },
 
+    // XXX: Some clients call explicitly .get("e.setFocus").fire();
+    // We should remove this method once we move to .focus() instead
     setFocus: function(component, event, helper) {
-        helper.setFocus(component);
+        helper.focus(component);
     },
 
     select: function(component, event, helper) {

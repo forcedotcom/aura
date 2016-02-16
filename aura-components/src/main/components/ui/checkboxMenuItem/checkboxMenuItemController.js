@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 ({
-    select : function(component) {
-        var concrete = component.getConcreteComponent();
-        var current = concrete.get("v.selected");
-        concrete.set("v.selected", !current);
+    select: function (component) {
+        if (component.get("v.disabled")) {
+            return;
+        }
 
-        return component.getSuper().select();
+        var current = component.get("v.selected");
+        component.set("v.selected", !current);
+
+        component.getSuper().select();
     }
 })// eslint-disable-line semi

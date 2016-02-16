@@ -16,4 +16,5 @@
 
 -->
 <aura:event type="COMPONENT" support="PROTO" description="Indicates that the popup trigger is requesting to show a target.">
+	<aura:attribute name="event" type="Object" description="The event that triggered the popup show." />
 </aura:event>

@@ -39,7 +39,7 @@ public class PerfMetricsUtil {
     private final PerfConfig config;
     private RDPAnalyzer rdpAnalyzer;
     private List<RDPNotification> notifications;
-    private Map<String, Map<String, Map<String, Long>>> auraStats;
+    private Map<String, Map<String, Map<String, Object>>> auraStats;
     private String dbURI;
 
     public PerfMetricsUtil(PerfExecutorTest test, String dbURI, PerfConfig config) {
@@ -53,7 +53,7 @@ public class PerfMetricsUtil {
      * 
      * @throws Exception
      */
-    public void evaluateResults() throws Exception {
+    public void evaluateResults(String testName) throws Exception {
         // Get the median metrics after all the runs.
         PerfMetrics metrics = test.getPerfRunsCollector().getMedianMetrics();
         PerfMetrics median = test.getPerfRunsCollector().getMedianRun();
@@ -64,7 +64,8 @@ public class PerfMetricsUtil {
         metrics.setCustomMetrics(median.getCustomMetrics());
 
         // Write the results into file
-        writeResults(metrics);
+        writeResults(testName, metrics);
+        //PerfResultsUtil.exportToCsv(test, dbURI);
 
         // Diff the results file against an existing goldfile per component
         PerfResultsUtil.assertPerfDiff(test, "goldfile.json", metrics);
@@ -77,23 +78,27 @@ public class PerfMetricsUtil {
      * @return
      * @throws JSONException
      */
-    private void writeResults(PerfMetrics metrics) throws JSONException {
+    public void writeResults(String testName, PerfMetrics metrics) throws JSONException {
         // Write the metrics into result file
     	PerfResultsUtil.writeGoldFile(metrics, test);
+    	String timeline = config.getOptions().get("timeline");
+    	String traceJson = "";
     	
-        // Write the timeline events
-        File traceLog = PerfResultsUtil.writeDevToolsLog(metrics.getDevToolsLog(), test.getComponentDef().getName(), test);
-
-        // Write the results to Db
-        try {
-            InputStream is = new FileInputStream(traceLog);
-            String traceJson = IOUtils.toString(is);
-            PerfResultsUtil.writeToDb(test, dbURI, metrics, traceJson);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(timeline!=null && !timeline.equals("disable")) {
+        	// Write the timeline events
+            File traceLog = PerfResultsUtil.writeDevToolsLog(metrics.getDevToolsLog(), test.getComponentDef().getName(), test);
+            try {
+	            InputStream is = new FileInputStream(traceLog);
+	            traceJson = IOUtils.toString(is);	            
+	        } catch (FileNotFoundException e) {
+	            e.printStackTrace();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
         }
+        
+        // Write the results to Db
+        PerfResultsUtil.writeToDb(test, testName, dbURI, metrics, traceJson);
     }
 
     private void prepareNetworkMetrics(PerfMetrics metrics) {
@@ -131,29 +136,44 @@ public class PerfMetricsUtil {
     }
 
     private void handleCoqlMetrics(PerfMetrics metrics, String name) {
-        Map<String, Map<String, Long>> nameValue = auraStats.get(name);
+        Map<String, Map<String, Object>> nameValue = auraStats.get(name);
         for (String method : nameValue.keySet()) {
-            Map<String, Long> methodValue = nameValue.get(method);
+            Map<String, Object> methodValue = nameValue.get(method);
             for (String what : methodValue.keySet()) {
-                Long value = methodValue.get(what);
+                Long value = (Long) methodValue.get(what);
                 metrics.setMetric("Aura." + name + '.' + method + '.' + what, value);
             }
         }
     }
     private void handleMetricsServiceTransaction(PerfMetrics metrics, String name) {
-    	Map<String, Map<String, Long>> transactionMap = auraStats.get(name);
+    	Map<String, Map<String, Object>> transactionMap = auraStats.get(name);
     	metrics.setMetricsServiceTransaction(transactionMap);
 	}
     
     private void handleCommonMetrics(PerfMetrics metrics, String name) {
-    	Map<String, Map<String, Long>> transactionMap = auraStats.get(name);
+    	Map<String, Map<String, Object>> transactionMap = auraStats.get(name);
     	metrics.setCommonMetrics(transactionMap);
 	}
     
     private void handleCustomMetrics(PerfMetrics metrics, String name) {
-    	Map<String, Map<String, Long>> transactionMap = auraStats.get(name);
-    	metrics.setCustomMetrics(transactionMap);
-	}
+        Map<String, Map<String, Object>> customMap = auraStats.get(name);
+        for (String method : customMap.keySet()) {
+                if(customMap.get(method) instanceof Map) {
+                    Map<String, Object> methodValue = customMap.get(method);
+                    for (String what : methodValue.keySet()) {
+                        Object value = methodValue.get(what);
+                        if(value!=null) {
+                                value = methodValue.get(what).toString();
+                                metrics.setMetric("Custom." + name + '.' + method + '.' + what, value);
+                        }
+                    }
+                } else {
+                        Object value = customMap.get(method);
+                        metrics.setMetric("Custom." + name + '.' + method, value);
+                }
+        }
+        metrics.setCustomMetrics(customMap);
+    }
 
     private void prepareAuraMetrics(PerfMetrics metrics) {
         if (auraStats != null) {
@@ -190,6 +210,6 @@ public class PerfMetricsUtil {
         }
         // TODO auraUITestingUtil unable to execute the js correctly
         Object obj = ((JavascriptExecutor) driver).executeScript("return $A.PerfRunner.getResults()");
-        auraStats = (Map<String, Map<String, Map<String, Long>>>) obj;
+        auraStats = (Map<String, Map<String, Map<String, Object>>>) obj;
     }
 }

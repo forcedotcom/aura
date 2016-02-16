@@ -16,6 +16,7 @@
 package org.auraframework.integration.test.root.parser.handler;
 
 
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
@@ -39,7 +40,7 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
 	public void testMethodMissingName() throws Exception {
 		try {
 			DefDescriptor<ComponentDef> desc = getSimpleCmpDesc("<aura:method> </aura:method>");
-			desc.getDef();
+			Aura.getDefinitionService().getDefinition(desc);
 			fail("Expect to fail with method without name");
 		} catch (Exception e) {
 			checkExceptionContains(e, InvalidDefinitionException.class, "The attribute 'name' is required on '<aura:method>'.");
@@ -51,7 +52,7 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
 		String basicMethod = "<aura:method name='myMethod'> </aura:method>";
         try {
         	DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(basicMethod+basicMethod);
-			desc.getDef();
+        	Aura.getDefinitionService().getDefinition(desc);
 			fail("Expect to fail with method with duplicate name");
 		} catch (Exception e) {
 			 checkExceptionContains(e, InvalidDefinitionException.class,
@@ -65,7 +66,7 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
 		String basicEvent = "<aura:registerEvent name='myMethod' type='aura:operationComplete'/>";
         try {
         	DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(basicEvent+basicMethod);
-			desc.getDef();
+        	Aura.getDefinitionService().getDefinition(desc);
 			fail("Expect to fail with method with duplicate name as an event");
 		} catch (Exception e) {
 			 checkExceptionContains(e, InvalidDefinitionException.class,
@@ -80,7 +81,7 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
 		String basicEvent = "<aura:registerEvent name='myMethod' type='aura:operationComplete'/>";
         try {
         	DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(basicMethod+basicEvent);
-			desc.getDef();
+        	Aura.getDefinitionService().getDefinition(desc);
 			fail("Expect to fail with method with duplicate name as an event");
 		} catch (Exception e) {
 			 checkExceptionContains(e, InvalidDefinitionException.class,
@@ -94,7 +95,7 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
 		String basicAttribute = "<aura:attribute name='myMethod' type='String'/>";
         try {
         	DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(basicAttribute+basicMethod);
-			desc.getDef();
+        	Aura.getDefinitionService().getDefinition(desc);
 			fail("Expect to fail with method with duplicate name as an attribute");
 		} catch (Exception e) {
 			 checkExceptionContains(e, InvalidDefinitionException.class,
@@ -110,7 +111,7 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
 		String basicAttribute = "<aura:attribute name='myMethod' type='String'/>";
         try {
         	DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(basicMethod+basicAttribute);
-			desc.getDef();
+        	Aura.getDefinitionService().getDefinition(desc);
 			fail("Expect to fail with method with duplicate name as an attribute");
 		} catch (Exception e) {
 			 checkExceptionContains(e, InvalidDefinitionException.class,

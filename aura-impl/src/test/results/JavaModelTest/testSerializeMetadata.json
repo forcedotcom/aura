@@ -1,7 +1,7 @@
 {
   "s":1,
   "v":{
-    "descriptor":"java://org.auraframework.components.test.java.model.TestModel",
+    "descriptor":"java://org.auraframework.impl.java.model.TestModel",
     "members":[
       {
         "s":2,

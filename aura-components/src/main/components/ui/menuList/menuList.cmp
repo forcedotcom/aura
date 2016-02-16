@@ -32,6 +32,9 @@
     <aura:registerEvent access="GLOBAL" name="menuFocusChange" type="ui:menuFocusChange" description="The event fired when the menu list focus changed from one menuItem to another menuItem."/>
     <aura:registerEvent name="refresh" type="ui:refresh" description="Fire this event to refresh the menuList."/>
 
+    <aura:registerEvent name="keydown" type="ui:popupKeyboardEvent" description="The event fired when the user presses a keyboard key on the component."/>
+    <aura:handler name="keydown" action="{!c.onKeyboardEvent}"/>
+
     <aura:handler name="refresh" action="{!c.update}"/>
 
     <div class="{!v.class}" aura:id="menu" role="menu">

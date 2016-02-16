@@ -15,19 +15,26 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extensible="true" abstract="true" extends="ui:interactive" provider="js://ui.menuItem" description="A UI menu item in a ui:menuList component.">
+<aura:component access="GLOBAL" support="GA" extensible="true" abstract="true" provider="js://ui.menuItem" description="A UI menu item in a ui:menuList component.">
 
-    <aura:method name="select" action="{!c.select}"/>
+    <aura:registerEvent name="menuSelect" type="ui:menuSelect" description="The event that is fired when the menu item is selected."/>
 
-    <aura:registerevent name="menuSelect" type="ui:menuSelect" description="The event that is fired when the menu item is selected."/>
     <aura:attribute access="GLOBAL" name="selected" type="Boolean" default="false" description="The status of the menu item. True means this menu item is selected; False is not selected."/>
     <aura:attribute access="GLOBAL" name="type" type="String" description="The concrete type of the menu item. Accepted values are 'action', 'checkbox', 'radio', 'separator' or any namespaced component descriptor, e.g. ns:xxxxmenuItem."/>
     <aura:attribute access="GLOBAL" name="label" type="String" description="The text displayed on the component."/>
-
     <aura:attribute access="GLOBAL" name="hideMenuAfterSelected" type="Boolean" default="true" description="Set to true to hide menu after the menu item is selected." />
+    <aura:attribute access="GLOBAL" name="disabled" type="Boolean" default="false" description="Specifies whether the component should be displayed in a disabled state. Default value is &quot;false&quot;."/>
 
-    <aura:attribute name="focusTriggerAfterSelected" type="Boolean" default="false" description="JBUCH: Access Check Failure. Assume necessary, based on menuItemController.js, line 27." />
+    <aura:attribute access="GLOBAL" name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component."/>
+    <aura:attribute access="GLOBAL" name="value" type="Object" description="References the controller class variable that is associated with the component."/>
 
-    <aura:handler name="mouseover" action="{!c.handleMouseover}"/>
+    <!-- TODO: These three shouldn't be global as they're only used internally (by menuList)  -->
+    <aura:registerEvent access="GLOBAL" name="keydown" type="ui:keydown" description="The event fired when the user presses a keyboard key on the component."/>
+    <aura:registerEvent access="GLOBAL" name="click" type="ui:click" description="The event fired when the user clicks on the component."/>
+
+    <aura:method name="select" action="{!c.select}"/>
+    <aura:method name="focus" action="{!c.focus}"/>
+
     {!v.body}
+
 </aura:component>

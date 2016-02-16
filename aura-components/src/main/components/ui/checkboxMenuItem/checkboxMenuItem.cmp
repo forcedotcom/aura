@@ -20,14 +20,7 @@
 
     <aura:method name="select" action="{!c.select}"/>
 
-    <li aura:id="listitem" class="{!v.class}" role="presentation">
-        <a aura:id="link" onclick="{!c.select}" role="menuitemcheckbox" title="{!v.label}" aria-disabled="{!v.disabled}" tabindex="{!v.disabled ? -1: 0}">
-            <aura:renderIf isTrue="{!v.body.length == 0}">
-                <b></b>{!v.label}
-                <aura:set attribute="else">
-                    <b></b>{!v.body}
-                </aura:set>
-            </aura:renderIf>
-        </a>
+    <li role="presentation" class="{!v.class}">
+        <a aura:id="anchor" role="menuitemcheckbox"><!-- The body is added on render --></a>
     </li>
 </aura:component>

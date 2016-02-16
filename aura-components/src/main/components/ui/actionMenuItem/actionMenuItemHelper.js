@@ -23,20 +23,16 @@
 
         var label = cmp.get("v.label");
         var isDisabled = cmp.get("v.disabled");
-        var isSelected = cmp.get("v.selected");
 
         anchorElement.setAttribute("aria-disabled", isDisabled);
         anchorElement.setAttribute("tabindex", isDisabled ? "-1" : "0");
         anchorElement.setAttribute("title", label);
-        anchorElement.setAttribute("aria-checked", isSelected);
 
         var bodyAttribute = cmp.get("v.body");
         var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
 
         if (shouldClearBody) {
             $A.util.clearNode(anchorElement);
-
-            anchorElement.appendChild(document.createElement("b"));
 
             if (hasBodyAttribute) {
                 $A.renderingService.renderFacet(cmp, bodyAttribute, anchorElement);
@@ -47,12 +43,6 @@
             if (hasBodyAttribute) {
                 $A.renderingService.rerenderFacet(cmp, bodyAttribute);
             }
-        }
-
-        if (isSelected === true) {
-            $A.util.addClass(anchorElement, "selected");
-        } else {
-            $A.util.removeClass(anchorElement, "selected");
         }
     },
 

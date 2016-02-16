@@ -19,29 +19,36 @@
         "checkbox": "ui:checkboxMenuItem",
         "radio": "ui:radioMenuItem",
         "separator": "ui:menuItemSeparator"
-
     },
 
     addMenuItemDomEvents: function (component) {
-        var events = ["click", "keydown", "mouseover"];
-        for (var i = 0, len = events.length; i < len; i++) {
-            // We need to fire these events for status update anyway
-            if (!component.hasEventHandler(events[i])) {
-                this.addDomHandler(component, events[i]);
+        var events = ["keydown", "mouseover"];
+        if (!component._menuItemDomEventsInstalled) {
+            for (var i = 0, len = events.length; i < len; i++) {
+                $A.util.on(component.getElement(), events[i], this.domEventHandler.bind(this, component));
             }
+            component._menuItemDomEventsInstalled = true;
         }
     },
-    /**
-     * Override
-     *
-     */
-    fireEvent: function (component, event, helper) {
-        if (this.isDisabled(component) && event.type !== "mouseover") {
-            return;
+
+    domEventHandler: function(component, event) {
+        event.preventDefault();
+
+        if (!component.isValid() || this.isDisabled(component)) {
+            return false;
         }
-        var e = component.getEvent(event.type);
-        helper.setEventParams(e, event);
-        e.fire();
+
+        var concreteComponent = component.getConcreteComponent();
+
+        if (event.type === "mouseover") {
+            concreteComponent.focus();
+        } else if (event.type === "keydown") {
+            if (event.keyCode === 32 || event.keyCode === 13) {  // space or enter key
+                concreteComponent.select();
+            }
+        }
+
+        return false;
     },
 
     isDisabled: function (component) {
@@ -53,10 +60,13 @@
             return;
         }
 
-        options = options || {};
-        var e = component.getEvent("menuSelect");
-        if (e) {
+        // XXX: menuSelect should be used instead of click, but this code should cover the old uses of click instead.
+        component.getEvent("click").fire();
 
+        options = options || {};
+
+        var menuSelectEvent = component.getEvent("menuSelect");
+        if (menuSelectEvent) {
             var hideMenu = options.hideMenu;
             if ($A.util.isUndefinedOrNull(hideMenu)) {
                 hideMenu = component.get("v.hideMenuAfterSelected");
@@ -67,77 +77,25 @@
                 focusTrigger = hideMenu;
             }
 
-            e.setParams({
+            menuSelectEvent.setParams({
                 selectedItem: component,
                 "hideMenu": hideMenu,
                 "deselectSiblings": options.deselectSiblings,
                 "focusTrigger": focusTrigger
             });
-            e.fire();
+            menuSelectEvent.fire();
         }
+
     }/*eslint-disable no-unused-vars*/,
-    /**
-     * Select the menu item when Space bar is pressed
-     *
-     */
-    handleSpacekeydown: function (component, event) {
-        if (this.isDisabled(component)) {
-            return;
-        }
-        component.select();
-    },
 
-    preEventFiring: function (component, event) {
-        this.supportKeyboardInteraction(component, event);
-    },
-
-    setDisabled: function (component) {
-        var concreteCmp = component.getConcreteComponent();
-        var linkCmp = this.getAnchorElement(component);
-        var elem = linkCmp ? linkCmp.getElement() : null;
-        if (elem) {
-            if (this.isDisabled(concreteCmp)) {
-                $A.util.removeClass(elem, "selectable");
-                elem.setAttribute("aria-disabled", "true");
-            } else {
-                $A.util.addClass(elem, "selectable");
-                elem.removeAttribute("aria-disabled");
-            }
-        }
-    },
-
-    setFocus: function (component) {
-        var linkCmp = this.getAnchorElement(component);
-        var elem = linkCmp ? linkCmp.getElement() : null;
-        if (elem && elem.focus) {
-            elem.focus();
-        }
-    },
-
-    getAnchorElement: function (component) {
-        //Walk up the component ancestor to find the contained component by localId
-        var localId = "link", c = component.getConcreteComponent();
-        var retCmp = null;
-        while (c) {
-            retCmp = c.find(localId);
-            if (retCmp) {
-                break;
-            }
-            c = c.getSuper();
-        }
-        return retCmp;
-    },
-
-    /**
-     * Handle keyboard interactions
-     *
-     */
-    supportKeyboardInteraction: function (component, event) {
-        var concreteCmp = component.getConcreteComponent();
-        if (event.type === "keydown") {
-            if (event.keyCode === 32) {  // space key: select the menu item
-                event.preventDefault();
-                this.handleSpacekeydown(concreteCmp, event);
+    focus: function (component) {
+        if (component.getElement()) {
+            var anchors = component.getElement().getElementsByTagName("a");
+            if (anchors && anchors.length > 0) {
+                var anchor = anchors[0];
+                if (anchor && anchor.focus) {
+                    anchor.focus();
+                }
             }
         }
     }

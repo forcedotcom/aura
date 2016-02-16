@@ -15,20 +15,14 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extends="ui:menuItem" extensible="true" description="​A menu item that triggers an action. This component is nested in a ui:menu component.">
+<aura:component access="GLOBAL" support="GA" extends="ui:menuItem" extensible="true" description="A menu item that triggers an action. This component is nested in a ui:menu component.">
 
     <aura:method name="select" action="{!c.select}"/>
 
     <aura:attribute name="id" type="String" description="id of the menu item"/>
 
-    <li aura:id="listitem" class="{!v.class}" role="presentation">
-        <a aura:id="link" onclick="{!c.select}" role="menuitem" aria-disabled="{!v.disabled}" title="{!v.label}" tabindex="{!v.disabled ? -1: 0}">
-            <aura:renderIf isTrue="{!v.body.length == 0}">
-                {!v.label}
-                <aura:set attribute="else">
-                    {!v.body}
-                </aura:set>
-            </aura:renderIf>
-        </a>
+    <li role="presentation" class="{!v.class}">
+        <a aura:id="anchor" role="menuitem"><!-- The body is added on render --></a>
     </li>
+
 </aura:component>

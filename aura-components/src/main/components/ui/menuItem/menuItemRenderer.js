@@ -15,13 +15,19 @@
  */
 ({
     afterRender: function(component, helper) {
-        helper.setDisabled(component);
         helper.addMenuItemDomEvents(component);
         return this.superAfterRender();
     },
+
     rerender: function(component, helper) {
-        helper.setDisabled(component);
         helper.addMenuItemDomEvents(component);
-        return this.superRerender();
+        this.superRerender();
+    },
+
+    unrender: function(component) {
+        delete component._menuItemDomEventsInstalled;
+
+        this.superUnrender();
     }
+
 })// eslint-disable-line semi

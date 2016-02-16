@@ -22,7 +22,7 @@
 
         var ret = this.superAfterRender();
 
-        _helper.setFocus(component, false);
+        _helper.setFocus(component);
 
         return ret;
     },
@@ -35,17 +35,9 @@
             _helper.setEventHandlersOnChildren(component);
         }
 
-        var currentlyVisible = false;
-        var divCmp = component.find("menu");
-        if (divCmp) {
-            var elem = divCmp.getElement();
-            if (elem) {
-                currentlyVisible = $A.util.hasClass(elem, "visible");
-            }
-        }
         helper.handleVisible(component);
         var ret = this.superRerender();
-        helper.setFocus(component, currentlyVisible);
+        helper.setFocus(component);
         return ret;
     },
 

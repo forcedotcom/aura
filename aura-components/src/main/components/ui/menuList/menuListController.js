@@ -14,15 +14,32 @@
  * limitations under the License.
  */
 ({
-    onMenuItemSelected: function(component, event, helper) {
-    	helper.onMenuItemSelected(component, event);
+    onMenuItemSelected: function (component, event, helper) {
+        helper.onMenuItemSelected(component, event);
+    },
+
+    onKeyboardEvent: function (component, event, helper) {
+        // If this was a keyboard event from the down arrow click then we need to focus on the first item
+        var originalEvent = event.getParam("event");
+        if (originalEvent && originalEvent.type === "keydown") {
+            var downArrowKeyCode = 40;
+            if (originalEvent.keyCode === downArrowKeyCode) {
+                originalEvent.preventDefault();
+
+                if (component.get("v.visible")) {
+                    helper.setMenuItemFocus(component, 0);
+                } else {
+                    component._focusOnRender = true;
+                }
+            }
+        }
     },
 
     // TODO: This should be moved to a method
-    update: function(component, event, helper) {
-    	var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
+    update: function (component, event, helper) {
+        var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
         _helper.setEventHandlersOnChildren(component);
-        
+
         event.stopPropagation();
     }
-})// eslint-disable-line semi
+});// eslint-disable-line semi

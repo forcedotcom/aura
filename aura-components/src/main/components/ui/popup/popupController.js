@@ -27,7 +27,7 @@
 
     onTargetShow: function(component, event, helper) {
         helper = component.getConcreteComponent().getDef().getHelper();
-        helper.handleTargetShow(component);
+        helper.handleTargetShow(component, event);
     },
 
     onTargetHide: function(component, event, helper) {

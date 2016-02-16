@@ -15,6 +15,10 @@
  */
 ({
     select : function(component, event, helper) {
+        if (component.get("v.disabled")) {
+            return;
+        }
+
         var current = component.get("v.selected");
         if (current === false) {
             component.set("v.selected", !current);

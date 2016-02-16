@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 ({
-    getTargetComponent : function(component){
+    getTargetComponent: function (component) {
         return this.getComponent(component, "ui:popupTarget");
     },
 
-    getTriggerComponent : function(component){
+    getTriggerComponent: function (component) {
         return this.getComponent(component, "ui:popupTrigger");
     },
 
-    getComponent: function(component, componentName){
+    getComponent: function (component, componentName) {
         var body = component.getConcreteComponent().get("v.body"),
             child;
 
@@ -39,39 +39,46 @@
         }
     },
 
-    handleTriggerPress : function(component) {
+    handleTriggerPress: function (component) {
         this.setTargetVisibility(component, !this.getTargetComponent(component).get("v.visible"));
     },
 
-    handleTargetShow : function(component) {
+    handleTargetShow: function (component, event) {
+        var originalEvent = event.getParam("event");
+        if (originalEvent && originalEvent.type === "keydown") {
+            this.delegateEventToTarget(component, originalEvent, 'e.keydown');
+        }
+
         this.setTargetVisibility(component, true);
     },
 
-    handleTargetHide : function(component) {
+    handleTargetHide: function (component) {
         this.setTargetVisibility(component, false);
     },
 
-    handleKeyboardEvent : function(component, event) {
+    handleKeyboardEvent: function (component, event) {
         this.delegateEventToTarget(component, event, 'e.popupKeyboardEvent');
     },
 
-    setTargetVisibility : function(component, visible) {
+    setTargetVisibility: function (component, visible) {
         var target = this.getTargetComponent(component);
 
         target.set("v.visible", visible);
     },
 
-    delegateEventToTarget: function(component, event, eventName) {
+    delegateEventToTarget: function (component, event, eventName) {
         var target = this.getTargetComponent(component),
             targetEvent = target.get(eventName);
 
-        targetEvent.setParams({
-            event : event
-        });
-        targetEvent.fire();
+        if (targetEvent) {
+            targetEvent.setParams({
+                event: event
+            });
+            targetEvent.fire();
+        }
     },
 
-    setEventHandlersOnChildren : function(component) {
+    setEventHandlersOnChildren: function (component) {
         var body = component.getConcreteComponent().get("v.body"),
             child;
 
@@ -80,33 +87,33 @@
             if (child.isInstanceOf("ui:popupTrigger")) {
                 this.setTriggerEventHandlers(component, child);
             }
-            
+
             if (child.isInstanceOf("ui:popupTarget")) {
                 this.setTargetEventHandlers(component, child);
             }
         }
     },
 
-    setTriggerEventHandlers : function(component, childComponent) {
+    setTriggerEventHandlers: function (component, childComponent) {
         childComponent.addHandler("popupTriggerPress", component, "c.onTriggerPress");
         childComponent.addHandler("popupTargetShow", component, "c.onTargetShow");
         childComponent.addHandler("popupTargetHide", component, "c.onTargetHide");
         childComponent.addHandler("popupKeyboardEvent", component, "c.onKeyboardEvent");
     },
 
-    setTargetEventHandlers : function(component, targetComponent) {
+    setTargetEventHandlers: function (component, targetComponent) {
         this.addCloseHandler(component, targetComponent);
     },
 
-    addCloseHandler : function(component, childComponent) {
+    addCloseHandler: function (component, childComponent) {
         childComponent.addHandler("doClose", component, "c.onTargetHide");
     },
 
-    handleRefresh: function(component) {
+    handleRefresh: function (component) {
         this.setEventHandlersOnChildren(component);
     },
 
-    findElement: function(component, localId) {
+    findElement: function (component, localId) {
         var cmp = component.getConcreteComponent();
         var retCmp = null;
         while (cmp) {

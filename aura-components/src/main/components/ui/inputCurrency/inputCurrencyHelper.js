@@ -71,11 +71,12 @@
     },
     setInvalidValueError: function (cmp, value) {
         cmp.set('v.errors', [{
-            message: 'Invalid value was pass.' + (value ? ' - ' + value : '')
+            message: 'Invalid value was passed.' + (value ? ' - ' + value : '')
         }]);
     },
     removeErrors: function (cmp) {
-        if (cmp.get('v.errors').length) {
+        var errors = cmp.get('v.errors');
+        if ($A.util.isArray(errors) && errors.length) {
             cmp.set('v.errors', []);
         }
     },

@@ -19,7 +19,7 @@
 	<aura:description>
 		<p>
 			A <code>ui:inputDate</code> component represents a date input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code> on desktop.
-			It displays a native date picker on mobile and tablet form factors using an input field of type <code>date</code>.
+			Web apps running on mobiles and tablets use an input field of type <code>date</code> for all browsers except Internet Explorer.
 			The value is displayed based on the locale of the browser, for example, <code>MMM d, yyyy</code>, which is returned by <code>$Locale.dateFormat</code>. 
 		</p>
 		<p>This is a basic set up of a date field with a date picker, which displays the field value <code>Jan 30, 2014</code> based on the locale format. 

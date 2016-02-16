@@ -58,7 +58,7 @@
                 if (newItems[0].get("v.active")) {
                     self.activateTab(cmp, index);
                 }
-                if (typeof callback === "function" && newItems[0]) {
+                if (typeof callback === "function") {
                     callback(newItems[0]);
                 }
             });

@@ -379,15 +379,27 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
     //handler for AuraInspector:RemoveActionFromWatchList from actionCard.removeActionCard
     //actionInfo = JSON.stringify ... {
-    //                        'actionName': string
+    //                        'actionName': string,
+    //                         'actionId': string, like "action_card_1852;a"
     //                       };
     function AuraInspectorActionsView_OnRemoveActionFromWatchList(actionInfo) {
         //console.log("AuraInspectorActionsView_OnRemoveActionFromWatchingList:", actionInfo);
         var actionInfoObj = JSON.parse(actionInfo);
         if( actionInfoObj && actionInfoObj.actionName) {
-            //call AuraInspectorInjectedScript.AddActionToWatch
+            //call AuraInspectorInjectedScript.RemoveActionFromWatch
             devtoolsPanel.publish("AuraInspector:OnActionToRemoveFromWatchEnqueue", actionInfoObj);
-        }        
+            //make actionCard on the leftside draggable again
+            var card = document.getElementById(actionInfoObj.actionId);
+            if(card) {
+                card.setAttribute("draggable","true");  
+                card.classList.remove("dropped");
+            } else {
+                console.log("AuraInspectorActionsView_OnRemoveActionFromWatchList, couldn't find actionCard on leftside for :", actionInfo);
+            }
+        } else {
+            console.log("AuraInspectorActionsView_OnRemoveActionFromWatchList, bad actionInfo:", actionInfo);
+        }
+              
     }
 
     //handler for AuraInspector:EnqueueNextResponseForAction from actionCard.saveNextResponse
@@ -413,7 +425,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
     }
 
     function AuraInspectorActionsView_OnEnqueueNextErrorForAction(actionInfo) {
-        console.log("AuraInspectorActionsView_OnEnqueueNextErrorForAction:", actionInfo);
+        //console.log("AuraInspectorActionsView_OnEnqueueNextErrorForAction:", actionInfo);
         var actionInfoObj = JSON.parse(actionInfo);
         if(actionInfoObj && actionInfoObj.actionId && actionInfoObj.nextError) {
             var action = actions.get(actionInfoObj.actionId);

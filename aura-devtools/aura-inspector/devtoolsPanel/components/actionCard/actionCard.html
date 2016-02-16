@@ -1,6 +1,10 @@
 
 <template id="actionCardTemplate">
 	<style>
+	button, html input[type=button], input[type=reset], input[type=submit] {
+		-webkit-appearance: button;
+		cursor: pointer;
+	}
 	button {
 	  /*.slds-button {*/
 	  position: relative;
@@ -21,6 +25,26 @@
 	  transition: color 0.05s linear, background-color 0.05s linear;
 	  /*}*/
 	}
+	.button {
+    	position: relative;
+    	display: inline-block;
+	    padding: 0;
+	    background: 0 0;
+	    background-clip: padding-box;
+	    border: 0;
+	    border-radius: .25rem;
+	    color: #0070d2;
+	    font-size: inherit;
+	    line-height: 2.125rem;
+	    text-decoration: none;
+	    -webkit-appearance: none;
+	    white-space: normal;
+	    -webkit-user-select: none;
+	    -moz-user-select: none;
+	    -ms-user-select: none;
+	    user-select: none;
+	    transition: color 50ms linear,background-color 50ms linear;
+	}
 	button.text-button{
 	  /*.slds-button--x-small {*/
 	  line-height: 1.25rem;
@@ -34,6 +58,25 @@
 	  border: 1px solid #d8dde6;
 	  background-color: white;
 	  /*}*/
+	}
+	.button--icon{
+    	vertical-align: middle;
+    	color: #54698d;
+	}
+	.button--icon:hover,
+	.button--icon:focus{
+    	color: #005fb2;
+	}
+	.button--icon:active{
+    	color: #00396b;
+	}
+	.button--icon-bare {
+    	line-height: 1;
+	}
+	.button--icon-small {
+    	width: 2rem;
+    	height: 2rem;
+    	line-height: 1.875rem;
 	}
 	button.toggle{
 	  /*.slds-button--x-small {*/
@@ -72,22 +115,20 @@
 	  background-color: white;
 	  cursor: default;
 	}
+	.button__icon {
+	    width: 1rem;
+    	height: 1rem;
+    	fill: currentColor;
+	}
 	.div_actionName {
 		font-weight: 300;
-			font-size: 1.125rem;
-			line-height: 1.25;
-			margin: .5rem;
-			overflow-wrap: break-word;
+		font-size: 1.125rem;
+		line-height: 1.25;
+		margin: .5rem;
+		overflow-wrap: break-word;
 	}
 	.span_removeActionCard {
-		float: right;
-	    display: none;
-	    margin: 7px;
-	    padding: 2px 5px;
-	    color: #2E00FF;
-	    background-color: #EAEFF6;
-	    border: 1px solid #d8dde6;
-	    border-radius: 0.25rem;
+		display: none;
 	}
 	dl{
 			display: flex;
@@ -194,9 +235,18 @@
 	.col {
 			flex: 1 1 auto;
 			min-width: 80px;
+			overflow-wrap: break-word;
+			overflow: hidden;
 	}
 	.shrink {
 			flex: 0 1 auto;
+	}
+	.shrink-none {
+		flex-shrink: 0;
+		flex-grow: 0;
+	}
+	.p-top--xsmall{
+			padding-top: .5rem;
 	}
 	.p-around--xsmall{
 			padding: .5rem;
@@ -220,12 +270,13 @@
 			display: none;
 	}
 	.label {
-			color: #54698d;
+		color: #54698d;
 	    flex: 0 0 auto;
 	    font-size: 0.75rem;
 	    line-height: 1.5;
 	    width: 80px;
 	    vertical-align: top;
+	    display: block;
 	}
 	.toggle::before {
 		  content: '';
@@ -249,11 +300,23 @@
 		  position: relative;
 		  top: 4px;
 	}
+	.assistive-text{
+		display:none;
+	}
 	</style>
 	<div class="card">
 		<div>
-			<div class="div_actionName" id="div_actionName"></div>
-			<span id='span_removeActionCard' class='span_removeActionCard'>x</span>
+			<div class="grid">
+				<div class="col">
+					<div class="div_actionName" id="div_actionName"></div>
+				</div>
+				<div class="shrink-none">
+					<button id='span_removeActionCard' class='span_removeActionCard button button--icon button--icon-bare button--icon-small'>
+						<svg xmlns="http://www.w3.org/2000/svg" class="button__icon" aria-hidden="true" width="52" height="52" viewBox="0 0 52 52"><path d="m31 25.4l13-13.1c0.6-0.6 0.6-1.5 0-2.1l-2-2.1c-0.6-0.6-1.5-0.6-2.1 0l-13.1 13.1c-0.4 0.4-1 0.4-1.4 0l-13.1-13.2c-0.6-0.6-1.5-0.6-2.1 0l-2.1 2.1c-0.6 0.6-0.6 1.5 0 2.1l13.1 13.1c0.4 0.4 0.4 1 0 1.4l-13.2 13.2c-0.6 0.6-0.6 1.5 0 2.1l2.1 2.1c0.6 0.6 1.5 0.6 2.1 0l13.1-13.1c0.4-0.4 1-0.4 1.4 0l13.1 13.1c0.6 0.6 1.5 0.6 2.1 0l2.1-2.1c0.6-0.6 0.6-1.5 0-2.1l-13-13.1c-0.4-0.4-0.4-1 0-1.4z"></path></svg>
+						<span class="assistive-text">Remove Action</span>
+					</button>
+				</div>
+			</div>
 		</div>
 	    <div>
 			<dl class="inline">
@@ -261,9 +324,11 @@
 					<dt class="shink">Parameters</dt>
 					<dd class="col"><aurainspector-json class="parameters code" expandTo="0"></aurainspector-json></dd>
 		        </div>
-		        <div class="div_actionResponse p-around--xsmall p-bottom--none grid">
-					<dt class="shrink">Result</dt>
-		            <dd class="col"><aurainspector-json class="result code" expandTo="0" id="actionResultOld" ></aurainspector-json></dd>
+		        <div id="div_actionResponse" class="div_actionResponse p-around--xsmall p-bottom--none grid">
+		        	<dt class="shrink">Result</dt>
+		            <dd class="col"><aurainspector-json class="result code" expandTo="0" id="actionResult"></aurainspector-json></dd>
+		        </div>
+		        <div id="div_actionError" class="div_actionResponse p-around--xsmall p-bottom--none grid">
 		            <dt class="shrink">Error</dt>
 		            <dd class="col"><aurainspector-json class="code" expandTo="0" id="actionError" ></aurainspector-json></dd>
 		        </div>
@@ -291,25 +356,27 @@
 	            	<label for="actionResult" class="label">Key</label>
 	            	<select id="select_actionResultKey" class="select">
 	            	</select>
-	            	<label for="actionResult" class="label">New Value</label>
-	            	<textarea name="actionResultValue" id="textarea_actionResultValue" class="textarea_ActionResult m-top--xsmall code" rows="3" wrap="off">
+	            	<label for="actionResult" class="label m-top--xsmall">New Value</label>
+	            	<textarea name="actionResultValue" id="textarea_actionResultValue" class="textarea_ActionResult code" rows="3" wrap="off">
 	            	</textarea>
 	        	</div>
-				<div class="div_actionButtons p-around--xsmall p-bottom--none">
-		            <button id="button_saveActionResult" class="button_saveActionResult text-button">Save Action Result</button>
+				<div class="div_actionButtons p-top--xsmall">
+		            <button id="button_saveActionResult" class="button_saveActionResult text-button">Save</button>
 		            <button id="button_cancelChangeActionResult" class="button_cancelChangeActionResult text-button">Cancel</button>
+		            <button id="button_editActionResult" class="button_editActionResult text-button hidden">Edit</button>
 				</div>
 	        </div>
 	        <div class="div_errorResponse p-around--xsmall p-bottom--none">
 	        	<label for="actionResult" class="label">Error Message</label>
-	        	<textarea name="actionErrorMessage" id="textarea_actionErrorMessage" class="textarea_ActionResult m-top--xsmall code" rows="3" wrap="off">
+	        	<textarea name="actionErrorMessage" id="textarea_actionErrorMessage" class="textarea_ActionResult code" rows="3" wrap="off">
 	            </textarea>
-	            <label for="actionResult" class="label">Error Stack</label>
-	            <textarea name="actionErrorStack" id="textarea_actionErrorStack" class="textarea_ActionResult m-top--xsmall code" rows="3" wrap="off">
+	            <label for="actionResult" class="label m-top--xsmall">Error Stack</label>
+	            <textarea name="actionErrorStack" id="textarea_actionErrorStack" class="textarea_ActionResult code" rows="3" wrap="off">
 	            </textarea>
-	            <div class="div_actionButtons p-around--xsmall p-bottom--none">
-		            <button id="button_saveError" class="button_saveError text-button">Save Error</button>
+	            <div class="div_actionButtons p-top--xsmall">
+		            <button id="button_saveError" class="button_saveError text-button">Save</button>
 		            <button id="button_cancelError" class="button_cancelError text-button">Cancel</button>
+		            <button id="button_editError" class="button_editError text-button hidden">Edit</button>
 				</div>
 	        </div>
 			<div class="hidden">

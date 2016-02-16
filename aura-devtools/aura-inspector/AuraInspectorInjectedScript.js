@@ -42,10 +42,12 @@
         data = { 
                     'actionName': string, 
                     'actionParameter':actionParameter, //no need for here...yet
-                    'actionId': actionId.substring(12, actionId.length), //action_card_713;a --> 713;a
-                    'actionIsStorable': actionIsStorable,
-                    'actionStorageKey': actionStorageKey,
-                    'nextResponse': nextResponse};
+                    'actionId': string, //action_card_713;a --> 713;a
+                    'actionIsStorable': boolean,
+                    'actionStorageKey': obj,
+                    'nextResponse': obj,
+                    'nextError': obj
+                    };
         */
         "AuraDevToolService.AddActionToWatch": function(data) {
             if(!data) {
@@ -84,7 +86,7 @@
                     }
                 }
             }//end of aleadyAdded is false
-            
+            //if we already watching this action, this will replace the old one
             actionsToWatch[data.actionName] = data; 
         },
 

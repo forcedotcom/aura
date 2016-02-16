@@ -28,6 +28,7 @@
             intf   = event.getParam('typeOf');
         
         if (action === 'destroyPanel' && intf === 'ui:destroyPanel') {
+            event.stopPropagation();
             helper.destroyPanelInstance(cmp, event.getParam('payload'));
         } else if (action === 'beforeShow' && intf === 'ui:panel') {
             helper.beforeShow(cmp, event.getParam('payload'));

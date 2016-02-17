@@ -16,8 +16,10 @@
 
 -->
 <aura:component implements="ui:pagingInterface, ui:scrollerEmbeddable">
-	<aura:attribute name="extendedPullAtrib"  type="Aura.Component[]"/>
-	 <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="extendedPullAtrib"  type="Aura.Component[]"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
 	<ui:scroller aura:id="scroller1" onPullToRefresh="{!c.refresh}" onPullToShowMore="{!c.showMore}" class="test">
 	    
 	    <ui:infiniteList aura:id="list" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}">

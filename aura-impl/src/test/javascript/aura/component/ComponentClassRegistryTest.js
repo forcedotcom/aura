@@ -37,6 +37,11 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
             "$A": {
                 "componentService": {
                     "getLibraryDef": function(){}
+                },
+                "util": {
+                  "globalEval": function(src){
+                    return eval(src);
+                  }
                 }
             }
         };

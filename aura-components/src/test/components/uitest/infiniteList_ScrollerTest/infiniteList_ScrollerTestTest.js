@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-// Excluding ie8 and 7 browsers due to lack of support for addEventListener function
 ({
-    
-    
    /*
     * Testing to make sure that when pullToRefresh and PullToShowMore are not present,
     * that there isn't a spacer div. This appears when the amount of data on the screen
     * does not fill out the scrollable area 
     */ 
    testNoPullToRefreshNoDivSpace: {
+       // Excluding ie8 and 7 browsers due to lack of support for addEventListener function
        browsers: ["-IE7","-IE8"],
         test: function(cmp) {
             var wrapper     = cmp.find("scroller3").getElement(),

@@ -8,7 +8,9 @@
 
     <div aura:id="clickTest" class="clickTest">Click Me</div>
 
-    <ui:button aura:id="button" label="Press Me, I am secure!" press="{!c.onpress}"/>
+    <ui:button aura:id="button" label="Press Me, I am secure!" press="{!c.onpress}">
+    	<ui:stamp severity="warning"><span>Locked Up</span></ui:stamp>
+	</ui:button>
 
     <aura:unescapedHtml value="{!v.xss}"/>
 

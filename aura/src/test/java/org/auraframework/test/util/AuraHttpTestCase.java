@@ -52,6 +52,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.EncodingStyle;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -85,8 +86,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @param statusCode expected status code of response
      * @throws Exception
      */
-    protected void assertUrlResponse(String msg, String url, int statusCode)
-            throws Exception {
+    protected void assertUrlResponse(String msg, String url, int statusCode) throws Exception {
         HttpGet get = obtainGetMethod(new URI(null, url, null).toString());
         HttpResponse httpResponse = perform(get);
         EntityUtils.consume(httpResponse.getEntity());
@@ -110,21 +110,29 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      */
     protected void assertDefaultAntiClickjacking(HttpResponse response, boolean guarded, boolean allowInline) {
         String adapterClassName = Aura.getConfigAdapter().getClass().getName();
-        if (adapterClassName.equals("org.auraframework.impl.adapter.ConfigAdapterImpl") ||
-                adapterClassName.equals("org.auraframework.impl.adapter.MockConfigAdapterImpl")) {
+        if (adapterClassName.equals("org.auraframework.impl.adapter.ConfigAdapterImpl")
+                || adapterClassName.equals("org.auraframework.impl.adapter.MockConfigAdapterImpl")) {
             Header[] headers = response.getHeaders("X-FRAME-OPTIONS");
             if (guarded) {
                 Map<String, String> csp = getCSP(response);
                 assertEquals("frame-ancestors is wrong", "'self'", csp.get("frame-ancestors"));
-                if (allowInline) {
+
+                AuraContext context = Aura.getContextService().getCurrentContext();
+                boolean testMode = context != null && context.isTestMode();
+                if (testMode || allowInline) {
                     assertEquals("script-src is wrong", "'self' chrome-extension: 'unsafe-eval' 'unsafe-inline'",
                             csp.get("script-src"));
-                    assertEquals("style-src is wrong", "'self' chrome-extension: 'unsafe-inline'", csp.get("style-src"));
+                    assertEquals("style-src is wrong", "'self' chrome-extension: 'unsafe-inline'",
+                            csp.get("style-src"));
                 } else {
-                    assertEquals("script-src is wrong", "'self' chrome-extension:", csp.get("script-src"));
-                    assertEquals("style-src is wrong", "'self' chrome-extension:", csp.get("style-src"));
+                    assertEquals("script-src is wrong", "'self' chrome-extension: 'nonce-LockerServiceTemporaryNonce'",
+                            csp.get("script-src"));
+                    assertEquals("style-src is wrong", "'self' chrome-extension: 'nonce-LockerServiceTemporaryNonce'",
+                            csp.get("style-src"));
                 }
-                // These maybe aren't strictly "anti-clickjacking", but since we're testing the rest of the default CSP:
+
+                // These maybe aren't strictly "anti-clickjacking", but since
+                // we're testing the rest of the default CSP:
                 assertEquals("font-src is wrong", "*", csp.get("font-src"));
                 assertEquals("img-src is wrong", "*", csp.get("img-src"));
                 assertEquals("media-src is wrong", "*", csp.get("media-src"));
@@ -199,8 +207,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @param path cookie path
      * @throws Exception
      */
-    protected void addCookie(String domain, String name, String value,
-            String path) throws Exception {
+    protected void addCookie(String domain, String name, String value, String path) throws Exception {
         BasicClientCookie cookie = makeCookie(domain, name, value, path);
         addCookie(cookie);
     }
@@ -236,8 +243,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @param path cookie path
      * @throws Exception
      */
-    protected void assertNoCookie(String domain, String name, String path)
-            throws Exception {
+    protected void assertNoCookie(String domain, String name, String path) throws Exception {
         Cookie expected = makeCookie(domain, name, null, path);
         for (Cookie cookie : getCookies()) {
             if (expected.equals(cookie)) {
@@ -255,13 +261,11 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @param path cookie path
      * @throws Exception
      */
-    protected void assertCookie(String domain, String name, String path,
-            String value) throws Exception {
+    protected void assertCookie(String domain, String name, String path, String value) throws Exception {
         Cookie expected = makeCookie(domain, name, value, path);
         for (Cookie cookie : getCookies()) {
             if (expected.equals(cookie)) {
-                assertEquals("Wrong cookie value!", expected.getValue(),
-                        cookie.getValue());
+                assertEquals("Wrong cookie value!", expected.getValue(), cookie.getValue());
                 return;
             }
         }
@@ -275,8 +279,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @param value cookie value
      * @return
      */
-    protected BasicClientCookie makeCookie(String name, String value)
-            throws Exception {
+    protected BasicClientCookie makeCookie(String name, String value) throws Exception {
         BasicClientCookie cookie = makeCookie(getHost(), name, value, "/");
         return cookie;
     }
@@ -290,8 +293,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @param path cookie path
      * @return
      */
-    protected BasicClientCookie makeCookie(String domain, String name,
-            String value, String path) {
+    protected BasicClientCookie makeCookie(String domain, String name, String value, String path) {
         BasicClientCookie cookie = new BasicClientCookie(name, value);
         cookie.setDomain(domain);
         cookie.setPath(path);
@@ -329,17 +331,14 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @throws URISyntaxException
      */
     protected HttpPost obtainPostMethod(String path, Map<String, String> params)
-            throws MalformedURLException, URISyntaxException,
-            UnsupportedEncodingException {
+            throws MalformedURLException, URISyntaxException, UnsupportedEncodingException {
 
-        HttpPost post = new HttpPost(getTestServletConfig().getBaseUrl()
-                .toURI().resolve(path).toString());
+        HttpPost post = new HttpPost(getTestServletConfig().getBaseUrl().toURI().resolve(path).toString());
 
         List<NameValuePair> nvps = Lists.newArrayList();
         if (params != null) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
-                nvps.add(new BasicNameValuePair(entry.getKey(), entry
-                        .getValue()));
+                nvps.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
             }
             post.setEntity(new UrlEncodedFormEntity(nvps, CharEncoding.UTF_8));
 
@@ -372,12 +371,12 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             postParams = Maps.newHashMap();
         }
         postParams.put("message", jsonMessage);
-        if(!postParams.containsKey("aura.token")){
+        if (!postParams.containsKey("aura.token")) {
             postParams.put("aura.token", getCsrfToken());
         }
         if (!postParams.containsKey("aura.context")) {
-            postParams
-            .put("aura.context", Aura.getContextService().getCurrentContext().serialize(EncodingStyle.Normal));
+            postParams.put("aura.context",
+                    Aura.getContextService().getCurrentContext().serialize(EncodingStyle.Normal));
         }
         HttpPost post = obtainPostMethod("/aura", postParams);
         perform(post);
@@ -394,8 +393,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @throws MalformedURLException if the path is invalid.
      * @throws URISyntaxException
      */
-    protected HttpGet obtainGetMethod(String path)
-            throws MalformedURLException, URISyntaxException {
+    protected HttpGet obtainGetMethod(String path) throws MalformedURLException, URISyntaxException {
         return obtainGetMethod(path, true, null);
     }
 
@@ -404,8 +402,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         return obtainGetMethod(path, followRedirects, null);
     }
 
-    protected HttpGet obtainGetMethod(String path, Header[] headers)
-            throws MalformedURLException, URISyntaxException {
+    protected HttpGet obtainGetMethod(String path, Header[] headers) throws MalformedURLException, URISyntaxException {
         return obtainGetMethod(path, true, headers);
     }
 
@@ -433,12 +430,11 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @param params extra parameters to set.
      * @param headers extra headers.
      */
-    protected HttpGet obtainAuraGetMethod(Mode mode, Format format,
-            String desc, Class<? extends BaseComponentDef> type,
+    protected HttpGet obtainAuraGetMethod(Mode mode, Format format, String desc, Class<? extends BaseComponentDef> type,
             Map<String, String> params, Header[] headers)
                     throws QuickFixException, MalformedURLException, URISyntaxException {
-        return obtainAuraGetMethod(mode, format, Aura.getDefinitionService()
-                .getDefDescriptor(desc, type), params, headers);
+        return obtainAuraGetMethod(mode, format, Aura.getDefinitionService().getDefDescriptor(desc, type), params,
+                headers);
     }
 
     /**
@@ -464,22 +460,18 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @param params extra parameters to set.
      * @param headers extra headers.
      */
-    protected HttpGet obtainAuraGetMethod(Mode mode, Format format,
-            DefDescriptor<? extends BaseComponentDef> desc,
+    protected HttpGet obtainAuraGetMethod(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc,
             Map<String, String> params, Header[] headers)
                     throws QuickFixException, MalformedURLException, URISyntaxException {
         List<NameValuePair> urlparams = Lists.newArrayList();
-        urlparams.add(new BasicNameValuePair("aura.tag", String.format("%s:%s",
-                desc.getNamespace(), desc.getName())));
-        urlparams.add(new BasicNameValuePair("aura.defType", desc.getDefType()
-                .toString()));
+        urlparams.add(new BasicNameValuePair("aura.tag", String.format("%s:%s", desc.getNamespace(), desc.getName())));
+        urlparams.add(new BasicNameValuePair("aura.defType", desc.getDefType().toString()));
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
-            urlparams.add(new BasicNameValuePair(entry.getKey(), entry
-                    .getValue()));
+            urlparams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
         }
-        urlparams.add(new BasicNameValuePair("aura.context",
-                getAuraTestingUtil().getContextURL(mode, format, desc, false)));
+        urlparams.add(
+                new BasicNameValuePair("aura.context", getAuraTestingUtil().getContextURL(mode, format, desc, false)));
         String query = URLEncodedUtils.format(urlparams, "UTF-8");
 
         // final url Request to be send to server
@@ -610,8 +602,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
         @Override
         public DefDescriptor<ActionDef> getDescriptor() {
-            return Aura.getDefinitionService().getDefDescriptor(qualifiedName.get(0),
-                    ActionDef.class);
+            return Aura.getDefinitionService().getDefDescriptor(qualifiedName.get(0), ActionDef.class);
         }
 
         public ArrayList<String> getQualifiedName() {
@@ -650,7 +641,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                     fail("Error response:" + rawResponse);
                 }
                 Map<String, Object> json = (Map<String, Object>) new JsonReader()
-                .read(rawResponse.substring(AuraBaseServlet.CSRF_PROTECT.length()));
+                        .read(rawResponse.substring(AuraBaseServlet.CSRF_PROTECT.length()));
                 ArrayList<Map<String, Object>> actions = (ArrayList<Map<String, Object>>) json.get("actions");
                 for (Map<String, Object> action : actions) {
 
@@ -659,8 +650,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                     this.errorsList.add((List<Object>) action.get("error"));
                 }
                 // for legacy uses
-                Map<String, Object> action = (Map<String, Object>) ((List<Object>) json
-                        .get("actions")).get(0);
+                Map<String, Object> action = (Map<String, Object>) ((List<Object>) json.get("actions")).get(0);
                 this.state = State.valueOf(action.get("state").toString());
                 this.returnValue = action.get("returnValue");
                 this.errors = (List<Object>) action.get("error");
@@ -751,13 +741,13 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         public void setCallingDescriptor(String caller) {
         }
 
-		@Override
-		public String getCallerVersion() {
-			return null;
-		}
+        @Override
+        public String getCallerVersion() {
+            return null;
+        }
 
-		@Override
-		public void setCallerVersion(String callerVersion) {
-		}
+        @Override
+        public void setCallerVersion(String callerVersion) {
+        }
     }
 }

@@ -82,6 +82,6 @@
     },
     setValue : function (cmp, newValue, isFromOutside) {
         cmp.set('v.updateWasFromOutside', !!isFromOutside);
-        cmp.set('v.value', String(newValue), true);
+        cmp.set('v.value', String(newValue));
     }
 });

@@ -23,7 +23,7 @@
     <!-- Attributes -->
     <aura:attribute name="inputValue"           type="string"  access="private" default="" />
     <aura:attribute name="lastValue"            type="string"  access="private" default="" />
-    <aura:attribute name="updateWasFromOutside"  type="boolean" access="private" default="true" />
+    <aura:attribute name="updateWasFromOutside" type="boolean" access="private" default="true" />
 
     <!-- Envents handler -->
     <aura:handler name="init"   value="{! this }"    action="{! c.initialize }" />

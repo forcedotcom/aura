@@ -18,6 +18,11 @@
         var formatter = cmp.get('v.format');
         var value = cmp.get('v.value');
 
+        if ($A.util.isUndefinedOrNull(value)) {
+            cmp.set('v.value','');
+            value = cmp.get('v.value');
+        }
+
         if (!formatter) {
             formatter = $A.get("$Locale.currencyFormat");
             cmp.set('v.format',formatter);
@@ -35,12 +40,6 @@
         var inputValue = event.target.value;
         var lib = helper.inputNumberLibrary.number;
         var formatter = cmp.get('v.format');
-
-        // is input empty ? empty isn't consider 0
-        if (!inputValue) {
-            helper.setValue(cmp,'');
-            return;
-        }
 
         if (lib.isFormattedNumber(inputValue,formatter) && helper.isNumberInRange(inputValue, cmp)) {
             helper.setValue(cmp, lib.unFormatNumber(inputValue));

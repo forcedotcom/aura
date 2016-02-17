@@ -227,17 +227,15 @@
         cmp.set('v.body', carouselPages);
     },
     createCarouselPage: function (contentCmp, pageConfig, index, preloadContent) {
-        return $A.newCmp({
-            componentDef : pageConfig.componentDef,
-            attributes   : {
-                values : {
-                    placeholder: pageConfig.placeholder,
-                    content: preloadContent || contentCmp,
-                    pageIndex: index,
-                    scrollerPlugins: pageConfig.scrollerPlugins,
-                    isScrollable: pageConfig.isScrollable,
-                    ignoreExistingAction: pageConfig.ignoreExistingAction
-                }
+        return $A.createComponentFromConfig({
+            descriptor: pageConfig.componentDef,
+            attributes: {
+                placeholder: pageConfig.placeholder,
+                content: preloadContent || contentCmp,
+                pageIndex: index,
+                scrollerPlugins: pageConfig.scrollerPlugins,
+                isScrollable: pageConfig.isScrollable,
+                ignoreExistingAction: pageConfig.ignoreExistingAction
             }
         });
     },

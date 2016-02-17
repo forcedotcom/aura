@@ -21,7 +21,7 @@
 
     openNotification: function(cmp){
         var refEl = '.uiExamplesPanelExamples a';
-        var body = $A.newCmp({componentDef: 'uiExamples:panelContent'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelContent'});
         $A.get('e.ui:createPanel').setParams({
             panelType   :'panel',
             visible: true,
@@ -38,8 +38,8 @@
     },
 
     createPanelWithHeader: function (cmp, event, helper) {
-        var body = $A.newCmp({componentDef: 'uiExamples:panelContent'}),
-            header = $A.newCmp({componentDef: 'uiExamples:panelHeader'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelContent'}),
+            header = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelHeader'});
 
         $A.get('e.ui:createPanel').setParams({
             panelType   :'panel',
@@ -61,7 +61,7 @@
         }).fire();
     },
     createFullPanel: function (cmp, event, helper) {
-        var body = $A.newCmp({componentDef: 'uiExamples:modalContent'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:modalContent'});
 
         $A.get('e.ui:createPanel').setParams({
             panelType   :'panel',
@@ -75,8 +75,8 @@
         }).fire();
     },
     createModal: function (cmp, event, helper) {
-        var body = $A.newCmp({componentDef: 'uiExamples:modalContent'});
-        var footer = $A.newCmp({componentDef: 'uiExamples:panelFooter'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:modalContent'});
+        var footer = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelFooter'});
 
         $A.get('e.ui:createPanel').setParams({
             panelType   :'modal',
@@ -95,8 +95,8 @@
         }).fire();
     },
     createLargeModal: function (cmp, event, helper) {
-        var body = $A.newCmp({componentDef: 'uiExamples:modalContent'});
-        var footer = $A.newCmp({componentDef: 'uiExamples:panelFooter'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:modalContent'});
+        var footer = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelFooter'});
 
         $A.get('e.ui:createPanel').setParams({
             panelType   :'modal',

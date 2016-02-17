@@ -38,19 +38,6 @@
         $A.enqueueAction(action);
     },
 
-    newCmpDeprecated: function (cmp, helper) {
-        var input = cmp.find('input').getElement();
-        try {
-            var newCmp = $A.newCmpDeprecated(input.value);
-            if (newCmp) {
-                console.log('Component Created successfully! ', newCmp + '');
-            }
-
-        } catch (e) {
-            console.log('BOoOoM!, Component blew up!');
-        }
-    },
-
     createComponent: function (cmp, helper) {
         var input = cmp.find('input').getElement();
         try {

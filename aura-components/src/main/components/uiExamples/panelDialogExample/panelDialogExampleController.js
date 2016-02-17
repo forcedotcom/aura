@@ -15,7 +15,7 @@
  */
 ({
 	showNonModal: function(cmp, event, helper) {
-	      var nonModalCmp = $A.newCmp({componentDef: 'uiExamples:detailPopover', attributes: {}});
+	      var nonModalCmp = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:detailPopover', attributes: {}});
 	      var referenceElement = cmp.find("detailTrigger").getElement();
 	      var openPanelEvent = $A.get('e.ui:openPanel').setParams({
 	          show: true,
@@ -32,7 +32,7 @@
 	   },
 	   
 	   showModal: function(cmp, event, helper) {
-		   var modalCmp = $A.newCmp({componentDef: 'uiExamples:detailPopover', attributes: {}});
+		   var modalCmp = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:detailPopover', attributes: {}});
 		      var openPanelEvent = $A.get('e.ui:openPanel').setParams({
 		          show: true,
 		          isModal: true,

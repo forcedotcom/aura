@@ -24,7 +24,7 @@
                           persistent="true"
                           clearStorageOnInit="false"/>
                           
-        <script>
+        <script nonce="LockerServiceTemporaryNonce">
             // Allow tests specify whether they want ComponentDefStorage overriden with a smaller maxSize or not
             // The rest of the settings here should match the real ComponentDefStorage config
             var overrideStorage = location.search.indexOf("overrideStorage") > -1;

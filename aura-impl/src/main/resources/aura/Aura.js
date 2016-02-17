@@ -326,7 +326,7 @@ function AuraInstance () {
          * @memberOf AuraInstance.prototype
          */
         style: this.styleService,
-        
+
         /**
          * Metrics Service
          *
@@ -344,7 +344,7 @@ function AuraInstance () {
          * @memberOf AuraInstance.prototype
          */
         locker: this.lockerService,
-        
+
         get : function(key) {
             var ret = $A.services[key];
             if (!ret && key === "root") {
@@ -550,17 +550,49 @@ AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; 
  */
 AuraInstance.prototype.initAsync = function(config) {
 
-    // Context is created async because of the GVPs go though async storage checks
-    $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
+    function createAuraContext() {
+        // Context is created async because of the GVPs go though async storage checks
+        $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
+            if (!window["$$safe-eval$$"]) {
+                throw new $A.auraError("Aura(): Failed to initialize locker worker.");
+            }
+            $A.context = context;
+            $A.clientService.initHost(config["host"]);
+            $A.setLanguage();
 
-        $A.context = context;
-        $A.clientService.initHost(config["host"]);
-        $A.setLanguage();
+            $A.metricsService.initialize();
 
-        $A.metricsService.initialize();
+            $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
+        });
+    }
 
-        $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
-    });
+    if (!window['$$safe-eval$$']) {
+        // safe eval worker is an iframe that enables the page to run arbitrary evaluation,
+        // if this iframe is still loading, we should wait for it before continue with
+        // initialization, in the other hand, if the iframe is not available, we create it,
+        // and wait for it to be ready.
+        var el = document.getElementById('safeEvalWorker');
+        if (!el) {
+            el = document.createElement('iframe');
+            // TODO: we should use `config["context"]["fwuid"]` as a token for cache control
+            el.setAttribute('src', '/auraFW/resources/lockerservice/safeEval.html');
+            el.setAttribute('width', "0");
+            el.setAttribute('height', "0");
+            el.setAttribute('tabIndex', "-1");
+            el.setAttribute('aria-hidden', "true");
+            el.setAttribute('title', "scripts");
+            el.style.display = 'none';
+            document.body.appendChild(el);
+        }
+        $A.util.on(el, 'load', createAuraContext);
+        $A.util.on(el, 'error', function () {
+            throw new $A.auraError("Aura(): Failed to load locker worker.");
+        });
+    } else {
+        // provision for an alternative safe evaluation. This will open the door to do some
+        // performance optimization.
+        createAuraContext();
+    }
 };
 
 /**
@@ -625,7 +657,7 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
                 $A.finishInit(doNotInitializeServices);
             });
         }
-        
+
     }
 };
 

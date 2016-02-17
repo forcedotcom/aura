@@ -34,7 +34,7 @@ import org.auraframework.util.json.JsonEncoder;
  * Test class to perform sanity tests on AuraServlet with all possible modes.
  *
  * This should be killed.
- * 
+ *
  * @hierarchy Aura.Configuration
  * @priority high
  * @userStory a07B0000000Dtmj
@@ -43,6 +43,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
     private final String componentTag = "&aura.tag=auratest:test_TokenValidation";
     private final String quickFixComponentTag = "&aura.tag=foo:bar";
     private static Map<Format, String> FORMAT_CONTENTTYPE = new HashMap<>();
+
     static {
         FORMAT_CONTENTTYPE.put(Format.JSON, JsonEncoder.MIME_TYPE + ";charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.JS, "text/javascript;charset=" + AuraBaseServlet.UTF_ENCODING);
@@ -67,7 +68,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         assertEquals(String.format(
                 "Received wrong Content-Type header%nURL(or Action): %s%nContent:%s%nRequest type:%s", url,
                 getResponseBody(response), method.getMethod()), FORMAT_CONTENTTYPE.get(format), contentType);
-        assertDefaultAntiClickjacking(response, expectHeaders, false);
+        assertDefaultAntiClickjacking(response, expectHeaders, true);
     }
 
     private void getOnAuraServlet(Format f, String tag) throws Exception {
@@ -100,7 +101,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
 
     /**
      * Basic sanity testing for all Valid Formats that can be specified for AuraServlet.
-     * 
+     *
      * @throws Exception
      */
     public void testResponseHeadersFromAuraServlet() throws Exception {

@@ -12,22 +12,26 @@ function AuraInspectorComponentTree(devtoolsPanel) {
     var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
 
     var markup = `
-        <menu type="toolbar">
-            <li>
-              <button id="refresh-button" class="refresh-status-bar-item status-bar-item" title="Refresh">
-                <div class="glyph toolbar-button-theme"></div>
-                <div class="glyph shadow"></div>
-              </button>
-            </li>
-            <li>
-              <button id="expandall-button" class="text-button">
-                <span>Expand All</span>
-              </button>
-            </li>
-            <li class="divider"></li>
-            <li><input type="checkbox" id="showglobalids-checkbox"><label for="showglobalids-checkbox">Show Global IDs</label></li>
-        </menu>
-        <div class="component-tree source-code" id="tree"></div>
+        <div class="grid grid-columns scroll-wrapper">
+          <menu type="toolbar" class="flex no-flex">
+              <li>
+                <button id="refresh-button" class="refresh-status-bar-item status-bar-item" title="Refresh">
+                  <div class="glyph toolbar-button-theme"></div>
+                  <div class="glyph shadow"></div>
+                </button>
+              </li>
+              <li>
+                <button id="expandall-button" class="text-button">
+                  <span>Expand All</span>
+                </button>
+              </li>
+              <li class="divider"></li>
+              <li><input type="checkbox" id="showglobalids-checkbox"><label for="showglobalids-checkbox">Show Global IDs</label></li>
+          </menu>
+          <div class="flex scroll">
+            <div class="component-tree source-code" id="tree"></div>
+          </div>
+        </di>
     `;
 
     this.init = function(tabBody) {
@@ -62,9 +66,9 @@ function AuraInspectorComponentTree(devtoolsPanel) {
         });
     };
 
-    /** 
+    /**
      * Possible to set the collection of items externally, but currently only done via this.refresh()
-     * Does not do a merge, does a complete replace. 
+     * Does not do a merge, does a complete replace.
      */
     this.setData = function(items) {
         if(items != _items || JSON.stringify(items) != JSON.stringify(_items)) {

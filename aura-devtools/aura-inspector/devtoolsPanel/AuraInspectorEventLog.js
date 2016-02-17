@@ -17,7 +17,8 @@ function AuraInspectorEventLog(devtoolsPanel) {
     var _handled = new Map();
 
     var markup = `
-        <menu type="toolbar">
+        <div class="grid grid-columns scroll-wrapper">
+        <menu type="toolbar no-flex">
             <li class="record-button"><aurainspector-onOffButton class="circle" data-filter="all" title="Toggle recording"><span>Recording</span></aurainspector-onOffButton></li>
             <li><button id="clear-button" class="clear-status-bar-item status-bar-item" title="Clear"><div class="glyph"></div><div class="glyph shadow"></div></button></li>
             <li class="divider" style="margin-left: -3px;"></li>
@@ -27,7 +28,8 @@ function AuraInspectorEventLog(devtoolsPanel) {
             <li><aurainspector-onOffButton class="on" data-filter="component" title="Show component events"><span>Cmp Events</span></aurainspector-onOffButton></li>
             <li><aurainspector-onOffButton class="" data-filter="unhandled" title="Show unhandled events"><span>Unhandled</span></aurainspector-onOffButton></li>
         </menu>
-        <ol class="event-log" id="event-log"></ol>
+        <ol class="event-log flex scroll" id="event-log"></ol>
+        </div>
     `;
 
     this.init = function(tabBody) {

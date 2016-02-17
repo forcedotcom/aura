@@ -139,21 +139,55 @@ Aura.Context.AuraContext.prototype.getStorage = function () {
 };
 
 
+
+/**
+ * Prunes the list of dynamically loaded components to reflect the actual defs
+ * on the client.
+ *
+ * The persisted list of dynamically received defs can diverge from the available
+ * defs when eviction runs on persistent component def storage and then the app is
+ * reloaded. The in-memory defs are lost due to the reload; the persisted defs may
+ * be a subset of the loaded list. Rather than try to maintain a loaded blacklist
+ * (which may grow and shrink) we prune the list once at startup.
+ *
+ * @private
+ */
+Aura.Context.AuraContext.prototype.pruneLoaded = function() {
+    var pruneCount = 0;
+    for (var key in this.loaded) {
+        if (key.indexOf("COMPONENT@") === 0) {
+            if (!$A.componentService.getDef(key.substr(10))) {
+                delete this.loaded[key];
+                pruneCount++;
+            }
+        }
+    }
+
+    if (pruneCount > 0) {
+        $A.log("AuraContext.pruneLoaded(): pruned " + pruneCount + " defs");
+        // force the save in case we removed all items
+        this.saveToStorage(true);
+    }
+};
+
 /**
  * Saves the context to storage.
+ * @param {Boolean} force true to force persisting to storage, otherwise persisting
+ *  may be skipped if nothing to save.
  * @return {Promise} a promise that resolves when saving is complete.
  * @private
  */
-Aura.Context.AuraContext.prototype.saveToStorage = function() {
+Aura.Context.AuraContext.prototype.saveToStorage = function(force) {
     var storage = this.getStorage();
     if (!storage) {
         return Promise["resolve"]();
     }
 
     // optimization: the application is always present and provided by the config so
-    // no need to serialize it. if no other values to serialize then short-circuit.
+    // no need to serialize it. if no other values to serialize then short-circuit
+    // unless force is specified.
     var loadedKeys = Object.keys(this.loaded);
-    if (loadedKeys.length === 1) {
+    if (loadedKeys.length === 1 && force !== true) {
         return Promise["resolve"]();
     }
     var filteredLoaded = {};
@@ -166,7 +200,7 @@ Aura.Context.AuraContext.prototype.saveToStorage = function() {
     return storage.put(this.storageKey, {"loaded": filteredLoaded}).then(
         undefined,
         function(err) {
-            $A.warning("AuraContext.saveToStorage(), failed to put, error: " + err);
+            $A.warning("AuraContext.saveToStorage(): failed to put, error: " + err);
             throw err;
         }
     );
@@ -196,7 +230,7 @@ Aura.Context.AuraContext.prototype.loadFromStorage = function(callback) {
     }, function() {
         // error retrieving from storage
         $A.run(function(err) {
-            $A.warning("AuraContext.loadFromStorage(), failed to load, error: " + err);
+            $A.warning("AuraContext.loadFromStorage(): failed to load, error: " + err);
             callback();
         });
     });

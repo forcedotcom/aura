@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.root.parser.handler.design;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignDef;
@@ -77,7 +76,7 @@ public class DesignLayoutDefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class, null);
         getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", ""), addToPrivileged);
 
-        DefDescriptor<DesignDef> designDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
+        DefDescriptor<DesignDef> designDesc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
         getAuraTestingUtil().addSourceAutoCleanup(designDesc,
                 String.format("<design:component>%s</design:component>", markup), addToPrivileged);

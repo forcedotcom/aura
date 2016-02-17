@@ -72,7 +72,7 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
             context = service.startContext(Mode.SELENIUM, Format.HTML,
                     Authentication.AUTHENTICATED);
         }
-        ApplicationDef ad = Aura.getDefinitionService().getDefinition(
+        ApplicationDef ad = definitionService.getDefinition(
                 String.format("%s:%s", testAppNamespace, testAppName), ApplicationDef.class);
         List<ImportDef> aid = ad.getImportDefs();
         DefDescriptor<? extends Definition> idd;

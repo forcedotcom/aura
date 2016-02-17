@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.adapter.format.html;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.adapter.format.html.BaseComponentDefHTMLFormatAdapterTest;
@@ -45,7 +44,7 @@ public class ComponentDefHTMLFormatAdapterTest extends BaseComponentDefHTMLForma
     public void testWriteManifestWithPreloads() throws Exception {
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component render='client'></aura:component>");
-        String body = doWrite(Aura.getDefinitionService().getDefinition(desc));
+        String body = doWrite(definitionService.getDefinition(desc));
         int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         if (tag.contains(" manifest=")) {

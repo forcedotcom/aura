@@ -459,7 +459,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     private <T extends Definition> DefDescriptor<T> createDef(Class<T> defClass, String qualifiedName, String content) {
-        DefDescriptor<T> desc = Aura.getDefinitionService().getDefDescriptor(qualifiedName, defClass);
+        DefDescriptor<T> desc = definitionService.getDefDescriptor(qualifiedName, defClass);
         addSourceAutoCleanup(desc, content);
         return desc;
     }
@@ -488,7 +488,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         if (context == null) {
             context = service.startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);
         }
-        return Aura.getDefinitionService().getDefinition(
+        return definitionService.getDefinition(
                 String.format("%s:%s", namespace, cmpName), ComponentDef.class);
     }
 

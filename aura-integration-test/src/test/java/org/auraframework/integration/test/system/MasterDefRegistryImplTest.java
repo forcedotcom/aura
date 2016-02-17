@@ -427,7 +427,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testUidValue() throws Exception {
         StringBuilder buffer = new StringBuilder();
         String cmpName = "ui:outputNumber";
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService()
+        DefDescriptor<ComponentDef> desc = definitionService
                 .getDefDescriptor(cmpName, ComponentDef.class);
         MasterDefRegistryImplOverride masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, desc);
@@ -460,7 +460,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     public void testGetUidLocalDef() throws Exception {
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("twiddledee:twiddledumb", ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("twiddledee:twiddledumb", ComponentDef.class);
         ComponentDef def = Mockito.mock(ComponentDef.class);
         Mockito.when(def.getDescriptor()).thenReturn(desc);
 
@@ -914,11 +914,11 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         List<ClientLibraryDef> libDefs = mdr.getClientLibraries(null);
         assertNull(libDefs);
 
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
         AuraContext cntx = Aura.getContextService().getCurrentContext();
         cntx.setApplicationDescriptor(appDesc);
-        Aura.getDefinitionService().updateLoaded(appDesc);
+        definitionService.updateLoaded(appDesc);
 
         libDefs = mdr.getClientLibraries(cntx.getUid(appDesc));
 
@@ -1584,7 +1584,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 //        private final Lock rLock;
 //
 //        public FakeRegistry(Lock rLock, Lock wLock) {
-//            this.desc = Aura.getDefinitionService().getDefDescriptor("java://fake.type", TypeDef.class);
+//            this.desc = definitionService.getDefDescriptor("java://fake.type", TypeDef.class);
 //            this.def = new FakeTypeDef(desc);
 //            this.rLock = rLock;
 //        }

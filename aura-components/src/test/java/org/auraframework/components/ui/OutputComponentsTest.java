@@ -30,7 +30,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventType;
 import org.auraframework.def.RegisterEventDef;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -66,7 +65,6 @@ public class OutputComponentsTest extends AuraTestCase {
     }
 
     private Set<ComponentDef> getUiOutputComponents() throws Exception {
-        DefinitionService definitionService = Aura.getDefinitionService();
         DescriptorFilter matcher = new DescriptorFilter("markup://ui:output*", DefType.COMPONENT);
         Set<ComponentDef> ret = Sets.newHashSet();
         for (DefDescriptor<?> def : definitionService.find(matcher)) {
@@ -78,7 +76,6 @@ public class OutputComponentsTest extends AuraTestCase {
     }
 
     private ComponentDef getUiOutputComponent() throws Exception {
-        DefinitionService definitionService = Aura.getDefinitionService();
         ComponentDef def = definitionService.getDefinition("markup://ui:output", ComponentDef.class);
         return def;
     }

@@ -24,7 +24,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.auraframework.Aura;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateService;

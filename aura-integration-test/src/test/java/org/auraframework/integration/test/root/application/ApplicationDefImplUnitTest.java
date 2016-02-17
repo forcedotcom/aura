@@ -20,11 +20,14 @@ import org.auraframework.def.*;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl.Builder;
 import org.auraframework.impl.root.component.BaseComponentDefImplUnitTest;
+import org.auraframework.service.DefinitionService;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
 public class ApplicationDefImplUnitTest extends
         BaseComponentDefImplUnitTest<ApplicationDefImpl, ApplicationDef, Builder> {
+
+    DefinitionService definitionService = Aura.getDefinitionService();
 
     @Mock
     DefDescriptor<EventDef> locationChangeEventDescriptor;
@@ -56,7 +59,7 @@ public class ApplicationDefImplUnitTest extends
     @Override
     protected void setupValidateReferences() throws Exception {
         super.setupValidateReferences();
-        DefDescriptor<EventDef> superDesc = Aura.getDefinitionService().getDefDescriptor("aura:locationChange",
+        DefDescriptor<EventDef> superDesc = definitionService.getDefDescriptor("aura:locationChange",
                 EventDef.class);
         EventDef locationChangeEventDef = Mockito.mock(EventDef.class);
         Mockito.doReturn(true).when(locationChangeEventDef).isInstanceOf(superDesc);

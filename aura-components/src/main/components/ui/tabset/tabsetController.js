@@ -27,7 +27,7 @@
     },
     
     addTab: function(cmp, evt, helper) {
-    	helper.addTab(cmp, evt.getParam("index"), evt.getParam("tab"), evt.getParam("callback"));
+    	helper.addTab(cmp, evt.getParam("index"), evt.getParam("tab"), evt.getParam("callback"), evt.getParam("name"));
     },
     
     getActiveTab: function(cmp, evt, helper) {

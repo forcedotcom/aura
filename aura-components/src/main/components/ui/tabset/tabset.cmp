@@ -19,6 +19,7 @@
     <aura:attribute name="tabs" type="List" description="The collection of objects to construct tabs." />
     <aura:attribute name="tabItems" access="private" type="List" description="Use internally for passing a list of tab items to ui:tabBar component." />
     <aura:attribute name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component." />
+    <aura:attribute name="name" type="String" description="Internal name for the tabsset and tabItems" />
     <aura:attribute name="lazyRenderTabs" type="Boolean" default="false" description="If true, contained ui:tab components are rendered only when they are activated. The default is false." />
 
     <aura:attribute name="useOverflowMenu" type="Boolean" default="false" description="Set to true to use an overflow menu. The default is false. The overflow menu contains any tabs that fall outside the width of the tabset."/>

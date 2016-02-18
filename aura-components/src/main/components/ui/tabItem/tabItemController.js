@@ -17,6 +17,9 @@
 ({	
 	init: function (cmp, event, helper) {
 		helper.initializeHandlers(cmp);
+        if (!cmp.get('v.name')) {
+            cmp.set('v.name', cmp.get('v.title'));
+        }
 	},
 	addHandler: function (cmp, event, helper) {
         var params = event.getParam('arguments');

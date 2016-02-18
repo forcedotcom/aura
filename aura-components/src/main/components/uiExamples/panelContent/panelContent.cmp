@@ -19,7 +19,7 @@
     <aura:attribute name="class" type="String" default="" />
 
     <div class="{!v.class + ' header'}">
-        <p>No activity for 30 days</p>
+        <p class="pointer">No activity for 30 days</p>
     </div>
     <a>Create a task</a> or <a>schedule an event</a> to keep this task moving!
 </aura:component>

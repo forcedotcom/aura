@@ -48,7 +48,7 @@
      * @param {Number} [index] The index of the new tab to insert to.
      * @param {Object} tab The configuration for the new tab. If the "componentDef" is not defined, "ui:tab" is used.
      */
-    addTab: function (cmp, index, tab, callback) {
+    addTab: function (cmp, index, tab, callback, name) {
         var self = this, size = cmp._tabCollection.getSize();
         if ($A.util.isUndefined(index) || index < 0 || index > size) {
             index = size;
@@ -62,6 +62,7 @@
             e.setParams({
                 "index": index,
                 "active": active,
+                "name": name,
                 "tab": self.getTabItemConfig(cmp, newTab)
             }).setComponentEvent().fire();
             if (newTab.get("v.active")) {
@@ -317,11 +318,14 @@
                 values[name] = tab.get("v." + name);
             }
         });
+
         if ($A.util.isUndefinedOrNull(values["ariaControlId"])) {
             values["ariaControlId"] = tab.getGlobalId();
         }
-        config["attributes"] = {"values": values};
-        config["componentDef"] = tabItemDef;
+
+        config.localId = values.name || cmp.get('v.name');
+        config.attributes = { "values": values };
+        config.componentDef = tabItemDef;
 
         return config;
     },

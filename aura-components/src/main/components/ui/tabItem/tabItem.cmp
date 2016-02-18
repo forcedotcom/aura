@@ -51,7 +51,8 @@
         -->
 
         <a  aura:id="tabItem"
-            class="tabHeader" 
+            class="tabHeader"
+            data-tab-name="{!v.name}"
             href="javascript:void(0);"
             title="{!v.title}"
             aria-controls="{!v.ariaControlId}"

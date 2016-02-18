@@ -39,7 +39,7 @@
 	},
 
 	addTab: function(cmp, evt, helper) {
-		helper.addTab(cmp, evt.getParam("index"), evt.getParam("tab"));
+		helper.addTab(cmp, evt.getParam("index"), evt.getParam("tab"), evt.getParam("callback"));
 	},
 
 	/**

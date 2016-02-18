@@ -6,7 +6,7 @@
 
     run : function(cmp, event, helper) {
         // load 200 list items
-        cmp.numItems = 200;
+        cmp.numItems = cmp.get("v.itemsToLoad");
         // keep track of how many times we're loading the next set of items in the infiniteList
         cmp.iterationCount = 0;
         cmp.done = event.getParam('arguments').done;

@@ -11,5 +11,11 @@
     { "Aura.coql.afterRender.added" : 5 },
     { "Network.numRequests" : 20 } 
   ],
-  "options" : { "metricsMode" : "foo" }
+	"customOptions": [
+	   {
+        "loadItems_200": {
+            "itemsToLoad": 200
+         }
+       }
+    ]
 }

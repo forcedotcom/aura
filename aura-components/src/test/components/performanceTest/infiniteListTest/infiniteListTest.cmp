@@ -1,4 +1,5 @@
 <aura:component extends="performance:perfTest"> 
+  <aura:attribute name="itemsToLoad" default="200" type="Integer" description="Number of list items the inifiniteList will load."></aura:attribute>
   <ui:scroller aura:id="listScroller" snap="true" showScrollbars="true" onPullToRefresh="{!c.show}">
   <ui:infinitelist aura:id="listData" itemVar="item" listComplete="{!c.listComplete}">
     <aura:set attribute="dataProvider">

@@ -20,13 +20,14 @@
         tabitem_anchor : '.uiTabItem .tabHeader',
         tabitem_active: '.uiTabItem.active',
         tabbody: '.uiTab.active',
-        tabbody_active: '.uiTab.active'
+        tabbody_active: '.uiTab.active',
+        tabitem_close: '.uiTabItem.active .close'
     },
 
     owner: 'sle',
 
     /**
-     * adding dynamic tab
+     * Test adding dynamic tabs
      */
     testAddTab: {
         attributes: {
@@ -68,6 +69,66 @@
         ]
     },
 
+    /**
+     * Test removing dynamic tabs
+     */
+    testRemoveTab: {
+        attributes: {
+            "renderItem": "testRemoveTab"
+        },
+        test: [
+            function(cmp){
+                // remove tab via API
+                var self = this,
+                tabSet = cmp.find(self.SELECTOR.tabsetcmp);
+
+                self.removeTab(tabSet, "tab0");
+
+                //assertion tab items
+                $A.test.addWaitForWithFailureMessage(
+                    1,
+                    function(){
+                        return $A.test.select(self.SELECTOR.tabitem).length;
+                    },
+                    'Tab items count should be 1 (after removing 1 tab)'
+                );
+            },
+            function(cmp){
+                var removeCallbackCount = cmp.get("v._tabRemoveCount");
+                $A.test.assertEquals(1, removeCallbackCount, "The number of onClose callbacks is not correct.");
+            },
+            function(cmp){
+                // close tab manually
+                var self = this,
+                tabSet = cmp.find(self.SELECTOR.tabsetcmp);
+                
+                self.closeActiveTab();
+
+                //assertion tab items
+                $A.test.addWaitForWithFailureMessage(
+                    0,
+                    function(){
+                        return $A.test.select(self.SELECTOR.tabitem).length;
+                    },
+                    'Tab items count should be 0 (after removing 2 tabs)'
+                );
+            },
+            function(cmp){
+                var removeCallbackCount = cmp.get("v._tabRemoveCount");
+                $A.test.assertEquals(2, removeCallbackCount, "The number of onClose callbacks is not correct.");
+
+                var removeIndices = cmp.get("v._tabRemoveIndices");
+                $A.test.assertEquals(2, removeIndices.length, "The number of onClose indices is not correct.");
+                $A.test.assertEquals(0, removeIndices[0], "The onClose index is not correct.");
+                $A.test.assertEquals(0, removeIndices[1], "The onClose index is not correct.");
+
+                // only one name should be returned since only one tab provided a name
+                var removeNames = cmp.get("v._tabRemoveNames");
+                $A.test.assertEquals(1, removeNames.length, "The number of onClose names is not correct.");
+                $A.test.assertEquals("tab0", removeNames[0], "The onClose name is not correct.");
+            }
+        ]
+    },
 
     /**
      * Test alt text on tabitem
@@ -461,6 +522,7 @@
             tab: {
                 "title": tabTitle,
                 "name": tabName || tabTitle,
+                "closable": true,
                 "body": [{
                     "componentDef": {
                         descriptor: "markup://aura:text"
@@ -473,6 +535,26 @@
                 }]
             }
         });
+        e.fire();
+    },
+
+    /**
+     * Closes the active tab.
+     */
+    closeActiveTab: function(){
+        // only one close button should be returned since the selector filters on the active tab        
+        var elemCloseButtons = $A.test.select(this.SELECTOR.tabitem_close);
+        if (elemCloseButtons && elemCloseButtons.length > 0) {
+            $A.test.clickOrTouch(elemCloseButtons[0]);
+        }
+    },
+
+    /**
+     * Removes the specified tab.
+     */
+    removeTab: function(tabSet, tabName){
+        var e = tabSet.get("e.removeTab");
+        e.setParams({ name: tabName });
         e.fire();
     },
     

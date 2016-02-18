@@ -154,6 +154,7 @@
      * @private
      */
     removeTabBody: function (cmp, index) {
+        var tabToRemove = cmp._tabCollection.getTab(index);
         var activeIndex = cmp._tabCollection.getTabIndex({"tab": cmp._activeTab});
         cmp._tabCollection.removeTab(index);
         var size = cmp._tabCollection.getSize();
@@ -161,6 +162,15 @@
             //activate next tab, or previous tabif the removed tab is the last one
             index = (index === size) ? --index : index % size;
             this.setActive(cmp, {"index": index});
+        }
+        // Fire remove event if the tab is removed via the removeTab event or if the tab is closed
+        if (tabToRemove) {
+            var attrs = { "index": index };
+            var name = tabToRemove.get("v.name");
+            if (name) {
+                attrs["name"] = name;
+            }
+            cmp.get("e.onRemove").setComponentEvent().fire(attrs);
         }
     },
     /**

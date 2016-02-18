@@ -16,6 +16,9 @@
 	<aura:attribute name="_tab0" type="Object"/>
 	<aura:attribute name="_tab1" type="Object"/>
 	<aura:attribute name="_tabTitle" type="String"/>
+	<aura:attribute name="_tabRemoveCount" type="Integer" default="0"/>
+	<aura:attribute name="_tabRemoveIndices" type="Integer[]" default="[]"/>
+	<aura:attribute name="_tabRemoveNames" type="String[]" default="[]"/>
 
 	<aura:if isTrue="{! v.renderItem == 'testAddTab'}">
 	<div class="block">
@@ -28,6 +31,20 @@
 	</div>
 	</aura:if>
 
+	<aura:if isTrue="{! v.renderItem == 'testRemoveTab'}">
+	<div class="block">
+	    <div>
+	        <h1>Dynamically adds tabs to ui:tabset</h1>
+	    </div>
+	    <div>
+	        <ui:tabset class="tabset" aura:id="tabSet" onRemove="{!c.onTabRemove}">
+	        	<!-- One tab has a name and the other does not -->
+	        	<ui:tab title="tab 0 title" name="tab0" closable="true">tab 0 content</ui:tab>
+	        	<ui:tab title="tab 1 title" closable="true">tab 1 content</ui:tab>
+	        </ui:tabset>
+	    </div>
+	</div>
+	</aura:if>
 
 	<aura:if isTrue="{! v.renderItem == 'testTabItemAltText'}">
 	<div class="block">

@@ -1,4 +1,5 @@
 <aura:component extends="performance:perfTest">
+<!--Deprecated: use performanceTest:tabSetTest without setting the testDynamicTabLoading and _lazyRenderTabs attributes -->
 	<ui:tabset>
 		<ui:tab title="Tab 0">
 			<ul>

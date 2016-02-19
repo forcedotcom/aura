@@ -10,7 +10,7 @@
       var validIdentifierEx = /^[a-z$_][a-z0-9$_]*$/i;
       // TODO: improve returnable detection. `function (...` is a trick used today
       //       to return arbitrary code from actions, it should be legacy in the future.
-      var returnableEx = /^\s*([{(["']|function\s*\()/;
+      var returnableEx = /^(\s*)([{(["']|function\s*\()/;
       // TODO: improve first comment removal
       var trimFirstMultilineCommentEx = /^\/\*([\s\S]*?)\*\//;
       var trimFirstLineCommentEx = /^\/\/.*\n?/;
@@ -52,7 +52,8 @@
           src = src.replace(trimFirstMultilineCommentEx, '');
           src = src.replace(trimFirstLineCommentEx, '');
           // only add return statement if source it starts with [, {, or (
-          if (returnableEx.test(src)) src = 'return ' + src;
+          var match = src.match(returnableEx);
+          if (match) src = src.replace(match[1], 'return ');
           if (useStrict) src = '"use strict";\n' + src;
           return {
               src: 'function ' + hookFn + '(' + keys + '){\n' + src + '\n}',

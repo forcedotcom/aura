@@ -660,6 +660,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 	
 	protected boolean isSafeEvalWorkerURI(String uri) {
         // TODO: we should allow `fwuid` as a token for cache control in this url
-		return uri.equals("/auraFW/resources/lockerservice/safeEval.html");
+		return uri.endsWith("/lockerservice/safeEval.html");
 	}
 }

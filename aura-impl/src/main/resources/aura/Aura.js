@@ -575,12 +575,13 @@ AuraInstance.prototype.initAsync = function(config) {
         if (!el) {
             el = document.createElement('iframe');
             // TODO: we should use `config["context"]["fwuid"]` as a token for cache control
-            el.setAttribute('src', '/auraFW/resources/lockerservice/safeEval.html');
+            el.setAttribute('src', (config["host"] || '') + '/auraFW/resources/lockerservice/safeEval.html');
             el.setAttribute('width', "0");
             el.setAttribute('height', "0");
             el.setAttribute('tabIndex', "-1");
             el.setAttribute('aria-hidden', "true");
             el.setAttribute('title', "scripts");
+            el.setAttribute('id', 'safeEvalWorker');
             el.style.display = 'none';
             document.body.appendChild(el);
         }

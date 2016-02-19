@@ -439,20 +439,21 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
          * @private
          */
         setFocus: function(cmp) {
-            
             if(cmp.isValid()) {
                 var el;
-
                 el = cmp.getElement();
-                if(cmp.returnFocus) {
-                    cmp.returnFocus.focus();
-                } else if(el && el.querySelectorAll) {
+                // TODO: commented out to work around bug
+                // in the app, return when that is fixed: W-2942958
+                // if(cmp.returnFocus) {
+                //     cmp.returnFocus.focus();
+                // } else 
+                if(el && el.querySelectorAll) {
                     var focusables = this.getFocusables(el);
                     focusables.initial && focusables.initial.focus();
                 }
             }
-
         },
+        
         scopeScroll: function (dom) {
             scrollUtil.scope(dom);
         },

@@ -1,0 +1,29 @@
+{
+  "s":1,
+  "v":{
+    "descriptor":"java://org.auraframework.impl.java.model.TestModel",
+    "members":[
+      {
+        "s":2,
+        "v":{
+          "name":"firstThing",
+          "type":"java://java.lang.String"
+        }
+      },
+      {
+        "s":3,
+        "v":{
+          "name":"readOnlyThing",
+          "type":"java://java.lang.String"
+        }
+      },
+      {
+        "s":4,
+        "v":{
+          "name":"stringList",
+          "type":"java://java.util.List"
+        }
+      }
+    ]
+  }
+}

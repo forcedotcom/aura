@@ -181,8 +181,6 @@ window['$A'] = {};
  * @borrows Aura.Services.AuraComponentService#newComponentDeprecated as newCmpDeprecated
  * @borrows Aura.Services.AuraComponentService#newComponentAsync as newCmpAsync
  * @borrows Aura.Services.AuraEventService.newEvent as getEvt
- * @borrows Aura.Services.AuraClientService#getCurrentTransactionId as getCurrentTransactionId
- * @borrows Aura.Services.AuraClientService#setCurrentTransactionId as setCurrentTransactionId
  */
 function AuraInstance () {
     this.globalValueProviders = {};
@@ -328,7 +326,7 @@ function AuraInstance () {
          * @memberOf AuraInstance.prototype
          */
         style: this.styleService,
-        
+
         /**
          * Metrics Service
          *
@@ -346,7 +344,7 @@ function AuraInstance () {
          * @memberOf AuraInstance.prototype
          */
         locker: this.lockerService,
-        
+
         get : function(key) {
             var ret = $A.services[key];
             if (!ret && key === "root") {
@@ -362,8 +360,6 @@ function AuraInstance () {
 
     this.enqueueAction             = this.clientService.enqueueAction.bind(this.clientService);
     this.deferAction               = this.clientService.deferAction.bind(this.clientService);
-    this.getCurrentTransactionId   = this.clientService.getCurrentTransactionId.bind(this.clientService);
-    this.setCurrentTransactionId   = this.clientService.setCurrentTransactionId.bind(this.clientService);
 
     this.render                    = this.renderingService.render.bind(this.renderingService);
     this.rerender                  = this.renderingService.rerender.bind(this.renderingService);
@@ -437,8 +433,6 @@ function AuraInstance () {
     };
 
     //	Google Closure Compiler Symbol Exports
-    this["getCurrentTransactionId"] = this.getCurrentTransactionId;
-    this["setCurrentTransactionId"] = this.setCurrentTransactionId;
     this["clientService"] = this.clientService;
     this["componentService"] = this.componentService;
     this["renderingService"] = this.renderingService;
@@ -526,6 +520,23 @@ function AuraInstance () {
 }
 
 /**
+ * Does nothing.
+ *
+ * @public
+ * @deprecated
+ */
+AuraInstance.prototype.setCurrentTransactionId = function() { };
+
+/**
+ * Does nothing.
+ *
+ * @returns undefined
+ * @public
+ * @deprecated
+ */
+AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; };
+
+/**
  * Initializes Aura with context info about the app that should be loaded.
  * @param {Object} config
  *
@@ -539,17 +550,50 @@ function AuraInstance () {
  */
 AuraInstance.prototype.initAsync = function(config) {
 
-    // Context is created async because of the GVPs go though async storage checks
-    $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
+    function createAuraContext() {
+        // Context is created async because of the GVPs go though async storage checks
+        $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
+            if (!window["$$safe-eval$$"]) {
+                throw new $A.auraError("Aura(): Failed to initialize locker worker.");
+            }
+            $A.context = context;
+            $A.clientService.initHost(config["host"]);
+            $A.setLanguage();
 
-        $A.context = context;
-        $A.clientService.initHost(config["host"]);
-        $A.setLanguage();
+            $A.metricsService.initialize();
 
-        $A.metricsService.initialize();
+            $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
+        });
+    }
 
-        $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
-    });
+    if (!window['$$safe-eval$$']) {
+        // safe eval worker is an iframe that enables the page to run arbitrary evaluation,
+        // if this iframe is still loading, we should wait for it before continue with
+        // initialization, in the other hand, if the iframe is not available, we create it,
+        // and wait for it to be ready.
+        var el = document.getElementById('safeEvalWorker');
+        if (!el) {
+            el = document.createElement('iframe');
+            // TODO: we should use `config["context"]["fwuid"]` as a token for cache control
+            el.setAttribute('src', (config["host"] || '') + '/auraFW/resources/lockerservice/safeEval.html');
+            el.setAttribute('width', "0");
+            el.setAttribute('height', "0");
+            el.setAttribute('tabIndex', "-1");
+            el.setAttribute('aria-hidden', "true");
+            el.setAttribute('title', "scripts");
+            el.setAttribute('id', 'safeEvalWorker');
+            el.style.display = 'none';
+            document.body.appendChild(el);
+        }
+        $A.util.on(el, 'load', createAuraContext);
+        $A.util.on(el, 'error', function () {
+            throw new $A.auraError("Aura(): Failed to load locker worker.");
+        });
+    } else {
+        // provision for an alternative safe evaluation. This will open the door to do some
+        // performance optimization.
+        createAuraContext();
+    }
 };
 
 /**
@@ -614,7 +658,7 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
                 $A.finishInit(doNotInitializeServices);
             });
         }
-        
+
     }
 };
 
@@ -747,7 +791,7 @@ AuraInstance.prototype.handleError = function(message, e) {
 AuraInstance.prototype.reportError = function(message, error) {
     $A.handleError(message, error);
     if ($A.initialized) {
-        $A.logger.reportError(error);
+        $A.logger.reportError(error || new Error("[NoErrorObjectAvailable] " + message));
         $A.services.client.postProcess();
     }
 };
@@ -797,20 +841,16 @@ AuraInstance.prototype.message = function(msg) {
 AuraInstance.prototype.getCallback = function(callback) {
     $A.assert($A.util.isFunction(callback),"$A.getCallback(): 'callback' must be a valid Function");
     var context=$A.getContext().getCurrentAccess();
-    var transactionId = $A.getCurrentTransactionId();
     return function(){
         var nested = $A.clientService.inAuraLoop();
         $A.getContext().setCurrentAccess(context);
         $A.clientService.pushStack(name);
-        var savedTid = $A.getCurrentTransactionId();
-        if (transactionId) {
-            $A.setCurrentTransactionId(transactionId);
-        }
         try {
             return callback.apply(this,Array.prototype.slice.call(arguments));
         } catch (e) {
             // Should we even allow 'nested'?
-            // no need to wrap AFE with auraError as customers who throw AFE would want to handle it with their own custom experience.
+            // no need to wrap AFE with auraError as customers who throw AFE would want to handle it with their
+            // own custom experience.
             if (nested || e instanceof $A.auraFriendlyError) {
                 throw e;
             } else {
@@ -819,9 +859,6 @@ AuraInstance.prototype.getCallback = function(callback) {
         } finally {
             $A.clientService.popStack(name);
             $A.getContext().releaseCurrentAccess();
-            if (nested) {
-                $A.setCurrentTransactionId(savedTid);
-            }
         }
     };
 };

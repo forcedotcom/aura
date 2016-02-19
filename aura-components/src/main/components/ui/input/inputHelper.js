@@ -27,29 +27,29 @@
             var labelClass = component.get("v.labelClass") + " uiLabel-" + labelPositionAttribute + " form-element__label";
             var labelDisplay = labelPositionAttribute !== "hidden";
             var requiredIndicator = labelDisplay && component.get("v.required") ? component.get("v.requiredIndicator") : null;
-            var labelComponent = $A.newCmp({
-                    componentDef: {descriptor: 'markup://ui:label'},
-                    localId: 'inputLabel',
-                    attributes: {values: {
-                        label: labelAttribute,
-                        "class": labelClass,
-                        "for": domId,
-                        labelDisplay: labelDisplay,
-                        title: component.get("v.labelTitle"),
-                        requiredIndicator: requiredIndicator}}},
-                    component );
+            var labelComponent = $A.createComponentFromConfig({
+                descriptor: 'markup://ui:label',
+                localId: 'inputLabel',
+                valueProvider: component,
+                attributes: {
+                    label: labelAttribute,
+                    "class": labelClass,
+                    "for": domId,
+                    labelDisplay: labelDisplay,
+                    title: component.get("v.labelTitle"),
+                    requiredIndicator: requiredIndicator}});
             if (labelPositionAttribute === 'left' || labelPositionAttribute === 'top') {
                 innerBody.unshift(labelComponent);
             } else if (labelPositionAttribute === 'right' || labelPositionAttribute === 'bottom' || labelPositionAttribute === 'hidden') {
                 innerBody.push(labelComponent);
             }
-            var divComponent = $A.newCmp({
-                    componentDef: {descriptor: 'markup://aura:html'},
-                    attributes: {values: {
+            var divComponent = $A.createComponentFromConfig({
+                    descriptor: 'markup://aura:html',
+                    attributes: {
                         body: innerBody,
                         tag: 'div',
                         "class": "form-element"
-                    }}}
+                    }}
             );
 
             var body = [];
@@ -124,15 +124,16 @@
             }
         }
 
-        var updateOn = this.getUpdateOn(component);
-        if (updateOn) {
-            var handledEvents = this.lib.interactive.getHandledDOMEvents(component);
-            for (var j=0, lenj=updateOn.length; j < lenj; j++) {
-                if (handledEvents[updateOn[j]] !== true) {
-                    this.addDomHandler(component, updateOn[j]);
+        if (!component.get('v.updateOnDisabled')) {
+            var updateOn = this.getUpdateOn(component);
+            if (updateOn) {
+                var handledEvents = this.lib.interactive.getHandledDOMEvents(component);
+                for (var j = 0, lenj = updateOn.length; j < lenj; j++) {
+                    if (handledEvents[updateOn[j]] !== true) {
+                        this.addDomHandler(component, updateOn[j]);
+                    }
                 }
             }
-
         }
     },
 

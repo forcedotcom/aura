@@ -1,0 +1,33 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+			A <code>ui:inputDateHtml</code> component represents a date input field  of type <code>date</code> for mobile and tablet form factors, which uses the native date picker on those devices.
+			Use the <code>ui:inputDate</code> component to render this component automatically on target devices. 
+		</p>
+		<p>This is a basic set up of a date field with a date picker, which displays the field value <code>Jan 30, 2014</code> based on the locale format. 
+		On desktop, the <code>input</code> tag is wrapped in a <code>form</code> tag.</p>
+		<pre>&lt;ui:inputDate aura:id="dateField" label="Birthday" value="2014-01-30" displayDatePicker="true"/></pre>
+		<p>When viewed on a mobile or tablet, the <code>ui:inputDate</code> component renders as <code>ui:inputDateHtml</code> and uses the native date picker.</p>
+	</aura:description>		
+	<aura:example name="inputExample" ref="uiExamples:date" label="Using ui:inputDate">
+    		This example sets today's date on a <code>ui:inputDate</code> component, retrieves its value, and displays it using <code>ui:outputDate</code>. The <code>init</code> handler initializes and sets the date on the component.
+    		When viewed on a mobile or tablet device, this component renders a native date picker using the <code>ui:inputDateHtml</code> component.
+    </aura:example>
+</aura:documentation>

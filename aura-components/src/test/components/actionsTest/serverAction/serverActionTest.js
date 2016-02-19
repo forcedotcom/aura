@@ -23,11 +23,9 @@
 		    	   //let's tap into transit and modify the response
 		    	   var decode_done = false;
 		    	   var cb_handle;
-		           
 			       var modifyResponse = function (oldResponse) {
 			        	var response = oldResponse["response"];
-			        	//Dangerous : executeInForegroundWithReturn is part of response because perf metrics add it, if they decide to remove it in the future, we need to modify condition below
-			        	if( response.indexOf("testModifyResponseFromServer") >= 0 && response.indexOf("executeInForegroundWithReturn") >= 0 && response.indexOf("recordObjCounter") >= 0) {
+			        	if( response.indexOf("testModifyResponseFromServer") >= 0 && response.indexOf("recordObjCounter") >= 0) {
 				        	var newResponse = {};
 				    		//copy everything from oldResponse
 				    		var responseText = oldResponse["responseText"];
@@ -464,7 +462,6 @@
      */
     testConcurrentServerActionsBothIncomplete : {
         test : [ function doTest(cmp) {
-            var currentTransactionId = $A.getCurrentTransactionId();
             //create two actions with same signature
             //also set current transcationId to be the same as first abortable action
             var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
@@ -502,116 +499,6 @@
         }]
     },
 
-
-    /*
-     * test for W-2802618
-     * enqueue two actions (a1 & a2) with same signature, a2 stored as a1's dupe, and NOT send to server. 
-     * when a1's reponse come back, we also run a2's callback with that
-     * This is ok if a2 is in the same transaction as a1, if not, the current transactionID for a2 should be bigger
-     * than a1's, and we didn't change that when processing a2's callback. 
-     * now if someone enqueue another abortable action (a3) in a2's callback, it would get current transactionID of a1,
-     * which will abort a3.
-     */
-    testDupeActionWithDifferentTransactionID : {
-    	test: [
-    	       function (cmp) {
-    	    	   //$A.test.setTestTimeout(600000);
-    	    	   //create foreground abortable a1 & a2 with same signature, a3 could be any abortable action
-    	    	   var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
-                   a1.setStorable(); 
-                   var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
-            	   a2.setStorable(); 
-                   var a3 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:3});
-                   a3.setStorable();
-                   //right after we send out a1, enqueue a2
-                   var postSendCallback = function(actions, actionToWatch) {
-                       if(actionToWatch) {
-                     	   //since a1 is already sent out, TransactionId has been increased by 1
-                    	   //enqueue abortable a3 in a2's callback, later we verify a3 doesn't get aborted.
-                           a2.setCallback(cmp, function(action2) {
-                               $A.enqueueAction(a3);
-                           });
-                    	   $A.enqueueAction(a2); 
-                       }
-                       //we only need to do this callback once, once we are done, remove it
-                       $A.test.removePreSendCallback(cb_handle);
-                   }
-                   var cb_handle = $A.test.addPostSendCallback(a1, postSendCallback);
-                   //now enqueue a1
-                   $A.enqueueAction(a1);
-                   //make sure the test did finish a3
-                   $A.test.addWaitForWithFailureMessage(true,
-   	                    function() { return $A.test.areActionsComplete([a3]) && (a3.getState() != "ABORTED"); },
-   	                    "fail waiting for action 3 to finish without being aborted"
-   	               );
-    	       }
-    	]
-    },
-    	       
-    /**
-     * We enqueue two foreground abortable actions with same action sigature (a1 & a2). Drop server connection right 
-     * before we send a1 out (a2 is a dupe of a1, we don't send a2 out)
-     * Right after we send them out, another foreground abortable action was enqueued(a4), which will push TransactionId
-     * forward by1
-     * When we deal with response for a1, server is offline already, we have no response, a1 was aborted because it has
-     * old transactionId, a2 was aborted because it's a dupe of a1. 
-     * 
-     * NOTE:
-     * Four places we do action.abort() on AuraClientSrevice: this test 3rd place in AuraClientService.processIncompletes().
-     * 1st is test in testAbortQueuedAbortable, 2nd by testAbortInFlightAbortable , 4th by testAbortStorable,
-     * all in enqueueActionTest.js
-     */
-    testConcurrentActionGetAbortedDuringReceive : {
-    	test: [
-    	       function enqueueConcurrentActions(cmp) {
-    	    	   var testCompleted = false;
-    	    	   //get two actions with same signature
-    	    	   var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
-                   var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
-    	    	   //let's drop offline right before sending a1, go offline right after sending is too late
-                   var preSendCallback = function(actions, actionToWatch) {
-                       if(actionToWatch) {
-                     	  //go offline
-                     	  $A.test.setServerReachable(false);
-                       }
-                       //we only need to do this callback once, once we are done, remove it
-                       $A.test.removePrePostSendCallback(cb_handle2);
-                   }
-                   var cb_handle2 = $A.test.addPreSendCallback(a1, preSendCallback);
-                   var postSendCallback = function(actions, actionToWatch) {
-                      if(actionToWatch) {
-                    	  //push TransactionId forward
-                    	  var a4 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:4});
-	                      a4.setAbortable();
-	                      $A.run(
-	                                  function() {    $A.enqueueAction(a4);  }
-	                      );
-                      }
-                      //we only need to do this callback once, once we are done, remove it
-                      $A.test.removePreSendCallback(cb_handle);
-                  }
-                  var cb_handle = $A.test.addPostSendCallback(a1, postSendCallback);
-                  //let's make sure a1 & a2 did finish
-                  $A.test.addWaitForWithFailureMessage(true, function() { return $A.test.areActionsComplete([a1,a2]); }, 
-                		  "a1&a2 finish",
-                		  function() {
-                	  			//we abort a1 and a2 in receive() after we enqueue a4
-                                $A.test.assertEquals("ABORTED", a1.getState(), "a1 should get aborted");
-                                $A.test.assertEquals("ABORTED", a2.getState(), "a2 should get aborted");
-                                $A.test.setServerReachable(true);//go online
-                  });
-                  //enqueue a1 and a2 with same signature, we will only send out a1, keep a1 in the actionsDeferred queue, a2 is stored as a1's dupe.
-                   a1.setStorable(); 
-                   a2.setStorable(); 
-                   $A.run(
-                           function() {
-                               $A.enqueueAction(a1);
-                               $A.enqueueAction(a2);
-                           }
-                   );
-    	       }
-    	]
-    },
 
     /*
      * two concurrent background actions, 2nd action get copy of 1st's response

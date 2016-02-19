@@ -17,6 +17,7 @@ package org.auraframework.integration.test.css;
 
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
@@ -42,7 +43,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(component);
         assertTrue("expected to find bundle flavor def", flavor.exists());
-        flavor.getDef(); // no errors with loading
+        Aura.getDefinitionService().getDefinition(flavor); // no errors with loading
     }
 
     /** basic loading of a custom flavor within another namespace */
@@ -50,14 +51,14 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.customFlavorDescriptor(component, "flavorTestAlt", "flavors");
         assertTrue("expected to find namespace flavor def", flavor.exists());
-        flavor.getDef(); // no errors with loading
+        Aura.getDefinitionService().getDefinition(flavor); // no errors with loading
     }
 
     /** test that flavor names are found in the css file and stored */
     public void testGetFlavorNamesFromStandardFlavor() throws Exception {
         DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(component);
-        Set<String> flavorNames = flavor.getDef().getFlavorNames();
+        Set<String> flavorNames = Aura.getDefinitionService().getDefinition(flavor).getFlavorNames();
 
         assertEquals("didn't get expected flavor names, found: " + flavorNames, 4, flavorNames.size());
         assertTrue(flavorNames.contains("default"));
@@ -70,7 +71,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
     public void testGetFlavorNamesFromCustomFlavor() throws Exception {
         DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.customFlavorDescriptor(component, "flavorTestAlt", "flavors");
-        Set<String> flavorNames = flavor.getDef().getFlavorNames();
+        Set<String> flavorNames = Aura.getDefinitionService().getDefinition(flavor).getFlavorNames();
 
         assertEquals("didn't get expected flavor names, found: " + flavorNames, 5, flavorNames.size());
         assertTrue(flavorNames.contains("default"));
@@ -84,7 +85,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
     public void testGetFlavorNamesVariations() throws Exception {
         DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_landmark", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(component);
-        Set<String> flavorNames = flavor.getDef().getFlavorNames();
+        Set<String> flavorNames = Aura.getDefinitionService().getDefinition(flavor).getFlavorNames();
 
         assertEquals("didn't get expected flavor names, found: " + flavorNames, 6, flavorNames.size());
         assertTrue(flavorNames.contains("default"));
@@ -102,7 +103,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         DefDescriptor<FlavoredStyleDef> flavor = addStandardFlavor(cmp, ".THIS--test {color:t(color);}");
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        flavor.getDef().appendDependencies(dependencies);
+        Aura.getDefinitionService().getDefinition(flavor).appendDependencies(dependencies);
         assertTrue(dependencies.contains(nsTokens));
     }
 
@@ -112,12 +113,12 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         DefDescriptor<FlavoredStyleDef> standard = addStandardFlavor(cmp, ".THIS--test {color:red}");
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        standard.getDef().appendDependencies(dependencies);
+        Aura.getDefinitionService().getDefinition(standard).appendDependencies(dependencies);
         assertTrue("did not expect standard flavor to have dependencies", dependencies.isEmpty());
 
         DefDescriptor<FlavoredStyleDef> custom = addCustomFlavor(cmp, ".THIS--test{}");
         dependencies = Sets.newHashSet();
-        custom.getDef().appendDependencies(dependencies);
+        Aura.getDefinitionService().getDefinition(custom).appendDependencies(dependencies);
         assertEquals("didn't get expected dependencies for custom flavor", 1, dependencies.size());
         assertTrue(dependencies.contains(cmp));
     }
@@ -129,7 +130,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         DefDescriptor<FlavoredStyleDef> flavor = addStandardFlavor(cmp,
                 ".THIS--test {color: token(color); font-weight: bold; margin: t(margin1); }");
 
-        Set<String> tokenNames = flavor.getDef().getTokenNames();
+        Set<String> tokenNames = Aura.getDefinitionService().getDefinition(flavor).getTokenNames();
         assertEquals("didn't have expected size", 2, tokenNames.size());
         assertTrue(tokenNames.contains("color"));
         assertTrue(tokenNames.contains("margin1"));
@@ -141,7 +142,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         DefDescriptor<FlavoredStyleDef> custom = addStandardFlavor(cmp, ".THIS--test {color:red}");
 
         try {
-            custom.getDef().validateReferences();
+        	Aura.getDefinitionService().getDefinition(custom).validateReferences();
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "must contain at least one");
@@ -154,7 +155,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         DefDescriptor<FlavoredStyleDef> custom = addCustomFlavor(cmp, ".THIS--test {color:red}");
 
         try {
-            custom.getDef().validateReferences();
+        	Aura.getDefinitionService().getDefinition(custom).validateReferences();
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "must contain at least one");

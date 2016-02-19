@@ -36,7 +36,8 @@ function lib() { //eslint-disable-line no-unused-vars
             delete clonedConfig.flavor; 
 
             $A.util.apply(clonedDef.attributes.values, clonedConfig); // merge panel config with DefRef
-            return $A.newCmp(clonedDef, containerVP);
+            clonedDef["attributes"]["valueProvider"] = containerVP;
+            return $A.createComponentFromConfig(clonedDef);
         }
 
         function renderContainer(containerManager, newContainer) {

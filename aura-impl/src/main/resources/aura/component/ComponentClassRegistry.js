@@ -172,14 +172,11 @@ ComponentClassRegistry.prototype.buildConstructor = function(componentProperties
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     var className = componentProperties["meta"]["name"];
 
-    /*jslint evil: true */
-    /*eslint-disable no-eval, no-redeclare*/
-    var componentConstructor = new Function(
-        "Component",
-        "return function " + className + "() { Component.apply(this, arguments); };"
-    )(Component);
-    /*eslint-enable no-eval, no-redeclare*/
-    /*jslint evil: false */
+    /*eslint-disable no-redeclare*/
+    var componentConstructor = $A.util.globalEval("(function " + className + "() { Component.apply(this, arguments); });", {
+        "Component": Component
+    });
+    /*eslint-enable no-redeclare*/
     //#end
 
     // Extends from Component (and restore constructor).

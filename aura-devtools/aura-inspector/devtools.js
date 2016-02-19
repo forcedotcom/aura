@@ -24,4 +24,3 @@ chrome.devtools.inspectedWindow.eval("window.location.href", function(url){
 
 
 });
-

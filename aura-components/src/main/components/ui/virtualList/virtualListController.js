@@ -45,16 +45,27 @@
         helper.createVirtualList(cmp);
     },
     appendItems: function (cmp, event, helper) {
-        var superCmp   = cmp.getSuper(),
-            isExtended = superCmp.getDef().getDescriptor().getName() !== 'component',
-            items      = event.getParam('arguments').items;
-
-        if (isExtended) {
-            cmp = superCmp;
-        }
+        var items = event.getParam('arguments').items;
+        cmp = helper._getRootComponent(cmp);
 
         if (items && items.length) {
             helper.appendVirtualRows(cmp, items);
         }
+    },
+    updateItem: function (cmp, event, helper) {
+        var params  = event.getParam('arguments'),
+            index   = params.index,
+            item    = params.item;
+        cmp = helper._getRootComponent(cmp);
+
+        helper.updateItem(cmp, item, index);
+    },
+    getComponentByIndex: function (cmp, event, helper) {
+        var params   = event.getParam('arguments'),
+            index    = params.index,
+            callback = params.callback;
+        cmp = helper._getRootComponent(cmp);
+
+        return helper.getComponentByIndex(cmp, index, callback);
     }
 })// eslint-disable-line semi

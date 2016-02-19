@@ -14,33 +14,40 @@
  * limitations under the License.
  */
 
-({
-	/**
-	 * Handler for event that's fired programatically
-	 */
-	setActive: function(cmp, evt, helper) {
-		var params = evt.getParam('arguments');
-		helper.setActive(cmp, params.active, params.focus);
+({	
+	init: function (cmp, event, helper) {
+		helper.initializeHandlers(cmp);
+        if (!cmp.get('v.name')) {
+            cmp.set('v.name', cmp.get('v.title'));
+        }
 	},
-	/**
-	 * Handler for event that's fired when user clicks on tab to activate
-	 */
-	onTabActivated: function(cmp) {
-		if($A.util.getBooleanValue("v.active")) {
-			cmp.get('e.onActivate').fire();
-		}
-	},
+	addHandler: function (cmp, event, helper) {
+        var params = event.getParam('arguments');
+        helper.addHandler(cmp, params);
+    },
+    /**
+     * Handler for event that's fired programatically
+     */
+    setActive: function(cmp, evt, helper) {
+        var params = evt.getParam('arguments');
+        helper.setActive(cmp, params.active, params.focus);
+    },
+    press: function(cmp) {
+        if($A.util.getBooleanValue("v.active")) {
+            cmp.get('e.onActivate').fire();
+        }
+    },
 
-	close: function(cmp, evt) {
-		cmp.get("e.onClose").fire();
-		$A.util.squash(evt, true);
-	},
+    close: function(cmp, evt) {
+        cmp.get("e.onClose").fire();
+        $A.util.squash(evt, true);
+    },
 
-	onTabHover: function(cmp, evt, helper) {
-		helper.handleHoverEvent(cmp, 'onTabHover');
-	},
+    onTabHover: function(cmp, evt, helper) {
+        helper.handleHoverEvent(cmp, 'onTabHover');
+    },
 
-	onTabUnhover: function(cmp, evt, helper) {
-		helper.handleHoverEvent(cmp, 'onTabUnhover');
-	}
+    onTabUnhover: function(cmp, evt, helper) {
+        helper.handleHoverEvent(cmp, 'onTabUnhover');
+    }
 })// eslint-disable-line semi

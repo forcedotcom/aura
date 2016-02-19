@@ -40,13 +40,13 @@ Test.Aura.Controller.ActionTest = function() {
 
     // Just sets up the mocks before creating a new action.
     // No logic
-    function newAction() {
+    function newAction(def, suffix, method, paramDefs, background, cmp, caboose) {
         var action;
         Mocks.GetMocks(Object.Global(), {
             "$A": { getContext: function() {} },
             "Action": Aura.Controller.Action
         })(function(){
-            action = new Action();
+            action = new Action(def, suffix, method, paramDefs, background, cmp, caboose);
         });
         return action;
     }
@@ -118,6 +118,21 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ConstructorSetsAbortableToFalse() {
+            // Arrange
+            var actual;
+
+            // Act
+            mockActionDependencies(function(){
+                var target = new Aura.Controller.Action();
+                actual = target.abortable;
+            });
+
+            // Assert
+            Assert.False(actual);
         }
     }
 
@@ -1409,150 +1424,92 @@ Test.Aura.Controller.ActionTest = function() {
         function SetsAbortableToTrueByDefault() {
             // Arrange
             var target = newAction();
-            var abortable;
+            var actual;
 
             // Act
             mock(function() {
                 target.setAbortable();
-                abortable = target.isAbortable();
+                actual = target.abortable
             });
 
             // Assert
-            Assert.True(abortable);
-        }
-        [Fact]
-        function IsAbortableReturnsAbortableProperty() {
-            // Arrange
-            var target = newAction();
-            var abortable;
-
-            // Act
-            mock(function() {
-                target.setAbortable();
-                abortable = target.isAbortable();
-            });
-
-            // Assert
-            Assert.Equal(true, target.abortable);
+            Assert.True(actual);
         }
 
         [Fact]
         function SetsAbortableToTrue() {
             // Arrange
             var target = newAction();
-            var abortable;
+            var actual;
 
             // Act
             mock(function() {
                 target.setAbortable(true);
-                abortable = target.isAbortable();
+                actual = target.abortable;
             });
 
             // Assert
-            Assert.True(abortable);
+            Assert.True(actual);
         }
 
         [Fact]
-        function SetsAbortableToFalse() {
+        function DoesNotSetAbortableToFalse() {
             // Arrange
             var target = newAction();
-            var abortable;
+            var actual;
 
             // Act
             mock(function() {
                 target.setAbortable(false);
-                abortable = target.isAbortable();
+                actual = target.abortable;
             });
 
             // Assert
-            Assert.False(abortable);
+            Assert.True(actual);
         }
 
         [Fact]
         function SetsAbortableToNull() {
             // Arrange
             var target = newAction();
-            var abortable;
+            var actual;
 
             // Act
             mock(function() {
                 target.setAbortable(null);
-                abortable = target.isAbortable();
+                actual = target.abortable;
             });
 
             // Assert
-            Assert.True(abortable);
+            Assert.True(actual);
         }
 
         [Fact]
         function SetsAbortableToNumber() {
             // Arrange
             var target = newAction();
-            var abortable;
+            var actual;
 
             // Act
             mock(function() {
                 target.setAbortable(1);
-                abortable = target.isAbortable();
+                actual = target.abortable;
             });
 
             // Assert
-            Assert.True(abortable);
+            Assert.True(actual);
         }
 
         [Fact]
         function SetsAbortableToString() {
             // Arrange
             var target = newAction();
-            var abortable;
-
-            // Act
-            mock(function() {
-                target.setAbortable("false");
-                abortable = target.isAbortable();
-            });
-
-            // Assert
-            Assert.True(abortable);
-        }
-    }
-
-    [ Fixture ]
-    function IsAbortable() {
-
-        var mock = Mocks.GetMock(Object.Global(), "$A", {
-            util : {
-                isUndefinedOrNull : function(obj) {
-                    return obj === undefined || obj === null;
-                }
-            }
-        });
-
-        [Fact]
-        function ReturnsFalseByDefault() {
-            // Arrange
-            var target = newAction();
-            var abortable;
-
-            // Act
-            mock(function() {
-                abortable = target.isAbortable();
-            });
-
-            // Assert
-            Assert.False(abortable);
-        }
-
-        [Fact]
-        function ReturnsTrueIfSetToTrue() {
-            // Arrange
-            var target = newAction();
-            target.abortable = true;
             var actual;
 
             // Act
             mock(function() {
-                actual = target.isAbortable();
+                target.setAbortable("false");
+                actual = target.abortable;
             });
 
             // Assert
@@ -1561,61 +1518,19 @@ Test.Aura.Controller.ActionTest = function() {
     }
 
     [ Fixture ]
-    function SetExclusive() {
+    function IsAbortable() {
         [Fact]
-        function SetsExclusiveTrueIfParamUndefined() {
+        function ReturnsAbortableProperty() {
             // Arrange
             var target = newAction();
-
-            // Act
-            target.setExclusive(undefined);
-
-            // Assert
-            Assert.True(target.exclusive);
-        }
-
-        [Fact]
-        function SetsExclusiveToParamIfDefined() {
-            // Arrange
             var expected = "expected";
-            var target = newAction();
 
             // Act
-            target.setExclusive(expected);
-            var actual = target.exclusive;
+            target.abortable = expected
+            var actual = target.isAbortable();
 
             // Assert
             Assert.Equal(expected, actual);
-        }
-    }
-
-    [ Fixture ]
-    function IsExclusive() {
-        [Fact]
-        function ReturnsExclusiveIfSet() {
-            // Arrange
-            var expected = "expected";
-            var target = newAction();
-            target.exclusive = expected;
-
-            // Act
-            var actual = target.isExclusive();
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function ReturnsFalseIfExclusiveNotSet() {
-            // Arrange
-            var target = newAction();
-            target.exclusive = undefined;
-
-            // Act
-            var actual = target.isExclusive();
-
-            // Assert
-            Assert.False(actual);
         }
     }
 
@@ -1717,9 +1632,8 @@ Test.Aura.Controller.ActionTest = function() {
         }
 
         [Fact]
-        function SetsStorableCallsSetAbortable() {
+        function SetsStorableSetsAbortableToTrue() {
             // Arrange
-            var expected = "expected";
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
                 assert : function() {
                 }
@@ -1729,12 +1643,8 @@ Test.Aura.Controller.ActionTest = function() {
                 isServerAction : function() {
                 }
             };
-            target.setAbortable = function() {
-                actual = expected;
-            };
             target.getStorageKey = function() {
             };
-            var actual = null;
 
             // Act
             mockAssert(function() {
@@ -1742,7 +1652,7 @@ Test.Aura.Controller.ActionTest = function() {
             })
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.True(target.abortable);
         }
 
         [Fact]
@@ -2088,6 +1998,164 @@ Test.Aura.Controller.ActionTest = function() {
     }
 
     [ Fixture ]
+    function MaybeAbort() {
+        [Fact]
+        function ReturnsFalseIfNotAbortableBeforeSend() {
+            // Arrange
+            var target = newAction();
+            target.abortable = false;
+            target.abort = undefined;
+
+            //Act
+            var actual = target.abortIfComponentInvalid(true);
+
+            //Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseIfNotAbortableBeforeSendEvenIfInvalid() {
+            // Arrange
+            var target = newAction();
+            target.abortable = false;
+            target.abort = undefined;
+            target.cmp = { isValid : function() { return false; } };
+
+            //Act
+            var actual = target.abortIfComponentInvalid(true);
+
+            //Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseIfAbortableBeforeSendButNoComponent() {
+            // Arrange
+            var target = newAction();
+            target.abortable = true;
+            target.abort = undefined;
+            target.cmp = undefined;
+
+            //Act
+            var actual = target.abortIfComponentInvalid(true);
+
+            //Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseIfAbortableBeforeSendButComponentIsValid() {
+            // Arrange
+            var target = newAction();
+            target.abortable = true;
+            target.abort = undefined;
+            target.cmp = { isValid : function() { return true; } };
+
+            //Act
+            var actual = target.abortIfComponentInvalid(true);
+
+            //Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueIfAbortableBeforeSendAndComponentIsNotValid() {
+            // Arrange
+            var target = newAction();
+            target.abortable = true;
+            target.abort = function() {};
+            target.cmp = { isValid : function() { return false; } };
+
+            //Act
+            var actual = target.abortIfComponentInvalid(true);
+
+            //Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function CallsAbortIfAbortableBeforeSendAndComponentIsNotValid() {
+            // Arrange
+            var target = newAction();
+            var expected = "abort was called";
+            var actual = null;
+            target.abortable = true;
+            target.abort = function() { actual = expected; };
+            target.cmp = { isValid : function() { return false; } };
+
+            //Act
+            target.abortIfComponentInvalid(true);
+
+            //Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsTrueIfNotBeforeSendAndComponentIsNotValid() {
+            // Arrange
+            var target = newAction();
+            target.abortable = false;
+            target.abort = function() {};
+            target.cmp = { isValid : function() { return false; } };
+
+            //Act
+            var actual = target.abortIfComponentInvalid(false);
+
+            //Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function CallsAbortIfNotBeforeSendAndComponentIsNotValid() {
+            // Arrange
+            var target = newAction();
+            var expected = "abort was called";
+            var actual = null;
+            target.abortable = false;
+            target.abort = function() { actual = expected; };
+            target.cmp = { isValid : function() { return false; } };
+
+            //Act
+            target.abortIfComponentInvalid(false);
+
+            //Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsTrueIfAbortableAndNotBeforeSendAndComponentIsNotValid() {
+            // Arrange
+            var target = newAction();
+            target.abortable = true;
+            target.abort = function() {};
+            target.cmp = { isValid : function() { return false; } };
+
+            //Act
+            var actual = target.abortIfComponentInvalid(false);
+
+            //Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function CallsAbortIfAbortableAndNotBeforeSendAndComponentIsNotValid() {
+            // Arrange
+            var target = newAction();
+            var expected = "abort was called";
+            var actual = null;
+            target.abortable = true;
+            target.abort = function() { actual = expected; };
+            target.cmp = { isValid : function() { return false; } };
+
+            //Act
+            target.abortIfComponentInvalid(false);
+
+            //Assert
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [ Fixture ]
     function ParseAndFireEvent() {
         [Fact]
         function CallsClientServiceWhenEventNotFoundByDescriptor() {
@@ -2260,145 +2328,6 @@ Test.Aura.Controller.ActionTest = function() {
             });
 
             Assert.Equal(actual, true);
-        }
-    }
-
-    [ Fixture ]
-    function setParentAction() {
-        var mockContext = Mocks.GetMocks(Object.Global(), {
-            "Action": Aura.Controller.Action,
-            "$A" : {
-                util : {
-                    isUndefinedOrNull : function(obj) {
-                        return obj === undefined || obj === null;
-                    },
-                    isUndefined: function(obj) {
-                        return obj === undefined;
-                    }
-                }
-            }
-        });
-
-        [Fact]
-        function SetsParentAction() {
-            var target = newAction();
-            var parent = newAction();
-            var expected = "EXPECTED";
-            var actual;
-
-            mockContext(function() {
-                parent.setAbortable(true);
-                parent.setAbortableId(expected);
-                target.setParentAction(parent);
-                actual = target.abortableId;
-            });
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function ThrowsIfParentIsUndefined() {
-            var target = newAction();
-            var expected = "Action.setParentAction(): The provided parent action must be a valid abortable Action: undefined";
-            var actual;
-
-            mockContext(function() {
-                actual = Record.Exception(function() {
-                    target.setParentAction();
-                })
-            });
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function ThrowsIfParentIsNull() {
-            var target = newAction();
-            var expected = "Action.setParentAction(): The provided parent action must be a valid abortable Action: null";
-            var actual;
-
-            mockContext(function() {
-                actual = Record.Exception(function() {
-                    target.setParentAction(null);
-                })
-            });
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function ThrowsIfParentIsNotAnAction() {
-            var target = newAction();
-            var expected = "Action.setParentAction(): The provided parent action must be a valid abortable Action: [object Object]";
-            var actual;
-
-            mockContext(function() {
-                actual = Record.Exception(function() {
-                    target.setParentAction({});
-                })
-            });
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function ThrowsIfParentNotAbortable() {
-            var target = newAction();
-            var expected = "Action.setParentAction(): The provided parent action must be a valid abortable Action: [object Object]";
-            var actual;
-
-            mockContext(function() {
-                target.abortableId = true;
-                target.getStorageKey = function(){ return "PROVIDED" };
-
-                actual = Record.Exception(function() {
-                    target.setParentAction({
-                        abortable : false
-                    });
-                })
-            });
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function ThrowsIfParentNotEnqueued() {
-            var target = newAction();
-            target.abortableId = true;
-            target.getStorageKey = function(){ return "PROVIDED" };
-            var parent = newAction();
-            parent.setAbortable(true);
-            var expected = "Action.setParentAction(): The provided parent action must be enqueued: [object Object]";
-            var actual;
-
-            mockContext(function() {
-
-                actual = Record.Exception(function() {
-                    target.setParentAction(parent);
-                })
-            });
-            Assert.Equal(expected, actual);
-        }
-
-
-        [Fact]
-        function ThrowsIfParentAlreadySet() {
-            var target = newAction();
-            var parent = newAction();
-            parent.setAbortable(true);
-            parent.setAbortableId("value");
-            var expected = "Action.setParentAction(): The abortable group is already set, call setParentAction before enqueueing : PROVIDED";
-            var actual;
-
-            mockContext(function() {
-                target.abortableId = true;
-                target.getStorageKey = function(){ return "PROVIDED" };
-
-                actual = Record.Exception(function() {
-                    target.setParentAction(parent);
-                })
-            });
-
-            Assert.Equal(expected, actual);
         }
     }
 }

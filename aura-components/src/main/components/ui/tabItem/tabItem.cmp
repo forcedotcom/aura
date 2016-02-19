@@ -23,14 +23,13 @@
     <aura:attribute name="active" type="Boolean" description="Specifies whether a tab is active (true) or not (false)."/>
     <aura:attribute name="hidden" type="Boolean" description="Specifies whether a tab is hidden (true) or not (false)."/>
     <aura:attribute name="iconClass" type="String" description="The CSS style used to display the icon on the tab."/>
-    <aura:attribute name="closable" type="Boolean" default="false" description="Specifies whether to display an 'x' that will close the tab when clicked. Default value is 'false'." />
+    <aura:attribute name="closable" type="Boolean" default="false" description="Specifies whether to display an 'x' to close the tab" />
     <aura:attribute name="ariaControlId" type="String" description="Internal use for aria-controls attribute."/>
 
-    <aura:registerevent name="onActivate" type="ui:tabsetEvent" description="The event is fired when the tab is clicked to activate." />
-    <aura:registerevent name="onClose" type="ui:tabsetEvent" description="The event is fired when the close icon is clicked to close the tab." />
-
-    <aura:registerevent name="onTabHover" type="ui:onTabHover" description="The event is fired when the mouse moves over a tab or when a tab is put into focus." />
-    <aura:registerevent name="onTabUnhover" type="ui:onTabHover" description="The event is fired when the mouse moves off of a tab or when focus is moved away from a tab." />
+    <aura:registerevent name="onActivate"   type="ui:tabsetEvent" />
+    <aura:registerevent name="onClose"      type="ui:tabsetEvent" />
+    <aura:registerevent name="onTabHover"   type="ui:onTabHover" />
+    <aura:registerevent name="onTabUnhover" type="ui:onTabHover" />
 
     <aura:method name="setActive" action="{!c.setActive}" access="PUBLIC" description="Set the tab item to active or inactive">
         <aura:attribute name="active" type="Boolean" description="Indicates the tab is active or not."/>
@@ -38,15 +37,39 @@
         <aura:attribute name="callback" type="Object" description="Callback function"/>
     </aura:method>
 
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
     <li aura:id="li" class="{!v.class + ' tabs__item' + (v.active ? ' active' : '') + (v.hidden ? ' hidden' : '')}"  role="presentation">
-        <a class="tabHeader" onclick="{!c.onTabActivated}" href="javascript:void(0);" aura:id="tabItem"
-           onmouseover="{!c.onTabHover}" onmouseout="{!c.onTabUnhover}" onfocus="{!c.onTabHover}" onblur="{!c.onTabUnhover}"
-           aria-controls="{!v.ariaControlId}" aria-selected="{!v.active ? 'true' : 'false'}" title="{!v.title}" tabindex="{!v.active ? 0: -1}" role="tab">
+
+        <!-- 
+            PROGRAMATIC ATTACHMENTS:
+
+            onmouseover="{!c.onTabHover}"
+            onmouseout="{!c.onTabUnhover}" 
+            onfocus="{!c.onTabHover}" 
+            onblur="{!c.onTabUnhover}"
+        -->
+
+        <a  aura:id="tabItem"
+            class="tabHeader"
+            data-tab-name="{!v.name}"
+            href="javascript:void(0);"
+            title="{!v.title}"
+            aria-controls="{!v.ariaControlId}"
+            aria-selected="{!v.active ? 'true' : 'false'}"
+            tabindex="{!v.active ? 0: -1}" 
+            role="tab"
+            onclick="{!c.press}">
 
             <span class="{!v.iconClass}">{!v.icon}</span>
             <span class="title">{!v.title}</span>
+
             <aura:if isTrue="{!v.closable}">
-                <a aura:id="close" class="close" href="javascript:void(0);" onclick="{!c.close}" tabindex="{!v.active ? 0: -1}">&times;
+                <a  aura:id="close" 
+                    class="close" 
+                    href="javascript:void(0);" 
+                    onclick="{!c.close}" 
+                    tabindex="{!v.active ? 0: -1}">&times;
                     <span class="assistiveText">Close</span>
                 </a>
             </aura:if>

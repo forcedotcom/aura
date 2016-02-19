@@ -28,7 +28,7 @@
  */
 var DomHandlersPlugin = function DomHandlersPlugin(config) {
     this.config = config;
-    this["enabled"] = true; // Do not enable it automatically
+    this["enabled"] = true;
 };
 
 DomHandlersPlugin.NAME = "domHandlers";
@@ -58,41 +58,88 @@ DomHandlersPlugin.prototype.disable = function () {
     }
 };
 
-DomHandlersPlugin.prototype.dispatchActionHook = function (original, action, event, cmp) {
-    var localCmpId = cmp.getLocalId();
-    var dispatchCmpId = action.getComponent().getLocalId();
+DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
+    // We want to get the localId of the component with the handler 
+    // and the component who owns the action (its lexical scope)
+    var localCmpId = cmp.getLocalId(); 
+    var dispatchCmpId = action.getComponent().getConcreteComponent().getLocalId();
 
-    if (localCmpId && dispatchCmpId) {
+    // Only if we have a uniquely identier send the interaction
+    if (localCmpId && dispatchCmpId) { 
         var contextId = localCmpId + ':' + dispatchCmpId;
+        var target = cmp["getElement"]();
+        var meta = target && target.getAttribute('data-meta-state'); // optional metadata
 
-        $A.log({
-            "id": contextId,
-            "eventType": event.type,
-            "action" : action.getDef().getDescriptor().toString()
-        });    
+        var context = {
+            "id" : contextId,
+            "type" : event.type,
+            "action" : action.getDef().getDescriptor().toString(),
+            "selector" : target.nodeName + ' ' + target.className,
+            "cmpId" : cmp.getGlobalId()
+        };
+
+        if (meta) {
+            var state = {};
+            state[meta] = target.getAttribute('data-' + meta);
+            context["interactionState"] = state;
+        }
+
+        this.metricsService.transaction('aura', 'interaction', { "context": context });
     }
+};
 
-    var ret = original.apply(this, Array.prototype.slice.call(arguments, 1));
-    return ret;
+DomHandlersPlugin.prototype.dispatchVirtualActionHook = function (action, event, virtualCmp) {
+    // For virtualActions we want to capture only clicks for now
+    if (event.type === 'click') {
+        this.dispatchActionHook(action, event, virtualCmp);
+    }
 };
 
 DomHandlersPlugin.prototype.bind = function (metricsService) {
+    var self = this;
     $A.clientService.runAfterInitDefs(function () {
+        // Hooking html helper to intercept all interactions
         var defConfig  = $A.componentService.createDescriptorConfig('markup://aura:html');
-        var htmlDef    = $A.componentService.getComponentDef(defConfig);
-        var htmlHelper = htmlDef.getHelper();
+        var def        = $A.componentService.getComponentDef(defConfig);
+        var defHelper  = def && def.getHelper();
 
-        metricsService.instrument(
-            htmlHelper, 
-            'dispatchAction', 
-            DomHandlersPlugin.NAME,
-            false/*async*/,
-            null, 
-            null,
-            this.dispatchActionHook
-        );
+        if (defHelper) {
+            metricsService.instrument(
+                defHelper, 
+                'dispatchAction', 
+                DomHandlersPlugin.NAME,
+                false/*async*/,
+                null, 
+                null,
+                function (original) {
+                    var xargs = Array.prototype.slice.call(arguments, 1);
+                    self.dispatchActionHook.apply(self, xargs);
+                    return original.apply(this, xargs);
+                }
+            );
+        }
 
-    }.bind(this));
+        // Hooking special handling for virtualList
+        defConfig  = $A.componentService.createDescriptorConfig('markup://ui:virtualList');
+        def        = $A.componentService.getComponentDef(defConfig);
+        defHelper  = def && def.getHelper();
+
+        if (defHelper) {
+            metricsService.instrument(
+                defHelper, 
+                '_dispatchAction', 
+                DomHandlersPlugin.NAME,
+                false/*async*/,
+                null, 
+                null,
+                function (original) {
+                    var xargs = Array.prototype.slice.call(arguments, 1);
+                    self.dispatchVirtualActionHook.apply(self, xargs);
+                    return original.apply(this, xargs);
+                }
+            );
+        }
+    });
 };
 
 //#if {"excludeModes" : ["PRODUCTION"]}

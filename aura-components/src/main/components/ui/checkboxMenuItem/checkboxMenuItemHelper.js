@@ -13,20 +13,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- ({
-    setSelected : function(component) {
-        var concreteCmp = component.getConcreteComponent();
-        var selected = concreteCmp.get("v.selected");
-        var linkCmp = concreteCmp.find("link");
-        if (linkCmp) {
-            var elem = linkCmp.getElement();
-            if (selected === true) {
-                $A.util.addClass(elem, "selected");
-                elem.setAttribute("aria-checked", "true");
+({
+    buildBody: function (cmp, shouldClearBody) {
+        var anchorElement = cmp.find("anchor").getElement();
+
+        if (!anchorElement.onclick) {
+            anchorElement.onclick = this.select.bind(this, cmp);
+        }
+
+        var label = cmp.get("v.label");
+        var isDisabled = cmp.get("v.disabled");
+        var isSelected = cmp.get("v.selected");
+
+        anchorElement.setAttribute("aria-disabled", isDisabled);
+        anchorElement.setAttribute("tabindex", isDisabled ? "-1" : "0");
+        anchorElement.setAttribute("title", label);
+        anchorElement.setAttribute("aria-checked", isSelected);
+
+        var bodyAttribute = cmp.get("v.body");
+        var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
+
+        if (shouldClearBody) {
+            $A.util.clearNode(anchorElement);
+
+            anchorElement.appendChild(document.createElement("b"));
+
+            if (hasBodyAttribute) {
+                $A.renderingService.renderFacet(cmp, bodyAttribute, anchorElement);
             } else {
-                $A.util.removeClass(elem, "selected");
-                elem.setAttribute("aria-checked", "false");
+                anchorElement.appendChild(document.createTextNode(label));
+            }
+        } else {
+            if (hasBodyAttribute) {
+                $A.renderingService.rerenderFacet(cmp, bodyAttribute);
             }
         }
+
+        if (isSelected === true) {
+            $A.util.addClass(anchorElement, "selected");
+        } else {
+            $A.util.removeClass(anchorElement, "selected");
+        }
+    },
+
+    // Since there's no way to specify that the concrete implementation of a method should be called, this is
+    // a workaround that achieves this functionality.
+    select: function(cmp) {
+        if (cmp.isValid()) {
+            cmp.getConcreteComponent().select();
+        }
     }
+
 })// eslint-disable-line semi

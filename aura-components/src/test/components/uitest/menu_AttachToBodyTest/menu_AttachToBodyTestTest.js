@@ -75,19 +75,6 @@
 				$A.test.assertFalse(actionMenu.get('v.visible'),"Menu should not be visible");
 			}
         ]
-    },
+    }
     
-    /**
-     * Test first item in menuList is focused.
-     * TODO: Disabling test in IE7&8, bug W-2320774
-     */
-    testFocusOnFirstMenuItem:{
-    	browsers: ["-IE7","-IE8"],
-    	test: function(cmp){
-			trigger = cmp.find("trigger");
-			this.clickAnchor(trigger);
-			var menuItem1 = cmp.find("actionItem1");
-			$A.test.addWaitForWithFailureMessage(menuItem1.get('v.label'), function(){return $A.test.getActiveElementText()}, "Focus should be on item 1");
-		}
-	}
 })

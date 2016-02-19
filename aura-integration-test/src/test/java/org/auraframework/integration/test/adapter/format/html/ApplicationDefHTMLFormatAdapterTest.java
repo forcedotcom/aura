@@ -56,7 +56,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
                 "<aura:application useAppcache='true' render='client'></aura:application>");
         context.setApplicationDescriptor(desc);
         context.addLoaded(desc, context.getDefRegistry().getUid(null, desc));
-        String body = doWrite(desc.getDef());
+        String body = doWrite(Aura.getDefinitionService().getDefinition(desc));
         int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         if (tag.contains("manifest=")) {
@@ -73,7 +73,8 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
                 "<aura:application render='client' useAppcache='false'></aura:application>");
         context.setApplicationDescriptor(desc);
         context.addLoaded(desc, context.getDefRegistry().getUid(null, desc));
-        String body = doWrite(desc.getDef());
+        String body = doWrite(Aura.getDefinitionService().getDefinition(desc)
+        		);
         int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         if (tag.contains(" manifest=")) {
@@ -90,7 +91,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
                 "<aura:application render='client'></aura:application>");
         context.setApplicationDescriptor(desc);
         context.addLoaded(desc, context.getDefRegistry().getUid(null, desc));
-        String body = doWrite(desc.getDef());
+        String body = doWrite(Aura.getDefinitionService().getDefinition(desc));
         int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         if (tag.contains(" manifest=")) {
@@ -108,7 +109,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         context.setApplicationDescriptor(desc);
         final String uid = context.getDefRegistry().getUid(null, desc);
         context.addLoaded(desc, uid);
-        String body = doWrite(desc.getDef());
+        String body = doWrite(Aura.getDefinitionService().getDefinition(desc));
         int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         String expectedSubPath = AuraTextUtil.urlencode(String.format(
@@ -132,7 +133,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         context.setApplicationDescriptor(desc);
         final String uid = context.getDefRegistry().getUid(null, desc);
         context.addLoaded(desc, uid);
-        String body = doWrite(desc.getDef());
+        String body = doWrite(Aura.getDefinitionService().getDefinition(desc));
         Pattern pattern = Pattern.compile("/auraFW|/l/");
         Matcher matcher = pattern.matcher(body);
         while(matcher.find()) {
@@ -165,11 +166,11 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         DefDescriptor<ApplicationDef> testApp = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application render='client' template='" + template.getQualifiedName() + "'></aura:application>");
 
-        String body = doWrite(testApp.getDef());
+        String body = doWrite(Aura.getDefinitionService().getDefinition(testApp));
         assertNotNull(body);
         assertFalse("Comments were not stripped out from template CSS", body.contains("Multi line comment"));
         assertFalse("Inline comments were not stripped our from template CSS", body.contains("Inline comment"));
         assertTrue("Expected template css not found in serialized response.",
-                body.contains("<style>body {background-color:#ededed; font-size:13px; line-height:1.3}</style>"));
+                body.contains("<style nonce=\"LockerServiceTemporaryNonce\">body {background-color:#ededed; font-size:13px; line-height:1.3}</style>"));
     }
 }

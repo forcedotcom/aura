@@ -21,6 +21,6 @@
     margin-right: 2px;
 }
 
-.THIS a.selected b {
+.THIS a[aria-checked="true"] b {
     background: url('/auraFW/resources/aura/images/menuitem-check.png') no-repeat center center;
 }

@@ -72,10 +72,10 @@
 	            cmpDef.attributes.ignoreExistingAction = ignoreExistingAction;
 	        }
 
-			this.injectComponent(cmp, $A.newCmp({
-				"componentDef": cmpDef.descriptor,
-				"attributes": {values: cmpDef.attributes}
-			}));
+            this.injectComponent(cmp, $A.createComponentFromConfig({
+                "descriptor": cmpDef.descriptor,
+                "attributes": cmpDef.attributes
+            }));
 			return;
 		}
 
@@ -119,9 +119,7 @@
 
                 serverAction.setStorable(storableConfig);
             }
-
-            // Only clobber the action, if there's another request for the exact tab:
-            serverAction.setAbortable(false);
+            serverAction.setAbortable();
         } else {
             serverAction.setAbortable();
         }
@@ -145,7 +143,7 @@
                 config.attributes.values.ignoreExistingAction = ignoreExistingAction;
             }
 
-			contentCmp = $A.newCmp(config);
+            contentCmp = $A.createComponentFromConfig(config);
 			isLoadSuccessful = true;
 			this.injectComponent(cmp, contentCmp, !isLoadSuccessful);
 			return isLoadSuccessful;
@@ -153,10 +151,10 @@
 		} else if (actionState === "INCOMPLETE") { // user is offline
 			if (!isAlreadyLoaded) {
 				cmpDef = {
-					componentDef: "markup://one:retryPanel",
-	            	attributes: { values : { "retryAction" : [action] } }
+					descriptor: "markup://one:retryPanel",
+	            	attributes : { "retryAction" : [action] }
 	        	};
-	        	contentCmp = $A.newCmp(cmpDef);
+				contentCmp = $A.createComponentFromConfig(cmpDef);
 	        	this.injectComponent(cmp, contentCmp, !isLoadSuccessful);
 				return isLoadSuccessful;
 			}	
@@ -175,8 +173,8 @@
 			placeholder;
 
 		placeholderDef = placeholderDef[0] || placeholderDef;
-		placeholderDef.attributes = {values: {name: name.toLowerCase()}};
-		placeholder = $A.newCmp(placeholderDef);
+		placeholderDef.attributes = {name: name.toLowerCase()};
+		placeholder = $A.createComponentFromConfig(placeholderDef);
 		cmp.set('v.body', placeholder);
 	},
 	setPullToLoadMoreDelegation: function (cmp, contentCmp) {

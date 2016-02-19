@@ -20,8 +20,8 @@
             chrome.runtime.onMessageExternal.addListener(BackgroundPage_OnMessageExternal.bind(this));
 
             chrome.contextMenus.create({
-                title: "Inspect Aura Component", 
-                contexts:["all"], 
+                title: "Inspect Lightning Component",
+                contexts:["all"],
                 onclick: BackgroundPage_OnContextClick.bind(this),
                 documentUrlPatterns: ["*://*/*cmp*", "*://*/*app*"]
             });
@@ -47,7 +47,7 @@
 
             if(port.name){
                 // Dev Tool
-                
+
                 // Delete the stored port on the tab
                 if(tabs.has(port.tabId)) {
                     var tabInfo = tabs.get(port.tabId);
@@ -65,8 +65,8 @@
                 var storedTab = tabs.get(tab.id);
                 if(storedTab && storedTab.port && !ports.has(storedTab.port.name)) {
                     // Chrome Tab
-                    tabs.delete(tab.id); 
-                    stored.delete(tab.id); 
+                    tabs.delete(tab.id);
+                    stored.delete(tab.id);
                 }
             }
         }
@@ -81,15 +81,15 @@
         function BackgroundPage_OnMessage(message, event) {
             if(message.subscribe){
                 var port = typeof message.port == "string" ? ports.get(message.port) : message.port;
-                var tabId = message.tabId; 
+                var tabId = message.tabId;
                 var tabInfo = getTabInfo(tabId);
 
-                // Tab doesn't exist. 
+                // Tab doesn't exist.
                 // Can happen when you launch dev tools on dev tools.
                 if(!tabInfo) {
                     return;
                 }
-                
+
                 tabInfo.port = port;
                 port.tabId = tabId;
 
@@ -114,7 +114,7 @@
                     });
 
                     if(storedMessages.length) {
-                        stored.set(tabId, storedMessages);                        
+                        stored.set(tabId, storedMessages);
                     } else {
                         stored.delete(tabId);
                     }
@@ -164,7 +164,7 @@
         // If it doesn't exist, create it
         function createTabInfo(tabId) {
             var tabInfo = tabs.get(tabId);
-            
+
             if(!tabInfo){
                 tabInfo = { subscriptions : new Set() };
                 tabs.set(tabId, tabInfo);

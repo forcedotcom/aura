@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 ({
-	render : function(component) {
-		var value = component.get("v.value");
+    render : function(component) {
+        var value = component.get("v.value");
         if($A.util.isUndefinedOrNull(value)){
             value = "";
         }
         if(!($A.util.isComponent(value)||$A.util.isArray(value))){
             // JBUCH: HALO: TODO: MIGHT BE ABLE TO RETURN THIS TO SIMPLE TEXTNODE MANAGEMENT
-            component._lastRenderedValue=value=$A.newCmp({componentDef:'aura:text', attributes:{values:{value:value}}});
+            component._lastRenderedValue=value=$A.createComponentFromConfig({descriptor:'markup://aura:text', attributes:{value:value}});
         }
         return $A.renderingService.renderFacet(component,value);
-	},
+    },
 
-	rerender : function(component) {
+    rerender : function(component) {
         var ret=[];
-		if (component.isRendered()) {
+        if (component.isRendered()) {
             var value = component.get("v.value");
             if(!($A.util.isComponent(value)||$A.util.isArray(value))){
                 if($A.util.isUndefinedOrNull(value)){
@@ -40,7 +40,7 @@
                     value=component._lastRenderedValue;
                     return $A.rerender(value);
                 }else {
-                    value = $A.newCmp({componentDef: 'aura:text', attributes: {values: {value: value}}});
+                    value = $A.createComponentFromConfig({descriptor: 'markup://aura:text', attributes: {value: value}});
                 }
             }
             ret=$A.renderingService.rerenderFacet(component, value);
@@ -48,18 +48,18 @@
         return ret;
     },
 
-	unrender : function(component) {
+    unrender : function(component) {
         $A.renderingService.unrenderFacet(component);
         if (component._lastRenderedValue) {
             component._lastRenderedValue.destroy();
             component._lastRenderedValue = null;
         }
-	},
+    },
 
-	afterRender : function(component) {
-		var value = component.get("v.value");
-		if ($A.util.isComponent(value)||$A.util.isArray(value)) {
-			$A.afterRender(value);
-		}
-	}
+    afterRender : function(component) {
+        var value = component.get("v.value");
+        if ($A.util.isComponent(value)||$A.util.isArray(value)) {
+            $A.afterRender(value);
+        }
+    }
 })// eslint-disable-line semi

@@ -23,19 +23,21 @@ import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.NoAccessException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 /**
  * Verify access checks done during Instance creation, particularly in custom (non-privileged) namespaces
  */
+@UnAdaptableTest("namespace cxxx means something special in core")
 public class InstanceAccessTest extends AuraImplTestCase {
-    private static final String DEFAULT = StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE;
-    private static final String OTHER = StringSourceLoader.OTHER_CUSTOM_NAMESPACE;
-    private static final String ANOTHER = StringSourceLoader.ANOTHER_CUSTOM_NAMESPACE;
+    private static final String DEFAULT = StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE;//'csstring'
+    private static final String OTHER = StringSourceLoader.OTHER_CUSTOM_NAMESPACE;//'csstring1'
+    private static final String ANOTHER = StringSourceLoader.ANOTHER_CUSTOM_NAMESPACE;//csstring2
 
     public InstanceAccessTest(String name) {
         super(name);
     }
-
+    
     public void testAccessToNonGlobalInSameNS() throws Exception {
         DefDescriptor<ComponentDef> otherCmp = buildCmp(DEFAULT, "cmp", "", "");
         assertAccess(otherCmp);

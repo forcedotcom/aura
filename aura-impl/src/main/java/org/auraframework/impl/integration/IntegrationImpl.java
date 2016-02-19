@@ -27,7 +27,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.instance.Action;
 import org.auraframework.integration.Integration;
-import org.auraframework.integration.IntegrationServiceObserver;
 import org.auraframework.integration.UnsupportedUserAgentException;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -55,13 +54,12 @@ public class IntegrationImpl implements Integration {
         "$A.run(function() { $A.clientService.injectComponentAsync(%s, '%s', %s); });";
 
     public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent,
-                           String application, IntegrationServiceObserver observer) throws QuickFixException {
+                           String application) throws QuickFixException {
         this.client = userAgent != null ? new Client(userAgent) : null;
         this.contextPath = contextPath;
         this.mode = mode;
         this.initializeAura = initializeAura;
         this.application = application != null ? application : DEFAULT_APPLICATION;
-        this.observer = observer;
     }
 
     @Override
@@ -248,23 +246,15 @@ public class IntegrationImpl implements Integration {
             context.setClient(client);
         }
 
-        if (observer != null) {
-            observer.contextEstablished(this, context);
-        }
-
         return context;
     }
 
     private void writeApplication(Appendable out) throws IOException, AuraRuntimeException, QuickFixException {
         if (isSupportedClient(client)) {
             // ensure that we have a context.
-            AuraContext context = getContext(null);
+            getContext(null);
             try {
                 ApplicationDef appDef = getApplicationDescriptor(application).getDef();
-
-                if (observer != null) {
-                    observer.beforeApplicationWritten(this, context, appDef);
-                }
 
                 Aura.getSerializationService().write(appDef, null,
                         ApplicationDef.class, out, "EMBEDDED_HTML");
@@ -292,7 +282,6 @@ public class IntegrationImpl implements Integration {
     private final boolean initializeAura;
     private final Client client;
     private final String application;
-    private final IntegrationServiceObserver observer;
 
     private boolean hasApplicationBeenWritten = false;
     private int contextDepthCount = 0;

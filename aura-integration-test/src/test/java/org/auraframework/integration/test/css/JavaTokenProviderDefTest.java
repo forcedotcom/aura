@@ -15,6 +15,7 @@
  */
 package org.auraframework.integration.test.css;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokenDescriptorProvider;
 import org.auraframework.def.TokensDef;
@@ -33,7 +34,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
 
     public void testProviderBasic() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF));
-        DefDescriptor<TokensDef> concrete = desc.getDef().getConcreteDescriptor();
+        DefDescriptor<TokensDef> concrete = Aura.getDefinitionService().getDefinition(desc).getConcreteDescriptor();
         DefDescriptor<TokensDef> expected = DefDescriptorImpl.getInstance(TestTokenDescriptorProvider.DESC, TokensDef.class);
         assertEquals(expected, concrete);
     }
@@ -61,7 +62,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
         DefDescriptor<TokensDef> expected = DefDescriptorImpl.getInstance("tokenProviderTest:javaProviderTest3",
                 TokensDef.class);
 
-        DefDescriptor<TokensDef> concrete = initial.getDef().getConcreteDescriptor();
+        DefDescriptor<TokensDef> concrete = Aura.getDefinitionService().getDefinition(initial).getConcreteDescriptor();
 
         assertEquals(expected, concrete);
     }
@@ -80,8 +81,8 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
 
     public void testProviderThrowsDuringInstantiation() throws Exception {
         try {
-            addSeparateTokens(tokens().descriptorProvider("java://" + ProviderThrowsOnInstantiate.class.getName()))
-            .getDef().getConcreteDescriptor();
+        	Aura.getDefinitionService().getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + ProviderThrowsOnInstantiate.class.getName())))
+        	.getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "Failed to instantiate");
@@ -98,8 +99,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
 
     public void testProviderThrowsQFE() throws Exception {
         try {
-            addSeparateTokens(tokens().descriptorProvider("java://" + ProviderThrowsOnProvide.class.getName()))
-            .getDef().getConcreteDescriptor();
+        	Aura.getDefinitionService().getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + ProviderThrowsOnProvide.class.getName()))).getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "provider error");
@@ -119,8 +119,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
 
     public void testProviderWithoutNoArgConstructor() throws Exception {
         try {
-            addSeparateTokens(tokens().descriptorProvider("java://" + ProviderConstructorArg.class.getName()))
-            .getDef().getConcreteDescriptor();
+        	Aura.getDefinitionService().getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + ProviderConstructorArg.class.getName()))).getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "Cannot instantiate");
@@ -140,8 +139,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
 
     public void testProviderWithPrivateConstructor() throws Exception {
         try {
-            addSeparateTokens(tokens().descriptorProvider("java://" + ProviderPrivateConstructor.class.getName()))
-            .getDef().getConcreteDescriptor();
+        	Aura.getDefinitionService().getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + ProviderPrivateConstructor.class.getName()))).getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "Constructor is inaccessible");
@@ -158,8 +156,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
 
     public void testProviderReturnsNonexistentDef() throws Exception {
         try {
-            addSeparateTokens(tokens().descriptorProvider("java://" + ProviderNonexistent.class.getName()))
-            .getDef().getConcreteDescriptor();
+        	Aura.getDefinitionService().getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + ProviderNonexistent.class.getName()))).getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, DefinitionNotFoundException.class, "No TOKENS");
@@ -172,8 +169,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
 
     public void testProviderMissingInterface() throws Exception {
         try {
-            addSeparateTokens(tokens().descriptorProvider("java://" + MissingInterface.class.getName()))
-            .getDef().getConcreteDescriptor();
+        	Aura.getDefinitionService().getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + MissingInterface.class.getName()))).getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "Provider must implement");
@@ -189,8 +185,8 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
 
     public void testProviderMissingAnnotation() throws Exception {
         try {
-            addSeparateTokens(tokens().descriptorProvider("java://" + MissingAnnotation.class.getName()))
-            .getDef().getConcreteDescriptor();
+        	Aura.getDefinitionService().getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + MissingAnnotation.class.getName())))
+            .getConcreteDescriptor();
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "annotation is required");

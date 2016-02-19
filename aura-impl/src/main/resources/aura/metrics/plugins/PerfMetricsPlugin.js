@@ -52,12 +52,17 @@ PerfMetricsPlugin.prototype = {
     },
     processResponsesOverride : function (/* config, auraXHR, responseObject, noAbort */) {
         var config         = Array.prototype.shift.apply(arguments),
+            auraXHR        = arguments[0],
             responseObject = arguments[1],
             perfData       = responseObject["perf"],
             stampMark      = this.collector["mark"](PerfMetricsPlugin.NAME, 'perf');
 
         if (perfData) {
-            stampMark["context"] = perfData;
+            stampMark["context"] = {
+                "id"        : auraXHR.marker,
+                "requestId" : auraXHR["requestId"],
+                "perf"      : perfData
+            };
         }
 
         return config["fn"].apply(config["scope"], arguments);

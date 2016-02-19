@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+  <script>
+  (function (window, placeholder, parent) {
+      'use strict';
+
+      var isStrictModeAvailable = (function () { return !this; })();
+      var validIdentifierEx = /^[a-z$_][a-z0-9$_]*$/i;
+      // TODO: improve returnable detection. `function (...` is a trick used today
+      //       to return arbitrary code from actions, it should be legacy in the future.
+      var returnableEx = /^\s*([{(["']|function\s*\()/;
+      // TODO: improve first comment removal
+      var trimFirstMultilineCommentEx = /^\/\*([\s\S]*?)\*\//;
+      var trimFirstLineCommentEx = /^\/\/.*\n?/;
+      var hookFn = '$globalEvalIIFE$';
+      var USE_STRICT = true;
+
+      // This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
+      // which, by definition, do not provide authority or access to globals.
+      // TODO: grow this list...
+      var whitelist = [
+              'undefined', 'NaN', 'Date', 'Number', 'Boolean', 'alert', 'confirm',
+              'Intl', 'Error', 'console',
+              'clearTimeout', 'clearInterval', 'setTimeout', 'setInterval'
+          ];
+
+      // wrapping the source with an IIFE that maps to `globals`, preventing access to
+      // the globals in the worker, while enabling access to members of the `shelve`;
+      // when specified, strict mode will be enforced to avoid leaking global variables
+      // into the worker.
+      function createWrapperFromSource(src, shelve, useStrict) {
+          var name;
+          var keys = [hookFn]; // preventing the caller to reset the hook from inside the source
+          var args = [undefined];
+          for (name in window) {
+              if (name === hookFn) continue;
+              if (name in shelve || !validIdentifierEx.test(name)) continue;
+              if (whitelist.indexOf(name) !== -1) continue; // skipping whitelist although shelve can redefine them.
+              keys.push(name);
+              args.push(undefined);
+          }
+          for (name in shelve) {
+              if (name === hookFn) continue;
+              if (!validIdentifierEx.test(name)) continue;
+              keys.push(name);
+              args.push(shelve[name]);
+          }
+          // removing first line CSFR protection and other comments to facilitate
+          // the detection of returnable code
+          src = src.replace(trimFirstMultilineCommentEx, '');
+          src = src.replace(trimFirstLineCommentEx, '');
+          // only add return statement if source it starts with [, {, or (
+          if (returnableEx.test(src)) src = 'return ' + src;
+          if (useStrict) src = '"use strict";\n' + src;
+          return {
+              src: 'function ' + hookFn + '(' + keys + '){\n' + src + '\n}',
+              args: args
+          };
+      }
+
+      // A shelve is just an object that contains all members that could be accessed
+      // in the evaluation via global identifiers from any of the provided environments
+      // To aggregate different env records we assume two things:
+      //  * only own properties are important per env (they should not inherit from other envs)
+      //  * enu and non-enu properties are important (window has a bunch of non enumerable globals)
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties
+      function createShelve(envs) {
+          var o = {};
+          // swallow merge of all environment records in `envs`
+          envs.forEach(function (env) {
+              Object.getOwnPropertyNames(env || {}).forEach(function (name) {
+                  o[name] = env[name];
+              });
+          });
+          return o;
+      }
+
+      function evalAndReturn(src) {
+          var script = document.createElement('script');
+          script.type = 'text/javascript';
+          window[hookFn] = undefined;
+          script.appendChild(document.createTextNode(src));
+          placeholder.appendChild(script);
+          placeholder.removeChild(script);
+          var result = window[hookFn];
+          window[hookFn] = undefined;
+          return result;
+      }
+
+      // adding non-configurable hooks into parent window.
+      Object.defineProperties(parent, {
+          '$$safe-eval$$': {
+              value: function(src) {
+                  if (!isStrictModeAvailable) {
+                    throw new Error("$$safe-eval$$ is only supported in strict mode capable browsers!");
+                  }
+                  if (!src) return undefined;
+                  var shelve = createShelve(Array.prototype.slice.call(arguments, 1));
+                  var wrapper = createWrapperFromSource(src, shelve, USE_STRICT);
+                  var fn = evalAndReturn(wrapper.src);
+                  return fn.apply(undefined, wrapper.args); // enforcing strict mode
+              }
+          },
+          '$$safe-eval-compat$$': {
+              value: function(src) {
+                  if (!src) return undefined;
+                  var shelve = createShelve(Array.prototype.slice.call(arguments, 1));
+                  var wrapper = createWrapperFromSource(src, shelve);
+                  var fn = evalAndReturn(wrapper.src);
+                  return fn.apply(shelve, wrapper.args);
+              }
+          }
+      });
+
+      // Bleaching the worker by nulling globals when possible.
+      // This is a one time operation on warm up, and it is aiming to
+      // protect a little, in case the break out of the IIFE
+      // they might encounter a broken env with no access to `window.parent`,
+      // and other globals.
+      // TODO: grow this list
+      ['parent'].forEach(function (name) {
+          try {
+              window[name] = undefined;
+          } catch (ignoring_bleaching_errors) {}
+      });
+
+      // Extra guarding:
+      // - protect against unexpected navigation events
+      // - protect against reloads
+
+  })(window, document.body, window.parent);
+  </script>
+</body>
+</html>

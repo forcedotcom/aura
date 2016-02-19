@@ -63,7 +63,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
                 "    function2: function(arg) {}" +
                 "})";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
-        ControllerDef controllerDef = controllerDesc.getDef();
+        ControllerDef controllerDef = Aura.getDefinitionService().getDefinition(controllerDesc);
 
         assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
         Map<String, ? extends ActionDef> actionDefMap = controllerDef.getActionDefs();
@@ -82,7 +82,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
         String expected = "function1";
         String controllerJs = "({ function1: function(arg) {} })";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
-        ControllerDef controllerDef = controllerDesc.getDef();
+        ControllerDef controllerDef = Aura.getDefinitionService().getDefinition(controllerDesc);
 
         assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
         ActionDef actionDef = controllerDef.getSubDefinition(expected);
@@ -102,7 +102,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
                 "    }\n" +
                 "})";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
-        ControllerDef controllerDef = controllerDesc.getDef();
+        ControllerDef controllerDef = Aura.getDefinitionService().getDefinition(controllerDesc);
 
         assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
         serializeAndGoldFile(controllerDef, "_JSControllerDef");
@@ -114,7 +114,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
     public void testCreateAction() throws Exception {
         String controllerJs = "({ function1: function(arg) {} })";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
-        ControllerDef controllerDef = controllerDesc.getDef();
+        ControllerDef controllerDef = Aura.getDefinitionService().getDefinition(controllerDesc);
 
         assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
         Action action = controllerDef.createAction("function1", null);
@@ -125,7 +125,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
     public void testCreateActionThrowsExceptionWhenCreatingNonExsitingAction() throws Exception {
         String controllerJs = "({ function1: function(arg) {} })";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
-        ControllerDef controllerDef = controllerDesc.getDef();
+        ControllerDef controllerDef = Aura.getDefinitionService().getDefinition(controllerDesc);
 
         try {
             controllerDef.createAction("nonExistingAction", new HashMap<String, Object>());

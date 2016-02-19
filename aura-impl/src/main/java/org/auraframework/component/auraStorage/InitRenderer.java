@@ -44,10 +44,11 @@ public class InitRenderer implements Renderer {
             version = "";
         }
 
-        appendable.append("<script>\n");
+        appendable.append("<script nonce='LockerServiceTemporaryNonce'>\n");
         String script = String.format(
                 "$A.storageService.initStorage('%s', %s, %s, %d, %d, %d, %s, %s, '%s');\n",
-                name, persistent, secure, maxSize.longValue() * 1024, defaultExpiration.longValue(), defaultAutoRefreshInterval.longValue(),
+                name, persistent, secure, maxSize.longValue() * 1024, defaultExpiration.longValue(),
+                defaultAutoRefreshInterval.longValue(),
                 debugLoggingEnabled, clearStorageOnInit, version);
         appendable.append(script);
         appendable.append("</script>\n");

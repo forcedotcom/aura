@@ -29,7 +29,7 @@
         */
         "AuraDevToolService.RemoveActionFromWatch": function(data) {
             if(!data) {
-                console.error("AuraDevToolService.AddActionToWatch receive no data from publisher");
+                console.error("AuraDevToolService.RemoveActionFromWatch receive no data from publisher");
             }
             if(data.actionName && actionsToWatch[data.actionName]) {
                 delete actionsToWatch[data.actionName];
@@ -42,10 +42,12 @@
         data = { 
                     'actionName': string, 
                     'actionParameter':actionParameter, //no need for here...yet
-                    'actionId': actionId.substring(12, actionId.length), //action_card_713;a --> 713;a
-                    'actionIsStorable': actionIsStorable,
-                    'actionStorageKey': actionStorageKey,
-                    'nextResponse': nextResponse};
+                    'actionId': string, //action_card_713;a --> 713;a
+                    'actionIsStorable': boolean,
+                    'actionStorageKey': obj,
+                    'nextResponse': obj,
+                    'nextError': obj
+                    };
         */
         "AuraDevToolService.AddActionToWatch": function(data) {
             if(!data) {
@@ -57,7 +59,7 @@
                 delete actionsToWatch[data.actionName];
                 aleadyAdded = true;
             }
-            //we only remove the response from storage once
+            //we only remove the response from storage when we first add this action
             if( aleadyAdded === false ) {
                 //remove the stored response from action storage -- if there is any
                 if(data.actionIsStorable && data.actionIsStorable === true) {
@@ -84,7 +86,7 @@
                     }
                 }
             }//end of aleadyAdded is false
-            
+            //if we already watching this action, this will replace the old one
             actionsToWatch[data.actionName] = data; 
         },
 
@@ -809,12 +811,13 @@
             var newResponseText = oldResponseText;
             var responseModified = false;//if we modify the response, set this to true
             var responseWithError = false;//if we send back error response, set this to true
+            var responseWithIncomplete = false;//if we want to kill the action, set this to true
 
             if( Object.getOwnPropertyNames(actionsWatched).length > 0 ) {
                 for(actionWatchedId in actionsWatched) {
                     if(oldResponseText.indexOf(actionWatchedId) > 0) {
                         var actionWatched = actionsWatched[actionWatchedId];
-                        if( ( actionWatched.nextResponse || actionWatched.nextError) && oldResponseText.startsWith("while(1);") ) {
+                        if( /*( actionWatched.nextResponse || actionWatched.nextError) &&*/ oldResponseText.startsWith("while(1);") ) {
                             //parse oldResponseObj out of oldResponseText
                             var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
                             //replace returnValue in oldResponseObj's actions
@@ -831,7 +834,7 @@
                                             actionsFromOldResponse[i].error = errsArr;
                                             responseWithError = true;
                                             break;//get out of looping over actionsFromOldResponse
-                                        } else {//we would like to return non-error response
+                                        } else if(actionWatched.nextResponse) {//we would like to return non-error response
                                             var returnValue = actionsFromOldResponse[i].returnValue; 
                                             responseModified = replaceValueInObj(returnValue, actionWatched.nextResponse);
                                             if(responseModified === true) {
@@ -839,6 +842,8 @@
                                                 actionsFromOldResponse[i].returnValue = returnValue;
                                                 break; //get out of looping over actionsFromOldResponse
                                             }
+                                        } else {//we would like to kill action, return incomplete
+                                            responseWithIncomplete = true;
                                         }
                                     } 
                                 }//end of looping over actionsFromOldResponse
@@ -889,13 +894,30 @@
                                 });
                                 delete actionsWatched[actionWatchedId];
                                 break;//get out of looping over actionsWatched
+                            } else if(responseWithIncomplete === true) {
+                                //move the actionCard from watch list to Processed
+                                //this will call AuraInspectorActionsView_OnActionStateChange in AuraInspectorActionsView.js
+                                $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
+                                        "id": actionWatchedId,
+                                        "idtoWatch": actionWatched.idtoWatch,
+                                        "state": "RESPONSEMODIFIED",
+                                        "sentTime": performance.now()//do we need this?
+                                });
+                                delete actionsWatched[actionWatchedId];
+                                break;//get out of looping over actionsWatched
                             }
                         }//end of actionWatched has nextResponse and oldResponseText start with 'while(1);'
                     }//end of oldResponseText contains the actionWatchedId we care
                 }//end of looping over actionsWatched
             }//end of actionsWatched is not empty
 
-            if(responseModified === true || responseWithError === true) {
+            if(responseWithIncomplete) {
+                oldResponse.status = 0;//so AuraClientService.isDisconnectedOrCancelled will return true
+
+                var ret = config["fn"].call(config["scope"], newHttpRequest, noStrip);
+                return ret;
+            }
+            else if(responseModified === true || responseWithError === true) {
                 var newHttpRequest = {};
                 newHttpRequest = $A.util.apply(newHttpRequest, oldResponse);
                 newHttpRequest["response"] = newResponseText;
@@ -908,7 +930,7 @@
                 return ret;
             }
         } else {
-            console.log("AuraInspectorInjectedScript.onDecode, receive bad response, just pass it along");
+            console.log("AuraInspectorInjectedScript.onDecode, receive bad response, just pass it along, let aura worry about it");
             var ret = config["fn"].call(config["scope"], oldResponse, noStrip);
             return ret;
         }
@@ -934,40 +956,19 @@
                                     action['idtoWatch'] = actionToWatch.actionId;
                                     actionsWatched[''+action.getId()] = action;
                                 }
-                                if(actionToWatch.nextResponse || actionToWatch.nextError) { //we want to modify response, so let it stay in watch list
-                                    console.log("action we want to modify response are send to server:"+actionToWatch.actionName, action);
-                                    //still update the left side
-                                    $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
-                                        "id": action.getId(),
-                                        "state": "RUNNING",
-                                        "sentTime": performance.now()
-                                        });
-                                } else { //we want to drop it, so do it
-                                    //move the action from Watching to Processed
-                                    $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
-                                        "id": action.getId(),
-                                        "idtoWatch": actionToWatch.actionId,
-                                        "state": "DROPPED",
-                                        "sentTime": performance.now()
-                                    });
-                                    //drop the action from auraXHR
-                                    actions.splice(c, 1);
-                                }
                                 //remove from actionsToWatch
-                                //if we wanted to drop the action it's done alreay,
-                                //if we want to override response, we did copy everything to actionsWatched
-                                //no need to keep this actoinToWatch around
+                                //we just copy everything needed(nextError,nextResponse,bla) to actionsWatched, no need to keep this actoinToWatch around
                                 delete actionsToWatch[key];
                             }
                         }
-                    }//end if actionsToWatch is not empty
-                    else {
-                        $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
+                    }//end of if actionsToWatch is not empty
+                    //udpate action card on the left side anyway
+                    $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
                         "id": actions[c].getId(),
                         "state": "RUNNING",
                         "sentTime": performance.now()
-                        });
-                    }//if actionsToWatch is empty
+                    });
+                   
 
                 }
             }

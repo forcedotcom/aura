@@ -16,270 +16,154 @@
 
 package org.auraframework.integration.test.root.parser.handler;
 
-import java.util.ArrayList;
-
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.impl.root.parser.ComponentXMLParser;
-import org.auraframework.impl.root.parser.handler.BaseAccessAttributeEnforcementTest;
-import org.auraframework.system.Source;
+import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
-public class AccessAttributeEnforcementTest extends BaseAccessAttributeEnforcementTest {
+import javax.inject.Inject;
 
-    public AccessAttributeEnforcementTest(String name) {
+@UnAdaptableTest("namespace start with c means something special in core")
+public class AccessAttributeEnforcementTest extends AuraImplTestCase {
+	
+	@Inject
+    protected StringSourceLoader stringSourceLoader;
+
+    public AccessAttributeEnforcementTest(String name) throws Exception {
         super(name);
-        testResource = TestResource.Component;
+    }
+    
+    @Test
+    public void testComponentWithTextWithSystemNamespace() throws Exception {
+    	String componentCource = "<aura:component><aura:text value='Hello World!' /></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+    	componentDescriptor.getDef();
+    }
+    
+    @Test
+    public void testComponentWithTextWithCustomNamespace() throws Exception {
+    	String componentCource = "<aura:component><aura:text value='Hello World!' /></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+    	componentDescriptor.getDef();
+    }
+    
+    
+    @Test
+    public void testComponentWithHTMLWithSystemNamespace() throws Exception {
+    	String componentCource = "<aura:component><aura:html tag='b' body='Hello World!' /></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+    	componentDescriptor.getDef();
+    }
+    
+    @Test
+    public void testComponentWithHTMLWithCustomNamespace() throws Exception {
+    	String componentCource = "<aura:component><aura:html tag='b' body='Hello World!' /></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+    	componentDescriptor.getDef();
+    }
+  
+
+    @Test
+    public void testComponentWithUnescapedHTMLWithSystemNamespace() throws Exception {
+    	String componentCource = "<aura:component><aura:unescapedHtml value='Hello World!'/></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+    	componentDescriptor.getDef();
+    }
+    
+    @Test
+    public void testComponentWithUnescapedHTMLWithCustomNamespace() throws Exception {
+    	String componentCource = "<aura:component><aura:unescapedHtml value='Hello World!'/></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+    	componentDescriptor.getDef();
+    }
+    
+    @Test
+    public void testComponentWithExpressionWithSystemNamespace() throws Exception {
+    	String componentCource = "<aura:component><aura:expression value='Hello + World!' /></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+    	componentDescriptor.getDef();
+    }
+    
+    @Test
+    public void testComponentWithExpressionWithCustomNamespace() throws Exception {
+    	String componentCource = "<aura:component><aura:expression value='Hello + World!' /></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+    	componentDescriptor.getDef();
+    }
+    
+    @Test
+    public void testComponentWithIfWithSystemNamespace() throws Exception {
+    	String componentCource = "<aura:component><aura:if isTrue='True' body='' else='' /></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+    	componentDescriptor.getDef();
+    }
+    
+    @Test
+    public void testComponentWithIfWithCustomNamespace() throws Exception {
+    	String componentCource = "<aura:component><aura:if isTrue='True' body='' else='' /></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+    	componentDescriptor.getDef();
+    }
+    
+    @Test
+    public void testComponentWithRenderIfWithSystemNamespace() throws Exception {
+    	String componentCource = "<aura:component><aura:renderIf isTrue='True' body='' else='' /></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+    	componentDescriptor.getDef();
+    }
+    
+    @Test
+    public void testComponentWithRenderIfWithCustomNamespace() throws Exception {
+    	String componentCource = "<aura:component><aura:renderIf isTrue='True' body='' else='' /></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+    	componentDescriptor.getDef();
+    }
+    
+    @Test
+    public void testComponentWithDependencyWithSystemNamespace() throws Exception {
+    	DefDescriptor<ComponentDef> cmpDescA = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        String componentCource = "<aura:component><aura:dependency resource='" + cmpDescA.getQualifiedName() + "'/></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+    	componentDescriptor.getDef();
+    }
+    
+    @Test
+    public void testComponentWithDependencyWithCustomNamespace() throws Exception {
+    	DefDescriptor<ComponentDef> cmpDescA = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        String componentCource = "<aura:component><aura:dependency resource='" + cmpDescA.getQualifiedName() + "'/></aura:component>";
+    	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
+    			componentCource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+    	componentDescriptor.getDef();
     }
 
-    /**
-     * Verify Creating a component with text works
-     * @throws Exception
-     */
-    public void testComponentWithText() throws Exception {
-        String resourceSource = "<aura:component><aura:text value='Hello World!' /></aura:component>";
-
-        ArrayList<String> failures = new ArrayList<>();
-
-        for (TestNamespace targetNamespace : TestNamespace.values()) {
-            testResourceNamespace = targetNamespace;
-
-            try {
-                runSimpleTestCase(resourceSource);
-            } catch (Throwable e) {
-                failures.add(e.getMessage());
-            }
-
-        }
-
-        if (!failures.isEmpty()) {
-            String message = "\n";
-            for (int i = 0; i < failures.size(); i++) {
-                message += failures.get(i);
-                if (i != failures.size() - 1) {
-                    message += ",\n";
-                }
-            }
-
-            fail("Test failed with " + failures.size() + " errors:" + message);
-        }
-    }
-
-    /**
-     * Verify Creating a component with HTML works
-     * @throws Exception
-     */
-    public void testComponentWithHTML() throws Exception {
-        String resourceSource = "<aura:component><aura:html tag='b' body='Hello World!' /></aura:component>";
-
-        ArrayList<String> failures = new ArrayList<>();
-
-        for (TestNamespace targetNamespace : TestNamespace.values()) {
-            testResourceNamespace = targetNamespace;
-
-            try {
-                runSimpleTestCase(resourceSource);
-            } catch (Throwable e) {
-                failures.add(e.getMessage());
-            }
-
-        }
-
-        if (!failures.isEmpty()) {
-            String message = "\n";
-            for (int i = 0; i < failures.size(); i++) {
-                message += failures.get(i);
-                if (i != failures.size() - 1) {
-                    message += ",\n";
-                }
-            }
-
-            fail("Test failed with " + failures.size() + " errors:" + message);
-        }
-    }
-
-    /**
-     * Verify Using a component with aura:unescapedhtml works
-     * @throws Exception
-     */
-    public void testComponentWithUnescapedHTML() throws Exception {
-        String resourceSource = "<aura:component><aura:unescapedHtml value='Hello World!'/></aura:component>";
-
-        ArrayList<String> failures = new ArrayList<>();
-
-        for (TestNamespace targetNamespace : TestNamespace.values()) {
-            testResourceNamespace = targetNamespace;
-
-            try {
-                runSimpleTestCase(resourceSource);
-            } catch (Throwable e) {
-                failures.add(e.getMessage());
-            }
-
-        }
-
-        if (!failures.isEmpty()) {
-            String message = "\n";
-            for (int i = 0; i < failures.size(); i++) {
-                message += failures.get(i);
-                if (i != failures.size() - 1) {
-                    message += ",\n";
-                }
-            }
-
-            fail("Test failed with " + failures.size() + " errors:" + message);
-        }
-    }
-
-    /**
-     * Verify Creating a component with expression works
-     * @throws Exception
-     */
-    public void testComponentWithExpression() throws Exception {
-        String resourceSource = "<aura:component><aura:expression value='Hello + World!' /></aura:component>";
-
-        ArrayList<String> failures = new ArrayList<>();
-
-        for (TestNamespace targetNamespace : TestNamespace.values()) {
-            testResourceNamespace = targetNamespace;
-
-            try {
-                runSimpleTestCase(resourceSource);
-            } catch (Throwable e) {
-                failures.add(e.getMessage());
-            }
-
-        }
-
-        if (!failures.isEmpty()) {
-            String message = "\n";
-            for (int i = 0; i < failures.size(); i++) {
-                message += failures.get(i);
-                if (i != failures.size() - 1) {
-                    message += ",\n";
-                }
-            }
-
-            fail("Test failed with " + failures.size() + " errors:" + message);
-        }
-    }
-
-    /**
-     * Verify Creating a component with aura:if
-     * @throws Exception
-     */
-    public void testComponentWithIf() throws Exception {
-        String resourceSource = "<aura:component><aura:if isTrue='True' body='' else='' /></aura:component>";
-
-        ArrayList<String> failures = new ArrayList<>();
-
-        for (TestNamespace targetNamespace : TestNamespace.values()) {
-            testResourceNamespace = targetNamespace;
-
-            try {
-                runSimpleTestCase(resourceSource);
-            } catch (Throwable e) {
-                failures.add(e.getMessage());
-            }
-
-        }
-
-        if (!failures.isEmpty()) {
-            String message = "\n";
-            for (int i = 0; i < failures.size(); i++) {
-                message += failures.get(i);
-                if (i != failures.size() - 1) {
-                    message += ",\n";
-                }
-            }
-
-            fail("Test failed with " + failures.size() + " errors:" + message);
-        }
-    }
-
-    /**
-     * Verify Creating a component with aura:renderIf
-     * @throws Exception
-     */
-    public void testComponentWithRenderIf() throws Exception {
-        String resourceSource = "<aura:component><aura:renderIf isTrue='True' else='' /></aura:component>";
-
-        ArrayList<String> failures = new ArrayList<>();
-
-        for (TestNamespace targetNamespace : TestNamespace.values()) {
-            testResourceNamespace = targetNamespace;
-
-            try {
-                runSimpleTestCase(resourceSource);
-            } catch (Throwable e) {
-                failures.add(e.getMessage());
-            }
-
-        }
-
-        if (!failures.isEmpty()) {
-            String message = "\n";
-            for (int i = 0; i < failures.size(); i++) {
-                message += failures.get(i);
-                if (i != failures.size() - 1) {
-                    message += ",\n";
-                }
-            }
-
-            fail("Test failed with " + failures.size() + " errors:" + message);
-        }
-    }
-
-    /**
-     * Verify Creating a component with aura:dependency
-     * @throws Exception
-     */
-    public void testComponentWithDependency() throws Exception {
-        DefDescriptor<ComponentDef> cmpDescA = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
-        String resourceSource = "<aura:component><aura:dependency resource='" + cmpDescA.getQualifiedName() + "'/></aura:component>";
-
-        ArrayList<String> failures = new ArrayList<>();
-
-        for (TestNamespace targetNamespace : TestNamespace.values()) {
-            testResourceNamespace = targetNamespace;
-
-            try {
-                runSimpleTestCase(resourceSource);
-            } catch (Throwable e) {
-                failures.add(e.getMessage());
-            }
-
-        }
-
-        if (!failures.isEmpty()) {
-            String message = "\n";
-            for (int i = 0; i < failures.size(); i++) {
-                message += failures.get(i);
-                if (i != failures.size() - 1) {
-                    message += ",\n";
-                }
-            }
-
-            fail("Test failed with " + failures.size() + " errors:" + message);
-        }
-    }
-
-    /**
-     * Verify Creating a component with aura:clientLibrary
-     * @throws Exception
-     */
-    public void testComponentWithClientLibrary() throws Exception {
-        String resourceSource = "<aura:component><aura:clientLibrary name='HTML5Shiv' type='JS' /></aura:component>";
-        String errorMessage = "No COMPONENT named markup://aura:clientLibrary found";
-        DefDescriptor<ComponentDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource, TestNamespace.Custom+":testCmp", false);
-        Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
-        try {
-            Definition def = new ComponentXMLParser().parse(descriptor, source);
-            def.validateDefinition();
-            fail("Should have thrown Exception");
-        } catch (Exception e) {
-            assertTrue("Expected error message: " + errorMessage, e.getMessage().contains(errorMessage));//
-        }
-    }
 }

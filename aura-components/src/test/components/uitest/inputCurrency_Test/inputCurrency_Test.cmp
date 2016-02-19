@@ -1,0 +1,34 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+
+    <!-- Attributes -->
+    <aura:attribute name="amount" type="string" default="3255"/>
+
+    <!--Layout -->
+    <div style="padding:15px;">
+        <ui:inputCurrency aura:id="inputCurrency" value="{! v.amount }" label="amount: "/>
+        <h1>The value is : {! v.amount }</h1>
+        <hr/>
+        <ui:button label="Set number - 1234" press="{! c.setNewValueAsNumber }"></ui:button>
+        <ui:button label="Set string number - '5678'" press="{! c.setNewValueAsString }"></ui:button>
+        <ui:button label="Set a well formatted string number '$5,678.00'" press="{! c.setNewValueAsWellFormatted }"></ui:button>
+        <ui:button label="Set incorrent  '35Aai#i'" press="{! c.setNewValueIncorrect }"></ui:button>
+    </div>
+
+</aura:component>

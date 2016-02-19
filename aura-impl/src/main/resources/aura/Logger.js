@@ -190,7 +190,6 @@ Logger.prototype.reportError = function(e, action, id){
     // But don't keep re-posting if the report of failure fails.  Do we want this to be production
     // mode only or similar?
     var reportAction = $A.get("c.aura://ComponentController.reportFailedAction");
-    reportAction.setAbortable(false);
     reportAction.setCaboose();
     reportAction.setParams({
         "failedAction": action,

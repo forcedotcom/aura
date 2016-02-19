@@ -56,7 +56,7 @@ public class JavascriptHelperDefTest extends AuraImplTestCase {
                 "    }\n" +
                 "})\n";
         DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJS);
-        HelperDef helperDef = helperDesc.getDef();
+        HelperDef helperDef = Aura.getDefinitionService().getDefinition(helperDesc);
 
         assertThat(helperDef, instanceOf(JavascriptHelperDef.class));
         this.serializeAndGoldFile(helperDef, "_JSHelperDef");

@@ -129,8 +129,8 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         DefDescriptor<TokensDef> tokens = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
         String src = String.format("<aura:application tokenOverrides=\"%s\"/>", tokens.getDescriptorName());
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(1, desc.getDef().getTokenOverrides().size());
-        assertEquals(tokens, desc.getDef().getTokenOverrides().get(0));
+        assertEquals(1, Aura.getDefinitionService().getDefinition(desc).getTokenOverrides().size());
+        assertEquals(tokens, Aura.getDefinitionService().getDefinition(desc).getTokenOverrides().get(0));
     }
 
     /** verify tokens descriptor is added to dependency set */
@@ -140,7 +140,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
-        desc.getDef().appendDependencies(deps);
+        Aura.getDefinitionService().getDefinition(desc).appendDependencies(deps);
         assertTrue(deps.contains(tokens));
     }
 
@@ -150,7 +150,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
         try {
-            desc.getDef().validateReferences();
+        	Aura.getDefinitionService().getDefinition(desc).validateReferences();
             fail("expected to get an exception");
         } catch (Exception e) {
             checkExceptionContains(e, DefinitionNotFoundException.class, "No TOKENS");

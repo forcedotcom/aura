@@ -18,10 +18,14 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			A <code>ui:inputDateTime</code> component represents a date and time input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code>.
-			The value is displayed in the default format specified by the language locale of the browser. 
+			A <code>ui:inputDateTime</code> component represents a date and time input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code> on desktop.
+			Web apps running on mobiles and tablets use an input field of type <code>datetime-local</code> for all browsers except Internet Explorer.
+			The value is displayed based on the locale of the browser, for example, <code>MMM d, yyyy</code> and <code>h:mm:ss a</code>, which is returned by <code>$Locale.dateFormat</code>
+			and <code>$Locale.timeFormat</code>. 
 		</p>
-		<p>This is a basic set up of a date and time field with a date picker, which displays the current date and time in the format <code>7/29/2014 1:11 PM</code>.</p>
+		<p>This is a basic set up of a date and time field with a date picker, which displays the current date and time.
+		On desktop, the <code>input</code> tag is wrapped in a <code>form</code> tag; the date and time fields display as two separate fields. 
+	The time picker displays a list of time in 30-minute increments.</p>
 		<pre>&lt;!-- Component markup -->
 &lt;aura:attribute name="today" type="DateTime" />
 &lt;ui:inputDateTime aura:id="expdate" label="Expense Date" class="form-control"
@@ -30,42 +34,7 @@
 /** Client-Side Controller **/
  var today = new Date(); 
 component.set("v.today", today);</pre>
-		<p>This example results in the following HTML.</p>
-		<pre>&lt;div class="uiInput uiInputDateTime uiInput--default uiInput--input uiInput--datetime">
-&lt;label class="uiLabel-left form-element__label uiLabel">
-    &lt;span>Expense Date&lt;/span>
-&lt;/label>
-&lt;form class="form--stacked">
-    &lt;div class="dateTime-inputDate form-element form-element__control">
-        &lt;input class="form-control uiInput uiInputDateTime" placeholder="MMM d, yyy" type="text">
-        &lt;a class="datePicker-openIcon display" aria-haspopup="true">
-            &lt;span class="assistiveText">Date Picker&lt;/span>
-        &lt;/a>
-    &lt;/div>
-    &lt;div class="dateTime-inputTime form-element form-element__control">
-        &lt;div class="input-has-icon input-has-icon--right">
-             &lt;label>&lt;/label>
-             &lt;input class="fieldinput" aria-describedby="" type="text" placeholder="h:mm a">
-                &lt;a aria-haspopup="true" class="timePicker-openIcon display" href="javascript:void(0);">
-                    &lt;span class="assistiveText">Time Picker&lt;/span>
-                &lt;/a>
-            &lt;/div>
-        &lt;/div>
-        &lt;div class="uiInputTimePicker--default uiInputTimePicker" >
-            &lt;div aria-hidden="false" data-selection="time" class="dropdown dropdown--left datepicker datepicker--time scrollable">
-                &lt;ul class="datepicker--time__list" role="menu" >&lt;/ul>
-            &lt;/div>
-        &lt;/div>
-&lt;/form>
-&lt;/div>
-&lt;div class="DESKTOP uiDatePicker--default uiDatePicker">
-    &lt;!-- Date picker set to visible when icon is clicked -->
-&lt;/div></pre>
-	<p>On desktop, the <code>input</code> tag is wrapped in a <code>form</code> tag; the date and time fields display as two separate fields. The form factor (DESKTOP, MOBILE, or PHONE) determines the dimensions of the date picker.
-	The time picker displays a list of time in 30-minute increments.
-    </p>
-	
-	
+		
 	</aura:description>		
 	<aura:example name="datetime" ref="uiExamples:datetime" label="Using ui:inputDateTime">
     	This example retrieves the value of a <code>ui:inputDateTime</code> component and displays it using <code>ui:outputDateTime</code>.

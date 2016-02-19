@@ -21,7 +21,7 @@
 
     openNotification: function(cmp){
         var refEl = cmp.getElement().querySelector('.positioned-target');
-        var body = $A.newCmp({componentDef: 'uiExamples:panelContent'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelContent'});
         var boundingEl = cmp.getElement().querySelector('.content.container');
         
         // toggling selected on the button
@@ -52,7 +52,7 @@
 
     openEastPanel: function(cmp){
         var refEl = '.positioned-target-east';
-        var body = $A.newCmp({componentDef: 'uiExamples:panelContent'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelContent'});
         $A.get('e.ui:createPanel').setParams({
             panelType   :'panel',
             visible: true,
@@ -73,8 +73,8 @@
     },
 
     createPanelWithHeader: function (cmp, event, helper) {
-        var body = $A.newCmp({componentDef: 'uiExamples:panelContent'}),
-            header = $A.newCmp({componentDef: 'uiExamples:panelHeader'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelContent'}),
+            header = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelHeader'});
 
         $A.get('e.ui:createPanel').setParams({
             panelType   :'panel',
@@ -98,7 +98,7 @@
 
     openWestPanel: function(cmp){
         var refEl = '.positioned-target-west';
-        var body = $A.newCmp({componentDef: 'uiExamples:panelContent'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelContent'});
         $A.get('e.ui:createPanel').setParams({
             panelType   :'panel',
             visible: true,
@@ -119,7 +119,7 @@
     },
     openNorthPanel: function(cmp){
         var refEl = '.positioned-target-north';
-        var body = $A.newCmp({componentDef: 'uiExamples:panelContent'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelContent'});
         $A.get('e.ui:createPanel').setParams({
             panelType   :'panel',
             visible: true,
@@ -140,7 +140,7 @@
     },
 
     createPanel: function (cmp, event, helper) {
-        var body = $A.newCmp({componentDef: 'uiExamples:panelContent'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelContent'});
 
         $A.get('e.ui:createPanel').setParams({
             panelType   :'panel',
@@ -157,7 +157,7 @@
         }).fire();
     },
     createFullPanel: function (cmp, event, helper) {
-        var body = $A.newCmp({componentDef: 'uiExamples:modalContent'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:modalContent'});
 
         $A.get('e.ui:createPanel').setParams({
             panelType   :'panel',
@@ -174,8 +174,8 @@
         }).fire();
     },
     createModal: function (cmp, event, helper) {
-        var body = $A.newCmp({componentDef: 'uiExamples:modalContent'});
-        var footer = $A.newCmp({componentDef: 'uiExamples:panelFooter'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:modalContent'});
+        var footer = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelFooter'});
 
         $A.get('e.ui:createPanel').setParams({
             panelType   :'modal',
@@ -193,8 +193,8 @@
         }).fire();
     },
     createLargeModal: function (cmp, event, helper) {
-        var body = $A.newCmp({componentDef: 'uiExamples:modalContent'});
-        var footer = $A.newCmp({componentDef: 'uiExamples:panelFooter'});
+        var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:modalContent'});
+        var footer = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:panelFooter'});
 
         $A.get('e.ui:createPanel').setParams({
             panelType   :'modal',
@@ -215,7 +215,7 @@
     },
 
     lazyLoadPanel: function(cmp) {
-        var spinner = $A.newCmp({componentDef: 'ui:spinner'});
+        var spinner = $A.createComponentFromConfig({descriptor: 'markup://ui:spinner'});
         $A.get('e.ui:createPanel').setParams({
             panelType   :'modal',
             visible: true,
@@ -228,7 +228,7 @@
             onCreate: function (panel) {
                 //simulating panel content has server dependencies and updates panel after content is loaded
                 setTimeout(function() {
-                    var body = $A.newCmp({componentDef: 'uiExamples:modalContent'});
+                    var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:modalContent'});
                     panel.update({ body : body });
                 }, 1000);
             }

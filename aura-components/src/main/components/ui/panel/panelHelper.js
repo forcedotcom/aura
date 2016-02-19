@@ -18,8 +18,8 @@
         //create default close button
         if ($A.util.isEmpty(cmp.get('v.closeButton')) && cmp.get('v.showCloseButton')) {
             $A.componentService.createComponent('ui:button', {
-                'body': $A.newCmp({componentDef: 'aura:unescapedHtml', attributes: {values: {value: '&times;'}}}),
-                'class': "closeBtn",
+                'body': $A.createComponentFromConfig({descriptor: 'markup://aura:unescapedHtml', attributes: {value: '&times;'}}),
+            	'class': "closeBtn",
                 'press': cmp.getReference("c.onCloseBtnPressed"),
                 'label': cmp.get('v.closeDialogLabel'),
                 'buttonTitle': cmp.get('v.closeDialogLabel'),

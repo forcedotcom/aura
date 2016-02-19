@@ -189,7 +189,7 @@
     	test : function(component){
     		var value = component.getElement().value;
     		$A.test.assertEquals(123, component.get("v.value"), "Cmp value does not equal expected");
-    		$A.test.assertEquals("Invalid format attribute", value, "Element value does not equal expected");
+    		$A.test.assertEquals("123", value, "Element value does not equal expected");
     	}
     },
 

@@ -1,4 +1,10 @@
 ({
+    // IndexedDB has problems in Safari and is not supported in older IE
+    browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
+
+    // Test modifies/deletes the persistent database
+    labels : [ "threadHostile" ],
+
     /**
      * Verify getting new defs from server is not overly aggressive about evicting previously stored defs from storage.
      * 

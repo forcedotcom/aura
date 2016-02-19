@@ -12,15 +12,15 @@
      * The messages you can publish and subscribe to are
      *
      * AuraInspector:OnAuraInitialized              $A is available and we are just about to run $A.initAsync
-     * AuraInspector:OnPanelConnect                 The Aura Panel has been loaded and initialized. (Where we start the instrumentation of the app.)      
-     * AuraInspector:OnBootstrapEnd                 We've instrumented Aura, and now the Dev Tools can initialize and expect it to be there.              
+     * AuraInspector:OnPanelConnect                 The Aura Panel has been loaded and initialized. (Where we start the instrumentation of the app.)
+     * AuraInspector:OnBootstrapEnd                 We've instrumented Aura, and now the Dev Tools can initialize and expect it to be there.
      * AuraInspector:OnContextMenu                  User Selected the "Inspect Aura Component" option in the context menu. Handled in the inspected script. Does not contain the information on what they clicked on.
      * AuraInspector:OnHighlightComponent           We focused over a component in the ComponentTree or ComponentView and the accompanying HTML element in the DOM should be spotlighted.
      * AuraInspector:OnHighlightComponentEnd        We have stopped focusing on the component, and now remove the dom element spotlight.
      * AuraInspector:AddPanel                       Add the panel at the specified URL as an Iframe tab.
      * AuraInspector:ConsoleLog                     [DEPRECATED] Show a message in the DevTools console.
      * AuraInspector:OnEventStart                   An Aura event is about to fire. Allows us to track that everything between the start and end happend as a result of this event.
-     * AuraInspector:OnEventEnd                     An Aura event fired. Process all the events and actions that have happened since the event fired. 
+     * AuraInspector:OnEventEnd                     An Aura event fired. Process all the events and actions that have happened since the event fired.
      * Transactions:OnTransactionEnd                Transaction has ended and should now be added to the UI.
      * AuraInspector:StorageData                    Aura Storage Service has async fetched data to show in the storage panel.
      * AuraInspector:RemoveStorageData              Remove stored response for the action we would like to drop next time we see it
@@ -45,7 +45,7 @@
         });
     });
 
-    
+
 
     function AuraInspectorDevtoolsPanel() {
         //var EXTENSIONID = "mhfgenmncdnmcoonglmkepfdnjjjcpla";
@@ -87,7 +87,7 @@
             this.connect();
 
             // Wait for the AuraInjectedScript to finish loading.
-            this.subscribe("AuraInspector:OnBootstrapEnd", function(){ 
+            this.subscribe("AuraInspector:OnBootstrapEnd", function(){
                 if(_initialized) { return; }
                 //-- Attach Event Listeners
                 var header = document.querySelector("header.tabs");
@@ -117,13 +117,13 @@
                     method: "get"
                 }).then(function(response){
                    response.json().then(function(json){
-                        drawHelp(json.help); 
-                   }); 
+                        drawHelp(json.help);
+                   });
                 });
 
                 this.subscribe("AuraInspector:OnAuraInitialized", AuraInspector_OnAuraInitialized.bind(this));
 
-                this.subscribe("AuraInspector:OnContextMenu", function() { 
+                this.subscribe("AuraInspector:OnContextMenu", function() {
                     this.publish("AuraInspector:ContextElementRequest", {});
                 }.bind(this));
 
@@ -137,7 +137,7 @@
                 runtime.postMessage({subscribe : [PUBLISH_KEY, PUBLISH_BATCH_KEY], port: runtime.name, tabId: tabId });
 
                 _initialized = true;
-                
+
                 if(typeof finishedCallback === "function") {
                     finishedCallback();
                 }
@@ -182,7 +182,7 @@
          */
         this.showPanel = function(key, options) {
             if(!key) { return; }
-            var buttons = document.querySelectorAll("header.tabs button");
+            var buttons = document.querySelectorAll("header.tabs button:not(.trigger)");
             var sections = document.querySelectorAll("section.tab-body:not(.sidebar)");
             var panelKey = key.indexOf("tabs-")==0?key.substring(5):key;
             var buttonKey = "tabs-"+panelKey;
@@ -195,6 +195,7 @@
                     buttons[c].classList.remove("selected");
                     sections[c].classList.remove("selected");
                 }
+                this.hideSidebar();
             }
 
             // Render the output. Panel is responsible for not redrawing if necessary.
@@ -307,14 +308,14 @@
 
             if(configuration && typeof configuration === "object") {
                 var configParameter = JSON.stringify(configuration);
-                command = `window[Symbol.for('AuraDevTools')].Inspector.getComponent('${globalId}', ${configParameter});`; 
+                command = `window[Symbol.for('AuraDevTools')].Inspector.getComponent('${globalId}', ${configParameter});`;
             } else {
-                command = `window[Symbol.for('AuraDevTools')].Inspector.getComponent('${globalId}');`; 
+                command = `window[Symbol.for('AuraDevTools')].Inspector.getComponent('${globalId}');`;
             }
 
             chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
-                if(exceptionInfo) { 
-                    console.error(command, " resulted in ", exceptionInfo); 
+                if(exceptionInfo) {
+                    console.error(command, " resulted in ", exceptionInfo);
                 }
                 if(!response) { return; }
                 var component = JSON.parse(response);
@@ -343,7 +344,7 @@
 
         this.getRootComponent = function(callback) {
             if(typeof callback !== "function") { throw new Error("callback is required for - getRootComponent(callback)"); }
-            var command = "window.$A && $A.getRoot() && window[Symbol.for('AuraDevTools')].Inspector.getComponent($A.getRoot().getGlobalId());"; 
+            var command = "window.$A && $A.getRoot() && window[Symbol.for('AuraDevTools')].Inspector.getComponent($A.getRoot().getGlobalId());";
             chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
                 if(exceptionInfo) { console.error(exceptionInfo); }
                 if(!response) { return; }
@@ -424,7 +425,7 @@
         /* Event Handlers */
         function HeaderActions_OnClick(event){
             var target = event.target;
-            if(target.id.indexOf("tabs-") === 0) { 
+            if(target.id.indexOf("tabs-") === 0) {
                 this.showPanel(target.id);
             }
         }
@@ -440,7 +441,7 @@
                 for(var c=0,length=data.length;c<length;c++) {
                     callSubscribers(data[c].key, data[c].data);
                 }
-            } 
+            }
         }
 
         function callSubscribers(key, data) {
@@ -471,7 +472,7 @@
 
             // Security fix.
             // We instantiate a panel using a global window[] reference,
-            // and we don't want people to call any function, just the panel 
+            // and we don't want people to call any function, just the panel
             // constructors.
             if(!message.classConstructor.startsWith("InspectorPanel")) {
                 return;
@@ -509,7 +510,7 @@
             if(event.target.classList.contains("trigger")) {
                 if(this.classList.contains("visible")) {
                     hideHelp(this);
-                } else { 
+                } else {
                     showHelp(this);
                 }
             }
@@ -541,7 +542,7 @@
             dropdown.className = "dropdown";
             dropdown.addEventListener("click", Dropdown_OnClick);
 
-            var trigger = document.createElement("a");
+            var trigger = document.createElement("button");
             trigger.className = "trigger";
             trigger.textContent="?";
             dropdown.appendChild(trigger);

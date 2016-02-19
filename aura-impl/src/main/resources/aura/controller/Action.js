@@ -58,7 +58,6 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.caboose = caboose;
     this.allAboardCallback = undefined;
     this.abortable = false;
-    this.abortableId = undefined;
 
     this.returnValue = undefined;
     this.returnValueUnmodified = undefined;
@@ -889,6 +888,21 @@ Action.prototype.finishAction = function(context) {
 };
 
 /**
+ * Abort an action if the component is not valid.
+ *
+ * @param {Boolean} beforeSend Have we sent the action to the server yet?
+ * @return {Boolean} true if the action was aborted.
+ * @private
+ */
+Action.prototype.abortIfComponentInvalid = function(beforeSend) {
+    if ((!beforeSend || this.abortable) && this.cmp !== undefined && !this.cmp.isValid()) {
+        this.abort();
+        return true;
+    }
+    return false;
+};
+
+/**
  * Mark this action as aborted.
  *
  * @private
@@ -913,71 +927,31 @@ Action.prototype.abort = function() {
 };
 
 /**
- * Marks the Action as abortable. For server-side Actions only.
+ * Set the action as abortable. Abortable actions are not sent to the server if the component is not valid.
  *
- * Note that the incoming value is assumed to be boolean, if missing, or not
- * equal to false, it will be set to true. I.e. action.setAbortable() sets it to
- * true.
+ * Actions not marked abortable are always sent to the server regardless of the validity of the component.
+ * For example, a save/modify action should not be set abortable to cause it to go to the server even if
+ * the component is deleted.
  *
- * @param {Boolean} value defaults to setting to true, only sets false if === false
+ * Setting an action as abortable can not be undone
+ *
  * @platform
  * @export
  */
-Action.prototype.setAbortable = function(value) {
-    if (value !== false) {
-        this.abortable = true;
-    } else {
-        this.abortable = false;
-    }
+Action.prototype.setAbortable = function() {
+    this.abortable = true;
 };
 
 /**
- * set the abortable 'UI transaction' id for this action.
- *
- * @private
- * @param {string} id the abortable ID.
- */
-Action.prototype.setAbortableId = function(id) {
-    if (this.abortableId === undefined) {
-        this.abortableId = id;
-    } else {
-        throw new Error("Action.setAbortableId(): abortable ID may only be set once: " + this);
-    }
-};
-
-/**
- * [Deprecated - Never AOTP] Set a parent action for this action.
- *
- * This function can be used to group actions for the purposes of 'abortable' when Aura cannot
- * reasonably be expected to do the grouping for you. This should be used in callbacks for actions
- * or in setTimeout functions when enqueing a new action to update/continue a display.
- *
- * @private
- * @param {Action} the action which is the logical parent of this action.
- * @export
- */
-Action.prototype.setParentAction = function(action) {
-    if(!(action instanceof Action) || !action.abortable) {
-        throw new Error("Action.setParentAction(): The provided parent action must be a valid abortable Action: " + action);
-    }
-    if (action.abortableId === undefined) {
-        throw new Error("Action.setParentAction(): The provided parent action must be enqueued: " + action);
-    }
-    if (this.abortableId !== undefined) {
-        throw new Error("Action.setParentAction(): The abortable group is already set, call setParentAction before enqueueing : "+this.getStorageKey());
-    }
-    this.abortableId = action.abortableId;
-};
-
-/**
- * Get the abortable ID for this action.
+ * [Deprecated] [Returns undefined] 
  *
  * @public
- * @returns {string} the abortable id that was set for this action.
+ * @returns {string} undefined
  * @export
+ * @deprecated
  */
 Action.prototype.getAbortableId = function() {
-    return this.abortableId;
+    return undefined;
 };
 
 /**
@@ -989,10 +963,10 @@ Action.prototype.isRefreshAction = function() {
 };
 
 /**
- * Checks if the function is abortable. For server-side Actions only.
+ * Returns the current state of the abortable flag.
  *
  * @public
- * @returns {Boolean} The function is abortable (true), or false otherwise.
+ * @returns {Boolean} tha abortable flag
  * @export
  */
 Action.prototype.isAbortable = function() {
@@ -1000,32 +974,31 @@ Action.prototype.isAbortable = function() {
 };
 
 /**
- * An exclusive Action is processed on an XMLHttpRequest of its own. <code>a.setExclusive(true)</code> and
- * <code>a.setExclusive()</code> are the same. For server-side Actions only.
+ * [Deprecated] Does nothing.
  *
  * @public
- * @param {Object}
- *            val
  * @returns {Boolean} Set to true if the Action should be exclusive, or false otherwise.
  * @export
+ * @deprecated
  */
-Action.prototype.setExclusive = function(val) {
-    this.exclusive = val === undefined ? true : val;
+Action.prototype.setExclusive = function() {
+    return false;
 };
 
 /**
- * Returns true if a given function is exclusive, or false otherwise.
+ * [Deprecated] Returns false
  *
  * @public
- * @returns {Boolean}
+ * @returns {Boolean} false
  * @export
+ * @deprecated
  */
 Action.prototype.isExclusive = function() {
-    return this.exclusive || false;
+    return false;
 };
 
 /**
- * Marks the Action as storable and abortable. For server-side Actions only.
+ * Marks the Action as storable. For server-side Actions only.
  *
  * @public
  * @param {Object}
@@ -1039,12 +1012,7 @@ Action.prototype.setStorable = function(config) {
               "setStorable() cannot be called on a client action.");
     this.storable = true;
     this.storableConfig = config;
-
-    //
-    // Storable actions must also be abortable (idempotent, replayable and non-mutating)
-    // Careful with this, as it will cause side effects if there are other abortable actions
-    //
-    this.setAbortable();
+    this.abortable = true;
 };
 
 
@@ -1215,9 +1183,8 @@ Action.prototype.copyToRefresh = function() {
         "errorHandler": this.getStorageErrorHandler()
     });
 
-    refreshAction.abortable = this.abortable;
-    refreshAction.abortableId = this.abortableId;
     refreshAction.background = this.background;
+    refreshAction.abortable = this.abortable;
 
     this.refreshAction = refreshAction;
 

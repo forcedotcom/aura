@@ -32,11 +32,10 @@ Aura.Services.MetricsService = function MetricsService() {
     this.doneBootstrap             = false;
     this.pluginsInitialized        = false;
     this.clearCompleteTransactions = true; // In PTEST Mode this is set to false (see initialize method)
-
-    // #if {"excludeModes" : ["PRODUCTION"]}
-    this["collector"] = this.collector; // Protected API to access the raw marks
-    // #end
 };
+
+// Version
+Aura.Services.MetricsService.VERSION  = '2.0.0';
 
 Aura.Services.MetricsService.PERFTIME = !!(window.performance && window.performance.now);
 Aura.Services.MetricsService.TIMER    = Aura.Services.MetricsService.PERFTIME ? window.performance.now.bind(performance) : Date.now.bind(Date);
@@ -250,8 +249,15 @@ Aura.Services.MetricsService.prototype.detachHandlerOfType = function (callback,
  * @public
  * @export
 **/
-Aura.Services.MetricsService.prototype.inTransaction = function () {
-    return !$A.util.isEmpty(this.transactions);
+Aura.Services.MetricsService.prototype.inTransaction = function (ignorePageTransactions) {
+    $A.util.isEmpty(this.transactions);
+    if (!ignorePageTransactions) {
+        return !$A.util.isEmpty(this.transactions);
+    }
+
+    if (this.getCurrentPageTransaction()) {
+        return Object.keys(this.transactions).length > 1;
+    }
 };
 
 
@@ -314,16 +320,16 @@ Aura.Services.MetricsService.prototype.transactionStart = function (ns, name, co
  * @export
 **/
 Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, config, postProcess) {
-    var id             = (ns || Aura.Services.MetricsService.DEFAULT) + ':' + name,
+    //console.time('>>>> TRANSACTIONPROCESSING > ' + ns + ':' + name);
+    var id             = ns + ':' + name,
         transaction    = this.transactions[id],
-        transactionCfg = $A.util.apply((transaction && transaction["config"]) || {}, config, true, true),
-        beacon         = this.beaconProviders[ns] ? this.beaconProviders[ns] : this.beaconProviders[Aura.Services.MetricsService.DEFAULT];
+        transactionCfg = $A.util.apply((transaction && transaction["config"]) || {}, config, true, false),
+        beacon         = this.beaconProviders[ns]|| this.beaconProviders[Aura.Services.MetricsService.DEFAULT];
 
     postProcess = typeof config === 'function' ? config : postProcess || transactionCfg["postProcess"];
 
     if (transaction && (beacon || postProcess || !this.clearCompleteTransactions)) {
-        var skipPluginPostProcessing = transactionCfg["skipPluginPostProcessing"],
-            parsedTransaction = {
+        var parsedTransaction = {
                 "id"            : id,
                 "ts"            : transaction["ts"],
                 "duration"      : Math.round((this.time() - transaction["ts"]) * 100) / 100,
@@ -343,10 +349,10 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
                     initialOffset     = transaction["offsets"] && (transaction["offsets"][plugin] || 0),
                     tMarks            = pluginCollector.slice(initialOffset),
                     pluginPostProcess = instance && instance.postProcess,
-                    parsedMarks       = !skipPluginPostProcessing && pluginPostProcess ? instance.postProcess(tMarks, transactionCfg) : tMarks;
+                    parsedMarks       = pluginPostProcess ? instance.postProcess(tMarks, transactionCfg) : tMarks;
 
                 //#if {"excludeModes" : ["PRODUCTION"]}
-                if (!skipPluginPostProcessing && !pluginPostProcess) {
+                if (!pluginPostProcess && tMarks.length) {
                     parsedMarks = this.defaultPostProcessing(tMarks);
                 }
                 //#end
@@ -356,21 +362,29 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
                 }
             }
         }
-
+        // 1. postProcess at the transaction level
         if (postProcess) {
             postProcess(parsedTransaction);
         }
-
+        // 2. execute any beacon middleware
+        if (beacon && beacon["middleware"]) {
+            beacon["middleware"](parsedTransaction);
+        }
+        // 3. Notify all the global transactionEnd handlers
         if (this.globalHandlers["transactionEnd"].length) {
             this.callHandlers("transactionEnd", parsedTransaction);
         }
 
-        this.signalBeacon(beacon, parsedTransaction);
+        // 4. Send to beacon
+        if (beacon) {
+            beacon["sendData"](parsedTransaction["id"], parsedTransaction);
+        }
 
         // Cleanup transaction
         if (!this.clearCompleteTransactions) {
             // Only for non-prod, to keep the transactions stored
             var newId = id + ':' + Math.round(parsedTransaction["ts"]);
+            parsedTransaction["config"] = transactionCfg;
             this.transactions[newId] = parsedTransaction;
             parsedTransaction["id"] = newId;
         }
@@ -423,7 +437,8 @@ Aura.Services.MetricsService.prototype.killLongRunningTransactions = function ()
 
     for (var i in this.transactions) {
         var transaction = this.transactions[i];
-        if (now - transaction["ts"] > Aura.Services.MetricsService.MAXTIME) {
+        var isPageTransaction = transaction["config"]["pageTransaction"];
+        if (!isPageTransaction && now - transaction["ts"] > Aura.Services.MetricsService.MAXTIME) {
             transactionsKilled.push(transaction);
             delete this.transactions[i];
         }
@@ -433,6 +448,49 @@ Aura.Services.MetricsService.prototype.killLongRunningTransactions = function ()
         this.callHandlers("transactionsKilled", transactionsKilled);
     }
 };
+
+/**
+ * Get the current page transaction
+ * has pageTransaction config flag
+ * @export
+**/
+Aura.Services.MetricsService.prototype.getCurrentPageTransaction = function () {
+    for (var i in this.transactions) {
+        if (this.transactions[i]["config"]["pageTransaction"]) {
+            return this.transactions[i];
+        }
+    }
+};
+
+/**
+ * Returns a clone of the marks currently available on the collector
+ * @export
+**/
+Aura.Services.MetricsService.prototype.getCurrentMarks = function () {
+    return $A.util.apply({}, this.collector, true, true);
+};
+
+/**
+ * Returns the metricsService version
+ * @export
+**/
+Aura.Services.MetricsService.prototype.getVersion = function (includePlugins) {
+    var msVersion = Aura.Services.MetricsService.VERSION;
+    if (!includePlugins) {
+        return msVersion;
+    }
+
+    var pluginsVersion = {};
+    for (var p in this.registeredPlugins) {
+        pluginsVersion[p] = this.registeredPlugins["VERSION"];
+    }
+
+    return {
+        "metricsService" : msVersion,
+        "plugins": pluginsVersion
+    };
+};
+
 
 //#if {"excludeModes" : ["PRODUCTION"]}
 
@@ -506,18 +564,6 @@ Aura.Services.MetricsService.prototype.setClearCompletedTransactions = function 
 };
 
 //#end
-
-/**
- * Calls sendData on the beacon passing a newly finished transaction
- * @param {Object} beacon Beacon Object
- * @param {Object} transaction Transaction
- * @private
-**/
-Aura.Services.MetricsService.prototype.signalBeacon = function (beacon, transaction) {
-    if (beacon) {
-        beacon["sendData"](transaction["id"], transaction);
-    }
-};
 
 /**
  * Creates a transaction

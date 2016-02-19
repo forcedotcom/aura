@@ -24,7 +24,7 @@
 			isRefresh: 		this.getAttribute("isStorable") === "true" ? this.getAttribute("isRefresh") : "-",
 			isAbortable:	this.getAttribute("isAbortable"),
 			returnValue:	this.getAttribute("returnValue"),
-			returnError:    this.getAttribute("returnError"),
+			returnError:    this.getAttribute("returnError") === '[]'? undefined : this.getAttribute("returnError"),
 			fromStorage:	this.getAttribute("isStorable") === "true" ? this.getAttribute("isFromStorage") : "-",
             //storageKey could be very long, I want people be able to see it when they want to, hide it like other JSON object when no one cares
 			storageKey:	this.getAttribute("isStorable") === "true" ? "{\"storageKey\":"+JSON.stringify(this.getAttribute("storageKey"))+"}" : "-",
@@ -36,9 +36,7 @@
 		// This seems sloppy
     	this.shadowRoot.querySelector("#div_actionName").textContent 		= model.actionName;
     	this.shadowRoot.querySelector(".parameters").textContent 	= model.parameters;
-    	this.shadowRoot.querySelector(".result").textContent 		= model.returnValue;
     	this.shadowRoot.querySelector(".storageKey").textContent = model.storageKey;
-    	this.shadowRoot.querySelector("#actionError").textContent = model.returnError;
     	this.shadowRoot.querySelector("#actionId").textContent 		= model.id;
     	this.shadowRoot.querySelector("#actionState").textContent 	= model.state;
     	this.shadowRoot.querySelector("#actionIsAbortable").textContent = model.isAbortable;
@@ -47,6 +45,15 @@
     	this.shadowRoot.querySelector("#actionStorableSize").textContent = model.storableSize;
     	this.shadowRoot.querySelector("#actionIsRefresh").textContent 	= model.isRefresh;
     	this.shadowRoot.querySelector("#actionFromStorage").textContent = model.fromStorage;
+    	if(model.returnError != undefined || model.returnError != null) {//when there is error, we don't show action result.
+    		this.shadowRoot.querySelector("#actionError").textContent = model.returnError;
+    		this.shadowRoot.querySelector("#div_actionResponse").classList.add("hidden");
+    		this.shadowRoot.querySelector("#div_actionError").classList.remove("hidden");
+    	} else {
+    		this.shadowRoot.querySelector("#actionResult").textContent = model.returnValue;
+    		this.shadowRoot.querySelector("#div_actionResponse").classList.remove("hidden");
+    		this.shadowRoot.querySelector("#div_actionError").classList.add("hidden");    		
+    	}
     	if(this.hasAttribute("stats")) {
     		var statsInfo = JSON.parse(this.getAttribute("stats"));
 
@@ -112,11 +119,12 @@
 		if(actionId) {
 			//var actionParameter = JSON.parse(actionParameter);//obj
 			var dataToPublish = {
-							'actionName': actionName//necessary, as we use this as key in actionsToWatch AuraInspectorInjectedScript.js
+							'actionName': actionName,//necessary, as we use this as key in actionsToWatch AuraInspectorInjectedScript.js
+							'actionId' : actionId,//like "action_card_1852;a", we need this to make actionCard on leftside draggable again
 							};
             dataToPublish = JSON.stringify(dataToPublish);
             //console.log('dropNextAction, dataToPublish = ', dataToPublish);
-            //call AuraInspectorActionsView_OnEnqueueNextResponseForAction in AuraInspectorActionsView
+            //call AuraInspectorActionsView_OnRemoveActionFromWatchList in AuraInspectorActionsView
             var command = `
                window[Symbol.for('AuraDevTools')].Inspector.
                 	publish("AuraInspector:RemoveActionFromWatchList", '${dataToPublish}');
@@ -204,6 +212,8 @@
 			addEventListener('click',  saveNextResponse.bind(this));
 			this.shadowRoot.querySelector("#button_cancelChangeActionResult").
 			addEventListener('click',  cancelNextResponse.bind(this));
+			this.shadowRoot.querySelector("#button_editActionResult").
+			addEventListener('click',  editNextResponse.bind(this));
 		} else if (dropOrModify === "errorResponseNextTime") {
 			this.shadowRoot.querySelector(".div_editActionResult").style.display = "none";
 			this.shadowRoot.querySelector(".div_errorResponse").style.display = "block";
@@ -211,6 +221,8 @@
 			addEventListener('click',  saveErrorResponse.bind(this));
 			this.shadowRoot.querySelector("#button_cancelError").
 			addEventListener('click',  cancelErrorResponse.bind(this));
+			this.shadowRoot.querySelector("#button_editError").
+			addEventListener('click',  editErrorResponse.bind(this));
 		} else {
 			console.log("unknown choice for dropOrModify, we need a handler for it !!!");
 		}
@@ -249,11 +261,27 @@
 		        this.shadowRoot.querySelector("#textarea_actionErrorMessage").setAttribute('readonly','readonly');
 		        this.shadowRoot.querySelector("#textarea_actionErrorStack").setAttribute('readonly','readonly');
 		        //hide save/cancel button
-		        this.shadowRoot.querySelector("#button_saveError").style.display="none";
-		        this.shadowRoot.querySelector("#button_cancelError").style.display="none";
+		        this.shadowRoot.querySelector("#button_saveError").classList.add("hidden");
+		        this.shadowRoot.querySelector("#button_cancelError").classList.add("hidden");
+		        //display the edit button
+		        this.shadowRoot.querySelector("#button_editError").classList.remove("hidden");
 			} else {
 				console.log("nextErrorMsg cannot be empty");
 			}
+		}
+	}
+
+	function editErrorResponse() {
+		var actionId = this.getAttribute("id");
+		if(actionId) {
+			//make the textara readonly
+		    this.shadowRoot.querySelector("#textarea_actionErrorMessage").removeAttribute('readonly');
+		    this.shadowRoot.querySelector("#textarea_actionErrorStack").removeAttribute('readonly');
+		    //show save/cancel button
+		    this.shadowRoot.querySelector("#button_saveError").classList.remove("hidden");
+		    this.shadowRoot.querySelector("#button_cancelError").classList.remove("hidden");
+		    //hide the edit button
+		    this.shadowRoot.querySelector("#button_editError").classList.add("hidden");
 		}
 	}
 
@@ -304,6 +332,15 @@
 		}
 	}
 
+	function editNextResponse() {
+		//make the textara writable
+	    this.shadowRoot.querySelector("#textarea_actionResultValue").removeAttribute('readonly');
+	    //show save/cancel button
+	    this.shadowRoot.querySelector("#button_saveActionResult").classList.remove("hidden");
+	    this.shadowRoot.querySelector("#button_cancelChangeActionResult").classList.remove("hidden");
+	    //hide edit button
+	    this.shadowRoot.querySelector("#button_editActionResult").classList.add("hidden");
+	}
 
 	function saveNextResponse() {
 		var actionId = this.getAttribute("id");//necessary
@@ -354,9 +391,10 @@
 	        //make the textara readonly
 	        this.shadowRoot.querySelector("#textarea_actionResultValue").setAttribute('readonly','readonly');
 	        //hide save/cancel button
-	        this.shadowRoot.querySelector("#button_saveActionResult").style.display="none";
-	        this.shadowRoot.querySelector("#button_cancelChangeActionResult").style.display="none";
-	        
+	        this.shadowRoot.querySelector("#button_saveActionResult").classList.add("hidden");
+	        this.shadowRoot.querySelector("#button_cancelChangeActionResult").classList.add("hidden");
+	        //show edit button
+	        this.shadowRoot.querySelector("#button_editActionResult").classList.remove("hidden");
 		} else {
 			console.log("saveNextResponse, either actionId is bogus, or bad value of key/value in nextResponse", 
 				actionId, nextResponseKey, nextResponseValue);

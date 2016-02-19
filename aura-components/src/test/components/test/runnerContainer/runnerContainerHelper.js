@@ -596,7 +596,7 @@
             pollTime   = this.POLL_TIME,
             dom        = containerDOM || cmp.getElement();
         
-        pollAction.setAbortable(true);
+        pollAction.setAbortable();
         pollAction.setParams({scope: cmp.get('v.scope')});
 
         pollAction.setCallback(this, function (action) {
@@ -617,12 +617,6 @@
                    console.log("we have abort the pollAction:"+action.getId()); 
             }
         });
-        
-        //we only set abortableID to pollActions after the first one for each testRunner Action.
-        //so when new testRunner Action success, the pollActions belong to revious testRunner Action will get aborted.
-        if( previousPollActionForThisTestRunnerAction != undefined ) {
-            pollAction.setParentAction(previousPollActionForThisTestRunnerAction); 
-           }
 
         $A.run(function () {
                $A.enqueueAction(pollAction);

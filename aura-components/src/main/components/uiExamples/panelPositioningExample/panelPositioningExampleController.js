@@ -29,7 +29,7 @@
 
     handlePress: function(cmp, evt, helper) {
         var advanced = cmp.get('v.advanced');
-        var body = $A.newCmp({componentDef: 'aura:unescapedHtml', attributes: {values: {value: '<div class="panel-content">This is the panel</div>'}}})
+        var body = $A.createComponentFromConfig({descriptor: 'markup://aura:unescapedHtml', attributes: {value: '<div class="panel-content">This is the panel</div>'}})
         var bigTarget = cmp.find('bigTarget').getElement();
         var littleTarget = cmp.find('littleTarget').getElement();
         var value = cmp.find('direction').get('v.value');

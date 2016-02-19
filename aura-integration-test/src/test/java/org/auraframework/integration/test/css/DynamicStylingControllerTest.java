@@ -54,7 +54,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         Action action = runAction(toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format(".%s {color:green}\n", style.getDef().getClassName());
+        String expected = String.format(".%s {color:green}\n", 
+        		Aura.getDefinitionService().getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
 
@@ -70,7 +71,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         Action action = runAction(toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format("@media screen {\n  .%s {color:green}\n}\n", style.getDef().getClassName());
+        String expected = String.format("@media screen {\n  .%s {color:green}\n}\n", 
+        		Aura.getDefinitionService().getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
 
@@ -86,7 +88,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         Action action = runAction(toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format(".%s {color:green}\n", style.getDef().getClassName());
+        String expected = String.format(".%s {color:green}\n", 
+        		Aura.getDefinitionService().getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
 
@@ -102,7 +105,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         Action action = runAction(toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format("@media screen {\n  .%s {color:red}\n}\n", style.getDef().getClassName());
+        String expected = String.format("@media screen {\n  .%s {color:red}\n}\n", 
+        		Aura.getDefinitionService().getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
 
@@ -118,7 +122,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         Action action = runAction(toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format(".%s {color:green}\n", style.getDef().getClassName());
+        String expected = String.format(".%s {color:green}\n", 
+        		Aura.getDefinitionService().getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
 
@@ -133,7 +138,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         Action action = runAction(toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format(".%s {color:green}\n", style.getDef().getClassName());
+        String expected = String.format(".%s {color:green}\n", 
+        		Aura.getDefinitionService().getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
 
@@ -148,7 +154,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         Action action = runAction(toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format(".%s {color:green}\n", style.getDef().getClassName());
+        String expected = String.format(".%s {color:green}\n", 
+        		Aura.getDefinitionService().getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
 
@@ -167,7 +174,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         Action action = runAction(toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
-        String expected = String.format(".%s {color:green}\n", style.getDef().getClassName());
+        String expected = String.format(".%s {color:green}\n", 
+        		Aura.getDefinitionService().getDefinition(style).getClassName());
         assertEquals(expected, action.getReturnValue());
     }
 

@@ -210,7 +210,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInput.sendKeys("123456");
         auraUITestingUtil.pressTab(elementInput);
 
-        assertEquals("InputCurrency component rendered with wrong value", "123456", elementInput.getAttribute("value"));
+        assertEquals("InputCurrency component rendered with wrong value", "$123,456.00", elementInput.getAttribute("value"));
         assertEquals("outputCurrency component rendered with wrong value", "$123,456.00", elementoutput.getText());
 
         // Submit click
@@ -220,7 +220,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='Currency']"));
         elementButton.click();
 
-        assertEquals("InputCurrency component rendered with wrong value", "123.456", elementInput.getAttribute("value"));
-        assertEquals("outputCurrency component rendered with wrong value", "$123.46", elementoutput.getText());
+        assertEquals("InputCurrency component rendered with wrong value", "$123.45", elementInput.getAttribute("value"));
+        assertEquals("outputCurrency component rendered with wrong value", "$123.45", elementoutput.getText());
     }
 }

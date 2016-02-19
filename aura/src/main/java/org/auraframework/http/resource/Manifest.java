@@ -58,14 +58,14 @@ public class Manifest extends AuraResourceImpl {
 
     /**
      * Write out the manifest.
-     * 
+     *
      * This writes out the full manifest for an application so that we can use the AppCache.
-     * 
+     *
      * The manifest contains CSS and JavaScript URLs. These specified resources are copied into the AppCache with the
      * HTML template. When the page is reloaded, the existing manifest is compared to the new manifest. If they are
      * identical, the resources are served from the AppCache. Otherwise, the resources are requested from the server and
      * the AppCache is updated.
-     * 
+     *
      * @param request the request
      * @param response the response
      * @param context the context
@@ -157,6 +157,10 @@ public class Manifest extends AuraResourceImpl {
                 sw.write(s);
                 sw.write('\n');
             }
+
+            // Add locker service safe eval worker url
+            sw.write(configAdapter.getLockerWorkerURL());
+            sw.write('\n');
 
             // Add in any application specific resources
             if (descr != null && descr.getDefType().equals(DefType.APPLICATION)) {

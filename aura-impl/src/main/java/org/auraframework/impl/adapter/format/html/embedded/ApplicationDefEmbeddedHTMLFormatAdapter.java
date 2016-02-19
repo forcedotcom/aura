@@ -78,6 +78,7 @@ public class ApplicationDefEmbeddedHTMLFormatAdapter extends EmbeddedHTMLFormatA
             auraInit.put("instance", instance);
             auraInit.put("token", AuraBaseServlet.getToken());
             auraInit.put("host", context.getContextPath());
+            auraInit.put("safeEvalWorker", Aura.getConfigAdapter().getLockerWorkerURL());
 
             StringBuilder contextWriter = new StringBuilder();
 

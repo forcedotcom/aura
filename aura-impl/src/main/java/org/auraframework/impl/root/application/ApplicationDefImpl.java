@@ -18,15 +18,20 @@ package org.auraframework.impl.root.application;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
+import org.auraframework.def.TokenDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImpl;
@@ -34,6 +39,7 @@ import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.instance.Action;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -46,6 +52,7 @@ import org.auraframework.util.json.Json;
  */
 public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> implements ApplicationDef {
 
+    private ContextService contextService=Aura.getContextService();
     public static final DefDescriptor<ApplicationDef> PROTOTYPE_APPLICATION = DefDescriptorImpl.getInstance(
             "markup://aura:application", ApplicationDef.class);
 
@@ -104,6 +111,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         if (locationChangeEventDescriptor != null) {
             json.writeMapEntry("locationChangeEventDef", locationChangeEventDescriptor.getDef());
         }
+        json.writeMapEntry("tokens",getTokens(null));
     }
 
     @Override
@@ -183,6 +191,39 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             throw new InvalidDefinitionException(String.format("%s must extend aura:locationChange",
                     locationChangeDef.getDescriptor()), getLocation());
         }
+    }
+
+    public Map<String, String> getTokens(DefDescriptor<TokensDef> tokenDescriptor){
+        Map<String,String> tokens=Maps.newHashMap();
+        try {
+            if(tokenDescriptor==null){
+                AuraContext context=contextService.getCurrentContext();
+                if(context!=null) {
+                    DefDescriptor<? extends BaseComponentDef> top = context.getLoadingApplicationDescriptor();
+                    if (top != null) {
+                        List<DefDescriptor<TokensDef>> tokensDefs = top.getDef().getTokenOverrides();
+                        for (DefDescriptor<TokensDef> descriptor : tokensDefs) {
+                            DefDescriptor<TokensDef> extendsDef=descriptor.getDef().getExtendsDescriptor();
+                            if(extendsDef!=null){
+                                tokens.putAll(getTokens(extendsDef));
+                            }
+                            tokens.putAll(getTokens(descriptor));
+                        }
+                    }
+                }
+            }else{
+                TokensDef tokensDef=tokenDescriptor.getDef();
+                if(tokensDef.getSerializable()) {
+                    Map<String, TokenDef> tokenDefs = tokensDef.getDeclaredTokenDefs();
+                    for (Map.Entry<String, TokenDef> token : tokenDefs.entrySet()) {
+                        tokens.put(token.getKey(), (String) token.getValue().getValue());
+                    }
+                }
+            }
+        } catch (QuickFixException e) {
+            // ??
+        }
+        return tokens;
     }
 
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;

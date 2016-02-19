@@ -84,7 +84,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     private static final String ATTRIBUTE_MODEL = "model";
     private static final String ATTRIBUTE_CONTROLLER = "controller";
     private static final String ATTRIBUTE_WHITESPACE = "whitespace";
-    private static final String ATTRIBUTE_TOKEN_OVERRIDES = "tokenOverrides";
+    private static final String ATTRIBUTE_TOKEN_OVERRIDES = "tokens";
     private static final String ATTRIBUTE_DEFAULT_FLAVOR = "defaultFlavor";
     private static final String ATTRIBUTE_DYNAMICALLY_FLAVORABLE = "dynamicallyFlavorable";
 

@@ -16,7 +16,6 @@
 package org.auraframework.impl.expression.functions;
 
 import org.auraframework.expression.Expression;
-
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
@@ -28,6 +27,7 @@ public class UtilFunctions {
 
 	public static final Function EMPTY = new Empty();
 	public static final Function FORMAT = new Format();
+	public static final Function TOKEN = new Token();
 
 	/**
 	 * Checks if the object is empty. An empty object"s value is undefined (only
@@ -140,6 +140,31 @@ public class UtilFunctions {
 		@Override
 		public String[] getKeys() {
 			return new String[] { "format" };
+		}
+	}
+
+	/**
+	 * Token is meant for application level configuration injection
+	 */
+	public static class Token implements Function {
+		private static final long serialVersionUID = -8834318318368934926L;
+
+		@Override
+		public Object evaluate(List<Object> args) {
+			return null;
+		}
+
+		@Override
+		public void compile(Appendable out, List<Expression> args) throws IOException {
+			out.append(JS_FN_TOKEN);
+			out.append("(cmp,");
+			args.get(0).compile(out);
+			out.append(")");
+		}
+
+		@Override
+		public String[] getKeys() {
+			return new String[] { "token","t" };
 		}
 	}
 }

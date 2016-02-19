@@ -46,7 +46,7 @@ ObjectValueProvider.prototype.merge = function(values) {
  * @return {Object} The value referenced by the expression.
  */
 ObjectValueProvider.prototype.get = function(expression, callback) {
-    var value = $A.expressionService.resolve(expression,this.values);
+    var value = this.values[expression]||$A.expressionService.resolve(expression,this.values);
     if( $A.util.isFunction(callback) ) {
         callback(value);
     }

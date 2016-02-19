@@ -149,7 +149,7 @@ public interface BaseComponentDef extends RootDefinition {
     /**
      * Gets the application-wide token overrides.
      */
-    List<DefDescriptor<TokensDef>> getTokenOverrides();
+    List<DefDescriptor<TokensDef>> getTokenOverrides() throws QuickFixException;
 
     /**
      * Gets the application-wide default flavor override.

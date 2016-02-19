@@ -16,6 +16,7 @@
 package org.auraframework.def;
 
 import java.util.List;
+import java.util.Map;
 
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -35,4 +36,7 @@ public interface ApplicationDef extends BaseComponentDef {
     List<String> getAdditionalAppCacheURLs() throws QuickFixException;
 
     Boolean isOnePageApp() throws QuickFixException;
+
+    Map<String, String> getTokens(DefDescriptor<TokensDef> tokensDescriptor);
+
 }

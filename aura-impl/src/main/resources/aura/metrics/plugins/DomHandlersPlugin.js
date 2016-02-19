@@ -28,7 +28,7 @@
  */
 var DomHandlersPlugin = function DomHandlersPlugin(config) {
     this.config = config;
-    this["enabled"] = false; // Do not enable it automatically
+    this["enabled"] = true;
 };
 
 DomHandlersPlugin.NAME = "domHandlers";

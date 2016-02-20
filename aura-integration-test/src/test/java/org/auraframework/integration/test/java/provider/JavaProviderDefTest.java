@@ -26,7 +26,6 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AuraValidationException;
@@ -322,7 +321,6 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         DefDescriptor<ProviderDef> desc = DefDescriptorImpl.getInstance(
                 "java://" + DefaultBeanProviderConstructor.class.getName(),
                 ProviderDef.class);
-        DefinitionService definitionService = Aura.getDefinitionService();
         try {
             definitionService.getDefinition(desc);
         } catch (Exception e) {

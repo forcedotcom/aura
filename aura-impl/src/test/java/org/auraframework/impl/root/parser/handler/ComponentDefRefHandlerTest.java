@@ -20,7 +20,6 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
@@ -45,7 +44,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component",
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 desc,
@@ -144,13 +143,13 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         cdrHandler.readSystemAttributes();
         cdrHandler.createDefinition();
 
-        Aura.getDefinitionService().getDefDescriptor("fake:component", ComponentDef.class);
+        definitionService.getDefDescriptor("fake:component", ComponentDef.class);
 
         assertEquals("fake", cdrHandler.createDefinition().getFlavor());
     }
 
     private ComponentDefRefHandler<?> createComponentDefHandler(String markup) throws Exception {
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component",
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc, markup, "myID", Format.XML);
         xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());

@@ -19,8 +19,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import junit.framework.AssertionFailedError;
-
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
@@ -28,6 +26,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
@@ -37,6 +36,8 @@ import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.util.test.util.UnitTestCase;
 
+import junit.framework.AssertionFailedError;
+
 /**
  * Base class for unit tests referencing the Aura framework.
  * 
@@ -45,6 +46,11 @@ import org.auraframework.util.test.util.UnitTestCase;
 public abstract class AuraTestCase extends UnitTestCase {
     protected final static String baseApplicationTag = "<aura:application %s>%s</aura:application>";
     protected final static String baseComponentTag = "<aura:component %s>%s</aura:component>";
+
+    //
+    // FIXME: Definition service cannot be used in ./aura/ this needs to be moved up a level.
+    //
+    protected DefinitionService definitionService = Aura.getDefinitionService();
 
     private AuraTestingUtil auraTestingUtil;
     private AuraTestingMarkupUtil auraTesingMarkupUtil;

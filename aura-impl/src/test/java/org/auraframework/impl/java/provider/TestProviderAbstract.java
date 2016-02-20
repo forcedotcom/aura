@@ -33,6 +33,7 @@ public class TestProviderAbstract implements ComponentDescriptorProvider {
     public DefDescriptor<ComponentDef> provide() {
         BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
         String num = (String) component.getAttributes().getExpression("implNumber");
+        //Warning test:test_Provider_Abstract no longer exist
         return DefDescriptorImpl.getInstance("test:test_Provider_Abstract" + num, ComponentDef.class);
     }
 }

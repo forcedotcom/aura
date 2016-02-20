@@ -29,9 +29,9 @@
     testBlurEventBubble: {
         test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
-            cmp.find("autocomplete").focus();
+            cmp.find("autocomplete").get('e.focus').fire();
             var result = cmp.find("event");
-            cmp.getElement().getElementsByTagName("input")[0].blur();
+            cmp.find("autocomplete").get('e.blur').fire();
             $A.test.addWaitForWithFailureMessage(true, function() {
                 return "blur" === result.get("v.value");
             },"blur event didn't bubble");
@@ -63,7 +63,7 @@
             var pillContainer = cmp.find("pillContainer");
             pillContainer.insertItems( [this.PILLS[0]] );
             var pill = pillContainer.find("pill");
-            pill.focus()
+            pill.get('e.focus').fire();
             $A.test.addWaitForWithFailureMessage(true, function() {
                 return "focus" === cmp.find("event").get("v.value");
             },"focus event didn't bubble");
@@ -78,8 +78,8 @@
             var pillContainer = cmp.find("pillContainer");
             pillContainer.insertItems( [this.PILLS[0]] );
             var pill = pillContainer.find("pill");
-            pill.focus();
-            cmp.find("event").focus();
+            pill.get('e.focus').fire();
+            pill.get('e.blur').fire();
             $A.test.addWaitForWithFailureMessage(true, function() {
                 return "blur" === cmp.find("event").get("v.value");
             },"blur event didn't bubble");

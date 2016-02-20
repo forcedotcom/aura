@@ -49,7 +49,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
         Object value = adr.getValue();
         assertEquals("unparsed value", original, value);
 
-        adr.parseValue(Aura.getDefinitionService().getDefinition(typeDefDesc, TypeDef.class));
+        adr.parseValue(definitionService.getDefinition(typeDefDesc, TypeDef.class));
         value = adr.getValue();
         assertEquals("parsed value", expected, value);
 
@@ -165,10 +165,10 @@ public class AttributeDefRefTest extends AuraImplTestCase {
         AttributeDefRefImpl adr2 = vendor.makeAttributeDefRef(testAttributeDescriptorName, "1", null);
         assertEquals("unparsed def refs should be equal", adr1, adr2);
 
-        adr1.parseValue(Aura.getDefinitionService().getDefinition("string", TypeDef.class));
+        adr1.parseValue(definitionService.getDefinition("string", TypeDef.class));
         assertEquals("parsed def ref and unparsed def ref should still be equal", adr1, adr2);
 
-        adr2.parseValue(Aura.getDefinitionService().getDefinition("long", TypeDef.class));
+        adr2.parseValue(definitionService.getDefinition("long", TypeDef.class));
         assertEquals("differently parsed def refs should still be equal", adr1, adr2);
     }
 }

@@ -17,7 +17,6 @@ package org.auraframework.integration.test.css;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.FlavorDefaultDef;
@@ -61,14 +60,14 @@ public class FlavorDefaultDefHandlerTest extends StyleTestCase {
     }
 
     private FlavorDefaultDef source(String src) throws Exception {
-        DefDescriptor<FlavorsDef> parentDesc = Aura.getDefinitionService().getDefDescriptor("test:tmp",
+        DefDescriptor<FlavorsDef> parentDesc = definitionService.getDefDescriptor("test:tmp",
                 FlavorsDef.class);
         StringSource<FlavorsDef> parentSource = new StringSource<>(parentDesc, "<aura:flavors/>", "myID", Format.XML);
         XMLStreamReader parentReader = XMLParser.createXMLStreamReader(parentSource.getHashingReader());
         parentReader.next();
         FlavorsDefHandler parent = new FlavorsDefHandler(parentDesc, parentSource, parentReader);
 
-        DefDescriptor<FlavorIncludeDef> desc = Aura.getDefinitionService().getDefDescriptor("test", FlavorIncludeDef.class);
+        DefDescriptor<FlavorIncludeDef> desc = definitionService.getDefDescriptor("test", FlavorIncludeDef.class);
         StringSource<FlavorIncludeDef> ss = new StringSource<>(desc, src, "myID", Format.XML);
         XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(ss.getHashingReader());
         xmlReader.next();

@@ -13,18 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.java.provider;
+({
+    render: function (cmp, helper) {
+        var ret = this.superRender();
 
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.system.Annotations.Provider;
-/**
- * this provider is for JavaProviderDefTest.testInterfaceWithNoProvider
- */
-@Provider
-public class TestProviderWithStaticMethod {
-    public static DefDescriptor<ComponentDef> provide() {
-        return DefDescriptorImpl.getInstance("test:test_Provider_Component", ComponentDef.class);
+        helper.buildBody(cmp, true);
+
+        return ret;
+    },
+
+    rerender: function (cmp, helper) {
+        this.superRerender();
+
+        var shouldClearBody = cmp.isDirty("v.label") || cmp.isDirty("v.body");
+        helper.buildBody(cmp, shouldClearBody);
+    },
+
+    afterRender: function (cmp) {
+        this.superAfterRender();
+
+        $A.renderingService.afterRender(cmp.get("v.body"));
+    },
+
+    unrender: function (cmp) {
+        $A.renderingService.unrender(cmp.get("v.body"));
+
+        this.superUnrender();
     }
-}
+
+});

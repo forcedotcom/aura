@@ -72,7 +72,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
      * @userStory AuraServlet: POST
      */
     public void testGetComponentDef() throws Exception {
-        ComponentDef component = Aura.getDefinitionService().getDefinition("auratest:testComponent1",
+        ComponentDef component = definitionService.getDefinition("auratest:testComponent1",
                 ComponentDef.class);
 
         Map<String, RegisterEventDef> red = component.getRegisterEventDefs();
@@ -137,7 +137,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
      * @userStory a07B0000000EYU4
      */
     public void testGetApplicationDef() throws Exception {
-        ApplicationDef application = Aura.getDefinitionService().getDefinition("auratest:testApplication1",
+        ApplicationDef application = definitionService.getDefinition("auratest:testApplication1",
                 ApplicationDef.class);
 
         Map<String, RegisterEventDef> red = application.getRegisterEventDefs();

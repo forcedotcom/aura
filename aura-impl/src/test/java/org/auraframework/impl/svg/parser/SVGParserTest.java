@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.svg.parser;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.SVGDef;
@@ -226,7 +225,7 @@ public class SVGParserTest extends AuraImplTestCase {
     private DefDescriptor<SVGDef> setupSimpleSVGDef(String markup) {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ComponentDef.class, null);
-        DefDescriptor<SVGDef> desc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
+        DefDescriptor<SVGDef> desc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),
                 SVGDef.class);
         return desc;
     }

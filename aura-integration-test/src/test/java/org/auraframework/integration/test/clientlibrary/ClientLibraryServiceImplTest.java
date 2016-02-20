@@ -41,7 +41,6 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoContextException;
-import org.auraframework.throwable.quickfix.ClientLibraryException;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 
@@ -91,10 +90,10 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
 
     public void testWriteResourcesCSS() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService()
+        DefDescriptor<ApplicationDef> appDesc = definitionService
                 .getDefDescriptor("clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         context.setApplicationDescriptor(appDesc);
-        Aura.getDefinitionService().updateLoaded(appDesc);
+        definitionService.updateLoaded(appDesc);
 
         StringBuilder sb = new StringBuilder();
         clientLibraryService.writeCss(context, sb);
@@ -111,12 +110,12 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
 
     public void testContextPath() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService()
+        DefDescriptor<ApplicationDef> appDesc = definitionService
                 .getDefDescriptor("clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         context.setApplicationDescriptor(appDesc);
         String coolContext = "/cool";
         context.setContextPath(coolContext);
-        Aura.getDefinitionService().updateLoaded(appDesc);
+        definitionService.updateLoaded(appDesc);
 
         Set<String> urlSet = clientLibraryService.getUrls(context, Type.JS);
         Pattern pattern = Pattern.compile("/auraFW|/l/");
@@ -134,10 +133,10 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
 
     public void testWriteResourcesJS() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService()
+        DefDescriptor<ApplicationDef> appDesc = definitionService
                 .getDefDescriptor("clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         context.setApplicationDescriptor(appDesc);
-        Aura.getDefinitionService().updateLoaded(appDesc);
+        definitionService.updateLoaded(appDesc);
         StringBuilder sb = new StringBuilder();
 
         clientLibraryService.writeJs(context, sb);
@@ -277,7 +276,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
     }
 
     public void testGetUrlsWithNullArgument() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         Set<String> urls = getClientLibraryUrls(appDesc, null);
         assertEquals(0, urls.size());
@@ -285,7 +284,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
 
     public void testGetUrlsWithSimpleApp() throws Exception {
         // UTEST mode
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertEquals(2, jsUrls.size());
@@ -305,7 +304,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
     public void testGetUrlsChangesWithMode() throws Exception {
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PTEST, Format.JSON, Authentication.AUTHENTICATED);
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertEquals(2, jsUrls.size());
@@ -318,7 +317,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
     public void testCaseSensitiveName() throws Exception {
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.STATS, Format.JSON, Authentication.AUTHENTICATED);
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
 
         Set<String> res = getClientLibraryUrls(appDesc, Type.CSS);
@@ -326,7 +325,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
     }
 
     public void testDifferentModes() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
 
         Aura.getContextService().endContext();
@@ -358,7 +357,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
     }
 
     public void testGetUrlsForAppWithDependencies() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertEquals(6, jsUrls.size());
@@ -405,7 +404,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         context.setApplicationDescriptor(desc);
         // TODO: Why this extra step, should the Client Library service take care of loading the appDesc def and
         // returning the urls?
-        Aura.getDefinitionService().updateLoaded(desc);
+        definitionService.updateLoaded(desc);
         Set<String> urls = clientLibraryService.getUrls(context, libraryType);
         return urls;
     }

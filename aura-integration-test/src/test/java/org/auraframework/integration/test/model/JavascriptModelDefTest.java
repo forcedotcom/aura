@@ -18,7 +18,6 @@ package org.auraframework.integration.test.model;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;
@@ -43,8 +42,8 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
      */
     public void testDefaults() throws Exception {
         // Find the model by autowiring
-        Aura.getDefinitionService().getDefinition("test:jsModel", ComponentDef.class);
-        JavascriptModelDef modelDef = (JavascriptModelDef) Aura.getDefinitionService().getDefinition(
+        definitionService.getDefinition("test:jsModel", ComponentDef.class);
+        JavascriptModelDef modelDef = (JavascriptModelDef) definitionService.getDefinition(
                 "js://test.jsModel", ModelDef.class);
 
         // Make sure the properties expected are found on the def

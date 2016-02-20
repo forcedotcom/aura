@@ -51,7 +51,7 @@ public class RendererDefTest extends AuraImplTestCase {
      * @expectedResults No rendererDef section found in componentDef
      */
     public void testComponentDefWhenRedererIsJava() throws Exception {
-        DefDescriptor<ComponentDef> d = Aura.getDefinitionService().getDefDescriptor("test:test_SimpleJavaRenderer",
+        DefDescriptor<ComponentDef> d = definitionService.getDefDescriptor("test:test_SimpleJavaRenderer",
                 ComponentDef.class);
         ComponentDef def = d.getDef();
         // Convert the definition to a format that is used by the client

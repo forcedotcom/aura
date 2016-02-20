@@ -21,8 +21,6 @@ import org.auraframework.test.util.WebDriverTestCase.CheckAccessibility;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import com.ibm.icu.util.Calendar;
-
 @CheckAccessibility(false)
 public class ClientLibraryTagUITest extends WebDriverTestCase {
     public ClientLibraryTagUITest(String name) {

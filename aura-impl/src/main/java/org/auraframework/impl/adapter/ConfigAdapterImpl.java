@@ -647,8 +647,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
                 inlineStyle = !isLockerServiceEnabled();
             }
         } else {
-        	// Look for /auraFW/resources/lockerservice/safeEval.html
-        	inlineStyle = isSafeEvalWorkerURI(request.getRequestURI());
+            inlineStyle = isSafeEvalWorkerURI(request.getRequestURI());
         }
 
         return new DefaultContentSecurityPolicy(inlineStyle);
@@ -667,7 +666,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 	}
 
 	protected boolean isSafeEvalWorkerURI(String uri) {
-        // TODO: we should allow `fwuid` as a token for cache control in this url
-		return uri.endsWith("/lockerservice/safeEval.html");
+        return uri.endsWith("/lockerservice/safeEval.html");
 	}
 }

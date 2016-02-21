@@ -53,7 +53,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
      * Verify the loading of libraryDefs.
      */
     public void testGetLibraryInstance() throws Exception {
-        LibraryDef libDef = Aura.getDefinitionService().getDefinition("test:test_Library", LibraryDef.class);
+        LibraryDef libDef = definitionService.getDefinition("test:test_Library", LibraryDef.class);
         assertNotNull(libDef);
 
         List<IncludeDefRef> includes = libDef.getIncludes();
@@ -92,7 +92,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
      * Tests the ordering logic of the {@link LibraryDef} to ensure that imports will be serialized in order.
      */
     public void testIncludeOrdering() throws Exception {
-        LibraryDef libDef = Aura.getDefinitionService().getDefinition("test:test_LibraryOrdering", LibraryDef.class);
+        LibraryDef libDef = definitionService.getDefinition("test:test_LibraryOrdering", LibraryDef.class);
         assertNotNull(libDef);
 
         List<IncludeDefRef> includes = libDef.getIncludes();
@@ -109,7 +109,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
      */
     public void testIncludeNotOrderable() throws Exception {
         try {
-            Aura.getDefinitionService().getDefinition("test:test_LibraryNotOrderable", LibraryDef.class);
+            definitionService.getDefinition("test:test_LibraryNotOrderable", LibraryDef.class);
             fail("Getting library should fail because it is malformed.");
         } catch (Throwable t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
@@ -121,7 +121,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
      * Tests the ordering logic of the {@link LibraryDef} to ensure that imports will be serialized in order.
      */
     public void testIncludeOrderingOneDependsOnRest() throws Exception {
-        LibraryDef libDef = Aura.getDefinitionService().getDefinition(
+        LibraryDef libDef = definitionService.getDefinition(
                 "test:test_LibraryIncludeOrderingOneDependsOnRest", LibraryDef.class);
         assertNotNull(libDef);
 
@@ -149,7 +149,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
      * Tests the ordering logic of the {@link LibraryDef} to ensure a mix of external and internal dependencies work.
      */
     public void testLibraryOrderingInternalExternalMix() throws Exception {
-        LibraryDef libDef = Aura.getDefinitionService().getDefinition("test:test_LibraryOrderingInternalExternalMix",
+        LibraryDef libDef = definitionService.getDefinition("test:test_LibraryOrderingInternalExternalMix",
                 LibraryDef.class);
         assertNotNull(libDef);
 
@@ -165,7 +165,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
      * Tests the {@link LibraryDef} (and {@link IncludeDefRef}) serialization.
      */
     public void testSerialization() throws Exception {
-        LibraryDef libDef = Aura.getDefinitionService().getDefinition("test:test_Library", LibraryDef.class);
+        LibraryDef libDef = definitionService.getDefinition("test:test_Library", LibraryDef.class);
         assertNotNull(libDef);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(512);

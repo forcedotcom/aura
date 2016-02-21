@@ -17,7 +17,6 @@ package org.auraframework.integration.test.css;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
 import org.auraframework.def.TokensImportDef;
@@ -36,7 +35,7 @@ public class TokensImportDefHandlerTest extends StyleTestCase {
     }
 
     private TokensImportDef source(String src) throws Exception {
-        DefDescriptor<TokensImportDef> desc = Aura.getDefinitionService().getDefDescriptor("test", TokensImportDef.class);
+        DefDescriptor<TokensImportDef> desc = definitionService.getDefDescriptor("test", TokensImportDef.class);
         StringSource<TokensImportDef> ss = new StringSource<>(desc, src, "myID", Format.XML);
         XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(ss.getHashingReader());
         xmlReader.next();

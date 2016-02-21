@@ -21,18 +21,11 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.DefinitionServiceImpl;
-import org.auraframework.service.DefinitionService;
 
 public class AuraComponentServiceImplTest extends AuraImplTestCase {
 
     public AuraComponentServiceImplTest(String name) {
         super(name);
-    }
-
-    public void testAuraComponentService() {
-        DefinitionService ds = Aura.getDefinitionService();
-        assertTrue(ds instanceof DefinitionServiceImpl);
     }
 
     public void testGetComponent() throws Exception {

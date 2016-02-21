@@ -20,7 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -40,7 +39,7 @@ public class ObjectSerializationTest extends AuraImplTestCase {
     }
 
     public void testSerializeTestCaseDef() throws Exception {
-        TestSuiteDef suite = Aura.getDefinitionService().getDefinition("js://auratest.jsmock", TestSuiteDef.class);
+        TestSuiteDef suite = definitionService.getDefinition("js://auratest.jsmock", TestSuiteDef.class);
         TestCaseDef test = null;
         for (TestCaseDef caseDef : suite.getTestCaseDefs()) {
             if ("testActionString".equals(caseDef.getName())) {

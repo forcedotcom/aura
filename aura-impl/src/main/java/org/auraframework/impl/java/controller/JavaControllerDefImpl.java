@@ -31,7 +31,6 @@ import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.system.SubDefDescriptor;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.util.json.Json;
 

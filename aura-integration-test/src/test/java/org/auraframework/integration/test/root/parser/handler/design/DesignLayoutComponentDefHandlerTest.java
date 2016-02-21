@@ -85,7 +85,7 @@ public class DesignLayoutComponentDefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class, null);
         getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", ""));
 
-        DefDescriptor<DesignDef> designDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
+        DefDescriptor<DesignDef> designDesc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
         getAuraTestingUtil().addSourceAutoCleanup(designDesc, String.format("<design:component><design:layout>" +
                 "<design:section><design:layoutItems>%s</design:layoutItems></design:section>" +

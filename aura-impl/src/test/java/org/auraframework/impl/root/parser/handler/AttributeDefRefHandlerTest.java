@@ -19,7 +19,6 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
@@ -59,7 +58,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
     }
 
     public void testGetElementWithValueAttribute() throws Exception {
-        DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor("mystring", AttributeDef.class);
+        DefDescriptor<AttributeDef> desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         StringSource<AttributeDef> source = new StringSource<>(desc,
                 "<aura:set attribute='mystring' value='testing'/>", "myID", Format.XML);
         XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
@@ -73,7 +72,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
     }
 
     public void testGetElementWithValueAsChildTag() throws Exception {
-        DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor("mystring", AttributeDef.class);
+        DefDescriptor<AttributeDef> desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         StringSource<AttributeDef> source = new StringSource<>(desc,
                 "<aura:set attribute='mystring'><aura:foo/></aura:set>", "myID", Format.XML);
         XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
@@ -86,7 +85,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
     }
 
     public void testGetElementWithTextBetweenTags() throws Exception {
-        DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor("mystring", AttributeDef.class);
+        DefDescriptor<AttributeDef> desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         StringSource<AttributeDef> source = new StringSource<>(desc,
                 "<aura:set attribute='mystring'>Child Text</aura:set>", "myID", Format.XML);
         XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());

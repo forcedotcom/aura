@@ -17,7 +17,6 @@ package org.auraframework.impl.root.parser.handler;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
@@ -54,7 +53,7 @@ public class ContainerTagHandlerTest extends AuraImplTestCase {
      * Utility method to create a DefRefHandler for a given markup.
      */
     private ParentedTagHandler<? extends ComponentDefRef, ?> createDefRefHandler(String markup) throws Exception {
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component",
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc, markup, "myID", Format.XML);
         xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());

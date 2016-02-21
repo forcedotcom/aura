@@ -21,7 +21,6 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.AttributeDefRef;
@@ -54,7 +53,7 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        desc = Aura.getDefinitionService().getDefDescriptor("mystring", AttributeDef.class);
+        desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         componentSource = new StringSource<>(desc, "<aura:component/>", "myID", Format.XML);
         componentXmlReader = getXmlReader(componentSource);
         cdh = new ComponentDefHandler(null, componentSource, componentXmlReader);

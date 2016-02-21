@@ -433,8 +433,8 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     protected HttpGet obtainAuraGetMethod(Mode mode, Format format, String desc, Class<? extends BaseComponentDef> type,
             Map<String, String> params, Header[] headers)
                     throws QuickFixException, MalformedURLException, URISyntaxException {
-        return obtainAuraGetMethod(mode, format, Aura.getDefinitionService().getDefDescriptor(desc, type), params,
-                headers);
+        return obtainAuraGetMethod(mode, format, definitionService
+                .getDefDescriptor(desc, type), params, headers);
     }
 
     /**
@@ -546,7 +546,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
 
         public ServerAction setApp(String name, Class<? extends BaseComponentDef> clazz) {
-            app = Aura.getDefinitionService().getDefDescriptor(name, clazz);
+            app = definitionService.getDefDescriptor(name, clazz);
             return this;
         }
 
@@ -585,7 +585,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                     actionInstanceArray.add(actionInstance);
                 }
                 if (app == null) {
-                    app = Aura.getDefinitionService().getDefDescriptor("auratest:test_SimpleServerRenderedPage",
+                    app = definitionService.getDefDescriptor("auratest:test_SimpleServerRenderedPage",
                             ApplicationDef.class);
                 }
                 message.put("actions", actionInstanceArray.toArray());
@@ -602,7 +602,8 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
         @Override
         public DefDescriptor<ActionDef> getDescriptor() {
-            return Aura.getDefinitionService().getDefDescriptor(qualifiedName.get(0), ActionDef.class);
+            return definitionService.getDefDescriptor(qualifiedName.get(0),
+                    ActionDef.class);
         }
 
         public ArrayList<String> getQualifiedName() {
@@ -610,7 +611,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
 
         public DefDescriptor<ActionDef> getDescriptor(String qualifiedName) {
-            return Aura.getDefinitionService().getDefDescriptor(qualifiedName, ActionDef.class);
+            return definitionService.getDefDescriptor(qualifiedName, ActionDef.class);
         }
 
         @Override
@@ -641,7 +642,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                     fail("Error response:" + rawResponse);
                 }
                 Map<String, Object> json = (Map<String, Object>) new JsonReader()
-                        .read(rawResponse.substring(AuraBaseServlet.CSRF_PROTECT.length()));
+                .read(rawResponse.substring(AuraBaseServlet.CSRF_PROTECT.length()));
                 ArrayList<Map<String, Object>> actions = (ArrayList<Map<String, Object>>) json.get("actions");
                 for (Map<String, Object> action : actions) {
 
@@ -741,13 +742,13 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         public void setCallingDescriptor(String caller) {
         }
 
-        @Override
-        public String getCallerVersion() {
-            return null;
-        }
+		@Override
+		public String getCallerVersion() {
+			return null;
+		}
 
-        @Override
-        public void setCallerVersion(String callerVersion) {
-        }
+		@Override
+		public void setCallerVersion(String callerVersion) {
+		}
     }
 }

@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.root.parser.handler.design;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignDef;
@@ -78,7 +77,7 @@ public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
         String cmpBody = "<aura:attribute name='mystring' type='String' />";
         addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpBody));
 
-        DefDescriptor<DesignDef> designDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
+        DefDescriptor<DesignDef> designDesc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
         addSourceAutoCleanup(designDesc,
                 String.format("<design:component><design:template>%s</design:template></design:component>", markup));

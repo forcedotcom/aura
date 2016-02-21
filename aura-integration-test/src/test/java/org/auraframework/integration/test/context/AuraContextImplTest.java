@@ -43,7 +43,6 @@ import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -85,16 +84,15 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * the component should be present easily, and give a more reasonable error message if it is not.
      */
     public void testComponentDefSerializedFormat() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "preloadTest:dependenciesApp", ApplicationDef.class);
         AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.HTML,
                 Authentication.AUTHENTICATED, appDesc);
-        DefinitionService ds = Aura.getDefinitionService();
-        ApplicationDef appDef = ds.getDefinition("preloadTest:dependenciesApp", ApplicationDef.class);
+        ApplicationDef appDef = definitionService.getDefinition("preloadTest:dependenciesApp", ApplicationDef.class);
         Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
         clientLoaded.put(appDesc, context.getDefRegistry().getUid(null, appDesc));
         context.setClientLoaded(clientLoaded);
-        ds.updateLoaded(null);
+        definitionService.updateLoaded(null);
 
         assertEquals("{\"descriptor\":\"markup://preloadTest:dependenciesApp\"}", JsonEncoder.serialize(appDef));
     }
@@ -103,7 +101,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * Verify we are able to check what DefDescriptors have been preloaded.
      */
     public void testIsPreloaded() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "preloadTest:dependenciesApp", ApplicationDef.class);
         AuraContext context = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.HTML, Authentication.AUTHENTICATED, appDesc);
@@ -130,7 +128,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      */
     @UnAdaptableTest
     public void testSerializeWithApp() throws Exception {
-        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor("arbitrary:appname",
+        DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor("arbitrary:appname",
                 ApplicationDef.class);
 
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED,
@@ -146,7 +144,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * Don't use a gold file here, the nonce changes often.
      */
     public void testSerializeNonceWithCmp() throws Exception {
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("arbitrary:cmpname",
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("arbitrary:cmpname",
                 ComponentDef.class);
 
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED,
@@ -163,7 +161,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      */
     @UnAdaptableTest
     public void testSerializeWithCmp() throws Exception {
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("arbitrary:cmpname",
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("arbitrary:cmpname",
                 ComponentDef.class);
 
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED,
@@ -189,11 +187,11 @@ public class AuraContextImplTest extends AuraImplTestCase {
      */
     @UnAdaptableTest
     public void testSetApplicationDescriptor() throws Exception {
-        DefDescriptor<ApplicationDef> descApp1 = Aura.getDefinitionService().getDefDescriptor("arbitrary:appnameApp1",
+        DefDescriptor<ApplicationDef> descApp1 = definitionService.getDefDescriptor("arbitrary:appnameApp1",
                 ApplicationDef.class);
-        DefDescriptor<ApplicationDef> descApp2 = Aura.getDefinitionService().getDefDescriptor("arbitrary:appnameApp2",
+        DefDescriptor<ApplicationDef> descApp2 = definitionService.getDefDescriptor("arbitrary:appnameApp2",
                 ApplicationDef.class);
-        DefDescriptor<ComponentDef> descCmp = Aura.getDefinitionService().getDefDescriptor("arbitrary:cmpname",
+        DefDescriptor<ComponentDef> descCmp = definitionService.getDefDescriptor("arbitrary:cmpname",
                 ComponentDef.class);
 
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
@@ -351,7 +349,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         if (Aura.getContextService().isEstablished()) {
             Aura.getContextService().endContext();
         }
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor("test:laxSecurity",
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("test:laxSecurity",
                 ApplicationDef.class);
         AuraContext cntx = Aura.getContextService().startContext(Mode.FTEST, Format.JSON, Authentication.AUTHENTICATED,
                 appDesc);
@@ -365,7 +363,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         if (Aura.getContextService().isEstablished()) {
             Aura.getContextService().endContext();
         }
-        DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService().getDefDescriptor("aura:text",
+        DefDescriptor<ComponentDef> cmpDesc = definitionService.getDefDescriptor("aura:text",
                 ComponentDef.class);
         AuraContext cntx = Aura.getContextService().startContext(Mode.FTEST, Format.JSON, Authentication.AUTHENTICATED,
                 cmpDesc);
@@ -565,7 +563,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         action.setCallerVersion("2.0");
         ctx.setCurrentAction(action);
         ctx.setApplicationDescriptor(
-                Aura.getDefinitionService().getDefDescriptor("markup://componentTest:versionInServer", ComponentDef.class));
+                definitionService.getDefDescriptor("markup://componentTest:versionInServer", ComponentDef.class));
 
         String version = ctx.getAccessVersion();
         assertEquals("2.0", version);

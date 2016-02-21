@@ -117,7 +117,7 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
         String markup = "<aura:clientLibrary name='HTML5Shiv' type='JS'/> <aura:clientLibrary name='HTML5Shiv' type='CSS'/>";
         DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", markup));
-        List<ClientLibraryDef> clientLibraries = Aura.getDefinitionService().getDefinition(cmp).getClientLibraries();
+        List<ClientLibraryDef> clientLibraries = definitionService.getDefinition(cmp).getClientLibraries();
         assertNotNull(clientLibraries);
         assertEquals("Expected to see two client libraries", 2, clientLibraries.size());
         assertEquals("Didn't find the JS library(or the order is wrong)", Type.JS, clientLibraries.get(0).getType());
@@ -165,7 +165,7 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", markup));
         try {
-            ComponentDef def = Aura.getDefinitionService().getDefinition(cmp);
+            ComponentDef def = definitionService.getDefinition(cmp);
             def.validateDefinition();
             fail("Should flag an error when resource type and specified type attribute do not match.");
         } catch (InvalidDefinitionException e) {

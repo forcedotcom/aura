@@ -1,0 +1,56 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component description="An input field for entering a number." implements="ui:visible, ui:uiEvents, ui:inputNumberComponent,ui:inputTextComponent">
+
+    <aura:import library="ui:inputNumberLibrary" property="inputNumberLibrary"/>
+
+    <!-- Public attributes -->
+    <aura:attribute name="id"        type="String"                                    description="DOM id of the input element." />
+    <aura:attribute name="required"  type="Boolean"  default="false"  access="GLOBAL" description="Specifies whether the input is required. Default value is &quot;false&quot;."/>
+    <aura:attribute name="value"     type="String"                    access="GLOBAL" description="The value currently in the input field."/>
+    <aura:attribute name="disabled"  type="Boolean"  default="false"  access="GLOBAL" description="Specifies whether the component should be displayed in a disabled state. Default value is &quot;false&quot;."/>
+    <aura:attribute name="style"     type="String"   default="number" access="GLOBAL" description="Specifies which number style should be used by default if format attributes is not passed. ['number','currency','percent']" />
+    <aura:attribute name="updateOn"  type="String"   default="change" access="GLOBAL" description="Specifies when do you want to change value attr. By default is on input 'change' event. ['change','input']" />
+
+    <!-- Private attributes -->
+    <aura:attribute name="inputValue"           type="string"  access="private" default="" />
+    <aura:attribute name="lastInputValue"       type="string"  access="private" default="" />
+
+    <!-- Event handlers -->
+    <aura:handler name="init"   value="{! this }"    action="{! c.initialize }" />
+    <aura:handler name="change" value="{! v.value }" action="{! c.handleChangeEvent }" />
+
+
+    <input type="text"
+           aura:id="input"
+           id="{! v.id }"
+           oninput="{! c.handleOnInput }"
+           onchange="{! c.handleOnChange }"
+           onblur="{! c.handleOnBlur }"
+           onfocus="{! c.handleOnFocus }"
+           class="{!v.class + ' input'}"
+           value="{! v.inputValue }"
+           max="{!v.max}"
+           min="{!v.min}"
+           step="{!v.step}"
+           placeholder="{!v.placeholder}"
+           required="{!v.required}"
+           disabled="{!v.disabled}"
+           aria-describedby="{!v.ariaDescribedBy}"/>
+    
+</aura:component>

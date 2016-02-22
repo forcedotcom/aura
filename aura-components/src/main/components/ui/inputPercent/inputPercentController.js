@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 salesforce.com, inc.
+ * Copyright (C) 2016 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 ({
-    afterRender : function (cmp, helper) {
-        var element = helper.getInputElement(cmp);
-        this.superAfterRender();
-        $A.util.on(element,'focus', function () {
-            helper.removeErrors(cmp);
-        });
+    initialize : function (cmp, event, helper) {
+        helper.setDefaultAttrs(cmp);
     }
 });

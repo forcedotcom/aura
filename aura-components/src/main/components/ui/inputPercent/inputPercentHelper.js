@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 salesforce.com, inc.
+ * Copyright (C) 2016 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,7 @@
  * limitations under the License.
  */
 ({
-    doUpdate: function(component, value) {
-        if (value) {
-            value = value.replace(/%+$/g, '');
-        }
-        component.set("v.value", value);
-    },
-
-    getNumber: function(component) {
-        var num = component.get("v.value");
-        var scale = component.get("v.valueScale");
-        if ($A.util.isFiniteNumber(num) && scale) {
-            num *= Math.pow(10, scale);
-        }
-        return num;
+    setDefaultAttrs : function (cmp) {
+        cmp.set('v.updateOnDisabled', true);
     }
-})// eslint-disable-line semi
+});

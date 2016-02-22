@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 salesforce.com, inc.
+ * Copyright (C) 2016 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 ({
-
-    afterRender: function(component, helper) {
-        var value = helper.getNumber(component);
-        var formatter = component.get('v.format') || $A.get("$Locale.numberFormat");
-        var el    = helper.getInputElement(component);
-
-        this.superAfterRender();
-        if (component.get("v.doFormat")) {
-            el.value = helper.inputNumberLibrary.number.formatNumber(value, formatter) || '';
-        }
+    initialize : function (cmp, event, helper) {
+        helper.setDefaultAttrs(cmp);
     }
-
-})// eslint-disable-line semi
+});

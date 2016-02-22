@@ -22,7 +22,7 @@
     },
 
     addMenuItemDomEvents: function (component) {
-        var events = ["keydown", "mouseover"];
+        var events = ["click", "keydown", "mouseover"];
         if (!component._menuItemDomEventsInstalled) {
             for (var i = 0, len = events.length; i < len; i++) {
                 $A.util.on(component.getElement(), events[i], this.domEventHandler.bind(this, component));
@@ -56,7 +56,7 @@
     },
 
     fireSelectEvent: function (component, event, options) {
-        if (this.isDisabled(component)) {
+        if (!component.isValid() || this.isDisabled(component)) {
             return;
         }
 

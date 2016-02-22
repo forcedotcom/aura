@@ -328,13 +328,13 @@
            $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
        }]
    },
-   _testSetWrongValue : {
+   testSetWrongValue : {
        attributes : {  value  :  12 },
        test : [function (cmp) {
-           cmp.set('v.value','abc');
-           $A.render(cmp);
-           var inputValue = cmp.getElement().value;
+           cmp.set('v.value', 'abc');
            $A.test.assertEquals(undefined, cmp.get("v.value"), "Cmp: value should be undefined.");
+       }, function(cmp){
+           var inputValue = cmp.getElement().value;
            $A.test.assertEquals('', inputValue, "Cmp: input value should be empty string");
        }]
    }

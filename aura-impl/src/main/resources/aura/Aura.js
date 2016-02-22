@@ -571,22 +571,24 @@ AuraInstance.prototype.initAsync = function(config) {
         // if this iframe is still loading, we should wait for it before continue with
         // initialization, in the other hand, if the iframe is not available, we create it,
         // and wait for it to be ready.
-        var el = document.getElementById('safeEvalWorker');
+        var el = document.getElementById("safeEvalWorker");
         if (!el) {
-            el = document.createElement('iframe');
-            // TODO: we should use `config["context"]["fwuid"]` as a token for cache control
-            el.setAttribute('src', (config["host"] || '') + '/auraFW/resources/lockerservice/safeEval.html');
-            el.setAttribute('width', "0");
-            el.setAttribute('height', "0");
-            el.setAttribute('tabIndex', "-1");
-            el.setAttribute('aria-hidden', "true");
-            el.setAttribute('title', "scripts");
-            el.setAttribute('id', 'safeEvalWorker');
-            el.style.display = 'none';
+            if (!config["safeEvalWorker"]) {
+                throw new $A.auraError("Aura(): Missing 'safeEvalWorker' configuration.");
+            }
+            el = document.createElement("iframe");
+            el.setAttribute("src", config["safeEvalWorker"]);
+            el.setAttribute("width", "0");
+            el.setAttribute("height", "0");
+            el.setAttribute("tabIndex", "-1");
+            el.setAttribute("aria-hidden", "true");
+            el.setAttribute("title", "scripts");
+            el.setAttribute("id", "safeEvalWorker");
+            el.style.display = "none";
             document.body.appendChild(el);
         }
-        $A.util.on(el, 'load', createAuraContext);
-        $A.util.on(el, 'error', function () {
+        $A.util.on(el, "load", createAuraContext);
+        $A.util.on(el, "error", function () {
             throw new $A.auraError("Aura(): Failed to load locker worker.");
         });
     } else {
@@ -783,7 +785,7 @@ AuraInstance.prototype.handleError = function(message, e) {
 
 /**
  * Report error to the server after handling it.
- * Note that the method should only be used if try-catch mechanism 
+ * Note that the method should only be used if try-catch mechanism
  * of error handling is not desired or not functional (ex: in nested promises)
  * @public
  * @platform

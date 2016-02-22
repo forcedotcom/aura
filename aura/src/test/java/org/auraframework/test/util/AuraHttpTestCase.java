@@ -120,14 +120,16 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 AuraContext context = Aura.getContextService().getCurrentContext();
                 boolean testMode = context != null && context.isTestMode();
                 if (testMode || allowInline) {
-                    assertEquals("script-src is wrong", "'self' chrome-extension: 'unsafe-eval' 'unsafe-inline'",
+                    assertEquals("script-src is wrong", "'self' chrome-extension: 'unsafe-inline' 'unsafe-eval'",
                             csp.get("script-src"));
                     assertEquals("style-src is wrong", "'self' chrome-extension: 'unsafe-inline'",
                             csp.get("style-src"));
                 } else {
-                    assertEquals("script-src is wrong", "'self' chrome-extension: 'nonce-LockerServiceTemporaryNonce'",
+                    assertEquals("script-src is wrong",
+                            "'self' chrome-extension: 'unsafe-inline' 'nonce-LockerServiceTemporaryNonce'",
                             csp.get("script-src"));
-                    assertEquals("style-src is wrong", "'self' chrome-extension: 'nonce-LockerServiceTemporaryNonce'",
+                    assertEquals("style-src is wrong",
+                            "'self' chrome-extension: 'unsafe-inline' 'nonce-LockerServiceTemporaryNonce'",
                             csp.get("style-src"));
                 }
 

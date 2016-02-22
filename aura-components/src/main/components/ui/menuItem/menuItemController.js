@@ -26,8 +26,6 @@
 
     select: function(component, event, helper) {
         helper.fireSelectEvent(component, event);
-
-        return false;
     }
 
 })// eslint-disable-line semi

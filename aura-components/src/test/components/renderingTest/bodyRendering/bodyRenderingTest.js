@@ -16,36 +16,36 @@
 ({
     createComponents: function(component, toAdd, alterFunction, ignoreChanges) {
 
+        // We have 4 items by default.
         // Add a few items to the end of the body
         var currentCount = component.find("content").get("v.body.length");
         var configs = [];
         for (var i = 1; i <= toAdd; i++) {
-            configs.push({
-                componentDef: { descriptor:"markup://renderingTest:renderCounter" },
-                attributes: {
-                    values: {
-                        index: currentCount + i
-                    }
+            configs.push([
+                "renderingTest:renderCounter",
+                {
+                    index: currentCount + i
                 }
-            });
+            ]);
         }
 
-        $A.componentService.newComponentAsync(
-            this,
-            function(newCmp){
-                this.changeBody(component, alterFunction, newCmp, ignoreChanges);
-            },
-            configs
+        var that = this;
+        $A.componentService.createComponents(
+            configs,
+            function(newCmps) {
+                that.changeBody(component, alterFunction, newCmps, ignoreChanges);
+            }
         );
     },
 
     /**
      * Alter the content of a body using a callback.
      */
-    changeBody: function(component, alterFunction, newCmp, ignoreChanges) {
+    changeBody: function(component, alterFunction, newCmps, ignoreChanges) {
+
         var content = component.find("content");
         var body = content.get("v.body");
-        var newBody = alterFunction(body, newCmp);
+        var newBody = alterFunction(body, newCmps);
         content.set("v.body", newBody, ignoreChanges);
     },
 
@@ -103,18 +103,16 @@
         );
     },
 
-    testInitialState: {
-        test: function(component) {
-            this.assertComponents(component, [1,2,3,4], "Initial rendering");
-        }
+    setUp : function(component) {
+        // This extra check ensures exisiting components are rendered before we modify them.
+        this.assertComponents(component, [1,2,3,4], "Initial rendering");
     },
 
     testAppendFour: {
         test: [
             function(component) {
-
-                this.createComponents(component, 4, function(body, newCmp) {
-                	return body.concat(newCmp);
+                this.createComponents(component, 4, function(body, newCmps) {
+                	return body.concat(newCmps);
                 });
             },
             function(component) {
@@ -127,8 +125,8 @@
         test: [
             function(component) {
 
-                this.createComponents(component, 4, function(body, newCmp) {
-                    return body.concat(newCmp);
+                this.createComponents(component, 4, function(body, newCmps) {
+                    return body.concat(newCmps);
                 }, true); // No rerender
             },
             function(component) {
@@ -157,8 +155,8 @@
         test: [
             function(component) {
 
-                this.createComponents(component, 4, function(body, newCmp) {
-                    return newCmp.concat(body);
+                this.createComponents(component, 4, function(body, newCmps) {
+                    return newCmps.concat(body);
                 });
             },
             function(component) {
@@ -170,8 +168,8 @@
     testInsertFour: {
         test: [
             function(component) {
-                this.createComponents(component, 4, function(body, newCmp) {
-                    body.splice.apply(body,[2,0].concat(newCmp));
+                this.createComponents(component, 4, function(body, newCmps) {
+                    body.splice.apply(body,[2,0].concat(newCmps));
                     return body;
                 });
             },
@@ -184,8 +182,8 @@
     testInsertFourWithOverlap: {
         test: [
             function(component) {
-                this.createComponents(component, 4, function(body, newCmp) {
-                    body.splice.apply(body,[1,2].concat(newCmp));
+                this.createComponents(component, 4, function(body, newCmps) {
+                    body.splice.apply(body,[1,2].concat(newCmps));
                     return body;
                 });
             },
@@ -198,8 +196,8 @@
     testAppendOne: {
         test: [
             function(component) {
-                this.createComponents(component, 1, function(body, newCmp) {
-                    body.push(newCmp[0]);
+                this.createComponents(component, 1, function(body, newCmps) {
+                    body.push(newCmps[0]);
                     return body;
                 });
             },
@@ -226,8 +224,8 @@
     testPrependOne: {
         test: [
             function(component) {
-                this.createComponents(component, 1, function(body, newCmp) {
-                    body.unshift(newCmp[0]);
+                this.createComponents(component, 1, function(body, newCmps) {
+                    body.unshift(newCmps[0]);
                     return body;
                 });
             },
@@ -254,8 +252,8 @@
     testInsertOne: {
         test: [
             function(component) {
-                this.createComponents(component, 1, function(body, newCmp) {
-                    body.splice(1, 0, newCmp[0]);
+                this.createComponents(component, 1, function(body, newCmps) {
+                    body.splice(1, 0, newCmps[0]);
                     return body;
                 });
             },
@@ -282,8 +280,8 @@
     testReplaceOne: {
         test: [
             function(component) {
-                this.createComponents(component, 1, function(body, newCmp) {
-                    body.splice(1, 1, newCmp[0]);
+                this.createComponents(component, 1, function(body, newCmps) {
+                    body.splice(1, 1, newCmps[0]);
                     return body;
                 });
             },
@@ -296,7 +294,7 @@
     testSwapEnds: {
         test: [
             function(component) {
-                this.createComponents(component, 1, function(body, newCmp) {
+                this.createComponents(component, 1, function(body) {
                     return [
                         body[3],
                         body[1],
@@ -315,7 +313,7 @@
     testSwapMiddleTwo: {
         test: [
             function(component) {
-                this.createComponents(component, 1, function(body, newCmp) {
+                this.createComponents(component, 1, function(body) {
                     return [
                         body[0],
                         body[2],
@@ -334,7 +332,7 @@
     testSwapFirstTwo: {
         test: [
             function(component) {
-                this.createComponents(component, 1, function(body, newCmp) {
+                this.createComponents(component, 1, function(body) {
                     return [
                         body[1],
                         body[0],
@@ -353,7 +351,7 @@
     testSwapLastTwo: {
         test: [
             function(component) {
-                this.createComponents(component, 1, function(body, newCmp) {
+                this.createComponents(component, 1, function(body) {
                     return [
                         body[0],
                         body[1],
@@ -372,9 +370,9 @@
     testMultiChange: {
         test: [
             function(component) {
-                this.createComponents(component, 1, function(body, newCmp) {
+                this.createComponents(component, 1, function(body, newCmps) {
                     // insert in 4rd place
-                    body.splice(3, 0, newCmp[0]);
+                    body.splice(3, 0, newCmps[0]);
                     // remove the second
                     body.splice(1, 1);
                     return body;

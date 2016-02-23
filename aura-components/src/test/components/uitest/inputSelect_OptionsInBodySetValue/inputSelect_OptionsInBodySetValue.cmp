@@ -17,6 +17,7 @@
 -->
 <aura:component>
     <aura:attribute name="cities" type="String[]" default="Toronto,Vancouver,Montreal"/>
+    <aura:attribute name="cities2" type="String[]" default="Toronto,Vancouver,Montreal"/>
     <aura:attribute name="condition" type="Boolean"/>
     <aura:attribute name="multi" type="Boolean"/>
 
@@ -96,6 +97,15 @@
                         <ui:inputSelectOption text="{!city}" label="{!city}"/>
                     </aura:set>
                 </aura:if>
+            </aura:iteration>
+        </ui:inputSelect>
+    </div>
+
+    <div style="margin:30px;">
+        <h2>Input Select With Options Changed In Iteration</h2>
+        <ui:inputSelect multiple="{!v.multi}" aura:id="InputSelectIterationChanged" class="InputSelectIterationChanged">
+            <aura:iteration aura:id="Iteration" items="{!v.cities2}" var="city">
+                <ui:inputSelectOption text="{!city}" label="{!city}" class="{!city}"/>
             </aura:iteration>
         </ui:inputSelect>
     </div>

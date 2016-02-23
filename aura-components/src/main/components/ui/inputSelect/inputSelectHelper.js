@@ -46,35 +46,15 @@
      * and the strategy to work with that array
      */
     getOptionsWithStrategy: function (cmp) {
-        var opts = cmp.get("v.options"),
-            strat = this.optionsStrategy;
+        var strat = this.optionsStrategy,
+            opts = strat.getOptions(cmp);
 
         if ($A.util.isEmpty(opts)) {
-            opts=this.getOptionsFromBody(cmp.get("v.body"));
-            if (!$A.util.isEmpty(opts)) {
-                strat = this.bodyStrategy;
-            } else {
-                opts = [];
-            }
+            strat = this.bodyStrategy;
+            opts = strat.getOptions(cmp);
         }
 
         return {options: opts, strategy: strat};
-    },
-
-    getOptionsFromBody:function(body){
-        var options=[];
-        if(body&&body.length){
-            for(var i=0;i<body.length;i++){
-                if($A.util.isComponent(body[i])){
-                    if(body[i].isInstanceOf("ui:inputSelectOption")){
-                        options.push(body[i]);
-                    }else{
-                        options=options.concat(this.getOptionsFromBody(body[i].get("v.body")));
-                    }
-                }
-            }
-        }
-        return options;
     },
 
     /**
@@ -175,6 +155,9 @@
      * Strategy object for an array of option objects
      */
     optionsStrategy: {
+        getOptions: function(cmp) {
+            return cmp.get("v.options");
+        },
 
         // If an option is in newValues, we want to select it
         updateOptions: function (cmp, options, newValues, createNewOptions) {
@@ -242,6 +225,11 @@
     bodyStrategy: {
         SUPPORTEDCONTAINERS: ["ui:inputSelectOptionGroup", "aura:iteration", "aura:if", "aura:renderIf"],
 
+        getOptions: function(cmp) {
+            var options = [];
+            this.performOperationOnCmps(cmp.get("v.body"), this.addOptionToList, options);
+            return options;
+        },
         // Updates options based on their existence in newValues
         updateOptions: function (cmp, options, newValues) {
             var result = {found: false};
@@ -267,8 +255,9 @@
                 // TODO: somehow expose that the option couldn't be set.
             }
         },
-        persistOptions: function (cmp, options) {
-            cmp.set("v.body", options);
+        persistOptions: function () {
+            // v.body should remain the same in case iteration options change. See W-2926861
+            //cmp.set("v.body", options);
         },
         // Performs op on every ui:inputSelectOption in opts, where op = function(optionCmp, resultsObject, optionalArguments)
         performOperationOnCmps: function (opts, op, result, newValues) {
@@ -309,6 +298,9 @@
                     valueList.push(text);
                 }
             }
+        },
+        addOptionToList: function (cmp, list) {
+            list.push(cmp);
         },
         canSupportOptions: function (cmp) {
             for (var i = 0; i < this.SUPPORTEDCONTAINERS.length; i++) {

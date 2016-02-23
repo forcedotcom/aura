@@ -1240,8 +1240,13 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     @Override
-    public List<DefDescriptor<TokensDef>> getTokenOverrides() {
-        return tokenOverrides;
+    public List<DefDescriptor<TokensDef>> getTokenOverrides() throws QuickFixException{
+        List<DefDescriptor<TokensDef>> tokens=new ArrayList<>();
+        if(extendsDescriptor!=null){
+            tokens.addAll(extendsDescriptor.getDef().getTokenOverrides());
+        }
+        tokens.addAll(tokenOverrides);
+        return tokens;
     }
 
     @Override

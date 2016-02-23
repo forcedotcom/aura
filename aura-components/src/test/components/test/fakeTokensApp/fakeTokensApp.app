@@ -1,3 +1,3 @@
-<aura:application access="unauthenticated" tokenOverrides="test:fakeTheme">
+<aura:application access="unauthenticated" tokens="test:fakeTheme">
  fakeThemeApp
 </aura:application>

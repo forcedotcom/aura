@@ -54,6 +54,11 @@ public interface TokensDef extends RootDefinition {
     DefDescriptor<TokenMapProviderDef> getMapProvider();
 
     /**
+     * Gets whether or not the tokens in this def should be serialized to the client.
+     */
+    boolean getSerializable();
+
+    /**
      * Returns true if this def can return a value for the given token name.
      * <p>
      * If you only need to know if a token is defined in this def, this method is faster than {@link #getToken(String)}

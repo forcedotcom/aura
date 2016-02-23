@@ -923,10 +923,19 @@ AuraClientService.prototype.init = function(config, token, container) {
             this._token = token;
         }
 
+        var context=$A.getContext();
+
+        // Load Tokens from Application Def
+        var rootDef = $A.componentService.getComponentDef(config["componentDef"]);
+        context.setTokens(rootDef.tokens);
+
+        // Create Root (Application) Component
         var component = $A.componentService.createComponentPriv(config);
-        $A.getContext().setCurrentAccess(component);
+
+        context.setCurrentAccess(component);
         $A.renderingService.render(component, container || document.body);
         $A.renderingService.afterRender(component);
+        context.releaseCurrentAccess();
 
         return component;
 
@@ -1965,15 +1974,19 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             $A.logger.auraErrorHelper(e);
         }
     }
-
+    var context=$A.getContext();
+    var priorAccess=context.getCurrentAccess();
     try {
-        var context=$A.getContext();
-        if(!context.getCurrentAccess()){
+        if(!priorAccess){
             context.setCurrentAccess($A.getRoot());
         }
         context['merge'](responseMessage["context"]);
     } catch (e) {
         $A.logger.auraErrorHelper(e);
+    }finally{
+        if(!priorAccess){
+            context.releaseCurrentAccess();
+        }
     }
 
     // Look for any Client side event exceptions

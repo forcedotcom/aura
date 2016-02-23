@@ -45,6 +45,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.allowedGlobals = config["allowedGlobals"];
     this.globals = config["globals"];
     this.accessStack=[];
+    this.tokens={};
 
     var that = this;
     this.initGlobalValueProviders(config["globalValueProviders"], function(gvps) {
@@ -168,6 +169,23 @@ Aura.Context.AuraContext.prototype.getAccessVersion = function(name) {
     }
 
     return ret;
+};
+
+/**
+ * Gets the application configuration tokens allowed to be used in component markup.
+ * @private
+ */
+Aura.Context.AuraContext.prototype.getTokens=function(){
+    return this.tokens;
+};
+
+/**
+ * Sets the application configuration tokens allowed to be used in component markup.
+ * @param tokens The object map containing name value pairs of tokens.
+ * @private
+ */
+Aura.Context.AuraContext.prototype.setTokens=function(tokens){
+    this.tokens=tokens;
 };
 
 /**

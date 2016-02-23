@@ -39,6 +39,7 @@ function ComponentDef(config) {
     this.controllerDef = config["controllerDef"] ? $A.componentService.createControllerDef(config["controllerDef"]) : undefined;
     this.modelDef = config["modelDef"] ? $A.componentService.createModelDef(config["modelDef"]) : undefined;
     this.methodDefs = config["methodDefs"] ? config["methodDefs"]: undefined;
+    this.tokens = config["tokens"] ? config["tokens"] : undefined;
 
     this.interfaces = {};
     var intfConfig = config["interfaces"];

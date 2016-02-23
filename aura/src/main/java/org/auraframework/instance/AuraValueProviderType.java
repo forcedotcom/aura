@@ -25,18 +25,15 @@ public enum AuraValueProviderType implements ValueProviderType {
     MODEL("m"),
     VIEW("v"),
     CONTROLLER("c"),
-    FOREACH(null), // key for foreach is dynamic
     LABEL("$Label", true),
     BROWSER("$Browser", true),
     LOCALE("$Locale", true),
     GLOBAL("$Global", true);
-    
+
     static {
         Map<String, AuraValueProviderType> m = Maps.newHashMapWithExpectedSize(values().length);
         for (AuraValueProviderType t : values()) {
-            if (t != FOREACH) {
-                m.put(t.getPrefix(), t);
-            }
+            m.put(t.getPrefix(), t);
         }
         prefixMap = ImmutableMap.copyOf(m);
     }

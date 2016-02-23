@@ -65,6 +65,7 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
     private final DefDescriptor<TokensDef> extendsDescriptor;
     private final DefDescriptor<TokenDescriptorProviderDef> descriptorProvider;
     private final DefDescriptor<TokenMapProviderDef> mapProvider;
+    private final boolean serializable;
     private final int hashCode;
 
     public TokensDefImpl(Builder builder) {
@@ -75,8 +76,14 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
         this.descriptorProvider = builder.descriptorProvider;
         this.mapProvider = builder.mapProvider;
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
+        this.serializable=builder.serialize;
         this.hashCode = AuraUtil.hashCode(super.hashCode(),
                 extendsDescriptor, imports, tokens, descriptorProvider, mapProvider);
+    }
+
+    @Override
+    public boolean getSerializable(){
+        return this.serializable;
     }
 
     @Override
@@ -389,6 +396,7 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
         private Set<PropertyReference> expressionRefs;
         private Set<DefDescriptor<TokensDef>> imports = Sets.newLinkedHashSet();
         private Map<String, TokenDef> tokens = Maps.newLinkedHashMap();
+        private boolean serialize=false;
 
         public Builder() {
             super(TokensDef.class);
@@ -419,6 +427,11 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
 
         public Builder setMapProvider(DefDescriptor<TokenMapProviderDef> mapProvider) {
             this.mapProvider = mapProvider;
+            return this;
+        }
+
+        public Builder setSerialize(boolean serialize) {
+            this.serialize = serialize;
             return this;
         }
 

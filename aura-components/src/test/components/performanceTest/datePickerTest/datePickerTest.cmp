@@ -1,0 +1,4 @@
+<aura:component extends="performance:perfTest">
+	<aura:attribute name="testHighlightRange" default="false" type="Boolean" description="if testing the highlightRange() function of ui:datePicker"></aura:attribute>
+	<div aura:id="datePickerContainer"/>
+</aura:component>

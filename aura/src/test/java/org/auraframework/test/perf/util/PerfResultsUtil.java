@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public final class PerfResultsUtil {
     }
 
 
-    public static void writeToDb(PerfExecutorTest test, String dbURI, PerfMetrics metrics,String traceLog) {
+    public static void writeToDb(PerfExecutorTest test, String testName, String dbURI, PerfMetrics metrics,String traceLog) {
         try {
             MongoClient mongo = getMongoClient(dbURI);
             if (mongo != null) {
@@ -74,18 +75,41 @@ public final class PerfResultsUtil {
                 Document doc = Document.parse(json.toString());
                 
                 doc.append("timeline", traceLog);
-                doc.append("testName", test.getComponentDef().getName());
+                doc.append("testName", testName);
                 doc.append("transaction", Document.parse((metrics.getMetricsServiceTransaction()).toString()));
                 doc.append("commonMetrics", Document.parse((metrics.getCommonMetrics()).toString()));
                 doc.append("customMetrics", Document.parse((metrics.getCustomMetrics()).toString()));
                 doc.append("run", RUN_TIME);
                 runs.insertOne(doc);
+                exportToCsv(test, doc);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public static void exportToCsv(PerfExecutorTest test, Document doc){
+    	Object id = doc.get("_id");
+    	StringBuilder sb = new StringBuilder();
+        
+        @SuppressWarnings("unchecked")
+		List<Map<String, Object>> metrics = (List<Map<String, Object>>) doc.get("metrics");
+        String testName = (String) doc.get("testName");
+        Date run = (Date) doc.get("run");
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        for (Map<String, Object> metricMap : metrics) {
+            sb.append(id).append(",").append(testName).append(",").append(format.format(run));
+            for (Map.Entry<String, Object> entry : metricMap.entrySet()) {
+                if (!entry.getKey().equals("units"))
+                    sb.append(",").append(entry.getValue());
+            }
+            sb.append("\n");
+        }
+        File file = PerfFilesUtil.getDbResultsDir(test.getExplicitPerfResultsFolder(), "data");
+        LOG.info("Perf results have been exported to csv at: " + file.toString());
+        writeFile(file, sb.toString(), "metrics from mongodb");
+    }
+    
     /**
      * Writes the dev tools log for a perf test run to
      * System.getProperty("aura.perf.results.dir")/timelines/testName_timeline.json
@@ -136,7 +160,7 @@ public final class PerfResultsUtil {
         OutputStreamWriter writer = null;
         try {
             IOUtil.mkdirs(file.getParentFile());
-            writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+            writer = new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8");
             writer.write(contents);
             LOG.info("wrote " + what + ": " + file.getAbsolutePath());
             return file;
@@ -177,7 +201,8 @@ public final class PerfResultsUtil {
         if (exceptionFound != null) {
             // add info about creating/updating log file in the assertion message
             Error error = new AssertionFailedError(message);
-            throw error;
+            LOG.log(Level.WARNING, message, error);
+            error.printStackTrace();
         }
     }
 

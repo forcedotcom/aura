@@ -16,30 +16,22 @@
 package org.auraframework.impl.javascript.parser.handler;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.root.library.IncludeDefImpl;
+import org.auraframework.impl.root.library.IncludeDefImpl.Builder;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.javascript.JavascriptProcessingError;
-import org.auraframework.util.javascript.JavascriptWriter;
 
 public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, IncludeDef> {
 
-    private static final String JS_PREFIX = "A="; // let first unnamed function satisfy Closure
-
-    private final IncludeDefImpl.Builder builder = new IncludeDefImpl.Builder();
+    private final Builder builder = new Builder();
 
     public JavascriptIncludeDefHandler(DefDescriptor<IncludeDef> descriptor, Source<?> source) {
         super(descriptor, source);
@@ -49,41 +41,10 @@ public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, I
     public IncludeDef getDefinition() {
         try {
             String code = source.getContents();
-
-            // Check for well-formed js before storing code in definition.
-
-            // We allow unnamed function at root, but Closure compiler doesn't.
-
-            // Remove leading whitespace and comments to get to code
-            String codeToCheck = code.replaceFirst("(?s)^(?:[\\s\n]|/\\*.*?\\*/|//.*?\n)+", "");
-            final boolean isUnnamedFunction = codeToCheck.matches("(?s)^function\\s*\\(.*");
-
-            if (isUnnamedFunction) {
-                codeToCheck = JS_PREFIX + codeToCheck;
-            }
-
-            Writer w = new StringWriter();
-            List<JavascriptProcessingError> errors;
-            try {
-                // strip whitespace, comments, and some unnecessary tokens
-                errors = JavascriptWriter.CLOSURE_WHITESPACE.compress(codeToCheck, w, source.getUrl());
-            } catch (IOException e) {
-                return createDefinition(new AuraRuntimeException(e, getLocation()));
-            }
-            if (!errors.isEmpty()) {
-                StringBuilder errorSummary = new StringBuilder();
-                for (JavascriptProcessingError error : errors) {
-                    errorSummary.append('\n');
-                    if (isUnnamedFunction && error.getLine() == 1) {
-                        // adjust for prefix
-                        error.setStartColumn(error.getStartColumn() - JS_PREFIX.length());
-                    }
-                    errorSummary.append(error.toString());
-                }
-                if (errorSummary.length() > 0) {
-                    return createDefinition(new InvalidDefinitionException(errorSummary.toString(), getLocation()));
-                }
-            }
+            String filename = source.getUrl();
+            
+            // Ignore the results for now
+            getCompressedSource(code, filename);
 
             try {
                 TextTokenizer tt = TextTokenizer.tokenize(code, getLocation());
@@ -95,8 +56,11 @@ public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, I
 
             builder.setCode(code);
             setDefBuilderFields(builder);
+
         } catch (QuickFixException qfe) {
             return createDefinition(qfe);
+        } catch (IOException e) {
+            return createDefinition(new AuraRuntimeException(e, getLocation()));
         }
 
         return builder.build();

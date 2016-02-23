@@ -21,7 +21,7 @@ import java.util.Set;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.javascript.provider.JavascriptProviderDef;
+import org.auraframework.impl.javascript.provider.JavascriptProviderDef.Builder;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
@@ -34,7 +34,8 @@ import org.auraframework.util.json.JsFunction;
  */
 public class JavascriptProviderDefHandler extends JavascriptHandler<ProviderDef, ProviderDef> {
 
-    private final JavascriptProviderDef.Builder builder = new JavascriptProviderDef.Builder();
+    private final Builder builder = new Builder();
+    private final String[] ALLOWED_METHODS = {"provide"};
 
     public JavascriptProviderDefHandler(DefDescriptor<ProviderDef> descriptor, Source<?> source) {
         super(descriptor, source);
@@ -43,7 +44,13 @@ public class JavascriptProviderDefHandler extends JavascriptHandler<ProviderDef,
     @Override
     protected ProviderDef createDefinition(Map<String, Object> map) throws QuickFixException {
         setDefBuilderFields(builder);
-        builder.setProvide((JsFunction) map.get("provide"));
+        for (String key : ALLOWED_METHODS) {
+            Object value = map.get(key);
+            if (value != null && value instanceof JsFunction) {
+                ((JsFunction) value).setName(key);
+                builder.addFunction(key, value);
+            }
+        }
         return builder.build();
     }
 

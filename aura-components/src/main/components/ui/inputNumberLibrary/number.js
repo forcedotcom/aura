@@ -38,7 +38,8 @@ function lib() { // eslint-disable-line no-unused-vars
     return {
         formatNumber: function (number, formatter) {
             var numberFormat = this.getNumberFormat(formatter);
-            if (number) {
+
+            if (!$A.util.isUndefinedOrNull(number) && !isNaN(number)) {
                 return numberFormat.format(number);
             }
             return '';
@@ -109,7 +110,7 @@ function lib() { // eslint-disable-line no-unused-vars
             var regString = '^' + const1 + '((\\s*(\\+|\\-)?\\s*)' + const1 + ')?' +
                             '(\\d+(\\' + groupingSeparator + '\\d*)*)*' +
                             '(\\' + decimalSeparator + '\\d{0,' + maxFractionDigits + '})?' +
-                            '(K|B|M|T)?\\s*$';
+                            '(K|B|M|T)?$';
 
 
             var reg = new RegExp(regString, 'i');

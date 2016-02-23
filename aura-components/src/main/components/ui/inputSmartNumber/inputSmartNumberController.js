@@ -38,7 +38,13 @@
         }
     },
     handleOnBlur : function (cmp, event, helper) {
-        helper.formatInputValue(cmp);
+        if (helper.hasChangedValue(cmp)) {
+            helper.setNewValue(cmp);
+            helper.formatInputValue(cmp);
+            helper.updateLastInputValue(cmp);
+        } else {
+            helper.formatInputValue(cmp);
+        }
     },
     handleChangeEvent : function (cmp, event, helper) {
         if (helper.hasChangedValue(cmp)) {

@@ -50,7 +50,7 @@
             onblur="{!c.onTabUnhover}"
         -->
 
-        <a  aura:id="tabItem"
+        <a  aura:id="tabItemAnchor"
             class="tabHeader"
             data-tab-name="{!v.name}"
             href="javascript:void(0);"

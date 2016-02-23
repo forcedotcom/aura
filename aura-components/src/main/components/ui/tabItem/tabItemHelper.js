@@ -20,7 +20,7 @@
         'onTabUnhover' : ['onblur', 'onmouseout']
     },
     initializeHandlers: function (cmp) {
-        var htmlItem   = cmp.find('tabItem');
+        var htmlItem   = cmp.find('tabItemAnchor');
         var htmlAttr   = htmlItem.get('v.HTMLAttributes');
         var dispatcher = cmp.getConcreteComponent().getEventDispatcher();
 
@@ -51,7 +51,7 @@
             tmp = tmp.getSuper();
         }
 
-        var htmlAnchor = tmp.find('tabItem');
+        var htmlAnchor = tmp.find('tabItemAnchor');
         var originalAddHandler = htmlAnchor.addHandler;
         var htmlAttr = htmlAnchor.get('v.HTMLAttributes');
 
@@ -78,7 +78,7 @@
 
     getTabItemElement: function (cmp) {
         var p = cmp;
-        var id = "tabItem";
+        var id = 'tabItemAnchor';
         var container = cmp.find(id);
         while (!container && p.isInstanceOf("ui:tabItem")) {
             p = p.getSuper();

@@ -15,7 +15,6 @@
  */
 package org.auraframework.clientlibrary;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.auraframework.def.ClientLibraryDef;
@@ -45,30 +44,6 @@ public interface ClientLibraryService extends AuraServiceProvider {
      * @throws QuickFixException
      */
     Set<String> getUrls(AuraContext context, ClientLibraryDef.Type type) throws QuickFixException;
-
-    /**
-     * Whether the client library can be combined.
-     *
-     * @param clientLibrary client library
-     * @return
-     */
-    boolean canCombine(ClientLibraryDef clientLibrary) throws QuickFixException;
-
-    /**
-     * Write resources css to appendable
-     *
-     * @param context aura context
-     * @param out appendable
-     */
-    void writeCss(AuraContext context, Appendable out) throws IOException, QuickFixException;
-
-    /**
-     * Writes resources js to appendable
-     *
-     * @param context aura context
-     * @param out appendable
-     */
-    void writeJs(AuraContext context, Appendable out) throws IOException, QuickFixException;
 
     /**
      * get resolver registery

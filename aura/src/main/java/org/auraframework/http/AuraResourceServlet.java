@@ -55,8 +55,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
     public AuraResourceServlet() {
         addResource(new AppCss());
         addResource(new AppJs());
-        addResource(new ClientLibraryJs());
-        addResource(new ClientLibraryCss());
         addResource(new Manifest());
         addResource(new ResourceSvg());
         addResource(new EncryptionKey());

@@ -337,19 +337,16 @@ public class AuraImplUnitTestingUtil {
         return makeAttributeDef(null, null, null, false, null, null);
     }
 
-    public ClientLibraryDef makeClientLibraryDef(String name, String url,
+    public ClientLibraryDef makeClientLibraryDef(String name,
             ClientLibraryDef.Type type,
             Set<AuraContext.Mode> modes,
-            boolean combine,
             DefDescriptor<? extends RootDefinition> parentDescriptor,
             Location location) {
         ClientLibraryDefImpl.Builder builder = new ClientLibraryDefImpl.Builder();
 
         builder.setName(name);
-        builder.setUrl(url);
         builder.setType(type);
         builder.setModes(modes);
-        builder.setCombine(combine);
 
         builder.setParentDescriptor(parentDescriptor);
         builder.setLocation(location);

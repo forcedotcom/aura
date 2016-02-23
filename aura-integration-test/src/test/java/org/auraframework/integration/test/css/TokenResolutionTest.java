@@ -18,7 +18,6 @@ package org.auraframework.integration.test.css;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokenDescriptorProvider;

@@ -1984,7 +1984,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
     } catch (e) {
         $A.logger.auraErrorHelper(e);
     }finally{
-        if(priorAccess){
+        if(!priorAccess){
             context.releaseCurrentAccess();
         }
     }

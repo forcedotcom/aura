@@ -37,6 +37,6 @@ public interface ApplicationDef extends BaseComponentDef {
 
     Boolean isOnePageApp() throws QuickFixException;
 
-    Map<String, String> getTokens(DefDescriptor<TokensDef> tokensDescriptor);
+    Map<String, String> getTokens();
 
 }

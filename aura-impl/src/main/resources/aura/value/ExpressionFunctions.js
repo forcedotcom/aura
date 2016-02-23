@@ -132,7 +132,7 @@ ExpressionFunctions.prototype.format = function() {
  * Passthrough to $A.getContext().getTokens()["token"];
  * @export
  */
-ExpressionFunctions.prototype.token = function(cmp,token){
+ExpressionFunctions.prototype.token = function(token){
     var context=$A.getContext();
     var tokens=context&&context.getTokens();
     if(tokens){

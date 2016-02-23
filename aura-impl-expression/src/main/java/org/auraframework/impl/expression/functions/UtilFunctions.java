@@ -15,10 +15,15 @@
  */
 package org.auraframework.impl.expression.functions;
 
+import org.auraframework.Aura;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.expression.Expression;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An implementation of utility functions to mimic Util.js.
@@ -151,14 +156,33 @@ public class UtilFunctions {
 
 		@Override
 		public Object evaluate(List<Object> args) {
-			return null;
+			try {
+				Map<String,String> tokens = ((ApplicationDef)Aura.getContextService().getCurrentContext().getApplicationDescriptor().getDef()).getTokens();
+				if (tokens != null) {
+					Object a0 = args.get(0);
+					if (a0 != null && tokens.containsKey(a0)) {
+						return tokens.get(a0);
+					}
+				}
+			} catch (ClassCastException exception) {
+				//??
+				return "AURA: INVALID APPLICATION";
+			} catch (QuickFixException exception) {
+				//??
+			}
+			return "";
 		}
 
 		@Override
 		public void compile(Appendable out, List<Expression> args) throws IOException {
 			out.append(JS_FN_TOKEN);
-			out.append("(cmp,");
-			args.get(0).compile(out);
+			out.append("(");
+			Expression a0 = args.get(0);
+			if (a0==null) {
+				out.append(JS_EMPTY);
+			} else {
+				a0.compile(out);
+			}
 			out.append(")");
 		}
 

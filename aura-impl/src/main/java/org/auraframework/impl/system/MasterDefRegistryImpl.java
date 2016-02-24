@@ -129,7 +129,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
     private final Cache<String, String> accessCheckCache;
 
-    private final Map<String, Boolean> componentClassesLoaded;
+    private final Map<String, Boolean> clientClassesLoaded;
 
     /**
      * A local dependencies cache.
@@ -179,7 +179,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         this.defs = Maps.newHashMap();
         this.localDescs = null;
         this.currentCC = null;
-        this.componentClassesLoaded = Maps.newHashMap();
+        this.clientClassesLoaded = Maps.newHashMap();
     }
 
     /**
@@ -1572,20 +1572,20 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     /**
-     * Track if the component class was already added to the pay load for this request.
+     * Track if the client class was already added to the pay load for this request.
      */
     @Override
-    public void setComponentClassLoaded(DefDescriptor<?> componentClass, Boolean isLoaded) {
-        componentClassesLoaded.put(componentClass.getQualifiedName(), isLoaded);
+    public void setClientClassLoaded(DefDescriptor<?> clientClass, Boolean isLoaded) {
+        clientClassesLoaded.put(clientClass.getQualifiedName(), isLoaded);
     }
 
     /**
-     * Check if the component class has already been added to the request pay load.
+     * Check if the client class has already been added to the request pay load.
      */
     @Override
-    public Boolean getComponentClassLoaded(DefDescriptor<?> componentClass) {
-        if(componentClassesLoaded.containsKey(componentClass.getQualifiedName())) {
-            return componentClassesLoaded.get(componentClass.getQualifiedName());
+    public Boolean getClientClassLoaded(DefDescriptor<?> clientClass) {
+        if(clientClassesLoaded.containsKey(clientClass.getQualifiedName())) {
+            return clientClassesLoaded.get(clientClass.getQualifiedName());
         }
         return false;
     }

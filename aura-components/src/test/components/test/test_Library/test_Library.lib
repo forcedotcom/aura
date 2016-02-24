@@ -22,7 +22,7 @@
     <aura:include name="expectsImportAlso" imports="expectsImport" />
     <aura:include name="reusesImport" imports="basicFirst" />
     <aura:include name="hasVars" export="firstVar" />
-    <aura:include name="importsAndExport" imports="basicFirst" export="anExport" />
-    <aura:include name="handlesMultipleImports" imports="basicFirst,basicSecond,undefined" />
+    <aura:include name="importsAndExport" imports="basicFirst" aliases="importedBasicFirst"  export="anExport" />
+    <aura:include name="handlesMultipleImports" imports="basicFirst,basicSecond,undefined" aliases="importedBasicFirst, importedBasicSecond, importedUndefined" export="anExport"/>
     <aura:include name="undefined" />
 </aura:library>

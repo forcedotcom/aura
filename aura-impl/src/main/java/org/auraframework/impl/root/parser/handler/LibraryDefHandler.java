@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +32,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 
 public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
 
@@ -39,7 +39,7 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
 
     private final LibraryDefImpl.Builder builder = new LibraryDefImpl.Builder();
 
-    private final List<IncludeDefRef> includes = Lists.newLinkedList();
+    private final List<IncludeDefRef> includes = new LinkedList<>();
 
     public LibraryDefHandler() {
         super();

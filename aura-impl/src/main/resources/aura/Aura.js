@@ -117,7 +117,8 @@ window['$A'] = {};
 // -- Helper -------------------------------------------------------------
 
 // -- Library ------------------------------------------------------------
-// #include aura.library.LibraryDefRegistry
+// #include aura.library.LibraryIncludeRegistry
+// #include aura.library.LibraryRegistry
 
 // -- Event --------------------------------------------------------------
 // #include aura.event.EventDef
@@ -1041,7 +1042,7 @@ AuraInstance.prototype.run = function(func, name) {
     return undefined;
 };
 
-/**@description
+/**
  * Checks the condition and if the condition is false, displays an error message.
  *
  * Displays an error message if condition is false, runs <code>trace()</code> and stops JS execution. The

@@ -22,11 +22,11 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.system.Parser.Format;
@@ -79,7 +79,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         assertNull(actualDef.getImports());
         assertNull(actualDef.getExport());
 
-        DefDescriptor<IncludeDef> actualDesc = actualDef.getIncludeDescriptor();
+        DefDescriptor<? extends Definition> actualDesc = actualDef.getDescriptor();
         assertEquals(parentDescriptor.getNamespace(), actualDesc.getNamespace());
         assertEquals(expectedName, actualDesc.getName());
         assertEquals(parentDescriptor, actualDesc.getBundle());
@@ -118,7 +118,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
             fail("Name should be required for Include");
         } catch (InvalidDefinitionException t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
-                    String.format("%s must specify a valid library name.", IncludeDefRefHandler.TAG));
+                    String.format("%s must specify a valid JavaScript file name.", IncludeDefRefHandler.TAG));
         }
     }
 
@@ -258,7 +258,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         List<String> expectedImports = Lists.newArrayList("import1", "import2", "import3");
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
                 "<%s name='%s' imports='%s'/>", IncludeDefRefHandler.TAG, expectedName,
-                " \t\r\n" + StringUtils.join(expectedImports, " \t\r\n, \t\r\n")) + " \t\r\n", "myID", Format.XML);
+                " \t\r\n" + String.join(" \t\r\n, \t\r\n", expectedImports)) + " \t\r\n", "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
         IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);

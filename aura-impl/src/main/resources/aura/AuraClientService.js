@@ -988,7 +988,7 @@ AuraClientService.prototype.initDefs = function(config) {
 
     var libraryConfigs = $A.util.json.resolveRefsArray(config["libraryDefs"]);
     for (i = 0; i < libraryConfigs.length; i++) {
-        $A.componentService.createLibraryDef(libraryConfigs[i]);
+        $A.componentService.saveLibraryConfig(libraryConfigs[i]);
     }
 
     var controllerConfigs = $A.util.json.resolveRefsArray(config["controllerDefs"]);

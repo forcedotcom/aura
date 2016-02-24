@@ -313,7 +313,7 @@ BaseComponent<D, I> {
         	json.writeMapBegin();
         	json.writeMapEntry("descriptor", def.getDescriptor());
         	json.writeMapEnd();
-            
+
             if (!descriptor.equals(originalDescriptor)) {
                 json.writeMapEntry("original", originalDescriptor);
             }
@@ -323,7 +323,7 @@ BaseComponent<D, I> {
                 json.writeMapEntry("attributes", attributeSet);
             }
 
-            if (def.getAPIVersion() != null  && 
+            if (def.getAPIVersion() != null  &&
             		Aura.getConfigAdapter().isPrivilegedNamespace(def.getDescriptor().getNamespace()) &&
             		context.getCurrentCallingDescriptor() == null) {
             	json.writeMapEntry("version", def.getAPIVersion());
@@ -343,14 +343,6 @@ BaseComponent<D, I> {
             if (model != null && model.getDescriptor().getDef().hasMembers()) {
                 json.writeMapEntry("model", model);
             }
-
-            // KRIS: COMPONENT CLASSES
-            // We need to return the definitions here since the client doesn't have them.
-            // Do we know if it doesn't have them? This can be a getComponent action call, but is it just
-            // wanting the instance and not the def?
-            // I know it does not have it in some instances, but now that I think about it, it probably
-            // also has the def sometimes too so this will be redundant.
-            //json.writeMapEntry("componentClass", def.getComponentClass());
 
             json.writeMapEnd();
         } catch (QuickFixException e) {

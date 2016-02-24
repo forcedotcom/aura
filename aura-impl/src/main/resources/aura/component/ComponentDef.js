@@ -50,12 +50,11 @@ function ComponentDef(config) {
             this.interfaces[intfName] = true;
         }
     }
-    
+
     // Initialize the concrete component class if provided
-    var componentClassDef = config["componentClass"];
-    if (componentClassDef && !$A.componentService.hasComponentClass(config["descriptor"])) {
-		componentClassDef = $A.util.json.decode(componentClassDef);
-    	componentClassDef();
+    if (config.hasOwnProperty("componentClass")) {
+		var componentClass = $A.util.json.decode(config["componentClass"]);
+    	componentClass();
     }
 
     var appHandlerDefs;

@@ -23,7 +23,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.Definition;
-import org.auraframework.def.ImportDef;
+import org.auraframework.def.LibraryDefRef;
+import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RootDefinition;
@@ -69,16 +70,16 @@ public class TopicExampleModel {
 
         // Add all imported libraries AND their source to the documentation.
         if (def instanceof ComponentDef) {
-            Collection<ImportDef> importDefs = ((ComponentDef) def).getImportDefs();
+            Collection<LibraryDefRef> importDefs = ((ComponentDef) def).getImports();
 
-            for (ImportDef importDef : importDefs) {
-                LibraryDef libraryDef = Aura.getDefinitionService().getDefinition(importDef.getLibraryDescriptor());
+            for (LibraryDefRef importDef : importDefs) {
+                LibraryDef libraryDef = Aura.getDefinitionService().getDefinition(importDef.getReferenceDescriptor());
                 if (ReferenceTreeModel.hasAccess(libraryDef)) {
                     defs.add(new DefModel(libraryDef.getDescriptor()));
 
                     // Treat the included js files specially because they load source differently:
                     for (IncludeDefRef includeDef : libraryDef.getIncludes()) {
-                        includeDefs.add(new IncludeDefModel(includeDef.getIncludeDescriptor()));
+                        includeDefs.add(new IncludeDefModel((DefDescriptor<IncludeDef>) includeDef.getDescriptor()));
                     }
                 }
             }

@@ -1921,7 +1921,7 @@ AuraClientService.prototype.receive = function(auraXHR, timedOut) {
     var responseMessage;
     this.auraStack.push("AuraClientService$receive");
     try {
-        responseMessage = this.decode(auraXHR.request, undefined, timedOut);
+        responseMessage = this.decode(auraXHR.request, false, timedOut);
 
         if (responseMessage["status"] === "SUCCESS") {
             this.processResponses(auraXHR, responseMessage["message"]);

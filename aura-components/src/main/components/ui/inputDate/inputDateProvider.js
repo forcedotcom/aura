@@ -15,8 +15,10 @@
  */
 ({
     provide: function () {
-        var useNative = $A.get("$Browser.isPhone") || $A.get("$Browser.isTablet");
-        if (useNative) {
+        var isPhoneOrTablet = $A.get("$Browser.isPhone") || $A.get("$Browser.isTablet"),
+            isWindows = $A.get("$Browser.isWindowsPhone") || $A.get("$Browser.isWindowsTablet");
+        // IE doesn't support type=date
+        if (isPhoneOrTablet && !isWindows) {
             return "markup://ui:inputDateHtml";
         } else {
             return "markup://ui:inputDate";

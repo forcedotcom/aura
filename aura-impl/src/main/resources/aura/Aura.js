@@ -567,7 +567,8 @@ AuraInstance.prototype.initAsync = function(config) {
         });
     }
 
-    if (!window['$$safe-eval$$']) {
+    var regexpDetectURLProcotolSegment = /^(.*?:)?\/\//;
+    if (!window['$$safe-eval$$'] && !regexpDetectURLProcotolSegment.test(config["host"])) {
         // safe eval worker is an iframe that enables the page to run arbitrary evaluation,
         // if this iframe is still loading, we should wait for it before continue with
         // initialization, in the other hand, if the iframe is not available, we create it,

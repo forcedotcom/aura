@@ -229,6 +229,13 @@
             panelObj.destroyCallback(panelId);
         }
 
+        // If you destroy without hiding we still need
+        // to tell listeners the panel is gone
+        $A.get('e.ui:panelTransitionEnd').setParams({
+                        action: 'hide', 
+                        panelId: panelId
+        }).fire();
+
         if (doActivateNext !== false) {
             this.activateNextPanel(cmp);
         }

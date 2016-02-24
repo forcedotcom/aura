@@ -11,7 +11,12 @@
     { "Aura.coql.afterRender.added" : 5 },
     { "Network.numRequests" : 20 } 
   ],
-     "customOptions":[  
+     "customOptions":[
+      {  
+         "testDefault":{  
+            "testHighlightRange":false
+         }
+      },  
       {  
          "testHighlightRange":{  
             "testHighlightRange":true

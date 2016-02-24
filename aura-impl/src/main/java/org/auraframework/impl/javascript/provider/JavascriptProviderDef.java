@@ -16,6 +16,9 @@
 package org.auraframework.impl.javascript.provider;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.auraframework.instance.AuraValueProviderType.LABEL;
@@ -35,38 +38,33 @@ import org.auraframework.instance.ComponentConfig;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
-
-import com.google.common.collect.Sets;
 
 /**
  * A javascript provider.
  */
 public class JavascriptProviderDef extends DefinitionImpl<ProviderDef> implements ProviderDef {
     private static final long serialVersionUID = -3839367107553671775L;
+    private final Map<String, Object> functions;
     private final Set<PropertyReference> expressionRefs;
-    private final JsFunction provide;
 
     protected JavascriptProviderDef(Builder builder) {
         super(builder);
+        this.functions = builder.functions;
         this.expressionRefs = builder.expressionRefs;
-        this.provide = builder.provide;
     }
 
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        if (this.provide == null) {
+        if (!functions.containsKey("provide")) {
             throw new InvalidDefinitionException("No provide function was found", getLocation());
         }
     }
 
     @Override
     public void serialize(Json json) throws IOException {
-    	json.writeMapBegin();
-        json.writeMapEntry("provide", provide);
-    	json.writeMapEnd();
+    	json.writeMap(functions);
     }
 
     @Override
@@ -81,21 +79,19 @@ public class JavascriptProviderDef extends DefinitionImpl<ProviderDef> implement
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<ProviderDef> {
-        private JsFunction provide;
-        private Set<PropertyReference> expressionRefs = Sets.newHashSet();
+        public Map<String, Object> functions = new HashMap<>();
+        public Set<PropertyReference> expressionRefs = new HashSet<>();
 
         public Builder() {
             super(ProviderDef.class);
         }
 
-        public Builder setProvide(JsFunction provide) {
-            this.provide = provide;
-            return this;
+        public void addFunction(String name, Object function) {
+            functions.put(name, function);
         }
 
-        public Builder addExpressionRefs(Collection<PropertyReference> refs) {
+        public void addExpressionRefs(Collection<PropertyReference> refs) {
             expressionRefs.addAll(refs);
-            return this;
         }
 
         @Override

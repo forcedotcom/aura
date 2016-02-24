@@ -195,11 +195,17 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 payload: { panelInstance: cmp.getGlobalId() }
             }).fire();
 
+            $A.get('e.ui:panelTransitionBegin').setParams(
+                { 
+                    panel: cmp, 
+                    isOpening: true,
+                    action: 'show'
+                }
+            ).fire();
 
 
             //endAnimationHandler: cleanup all classes and events
             var finishHandler = function () {
-
                 if(!cmp.isValid()) {
                     return;
                 }
@@ -224,6 +230,12 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                         closeButton.focus();
                     }
                 }
+
+                $A.get('e.ui:panelTransitionEnd').setParams({
+                    action: 'show', 
+                    panelId: cmp.getGlobalId()
+                }).fire();
+
                 config.onFinish && config.onFinish();
             };
 
@@ -259,8 +271,10 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
             if(useTransition) {
                 useTransition = this.validateAnimationName(animName);
             }
-
+            
             cmp.set('v.visible', false);
+            $A.get('e.ui:panelTransitionBegin').setParams({ panel: cmp, isOpening: false }).fire();
+
 
             //endAnimationHandler: cleanup all classes and events
             var finishHandler = function () {
@@ -281,6 +295,10 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                         $A.util.removeClass(animEl, 'transitioning ' + animName);
                     }, 1000); //make sure all transitions are finished
 
+                    $A.get('e.ui:panelTransitionEnd').setParams({
+                        action: 'hide', 
+                        panelId: cmp.getGlobalId()
+                    }).fire();
                 } else {
                     config.onFinish && config.onFinish();
                 }

@@ -2,7 +2,7 @@
 	// IndexedDb not supported in IE < 10
     // Disable IndexedDB for Safari because it doesn't work reliably in iframe.
     browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
-	
+
     tearDown: function() {
         $A.storageService.getStorage('actions').remove('aura://ComponentController/ACTION$getApplication:{"name":"auraStorageTest:noGetApplicationCache"}');
     },
@@ -25,9 +25,9 @@
                 });
             },
             function verifyStorageGets(cmp) {
-                // First get is for GVP
+                // Two gets: AuraContext then GVP
                 var gets = document.getElementById("myFrame").contentWindow._storageGets;
-                $A.test.assertEquals(2, gets.length, "Expected two storage.get() on reload! " + JSON.stringify(gets));
+                $A.test.assertEquals(3, gets.length, "Expected three storage.get() on reload! " + JSON.stringify(gets));
             }
         ]
     },
@@ -47,9 +47,9 @@
                 });
             },
             function verifyStorageGets(cmp) {
-                // First get is for GVP
+                // Two gets: AuraContext then GVP
                 var gets = document.getElementById("myFrame").contentWindow._storageGets;
-                $A.test.assertEquals(1, gets.length, "More than one storage.get() on reload! " + JSON.stringify(gets));
+                $A.test.assertEquals(2, gets.length, "More than two storage.get() on reload! " + JSON.stringify(gets));
             }
         ]
     }

@@ -2172,68 +2172,80 @@ AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, 
     var config = $A.util.json.resolveRefsObject(rawConfig);
 
     // Save off any context global stuff like new labels
-    $A.getContext()['merge'](config["context"]);
+    var context = $A.getContext();
+    context['merge'](config["context"]);
+    var priorAccess = context.getCurrentAccess();
 
     var actionResult = config["actions"][0];
     var action = $A.get("c.aura://ComponentController.getComponent");
     var self = this;
 
     action.setCallback(action, function(a) {
-        var element = $A.util.getElement(locatorDomId);
+        try {
+	        var root = $A.getRoot();
 
-        // Check for bogus locatorDomId
-        var errors;
-        if (!element) {
-            // We have no other place to display this
-            // critical failure - fallback to the
-            // document.body
-            element = document.body;
-            errors = [
-                    "Invalid locatorDomId specified - no element found in the DOM with id=" + locatorDomId
-            ];
-        } else {
-            errors = a.getState() === "SUCCESS" ? undefined : action.getError();
-        }
-
-        var componentConfig;
-        if (!errors) {
-            componentConfig = a.getReturnValue();
-        } else {
-            //
-            // Make sure we clear any configs associated with the action.
-            //
-            $A.getContext().clearComponentConfigs(a.getId());
-            //
-            // Display the errors in a ui:message instead
-            //
-            componentConfig = self.createIntegrationErrorConfig(errors);
-        }
-
-        var root = $A.getRoot();
-
-        $A.util.apply(componentConfig, {
-            "localId" : localId,
-            "attributes" : {
-                "valueProvider" : root
+            if(!priorAccess){
+                context.setCurrentAccess(root);
             }
-        }, null, true);
 
-        var c = $A.componentService.createComponentPriv(componentConfig);
-
-        if (!errors) {
-            // Wire up event handlers
-            self.addComponentHandlers(c, config["actionEventHandlers"]);
+	        var element = $A.util.getElement(locatorDomId);
+	
+	        // Check for bogus locatorDomId
+	        var errors;
+	        if (!element) {
+	            // We have no other place to display this
+	            // critical failure - fallback to the
+	            // document.body
+	            element = document.body;
+	            errors = [
+	                    "Invalid locatorDomId specified - no element found in the DOM with id=" + locatorDomId
+	            ];
+	        } else {
+	            errors = a.getState() === "SUCCESS" ? undefined : action.getError();
+	        }
+	
+	        var componentConfig;
+	        if (!errors) {
+	            componentConfig = a.getReturnValue();
+	        } else {
+	            //
+	            // Make sure we clear any configs associated with the action.
+	            //
+	            $A.getContext().clearComponentConfigs(a.getId());
+	            //
+	            // Display the errors in a ui:message instead
+	            //
+	            componentConfig = self.createIntegrationErrorConfig(errors);
+	        }
+		
+	        $A.util.apply(componentConfig, {
+	            "localId" : localId,
+	            "attributes" : {
+	                "valueProvider" : root
+	            }
+	        }, null, true);
+	
+	        var c = $A.componentService.createComponentPriv(componentConfig);
+	
+	        if (!errors) {
+	            // Wire up event handlers
+	            self.addComponentHandlers(c, config["actionEventHandlers"]);
+	        }
+	
+	        var body = root.get("v.body");
+	        body.push(c);
+	
+	        // Do not let Aura consider this initial setting into the surrogate app as a candiadate for rerendering
+	        root.set("v.body", body, true);
+	
+	        $A.render(c, element);
+	
+	        $A.afterRender(c);
+        } finally {
+        	if (!priorAccess) {
+        		context.releaseCurrentAccess();
+        	}
         }
-
-        var body = root.get("v.body");
-        body.push(c);
-
-        // Do not let Aura consider this initial setting into the surrogate app as a candiadate for rerendering
-        root.set("v.body", body, true);
-
-        $A.render(c, element);
-
-        $A.afterRender(c);
     });
 
     action.updateFromResponse(actionResult);
@@ -2321,16 +2333,26 @@ AuraClientService.prototype.renderInjection = function(component, locator, actio
  */
 AuraClientService.prototype.injectComponentAsync = function(config, locator, eventHandlers, callback) {
     var acs = this;
+    var context = $A.getContext();
+    var priorAccess = context.getCurrentAccess();
+    var root = $A.getRoot();
+    if (!priorAccess) {
+    	context.setCurrentAccess(root);
+    }
+    
     $A.componentService.newComponentAsync(undefined, function(component) {
         if (callback) {
             callback(component);
         }
 
         acs.renderInjection(component, locator, eventHandlers);
-    }, config, $A.getRoot(), false, false, true);
-    //
+        
+        if (!priorAccess) {
+        	context.releaseCurrentAccess();
+        }
+    }, config, root, false, false, true);
+    
     // Now we go ahead and stick a label load on the request.
-    //
     var labelAction = $A.get("c.aura://ComponentController.loadLabels");
     labelAction.setCallback(this, function() {});
     acs.enqueueAction(labelAction);

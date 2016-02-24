@@ -550,11 +550,10 @@ AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; 
  * @public
  */
 AuraInstance.prototype.initAsync = function(config) {
-
     function createAuraContext() {
         // Context is created async because of the GVPs go though async storage checks
         $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
-            if (!window["$$safe-eval$$"]) {
+            if (!window["$$safe-eval$$"] && !regexpDetectURLProcotolSegment.test(config["host"])) {
                 throw new $A.auraError("Aura(): Failed to initialize locker worker.");
             }
             $A.context = context;
@@ -567,7 +566,8 @@ AuraInstance.prototype.initAsync = function(config) {
         });
     }
 
-    if (!window['$$safe-eval$$']) {
+    var regexpDetectURLProcotolSegment = /^(.*?:)?\/\//;
+    if (!window['$$safe-eval$$'] && !regexpDetectURLProcotolSegment.test(config["host"])) {
         // safe eval worker is an iframe that enables the page to run arbitrary evaluation,
         // if this iframe is still loading, we should wait for it before continue with
         // initialization, in the other hand, if the iframe is not available, we create it,

@@ -22,7 +22,7 @@
 
     <aura:method name="select" action="{!c.select}"/>
 
-    <li aura:id="listitem" class="{!v.class + ' has-icon--left'}" role="presentation">
+    <li aura:id="listitem" class="{!v.class}" role="presentation">
         <a aura:id="anchor" role="menuitemradio"><!-- The body is added on render --></a>
     </li>
 

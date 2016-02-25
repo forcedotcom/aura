@@ -244,7 +244,6 @@
           var children = component.get("v.childMenuItems");
           for (var i = 0; i < children.length; i++) {
               var c = children[i];
-              //TODO: should use boolean flag such as singleSelect or multiSelect instead of checking for ui:radioMenuItem
               if (c.isInstanceOf("ui:radioMenuItem") &&
                       $A.util.getBooleanValue(c.get("v.selected")) &&
                       c.getGlobalId() !== selectedItem.getGlobalId()) {

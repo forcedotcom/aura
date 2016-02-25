@@ -1,7 +1,6 @@
 <!-- tests setting ui:virtualDataGrid's `data` attribute with a large amount of data without using a provider -->
 
 <aura:component extends="performance:perfTest">
-	<aura:dependency resource="markup://ui:outputText" type="COMPONENT"/>
     <aura:attribute name="data" type="List"/>
     <ui:virtualDataGrid aura:id="myData" items="{!v.data}">
     

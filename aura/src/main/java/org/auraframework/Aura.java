@@ -17,8 +17,6 @@ package org.auraframework;
 
 import javax.inject.Inject;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
@@ -27,7 +25,6 @@ import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.clientlibrary.ClientLibraryService;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.Definition;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Application;
@@ -46,9 +43,6 @@ import org.auraframework.service.RenderingService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.adapter.SourceControlAdapter;
 
@@ -57,8 +51,6 @@ import org.auraframework.util.adapter.SourceControlAdapter;
  */
 @ServiceComponent
 public class Aura {
-    private static final Log log = LogFactory.getLog(Aura.class);
-
     private static ClientLibraryService clientLibraryService;
 
     @Inject
@@ -210,23 +202,5 @@ public class Aura {
 
     public static <T extends AuraServiceProvider> T get(Class<T> type) {
         return ServiceLocator.get().get(type);
-    }
-
-    /**
-     * Pass in the name of a Aura ApplicationDef, and it will be rendered to Standard Out
-     */
-    public static void main(String[] args) {
-        try {
-            Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.UNAUTHENTICATED);
-            String tag = args[0];
-            Application app = Aura.getInstanceService().getInstance(tag, ApplicationDef.class);
-            Aura.getRenderingService().render(app, System.out);
-            System.out.println();
-        } catch (Exception e) {
-            log.fatal(e.getClass() + ": " + e.getMessage(), e);
-            System.exit(1);
-        } finally {
-            Aura.getContextService().endContext();
-        }
     }
 }

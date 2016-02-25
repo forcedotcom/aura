@@ -28,8 +28,6 @@ import org.auraframework.system.AuraContext;
 public interface ClientLibraryDefBuilder extends DefBuilder<ClientLibraryDef, ClientLibraryDef> {
     ClientLibraryDefBuilder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor);
     ClientLibraryDefBuilder setName(String name);
-    ClientLibraryDefBuilder setUrl(String url);
     ClientLibraryDefBuilder setType(ClientLibraryDef.Type type);
     ClientLibraryDefBuilder setModes(Set<AuraContext.Mode> modes);
-    ClientLibraryDefBuilder setCombine(boolean combine);
 }

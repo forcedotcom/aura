@@ -19,7 +19,6 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -55,7 +54,7 @@ public class PagerProvider implements ComponentDescriptorProvider {
         }
         String typeDescriptor = type.contains(":") ? type : typeMap.get(type);
         if (typeDescriptor != null) {
-            return DefDescriptorImpl.getInstance(typeDescriptor, ComponentDef.class);
+            return Aura.getDefinitionService().getDefDescriptor(typeDescriptor, ComponentDef.class);
         }
         throw new AuraRuntimeException("Unknown type attribute specified for ui:pager '" + type
                 + "'. Remove the type attribute or use one of the following values: '"

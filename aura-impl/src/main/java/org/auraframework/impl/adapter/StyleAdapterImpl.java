@@ -30,7 +30,6 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.css.parser.plugin.DuplicateFontFacePlugin;
 import org.auraframework.impl.css.token.TokenValueProviderImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -74,7 +73,7 @@ public class StyleAdapterImpl implements StyleAdapter {
     @Override
     public DefDescriptor<TokensDef> getNamespaceDefaultDescriptor(DefDescriptor<?> descriptor) {
         String fmt = String.format("%s:%sNamespace", descriptor.getNamespace(), descriptor.getNamespace());
-        return DefDescriptorImpl.getInstance(fmt, TokensDef.class);
+        return Aura.getDefinitionService().getDefDescriptor(fmt, TokensDef.class);
     }
 
     @Override

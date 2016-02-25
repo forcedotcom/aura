@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.css;
 
-import org.auraframework.Aura;
 import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;

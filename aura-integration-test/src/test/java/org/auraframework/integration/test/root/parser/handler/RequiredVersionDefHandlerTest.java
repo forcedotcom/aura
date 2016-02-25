@@ -16,7 +16,6 @@
 
 package org.auraframework.integration.test.root.parser.handler;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;

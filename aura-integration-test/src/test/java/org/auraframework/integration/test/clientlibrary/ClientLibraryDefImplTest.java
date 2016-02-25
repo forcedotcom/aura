@@ -56,56 +56,58 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
         service = Aura.getClientLibraryService();
     }
 
-    public void testValidation() throws Exception {
-
+    public void testValidationNullName() throws Exception {
         ClientLibraryDef def;
         Set<AuraContext.Mode> modes = Collections.emptySet();
-
         try {
-            def = vendor.makeClientLibraryDef(null, null, ClientLibraryDef.Type.JS, modes, false,
+            def = vendor.makeClientLibraryDef(null, ClientLibraryDef.Type.JS, modes,
                     vendor.makeComponentDefDescriptor("comp"), vendor.makeLocation("f1", 5, 5, 0));
             def.validateDefinition();
             fail("Should have thrown InvalidDefinitionException for no name");
         } catch (Exception e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Must have either a name or url");
+            checkExceptionFull(e, InvalidDefinitionException.class, "Must have a name");
         }
+    }
 
+    public void testValidationEmptyName() throws Exception {
+        ClientLibraryDef def;
+        Set<AuraContext.Mode> modes = Collections.emptySet();
         try {
-            def = vendor.makeClientLibraryDef("", null, ClientLibraryDef.Type.JS, modes, false,
+            def = vendor.makeClientLibraryDef("", ClientLibraryDef.Type.JS, modes,
                     vendor.makeComponentDefDescriptor("comp"), vendor.makeLocation("f1", 5, 5, 0));
             def.validateDefinition();
             fail("Should have thrown InvalidDefinitionException for Empty name");
         } catch (Exception e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Must have either a name or url");
+            checkExceptionFull(e, InvalidDefinitionException.class, "Must have a name");
         }
+    }
+
+    public void testValidationNoType() throws Exception {
+        ClientLibraryDef def;
+        Set<AuraContext.Mode> modes = Collections.emptySet();
 
         try {
-            def = vendor.makeClientLibraryDef("hello", null, null, modes, false,
+            def = vendor.makeClientLibraryDef("hello", null, modes,
                     vendor.makeComponentDefDescriptor("comp"), vendor.makeLocation("f1", 5, 5, 0));
             def.validateDefinition();
             fail("Should have thrown InvalidDefinitionException for no type");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Missing required type");
         }
+    }
+
+    public void testValidationNoParent() throws Exception {
+        ClientLibraryDef def;
+        Set<AuraContext.Mode> modes = Collections.emptySet();
 
         try {
-            def = vendor.makeClientLibraryDef("hello", null, ClientLibraryDef.Type.JS, modes, false,
+            def = vendor.makeClientLibraryDef("hello", ClientLibraryDef.Type.JS, modes,
                     null, vendor.makeLocation("f1", 5, 5, 0));
             def.validateDefinition();
             fail("Should have thrown InvalidDefinitionException for no parent descriptor");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "No parent for ClientLibraryDef");
         }
-
-        try {
-            def = vendor.makeClientLibraryDef("hello", "somewhere/somefile.css", ClientLibraryDef.Type.JS, modes, false,
-                    vendor.makeComponentDefDescriptor("comp"), vendor.makeLocation("f1", 5, 5, 0));
-            def.validateDefinition();
-            fail("Should have thrown InvalidDefinitionException for invalid file extension ");
-        } catch (Exception e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Url file extension must match type");
-        }
-
     }
 
     /**
@@ -133,10 +135,10 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testCommaSeparatedStringInNameWillNotResolve() throws Exception {
-        ClientLibraryService service = new ClientLibraryServiceImpl();
-        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("MyLib, MyLib2", null, ClientLibraryDef.Type.JS,
-                null, false, null, null);
-        String url = service.getResolvedUrl(clientLibrary);
+        ClientLibraryService tmpService = new ClientLibraryServiceImpl();
+        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("MyLib, MyLib2", ClientLibraryDef.Type.JS,
+                null, null, null);
+        String url = tmpService.getResolvedUrl(clientLibrary);
         assertNull("Expected null if a invalid library name was specified", url);
     }
 
@@ -145,8 +147,8 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
      */
     public void testDefaultModeIfNoneSpecified() {
         Set<Mode> modes = Collections.emptySet();
-        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("MyLib", null, ClientLibraryDef.Type.JS,
-                modes, false, null, null);
+        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("MyLib", ClientLibraryDef.Type.JS,
+                modes, null, null);
         assertTrue(clientLibrary.shouldInclude(null));
         for (Mode mode : AuraContext.Mode.values()) {
             assertTrue("When no mode is specified, library should be included in all modes",
@@ -156,24 +158,8 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
         assertFalse(clientLibrary.shouldInclude(Mode.DEV, ClientLibraryDef.Type.CSS));
     }
 
-    /**
-     * Verify that definition validation catches when an aura:clientLibrary tag specified a CSS resource as url and JS
-     * as type.
-     */
-    public void testMismatchedComponentResourceAndTypeSpecification() throws Exception {
-        String markup = "<aura:clientLibrary name='urlAndTypeMismatch' url='js://clientLibraryTest.clientLibraryTest' type='CSS'/>";
-        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "", markup));
-        try {
-            ComponentDef def = definitionService.getDefinition(cmp);
-            def.validateDefinition();
-            fail("Should flag an error when resource type and specified type attribute do not match.");
-        } catch (InvalidDefinitionException e) {
-            assertEquals("ResourceDef type must match library type", e.getMessage());
-        }
-    }
 
-    public void testComparingLibraryDefs() throws Exception{
+    public void testComparingLibraryDefsIdentical() throws Exception{
         ClientLibraryDef cdf1 = getElement("<aura:clientLibrary name='HTML5Shiv' type='JS'/>");
         assertFalse(cdf1.equals(null));
         assertFalse(cdf1.equals(""));
@@ -181,49 +167,35 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
         ClientLibraryDef sameLibraryTag = getElement("<aura:clientLibrary name='HTML5Shiv' type='JS'/>");
         assertTrue("Same library tag should be considered duplicates", 
                 cdf1.equals(sameLibraryTag));
+    }
         
+    public void testComparingLibraryDefsDifferentModes() throws Exception{
         //When two components include same library for different modes, the final clientLibrary set should include for both modes
         ClientLibraryDef sameLibraryButDifferentModes1 = getElement("<aura:clientLibrary name='HTML5Shiv' type='JS' modes='DEV'/>");
         ClientLibraryDef sameLibraryButDifferentModes2 = getElement("<aura:clientLibrary name='HTML5Shiv' type='JS' modes='JSTEST'/>");
         assertFalse("Same library tag marked for different modes should not be considered duplicates",
                 sameLibraryButDifferentModes1.equals(sameLibraryButDifferentModes2));
+    }
 
+    public void testComparingLibraryDefsDifferentTypes() throws Exception{
         ClientLibraryDef sameNameButDifferentType1 = getElement("<aura:clientLibrary name='MyLib' type='CSS'/>");
         ClientLibraryDef sameNameButDifferentType2 = getElement("<aura:clientLibrary name='MyLib' type='JS'/>");
         assertFalse("Same library with diffrent types should not be considered duplicates", 
                 sameNameButDifferentType1.equals(sameNameButDifferentType2));
+    }
 
-        ClientLibraryDef sameNameButDifferentUrl1 = getElement("<aura:clientLibrary name='MyLib' url='/auraFW/resources/some/lib.css' type='CSS'/>");
-        ClientLibraryDef sameNameButDifferentUrl2 = getElement("<aura:clientLibrary name='MyLib' url='/auraFW/resources/some/lib2.js' type='JS'/>");
-        assertFalse("Same library with diffrent types should not be considered duplicates",
-                sameNameButDifferentUrl1.equals(sameNameButDifferentUrl2));
+    public void testComparingLibraryDefsDifferentNames() throws Exception{
+        ClientLibraryDef differentName1 = getElement("<aura:clientLibrary name='MyLib1' type='JS'/>");
+        ClientLibraryDef differentName2 = getElement("<aura:clientLibrary name='MyLib2' type='JS'/>");
+        assertFalse("Different names should not be considered duplicates",
+                differentName1.equals(differentName2));
+    }
 
-        ClientLibraryDef sameUrlButDifferentName1 = getElement("<aura:clientLibrary name='MyLib1' url='/auraFW/resources/some/lib.js' type='JS'/>");
-        ClientLibraryDef sameUrlButDifferentName2 = getElement("<aura:clientLibrary name='MyLib2' url='/auraFW/resources/some/lib.js' type='JS'/>");
-        assertTrue("Same library url with different names should not be considered duplicates",
-                sameUrlButDifferentName1.equals(sameUrlButDifferentName2));
-
-        ClientLibraryDef sameUrl1 = getElement("<aura:clientLibrary url='/auraFW/resources/some/lib.js' type='JS'/>");
-        ClientLibraryDef sameUrl2 = getElement("<aura:clientLibrary url='/auraFW/resources/some/lib.js' type='JS'/>");
-        assertTrue("Library tags without a name but same URL should be considered equal", sameUrl1.equals(sameUrl2));
-
-        ClientLibraryDef sameUrlDifferentName1 = getElement("<aura:clientLibrary name='name' url='/auraFW/resources/some/lib.js' type='JS'/>");
-        ClientLibraryDef sameUrlDifferentName2 = getElement("<aura:clientLibrary name='name2' url='/auraFW/resources/some/lib.js' type='JS'/>");
-        assertTrue("Library tags without a name but same URL should be considered equal", sameUrlDifferentName1.equals(sameUrlDifferentName2));
-
-        ClientLibraryDef sameUrl3 = getElement("<aura:clientLibrary url='/auraFW/resources/some/lib.js' type='JS'/>");
-        ClientLibraryDef sameUrl4 = getElement("<aura:clientLibrary url='/auraFW/resources/some/lib2.js' type='JS'/>");
-        assertFalse("Library tags without a name and different URLs should not equal", sameUrl3.equals(sameUrl4));
-
+    public void testComparingLibraryDefsEnclosedModes() throws Exception{
         ClientLibraryDef sameButAllMode = getElement("<aura:clientLibrary name='MyLib' type='JS' />");
         ClientLibraryDef sameButDifferentMode = getElement("<aura:clientLibrary name='MyLib' type='JS' modes='PTEST' />");
         assertTrue("Library which includes all modes is equal to one which specifies one",
                 sameButAllMode.equals(sameButDifferentMode));
-
-        ClientLibraryDef sameButCombine = getElement("<aura:clientLibrary name='MyLib' type='JS' combine='true' />");
-        ClientLibraryDef sameButNotCombine = getElement("<aura:clientLibrary name='MyLib' type='JS' modes='PTEST' />");
-        assertTrue("Library with different combine attribute is still the same",
-                sameButCombine.equals(sameButNotCombine));
     }
 
     private ClientLibraryDefHandler<ComponentDef> getHandler(String clMarkup) throws Exception {

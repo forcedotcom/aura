@@ -22,9 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.auraframework.builder.ClientLibraryDefBuilder;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ResourceDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -39,10 +37,8 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
     private static final long serialVersionUID = -1342087284192933971L;
     private final DefDescriptor<? extends RootDefinition> parentDescriptor;
     private final String name;
-    private final String url;
     private final Type type;
     private final Set<AuraContext.Mode> modes;
-    private final boolean combine;
     private final int myHashCode;
 
     protected ClientLibraryDefImpl(Builder builder) {
@@ -50,15 +46,10 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
         this.parentDescriptor = builder.parentDescriptor;
         this.type = builder.type;
         this.name = builder.name;
-        this.url = builder.url;
         this.modes = builder.modes;
-        this.combine = builder.combine;
 
         int val = 0;
 
-        if (url != null) {
-            val += url.hashCode();
-        }
         if (name != null) {
             val += name.hashCode();
         }
@@ -82,8 +73,8 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
      */
     @Override
     public void validateDefinition() throws QuickFixException {
-        if (StringUtils.isBlank(this.name) && StringUtils.isBlank(this.url)) {
-            throw new InvalidDefinitionException("Must have either a name or url", getLocation());
+        if (StringUtils.isBlank(this.name)) {
+            throw new InvalidDefinitionException("Must have a name", getLocation());
         }
         if (this.type == null) {
             throw new InvalidDefinitionException("Missing required type", getLocation());
@@ -91,37 +82,11 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
         if (this.parentDescriptor == null) {
             throw new InvalidDefinitionException("No parent for ClientLibraryDef", getLocation());
         }
-
-        if (StringUtils.isNotBlank(this.url)) {
-            if (StringUtils.startsWithIgnoreCase(this.url, DefDescriptor.CSS_PREFIX + "://") ||
-                StringUtils.startsWithIgnoreCase(this.url, DefDescriptor.JAVASCRIPT_PREFIX + "://")) {
-
-                if (!StringUtils.startsWithIgnoreCase(this.url, this.type.toString())) {
-                    throw new InvalidDefinitionException("ResourceDef type must match library type", getLocation());
-                }
-
-                DefDescriptor<ResourceDef> resourceDesc = DefDescriptorImpl.getInstance(this.url, ResourceDef.class);
-                if (!resourceDesc.exists()) {
-                    throw new InvalidDefinitionException("No resource named " + this.url + " found", getLocation());
-                }
-
-            } else {
-                // must have the same file extension as type
-                if (!StringUtils.endsWithIgnoreCase(this.url, "." + this.type.toString())) {
-                    throw new InvalidDefinitionException("Url file extension must match type", getLocation());
-                }
-            }
-        }
     }
 
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
-    }
-
-    @Override
-    public String getUrl() {
-        return this.url;
     }
 
     @Override
@@ -137,14 +102,6 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
     @Override
     public Set<AuraContext.Mode> getModes() {
         return this.modes;
-    }
-
-    @Override
-    public boolean shouldCombine() {
-        // combine only when it's a readable resource
-        return (StringUtils.startsWithIgnoreCase(this.url, DefDescriptor.CSS_PREFIX + "://") ||
-            StringUtils.startsWithIgnoreCase(this.url, DefDescriptor.JAVASCRIPT_PREFIX + "://")) ||
-            (StringUtils.isBlank(this.url) && this.combine) ;
     }
 
     @Override
@@ -177,19 +134,13 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("type: ").append(this.type)
-                .append(", name: ").append(this.name)
-                .append(", url: ").append(this.url);
+        sb.append("type: ").append(this.type).append(", name: ").append(this.name);
         return sb.toString();
     }
 
     @Override
     public boolean equalsIgnoreModes(ClientLibraryDef c) {
-        return ((StringUtils.isBlank(c.getUrl()) && StringUtils.isBlank(this.getUrl()) &&
-                c.getLibraryName().equals(this.getLibraryName())) ||
-                (StringUtils.isNotBlank(c.getUrl()) && StringUtils.isNotBlank(this.getUrl()) &&
-                c.getUrl().equals(this.getUrl()))) &&
-                c.getType() == this.getType();
+        return c.getLibraryName().equals(this.getLibraryName()) && c.getType() == this.getType();
     }
 
     @Override
@@ -215,10 +166,8 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
 
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
         private String name;
-        private String url;
         private Type type;
         private Set<AuraContext.Mode> modes;
-        private boolean combine;
 
         public Builder() {
             super(ClientLibraryDef.class);
@@ -237,12 +186,6 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
         }
 
         @Override
-        public ClientLibraryDefBuilder setUrl(String url) {
-            this.url = url;
-            return this;
-        }
-
-        @Override
         public ClientLibraryDefBuilder setType(Type type) {
             this.type = type;
             return this;
@@ -251,12 +194,6 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
         @Override
         public ClientLibraryDefBuilder setModes(Set<AuraContext.Mode> modes) {
             this.modes = modes;
-            return this;
-        }
-
-        @Override
-        public ClientLibraryDefBuilder setCombine(boolean combine) {
-            this.combine = combine;
             return this;
         }
 

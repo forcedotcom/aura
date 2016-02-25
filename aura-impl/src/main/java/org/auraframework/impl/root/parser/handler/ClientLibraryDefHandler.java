@@ -79,15 +79,6 @@ public class ClientLibraryDefHandler<P extends RootDefinition> extends ParentedT
     protected void readAttributes() throws QuickFixException {
         builder.setName(getAttributeValue(ATTRIBUTE_NAME));
 
-        String url = getAttributeValue(ATTRIBUTE_URL);
-        if (url == null) {
-            // url needs value for comparison
-            url = "";
-        }
-        builder.setUrl(url);
-
-        builder.setCombine(StringUtils.equalsIgnoreCase(getAttributeValue(ATTRIBUTE_COMBINE), "true"));
-
         String type = getAttributeValue(ATTRIBUTE_TYPE);
         // JS by default
         builder.setType(ClientLibraryDef.Type.JS);
@@ -135,6 +126,4 @@ public class ClientLibraryDefHandler<P extends RootDefinition> extends ParentedT
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         error("ClientLibrary cannot have child text");
     }
-
-
 }

@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.css;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokenDescriptorProvider;
 import org.auraframework.def.TokensDef;

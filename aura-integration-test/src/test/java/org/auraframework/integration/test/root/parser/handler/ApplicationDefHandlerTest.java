@@ -17,7 +17,6 @@ package org.auraframework.integration.test.root.parser.handler;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorsDef;

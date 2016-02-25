@@ -1890,20 +1890,23 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         return cmpConfig.containsKey(property) ? cmpConfig.get(property) : null;
     }
 
-    public void testClientLibraryDefValidation() throws Exception {
+    public void testClientLibraryDefValidationNoName() throws Exception {
         DefDescriptor<T> missingRequiredAttr = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "", "<aura:clientLibrary type='JS' />"));
         try {
-        	definitionService.getDefinition(missingRequiredAttr);
+            definitionService.getDefinition(missingRequiredAttr);
             fail("Failed to validate client library type which didn't specify a name attribute.");
         } catch (InvalidDefinitionException e) {
-            assertEquals("Must have either a name or url", e.getMessage());
+            assertEquals("Must have a name", e.getMessage());
         }
+    }
 
+    // FIXME: we probably should have a test for this.
+    public void _testClientLibraryDefValidationBadName() throws Exception {
         DefDescriptor<T> invalidResource = addSourceAutoCleanup(getDefClass(),
-                String.format(baseTag, "", "<aura:clientLibrary name='doesntExist' type='js' url='js://foo.bar'/>"));
+                String.format(baseTag, "", "<aura:clientLibrary name='doesntExist' type='js'/>"));
         try {
-        	definitionService.getDefinition(invalidResource);
+            definitionService.getDefinition(invalidResource);
             fail("Failed to validate client library type which specified non existing component resource.");
         } catch (QuickFixException e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "No resource named js://foo.bar found");

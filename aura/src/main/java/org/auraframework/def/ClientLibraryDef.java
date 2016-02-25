@@ -40,12 +40,6 @@ public interface ClientLibraryDef extends Definition {
     String getLibraryName();
 
     /**
-     * Url specified in tag
-     * @return url
-     */
-    String getUrl();
-
-    /**
      * Either CSS or JS
      * @return library type
      */
@@ -73,13 +67,6 @@ public interface ClientLibraryDef extends Definition {
      * @return true if should be included with mode and type
      */
     boolean shouldInclude(AuraContext.Mode mode, Type type);
-
-    /**
-     * Whether should be included in concatenation with other client libraries
-     *
-     * @return true if should be combine
-     */
-    boolean shouldCombine();
 
     /**
      * Whether its the same client library def with differing modes

@@ -57,6 +57,5 @@
         },
         {
             "Tracing.Memory.nodes": 10
-        }],
-  "options" : {}
+        }]
 }

@@ -161,7 +161,7 @@ ComponentClassRegistry.prototype.buildConstructor = function(componentProperties
     //#end
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    var className = componentProperties["meta"]["className"];
+    var className = componentProperties["meta"]["name"];
 
     /*eslint-disable no-redeclare*/
     var componentConstructor = $A.util.globalEval("(function " + className + "() { Component.apply(this, arguments); });", {

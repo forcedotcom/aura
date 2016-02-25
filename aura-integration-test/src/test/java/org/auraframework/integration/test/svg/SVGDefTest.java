@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.svg;
 
-import org.auraframework.Aura;
 import org.auraframework.def.SVGDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -28,7 +27,7 @@ public class SVGDefTest extends AuraImplTestCase {
     }
 
     public void testGetSVGDef() throws Exception {
-        SVGDef svg = Aura.getDefinitionService().getDefinition("test:fakeComponent", SVGDef.class);
+        SVGDef svg = definitionService.getDefinition("test:fakeComponent", SVGDef.class);
         assertNotNull("SVGDef not found!", svg);
         String contents = svg.getContents();
         assertTrue("SVGDef source should not be empty!", contents != null && contents.length() > 0);
@@ -37,7 +36,7 @@ public class SVGDefTest extends AuraImplTestCase {
 
     public void testGetNonExistentSVGDef() throws Exception {
         try {
-            Aura.getDefinitionService().getDefinition("this:doesNotExist", SVGDef.class);
+            definitionService.getDefinition("this:doesNotExist", SVGDef.class);
             fail("SVGDef for 'this:doesNotExist' should not exist.");
         } catch (Exception t) {
             assertExceptionMessageStartsWith(t, DefinitionNotFoundException.class,
@@ -47,7 +46,7 @@ public class SVGDefTest extends AuraImplTestCase {
 
     public void testSvgParsingLimit() throws Exception {
         try {
-            Aura.getDefinitionService().getDefinition("test:svgIsTooLarge", SVGDef.class);
+            definitionService.getDefinition("test:svgIsTooLarge", SVGDef.class);
             fail("SVGDef for 'test:svgIsTooLarge' should be too large.");
         } catch (Exception t) {
             assertExceptionMessageStartsWith(t, SVGParserException.class,

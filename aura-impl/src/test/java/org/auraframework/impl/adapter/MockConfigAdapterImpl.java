@@ -76,7 +76,6 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
             if (context != null && context.isTestMode()) {
                 list = removeNonceCspEntry(list);
                 list.add(CSP.UNSAFE_EVAL);
-                list.add(CSP.UNSAFE_INLINE);
             }
             return list;
         }
@@ -87,7 +86,6 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
             AuraContext context = Aura.getContextService().getCurrentContext();
             if (context != null && context.isTestMode()) {
                 list = removeNonceCspEntry(list);
-                list.add(CSP.UNSAFE_INLINE);
             }
             return list;
         }

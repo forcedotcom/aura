@@ -197,6 +197,30 @@
         }
     },
 
+    testSelectWithIterationOptionsChanged : {
+        attributes :{
+            multi:"false"
+        }, test: function(cmp) {
+            var inputSelectCmp = cmp.find("InputSelectIterationChanged"),
+                context = this;
+
+            $A.test.assertEquals(3, this.getNumberOfOptions(inputSelectCmp), "Initially there should be no options in the select");
+            this.selectOptionAndVerify(inputSelectCmp, "Montreal");
+            this.selectOptionAndVerify(inputSelectCmp, "Toronto");
+
+            $A.test.addWaitForWithFailureMessage(4,
+                function () {
+                    cmp.set("v.cities2", ["San Francisco", "New York", "Washington", "Los Angeles"]);
+                    return context.getNumberOfOptions(inputSelectCmp);
+                }, "Options should have been changed to 4 US cities",
+                function() {
+                    context.selectOptionAndVerify(inputSelectCmp, "San Francisco");
+                    context.selectOptionAndVerify(inputSelectCmp, "Los Angeles");
+                    context.verifyCannotSetValue(inputSelectCmp, "Montreal");
+                });
+        }
+    },
+
     selectOptionAndVerify: function(inputSelectCmp, optionValue) {
         this.selectOptions(inputSelectCmp, optionValue);
         this.verifyComponentValue(inputSelectCmp, optionValue);
@@ -246,5 +270,14 @@
         if (componentValue) {
             $A.test.assertTrue(componentValue.indexOf(optionValue) == -1, "value was set incorrectly");
         }
+    },
+
+    getNumberOfOptions: function (inputSelectCmp) {
+        var selectElement = inputSelectCmp.getElement();
+        var options = selectElement.options;
+        if ($A.util.isUndefinedOrNull(options)) {
+            return 0;
+        }
+        return options.length;
     }
 })

@@ -29,6 +29,7 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.def.TokensImportDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.token.TokensDefImpl;
+import org.auraframework.impl.expression.functions.BooleanFunctions;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
@@ -45,9 +46,10 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
     private static final String ATTRIBUTE_EXTENDS = "extends";
     private static final String ATTRIBUTE_PROVIDER = "provider";
     private static final String ATTRIBUTE_MAP_PROVIDER = "mapProvider";
+    private static final String ATTRIBUTE_SERIALIZE = "serialize";
 
     private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
-            .add(ATTRIBUTE_ACCESS, ATTRIBUTE_EXTENDS, RootTagHandler.ATTRIBUTE_API_VERSION)
+            .add(ATTRIBUTE_ACCESS, ATTRIBUTE_EXTENDS, ATTRIBUTE_SERIALIZE, RootTagHandler.ATTRIBUTE_API_VERSION)
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES)
             .build();
 
@@ -102,6 +104,11 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
         String mapProvider = getAttributeValue(ATTRIBUTE_MAP_PROVIDER);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(mapProvider)) {
             builder.setMapProvider(DefDescriptorImpl.getInstance(mapProvider, TokenMapProviderDef.class));
+        }
+
+        String serialize = getAttributeValue(ATTRIBUTE_SERIALIZE);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(serialize)) {
+            builder.setSerialize(Boolean.parseBoolean(serialize));
         }
 
         try {

@@ -45,6 +45,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.allowedGlobals = config["allowedGlobals"];
     this.globals = config["globals"];
     this.accessStack=[];
+    this.tokens={};
 
     var that = this;
     this.initGlobalValueProviders(config["globalValueProviders"], function(gvps) {
@@ -59,7 +60,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
         if(config["libraryDefs"]) {
             defs = config["libraryDefs"];
             for (i = 0; i < defs.length; i++) {
-                $A.componentService.createLibraryDef(defs[i]);
+                $A.componentService.saveLibraryConfig(defs[i]);
             }
         }
 
@@ -171,6 +172,23 @@ Aura.Context.AuraContext.prototype.getAccessVersion = function(name) {
 };
 
 /**
+ * Gets the application configuration tokens allowed to be used in component markup.
+ * @private
+ */
+Aura.Context.AuraContext.prototype.getTokens=function(){
+    return this.tokens;
+};
+
+/**
+ * Sets the application configuration tokens allowed to be used in component markup.
+ * @param tokens The object map containing name value pairs of tokens.
+ * @private
+ */
+Aura.Context.AuraContext.prototype.setTokens=function(tokens){
+    this.tokens=tokens;
+};
+
+/**
  * Adds a new global value provider.
  * @param type The key to identify the valueProvider.
  * @param valueProvider The valueProvider to add.
@@ -243,7 +261,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     if (otherContext["libraryDefs"]) {
         defs = otherContext["libraryDefs"];
         for (i = 0; i < defs.length; i++) {
-            $A.componentService.createLibraryDef(defs[i]);
+            $A.componentService.saveLibraryConfig(defs[i]);
         }
     }
 

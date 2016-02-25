@@ -19,11 +19,10 @@
     <aura:import library="test:test_Library" property="importED" /> 
     <aura:import library="test:TEST_Library" property="importedWithWrongCase" /> 
     
-    <!-- aura clientLibrary, name is case sensitive, url is case sensitive -->
-    <aura:clientLibrary name="clTestAppJS" url="js://clientLibraryTest.clientLibraryTest" type="JS" />
+    <!-- aura clientLibrary, name is case sensitive -->
+    <!-- <aura:clientLibrary name="clTestAppJS" type="JS" /> -->
     <!-- this won't load as we register the lib with name: CkEditor -->
     <aura:clientLibrary name="ckEDITOR" type="JS" />
-    
     
 	<ui:button press="{!c.tryOutMarkup}" label="press me to test markup" class="button_tryOutMarkup"/> 
 	<ui:button press="{!c.tryOutDependency}" label="press me to test dependency" class="button_tryOutDependency"/> 

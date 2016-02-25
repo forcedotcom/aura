@@ -20,7 +20,6 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
@@ -45,7 +44,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component",
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc,
                 "<div class='MyClass'>Child Text<br/></div>", "myID", Format.XML);
@@ -78,7 +77,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     }
 
     public void testHandleChildSetTag() throws Exception {
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component",
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc,
                 "<div><aura:set attribute='header' value='false'/></div>", "myID", Format.XML);
@@ -91,7 +90,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
         htmlHandler.handleChildTag();
         @SuppressWarnings("unchecked")
         String value = (String) ((Map<String, Object>) htmlHandler.createDefinition()
-                .getAttributeDefRef("HTMLAttributes").getValue()).get(Aura.getDefinitionService().getDefDescriptor(
+                .getAttributeDefRef("HTMLAttributes").getValue()).get(definitionService.getDefDescriptor(
                 "header", AttributeDef.class));
         assertEquals("false", value);
     }
@@ -122,7 +121,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     }
 
     public void testReadFlavorable() throws Exception {
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component", ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc,"<div aura:flavorable='true'></div>", "myID", Format.XML);
         xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
         xmlReader.next();

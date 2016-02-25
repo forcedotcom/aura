@@ -37,12 +37,16 @@ Test.Aura.AuraComponentServiceTest = function(){
             ComponentClassRegistry: function () {}
         },
         Library: {
-            LibraryDefRegistry: function () {},
+            LibraryRegistry: function () {},
+            LibraryIncludeRegistry: function () {}
         },
 
     };
 
     Mocks.GetMocks(Object.Global(), {
+        "LibraryRegistry": function(){},
+        "LibraryIncludeRegistry": function(){},
+        "ComponentClassRegistry": function(){},
         "AuraComponentService": function(){},
         "ComponentDefStorage": function(){},
         "Aura": Aura

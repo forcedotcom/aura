@@ -15,6 +15,7 @@
  */
 package org.auraframework.test.perf;
 
+import org.auraframework.def.ComponentDef;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.util.SauceUtil;
 import org.auraframework.util.AuraTextUtil;
@@ -68,7 +69,7 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
      * Test loading component using /perfTest/perf.app
      */
     public void testButton() throws Exception {
-        runWithPerfApp(getDefDescriptor("ui:button"));
+        runWithPerfApp(definitionService.getDefDescriptor("ui:button", ComponentDef.class));
     }
 
     private void verifyButton(PerfMetrics actual) {
@@ -93,7 +94,7 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
     // ui:label: perf.app was not showing the label in the page
 
     public void testLabel() throws Exception {
-        runWithPerfApp(getDefDescriptor("ui:label"));
+        runWithPerfApp(definitionService.getDefDescriptor("ui:label", ComponentDef.class));
     }
 
     private void verifyLabel(PerfMetrics actual) {
@@ -111,7 +112,7 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
     // perfTest:dummyPerf
 
     public void testDummyPerf() throws Exception {
-        runWithPerfApp(getDefDescriptor("perfTest:dummyPerf"));
+        runWithPerfApp(definitionService.getDefDescriptor("perfTest:dummyPerf", ComponentDef.class));
     }
 
     private void verifyDummyPerf(PerfMetrics actual) {

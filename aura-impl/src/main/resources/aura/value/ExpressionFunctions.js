@@ -110,7 +110,7 @@ ExpressionFunctions.prototype.format = function() {
 
     // Guard for "null" or "undefined", just like we do for add.
     var a0 = arguments[0];
-    if (a0 === undefined || a0 === null) {
+    if (a0 === undefined || a0 === null || !$A.util.isFunction(a0.toString)) {
         return "";
     }
 
@@ -127,5 +127,22 @@ ExpressionFunctions.prototype.format = function() {
 
     return $A.util.format.apply($A.util, formatArguments);
 };
+
+/**
+ * Passthrough to $A.getContext().getTokens()["token"];
+ * @export
+ */
+ExpressionFunctions.prototype.token = function(token){
+    var context=$A.getContext();
+    var tokens=context&&context.getTokens();
+    if(tokens){
+        if(tokens.hasOwnProperty(token)){
+            return tokens[token];
+        }
+        throw new Error("Unknown token: '"+token+"'. Are you missing a tokens file or declaration?");
+    }
+    return '';
+};
+
 
 Aura.Value.ExpressionFunctions = ExpressionFunctions;

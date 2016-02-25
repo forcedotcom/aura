@@ -29,7 +29,6 @@ import org.auraframework.impl.java.model.JavaModelDefImpl;
 import org.auraframework.impl.test.util.AuraImplUnitTestingUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Model;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -45,7 +44,6 @@ public abstract class AuraImplTestCase extends AuraTestCase {
     private final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 
     protected final AuraImplUnitTestingUtil vendor = new AuraImplUnitTestingUtil();
-    protected final DefinitionService definitionService = Aura.getDefinitionService();
     private boolean shouldSetupContext = true;
 
     protected final DefDescriptor<ApplicationDef> laxSecurityApp = definitionService.getDefDescriptor(

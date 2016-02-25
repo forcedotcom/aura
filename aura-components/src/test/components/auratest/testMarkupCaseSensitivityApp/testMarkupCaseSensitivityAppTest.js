@@ -138,11 +138,9 @@
      */
     testClientLib : {
     	test: function(cmp) {
-    		// look at clientLibraryTest/clientLibraryTestResourse.js
-    		$A.test.assertTrue(clientLibraryTest.cool === "awesome", "clientLibrary imported by url fail to load");
     		///we have register(new AuraResourceResolver("CkEditor", ClientLibraryDef.Type.JS, 
     		//"ckeditor/ckeditor-4.x/rel/ckeditor.js",  "ckeditor/ckeditor-4.x/rel/ckeditor.js"));
-    	    //in ClientLibraryResolverRegistryImpl.java
+    	        //in ClientLibraryResolverRegistryImpl.java
     		//in ckeditor.js, we have window.CKEDITOR = blablalba, hence the CKEDITOR down there
     		//however in the test app markup, we use the wrong name ("ckEDITOR" instead of "CkEditor"), so it won't load
     		$A.test.assertTrue(window.CKEDITOR === undefined, "clientLibrary CkEDITOR shouldn't get loaded");

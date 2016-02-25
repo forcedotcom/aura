@@ -362,7 +362,7 @@
             cmp._twoKbPayload = new Array(2048).join("2");
             cmp._fourKbPayload = new Array(4096).join("4");
             cmp._sixtyfourKbPayload = new Array(65536).join("6");
-            cmp._fivetwelveKbPayload = new Array(524288).join("8");
+            cmp._thousandtwentyfourKbPayload = new Array(1048576).join("8");
         }
 
         var payload;
@@ -382,8 +382,8 @@
             case "64kb":
                 payload = cmp._sixtyfourKbPayload;
                 break;
-            case "512kb":
-                payload = cmp._fivetwelveKbPayload;
+            case "1024kb":
+                payload = cmp._thousandtwentyfourKbPayload;
                 break;
             default:
                 $A.error("Unknown payload: " + cmp.get("v.payload"));

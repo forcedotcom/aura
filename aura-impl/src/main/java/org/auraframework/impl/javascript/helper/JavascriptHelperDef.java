@@ -18,6 +18,9 @@ package org.auraframework.impl.javascript.helper;
 import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,19 +32,17 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.Sets;
-
 /**
  */
 public class JavascriptHelperDef extends DefinitionImpl<HelperDef> implements HelperDef {
     private static final long serialVersionUID = 1967445547376133339L;
-    private final Set<PropertyReference> expressionRefs;
     private final Map<String, Object> functions;
+    private final Set<PropertyReference> expressionRefs;
 
     protected JavascriptHelperDef(Builder builder) {
         super(builder);
-        this.expressionRefs = builder.expressionRefs;
         this.functions = builder.functions;
+        this.expressionRefs = builder.expressionRefs;
     }
 
     @Override
@@ -66,11 +67,19 @@ public class JavascriptHelperDef extends DefinitionImpl<HelperDef> implements He
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<HelperDef> {
-        public Map<String, Object> functions;
-        public Set<PropertyReference> expressionRefs = Sets.newHashSet();
+        public Map<String, Object> functions = new HashMap<>();
+        public Set<PropertyReference> expressionRefs = new HashSet<>();
 
         public Builder() {
             super(HelperDef.class);
+        }
+
+        public void addFunctions(Map<String, Object> functions) {
+            this.functions.putAll(functions);
+        }
+
+        public void addExpressionRefs(Collection<PropertyReference> refs) {
+            expressionRefs.addAll(refs);
         }
 
         @Override

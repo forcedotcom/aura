@@ -119,6 +119,7 @@
     },
 
     hide: function (cmp, callback) {
+
         var self = this,
             containerEl = cmp.getElement(),
             animationName = cmp.get('v.animation'),

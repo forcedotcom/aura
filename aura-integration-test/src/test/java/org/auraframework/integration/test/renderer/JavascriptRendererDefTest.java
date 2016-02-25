@@ -20,7 +20,6 @@ import static org.junit.Assert.assertThat;
 
 import java.io.StringWriter;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -44,7 +43,7 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
 
     public void testGetDescriptor() throws Exception {
         DefDescriptor<RendererDef> expectedRendererDesc = addSourceAutoCleanup(RendererDef.class, "({})");
-        RendererDef rendererDef = Aura.getDefinitionService().getDefinition(expectedRendererDesc);
+        RendererDef rendererDef = definitionService.getDefinition(expectedRendererDesc);
 
         DefDescriptor<RendererDef> actualRendererDesc = rendererDef.getDescriptor();
         assertSame(expectedRendererDesc, actualRendererDesc);
@@ -72,7 +71,7 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
                 "    unrender: function() {}\n" +
                 "})";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
-        RendererDef rendererDef = Aura.getDefinitionService().getDefinition(rendererDesc);
+        RendererDef rendererDef = definitionService.getDefinition(rendererDesc);
 
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
         serializeAndGoldFile(rendererDef, "_JSRendererDef");
@@ -81,7 +80,7 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
     public void testSerializeJavascriptRendererDefHasNoFunction() throws Exception {
         String rendererJs = "({ })";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
-        RendererDef rendererDef = Aura.getDefinitionService().getDefinition(rendererDesc);
+        RendererDef rendererDef = definitionService.getDefinition(rendererDesc);
 
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
         serializeAndGoldFile(rendererDef, "_JSRendererDef");

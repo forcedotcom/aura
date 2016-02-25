@@ -188,16 +188,8 @@ public class TestSetRunnerState {
                 }
 
                 if (t instanceof PerfExecutorTest) {
-                    //url = ((PerfExecutorTest) t).generateUrl();
                 	List<String> urls = ((PerfExecutorTest) t).generateUrl();
-                	if(urls.size()>1){
-                		for(String u: urls){
-                			testWithProps.put("jsConsole", u);
-                            testsWithPropsMap.put(t.toString(), testWithProps);       
-                		}
-                		return;
-                	} 
-                	url = urls.get(0);               	
+                	url = urls.get(0);
                 }
 
                 testWithProps.put("jsConsole", url);

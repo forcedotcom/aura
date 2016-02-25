@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.util;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
@@ -31,7 +30,7 @@ public class JsonSerializationUITest extends WebDriverTestCase {
         DefDescriptor<ComponentDef> cmpdd = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "render='client'", ""));
         addSourceAutoCleanup(
-                Aura.getDefinitionService().getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
+                definitionService.getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
                 "({countDown:function(){if(!document.counter)document.counter=3;return !--document.counter?'done':'continue'}})");
         open(cmpdd);
         assertEquals("continue",auraUITestingUtil.getEval("return $A.getRoot().getDef().getHelper().countDown()"));
@@ -43,7 +42,7 @@ public class JsonSerializationUITest extends WebDriverTestCase {
         DefDescriptor<ComponentDef> cmpdd = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "render='client'", ""));
         addSourceAutoCleanup(
-                Aura.getDefinitionService().getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
+                definitionService.getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
                 "({getComment:function(){return '<!-- inside -->'}})");
         open(cmpdd);
         assertEquals("<!-- inside -->",auraUITestingUtil.getEval("return $A.getRoot().getDef().getHelper().getComment()"));
@@ -54,7 +53,7 @@ public class JsonSerializationUITest extends WebDriverTestCase {
         DefDescriptor<ComponentDef> cmpdd = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "render='client'", ""));
         addSourceAutoCleanup(
-                Aura.getDefinitionService().getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
+                definitionService.getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
                 "({replaceStar:function(str){return str.replace(/\\*/,'evil')}})");
         open(cmpdd);
         assertEquals("evildoer",auraUITestingUtil.getEval("return $A.getRoot().getDef().getHelper().replaceStar('*doer')"));
@@ -64,7 +63,7 @@ public class JsonSerializationUITest extends WebDriverTestCase {
         DefDescriptor<ComponentDef> cmpdd = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "render='client'", ""));
         addSourceAutoCleanup(
-                Aura.getDefinitionService().getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
+                definitionService.getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
                 "({getComment:function(){return '/* non-comment */'}})");
         open(cmpdd);
         assertEquals("/* non-comment */",auraUITestingUtil.getEval("return $A.getRoot().getDef().getHelper().getComment()"));
@@ -76,7 +75,7 @@ public class JsonSerializationUITest extends WebDriverTestCase {
         DefDescriptor<ComponentDef> cmpdd = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "render='client'", ""));
         addSourceAutoCleanup(
-                Aura.getDefinitionService().getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
+                definitionService.getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
                 "({replaceQuotes:function(str){return str.replace(/\"/g,'\\'')}})");
         open(cmpdd);
         assertEquals("'exactly'",auraUITestingUtil.getEval("return $A.getRoot().getDef().getHelper().replaceQuotes('\"exactly\"')"));

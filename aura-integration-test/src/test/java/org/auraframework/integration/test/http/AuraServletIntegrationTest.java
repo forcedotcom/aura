@@ -39,7 +39,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
      * check manifest URL when context has no preloads.
      */
     public void testGetManifestWithoutPreloads() throws Exception {
-        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(
                 "appCache:nopreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, desc);
         assertTrue(new ManifestUtil().isManifestEnabled());
@@ -52,7 +52,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
      */
     @ThreadHostileTest("preload sensitive")
     public void testGetManifestWithPreloads() throws Exception {
-        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(
                 "appCache:withpreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, desc);
         String url = new ManifestUtil().getManifestUrl();

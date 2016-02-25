@@ -38,7 +38,7 @@
         }
 
         if (!root) {
-            if (!win.aura.test.isComplete()) {
+            if (!win.$A.test.isComplete()) {
                 cmp.set("v.status", "spin");
                 setTimeout(function () {
                     cmp.getDef().getHelper().runTest(cmp);
@@ -58,11 +58,11 @@
             return;
         }
         //IF there were any errors in the test case (excluding assertions in callback functions)
-        if (win.aura.test.getErrors() !== "") {
+        var testErrors = win.$A.test.getErrors();
+        if (testErrors !== "") {
             cmp.set("v.status", "fail");
             var msg = "";
-            /*eslint-disable no-eval*/
-            var errorsInCallbackFunc = $A.util.globalEval("(" + win.aura.test.getErrors() + ")");
+            var errorsInCallbackFunc = testErrors && testErrors.length ? JSON.parse(testErrors) : [];
             var error = null;
             for (var i = 0; i < errorsInCallbackFunc.length; i++) {
                 error = errorsInCallbackFunc[i];

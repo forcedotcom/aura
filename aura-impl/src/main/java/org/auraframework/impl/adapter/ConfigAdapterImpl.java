@@ -165,7 +165,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         } else {
             buildTimestamp = System.currentTimeMillis();
         }
-        
+
         if (auraVersionString == null || auraVersionString.isEmpty()) {
             throw new AuraError("Unable to read build version from version.prop file");
         }
@@ -409,6 +409,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return String.format("%s/auraFW/javascript/%s/aura_%s.js", contextPath, nonce, suffix);
     }
 
+    @Override
+    public String getLockerWorkerURL() {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        String contextPath = context.getContextPath();
+        String nonce = context.getFrameworkUID();
+        return String.format("%s/auraFW/resources/%s/lockerservice/safeEval.html", contextPath, nonce);
+    }
+
     /**
      * Returns default aura url for encryption key
      */
@@ -639,10 +647,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
                 inlineStyle = !isLockerServiceEnabled();
             }
         } else {
-        	// Look for /auraFW/resources/lockerservice/safeEval.html
-        	inlineStyle = isSafeEvalWorkerURI(request.getRequestURI());
+            inlineStyle = isSafeEvalWorkerURI(request.getRequestURI());
         }
-        
+
         return new DefaultContentSecurityPolicy(inlineStyle);
     }
 
@@ -657,9 +664,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 	public boolean isLockerServiceEnabled() {
 		return true;
 	}
-	
+
 	protected boolean isSafeEvalWorkerURI(String uri) {
-        // TODO: we should allow `fwuid` as a token for cache control in this url
-		return uri.endsWith("/lockerservice/safeEval.html");
+        return uri.endsWith("/lockerservice/safeEval.html");
 	}
 }

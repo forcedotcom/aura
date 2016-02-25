@@ -15,6 +15,10 @@
  */
 package org.auraframework.integration.test.service;
 
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -71,8 +75,6 @@ import org.mockito.Mockito;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import static org.mockito.Mockito.*;
 
 public class ServerServiceImplTest extends AuraImplTestCase {
     public ServerServiceImplTest(String name) {
@@ -186,7 +188,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
     }
 
-    private static class EmptyAction extends AbstractActionImpl<EmptyActionDef> {
+    private class EmptyAction extends AbstractActionImpl<EmptyActionDef> {
         private String returnValue = "";
         private Integer count = 0;
         private String parameter = "";
@@ -209,7 +211,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         @Override
         public DefDescriptor<ActionDef> getDescriptor() {
-            return Aura.getDefinitionService()
+            return definitionService
                     .getDefDescriptor("java://aura.empty/ACTION$emptyAction", ActionDef.class);
         }
 
@@ -484,7 +486,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      */
     public void testWriteCssWithoutDupes() throws Exception {
         ServerService ss = Aura.getServerService();
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService()
+        DefDescriptor<ApplicationDef> appDesc = definitionService
                 .getDefDescriptor("preloadTest:test_SimpleApplication", ApplicationDef.class);
         AuraContext context = Aura.getContextService()
                 .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Authentication.AUTHENTICATED, appDesc);
@@ -512,15 +514,15 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      */
     public void testCSSOrder() throws Exception {
         ServerService ss = Aura.getServerService();
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService()
+        DefDescriptor<ApplicationDef> appDesc = definitionService
                 .getDefDescriptor("auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
-        DefDescriptor<ComponentDef> grandparent = Aura.getDefinitionService()
+        DefDescriptor<ComponentDef> grandparent = definitionService
                 .getDefDescriptor("setAttributesTest:grandparent", ComponentDef.class);
-        DefDescriptor<ComponentDef> parent = Aura.getDefinitionService()
+        DefDescriptor<ComponentDef> parent = definitionService
                 .getDefDescriptor("setAttributesTest:parent", ComponentDef.class);
-        DefDescriptor<ComponentDef> child1 = Aura.getDefinitionService()
+        DefDescriptor<ComponentDef> child1 = definitionService
                 .getDefDescriptor("setAttributesTest:child", ComponentDef.class);
-        DefDescriptor<ComponentDef> child2 = Aura.getDefinitionService()
+        DefDescriptor<ComponentDef> child2 = definitionService
                 .getDefDescriptor("setAttributesTest:anotherChild", ComponentDef.class);
         Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
                 AuraContext.Authentication.AUTHENTICATED, appDesc);
@@ -550,7 +552,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
     public void testPreloadCSSDependencies() throws Exception {
         ServerService ss = Aura.getServerService();
-        DefDescriptor<ComponentDef> appDesc = Aura.getDefinitionService()
+        DefDescriptor<ComponentDef> appDesc = definitionService
                 .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
         AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
                 AuraContext.Authentication.AUTHENTICATED, appDesc);
@@ -574,7 +576,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      */
     public void testWriteDefinitionsWithoutDupes() throws Exception {
         ServerService ss = Aura.getServerService();
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService()
+        DefDescriptor<ApplicationDef> appDesc = definitionService
                 .getDefDescriptor("appCache:withpreload", ApplicationDef.class);
         AuraContext context = Aura.getContextService()
                 .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
@@ -603,7 +605,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
     public void testPreloadJSDependencies() throws Exception {
         ServerService ss = Aura.getServerService();
-        DefDescriptor<ComponentDef> appDesc = Aura.getDefinitionService()
+        DefDescriptor<ComponentDef> appDesc = definitionService
                 .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
         AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.JS,
                 AuraContext.Authentication.AUTHENTICATED, appDesc);

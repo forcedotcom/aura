@@ -236,6 +236,10 @@ function AuraInspectorActionsView(devtoolsPanel) {
             card.setAttribute("returnError", action.error);
             //also want to hide choice to drop/modify action
             card.setAttribute("toWatch", "false");
+            //let's make it draggable again, so people can drag already processed action back to watch list
+            card.setAttribute("draggable","true");
+            card.addEventListener("dragstart", drag.bind(this) );
+            card.addEventListener("dragend", endDrag.bind(this) );
         } else { //card on the left side
             if(!isAllowed(action)) {
                 return;
@@ -321,11 +325,11 @@ function AuraInspectorActionsView(devtoolsPanel) {
             if(action.stats) {
                 card.setAttribute("stats", JSON.stringify(action.stats));
             }
-            //if card is on the right side, it's not draggable, we need to remember that in the actionCard itself.
+            //if card is on the watch list, it's not draggable, we need to remember that in the actionCard itself.
             if(toWatch === true) {
                 card.setAttribute("toWatch", true);
             } else {
-                //we allow people to drag the card only when the card is on the left side
+                //we allow people to drag the card when the card is on the left side
                 card.setAttribute("draggable","true");
                 card.addEventListener("dragstart", drag.bind(this) );
                 card.addEventListener("dragend", endDrag.bind(this) );

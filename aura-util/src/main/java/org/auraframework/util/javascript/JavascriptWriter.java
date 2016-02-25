@@ -33,6 +33,7 @@ import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.PropertyRenamingPolicy;
 import com.google.javascript.jscomp.Result;
@@ -46,81 +47,39 @@ import com.google.javascript.jscomp.WarningsGuard;
  */
 public enum JavascriptWriter {
 
-    CLOSURE_SIMPLE {
-        @Override
-        public void setClosureOptions(CompilerOptions options) {
-            CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
-        }
-    },
-
     CLOSURE_WHITESPACE {
         @Override
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.WHITESPACE_ONLY.setOptionsForCompilationLevel(options);
+        	options.setLanguageIn(LanguageMode.ECMASCRIPT5);
+        }
+    },
+
+    CLOSURE_SIMPLE {
+        @Override
+        public void setClosureOptions(CompilerOptions options) {
+            CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
+        	options.setLanguageIn(LanguageMode.ECMASCRIPT5);
         }
     },
 
     CLOSURE_ADVANCED {
         @Override
         public void setClosureOptions(CompilerOptions options) {
-            CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
-        }
-    },
-
-    /**
-     * Closure Compiler using advanced optimizations, but avoids some compiler-created global variables.
-     * 
-     * Closure does some optimizations that use global variables like so: var b=false,f; Then it will use "b" in place
-     * of the "false" value. It could also set "f" to the prototype of some object. It does all of this to reduce the
-     * number of chars in the file. Unless accounted for, this will cause issues since files are run through the
-     * compiler individually. So it's possible that the global variable "b" is later set to "true" as part of another
-     * file's compilation, which will change the behavior of the previous files's compiled code.
-     * 
-     * Note: This doesn't prevent global functions from being renamed, i.e., it will still rename
-     * "function MyObject(){...}" to "function b(){...}", leaving the "b" function in the global namespace. This is true
-     * even if "b" is exported in the standard way (window["MyObject"] = MyObject).
-     * 
-     * TODO the keyword renaming can cause issues, but would the prototype renaming cause any code conflicts?
-     */
-    CLOSURE_ADVANCED_SAFER {
-        @Override
-        public void setClosureOptions(CompilerOptions options) {
-            CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
-            options.aliasKeywords = false;
-            options.extractPrototypeMemberDeclarations = false;
-        }
-    },
-
-    /**
-     * A closure that should do almost nothing to the file.
-     */
-    CLOSURE_AURA_PASS {
-        @Override
-        public void setClosureOptions(CompilerOptions options) {
-            options.prettyPrint = true;
-            options.generatePseudoNames = false;
-            options.aliasKeywords = false;
-            options.reserveRawExports = true;
-            options.variableRenaming = VariableRenamingPolicy.OFF;
-            options.propertyRenaming = PropertyRenamingPolicy.OFF;
-        }
-
-        @Override
-        public boolean isSelfScoping() {
-            return true;
+            CompilationLevel.ADVANCED_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
+        	options.setLanguageIn(LanguageMode.ECMASCRIPT5);
         }
     },
 
     CLOSURE_AURA_DEBUG {
         @Override
         public void setClosureOptions(CompilerOptions options) {
-            options.prettyPrint = true;
-            options.generatePseudoNames = true;
-            options.aliasKeywords = true;
-            options.reserveRawExports = true;
-            options.variableRenaming = VariableRenamingPolicy.OFF;
-            options.propertyRenaming = PropertyRenamingPolicy.ALL_UNQUOTED;
-            options.generateExports = true;
+        	options.setLanguageIn(LanguageMode.ECMASCRIPT5);
+            options.setPrettyPrint(true);
+            options.setGeneratePseudoNames(true);
+            options.setReserveRawExports(true);
+            options.setRenamingPolicy(VariableRenamingPolicy.OFF, PropertyRenamingPolicy.ALL_UNQUOTED);
+            options.setGenerateExports(true);
         }
 
         @Override
@@ -133,8 +92,9 @@ public enum JavascriptWriter {
         @Override
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.ADVANCED_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
-            options.aliasAllStrings = true;
-            options.generateExports = true;
+        	options.setLanguageIn(LanguageMode.ECMASCRIPT5);
+            options.setAliasAllStrings(true);
+            options.setGenerateExports(true);
         }
 
         @Override

@@ -315,7 +315,7 @@ public class IterationTest extends AuraImplTestCase {
      * Verify that iteams, var and body are required attributes.
      */
     public void testRequiredAttributes() throws Exception {
-        ComponentDef def = Aura.getDefinitionService().getDefinition("aura:iteration", ComponentDef.class);
+        ComponentDef def = definitionService.getDefinition("aura:iteration", ComponentDef.class);
         assertNotNull(def);
         assertTrue("Cannot use iteration component with something to iterate through.", def.getAttributeDef("items")
                 .isRequired());

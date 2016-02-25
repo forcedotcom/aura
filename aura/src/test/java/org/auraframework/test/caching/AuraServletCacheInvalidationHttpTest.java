@@ -118,7 +118,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
 
         String serContext;
         AuraContext ctx = startContext(name, ComponentDef.class);
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(name, ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(name, ComponentDef.class);
         String uid = ctx.getDefRegistry().getUid(null, desc);
         if (modified) {
             uid = getAuraTestingUtil().modifyUID(uid);
@@ -132,7 +132,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
 
     private AuraContext startContext(String qualifiedName, Class<? extends BaseComponentDef> clazz) {
         return Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
-                Aura.getDefinitionService().getDefDescriptor(qualifiedName, clazz));
+                definitionService.getDefDescriptor(qualifiedName, clazz));
     }
 
     @SuppressWarnings("unchecked")

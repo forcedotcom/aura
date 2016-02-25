@@ -29,7 +29,8 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
-import org.auraframework.def.ImportDef;
+import org.auraframework.def.LibraryDefRef;
+import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LibraryDef;
@@ -51,7 +52,8 @@ import com.google.common.collect.Lists;
  */
 @Model
 public class ComponentDefModel {
-    public ComponentDefModel() throws QuickFixException {
+    @SuppressWarnings("unchecked")
+	public ComponentDefModel() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
 
@@ -148,16 +150,16 @@ public class ComponentDefModel {
 
             // Add all imported libraries AND their source to the documentation.
             if (definition instanceof ComponentDef) {
-                Collection<ImportDef> importDefs = ((ComponentDef) definition).getImportDefs();
+                Collection<LibraryDefRef> importDefs = ((ComponentDef) definition).getImports();
 
-                for (ImportDef importDef : importDefs) {
-                    LibraryDef libraryDef = Aura.getDefinitionService().getDefinition(importDef.getLibraryDescriptor());
+                for (LibraryDefRef importDef : importDefs) {
+                    LibraryDef libraryDef = Aura.getDefinitionService().getDefinition(importDef.getReferenceDescriptor());
                     if (ReferenceTreeModel.hasAccess(libraryDef)) {
                         defs.add(new DefModel(libraryDef.getDescriptor()));
 
                         // Treat the included js files specially because they load source differently:
                         for (IncludeDefRef includeDef : libraryDef.getIncludes()) {
-                            includeDefs.add(new IncludeDefModel(includeDef.getIncludeDescriptor()));
+                            includeDefs.add(new IncludeDefModel((DefDescriptor<IncludeDef>) includeDef.getDescriptor()));
                         }
                     }
                 }

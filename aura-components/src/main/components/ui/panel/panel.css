@@ -45,7 +45,7 @@
     z-index: 2;
 }
 
-.THIS .pointer {
+.THIS > .pointer {
     z-index: 1;
     width: calc(1.25rem + .0625rem);
     height: calc(1.25rem + .0625rem);
@@ -60,19 +60,19 @@
     left: 0;
 }
 
-.THIS.east .pointer {
+.THIS.east > .pointer {
     border:0;
     border-left: 1px solid #d8dde6;
     border-bottom: 1px solid #d8dde6;
 }
 
-.THIS.west .pointer {
+.THIS.west > .pointer {
     border:0;
     border-right: 1px solid #d8dde6;
     border-top: 1px solid #d8dde6;
 }
 
-.THIS.north .pointer {
+.THIS.north > .pointer {
     border:0;
     border-bottom: 1px solid #d8dde6;
     border-right: 1px solid #d8dde6;

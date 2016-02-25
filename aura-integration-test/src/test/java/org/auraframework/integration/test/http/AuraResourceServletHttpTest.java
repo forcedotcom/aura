@@ -85,6 +85,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
        also since I ask cache to log something when hit miss, this kind of verify W-2105858 as well
      * @throws Exception
      */
+    @UnAdaptableTest("W-2928878, enable this after we have a proper test logging adapter in core")
     public void testConcurrentGetRequests() throws Exception {
     	// I tried to use obtainGetMethod(url) then perform(HttpGet) , but 
     	// our default httpClient use BasicClientConnectionManager, which doesn't work well with MultiThread

@@ -22,9 +22,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.system.Parser.Format;
@@ -44,15 +44,6 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
     @Mock(answer = Answers.RETURNS_MOCKS)
     DefDescriptor<LibraryDef> descriptor;
 
-    private XMLStreamReader getReader(Source<?> source) throws XMLStreamException {
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(),
-                source.getHashingReader());
-        xmlReader.next();
-        return xmlReader;
-    }
-
     public void testGetElement() throws Exception {
         StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format(
                 "<%s><%s name='sanity'/></%1$s>",
@@ -68,8 +59,8 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testGetElementWithEmptyTag() throws Exception {
-        StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s></%1$s>",
-                LibraryDefHandler.TAG), "myID", Format.XML);
+        StringSource<LibraryDef> source = new StringSource<>(descriptor, 
+        		String.format("<%s></%1$s>", LibraryDefHandler.TAG), "myID", Format.XML);
         LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source));
 
         LibraryDef actualDef = handler.getElement();
@@ -78,8 +69,8 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testGetElementWithBodyText() throws Exception {
-        StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s>text</%1$s>",
-                LibraryDefHandler.TAG), "myID", Format.XML);
+        StringSource<LibraryDef> source = new StringSource<>(descriptor, 
+        		String.format("<%s>text</%1$s>", LibraryDefHandler.TAG), "myID", Format.XML);
         LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source));
 
         try {
@@ -92,13 +83,13 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testGetElementWithUnsupportedBodyTag() throws Exception {
-        StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s><br/></%1$s>",
-                LibraryDefHandler.TAG), "myID", Format.XML);
+        StringSource<LibraryDef> source = new StringSource<>(descriptor, 
+        		String.format("<%s><br/></%1$s>", LibraryDefHandler.TAG), "myID", Format.XML);
         LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source));
 
         try {
             handler.getElement();
-            fail("only aura:include is allowed in a library body");
+            fail("Only aura:include is allowed in a library body");
         } catch (AuraRuntimeException t) {
             assertExceptionMessageEndsWith(t, AuraRuntimeException.class, "Found unexpected tag br");
         }
@@ -106,8 +97,8 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
 
     public void testGetElementWithDescription() throws Exception {
         String expectedDescription = "needs to be included";
-        StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s description='%s'></%1$s>",
-                LibraryDefHandler.TAG, expectedDescription), "myID", Format.XML);
+        StringSource<LibraryDef> source = new StringSource<>(descriptor, 
+        		String.format("<%s description='%s'></%1$s>", LibraryDefHandler.TAG, expectedDescription), "myID", Format.XML);
         LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source));
 
         LibraryDef actualDef = handler.getElement();
@@ -115,16 +106,24 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testGetElementWithUnexpectedAttribute() throws Exception {
-        StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s unexpected='me'></%1$s>",
-                LibraryDefHandler.TAG), "myID", Format.XML);
+        StringSource<LibraryDef> source = new StringSource<>(descriptor, 
+        		String.format("<%s unexpected='me'></%1$s>", LibraryDefHandler.TAG), "myID", Format.XML);
         LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source));
 
         try {
             handler.getElement();
-            fail("unexpected attribute was not validated");
+            fail("Unexpected attribute was not validated");
         } catch (InvalidSystemAttributeException t) {
             assertExceptionMessageEndsWith(t, InvalidSystemAttributeException.class, "Invalid attribute \"unexpected\"");
         }
     }
 
+    private XMLStreamReader getReader(Source<?> source) throws XMLStreamException {
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
+        XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(),
+                source.getHashingReader());
+        xmlReader.next();
+        return xmlReader;
+    }
 }

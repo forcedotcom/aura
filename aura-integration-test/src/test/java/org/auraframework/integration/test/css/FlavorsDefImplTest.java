@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.css;
 
-import org.auraframework.Aura;
 import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -36,7 +35,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
         // flavor assortments can be placed independently in their own bundles
         DefDescriptor<FlavorsDef> fa = addFlavorAssortment("<aura:flavors></aura:flavors>");
         assertTrue(fa.exists());
-        Aura.getDefinitionService().getDefinition(fa).validateDefinition(); // no errors
+        definitionService.getDefinition(fa).validateDefinition(); // no errors
     }
 
     public void testLoadsFromAppBundle() throws QuickFixException {
@@ -47,7 +46,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
         addSourceAutoCleanup(app, String.format("<aura:application></aura:application>"));
 
         assertTrue(fa.exists());
-        Aura.getDefinitionService().getDefinition(fa).validateDefinition(); // no errors
+        definitionService.getDefinition(fa).validateDefinition(); // no errors
     }
 
     public void testGetFlavorIncludeDefs() throws QuickFixException {
@@ -56,7 +55,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
 
         String src = "<aura:flavors><aura:include source='flavorTestAlt:flavorsAlt'/></aura:flavors>";
         DefDescriptor<FlavorsDef> fa = addFlavorAssortment(src);
-        assertEquals("flavors did not have the right size", 1, Aura.getDefinitionService().getDefinition(fa).getFlavorIncludeDefs().size());
+        assertEquals("flavors did not have the right size", 1, definitionService.getDefinition(fa).getFlavorIncludeDefs().size());
     }
 
     public void testGetFlavorDefaultDefs() throws QuickFixException {
@@ -67,7 +66,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
                 + String.format("<aura:flavor component='%s' default='test'/>", cmp.getDescriptorName())
                 + "</aura:flavors>";
         DefDescriptor<FlavorsDef> fa = addFlavorAssortment(src);
-        assertEquals("flavors did not have the right size", 1, Aura.getDefinitionService().getDefinition(fa).getFlavorDefaultDefs().size());
+        assertEquals("flavors did not have the right size", 1, definitionService.getDefinition(fa).getFlavorDefaultDefs().size());
     }
 
     public void testIterationOrderOfComputeOverrides() throws Exception {
@@ -81,7 +80,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
         DefDescriptor<FlavoredStyleDef> style = Flavors.customFlavorDescriptor(cmp1, "flavorTestAlt", "flavorsAlt");
 
         DefDescriptor<FlavorsDef> fa = addFlavorAssortment(fmt);
-        FlavorOverrideLocator mapping = Aura.getDefinitionService().getDefinition(fa).computeOverrides();
+        FlavorOverrideLocator mapping = definitionService.getDefinition(fa).computeOverrides();
 
         assertEquals(style, mapping.getLocation(cmp1, "default").get().getDescriptor());
     }
@@ -100,6 +99,6 @@ public class FlavorsDefImplTest extends StyleTestCase {
         addContextApp(String.format("<aura:application><%s/><%s/></aura:application>", cmp1.getDescriptorName(),
                 cmp2.getDescriptorName()));
 
-        serializeAndGoldFile(Aura.getDefinitionService().getDefinition(fa));
+        serializeAndGoldFile(definitionService.getDefinition(fa));
     }
 }

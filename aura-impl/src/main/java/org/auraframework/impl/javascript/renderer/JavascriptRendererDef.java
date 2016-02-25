@@ -21,7 +21,10 @@ package org.auraframework.impl.javascript.renderer;
 import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -34,24 +37,14 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.Sets;
-
 public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implements RendererDef {
     private static final long serialVersionUID = -6937625695562864219L;
-
-    private final JsFunction render;
-    private final JsFunction afterRender;
-    private final JsFunction rerender;
-    private final JsFunction unrender;
-
+    private final Map<String, Object> functions;
     private final Set<PropertyReference> expressionRefs;
 
     protected JavascriptRendererDef(Builder builder) {
         super(builder);
-        this.render = builder.render;
-        this.afterRender = builder.afterRender;
-        this.rerender = builder.rerender;
-        this.unrender = builder.unrender;
+        this.functions = builder.functions;
         this.expressionRefs = builder.expressionRefs;
     }
 
@@ -64,10 +57,10 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
 
-        serializeMethod(json, "render", render);
-        serializeMethod(json, "afterRender", afterRender);
-        serializeMethod(json, "rerender", rerender);
-        serializeMethod(json, "unrender", unrender);
+        serializeMethod(json, "render", functions.get("render"));
+        serializeMethod(json, "afterRender", functions.get("afterRender"));
+        serializeMethod(json, "rerender", functions.get("rerender"));
+        serializeMethod(json, "unrender", functions.get("unrender"));
 
         json.writeMapEnd();
     }
@@ -79,11 +72,11 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
      * the renderer anymore.
      * @return
      */
-    void serializeMethod(Json json, String methodName, JsFunction function)
+    void serializeMethod(Json json, String name, Object function)
             throws IOException {
-        if (function != null) {
-            json.writeMapKey(methodName);
-            json.writeLiteral(changeSuper(methodName, function));
+        if (function != null && function instanceof JsFunction) {
+            json.writeMapKey(name);
+            json.writeLiteral(changeSuper(name, (JsFunction) function));
         }
     }
 
@@ -93,7 +86,7 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
      * of the renderer at each level of the component inheritance just to hold a
      * reference on the component.
      */
-    private JsFunction changeSuper(String methodName, JsFunction function) {
+    private JsFunction changeSuper(String name, JsFunction function) {
 
     	// Get the name of the first argument, if not supplied, add a default one.
     	List<String> arguments = function.getArguments();
@@ -107,7 +100,7 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
 
         // Re-scope the call to the super method .
         String body = function.getBody();
-        String superMethodName = "super" + Character.toString(methodName.charAt(0)).toUpperCase() + methodName.substring(1);
+        String superMethodName = "super" + Character.toString(name.charAt(0)).toUpperCase() + name.substring(1);
 		body = body.replace("this." + superMethodName,  cmp + "." + superMethodName);
 
         // Now make sure we escape the right sequences.
@@ -136,16 +129,16 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<RendererDef> {
+        public Map<String, Object> functions = new HashMap<>();
+        public Set<PropertyReference> expressionRefs = new HashSet<>();
+
         public Builder() {
             super(RendererDef.class);
         }
 
-        public JsFunction render;
-        public JsFunction afterRender;
-        public JsFunction rerender;
-        public JsFunction unrender;
-        public String code;
-        public Set<PropertyReference> expressionRefs = Sets.newHashSet();
+        public void addFunction(String name, Object function) {
+            functions.put(name, function);
+        }
 
         @Override
         public JavascriptRendererDef build() {

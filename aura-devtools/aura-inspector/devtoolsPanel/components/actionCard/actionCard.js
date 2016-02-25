@@ -59,8 +59,8 @@
 
     		this.shadowRoot.querySelector("#statsCreated").textContent = statsInfo.created;
     	}
-    	//let people decide what they would like to do once the actionCard is created inside watch list
     	if(this.getAttribute("toWatch") === "true") {
+    		//let people decide what they would like to do once the actionCard is created inside watch list    	
     		this.shadowRoot.querySelector(".span_removeActionCard").style.display = "inline-block";
     		this.shadowRoot.querySelector(".dropOrModify").style.display = "block";
 			this.shadowRoot.querySelector(".card").classList.add("watch");
@@ -75,6 +75,7 @@
 				this.shadowRoot.querySelector(".div_editActionResult").style.display = "none";
     		}
     	} else {
+    		//action card on the left side. 
     		this.shadowRoot.querySelector(".div_editActionResult").style.display = "none";
 			this.shadowRoot.querySelector(".div_errorResponse").style.display = "none";	
     		this.shadowRoot.querySelector(".dropOrModify").style.display = "none";

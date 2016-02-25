@@ -34,6 +34,10 @@
     <aura:handler event="ui:stackPanel"     action="{!c.stackPanel}"/>
     <aura:handler event="ui:registerPanels" action="{!c.registerPanels}"/>
 
+
+    <aura:dependency resource="markup://ui:panelTransitionBegin" type="EVENT" />
+    <aura:dependency resource="markup://ui:panelTransitionEnd" type="EVENT" />
+
     <aura:if isTrue="{! not(v.useSharedContainer) }">
         <div aura:id="container" class="{!$Browser.formFactor}"/>
     </aura:if>

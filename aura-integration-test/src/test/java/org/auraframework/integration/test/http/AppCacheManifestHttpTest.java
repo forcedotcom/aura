@@ -364,9 +364,6 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         get.releaseConnection();
         assertNotNull(responseString);
         
-        assertTrue("Manifest doesn't contain combinable CSS resource url", responseString.contains("/resources.css"));
-        assertTrue("Manifest doesn't contain combinable JS resource url", responseString.contains("/resources.js"));
-        
         //Verify the urls of uncombinable resources
         assertTrue("Missing combined libs", responseString.contains("/libs"));
     }

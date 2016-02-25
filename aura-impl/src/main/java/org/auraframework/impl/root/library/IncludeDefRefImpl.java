@@ -18,33 +18,36 @@ package org.auraframework.impl.root.library;
 import java.io.IOException;
 import java.util.List;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
-public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements IncludeDefRef {
+public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements IncludeDefRef {
     private static final long serialVersionUID = 610875326950592992L;
 
-    private final int hashCode;
-    private final String export;
     private final List<DefDescriptor<IncludeDef>> imports;
-    private final DefDescriptor<IncludeDef> includeDescriptor;
+    private final List<String> aliases;
+    private final String export;
+    private final int hashCode;
 
     protected IncludeDefRefImpl(Builder builder) {
         super(builder);
-        this.includeDescriptor = builder.includeDescriptor;
-        this.export = builder.export;
         this.imports = builder.imports;
-        this.hashCode = AuraUtil.hashCode(includeDescriptor, export, imports);
+        this.aliases = builder.aliases;
+        this.export = builder.export;
+        this.hashCode = AuraUtil.hashCode(imports, aliases, export);
+    }
+
+    @Override
+    public DefDescriptor<IncludeDef> getReferenceDescriptor() {
+        return descriptor;
     }
 
     @Override
@@ -57,37 +60,51 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
         return imports;
     }
 
+	@Override
+	public List<String> getAliases() {
+		return aliases;
+	}
+
     @Override
     public String getExport() {
         return export;
     }
 
     @Override
-    public DefDescriptor<IncludeDef> getIncludeDescriptor() {
-        return includeDescriptor;
-    }
-
-    @Override
     public void serialize(Json json) throws IOException {
-        json.writeLiteral(String.format("function(){%s}", prepareCode()));
+    	throw new UnsupportedOperationException("IncludeDefRef can't be serialized to JSON");
     }
 
     @Override
     public void validateDefinition() throws QuickFixException {
-        if (getName() == null) {
-            throw new InvalidDefinitionException(String.format("%s must specify a name", IncludeDefRefHandler.TAG),
-                    getLocation());
+    	if (AuraTextUtil.isNullEmptyOrWhitespace(getName())) {
+            throw new InvalidDefinitionException(String.format(
+            		"%s must specify a name", IncludeDefRefHandler.TAG), getLocation());
+        }
+        // if (!AuraTextUtil.isValidNCNameIdentifier(getName())) {
+        //     throw new InvalidDefinitionException(String.format(
+        //             "%s 'name' attribute must be a valid NCName identifier", IncludeDefRefHandler.TAG),
+        //             getLocation());
+        // }
+        if (aliases != null && !aliases.isEmpty()) {
+        	for (String alias : aliases) {
+        		if (!AuraTextUtil.isValidJsIdentifier(alias)) {
+        			throw new InvalidDefinitionException(String.format(
+        					"%s 'alias' attribute must contain only valid javascript identifiers", IncludeDefRefHandler.TAG),
+        					getLocation());
+        		}
+        	}
         }
         if (export != null && !AuraTextUtil.isValidJsIdentifier(export)) {
             throw new InvalidDefinitionException(String.format(
-                    "%s 'export' attribute must be valid javascript identifier", IncludeDefRefHandler.TAG),
+                    "%s 'export' attribute must be a valid javascript identifier", IncludeDefRefHandler.TAG),
                     getLocation());
         }
     }
 
     @Override
     public void validateReferences() throws QuickFixException {
-        IncludeDef includeDef = includeDescriptor.getDef();
+        IncludeDef includeDef = descriptor.getDef();
         includeDef.validateDefinition();
         if (imports != null) {
             for (DefDescriptor<IncludeDef> imported : imports) {
@@ -100,7 +117,7 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
     @Override
     public void appendDependencies(java.util.Set<org.auraframework.def.DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
-        dependencies.add(includeDescriptor);
+        dependencies.add(descriptor);
         if (imports != null) {
             for (DefDescriptor<IncludeDef> imported : imports) {
                 dependencies.add(imported);
@@ -123,77 +140,16 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
         return hashCode;
     }
 
-    @Override
-    public void retrieveLabels() throws QuickFixException {
-        IncludeDef includeDef = includeDescriptor.getDef();
-        includeDef.retrieveLabels();
-    }
+    public static class Builder extends DefinitionImpl.RefBuilderImpl<IncludeDef, IncludeDefRef> {
 
-    private String prepareCode() {
-        String source;
-        try {
-            source = Aura.getDefinitionService().getDefinition(getIncludeDescriptor()).getCode();
-        } catch (QuickFixException qfe) {
-            throw new AuraRuntimeException(qfe);
-        }
-
-        DefDescriptor<?> localBundle = includeDescriptor.getBundle();
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("arguments[0](\"");
-        builder.append(localBundle.getDescriptorName());
-        builder.append(":");
-        builder.append(getName());
-        builder.append("\", ");
-        if (imports != null && !imports.isEmpty()) {
-            for (DefDescriptor<IncludeDef> imported : imports) {
-                DefDescriptor<?> importedBundle = imported.getBundle();
-
-                builder.append("\"");
-                if (!localBundle.equals(importedBundle)) {
-                    builder.append(importedBundle.getDescriptorName());
-                    builder.append(":");
-                }
-                builder.append(imported.getName());
-                builder.append("\", ");
-            }
-        }
-
-        // Wrap exported libraries in a function:
-        if (export != null) {
-            builder.append("function(){");
-            // first newline is to preserve indentation of first line
-            builder.append("\n");
-            builder.append(source);
-            // next newline is to allow for single-line comments at end of source, missing semi-colons, ...
-            builder.append("\n");
-            builder.append("return ");
-            builder.append(export);
-            builder.append("}");
-        } else {
-            // first newline is to preserve indentation of first line
-            builder.append("\n");
-            builder.append(source);
-            // next newline is to allow for single-line comments at end of source, missing semi-colons, ...
-            builder.append("\n");
-        }
-        builder.append(")");
-        return builder.toString();
-    }
-
-    public static class Builder extends DefinitionImpl.BuilderImpl<IncludeDefRef> {
-
-        private DefDescriptor<IncludeDef> includeDescriptor;
-        private List<DefDescriptor<IncludeDef>> imports;
+		private List<DefDescriptor<IncludeDef>> imports;
+        private List<String> aliases;
         private String export;
 
         public Builder() {
-            super(IncludeDefRef.class);
-        }
+			super(IncludeDef.class);
+		}
 
-        /**
-         * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
-         */
         @Override
         public IncludeDefRefImpl build() {
             return new IncludeDefRefImpl(this);
@@ -203,12 +159,12 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
             this.imports = AuraUtil.immutableList(imports);
         }
 
-        public void setExport(String exports) {
-            this.export = exports;
+        public void setAliases(List<String> aliases) {
+            this.aliases = aliases;
         }
 
-        public void setIncludeDescriptor(DefDescriptor<IncludeDef> includeDescriptor) {
-            this.includeDescriptor = includeDescriptor;
+        public void setExport(String exports) {
+            this.export = exports;
         }
     }
 }

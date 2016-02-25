@@ -526,7 +526,7 @@ var AuraDevToolService = function() {
         	   // Checking for the data_aura_rendered_by attribute
          	   if(!$A.util.isEmpty(data_aura_rendered_by)){
                    var component = $A.getCmp(data_aura_rendered_by);
-                   if(!$A.util.isComponent(component)){
+                   if(!$A.util.isUndefinedOrNull(component) && !$A.util.isComponent(component)){
                 	   // This is to account for <img/> created both dynamically by image.cmp as well as the ones
                        // that are within a .cmp and are therefore created by aura through the html.cmp template.
                        // we can skip ui:button images, they're hardcoded

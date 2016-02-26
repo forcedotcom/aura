@@ -110,7 +110,7 @@ ExpressionFunctions.prototype.format = function() {
 
     // Guard for "null" or "undefined", just like we do for add.
     var a0 = arguments[0];
-    if (a0 === undefined || a0 === null) {
+    if (a0 === undefined || a0 === null || !$A.util.isFunction(a0.toString)) {
         return "";
     }
 

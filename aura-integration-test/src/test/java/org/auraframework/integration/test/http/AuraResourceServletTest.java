@@ -195,6 +195,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         }
     }
 
+    @UnAdaptableTest("W-2931019 enable this once 3Tier change is in")
     public void testRequestFromDifferentBrowserOnSamePage() throws Exception {
         runTestRequestFromDifferentBrowserOnSamePage(UserAgent.IE9.getUserAgentString(), Type.IE9, "");
         // ui:button has special session for IE7 in button.css under @if (IE7){...}
@@ -207,6 +208,7 @@ public class AuraResourceServletTest extends AuraTestCase {
      * source monitor, but we'll just emulate a source change for the sake of speed and simplicity. Original dev caching
      * story: W-1450222
      */
+    @UnAdaptableTest("W-2931019 enable this once 3Tier change is in")
     public void testCssCacheClearedOnSourceChange() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload", ApplicationDef.class);
         AuraContext context = Aura.getContextService()

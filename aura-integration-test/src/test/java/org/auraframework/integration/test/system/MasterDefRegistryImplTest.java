@@ -1782,7 +1782,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 //        }
 //    }
 
-    private class MasterDefRegistryImplOverride extends MasterDefRegistryImpl {
+    public class MasterDefRegistryImplOverride extends MasterDefRegistryImpl {
         public MasterDefRegistryImplOverride(@Nonnull DefRegistry<?>... registries) {
             super(registries);
         }

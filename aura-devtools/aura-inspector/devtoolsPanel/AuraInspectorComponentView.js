@@ -1,6 +1,7 @@
 function AuraInspectorComponentView(devtoolsPanel) {
     var container;
-    var propertyMap = {
+    // Generic properties to show for the concrete component
+    var concretePropertyMap = {
         "globalId": "Global ID",
         "rendered": "IsRendered",
         "valid": "IsValid",
@@ -8,7 +9,13 @@ function AuraInspectorComponentView(devtoolsPanel) {
         "descriptor": "Descriptor",
         "elementCount": "HTML Elements",
         "rerender_count": "Rerendered"
-    }
+    };
+    // When we render the super, show these properties instead of the ones above.
+    var superPropertyMap = {
+        "globalId": "Global ID",
+        "localId": "aura:id",
+        "descriptor": "Descriptor"
+    };
     var treeComponent;
     var _componentId = null;
     var _isDirty = false;
@@ -36,7 +43,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
             treeComponent.clearChildren();
 
             devtoolsPanel.getComponent(_componentId, function(component) {
-                renderForComponent(component, true);
+                renderForComponent(component);
                 renderForComponentSuper(component, function(){
                     treeComponent.render();              
                 });
@@ -47,7 +54,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
         }
     };
 
-    function renderForComponent(current, showAttributes) {
+    function renderForComponent(current) {
 
         var componentId;
         var parentNode;
@@ -79,7 +86,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
 
         var bodies = current.attributes.body || {};
         // Do attributes only at the concrete level
-        if(showAttributes) {
+        if(current.isConcrete) {
             treeComponent.addChild(TreeNode.create("Attributes", "Attributes", "header"));
 
             current.attributes.body = bodies[current.globalId] || [];
@@ -108,7 +115,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
         if(component.supers && component.supers.length) {
             devtoolsPanel.getComponent(component.supers[0], function(superComponent) {
                 treeComponent.addChild(TreeNode.create("[[Super]]", "Super" + superComponent.globalId, "header"));
-                renderForComponent(superComponent, false);
+                renderForComponent(superComponent);
                 renderForComponentSuper(superComponent, function() {
                     if(callback) { 
                         callback();
@@ -202,6 +209,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
     }
 
     function generateGeneralNodes(json) {
+        var propertyMap = json.isConcrete ? concretePropertyMap : superPropertyMap;
         var nodes = [];
         for(var prop in json) {
             if(propertyMap.hasOwnProperty(prop)) {

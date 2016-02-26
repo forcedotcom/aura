@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.root.parser.handler.design;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignDef;
@@ -41,7 +40,7 @@ public class DesignLayoutAttributeDefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class, null);
         addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", ""));
 
-        DefDescriptor<DesignDef> designDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
+        DefDescriptor<DesignDef> designDesc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
         addSourceAutoCleanup(designDesc, String.format("<design:component><design:layout>" +
                 "<design:section><design:layoutItems>%s</design:layoutItems></design:section>" +
@@ -96,7 +95,7 @@ public class DesignLayoutAttributeDefHandlerTest extends AuraImplTestCase {
         }
         addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", builder.toString()));
 
-        DefDescriptor<DesignDef> designDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
+        DefDescriptor<DesignDef> designDesc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
         builder = new StringBuilder();
         for (String attr : attrs) {

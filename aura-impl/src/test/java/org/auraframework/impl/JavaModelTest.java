@@ -28,7 +28,6 @@ import org.auraframework.impl.java.model.JavaModelDefFactory;
 import org.auraframework.impl.java.model.JavaModelDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Model;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations;
 import org.auraframework.system.Location;
 import org.auraframework.test.source.StringSourceLoader;
@@ -140,12 +139,12 @@ public class JavaModelTest extends AuraImplTestCase {
     public void _testClassLevelAnnotationForJavaModel() throws Exception {
         DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
                 "java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
-        assertNotNull(Aura.getDefinitionService().getDefinition(javaModelDefDesc));
+        assertNotNull(definitionService.getDefinition(javaModelDefDesc));
 
         DefDescriptor<ModelDef> javaModelWOAnnotationDefDesc = DefDescriptorImpl.getInstance(
                 "java://org.auraframework.impl.java.model.TestModelWithoutAnnotation", ModelDef.class);
         try {
-        	Aura.getDefinitionService().getDefinition(javaModelWOAnnotationDefDesc);
+        	definitionService.getDefinition(javaModelWOAnnotationDefDesc);
             fail("Expected InvalidDefinitionException");
         } catch (Exception e) {
             checkExceptionStart(e, InvalidDefinitionException.class, "@Model annotation is required on all Models.",
@@ -159,7 +158,7 @@ public class JavaModelTest extends AuraImplTestCase {
     public void _testModelSubclass() throws Exception {
         DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
                 "java://org.auraframework.impl.java.model.TestModelSubclass", ModelDef.class);
-        ModelDef def = Aura.getDefinitionService().getDefinition(javaModelDefDesc);
+        ModelDef def = definitionService.getDefinition(javaModelDefDesc);
         assertNotNull(def);
         Model model = def.newInstance();
         ValueDef vd = def.getMemberByName("nextThing");
@@ -185,7 +184,7 @@ public class JavaModelTest extends AuraImplTestCase {
 
         for (int i = 0; i < failModels.length; i++) {
             try {
-                Aura.getDefinitionService().getDefinition(failModels[i], ModelDef.class);
+                definitionService.getDefinition(failModels[i], ModelDef.class);
                 fail("Expected InvalidDefinitionException on model " + failModels[i]);
             } catch (Exception e) {
                 checkExceptionStart(e, InvalidDefinitionException.class, failMessages[i], failModels[i]);
@@ -247,7 +246,7 @@ public class JavaModelTest extends AuraImplTestCase {
     public void _testNonExistingPropertiesOnModel() throws Exception {
         DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
                 "java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
-        ModelDef mDef = Aura.getDefinitionService().getDefinition(javaModelDefDesc);
+        ModelDef mDef = definitionService.getDefinition(javaModelDefDesc);
         assertNotNull(mDef);
         Model model = mDef.newInstance();
         try {
@@ -269,10 +268,9 @@ public class JavaModelTest extends AuraImplTestCase {
     private void checkInvalidModel(Class<?> clazz, String message) {
         DefDescriptor<ModelDef> desc = DefDescriptorImpl.getInstance("java://" + clazz.getName(), ModelDef.class);
         
-        DefinitionService definitionService = Aura.getDefinitionService();
         try {
             //definitionService.getDefinition(desc);
-            ModelDef modelDef = Aura.getDefinitionService().getDefinition(desc);
+            ModelDef modelDef = definitionService.getDefinition(desc);
             ((JavaModelDefImpl)modelDef).getJavaType().newInstance();
             fail("Expected exception");
         } catch (Exception e) {
@@ -294,7 +292,7 @@ public class JavaModelTest extends AuraImplTestCase {
     	DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
                 "java://org.auraframework.impl.java.model.TestModelWithProtectedConstructor", ModelDef.class);
         try {
-        	Aura.getDefinitionService().getDefinition(javaModelDefDesc);
+        	definitionService.getDefinition(javaModelDefDesc);
         } catch (Exception e) {
         	System.out.println(e.getClass()+","+e.getMessage());
         }

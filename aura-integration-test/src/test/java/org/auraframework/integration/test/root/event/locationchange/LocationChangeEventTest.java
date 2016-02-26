@@ -54,7 +54,7 @@ public class LocationChangeEventTest extends AuraImplTestCase {
      * Negative test case: Check that events used to handle location change always extend aura:locationChange.
      */
     public void testRegisteredLocationChangeEventExtendsAuraLocationChange() throws Exception {
-        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(
                 "test:test_LocChng_NoExtends", ApplicationDef.class);
         try {
             Aura.getInstanceService().getInstance(desc);

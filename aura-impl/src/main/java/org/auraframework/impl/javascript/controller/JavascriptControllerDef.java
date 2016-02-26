@@ -16,8 +16,11 @@
 package org.auraframework.impl.javascript.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
@@ -31,36 +34,34 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.Sets;
-
 /**
  * def for client controllers
  */
 public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> implements ControllerDef {
 
     private static final long serialVersionUID = 133829572661899255L;
-    private final Map<String, JavascriptActionDef> actionMap;
+    private final Map<String, JavascriptActionDef> actions;
     private final Set<PropertyReference> expressionRefs;
 
     protected JavascriptControllerDef(Builder builder) {
         super(builder);
-        this.actionMap = AuraUtil.immutableMap(builder.actionDefs);
+        this.actions = AuraUtil.immutableMap(builder.actions);
         this.expressionRefs = builder.expressionRefs;
     }
 
     @Override
     public JavascriptActionDef getSubDefinition(String name) {
-        return actionMap.get(name);
+        return actions.get(name);
     }
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeMap(actionMap);
+        json.writeMap(actions);
     }
-
+    
     @Override
     public Map<String, JavascriptActionDef> getActionDefs() {
-        return actionMap;
+        return actions;
     }
 
     /**
@@ -74,10 +75,10 @@ public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> imple
      * @returns an Action for the given action name.
      */
     @Override
-    public Action createAction(String actionName, Map<String, Object> paramValues) throws DefinitionNotFoundException {
-        JavascriptActionDef actionDef = actionMap.get(actionName);
+    public Action createAction(String name, Map<String, Object> paramValues) throws DefinitionNotFoundException {
+        JavascriptActionDef actionDef = actions.get(name);
         if(actionDef == null){
-            DefDescriptor<ActionDef> desc = SubDefDescriptorImpl.getInstance(actionName, getDescriptor(), ActionDef.class);
+            DefDescriptor<ActionDef> desc = SubDefDescriptorImpl.getInstance(name, getDescriptor(), ActionDef.class);
             throw new DefinitionNotFoundException(desc);
         }
         return new JavascriptPseudoAction(actionDef);
@@ -94,14 +95,17 @@ public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> imple
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<ControllerDef> {
+        public Map<String, JavascriptActionDef> actions = new TreeMap<>();
+        public Set<PropertyReference> expressionRefs = new HashSet<>();
 
         public Builder() {
             super(ControllerDef.class);
         }
-
-        public Map<String, JavascriptActionDef> actionDefs;
-        public Set<PropertyReference> expressionRefs = Sets.newHashSet();
-
+        
+        public void addAction(String name, JavascriptActionDef action) {
+            actions.put(name, action);
+        }
+        
         @Override
         public JavascriptControllerDef build() {
             return new JavascriptControllerDef(this);

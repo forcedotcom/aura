@@ -41,7 +41,7 @@
         <td>{!v.onloadCount}</td>
         <td>
             <iframe
-                src="about:blank"
+                src="/auraFW/resources/aura/images/logo.png"
                 onload="{!c.onload}"
             />
         </td>

@@ -785,16 +785,14 @@
             }
         }  else if (isTrueObject(returnValue)) {
             for(key in returnValue) {
-                if(key && nextResponse) {
-                    var returnValuek = returnValue[key];
-                    if(nextResponse[key]) {
-                        returnValue[key] = nextResponse[key];
-                        //console.log("found a match, update response for "+key);
-                        return true;   
-                    } else {
-                        var res = replaceValueInObj(returnValuek, nextResponse);
-                        if(res) { return res; }
-                    }
+                var returnValuek = returnValue[key];
+                if(nextResponse && nextResponse.hasOwnProperty(key)) {
+                    returnValue[key] = nextResponse[key];
+                    //console.log("found a match, update response for "+key);
+                    return true;   
+                } else {
+                    var res = replaceValueInObj(returnValuek, nextResponse);
+                    if(res) { return res; }
                 }
             }
         }

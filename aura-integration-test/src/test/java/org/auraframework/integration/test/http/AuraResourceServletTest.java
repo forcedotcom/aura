@@ -235,7 +235,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertNotNull("Nothing added to CSS cache", cssCache);
 
         // Now force a source change event and verify cache is emptied
-        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
+        definitionService.onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         cssCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
 
@@ -276,7 +276,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertNotNull("Nothing added to JS cache", jsCache);
 
         // Now force a source change event and verify cache is emptied
-        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
+        definitionService.onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         jsCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
         assertNull("JS cache not cleared after source change event", jsCache);
@@ -291,7 +291,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraContext context = Aura.getContextService()
                 .startContext(Mode.DEV, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
-        DefDescriptor<SVGDef> svgDesc = Aura.getDefinitionService().getDefinition(appDesc).getSVGDefDescriptor();
+        DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
         final String uid = context.getDefRegistry().getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
 
@@ -313,7 +313,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertNotNull("Nothing added to SVG cache", svgCache);
 
         // Now force a source change event and verify cache is emptied
-        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
+        definitionService.onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         svgCache = context.getDefRegistry().getCachedString(uid, svgDesc, key);
         assertNull("SVG cache not cleared after source change event", svgCache);
@@ -328,8 +328,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraContext context = Aura.getContextService()
                 .startContext(Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
-        DefDescriptor<SVGDef> svgDesc = Aura.getDefinitionService().getDefinition(appDesc).getSVGDefDescriptor();
-        String etag = Aura.getDefinitionService().getDefinition(svgDesc).getOwnHash();
+        DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
+        String etag = definitionService.getDefinition(svgDesc).getOwnHash();
 
         final String uid = context.getDefRegistry().getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
@@ -383,8 +383,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraContext context = Aura.getContextService()
                 .startContext(Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
-        DefDescriptor<SVGDef> svgDesc = Aura.getDefinitionService().getDefinition(appDesc).getSVGDefDescriptor();
-        final String etag = Aura.getDefinitionService().getDefinition(svgDesc).getOwnHash();
+        DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
+        final String etag = definitionService.getDefinition(svgDesc).getOwnHash();
 
         final String uid = context.getDefRegistry().getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
@@ -435,7 +435,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraContext context = Aura.getContextService()
                 .startContext(Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
-        DefDescriptor<SVGDef> svgDesc = Aura.getDefinitionService().getDefinition(appDesc).getSVGDefDescriptor();
+        DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
 
         final String uid = context.getDefRegistry().getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);

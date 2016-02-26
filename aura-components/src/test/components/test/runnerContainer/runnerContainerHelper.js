@@ -617,12 +617,6 @@
                    console.log("we have abort the pollAction:"+action.getId()); 
             }
         });
-        
-        //we only set abortableID to pollActions after the first one for each testRunner Action.
-        //so when new testRunner Action success, the pollActions belong to revious testRunner Action will get aborted.
-        if( previousPollActionForThisTestRunnerAction != undefined ) {
-            pollAction.setParentAction(previousPollActionForThisTestRunnerAction); 
-           }
 
         $A.run(function () {
                $A.enqueueAction(pollAction);

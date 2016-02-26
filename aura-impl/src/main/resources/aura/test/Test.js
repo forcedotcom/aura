@@ -2253,14 +2253,15 @@ window.onerror = (function() {
     var origHandler = window.onerror;
     /** @inner */
     var newHandler = function(msg, url, line, col, e) {
-        if (e && e["name"] === "AuraError") {
-            try {
-                $A["test"].auraError.call($A["test"], "ERROR", msg);
-            } catch(err) {
-                // The error may have broken the test runner loop so tear down to guarantee the test is completed.
-                $A["test"].doTearDown();
-            }
-            return true;
+    	//not all browsers call winodw.onerror with e, IEs and safari don't
+    	if ((e && e["name"] === "AuraError") || msg) {
+                try {
+                    $A["test"].auraError.call($A["test"], "ERROR", msg);
+                } catch(err) {
+                    // The error may have broken the test runner loop so tear down to guarantee the test is completed.
+                    $A["test"].doTearDown();
+                }
+                return true;
         } else {
             var error = {
                 message : "Uncaught js error: " + msg

@@ -104,7 +104,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
 
         // must have valid name
         String name = this.descriptor.getName();
-        if (!AuraTextUtil.validateAttributeName(name)) {
+        if (!validateTokenName(name)) {
             throw new InvalidDefinitionException(String.format(INVALID_NAME, name), getLocation());
         }
 
@@ -212,5 +212,11 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         public TokenDefImpl build() {
             return new TokenDefImpl(this);
         }
+    }
+
+    private boolean validateTokenName(String name){
+        Pattern p = Pattern.compile("^[a-zA-Z_](\\.?[-a-zA-Z0-9_]*)*$");
+        Matcher m = p.matcher(name);
+        return m.find();
     }
 }

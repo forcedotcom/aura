@@ -117,7 +117,8 @@ window['$A'] = {};
 // -- Helper -------------------------------------------------------------
 
 // -- Library ------------------------------------------------------------
-// #include aura.library.LibraryDefRegistry
+// #include aura.library.LibraryIncludeRegistry
+// #include aura.library.LibraryRegistry
 
 // -- Event --------------------------------------------------------------
 // #include aura.event.EventDef
@@ -549,11 +550,10 @@ AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; 
  * @public
  */
 AuraInstance.prototype.initAsync = function(config) {
-
     function createAuraContext() {
         // Context is created async because of the GVPs go though async storage checks
         $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
-            if (!window["$$safe-eval$$"]) {
+            if (!window["$$safe-eval$$"] && !regexpDetectURLProcotolSegment.test(config["host"])) {
                 throw new $A.auraError("Aura(): Failed to initialize locker worker.");
             }
             $A.context = context;
@@ -566,26 +566,30 @@ AuraInstance.prototype.initAsync = function(config) {
         });
     }
 
-    if (!window['$$safe-eval$$']) {
+    var regexpDetectURLProcotolSegment = /^(.*?:)?\/\//;
+    if (!window['$$safe-eval$$'] && !regexpDetectURLProcotolSegment.test(config["host"])) {
         // safe eval worker is an iframe that enables the page to run arbitrary evaluation,
         // if this iframe is still loading, we should wait for it before continue with
         // initialization, in the other hand, if the iframe is not available, we create it,
         // and wait for it to be ready.
-        var el = document.getElementById('safeEvalWorker');
+        var el = document.getElementById("safeEvalWorker");
         if (!el) {
-            el = document.createElement('iframe');
-            // TODO: we should use `config["context"]["fwuid"]` as a token for cache control
-            el.setAttribute('src', '/auraFW/resources/lockerservice/safeEval.html');
-            el.setAttribute('width', "0");
-            el.setAttribute('height', "0");
-            el.setAttribute('tabIndex', "-1");
-            el.setAttribute('aria-hidden', "true");
-            el.setAttribute('title', "scripts");
-            el.style.display = 'none';
+            if (!config["safeEvalWorker"]) {
+                throw new $A.auraError("Aura(): Missing 'safeEvalWorker' configuration.");
+            }
+            el = document.createElement("iframe");
+            el.setAttribute("src", config["safeEvalWorker"]);
+            el.setAttribute("width", "0");
+            el.setAttribute("height", "0");
+            el.setAttribute("tabIndex", "-1");
+            el.setAttribute("aria-hidden", "true");
+            el.setAttribute("title", "scripts");
+            el.setAttribute("id", "safeEvalWorker");
+            el.style.display = "none";
             document.body.appendChild(el);
         }
-        $A.util.on(el, 'load', createAuraContext);
-        $A.util.on(el, 'error', function () {
+        $A.util.on(el, "load", createAuraContext);
+        $A.util.on(el, "error", function () {
             throw new $A.auraError("Aura(): Failed to load locker worker.");
         });
     } else {
@@ -782,7 +786,7 @@ AuraInstance.prototype.handleError = function(message, e) {
 
 /**
  * Report error to the server after handling it.
- * Note that the method should only be used if try-catch mechanism 
+ * Note that the method should only be used if try-catch mechanism
  * of error handling is not desired or not functional (ex: in nested promises)
  * @public
  * @platform
@@ -1038,7 +1042,7 @@ AuraInstance.prototype.run = function(func, name) {
     return undefined;
 };
 
-/**@description
+/**
  * Checks the condition and if the condition is false, displays an error message.
  *
  * Displays an error message if condition is false, runs <code>trace()</code> and stops JS execution. The

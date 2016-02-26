@@ -15,11 +15,15 @@
  */
 package org.auraframework.impl.expression.functions;
 
+import org.auraframework.Aura;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.expression.Expression;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An implementation of utility functions to mimic Util.js.
@@ -28,6 +32,7 @@ public class UtilFunctions {
 
 	public static final Function EMPTY = new Empty();
 	public static final Function FORMAT = new Format();
+	public static final Function TOKEN = new Token();
 
 	/**
 	 * Checks if the object is empty. An empty object"s value is undefined (only
@@ -140,6 +145,50 @@ public class UtilFunctions {
 		@Override
 		public String[] getKeys() {
 			return new String[] { "format" };
+		}
+	}
+
+	/**
+	 * Token is meant for application level configuration injection
+	 */
+	public static class Token implements Function {
+		private static final long serialVersionUID = -8834318318368934926L;
+
+		@Override
+		public Object evaluate(List<Object> args) {
+			try {
+				Map<String,String> tokens = ((ApplicationDef)Aura.getContextService().getCurrentContext().getApplicationDescriptor().getDef()).getTokens();
+				if (tokens != null) {
+					Object a0 = args.get(0);
+					if (a0 != null && tokens.containsKey(a0)) {
+						return tokens.get(a0);
+					}
+				}
+			} catch (ClassCastException exception) {
+				//??
+				return "AURA: INVALID APPLICATION";
+			} catch (QuickFixException exception) {
+				//??
+			}
+			return "";
+		}
+
+		@Override
+		public void compile(Appendable out, List<Expression> args) throws IOException {
+			out.append(JS_FN_TOKEN);
+			out.append("(");
+			Expression a0 = args.get(0);
+			if (a0==null) {
+				out.append(JS_EMPTY);
+			} else {
+				a0.compile(out);
+			}
+			out.append(")");
+		}
+
+		@Override
+		public String[] getKeys() {
+			return new String[] { "token","t" };
 		}
 	}
 }

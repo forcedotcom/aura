@@ -18,7 +18,6 @@ package org.auraframework.integration.test.helper;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -42,7 +41,7 @@ public class JavascriptHelperDefTest extends AuraImplTestCase {
 
     public void testGetDescriptor() throws Exception {
         DefDescriptor<HelperDef> expectedHelperDesc = addSourceAutoCleanup(HelperDef.class, "({})");
-        HelperDef helperDef = Aura.getDefinitionService().getDefinition(expectedHelperDesc);
+        HelperDef helperDef = definitionService.getDefinition(expectedHelperDesc);
 
         DefDescriptor<HelperDef> actualHelperDesc = helperDef.getDescriptor();
         assertSame(expectedHelperDesc, actualHelperDesc);
@@ -56,7 +55,7 @@ public class JavascriptHelperDefTest extends AuraImplTestCase {
                 "    }\n" +
                 "})\n";
         DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJS);
-        HelperDef helperDef = Aura.getDefinitionService().getDefinition(helperDesc);
+        HelperDef helperDef = definitionService.getDefinition(helperDesc);
 
         assertThat(helperDef, instanceOf(JavascriptHelperDef.class));
         this.serializeAndGoldFile(helperDef, "_JSHelperDef");

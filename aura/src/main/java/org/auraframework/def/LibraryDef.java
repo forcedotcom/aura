@@ -18,11 +18,12 @@ package org.auraframework.def;
 import java.util.List;
 
 public interface LibraryDef extends RootDefinition {
-    @Override
+
+	@Override
     DefDescriptor<LibraryDef> getDescriptor();
     
     /**
-     * Gets the list of included js files.
+     * Gets the list of included JS files.
      * @return {@link List} of included resources.
      */
     List<IncludeDefRef> getIncludes();

@@ -144,7 +144,7 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
                 "</aura:attribute>") );
 
         try{
-            Aura.getDefinitionService().getDefinition(desc);
+            definitionService.getDefinition(desc);
             fail("Should have failed creation because of non existing component.");
         }catch(Exception e){
             checkExceptionStart(e,DefinitionNotFoundException.class,

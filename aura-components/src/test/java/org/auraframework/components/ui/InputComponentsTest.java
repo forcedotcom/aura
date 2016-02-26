@@ -73,7 +73,7 @@ public class InputComponentsTest extends AuraTestCase {
         events.put("keyup", "markup://ui:keyup");
         events.put("select", "markup://ui:select");
 
-        ComponentDef def = Aura.getDefinitionService().getDefinition("ui:input", ComponentDef.class);
+        ComponentDef def = definitionService.getDefinition("ui:input", ComponentDef.class);
         assertNotNull("Failed to retrieve definition of ui:input", def);
         Map<String, RegisterEventDef> registeredEvents = def.getRegisterEventDefs();
         RegisterEventDef registeredEvent;

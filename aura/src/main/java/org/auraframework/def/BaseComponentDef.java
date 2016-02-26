@@ -64,7 +64,7 @@ public interface BaseComponentDef extends RootDefinition {
      * @return all library requirements on this component, including those inherited
      * @throws QuickFixException
      */
-    List<ImportDef> getImportDefs() throws QuickFixException;
+    List<LibraryDefRef> getImports() throws QuickFixException;
 
     DefDescriptor<ModelDef> getLocalModelDefDescriptor();
 
@@ -149,7 +149,7 @@ public interface BaseComponentDef extends RootDefinition {
     /**
      * Gets the application-wide token overrides.
      */
-    List<DefDescriptor<TokensDef>> getTokenOverrides();
+    List<DefDescriptor<TokensDef>> getTokenOverrides() throws QuickFixException;
 
     /**
      * Gets the application-wide default flavor override.
@@ -201,11 +201,8 @@ public interface BaseComponentDef extends RootDefinition {
 
     /**
      * Get the generated JavaScript class for this component.
-     * This class includes setting up its inheritance, its render methods and its helper methods.
-     * The rest of the definition of the class comes back as meta data in a JSON object.
-     * Which further configures the generated JavaScript class.
-     * If not provided, will use the base Component() constructor, but won't have a valid helper, so this is pretty much required now.
      *
+     * @return the generated code.
      * @throws QuickFixException
      * @throws IOException
      */

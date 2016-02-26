@@ -28,16 +28,17 @@ import org.auraframework.Aura;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
+import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.root.component.ClientComponentClass;
+import org.auraframework.impl.root.library.ClientIncludeClass;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.service.LoggingService;
@@ -324,47 +325,47 @@ public class ServerServiceImpl implements ServerService {
     private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key, boolean minify)
     		throws QuickFixException, IOException {
 
-    	Collection<BaseComponentDef> defs = filterAndLoad(BaseComponentDef.class, dependencies, null);
-    	
-        //
-        // create a temp buffer in case anything bad happens while we're processing this.
-        // don't want to end up with a half a JS init function
-        //
-        // TODO: get rid of this buffering by adding functionality to Json.serialize that will help us
-        // make sure serialized JS is valid, non-error-producing syntax if an exception happens in the
-        // middle of serialization.
-        //
-
-        StringBuilder sb = new StringBuilder();
-
-        // Now write the component shape specific classes
-        BaseComponentDef componentComponentDef = Aura.getDefinitionService().getDefinition("aura:component", ComponentDef.class);
-
-        final ClientComponentClass auraComponentCientClass = new ClientComponentClass(componentComponentDef);
-        auraComponentCientClass.writeComponentClass(sb);
-
-        //String classOutput;
-        ClientComponentClass clientComponentClass;
         AuraContext context = Aura.getContextService().getCurrentContext();
         MasterDefRegistry masterDefRegistry = context.getDefRegistry();
-        for (BaseComponentDef def : defs) {
-            if (def != componentComponentDef) {
-                clientComponentClass = new ClientComponentClass(def);
-                clientComponentClass.writeComponentClass(sb);
+        StringBuilder sb = new StringBuilder();
+        List<JavascriptProcessingError> errors = null;
 
-                // We've generated this class component, do not output it as part of the component def.
-                masterDefRegistry.setComponentClassLoaded(def.getDescriptor(), true);
-            }
+        // append component classes
+        Collection<BaseComponentDef> componentDefs = filterAndLoad(BaseComponentDef.class, dependencies, null);
+        for (BaseComponentDef def : componentDefs) {
+        	ClientComponentClass clientComponentClass = new ClientComponentClass(def);
+            clientComponentClass.writeClass(sb);
+            masterDefRegistry.setClientClassLoaded(def.getDescriptor(), true);
         }
 
+        // append library include classes
+        Collection<LibraryDef> libraryDefs = filterAndLoad(LibraryDef.class, dependencies, null);
+        for (LibraryDef libraryDef : libraryDefs) {
+        	List<IncludeDefRef> includeDefs = libraryDef.getIncludes();
+	        for (IncludeDefRef defRef : includeDefs) {
+	            ClientIncludeClass clientIncludeClass = new ClientIncludeClass(defRef);
+	            clientIncludeClass.writeClass(sb);
+	        }
+            masterDefRegistry.setClientClassLoaded(libraryDef.getDescriptor(), true);
+        }
+        
+        // If requested, compile the classes.
+        if (minify) {
+            StringWriter sw = new StringWriter();
+            errors = JavascriptWriter.CLOSURE_SIMPLE.compress(sb.toString(), sw, key);
+            if (errors == null || errors.isEmpty()) {
+                sb.setLength(0);
+                sb.append(sw);
+            }
+        }
+        
         sb.append("$A.clientService.initDefs({");
 
         // append component definitions
         sb.append("componentDefs:");
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
         serializationContext.pushFormatRootItems();
-        Aura.getSerializationService().writeCollection(defs, BaseComponentDef.class, sb, "JSON");
-        serializationContext.popFormatRootItems();
+        Aura.getSerializationService().writeCollection(componentDefs, BaseComponentDef.class, sb, "JSON");
         sb.append(",");
 
         // append namespaces. for now. *sigh*
@@ -380,8 +381,7 @@ public class ServerServiceImpl implements ServerService {
 
         // append library definitions
         sb.append("libraryDefs:");
-        Collection<LibraryDef> libraries = filterAndLoad(LibraryDef.class, dependencies, null);
-        Aura.getSerializationService().writeCollection(libraries, LibraryDef.class, sb, "JSON");
+        Aura.getSerializationService().writeCollection(libraryDefs, LibraryDef.class, sb, "JSON");
         sb.append(",");
 
         //
@@ -396,24 +396,17 @@ public class ServerServiceImpl implements ServerService {
 
         sb.append("});\n\n");
 
-        String output = sb.toString();
-
-        // only use closure compiler in prod mode, due to compile cost
+        // if unable to compress, add error comments to the end.
+        // ONLY if not production instance
         if (minify) {
-            StringWriter sw = new StringWriter();
-            List<JavascriptProcessingError> errors = JavascriptWriter.CLOSURE_SIMPLE.compress(output, sw, key);
-            if (errors == null || errors.isEmpty()) {
-                // For now, just use the non-compressed version if we can't get
-                // the compression to work.
-            	output = sw.toString();
-            } else {
-                // if unable to compress, add error comments to the end.
-                // ONLY if not production instance
+            if (errors != null && !errors.isEmpty()) {
                 if (!Aura.getConfigAdapter().isProduction()) {
                     sb.append(commentedJavascriptErrors(errors));
                 }
             }
         }
+        
+        String output = sb.toString();
         return output;
     }
 

@@ -92,6 +92,9 @@ public class AuraTextUtil {
     private static final String JS_IDENTIFIER_REGEX = "^[_$a-zA-Z][_$a-zA-Z0-9]*$";
     private static final Pattern JS_IDENTIFIER_PATTERN = Pattern.compile(JS_IDENTIFIER_REGEX);
 
+    private static final String NCNAME_IDENTIFIER_REGEX = "^[_a-zA-Z][\\.\\-_a-zA-Z0-9]*$";
+    private static final Pattern NCNAME_IDENTIFIER_PATTERN = Pattern.compile(NCNAME_IDENTIFIER_REGEX);
+
     /**
      * Makes the first letter of the input string lower case.
      */
@@ -693,7 +696,7 @@ public class AuraTextUtil {
     }
 
     /**
-     * Checks whether input is valid js identifier. Currently ASCII only and doesn't include javascript reserved words.
+     * Checks whether input is valid js identifier: only letters, numbers, dollar and underscore (but can't start with number).
      *
      * @param input String to match
      * @return true if identifier is valid
@@ -701,6 +704,19 @@ public class AuraTextUtil {
     public static boolean isValidJsIdentifier(String input) {
         if (input != null) {
             return JS_IDENTIFIER_PATTERN.matcher(input).matches();
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether input is valid XML identifier: letters, numbers, dot, dash and underscore (but must start with underscore or letter).
+     *
+     * @param input String to match
+     * @return true if identifier is valid
+     */
+    public static boolean isValidNCNameIdentifier(String input) {
+        if (input != null) {
+            return NCNAME_IDENTIFIER_PATTERN.matcher(input).matches();
         }
         return false;
     }

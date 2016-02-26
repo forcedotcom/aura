@@ -18,10 +18,9 @@ package org.auraframework.integration.test.clientlibrary;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.CheckAccessibility;
+import org.junit.Ignore;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-
-import com.ibm.icu.util.Calendar;
 
 @CheckAccessibility(false)
 public class ClientLibraryTagUITest extends WebDriverTestCase {
@@ -29,28 +28,6 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
         super(name);
     }
 
-    /**
-     * Verify that Javascript and Style resources marked as combinable are available at the client.
-     * clientLibraryTest:clientLibraryTest Moment, Walltime, js://clientLibraryTest.clientLibraryTest are marked as
-     * combinable JS resources. css://clientLibraryTest.clientLibraryTest is marked as combinable CSS resource
-     * 
-     * @throws Exception
-     */
-    public void testCombinableResources() throws Exception {
-        open("/clientLibraryTest/clientLibraryTest.app");
-        waitForAuraFrameworkReady();
-        Object minuteThruMoment = auraUITestingUtil.getEval("return moment(new Date()).minutes()");
-        assertNotNull(minuteThruMoment);
-
-        Boolean walltime = (Boolean)auraUITestingUtil.getEval("return !!WallTime");
-        assertTrue(walltime);
-
-        assertEquals("awesome", auraUITestingUtil.getEval("return clientLibraryTest.cool;"));
-
-        WebElement div = findDomElement(By.cssSelector("div[class~='identifier']"));
-        String divCss = div.getCssValue("background-color");
-        assertEquals("CSS not loaded from combinable resource", "rgba(255, 0, 0, 1)", divCss);
-    }
 
     /**
      * Verify that Javascript and Style resources marked as uncombinable are available at the client. WalltimeLocale is
@@ -68,6 +45,7 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
     /**
      * Verify that resource change depending on Mode. Mixture of combinable and uncombinable resources
      */
+    @Ignore("missing resources to test - need to inject extra client libs")
     public void testModeDependentResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
 

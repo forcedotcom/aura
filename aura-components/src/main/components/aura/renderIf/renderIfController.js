@@ -15,10 +15,18 @@
  */
 ({
     facetChange: function(component, event) {
-        var facets=[event.getParam("value"),event.getParam("oldValue")];
+    	var value = event.getParam("value");
+    	if (!$A.util.isArray(value)) {
+    	    value = [value];
+    	}
+    	var oldValue = event.getParam("oldValue");
+    	if (!$A.util.isArray(oldValue)) {
+    	    oldValue = [oldValue];
+    	}
+    	var facets=[value, oldValue];
         for(var i=0;i<facets.length;i++){
             for(var j=0;j<facets[i].length;j++){
-                facets[i][j].autoDestroy(i);
+                facets[i][j].autoDestroy(true);
             }
         }
     },

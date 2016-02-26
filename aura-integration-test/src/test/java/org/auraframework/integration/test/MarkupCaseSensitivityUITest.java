@@ -21,7 +21,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.ImportDef;
+import org.auraframework.def.LibraryDefRef;
 import org.auraframework.integration.test.error.AbstractErrorUITestCase;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
@@ -72,13 +72,13 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
             context = service.startContext(Mode.SELENIUM, Format.HTML,
                     Authentication.AUTHENTICATED);
         }
-        ApplicationDef ad = Aura.getDefinitionService().getDefinition(
+        ApplicationDef ad = definitionService.getDefinition(
                 String.format("%s:%s", testAppNamespace, testAppName), ApplicationDef.class);
-        List<ImportDef> aid = ad.getImportDefs();
+        List<LibraryDefRef> aid = ad.getImports();
         DefDescriptor<? extends Definition> idd;
         Source<?> source = null;
         String newSource = null; 
-        for(ImportDef id : aid) {
+        for(LibraryDefRef id : aid) {
         	idd = id.getDescriptor();
         	source = context.getDefRegistry().getSource(idd);
             String originalContent = source.getContents();

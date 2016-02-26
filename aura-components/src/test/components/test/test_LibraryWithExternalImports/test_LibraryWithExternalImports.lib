@@ -20,7 +20,7 @@
     <aura:include name="basicSecond" />
     <aura:include name="expectsImport" imports="test:test_Library:basicFirst" />
     <aura:include name="expectsImportAlso" imports="test:test_Library:expectsImport" />
-    <aura:include name="importsAndExport" imports="test:test_Library:basicFirst,test:test_Library:basicSecond" export="anExport" />
+    <aura:include name="importsAndExport" imports="test:test_Library:basicFirst,test:test_Library:basicSecond" aliases="firstAlias" export="anExport" />
     <aura:include name="handlesMultipleImports" imports="test:test_Library:basicFirst,test:test_Library:basicSecond,test:test_Library:expectsImport" />
     <aura:include name="handlesMultipleImportsAlso" imports="basicFirst,basicSecond,test:test_Library:basicFirst,test:test_Library:basicSecond" />
 </aura:library>

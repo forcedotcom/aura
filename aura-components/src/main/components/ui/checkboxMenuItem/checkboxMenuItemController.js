@@ -15,12 +15,14 @@
  */
 ({
     select: function (component) {
-        if (component.get("v.disabled")) {
+        var concreteComponent = component.getConcreteComponent();
+
+        if (concreteComponent.get("v.disabled")) {
             return;
         }
 
-        var current = component.get("v.selected");
-        component.set("v.selected", !current);
+        var current = concreteComponent.get("v.selected");
+        concreteComponent.set("v.selected", !current);
 
         component.getSuper().select();
     }

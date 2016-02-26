@@ -22,16 +22,8 @@
 
     <aura:method name="select" action="{!c.select}"/>
 
-    <li aura:id="listitem" class="{!v.class + ' has-icon--left'}" role="presentation">
-        <a aura:id="link" onclick="{!c.select}" class="{!v.selected == true ? 'selected' : ''}" role="menuitemradio"
-           title="{!v.label}" aria-disabled="{!v.disabled}" aria-checked="{!v.selected}" tabindex="{!v.disabled ? -1: 0}">
-
-            <aura:renderIf isTrue="{!v.body.length == 0}">
-                <b class="icon icon--left"></b>{!v.label}
-                <aura:set attribute="else">
-                    {!v.body}
-                </aura:set>
-            </aura:renderIf>
-        </a>
+    <li aura:id="listitem" class="{!v.class}" role="presentation">
+        <a aura:id="anchor" role="menuitemradio"><!-- The body is added on render --></a>
     </li>
+
 </aura:component>

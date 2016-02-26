@@ -22,6 +22,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -65,6 +67,7 @@ public class PerfExecutorTest extends WebDriverTestCase {
     private PerfMetricsUtil perfMetricsUtil;
     private PerfRunsCollector runsCollector;
     private String dbURI;
+    private String testName;
     private static String DEFAULT_DB_URI = "mongodb://byao-wsl5:27017";
     private static String RUNNER_BASE_URL = "/performance/runner.app?";
     private static int DEFAULT_TIMEOUT = 60; // Webdriver timeout of 60 secs
@@ -83,15 +86,10 @@ public class PerfExecutorTest extends WebDriverTestCase {
             int numberOfRuns = config.getNumberOfRuns();
             String customTimeout = config.getOptions().get("timeout");
             if(customTimeout!=null){
-            	DEFAULT_TIMEOUT = Integer.parseInt(customTimeout);
+            	DEFAULT_TIMEOUT = Integer.valueOf(customTimeout);
             }
-            runsCollector = new PerfRunsCollector();
             while(numberOfRuns-- > 0)
                 runWithPerfApp(def, config);
-            //Evaluate results after all the runs are done.
-            perfMetricsUtil.evaluateResults();
-            // Destroy the collector object after all runs are done.
-            runsCollector = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -99,6 +97,7 @@ public class PerfExecutorTest extends WebDriverTestCase {
     
     private void init(){
         perfMetricsUtil = new PerfMetricsUtil(this, this.dbURI, config);
+        this.testName = this.getComponentDef().getName();
     }
     
     private void setDB(String dbURI){
@@ -195,7 +194,7 @@ public class PerfExecutorTest extends WebDriverTestCase {
     }
 
     public List<String> generateUrl(){
-    	List<String> customUrls = getCustomUrls();    	 
+    	Collection<String> customUrls = getCustomUrls().values();    	 
     	List<String> urls = new ArrayList<>();
         try {
 	    	if(customUrls.size()==0) {
@@ -242,9 +241,9 @@ public class PerfExecutorTest extends WebDriverTestCase {
 	    }
     }
     
-    private List<String> getCustomUrls() {
+    private Map<String, String> getCustomUrls() {
     	List<Map<String, Map<String, Object>>> options = config.getCustomOptions();
-    	List<String> urls = new ArrayList<>();
+    	Map<String, String> testUrlMap = new HashMap<>();
     	
         if(options!=null) {
         	//For each custom option, generate a unique url
@@ -252,32 +251,35 @@ public class PerfExecutorTest extends WebDriverTestCase {
         		StringBuilder customUrl = new StringBuilder();
         		for(Entry<String, Map<String, Object>> entry: map.entrySet()) {        			
         			for(Entry<String, Object> item: entry.getValue().entrySet())
-        				customUrl.append("&").append(item.getKey()).append("=").append(item.getValue()); 	
+        				customUrl.append("&").append(item.getKey()).append("=").append(item.getValue());
+        			testUrlMap.put(entry.getKey(), customUrl.toString());
         		}
-        		urls.add(customUrl.toString());
         	}
         }
-        
-        return urls;
+        return testUrlMap;
     }
     
-    private void runWithPerfApp(DefDescriptor<BaseComponentDef> descriptor, PerfConfig config) throws Exception {
-        Mode mode = Mode.STATS;
-        String url = null;
-                   
+    private void runWithUrl(DefDescriptor<BaseComponentDef> descriptor, String testName, String custUrl) throws Exception{
+    	runsCollector = new PerfRunsCollector();
+    	String url = generateUrl(descriptor, Mode.STATS, custUrl);
+		doRun(url, descriptor);
+		perfMetricsUtil.evaluateResults(testName);
+		// Destroy the collector object after all runs are done.
+        runsCollector = null;
+    }
+    
+    private void runWithPerfApp(DefDescriptor<BaseComponentDef> descriptor, PerfConfig config) throws Exception {           
         List<Map<String, Map<String, Object>>> options = config.getCustomOptions();
+        
         if(options!=null) {
-        	List<String> urls = getCustomUrls();
-	        for(String custUrl: urls){
-	        	url = generateUrl(descriptor, mode, custUrl);
-				doRun(url, descriptor);
-				//evaluateResults();
-	        }
+        	Map<String, String> testUrlMap = getCustomUrls();
+        	for(Entry<String, String> testUrl: testUrlMap.entrySet()){
+        		runWithUrl(descriptor, this.getComponentDef().getName()+"."+testUrl.getKey(), testUrl.getValue());
+        	}
 	        return;
         }
         
-        url = generateUrl(descriptor, mode, "");
-        doRun(url, descriptor);
+        runWithUrl(descriptor, this.getComponentDef().getName(), "");
     }
 
     @Override
@@ -289,6 +291,14 @@ public class PerfExecutorTest extends WebDriverTestCase {
         }
     }
 
+    public String getName(){
+    	return testName;
+    }
+    
+    public void setName(String name){
+    	this.testName = name;
+    }
+    
     public DefDescriptor<BaseComponentDef> getComponentDef(){
         return def;
     }

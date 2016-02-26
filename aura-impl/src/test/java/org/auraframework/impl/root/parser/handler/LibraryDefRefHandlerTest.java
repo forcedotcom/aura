@@ -19,12 +19,12 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ImportDef;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.LibraryDef;
+import org.auraframework.def.LibraryDefRef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.library.ImportDefImpl;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
@@ -35,20 +35,20 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-public class ImportDefHandlerTest extends AuraImplTestCase {
+public class LibraryDefRefHandlerTest extends AuraImplTestCase {
 
-    public ImportDefHandlerTest(String name) {
+    public LibraryDefRefHandlerTest(String name) {
         super(name);
     }
 
     @Mock
-    DefDescriptor<ImportDef> descriptor;
+    DefDescriptor<LibraryDefRef> descriptor;
 
     @Mock
-    DefDescriptor<?> parentDescriptor;
+    DefDescriptor<ComponentDef> parentDescriptor;
 
     @Mock
-    RootTagHandler<?> parentHandler;
+    RootTagHandler<ComponentDef> parentHandler;
 
     private XMLStreamReader getReader(Source<?> source) throws XMLStreamException {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
@@ -61,57 +61,61 @@ public class ImportDefHandlerTest extends AuraImplTestCase {
 
     public void testGetElement() throws Exception {
         String expectedLibrary = "my:Lib";
-        StringSource<ImportDef> source = new StringSource<>(descriptor, String.format(
-                "<%s library='%s' property='p'/>", ImportDefHandler.TAG, expectedLibrary), "myID", Format.XML);
+        StringSource<LibraryDefRef> source = new StringSource<>(descriptor, 
+        		String.format("<%s library='%s' property='p'/>", LibraryDefRefHandler.TAG, expectedLibrary), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        ImportDefHandler handler = new ImportDefHandler(parentHandler, getReader(source), source);
+        Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
 
-        ImportDefImpl def = handler.getElement();
+        LibraryDefRef def = handler.getElement();
 
         DefDescriptor<LibraryDef> expectedDescriptor = DefDescriptorImpl.getInstance(expectedLibrary, LibraryDef.class);
         assertEquals(expectedDescriptor, def.getDescriptor());
-        assertEquals(expectedDescriptor, def.getLibraryDescriptor());
+        assertEquals(expectedDescriptor, def.getReferenceDescriptor());
     }
 
     public void testGetElementWithoutLibrary() throws Exception {
-        StringSource<ImportDef> source = new StringSource<>(descriptor, String.format(
-                "<%s/>", ImportDefHandler.TAG), "myID", Format.XML);
+        StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
+                "<%s/>", LibraryDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        ImportDefHandler handler = new ImportDefHandler(parentHandler, getReader(source), source);
+        Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
 
         try {
             handler.getElement();
-            fail("Name should be required for Include");
+            fail("Include tag requires a library attribute.");
         } catch (InvalidDefinitionException t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
-                    String.format("%s missing library attribute", ImportDefHandler.TAG));
+                    String.format("%s missing library attribute", LibraryDefRefHandler.TAG));
         }
     }
 
     public void testGetElementWithEmptyLibrary() throws Exception {
-        StringSource<ImportDef> source = new StringSource<>(descriptor, String.format(
-                "<%s library=''/>", ImportDefHandler.TAG), "myID", Format.XML);
+        StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
+                "<%s library=''/>", LibraryDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        ImportDefHandler handler = new ImportDefHandler(parentHandler, getReader(source), source);
+        Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
 
         try {
             handler.getElement();
-            fail("Name should be required for Include");
+            fail("Include tag requires a non empty library attribute.");
         } catch (InvalidDefinitionException t) {
             assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
-                    String.format("%s missing library attribute", ImportDefHandler.TAG));
+                    String.format("%s missing library attribute", LibraryDefRefHandler.TAG));
         }
     }
 
     public void testGetElementWithInvalidLibraryName() throws Exception {
-        StringSource<ImportDef> source = new StringSource<>(descriptor, String.format(
-                "<%s library='this is invalid'/>", ImportDefHandler.TAG), "myID", Format.XML);
+        StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
+                "<%s library='this is invalid'/>", LibraryDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        ImportDefHandler handler = new ImportDefHandler(parentHandler, getReader(source), source);
+        Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
 
         try {
             handler.getElement();
-            fail("Name should be required for Include");
+            fail("Include tag requires a library attribute with a valid descriptor.");
         } catch (AuraRuntimeException t) {
             assertExceptionMessageEndsWith(t, AuraRuntimeException.class,
                     String.format("Invalid Descriptor Format: this is invalid[%s]", DefType.LIBRARY));
@@ -119,37 +123,39 @@ public class ImportDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testGetElementWithNonEmptyTag() throws Exception {
-        StringSource<ImportDef> source = new StringSource<>(descriptor, String.format(
-                "<%s library='l' property='p'>text</%1$s>", ImportDefHandler.TAG), "myID", Format.XML);
+        StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
+                "<%s library='l' property='p'>text</%1$s>", LibraryDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        ImportDefHandler handler = new ImportDefHandler(parentHandler, getReader(source), source);
+        Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
 
         try {
             handler.getElement();
             fail("Include tag may not contain any children");
         } catch (AuraRuntimeException t) {
             assertExceptionMessageEndsWith(t, AuraRuntimeException.class,
-                    String.format("expected end of %s tag", ImportDefHandler.TAG));
+                    String.format("expected end of %s tag", LibraryDefRefHandler.TAG));
         }
     }
 
     public void testGetElementWithDescription() throws Exception {
         String expectedDescription = "needs to be included";
-        StringSource<ImportDef> source = new StringSource<>(descriptor, String.format(
-                "<%s library='l' property='p' description='%s'/>", ImportDefHandler.TAG, expectedDescription), "myID",
-                Format.XML);
+        StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
+                "<%s library='l' property='p' description='%s'/>", LibraryDefRefHandler.TAG, expectedDescription), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        ImportDefHandler handler = new ImportDefHandler(parentHandler, getReader(source), source);
+        Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
 
-        ImportDef actualDef = handler.getElement();
+        LibraryDefRef actualDef = handler.getElement();
         assertEquals(expectedDescription, actualDef.getDescription());
     }
 
     public void testGetElementWithUnexpectedAttribute() throws Exception {
-        StringSource<ImportDef> source = new StringSource<>(descriptor, String.format(
-                "<%s library='l' property='p' unexpected='me'/>", ImportDefHandler.TAG), "myID", Format.XML);
+        StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
+                "<%s library='l' property='p' unexpected='me'/>", LibraryDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        ImportDefHandler handler = new ImportDefHandler(parentHandler, getReader(source), source);
+        Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
 
         try {
             handler.getElement();

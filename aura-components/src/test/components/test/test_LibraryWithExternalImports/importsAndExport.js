@@ -16,7 +16,8 @@
 var imports = Array.prototype.slice.call(arguments, 0);
 var anExport = function() {
 	var ret = "EXT_EXPORTED_IMPORT:";
-	for(var i=0; i<imports.length; i++){
+	ret = ret + (firstAlias && firstAlias()) + "|";
+	for(var i=imports.length-1; i<imports.length; i++){
 		ret = ret + (imports[i] && imports[i]()) + "|";
 	}
 	return ret;

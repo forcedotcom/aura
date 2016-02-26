@@ -15,10 +15,14 @@
  */
 /*jslint sub: true*/
 
+/**
+ * A registry of Component classes.
+ * @constructor
+ */
 function ComponentClassRegistry () {
     // We delay the creation of the definition of a class till it's requested.
-    // The function that creates the component class is a classConstructorExporter
-    this.classConstructorExporter = {};
+    // The function that creates the component class is a classExporter.
+    this.classExporter = {};
 
     // Collection of all the component classes we generate for
     // proper stack traces and proper use of prototypical inheritance
@@ -26,43 +30,30 @@ function ComponentClassRegistry () {
 }
 
 /**
- * Load the initial map of class constructors.
- * @param {Object} classConstructorExporter A map of descriptor:exporter. See addComponentClass().
- * @export
- */
-ComponentClassRegistry.prototype.initClasses = function(classConstructorExporter){
-    if (!this.classConstructorExporter) {
-        this.classConstructorExporter = classConstructorExporter;
-    }
-};
-
-/**
- * Detects of the component class has been already defined without actually defining it.
- * hasComponentClass is more performant that running getComponentClass() since if the class
- * hasn't been built yet, we don't want it to be forcably built if not requested.
- *
- * @param {String} descriptor The qualified name of the component to check in the form prefix:componentname or protocol://prefix:componentname
+ * Detects if the component class exists without actually defining it.
+ * @param {String} descriptor The qualified name of the component in the form markup://namespace:component
  */
 ComponentClassRegistry.prototype.hasComponentClass = function(descriptor) {
-    return !!(descriptor in this.classConstructorExporter || descriptor in this.classConstructors);
+    return descriptor in this.classExporter || descriptor in this.classConstructors;
 };
 
 /**
- * Use the specified constructor as the definition of the class descriptor.
- * We store them for execution later so we do not load definitions into memory unless they are utilized in getComponentClass.
- * @param {String} descriptor Uses the pattern of namespace:componentName.
+ * The function that handles definitions of component classes.
+ * @param {String} descriptor in the form markup://namespace:component
  * @param {Function} exporter A function that when executed will return the component object litteral.
  * @export
  */
 ComponentClassRegistry.prototype.addComponentClass = function(descriptor, exporter){
+    $A.assert($A.util.isString(descriptor), "Component class descriptor is invalid: " + descriptor);
+    $A.assert($A.util.isFunction(exporter), "Component class exporter is not a function: " + descriptor);
     if (!this.hasComponentClass(descriptor)) {
-        this.classConstructorExporter[descriptor] = exporter;
+        this.classExporter[descriptor] = exporter;
     }
 };
 
 /**
- * Get the class constructor for the specified component.
- * @param {String} descriptor use either the fqn markup://prefix:name or just prefix:name of the component to get a constructor for.
+ * Get or build the class constructor for the specified component.
+ * @param {String} descriptor in the form markup://namespace:component
  * @returns Either the class that defines the component you are requesting, or undefined if not found.
  * @export
  */
@@ -70,13 +61,13 @@ ComponentClassRegistry.prototype.getComponentClass = function(descriptor) {
     var storedConstructor = this.classConstructors[descriptor];
 
     if (!storedConstructor) {
-        var exporter = this.classConstructorExporter[descriptor];
+        var exporter = this.classExporter[descriptor];
         if (exporter) {
             var componentProperties = exporter();
             storedConstructor = this.buildComponentClass(componentProperties);
             this.classConstructors[descriptor] = storedConstructor;
-            // No need to keep all these extra functions.
-            delete this.classConstructorExporter[descriptor];
+            // No need to keep the exporter in memory.
+            delete this.classExporter[descriptor];
         }
     }
 
@@ -145,7 +136,7 @@ ComponentClassRegistry.prototype.buildLibraries = function(componentProperties) 
     if (componentImports) {
         var helper = componentProperties["helper"];
         for (var property in componentImports) {
-            helper[property] = $A.componentService.getLibraryDef(componentImports[property]);
+            helper[property] = $A.componentService.getLibrary(componentImports[property]);
         }
         componentProperties["helper"] = helper;
     }

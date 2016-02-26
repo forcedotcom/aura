@@ -198,7 +198,7 @@ public interface MasterDefRegistry {
      * @param componentClassDef The component to indicate we have loaded.
      * @param isLoaded Was the class included in the current request or not. There is no reason to set this to false at this point.
      */
-    void setComponentClassLoaded(DefDescriptor<?> componentClassDef, Boolean isLoaded);
+    void setClientClassLoaded(DefDescriptor<?> componentClassDef, Boolean isLoaded);
     
     /**
      * Has the current component class already been output in the current request? 
@@ -206,5 +206,5 @@ public interface MasterDefRegistry {
      * @param componentClassDef
      * @return
      */
-    Boolean getComponentClassLoaded(DefDescriptor<?> componentClassDef);
+    Boolean getClientClassLoaded(DefDescriptor<?> componentClassDef);
 }

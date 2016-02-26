@@ -128,4 +128,21 @@ ExpressionFunctions.prototype.format = function() {
     return $A.util.format.apply($A.util, formatArguments);
 };
 
+/**
+ * Passthrough to $A.getContext().getTokens()["token"];
+ * @export
+ */
+ExpressionFunctions.prototype.token = function(token){
+    var context=$A.getContext();
+    var tokens=context&&context.getTokens();
+    if(tokens){
+        if(tokens.hasOwnProperty(token)){
+            return tokens[token];
+        }
+        throw new Error("Unknown token: '"+token+"'. Are you missing a tokens file or declaration?");
+    }
+    return '';
+};
+
+
 Aura.Value.ExpressionFunctions = ExpressionFunctions;

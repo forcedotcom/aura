@@ -195,11 +195,17 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 payload: { panelInstance: cmp.getGlobalId() }
             }).fire();
 
+            $A.get('e.ui:panelTransitionBegin').setParams(
+                { 
+                    panel: cmp, 
+                    isOpening: true,
+                    action: 'show'
+                }
+            ).fire();
 
 
             //endAnimationHandler: cleanup all classes and events
             var finishHandler = function () {
-
                 if(!cmp.isValid()) {
                     return;
                 }
@@ -224,6 +230,12 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                         closeButton.focus();
                     }
                 }
+
+                $A.get('e.ui:panelTransitionEnd').setParams({
+                    action: 'show', 
+                    panelId: cmp.getGlobalId()
+                }).fire();
+
                 config.onFinish && config.onFinish();
             };
 
@@ -259,8 +271,10 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
             if(useTransition) {
                 useTransition = this.validateAnimationName(animName);
             }
-
+            
             cmp.set('v.visible', false);
+            $A.get('e.ui:panelTransitionBegin').setParams({ panel: cmp, isOpening: false }).fire();
+
 
             //endAnimationHandler: cleanup all classes and events
             var finishHandler = function () {
@@ -281,6 +295,10 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                         $A.util.removeClass(animEl, 'transitioning ' + animName);
                     }, 1000); //make sure all transitions are finished
 
+                    $A.get('e.ui:panelTransitionEnd').setParams({
+                        action: 'hide', 
+                        panelId: cmp.getGlobalId()
+                    }).fire();
                 } else {
                     config.onFinish && config.onFinish();
                 }
@@ -439,20 +457,21 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
          * @private
          */
         setFocus: function(cmp) {
-            
             if(cmp.isValid()) {
                 var el;
-
                 el = cmp.getElement();
-                if(cmp.returnFocus) {
-                    cmp.returnFocus.focus();
-                } else if(el && el.querySelectorAll) {
+                // TODO: commented out to work around bug
+                // in the app, return when that is fixed: W-2942958
+                // if(cmp.returnFocus) {
+                //     cmp.returnFocus.focus();
+                // } else 
+                if(el && el.querySelectorAll) {
                     var focusables = this.getFocusables(el);
                     focusables.initial && focusables.initial.focus();
                 }
             }
-
         },
+        
         scopeScroll: function (dom) {
             scrollUtil.scope(dom);
         },

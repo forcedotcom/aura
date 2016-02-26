@@ -22,15 +22,18 @@ import java.util.Set;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.javascript.helper.JavascriptHelperDef;
+import org.auraframework.impl.javascript.helper.JavascriptHelperDef.Builder;
 import org.auraframework.system.Source;
 import org.auraframework.util.json.JsFunction;
 
 /**
+ * This is a basic handler for a javascript helper def.
+ *
+ * This does no particular validation other than parsing the file.
  */
 public class JavascriptHelperDefHandler extends JavascriptHandler<HelperDef, HelperDef> {
 
-    private final JavascriptHelperDef.Builder builder = new JavascriptHelperDef.Builder();
+    private final Builder builder = new Builder();
 
     public JavascriptHelperDefHandler(DefDescriptor<HelperDef> descriptor, Source<?> source) {
         super(descriptor, source);
@@ -39,13 +42,13 @@ public class JavascriptHelperDefHandler extends JavascriptHandler<HelperDef, Hel
     @Override
     protected HelperDef createDefinition(Map<String, Object> map) {
         setDefBuilderFields(builder);
-        builder.functions = map;
         for (Entry<String, Object> entry : map.entrySet()) {
             Object value = entry.getValue();
             if (value != null && value instanceof JsFunction) {
                 ((JsFunction) value).setName(entry.getKey());
             }
         }
+        builder.addFunctions(map);
         return builder.build();
     }
 

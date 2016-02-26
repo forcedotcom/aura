@@ -19,8 +19,8 @@
 	            { "label": "Option3", "value": "Option3", "class": "option" },
 	            { "label": "Option4", "value": "Option4", "class": "option" }],
 	OPTS2 : [{ "label": "OptionA", "value": "OptionA", "class": "option", selected: true },
-		            { "label": "OptionB", "value": "OptionB", "class": "option" }], 
-	
+		            { "label": "OptionB", "value": "OptionB", "class": "option" }],
+
     /**
      * Checking to make sure that going from 0 options to some options (set of 4 in this case) work correctly
      */
@@ -33,7 +33,7 @@
 			this.verifyElements(cmp.find("dynamicSelect"), this.OPTS);
 		}]
 	},
-	
+
     /**
      * Checking to make sure that going from 4 options to some smaller set of options (set of 2 in this case) work correctly
      */
@@ -46,7 +46,7 @@
 			this.verifyElements(cmp.find("dynamicSelect"), this.OPTS2);
 		}]
 	},
-	
+
 	/**
      * Checking to make sure that going from 2 options to0 options work correctly
      */
@@ -59,7 +59,7 @@
 			this.verifyElements(cmp.find("dynamicSelect"), []);
 		}]
 	},
-	
+
 	/**
      * Overall Test Of Flow. Going from 2 options to 4, to 0, and back to 2
      */
@@ -80,7 +80,7 @@
 			this.verifyElements(cmp.find("dynamicSelect"), this.OPTS2);
 		}]
 	},
-	
+
 	/**
 	 * Verify can change selected option to another option.
 	 */
@@ -95,7 +95,7 @@
 			this.verifySelectedOptions(inputSelectCmp, "3");
 		}
 	},
-	
+
 	verifyElements : function(inputSelect, expectedOptions){
 		var actualOptions = inputSelect.getElement().getElementsByTagName("option");
 		var expectedOption = "", actualOption = "" ;
@@ -103,15 +103,15 @@
 		for(var i = 0; i < expectedOptions.length; i++){
 			expectedOption = expectedOptions[i];
 			actualOption   = actualOptions[i];
-			
+
 			$A.test.assertEquals(expectedOption["label"], actualOption["label"], "Options do not have the same label");
 		}
 	},
-	
+
 	setOptions : function(cmp, opts){
 		cmp.find("dynamicSelect").set("v.options", opts);
 	},
-	
+
 	changeSelection : function(inputSelectCmp, newOptionsText, doNotDeselectTheseOptions) {
 		var optionCmps = this.getOptions(inputSelectCmp);
 
@@ -136,7 +136,7 @@
 		if (!(newOptionsText instanceof Array)) {
 			newOptionsText = [newOptionsText];
 		}
-		
+
 		// for all options that need to be selected find it in list of all
 		// options in select then select it
 		for (var j=0; j<newOptionsText.length; j++) {
@@ -224,7 +224,7 @@
 					if(body[i].isInstanceOf("ui:inputSelectOption")){
 						options.push(body[i]);
 					}else{
-						options=options.concat(this.getOptionsFromBody(body[i].get("v.body")));
+						options=options.concat(this.getOptions(body[i]));
 					}
 				}
 			}

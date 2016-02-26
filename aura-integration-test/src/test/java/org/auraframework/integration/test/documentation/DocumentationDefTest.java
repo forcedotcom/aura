@@ -16,7 +16,6 @@
 
 package org.auraframework.integration.test.documentation;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -68,7 +67,7 @@ public class DocumentationDefTest extends AuraImplTestCase {
 				"</aura:documentation>";
 
 		DefDescriptor<DocumentationDef> dd= addSourceAutoCleanup(DocumentationDef.class, docDefSource);
-		ComponentDef cd = Aura.getDefinitionService().getDefinition(Aura.getDefinitionService().getDefinition(dd).getExampleDefs().get(0).getRef());
+		ComponentDef cd = definitionService.getDefinition(definitionService.getDefinition(dd).getExampleDefs().get(0).getRef());
 		assertEquals("Unable to get to the ComponentDef referenced in example!", exampleCmp, cd.getDescriptor().getNamespace()+":"+cd.getName());
 	}
 
@@ -95,7 +94,7 @@ public class DocumentationDefTest extends AuraImplTestCase {
 
 	private <T extends Definition> void testLoadDocumentationDefViaRootDef(String qualifiedName, Class<T> defType, int noOfDescs)
 			throws DefinitionNotFoundException, QuickFixException {
-		RootDefinition c = (RootDefinition) Aura.getDefinitionService().getDefinition(qualifiedName, defType);
+		RootDefinition c = (RootDefinition) definitionService.getDefinition(qualifiedName, defType);
 		DocumentationDef docDef = c.getDocumentationDef();
 		assertNotNull("DocumentationDef not found!", docDef);
 		assertEquals("Number DescriptionDefs don't match the expected value!", noOfDescs, docDef.getDescriptionDefs().size());

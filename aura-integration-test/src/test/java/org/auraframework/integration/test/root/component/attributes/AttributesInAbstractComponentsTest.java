@@ -50,7 +50,7 @@ public class AttributesInAbstractComponentsTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> extensionCmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
         assertNotNull(
                 "Failed to retrieve definition of extension component which was setting value of inherited attribute",
-                Aura.getDefinitionService().getDefinition(extensionCmpDesc));
+                definitionService.getDefinition(extensionCmpDesc));
         Component component = (Component) Aura.getInstanceService().getInstance(extensionCmpDesc.getQualifiedName(),
                 ComponentDef.class);
         assertEquals("Attribute value set using value assignment does not match expected value.", "Aura", component
@@ -72,7 +72,7 @@ public class AttributesInAbstractComponentsTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> extensionCmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
         assertNotNull(
                 "Failed to retrieve definition of extension component which was setting value of inherited attribute",
-                Aura.getDefinitionService().getDefinition(extensionCmpDesc));
+                definitionService.getDefinition(extensionCmpDesc));
         Component component = (Component) Aura.getInstanceService().getInstance(extensionCmpDesc.getQualifiedName(),
                 ComponentDef.class);
         Object value = component.getSuper().getAttributes().getValue("innerBody");

@@ -18,7 +18,6 @@ package org.auraframework.integration.test.css;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokenDescriptorProvider;
@@ -43,7 +42,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     private void assertStyle(DefDescriptor<StyleDef> style, String expected) throws QuickFixException {
-        expected = expected.replace(".THIS", "." + Aura.getDefinitionService().getDefinition(style).getClassName());
+        expected = expected.replace(".THIS", "." + definitionService.getDefinition(style).getClassName());
         assertEquals("Did not get the expected css code", expected, getParsedCssUseAppTokens(style));
     }
 
@@ -129,7 +128,7 @@ public class TokenResolutionTest extends StyleTestCase {
     /** errors when the def does not exist */
     public void testNonexistentDef() throws Exception {
         try {
-        	Aura.getDefinitionService().getDefinition(addStyleDef(".THIS{color: token(color)")).getCode();
+            definitionService.getDefinition(addStyleDef(".THIS{color: token(color)")).getCode();
             fail("expected exception");
         } catch (Exception e) {
         }
@@ -139,7 +138,7 @@ public class TokenResolutionTest extends StyleTestCase {
     public void testNonexistentToken() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         try {
-        	Aura.getDefinitionService().getDefinition(addStyleDef(".THIS{color: token(dolor)")).getCode();
+            definitionService.getDefinition(addStyleDef(".THIS{color: token(dolor)")).getCode();
             fail("expected exception");
         } catch (Exception e) {
         }
@@ -202,7 +201,7 @@ public class TokenResolutionTest extends StyleTestCase {
                 "}";
 
         try {
-        	Aura.getDefinitionService().getDefinition(addStyleDef(src)).getCode();
+            definitionService.getDefinition(addStyleDef(src)).getCode();
             fail("expected exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "Expected to find keyword");
@@ -218,7 +217,7 @@ public class TokenResolutionTest extends StyleTestCase {
                 "}";
 
         try {
-        	Aura.getDefinitionService().getDefinition(addStyleDef(src)).getCode();
+            definitionService.getDefinition(addStyleDef(src)).getCode();
             fail("expected exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "must not evaluate to an empty string");
@@ -273,7 +272,7 @@ public class TokenResolutionTest extends StyleTestCase {
 
         // our app is in a different ns from the cmp, specifying explicit app tokens
         DefDescriptor<TokensDef> override = addSeparateTokens(tokens().token("color", "blue"));
-        addContextApp(String.format("<aura:application tokenOverrides='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application tokens='%s'/>", override.getDescriptorName()));
 
         // the explicit tokens should override the namespace-defaults
         assertStyle(toTest, ".THIS {color:blue}");
@@ -290,7 +289,7 @@ public class TokenResolutionTest extends StyleTestCase {
 
         // our app is in a different ns from the cmp, specifying explicit tokens
         DefDescriptor<TokensDef> override = addSeparateTokens(tokens().token("color", "green"));
-        addContextApp(String.format("<aura:application tokenOverrides='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application tokens='%s'/>", override.getDescriptorName()));
 
         // the explicit tokens def outranks the cmp's namespace-default and the app's namespace-default
         assertStyle(toTest, ".THIS {color:green}");
@@ -304,7 +303,7 @@ public class TokenResolutionTest extends StyleTestCase {
 
         // our app is in a different ns from the cmp, specifying explicit tokens
         DefDescriptor<TokensDef> override = addSeparateTokens(tokens().token("font", "arial"));
-        addContextApp(String.format("<aura:application tokenOverrides='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application tokens='%s'/>", override.getDescriptorName()));
 
         // the cmp should fallback to it's namespace-default, without an error
         assertStyle(toTest, ".THIS {color:red}");
@@ -321,7 +320,7 @@ public class TokenResolutionTest extends StyleTestCase {
 
         // our app is in a different ns from the cmp, specifying explicit app tokens
         DefDescriptor<TokensDef> override = addSeparateTokens(tokens().parent(parent).token("font", "arial"));
-        addContextApp(String.format("<aura:application tokenOverrides='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application tokens='%s'/>", override.getDescriptorName()));
 
         // the inherited value should be used
         assertStyle(toTest, ".THIS {color:blue}");
@@ -337,7 +336,7 @@ public class TokenResolutionTest extends StyleTestCase {
         DefDescriptor<TokensDef> override = addNsTokens(tokens().parent(other));
 
         // our app is in a different ns from the cmp
-        addContextApp(String.format("<aura:application tokenOverrides='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application tokens='%s'/>", override.getDescriptorName()));
 
         // the effect should be the same as if the override wasn't there
         assertStyle(toTest, ".THIS {color:red}");
@@ -353,7 +352,7 @@ public class TokenResolutionTest extends StyleTestCase {
         DefDescriptor<TokensDef> override = addNsTokens(tokens().parent(other).token("color", "blue"));
 
         // our app is in a different ns from the cmp
-        addContextApp(String.format("<aura:application tokenOverrides='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application tokens='%s'/>", override.getDescriptorName()));
 
         // the app's implicit tokens value should be used
         assertStyle(toTest, ".THIS {color:blue}");
@@ -374,7 +373,7 @@ public class TokenResolutionTest extends StyleTestCase {
 
         DefDescriptor<TokensDef> override = addSeparateTokens(tokens().descriptorProvider(
                 "java://" + Provider1.class.getName()));
-        addContextApp(String.format("<aura:application tokenOverrides='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application tokens='%s'/>", override.getDescriptorName()));
 
         // should get the value from the provided def
         assertStyle(styleDef, ".THIS {color:blue}");
@@ -394,7 +393,7 @@ public class TokenResolutionTest extends StyleTestCase {
 
         DefDescriptor<TokensDef> override = addSeparateTokens(tokens().mapProvider(
                 "java://" + Provider2.class.getName()));
-        addContextApp(String.format("<aura:application tokenOverrides='%s'/>", override.getDescriptorName()));
+        addContextApp(String.format("<aura:application tokens='%s'/>", override.getDescriptorName()));
 
         // should get the value from the provided def
         assertStyle(styleDef, ".THIS {color:green}");
@@ -471,7 +470,7 @@ public class TokenResolutionTest extends StyleTestCase {
         tokens.add(usesProvider);
         tokens.add(mapTokens1);
         tokens.add(mapTokens2);
-        addContextApp(String.format("<aura:application tokenOverrides='%s'/>", Joiner.on(", ").join(tokens)));
+        addContextApp(String.format("<aura:application tokens='%s'/>", Joiner.on(", ").join(tokens)));
 
         assertStyle(styleDef, expected);
     }

@@ -392,7 +392,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> noDefaultPreloadsInterfaceDef = definitionService.getDefDescriptor(IntegrationService.NO_DEFAULT_PRELOADS_INTERFACE, 
                 InterfaceDef.class);
         try{
-        	Aura.getDefinitionService().getDefinition(noDefaultPreloadsInterfaceDef);
+        	definitionService.getDefinition(noDefaultPreloadsInterfaceDef);
         }catch(QuickFixException e){
             fail("Failed to get definition of noDefaultPreloads interface. IntegrationService may suffer performance degredation.");
         }

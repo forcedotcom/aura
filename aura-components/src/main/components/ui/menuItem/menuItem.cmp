@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extensible="true" abstract="true" provider="js://ui.menuItem" description="A UI menu item in a ui:menuList component.">
+<aura:component access="GLOBAL" support="GA" implements="ui:visible, ui:uiEvents" extensible="true" abstract="true" provider="js://ui.menuItem" description="A UI menu item in a ui:menuList component.">
 
     <aura:registerEvent name="menuSelect" type="ui:menuSelect" description="The event that is fired when the menu item is selected."/>
 
@@ -28,8 +28,7 @@
     <aura:attribute access="GLOBAL" name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component."/>
     <aura:attribute access="GLOBAL" name="value" type="Object" description="References the controller class variable that is associated with the component."/>
 
-    <!-- TODO: These three shouldn't be global as they're only used internally (by menuList)  -->
-    <aura:registerEvent access="GLOBAL" name="keydown" type="ui:keydown" description="The event fired when the user presses a keyboard key on the component."/>
+    <!-- menuSelect should be used instead -->
     <aura:registerEvent access="GLOBAL" name="click" type="ui:click" description="The event fired when the user clicks on the component."/>
 
     <aura:method name="select" action="{!c.select}"/>

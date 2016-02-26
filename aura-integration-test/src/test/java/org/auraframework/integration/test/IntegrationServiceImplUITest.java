@@ -20,7 +20,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -155,13 +154,13 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     private DefDescriptor<ComponentDef> setupSimpleComponentWithModelControllerHelperAndProvider() {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ComponentDef.class, null);
-        DefDescriptor<ControllerDef> jsControllerdesc = Aura.getDefinitionService()
+        DefDescriptor<ControllerDef> jsControllerdesc = definitionService
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX, ControllerDef.class);
-        DefDescriptor<ProviderDef> jsProviderdesc = Aura.getDefinitionService()
+        DefDescriptor<ProviderDef> jsProviderdesc = definitionService
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX, ProviderDef.class);
-    	DefDescriptor<HelperDef> jsHelperdesc = Aura.getDefinitionService()
+    	DefDescriptor<HelperDef> jsHelperdesc = definitionService
                 .getDefDescriptor(cmpDesc,  DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class);
-    	DefDescriptor<StyleDef> CSSdesc = Aura.getDefinitionService()
+    	DefDescriptor<StyleDef> CSSdesc = definitionService
                 .getDefDescriptor(cmpDesc,  DefDescriptor.CSS_PREFIX, StyleDef.class);
     	//fill in component to be injected
         String jsProviderName = jsProviderdesc.getQualifiedName();
@@ -438,7 +437,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 + "<div class='click3_t' onclick='{!c.click3Hndlr}'>Click Me3</div>";
         DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
                 String.format(AuraImplTestCase.baseComponentTag, "", bodyMarkup));
-        DefDescriptor<ControllerDef> jsControllerdesc = Aura.getDefinitionService()
+        DefDescriptor<ControllerDef> jsControllerdesc = definitionService
                 .getDefDescriptor(
                         String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, cmpToInject.getNamespace(),
                                 cmpToInject.getName()), ControllerDef.class
@@ -613,7 +612,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     private void verifyMissingLocalId(DefDescriptor<ComponentDef> stub) throws Exception {
-        DefDescriptor<ComponentDef> cmpToInject = Aura.getDefinitionService().getDefDescriptor("aura:text",
+        DefDescriptor<ComponentDef> cmpToInject = definitionService.getDefDescriptor("aura:text",
                 ComponentDef.class);
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("value", "No Local Id");
@@ -715,7 +714,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     public void testHistoryServiceAPIs() throws Exception {
         String expectedTxt = "";
         openIntegrationStub(
-                Aura.getDefinitionService().getDefDescriptor("integrationService:noHistoryService", ComponentDef.class),
+                definitionService.getDefDescriptor("integrationService:noHistoryService", ComponentDef.class),
                 null);
         String initialUrl = getDriver().getCurrentUrl();
         // open("/integrationService/noHistoryService.cmp");

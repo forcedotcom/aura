@@ -112,7 +112,7 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
             tokens.add(DefDescriptorImpl.getInstance(descriptors[i], TokensDef.class));
         }
 
-        String markup = "<aura:application access='unauthenticated' tokenOverrides='%s'/>";
+        String markup = "<aura:application access='unauthenticated' tokens='%s'/>";
         String src = String.format(markup, Joiner.on(",").join(tokens));
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
         return setupContext(app);

@@ -18,6 +18,7 @@ package org.auraframework.test.perf.rdp;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.def.ComponentDef;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
@@ -115,7 +116,7 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
      * Checks the timeline has the marks we are adding
      */
     public void testTimelineMarks() throws Exception {
-        runWithPerfApp(getDefDescriptor("ui:button"));
+        runWithPerfApp(definitionService.getDefDescriptor("ui:button", ComponentDef.class));
 
         List<RDPNotification> notifications = getRDPNotifications();
         RDPAnalyzer analyzer = new RDPAnalyzer(notifications, getPerfStartMarker(), getPerfEndMarker());
@@ -145,7 +146,7 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
     public void testGetDevToolsLog() throws Exception {
         PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, PerfRunMode.TIMELINE);
         metricsCollector.startCollecting();
-        runWithPerfApp(getDefDescriptor("ui:button"));
+        runWithPerfApp(definitionService.getDefDescriptor("ui:button", ComponentDef.class));
         metricsCollector.stopCollecting();
         RDPAnalyzer analyzer = metricsCollector.getRDPAnalyzer();
 

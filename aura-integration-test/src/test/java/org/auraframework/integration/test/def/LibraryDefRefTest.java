@@ -15,18 +15,17 @@
  */
 package org.auraframework.integration.test.def;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.handler.ImportDefHandler;
+import org.auraframework.impl.root.parser.handler.LibraryDefRefHandler;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
-public class ImportDefTest extends AuraImplTestCase {
+public class LibraryDefRefTest extends AuraImplTestCase {
 
-    public ImportDefTest(String name) {
+    public LibraryDefRefTest(String name) {
         super(name);
     }
 
@@ -37,11 +36,11 @@ public class ImportDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<aura:import library='dummy'/>"));
         try {
-            Aura.getDefinitionService().getDefinition(cmpDesc);
-            fail("QuickFixException expected. property attribute is missing.");
+            definitionService.getDefinition(cmpDesc);
+            fail("Import tag requires a Property attribute.");
         } catch (InvalidDefinitionException t) {
             assertExceptionMessage(t, InvalidDefinitionException.class,
-                    String.format("%s missing property attribute", ImportDefHandler.TAG));
+                    String.format("%s missing property attribute", LibraryDefRefHandler.TAG));
         }
     }
 
@@ -53,11 +52,11 @@ public class ImportDefTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "",
                         "<aura:import library='dummy' property='not just anything you want'/>"));
         try {
-            Aura.getDefinitionService().getDefinition(cmpDesc);
-            fail("QuickFixException expected. property attribute is invalid.");
+            definitionService.getDefinition(cmpDesc);
+            fail("Import tag requires a Property attribute with a valid javascript identifier.");
         } catch (InvalidDefinitionException t) {
             assertExceptionMessage(t, InvalidDefinitionException.class,
-                    String.format("%s 'property' attribute must be valid javascript identifier", ImportDefHandler.TAG));
+                    String.format("%s 'property' attribute must be valid javascript identifier", LibraryDefRefHandler.TAG));
         }
     }
 
@@ -68,8 +67,8 @@ public class ImportDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<aura:import library='not:here' property='p'/>"));
         try {
-            Aura.getDefinitionService().getDefinition(cmpDesc);
-            fail("QuickFixException expected. property attribute is missing.");
+            definitionService.getDefinition(cmpDesc);
+            fail("Import tag requires a Library attribute that references an existing library.");
         } catch (DefinitionNotFoundException t) {
             assertExceptionMessage(t, DefinitionNotFoundException.class,
                     String.format("No LIBRARY named markup://not:here found : [%s]", cmpDesc.getQualifiedName()));
@@ -86,8 +85,8 @@ public class ImportDefTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "",
                         String.format("<aura:import library='%s' property='p'/>", libraryDesc.getDescriptorName())));
         try {
-            Aura.getDefinitionService().getDefinition(cmpDesc);
-            fail("QuickFixException expected. property attribute is missing.");
+            definitionService.getDefinition(cmpDesc);
+            fail("Import tag requires a Library attribute that must be validated.");
         } catch (InvalidDefinitionException t) {
             assertExceptionMessage(t, InvalidDefinitionException.class,
                     "aura:library must contain at least one aura:include attribute");

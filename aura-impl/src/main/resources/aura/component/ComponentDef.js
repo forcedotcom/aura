@@ -39,6 +39,7 @@ function ComponentDef(config) {
     this.controllerDef = config["controllerDef"] ? $A.componentService.createControllerDef(config["controllerDef"]) : undefined;
     this.modelDef = config["modelDef"] ? $A.componentService.createModelDef(config["modelDef"]) : undefined;
     this.methodDefs = config["methodDefs"] ? config["methodDefs"]: undefined;
+    this.tokens = config["tokens"] ? config["tokens"] : undefined;
 
     this.interfaces = {};
     var intfConfig = config["interfaces"];
@@ -49,12 +50,11 @@ function ComponentDef(config) {
             this.interfaces[intfName] = true;
         }
     }
-    
+
     // Initialize the concrete component class if provided
-    var componentClassDef = config["componentClass"];
-    if (componentClassDef && !$A.componentService.hasComponentClass(config["descriptor"])) {
-		componentClassDef = $A.util.json.decode(componentClassDef);
-    	componentClassDef();
+    if (config.hasOwnProperty("componentClass")) {
+		var componentClass = $A.util.json.decode(config["componentClass"]);
+    	componentClass();
     }
 
     var appHandlerDefs;

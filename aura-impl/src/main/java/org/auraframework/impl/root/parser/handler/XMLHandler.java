@@ -42,7 +42,7 @@ public abstract class XMLHandler<T extends Definition> {
 
     public final static Set<String> SYSTEM_TAGS = ImmutableSet.of(ApplicationDefHandler.TAG,
             AttributeDefHandler.TAG, ComponentDefHandler.TAG, EventDefHandler.TAG, InterfaceDefHandler.TAG,
-            EventHandlerDefHandler.TAG, ImportDefHandler.TAG, MethodDefHandler.TAG,RegisterEventHandler.TAG, 
+            EventHandlerDefHandler.TAG, LibraryDefRefHandler.TAG, MethodDefHandler.TAG,RegisterEventHandler.TAG, 
             AttributeDefRefHandler.TAG,
             DependencyDefHandler.TAG, TokensDefHandler.TAG, DesignDefHandler.TAG,
             DesignAttributeDefHandler.TAG, DesignTemplateDefHandler.TAG, DesignTemplateRegionDefHandler.TAG,

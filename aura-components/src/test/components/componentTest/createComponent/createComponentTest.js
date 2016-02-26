@@ -85,6 +85,42 @@
             });
         }
     },
+    
+    /**
+     * Test to guard component creation when libraries are attached.
+     * Bug: W-2949123
+     */
+    testAsyncCmpCreationWithLibrary:{
+        test:function(){
+            var actualDef, actualCmp;
+            var actionComplete = false;
+            //Verify that component is not already on client (in app.js or in cache)
+            $A.test.assertUndefinedOrNull($A.componentService.getDef("test:libraryTest",true));
+            $A.createComponent("test:libraryTest", {},function(newCmp){
+            	//checks that getDef does not error out when the definition has a library
+            	actualDef = $A.componentService.getDef("test:libraryTest", true);
+            	actualCmp = newCmp;
+            	actionComplete = true;
+            });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
+                //verify that the definition was obtained and not error out when the definition has a library
+            	$A.test.assertNotUndefinedOrNull(actualDef);
+                var helper = actualCmp.getDef().getHelper();
+                
+                //check for imports exist in cmp
+                $A.test.assertDefined(helper.imported);
+                $A.test.assertDefined(helper.imported.basicFirst);
+                $A.test.assertEquals("BASIC1", helper.imported.basicFirst());
+                
+                //check for multiple external imports exist in cmp
+                $A.test.assertDefined(helper.externallyImported);
+                $A.test.assertDefined(helper.externallyImported.handlesMultipleImportsAlso);
+                $A.test.assertEquals("EXT_MULTIPLE2:EXT1|EXT2|BASIC1|BASIC2|", helper.externallyImported
+                        .handlesMultipleImportsAlso());
+            });
+        }
+    },
 
     testCreatesButtonComponentWithPressEvent:{
         test:[function(component){

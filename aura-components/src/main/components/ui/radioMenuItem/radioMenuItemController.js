@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 ({
+
     select : function(component, event, helper) {
-        if (component.get("v.disabled")) {
+        var concreteComponent = component.getConcreteComponent();
+
+        if (concreteComponent.get("v.disabled")) {
             return;
         }
 
-        var current = component.get("v.selected");
+        var current = concreteComponent.get("v.selected");
         if (current === false) {
-            component.set("v.selected", !current);
+            concreteComponent.set("v.selected", true);
         }
 
-        helper.fireSelectEvent(component, event, {
+        helper.fireSelectEvent(concreteComponent, event, {
             "deselectSiblings": true
         });
     }

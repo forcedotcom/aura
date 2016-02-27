@@ -11,18 +11,24 @@ function AuraInspectorComponentTree(devtoolsPanel) {
     var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
     var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
 
+    var labels = {
+        refresh: chrome.i18n.getMessage("menu_refresh"),
+        expandall: chrome.i18n.getMessage("componenttree_menu_expandall"),
+        showids: chrome.i18n.getMessage("menu_refresh")
+    };
+
     var markup = `
         <div class="grid grid-columns scroll-wrapper">
           <menu type="toolbar" class="flex no-flex">
               <li>
-                <button id="refresh-button" class="refresh-status-bar-item status-bar-item" title="Refresh">
+                <button id="refresh-button" class="refresh-status-bar-item status-bar-item" title="${labels.refresh}">
                   <div class="glyph toolbar-button-theme"></div>
                   <div class="glyph shadow"></div>
                 </button>
               </li>
               <li>
                 <button id="expandall-button" class="text-button">
-                  <span>Expand All</span>
+                  <span>${labels.expandall}</span>
                 </button>
               </li>
               <li class="divider"></li>

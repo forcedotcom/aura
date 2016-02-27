@@ -1,0 +1,111 @@
+{
+	"manifest_name": {
+		"message": "Aura Inspector",
+		"desccription": "Public title that shows up in the list of extensions the user has installed."
+	},
+	"manifest_description": {
+		"message": "For inspecting Aura apps",
+		"desccription": "Description that shows up in the list of extensions the user has installed."
+	},
+	"devtools_tabname": {
+		"message": "Aura",
+		"description": "The tab that shows up in the chrome devtools"
+	},
+	"tabs_componentree": {
+		"message": "Component Tree",
+		"desccription": ""
+	},
+	"tabs_performance": {
+		"message": "Performance",
+		"desccription": ""
+	},
+	"tabs_transactions": {
+		"message": "Transactions",
+		"desccription": ""
+	},
+	"tabs_eventlog": {
+		"message": "Event Log",
+		"desccription": ""
+	},
+	"tabs_actions": {
+		"message": "Actions",
+		"desccription": ""
+	},
+	"tabs_storage": {
+		"message": "Storage",
+		"desccription": ""
+	},
+	"menu_refresh": {
+		"message": "Refresh",
+		"desccription": ""
+	},
+	"menu_record": {
+		"message": "Toggle Recording",
+		"desccription": ""
+	},
+	"menu_clear": {
+		"message": "Clear",
+		"desccription": ""
+	},
+	"menu_filter": {
+		"message": "Filter",
+		"desccription": ""
+	},
+	"componenttree_menu_expandall": {
+		"message": "Expand All",
+		"desccription": ""
+	},
+	"componenttree_menu_showids": {
+		"message": "Show Global IDs",
+		"desccription": ""
+	},
+	"performance_menu_showcollected": {
+		"message": "Show Current Collected",
+		"desccription": ""
+	},
+	"eventlog_menu_appevents": {
+		"message": "App Events",
+		"desccription": ""
+	},
+	"eventlog_menu_cmpevents": {
+		"message": "Cmp Events",
+		"desccription": ""
+	},
+	"eventlog_menu_unhandled": {
+		"message": "Unhandled",
+		"desccription": ""
+	},
+	"actions_menu_storable": {
+		"message": "Storable",
+		"desccription": ""
+	},
+	"actions_menu_cached": {
+		"message": "Cached",
+		"desccription": ""
+	},
+	"actions_menu_background": {
+		"message": "Background",
+		"desccription": ""
+	},
+	"actions_menu_success": {
+		"message": "Success",
+		"desccription": ""
+	},
+	"actions_menu_incomplete": {
+		"message": "Incomplete",
+		"desccription": ""
+	},
+	"actions_menu_error": {
+		"message": "Error",
+		"desccription": ""
+	},
+	"actions_menu_aborted": {
+		"message": "Aborted",
+		"desccription": ""
+	}
+	/*,
+	"": {
+		"message": "",
+		"desccription": ""
+	}*/
+}

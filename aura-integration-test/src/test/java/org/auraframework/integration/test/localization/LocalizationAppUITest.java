@@ -172,10 +172,10 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         // Tab out
         elementInput.click();
         elementInput.clear();
-        elementInput.sendKeys(".2235");
+        elementInput.sendKeys("22.35");
         auraUITestingUtil.pressTab(elementInput);
 
-        assertEquals("InputPercent component rendered with wrong value", ".2235", elementInput.getAttribute("value"));
+        assertEquals("InputPercent component rendered with wrong value", "22%", elementInput.getAttribute("value"));
         assertEquals("outputPercent component rendered with wrong value", "22%", elementoutput.getText());
 
         // Submit click
@@ -185,8 +185,8 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='Percent']"));
         elementButton.click();
 
-        assertEquals("InputPercent component rendered with wrong value", "1.2235", elementInput.getAttribute("value"));
-        assertEquals("outputPercent component rendered with wrong value", "122%", elementoutput.getText());
+        assertEquals("InputPercent component rendered with wrong value", "1%", elementInput.getAttribute("value"));
+        assertEquals("outputPercent component rendered with wrong value", "1%", elementoutput.getText());
     }
 
     // Excluded on mobile browsers for lack of tab support

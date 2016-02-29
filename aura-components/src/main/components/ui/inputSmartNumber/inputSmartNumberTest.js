@@ -29,7 +29,7 @@
     testZero: {
         attributes: {value: 0},
         test: function (component) {
-            this.assertValue(component, "0", "");
+            this.assertValue(component, 0, "");
         }
     },
 

@@ -15,28 +15,24 @@
  */
 package org.auraframework.impl.design;
 
-import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import javax.management.modelmbean.XMLParseException;
-
+import com.google.common.collect.Sets;
 import org.auraframework.def.design.DesignItemsDef;
 import org.auraframework.def.design.DesignLayoutAttributeDef;
 import org.auraframework.def.design.DesignLayoutComponentDef;
 import org.auraframework.def.design.DesignLayoutItemDef;
-import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.impl.system.BaseXmlElementImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
 
-import com.google.common.collect.Sets;
+import javax.management.modelmbean.XMLParseException;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-public class DesignItemsDefImpl extends DefinitionImpl<DesignItemsDef> implements DesignItemsDef{
+public class DesignItemsDefImpl extends BaseXmlElementImpl implements DesignItemsDef {
 
     private static final long serialVersionUID = 4644414865773818291L;
-    private Set<DesignLayoutItemDef> items;
     private final String name;
+    private Set<DesignLayoutItemDef> items;
 
     protected DesignItemsDefImpl(Builder builder) {
         super(builder);
@@ -55,9 +51,6 @@ public class DesignItemsDefImpl extends DefinitionImpl<DesignItemsDef> implement
     }
 
     @Override
-    public void serialize(Json json) throws IOException { }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -74,7 +67,7 @@ public class DesignItemsDefImpl extends DefinitionImpl<DesignItemsDef> implement
         return name != null ? name.hashCode() : 0;
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<DesignItemsDef> {
+    public static class Builder extends BaseBuilderImpl {
         private LinkedHashSet<DesignLayoutItemDef> items = Sets.newLinkedHashSet();
         //Default value is an empty string
         private String name = "";
@@ -82,7 +75,6 @@ public class DesignItemsDefImpl extends DefinitionImpl<DesignItemsDef> implement
             super(DesignItemsDef.class);
         }
 
-        @Override
         public DesignItemsDef build() throws QuickFixException {
             return new DesignItemsDefImpl(this);
         }

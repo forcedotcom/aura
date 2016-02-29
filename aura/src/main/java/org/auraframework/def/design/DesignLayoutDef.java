@@ -15,11 +15,11 @@
  */
 package org.auraframework.def.design;
 
-import org.auraframework.def.Definition;
+import org.auraframework.def.BaseXmlElement;
 
 import java.util.Set;
 
-public interface DesignLayoutDef extends Definition {
+public interface DesignLayoutDef extends BaseXmlElement {
     /**
      * Get the set of sections defined under a layout
      * @return a set

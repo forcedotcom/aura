@@ -15,20 +15,17 @@
  */
 package org.auraframework.impl.design;
 
-import java.io.IOException;
+import com.google.common.collect.Sets;
+import org.auraframework.def.design.DesignItemsDef;
+import org.auraframework.def.design.DesignSectionDef;
+import org.auraframework.impl.system.BaseXmlElementImpl;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.auraframework.def.design.DesignItemsDef;
-import org.auraframework.def.design.DesignSectionDef;
-import org.auraframework.impl.system.DefinitionImpl;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
-
-import com.google.common.collect.Sets;
-
-public class DesignSectionDefImpl extends DefinitionImpl<DesignSectionDef> implements DesignSectionDef {
+public class DesignSectionDefImpl extends BaseXmlElementImpl implements DesignSectionDef {
 
     private static final long serialVersionUID = -4702186496331871091L;
     private final Set<DesignItemsDef> items;
@@ -58,9 +55,6 @@ public class DesignSectionDefImpl extends DefinitionImpl<DesignSectionDef> imple
     }
 
     @Override
-    public void serialize(Json json) throws IOException { }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -77,7 +71,7 @@ public class DesignSectionDefImpl extends DefinitionImpl<DesignSectionDef> imple
         return name.hashCode();
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<DesignSectionDef> {
+    public static class Builder extends BaseBuilderImpl {
 
         private LinkedHashSet<DesignItemsDef> items = Sets.newLinkedHashSet();
         //Default name for a section is an empty string.
@@ -100,7 +94,6 @@ public class DesignSectionDefImpl extends DefinitionImpl<DesignSectionDef> imple
             this.name = name;
         }
 
-        @Override
         public DesignSectionDef build() throws QuickFixException {
             return new DesignSectionDefImpl(this);
         }

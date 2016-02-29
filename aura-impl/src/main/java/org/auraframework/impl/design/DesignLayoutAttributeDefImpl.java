@@ -15,14 +15,11 @@
  */
 package org.auraframework.impl.design;
 
-import java.io.IOException;
-
 import org.auraframework.def.design.DesignLayoutAttributeDef;
-import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.impl.system.BaseXmlElementImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
 
-public class DesignLayoutAttributeDefImpl extends DefinitionImpl<DesignLayoutAttributeDef> implements DesignLayoutAttributeDef {
+public class DesignLayoutAttributeDefImpl extends BaseXmlElementImpl implements DesignLayoutAttributeDef {
 
     private static final long serialVersionUID = 5394555836660607465L;
     private final String name;
@@ -36,9 +33,6 @@ public class DesignLayoutAttributeDefImpl extends DefinitionImpl<DesignLayoutAtt
     public String getName() {
         return name;
     }
-
-    @Override
-    public void serialize(Json json) throws IOException { }
 
     @Override
     public boolean equals(Object o) {
@@ -57,7 +51,7 @@ public class DesignLayoutAttributeDefImpl extends DefinitionImpl<DesignLayoutAtt
         return name.hashCode();
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<DesignLayoutAttributeDef> {
+    public static class Builder extends BaseBuilderImpl {
         private String name;
         public Builder() {
             super(DesignLayoutAttributeDef.class);
@@ -67,7 +61,6 @@ public class DesignLayoutAttributeDefImpl extends DefinitionImpl<DesignLayoutAtt
             this.name = name;
         }
 
-        @Override
         public DesignLayoutAttributeDef build() throws QuickFixException {
             return new DesignLayoutAttributeDefImpl(this);
         }

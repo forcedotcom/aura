@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package configuration;
 
 import org.auraframework.Aura;
@@ -30,6 +31,7 @@ import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.clientlibrary.ClientLibraryService;
+import org.auraframework.def.genericxml.RootLevelGenericXmlValidator;
 import org.auraframework.impl.BuilderServiceImpl;
 import org.auraframework.impl.CachingServiceImpl;
 import org.auraframework.impl.ContextAdapterImpl;
@@ -80,6 +82,7 @@ import org.auraframework.impl.context.AuraContextServiceImpl;
 import org.auraframework.impl.context.AuraPrefixDefaultsProviderImpl;
 import org.auraframework.impl.context.AuraRegistryProviderImpl;
 import org.auraframework.impl.context.LocalizationAdapterImpl;
+import org.auraframework.impl.design.DesignOptionsValidator;
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.impl.java.type.converter.LocalizedBigDecimalToStringConverter;
 import org.auraframework.impl.java.type.converter.LocalizedDateOnlyToStringConverter;
@@ -432,5 +435,10 @@ public class AuraImplConfig {
     @Impl
     public static TestContextAdapter auraImplTestContextAdapter() {
         return Aura.getConfigAdapter().isProduction() ? null : new TestContextAdapterImpl();
+    }
+
+    @Impl
+    public static RootLevelGenericXmlValidator designOptionsValidator() {
+        return new DesignOptionsValidator();
     }
 }

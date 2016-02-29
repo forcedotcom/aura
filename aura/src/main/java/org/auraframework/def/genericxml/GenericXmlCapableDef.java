@@ -13,16 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def.design;
 
-import org.auraframework.def.BaseXmlElement;
+package org.auraframework.def.genericxml;
 
+import javax.annotation.Nonnull;
 import java.util.Set;
 
-public interface DesignSectionDef extends BaseXmlElement {
+/**
+ * Describes that the definition is capable of handling GenericXml tags.
+ */
+public interface GenericXmlCapableDef {
+
     /**
-     * get a set of design items found under a section
-     * @return a set of items
+     * Returns a set of all GenericXmlTags
      */
-    Set<DesignItemsDef> getItems();
+    @Nonnull
+    Set<GenericXmlElement> getGenericTags();
+
+    /**
+     * Returns a set of GenericXmlDef given a class that the Validator specifies.
+     * See {@link GenericXmlValidator#definition}
+     *
+     * @param validatorClass class used to map elements
+     */
+    @Nonnull
+    Set<GenericXmlElement> getGenericTags(Class<? extends GenericXmlValidator> validatorClass);
 }

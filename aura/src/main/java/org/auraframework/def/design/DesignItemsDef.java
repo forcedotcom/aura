@@ -15,11 +15,11 @@
  */
 package org.auraframework.def.design;
 
-import org.auraframework.def.Definition;
+import org.auraframework.def.BaseXmlElement;
 
 import java.util.Set;
 
-public interface DesignItemsDef extends Definition {
+public interface DesignItemsDef extends BaseXmlElement {
     /**
      * Returns a set of sections, each section contains a set of items.
      * @return a set of designItem

@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.impl.system;
-
-import java.io.IOException;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
-import org.auraframework.impl.util.*;
+import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.impl.util.TypeParser;
 import org.auraframework.impl.util.TypeParser.Type;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
@@ -33,11 +32,15 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import java.io.IOException;
+
 /**
  */
 public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T> {
     private static final long serialVersionUID = 3030118554156737974L;
-    private final DefDescriptor<?> bundle;
+    private static CachingService cSrv = Aura.getCachingService();
     protected final String namespace;
     protected final String name;
     protected final String qualifiedName;
@@ -45,26 +48,8 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     protected final String prefix;
     protected final String nameParameters;
     protected final DefType defType;
-
+    private final DefDescriptor<?> bundle;
     private final int hashCode;
-
-    private static CachingService cSrv = Aura.getCachingService();
-
-    public static String buildQualifiedName(String prefix, String namespace, String name) {
-        if (namespace == null) {
-            return String.format("%s://%s", prefix, name);
-        }
-        String format = MARKUP_PREFIX.equals(prefix) ? "%s://%s:%s" : "%s://%s.%s";
-        return String.format(format, prefix, namespace, name);
-    }
-
-    private static String buildDescriptorName(String prefix, String namespace, String name) {
-        if (namespace == null) {
-            return String.format("%s", name);
-        }
-        String format = MARKUP_PREFIX.equals(prefix) ? "%s:%s" : "%s.%s";
-        return String.format(format, namespace, name);
-    }
 
     protected DefDescriptorImpl(DefDescriptor<?> associate, Class<T> defClass, String newPrefix) {
         LoggingService loggingService = Aura.getLoggingService();
@@ -121,8 +106,8 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                     prefix = clazz.prefix;
                     namespace = clazz.namespace;
                     name = clazz.name;
-                    
-                    if (clazz.nameParameters != null 
+
+                    if (clazz.nameParameters != null
                         && defType == org.auraframework.def.DefDescriptor.DefType.TYPE) {
 
                         nameParameters = clazz.nameParameters;
@@ -146,12 +131,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case ATTRIBUTE_DESIGN:
             case DESIGN_TEMPLATE:
             case DESIGN_TEMPLATE_REGION:
-            case DESIGN_LAYOUT:
-            case DESIGN_LAYOUT_SECTION:
-            case DESIGN_LAYOUT_SECTION_ITEMS:
-            case DESIGN_LAYOUT_SECTION_ITEMS_ATTRIBUTE:
-            case DESIGN_LAYOUT_SECTION_ITEMS_COMPONENT:
-            case DESIGN_OPTION:
             case INCLUDE_REF:
             case FLAVOR_INCLUDE:
             case FLAVOR_DEFAULT:
@@ -206,87 +185,20 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         this(qualifiedName, defClass, null);
     }
 
-    private int createHashCode() {
-        return (bundle == null ? 0 : bundle.hashCode())
-                + AuraUtil.hashCodeLowerCase(name, namespace, prefix, defType.ordinal());
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getNamespace() {
-        return this.namespace;
-    }
-
-    @Override
-    public String getQualifiedName() {
-        return this.qualifiedName;
-    }
-
-    @Override
-    public String getDescriptorName() {
-        return descriptorName;
-    }
-
-    @Override
-    public DefType getDefType() {
-        return this.defType;
-    }
-
-    @Override
-    public String getNameParameters() {
-        return nameParameters;
-    }
-
-    @Override
-    public void serialize(Json json) throws IOException {
-        json.writeValue(qualifiedName);
-    }
-
-    @Override
-    public String toString() {
-        return qualifiedName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof DefDescriptor) {
-            DefDescriptor<?> e = (DefDescriptor<?>) o;
-            return (bundle == e.getBundle() || (bundle != null && bundle.equals(e.getBundle())))
-                    && getDefType() == e.getDefType() && name.equalsIgnoreCase(e.getName())
-                    && (namespace == null ? e.getNamespace() == null : namespace.equalsIgnoreCase(e.getNamespace()))
-                    && (prefix == null ? e.getPrefix() == null : prefix.equalsIgnoreCase(e.getPrefix()));
+    public static String buildQualifiedName(String prefix, String namespace, String name) {
+        if (namespace == null) {
+            return String.format("%s://%s", prefix, name);
         }
-        return false;
+        String format = MARKUP_PREFIX.equals(prefix) ? "%s://%s:%s" : "%s://%s.%s";
+        return String.format(format, prefix, namespace, name);
     }
 
-    @Override
-    public final int hashCode() {
-        return hashCode;
-    }
-
-    /**
-     * @return Returns the prefix.
-     */
-    @Override
-    public String getPrefix() {
-        return prefix;
-    }
-
-    @Override
-    public DefDescriptor<?> getBundle() {
-        return this.bundle;
-    }
-
-    /**
-     * @return Returns isParameterized.
-     */
-    @Override
-    public boolean isParameterized() {
-        return nameParameters != null;
+    private static String buildDescriptorName(String prefix, String namespace, String name) {
+        if (namespace == null) {
+            return String.format("%s", name);
+        }
+        String format = MARKUP_PREFIX.equals(prefix) ? "%s:%s" : "%s.%s";
+        return String.format(format, namespace, name);
     }
 
     private static <E extends Definition> DefDescriptor<E> buildInstance(String qualifiedName,
@@ -385,37 +297,12 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         return getInstance(sb.toString(), defType.getPrimaryInterface(), null);
     }
 
-    /**
-     * @see DefDescriptor#getDef()
-     */
-    @Override
-    public T getDef() throws QuickFixException {
-        return Aura.getDefinitionService().getDefinition(this);
-    }
-
     public static <E extends Definition> DefDescriptor<E> getAssociateDescriptor(DefDescriptor<?> desc,
             Class<E> defClass, String newPrefix) {
         if (desc == null) {
             throw new AuraRuntimeException("descriptor is null");
         }
         return new DefDescriptorImpl<>(desc, defClass, newPrefix);
-    }
-
-    /**
-     * @see DefDescriptor#exists()
-     */
-    @Override
-    public boolean exists() {
-        return Aura.getContextService().getCurrentContext().getDefRegistry().exists(this);
-    }
-
-    /**
-     * Compares one {@link DefDescriptor} to another. Sorting uses (only) the qualified name, case insensitively. Per
-     * {@link Comparable}'s spec, throws {@link ClassCastException} if {@code arg} is not a {@code DefDescriptor}.
-     */
-    @Override
-    public int compareTo(DefDescriptor<?> other) {
-        return compare(this, other);
     }
 
     /**
@@ -449,5 +336,113 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         }
 
         return compare(dd1.getBundle(), dd2.getBundle());
+    }
+
+    private int createHashCode() {
+        return (bundle == null ? 0 : bundle.hashCode())
+                + AuraUtil.hashCodeLowerCase(name, namespace, prefix, defType.ordinal());
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getNamespace() {
+        return this.namespace;
+    }
+
+    @Override
+    public String getQualifiedName() {
+        return this.qualifiedName;
+    }
+
+    @Override
+    public String getDescriptorName() {
+        return descriptorName;
+    }
+
+    @Override
+    public DefType getDefType() {
+        return this.defType;
+    }
+
+    @Override
+    public String getNameParameters() {
+        return nameParameters;
+    }
+
+    @Override
+    public void serialize(Json json) throws IOException {
+        json.writeValue(qualifiedName);
+    }
+
+    @Override
+    public String toString() {
+        return qualifiedName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof DefDescriptor) {
+            DefDescriptor<?> e = (DefDescriptor<?>) o;
+            return (bundle == e.getBundle() || (bundle != null && bundle.equals(e.getBundle())))
+                    && getDefType() == e.getDefType() && name.equalsIgnoreCase(e.getName())
+                    && (namespace == null ? e.getNamespace() == null : namespace.equalsIgnoreCase(e.getNamespace()))
+                    && (prefix == null ? e.getPrefix() == null : prefix.equalsIgnoreCase(e.getPrefix()));
+        }
+        return false;
+    }
+
+    @Override
+    public final int hashCode() {
+        return hashCode;
+    }
+
+    /**
+     * @return Returns the prefix.
+     */
+    @Override
+    public String getPrefix() {
+        return prefix;
+    }
+
+    @Override
+    public DefDescriptor<?> getBundle() {
+        return this.bundle;
+    }
+
+    /**
+     * @return Returns isParameterized.
+     */
+    @Override
+    public boolean isParameterized() {
+        return nameParameters != null;
+    }
+
+    /**
+     * @see DefDescriptor#getDef()
+     */
+    @Override
+    public T getDef() throws QuickFixException {
+        return Aura.getDefinitionService().getDefinition(this);
+    }
+
+    /**
+     * @see DefDescriptor#exists()
+     */
+    @Override
+    public boolean exists() {
+        return Aura.getContextService().getCurrentContext().getDefRegistry().exists(this);
+    }
+
+    /**
+     * Compares one {@link DefDescriptor} to another. Sorting uses (only) the qualified name, case insensitively. Per
+     * {@link Comparable}'s spec, throws {@link ClassCastException} if {@code arg} is not a {@code DefDescriptor}.
+     */
+    @Override
+    public int compareTo(DefDescriptor<?> other) {
+        return compare(this, other);
     }
 }

@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+package org.auraframework.def;
 
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignDef;
-import org.auraframework.def.design.DesignItemsDef;
-import org.auraframework.def.design.DesignLayoutAttributeDef;
-import org.auraframework.def.design.DesignLayoutComponentDef;
-import org.auraframework.def.design.DesignLayoutDef;
-import org.auraframework.def.design.DesignOptionDef;
-import org.auraframework.def.design.DesignSectionDef;
 import org.auraframework.def.design.DesignTemplateDef;
 import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A descriptor "handle" for a definition. For applications which care about sorting, such as generating a unique hash
@@ -43,161 +38,13 @@ import org.auraframework.util.json.JsonSerializable;
 public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         Serializable, Comparable<DefDescriptor<?>> {
 
-    public static final String MARKUP_PREFIX = "markup";
-    public static final String CSS_PREFIX = "css";
-    public static final String TEMPLATE_CSS_PREFIX = "templateCss";
-    public static final String CUSTOM_FLAVOR_PREFIX = "customFlavorCss";
-    public static final String JAVASCRIPT_PREFIX = "js";
-    public static final String COMPOUND_PREFIX = "compound";
-    public static final String JAVA_PREFIX = "java";
-
-    public static final class DescriptorKey {
-        private final String name;
-        private final Class<? extends Definition> clazz;
-        private final DefDescriptor<? extends Definition> bundle;
-
-        public DescriptorKey(String name, Class<? extends Definition> clazz) {
-            this(name, clazz, null);
-        }
-
-        public DescriptorKey(String name, Class<? extends Definition> clazz, DefDescriptor<? extends Definition> bundle) {
-            // FIXME: this case flattening would remove the extra copies of
-            // definitions.
-            // If we go case sensitive, we won't want it though.
-            // this.qualifiedName = qualifiedName.toLowerCase();
-            this.name = name;
-            this.clazz = clazz;
-            this.bundle = bundle;
-        }
-
-        @Override
-        public int hashCode() {
-            return name.hashCode() + clazz.hashCode() + (bundle != null ? bundle.hashCode() : 0);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (!(obj instanceof DescriptorKey)) {
-                return false;
-            }
-            DescriptorKey dk = (DescriptorKey) obj;
-            return dk.clazz.equals(clazz) && dk.name.equals(name)
-                    && (dk.bundle == bundle || dk.bundle != null && dk.bundle.equals(bundle));
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Class<? extends Definition> getClazz() {
-            return clazz;
-        }
-
-        public DefDescriptor<? extends Definition> getBundle() {
-            return bundle;
-        }
-    }
-
-    public static enum DefType {
-        ATTRIBUTE(AttributeDef.class), //
-        APPLICATION(ApplicationDef.class, true), //
-        COMPONENT(ComponentDef.class, true), //
-        EVENT(EventDef.class, true), //
-        HELPER(HelperDef.class), //
-        INTERFACE(InterfaceDef.class, true), //
-        CONTROLLER(ControllerDef.class), //
-        METHOD(MethodDef.class), //
-        MODEL(ModelDef.class), //
-        LIBRARY(LibraryDef.class, true), //
-        INCLUDE(IncludeDef.class), //
-        INCLUDE_REF(IncludeDefRef.class), //
-        RENDERER(RendererDef.class), //
-        ACTION(ActionDef.class), //
-        TYPE(TypeDef.class), //
-        STYLE(StyleDef.class), //
-        FLAVORED_STYLE(FlavoredStyleDef.class), //
-        FLAVORS(FlavorsDef.class), //
-        FLAVOR_DEFAULT(FlavorDefaultDef.class), //
-        FLAVOR_INCLUDE(FlavorIncludeDef.class), //
-        FLAVOR_BUNDLE(FlavorBundleDef.class, true), //
-        TOKEN(TokenDef.class), //
-        TOKENS(TokensDef.class, true), //
-        TOKENS_IMPORT(TokensImportDef.class), //
-        TOKEN_DESCRIPTOR_PROVIDER(TokenDescriptorProviderDef.class), //
-        TOKEN_MAP_PROVIDER(TokenMapProviderDef.class), //
-        DOCUMENTATION(DocumentationDef.class), //
-        DESCRIPTION(DescriptionDef.class), //
-        EXAMPLE(ExampleDef.class), //
-        TESTSUITE(TestSuiteDef.class), //
-        TESTCASE(TestCaseDef.class), //
-        PROVIDER(ProviderDef.class), //
-        REQUIRED_VERSION(RequiredVersionDef.class), //
-        RESOURCE(ResourceDef.class),
-        DESIGN(DesignDef.class),
-        ATTRIBUTE_DESIGN(DesignAttributeDef.class),
-        DESIGN_TEMPLATE(DesignTemplateDef.class),
-        DESIGN_TEMPLATE_REGION(DesignTemplateRegionDef.class),
-        DESIGN_LAYOUT(DesignLayoutDef.class),
-        DESIGN_LAYOUT_SECTION(DesignSectionDef.class),
-        DESIGN_LAYOUT_SECTION_ITEMS(DesignItemsDef.class),
-        DESIGN_LAYOUT_SECTION_ITEMS_ATTRIBUTE(DesignLayoutAttributeDef.class),
-        DESIGN_LAYOUT_SECTION_ITEMS_COMPONENT(DesignLayoutComponentDef.class),
-        DESIGN_OPTION(DesignOptionDef.class),
-        SVG(SVGDef.class);
-
-        private static Map<Class<? extends Definition>, DefType> defTypeMap;
-
-        private final Class<? extends Definition> clz;
-        private final boolean definesBundle;
-        private DefType(Class<? extends Definition> clz) {
-            this(clz, false);
-        }
-
-        private DefType(Class<? extends Definition> clz, boolean definesBundle) {
-            this.clz = clz;
-            this.definesBundle = definesBundle;
-            mapDefType(clz, this);
-        }
-
-        private static void mapDefType(Class<? extends Definition> clz, DefType defType) {
-            if (defTypeMap == null) {
-                defTypeMap = new HashMap<>();
-            }
-
-            defTypeMap.put(clz, defType);
-        }
-
-        public Class<? extends Definition> getPrimaryInterface() {
-            return clz;
-        }
-
-        /**
-         * Indicated this def type can stand alone in a bundle.
-         */
-        public boolean definesBundle() {
-            return definesBundle;
-        }
-
-        public static boolean hasDefType(Class<?> primaryInterface) {
-            return defTypeMap.containsKey(primaryInterface);
-        }
-
-        public static DefType getDefType(
-                Class<? extends Definition> primaryInterface) {
-            DefType ret = defTypeMap.get(primaryInterface);
-            if (ret == null) {
-                String message = String
-                        .format("Unsupported Java Interface %s specified for DefDescriptor. Valid types are : %s",
-                                primaryInterface.getName(), defTypeMap.keySet()
-                                        .toString());
-                throw new AuraRuntimeException(message);
-            }
-            return ret;
-        }
-    }
+    String MARKUP_PREFIX = "markup";
+    String CSS_PREFIX = "css";
+    String TEMPLATE_CSS_PREFIX = "templateCss";
+    String CUSTOM_FLAVOR_PREFIX = "customFlavorCss";
+    String JAVASCRIPT_PREFIX = "js";
+    String COMPOUND_PREFIX = "compound";
+    String JAVA_PREFIX = "java";
 
     /**
      * @return The name of this descriptor
@@ -263,4 +110,145 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
      * @return true if the definition represented by this descriptor exists at all. does not compile the definition
      */
     boolean exists();
+
+    enum DefType {
+        ATTRIBUTE(AttributeDef.class), //
+        APPLICATION(ApplicationDef.class, true), //
+        COMPONENT(ComponentDef.class, true), //
+        EVENT(EventDef.class, true), //
+        HELPER(HelperDef.class), //
+        INTERFACE(InterfaceDef.class, true), //
+        CONTROLLER(ControllerDef.class), //
+        METHOD(MethodDef.class), //
+        MODEL(ModelDef.class), //
+        LIBRARY(LibraryDef.class, true), //
+        INCLUDE(IncludeDef.class), //
+        INCLUDE_REF(IncludeDefRef.class), //
+        RENDERER(RendererDef.class), //
+        ACTION(ActionDef.class), //
+        TYPE(TypeDef.class), //
+        STYLE(StyleDef.class), //
+        FLAVORED_STYLE(FlavoredStyleDef.class), //
+        FLAVORS(FlavorsDef.class), //
+        FLAVOR_DEFAULT(FlavorDefaultDef.class), //
+        FLAVOR_INCLUDE(FlavorIncludeDef.class), //
+        FLAVOR_BUNDLE(FlavorBundleDef.class, true), //
+        TOKEN(TokenDef.class), //
+        TOKENS(TokensDef.class, true), //
+        TOKENS_IMPORT(TokensImportDef.class), //
+        TOKEN_DESCRIPTOR_PROVIDER(TokenDescriptorProviderDef.class), //
+        TOKEN_MAP_PROVIDER(TokenMapProviderDef.class), //
+        DOCUMENTATION(DocumentationDef.class), //
+        DESCRIPTION(DescriptionDef.class), //
+        EXAMPLE(ExampleDef.class), //
+        TESTSUITE(TestSuiteDef.class), //
+        TESTCASE(TestCaseDef.class), //
+        PROVIDER(ProviderDef.class), //
+        REQUIRED_VERSION(RequiredVersionDef.class), //
+        RESOURCE(ResourceDef.class),
+        DESIGN(DesignDef.class),
+        ATTRIBUTE_DESIGN(DesignAttributeDef.class),
+        DESIGN_TEMPLATE(DesignTemplateDef.class),
+        DESIGN_TEMPLATE_REGION(DesignTemplateRegionDef.class),
+        SVG(SVGDef.class);
+        private static Map<Class<? extends Definition>, DefType> defTypeMap;
+
+        private final Class<? extends Definition> clz;
+        private final boolean definesBundle;
+        DefType(Class<? extends Definition> clz) {
+            this(clz, false);
+        }
+
+        DefType(Class<? extends Definition> clz, boolean definesBundle) {
+            this.clz = clz;
+            this.definesBundle = definesBundle;
+            mapDefType(clz, this);
+        }
+
+        private static void mapDefType(Class<? extends Definition> clz, DefType defType) {
+            if (defTypeMap == null) {
+                defTypeMap = new HashMap<>();
+            }
+
+            defTypeMap.put(clz, defType);
+        }
+
+        public static boolean hasDefType(Class<?> primaryInterface) {
+            return defTypeMap.containsKey(primaryInterface);
+        }
+
+        public static DefType getDefType(
+                Class<? extends Definition> primaryInterface) {
+            DefType ret = defTypeMap.get(primaryInterface);
+            if (ret == null) {
+                String message = String
+                        .format("Unsupported Java Interface %s specified for DefDescriptor. Valid types are : %s",
+                                primaryInterface.getName(), defTypeMap.keySet()
+                                        .toString());
+                throw new AuraRuntimeException(message);
+            }
+            return ret;
+        }
+
+        public Class<? extends Definition> getPrimaryInterface() {
+            return clz;
+        }
+
+        /**
+         * Indicated this def type can stand alone in a bundle.
+         */
+        public boolean definesBundle() {
+            return definesBundle;
+        }
+    }
+
+    final class DescriptorKey {
+        private final String name;
+        private final Class<? extends Definition> clazz;
+        private final DefDescriptor<? extends Definition> bundle;
+
+        public DescriptorKey(String name, Class<? extends Definition> clazz) {
+            this(name, clazz, null);
+        }
+
+        public DescriptorKey(String name, Class<? extends Definition> clazz, DefDescriptor<? extends Definition> bundle) {
+            // FIXME: this case flattening would remove the extra copies of
+            // definitions.
+            // If we go case sensitive, we won't want it though.
+            // this.qualifiedName = qualifiedName.toLowerCase();
+            this.name = name;
+            this.clazz = clazz;
+            this.bundle = bundle;
+        }
+
+        @Override
+        public int hashCode() {
+            return name.hashCode() + clazz.hashCode() + (bundle != null ? bundle.hashCode() : 0);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof DescriptorKey)) {
+                return false;
+            }
+            DescriptorKey dk = (DescriptorKey) obj;
+            return dk.clazz.equals(clazz) && dk.name.equals(name)
+                    && (dk.bundle == bundle || dk.bundle != null && dk.bundle.equals(bundle));
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Class<? extends Definition> getClazz() {
+            return clazz;
+        }
+
+        public DefDescriptor<? extends Definition> getBundle() {
+            return bundle;
+        }
+    }
 }

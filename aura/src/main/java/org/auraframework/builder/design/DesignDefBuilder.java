@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.builder.design;
 
 import org.auraframework.builder.RootDefinitionBuilder;
@@ -20,7 +21,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignLayoutDef;
-import org.auraframework.def.design.DesignOptionDef;
 import org.auraframework.def.design.DesignTemplateDef;
 
 public interface DesignDefBuilder extends RootDefinitionBuilder<DesignDef> {
@@ -32,6 +32,4 @@ public interface DesignDefBuilder extends RootDefinitionBuilder<DesignDef> {
     public DesignDefBuilder setLabel(String label);
 
     public DesignDefBuilder setDesignTemplateDef(DesignTemplateDef template);
-
-    public DesignDefBuilder addOption(DesignOptionDef option);
 }

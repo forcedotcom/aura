@@ -15,22 +15,18 @@
  */
 package org.auraframework.impl.design;
 
-import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.auraframework.def.DefDescriptor;
+import com.google.common.collect.Sets;
 import org.auraframework.def.design.DesignLayoutDef;
 import org.auraframework.def.design.DesignSectionDef;
-import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.impl.system.BaseXmlElementImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
 
-import com.google.common.collect.Sets;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-public class DesignLayoutDefImpl extends DefinitionImpl<DesignLayoutDef> implements DesignLayoutDef {
+public class DesignLayoutDefImpl extends BaseXmlElementImpl implements DesignLayoutDef {
 
     private static final long serialVersionUID = -6058393181603727999L;
     private final Set<DesignSectionDef> sections;
@@ -53,9 +49,6 @@ public class DesignLayoutDefImpl extends DefinitionImpl<DesignLayoutDef> impleme
     }
 
     @Override
-    public void serialize(Json json) throws IOException { }
-
-    @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
         for (DesignSectionDef section : sections) {
@@ -63,7 +56,7 @@ public class DesignLayoutDefImpl extends DefinitionImpl<DesignLayoutDef> impleme
         }
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<DesignLayoutDef> {
+    public static class Builder extends BaseBuilderImpl {
 
         private LinkedHashSet<DesignSectionDef> sections = Sets.newLinkedHashSet();
         //Default name for a layout is an empty string
@@ -87,12 +80,6 @@ public class DesignLayoutDefImpl extends DefinitionImpl<DesignLayoutDef> impleme
             this.name = name;
         }
 
-        @Override
-        public DefDescriptor<DesignLayoutDef> getDescriptor() {
-            return super.getDescriptor();
-        }
-
-        @Override
         public DesignLayoutDefImpl build() throws QuickFixException {
             return new DesignLayoutDefImpl(this);
         }

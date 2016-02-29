@@ -18,7 +18,7 @@
     testTitle : {
         attributes : {"title" : "title1"},
         test : function(cmp){
-            var element = cmp.find("tabItem").getElement();
+            var element = cmp.find("tabItemAnchor").getElement();
             var text = $A.util.getText(element);
             $A.test.assertEquals("title1", text, "The title of the tabItem element was not correct");       
         }
@@ -34,7 +34,7 @@
     
     //Helper functions
     verifyChildExists : function(cmp, elementName, text){
-        var anchor = cmp.find("tabItem").getElement();
+        var anchor = cmp.find("tabItemAnchor").getElement();
         var img = anchor.getElementsByTagName(elementName)[0];
         $A.test.assertNotUndefinedOrNull(img, text);  
     }

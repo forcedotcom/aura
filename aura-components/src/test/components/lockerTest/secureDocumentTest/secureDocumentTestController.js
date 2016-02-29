@@ -18,7 +18,7 @@
     createElementsPushToMarkup: function(cmp) {
         var docFragment = document.createDocumentFragment();
         var span = document.createElement("span");
-        span.innerText = "hello from the locker";
+        span.setAttribute("lockerAttr", "hello from the locker");
         docFragment.appendChild(span);
         var content = cmp.find("content").getElement();
         content.appendChild(docFragment);

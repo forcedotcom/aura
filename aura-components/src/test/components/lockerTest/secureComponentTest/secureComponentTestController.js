@@ -14,11 +14,11 @@
          );
     },
 
-    getElement: function(cmp) {
+    getElementTest: function(cmp) {
         cmp.set("v.log", cmp.getElement());
     },
 
-    getEvent: function(cmp) {
+    getEventTest: function(cmp) {
         cmp.set("v.log", cmp.getEvent("press"));
     }
 })

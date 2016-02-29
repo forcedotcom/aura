@@ -7,13 +7,10 @@
 
     testCannotAccessDocumentBodyFromHelper: {
         test: function(cmp) {
-            try {
-                cmp.helper.accessDocumentBody();
-                $A.test.fail("Expected error to be thrown trying to access document.body");
-            } catch(e) {
-                $A.test.assertStartsWith("Error: Access denied", e.toString(), "Unexpected error trying to access"
-                        + " document.body");
-            }
+            cmp.helper.accessDocumentBody(cmp);
+            var wrapped = cmp.get("v.log");
+            $A.test.assertStartsWith("ObscureThing", wrapped.toString(), "Expected document.body passed to helper"
+                    + " to be an ObscureThing");
         }
     },
 
@@ -30,7 +27,7 @@
             cmp.getWrappersFromController();
             var wrapped = cmp.get("v.log")["$A"];
             $A.test.assertStartsWith("SecureAura", wrapped.toString(), "Expected $A passed to controller"
-                    + "to be a SecureAura");
+                    + " to be a SecureAura");
         }
     },
 
@@ -39,7 +36,7 @@
             var wrapped = cmp.helper.getWrappersFromHelper()["$A"];
             var wrapped = cmp.get("v.log")["$A"];
             $A.test.assertStartsWith("SecureAura", wrapped.toString(), "Expected $A passed to helper"
-                    + "to be a SecureAura");
+                    + " to be a SecureAura");
         }
     },
 
@@ -47,7 +44,7 @@
         test: function(cmp) {
             var wrapped = cmp.get("v.log")["$A"];
             $A.test.assertStartsWith("SecureAura", wrapped.toString(), "Expected component passed to renderer"
-                    + "to be a SecureAura");
+                    + " to be a SecureAura");
         }
     },
     
@@ -56,7 +53,7 @@
             cmp.getWrappersFromController();
             var wrapped = cmp.get("v.log")["cmp"];
             $A.test.assertStartsWith("SecureComponent", wrapped.toString(), "Expected component passed to controller"
-                    + "to be a SecureComponent");
+                    + " to be a SecureComponent");
         }
     },
 
@@ -64,7 +61,7 @@
         test: function(cmp) {
             var wrapped = cmp.get("v.log")["cmp"];
             $A.test.assertStartsWith("SecureComponent", wrapped.toString(), "Expected component passed to renderer"
-                    + "to be a SecureComponent");
+                    + " to be a SecureComponent");
         }
     },
 
@@ -73,7 +70,7 @@
             cmp.getWrappersFromController();
             var wrapped = cmp.get("v.log")["document"];
             $A.test.assertStartsWith("SecureDocument", wrapped.toString(), "Expected document passed to controller"
-                    + "to be a SecureDocument");
+                    + " to be a SecureDocument");
         }
     },
 
@@ -81,7 +78,7 @@
         test: function(cmp) {
             var wrapped = cmp.helper.getWrappersFromHelper()["document"];
             $A.test.assertStartsWith("SecureDocument", wrapped.toString(), "Expected document passed to helper"
-                    + "to be a SecureDocument");
+                    + " to be a SecureDocument");
         }
     },
 
@@ -89,7 +86,7 @@
         test: function(cmp) {
             var wrapped = cmp.get("v.log")["document"];
             $A.test.assertStartsWith("SecureDocument", wrapped.toString(), "Expected document accessed from renderer"
-                    + "to be a SecureDocument");
+                    + " to be a SecureDocument");
         }
     },
 
@@ -98,7 +95,7 @@
             cmp.getWrappersFromController();
             var wrapped = cmp.get("v.log")["window"];
             $A.test.assertStartsWith("SecureWindow", wrapped.toString(), "Expected window passed to controller"
-                    + "to be a SecureWindow");
+                    + " to be a SecureWindow");
         }
     },
 
@@ -106,7 +103,7 @@
         test: function(cmp) {
             var wrapped = cmp.helper.getWrappersFromHelper()["window"];
             $A.test.assertStartsWith("SecureWindow", wrapped.toString(), "Expected window passed to helper"
-                    + "to be a SecureWindow");
+                    + " to be a SecureWindow");
         }
     },
 
@@ -114,7 +111,7 @@
         test: function(cmp) {
             var wrapped = cmp.get("v.log")["window"];
             $A.test.assertStartsWith("SecureWindow", wrapped.toString(), "Expected window accessed from renderer"
-                    + "to be a SecureWindow");
+                    + " to be a SecureWindow");
         }
     },
 

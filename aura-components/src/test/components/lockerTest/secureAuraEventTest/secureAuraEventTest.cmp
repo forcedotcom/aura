@@ -18,7 +18,7 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
 
-    <aura:method name="getEvent" action="{!c.getEvent}"/>
+    <aura:method name="getEventTest" action="{!c.getEventTest}"/>
 
     <aura:registerevent name="debugLog" type="aura:debugLog"/>
 

@@ -100,7 +100,8 @@
     "SecureScriptElement": true,
     "SecureIFrameElement": true,
     "SecureDOMEvent": true,
-    "SecureAuraEvent": true
+    "SecureAuraEvent": true,
+    "ObscureThing": true
   },
 
   "rules": {

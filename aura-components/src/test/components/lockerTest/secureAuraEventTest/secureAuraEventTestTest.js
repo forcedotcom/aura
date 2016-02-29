@@ -6,16 +6,15 @@
 
     testGetEventSourceReturnsSecureComponent: {
         test: function(cmp) {
-            cmp.getEvent();
+            cmp.getEventTest();
             var event = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureComponent", event.source.toString());
             $A.test.assertStartsWith("SecureComponent", event.getSource().toString());
         }
     },
-    
+
     testExerciseEventAPIs: {
         test: function(cmp) {
-            cmp.getEvent();
+            cmp.getEventTest();
             var event = cmp.get("v.log");
             var params = { "type": "event", "message": "testMessage" };
             event.setParams(params);

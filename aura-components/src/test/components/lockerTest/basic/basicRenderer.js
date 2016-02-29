@@ -24,7 +24,7 @@
 			component : component,
 			helper : helper
 		}));
-		
+
 		// Try to access document.body
 		try {
 			var body = document.body;
@@ -76,25 +76,19 @@
 
 		// Visible div should now exist in the DOM Document
 		helper.verifyElementCount("smoothAsButter", 1);
-		
-		function testNoAccess(scenario, successMessage) {
-			try {
-				scenario();
-				throw new Error("Senario should not have successed: " + successMessage);
-			} catch (x) {
-				if (x.toString().indexOf("Access denied") < 0) {
-					throw x;
-				}
 
-				helper.log(component, successMessage);
-			}
-		}
-
-		testNoAccess(function() {
+		try {
 			var content = component.find("content");
 			var div = content.getElement();
-			var parentNode = div.parentNode;
-		}, "Blocked access to div.parentNode in afterRender()");
+			return div.parentNode;
+			parentNode.setAttribute('foo', 'bar');
+		} catch (x) {
+			if (x.toString().indexOf("parentNode.setAttribute is not a function") < 0) {
+				throw x;
+			}
+
+			helper.log(component, successMessage);
+		}
 
 		// DCHASMAN TODO Add hasAccess check in Component.getElement()
 		/*

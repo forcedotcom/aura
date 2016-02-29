@@ -102,22 +102,29 @@ function LockerService() {
 			return sc;
 		},
 
-		unwrap : function(elements) {
-			if (!$A.lockerService.util.isKeyed(elements)) {
-				return elements;
+		wrapComponentEvent : function(component, event) {
+			if (!event || !component) {
+				return event;
 			}
 
-			if ($A.util.isArray(elements)) {
+			var key = $A.lockerService.util._getKey(component, $A.lockerService.masterKey);
+			if (!key) {
+				return event;
+			}
+
+			return new SecureAuraEvent(event, key);
+		},
+
+		unwrap : function(elements) {
+			if (Array.isArray(elements)) {
 				for (var n = 0; n < elements.length; n++) {
 					var value = elements[n];
 					if (value && value.unwrap) {
 						elements[n] = value.unwrap($A.lockerService.masterKey);
 					}
 				}
-			} else {
-				if (elements && elements.unwrap) {
-					elements = elements.unwrap($A.lockerService.masterKey);
-				}
+			} else if (elements && elements.unwrap && $A.lockerService.util.isKeyed(elements)) {
+				elements = elements.unwrap($A.lockerService.masterKey);
 			}
 
 			return elements;
@@ -136,7 +143,7 @@ function LockerService() {
 			if (!root) {
 				root = document;
 			}
-			
+
 			if ($A.lockerService.util.isKeyed(root)) {
 				$A.util.addClass(root, "lockerizedNode");
 			}
@@ -160,7 +167,7 @@ function LockerService() {
 			if (!thing) {
 				return undefined;
 			}
-			
+
 			var f = thing["$lsKey"];
 			return f ? f($A.lockerService.masterKey) : undefined;
 		}

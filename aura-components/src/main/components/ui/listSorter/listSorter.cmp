@@ -31,7 +31,7 @@
 	<aura:attribute name="trigger" type="Aura.Component[]" description="Trigger component" />
 	<aura:attribute name="modal" type="Boolean" default="true" description="Determines whether the component is a modal dialog." />
 	<aura:attribute name="rowVar" type="String" description="The name by which to refer to the current data object inside of the sorter for each sorter row."/>
-	<aura:attribute name="rowDef" type="Aura.ComponentDefRef[]" description="Component definition to use for each row in the list sorter"/> 	
+	<aura:attribute name="rowDef" type="Aura.ComponentDefRef[]" description="A component definition to use for each row in the list sorter (should be ui:radioToggleMenuItem or its descendant)"/>
 	
 	<aura:attribute name="onApply" type="Aura.Action" description="The action invoked when the user click on the apply button. The selected items are passed in as the argument. If the sort order is descending, the prefix '-' is appended to the the item." />
 	<aura:attribute name="onOpen" type="Aura.Action" description="The action invoked when the user click on the trigger to open the sorter component." />

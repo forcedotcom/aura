@@ -26,7 +26,6 @@
     <aura:attribute access="GLOBAL" name="disabled" type="Boolean" default="false" description="Specifies whether the component should be displayed in a disabled state. Default value is &quot;false&quot;."/>
 
     <aura:attribute access="GLOBAL" name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component."/>
-    <aura:attribute access="GLOBAL" name="value" type="Object" description="References the controller class variable that is associated with the component."/>
 
     <!-- menuSelect should be used instead -->
     <aura:registerEvent access="GLOBAL" name="click" type="ui:click" description="The event fired when the user clicks on the component."/>

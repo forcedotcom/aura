@@ -17,7 +17,7 @@
     ],
 	"devtools_page": "devtools.html",
 	"content_scripts": [{
-        "matches": ["*://*/*cmp*", "*://*/*app*", "*://*.force.com/*", "*://*.salesforce.com/*"],
+        "matches": ["*://*/*cmp*", "*://*/*app*", "*://*.force.com/*", "*://*.salesforce.com/*", "*://*/*/s/*"],
 		"js": ["contentScript.js"],
 		"run_at": "document_start",
 		"all_frames": false

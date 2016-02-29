@@ -16,13 +16,13 @@
 
 -->
 <aura:component>
-<!-- attribute that indicates that search has been called atleast once. Its set via c.doSearch -->
-<aura:attribute name="searched" type="boolean" default="false"/>
-<aura:attribute name="value" type="string" />
-<aura:attribute name="showClear" type="boolean" default="{!false}"/>
+	<!-- attribute that indicates that search has been called atleast once. Its set via c.doSearch -->
+	<aura:attribute name="searched" type="boolean" default="false"/>
+	<aura:attribute name="value" type="string" />
+	<aura:attribute name="showClear" type="boolean" default="{!false}"/>
 
-<div id="search">
-<ui:inputSearch aura:id="searchCmp" class="search" updateOn="search" search="{!c.doSearch}" value="{!v.value}" showClear="{!v.showClear}"/>
-</div>
+	<div id="search">
+	   <ui:inputSearch aura:id="searchCmp" class="search" updateOn="search" search="{!c.doSearch}" value="{!v.value}" showClear="{!v.showClear}"/>
+	</div>
 
 </aura:component>

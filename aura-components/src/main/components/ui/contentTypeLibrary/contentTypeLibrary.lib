@@ -1,0 +1,3 @@
+<aura:library description="Helper functions to work with content-types">
+    <aura:include name="contentType"/>
+</aura:library>

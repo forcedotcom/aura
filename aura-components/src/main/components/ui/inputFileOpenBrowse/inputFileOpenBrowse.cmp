@@ -1,0 +1,10 @@
+<aura:component>
+
+    <aura:handler name="modelHasChange" event="ui:inputFileChangeEvent" action="{! c.handleChangeFiles }" />
+
+    <ui:inputFileModel aura:id="model" />
+    <span class="open-browse-container" onclick="{! c.handleOpenClick }">
+        {! v.body }
+    </span>
+
+</aura:component>

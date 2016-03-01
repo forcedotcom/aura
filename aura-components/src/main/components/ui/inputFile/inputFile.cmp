@@ -15,6 +15,24 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" extensible="true" support="PROTO" description="An HTML input element for specifying or uploading a file.">
-    <ui:underConstruction/>
+<aura:component support="PROTO" description="An HTML input element for specifying or uploading a file.">
+
+    <!-- Attributes -->
+    <aura:attribute name="files"    type="Object" />
+    <aura:attribute name="multiple" type="Boolean" default="false" />
+    <aura:attribute name="accept"   type="String"  default="" />
+    <aura:attribute name="name"     type="String"  />
+    <aura:attribute name="disabled" type="Boolean" default="false" />
+    <aura:attribute name="required" type="Boolean" default="false" />
+
+    <!--Handlers -->
+    <aura:handler name="modelHasChange" event="ui:inputFileChangeEvent" action="{! c.handleOpenBrowseChange }" />
+
+    <ui:inputFileDroppableZone multiple="false">
+        Drag and Drop files here or
+        <ui:inputFileOpenBrowse>
+            <a>Browse</a>
+        </ui:inputFileOpenBrowse>
+        <ui:inputFileFilesList files="{! v.files }"/>
+    </ui:inputFileDroppableZone>
 </aura:component>

@@ -1,0 +1,20 @@
+<aura:component>
+
+    <aura:attribute name="files" type="Object" />
+    <aura:attribute name="filesArr" type="Object[]" default="[]"  access="private" />
+
+    <aura:handler name="change" value="{! v.files }" action="{! c.mapFilesToArray }" />
+
+    <h1 class="files-list-header">List of selected files</h1>
+    <aura:if isTrue="{! v.filesArr.length == 0 }">
+        Empty
+    </aura:if>
+    <ul>
+    <aura:iteration items="{! v.filesArr }" var="file" >
+        <li>
+        {! file.name }
+        </li>
+    </aura:iteration>
+    </ul>
+
+</aura:component>

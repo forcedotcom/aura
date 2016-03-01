@@ -1,0 +1,3 @@
+<aura:library description="Helper functions to manipulate class names">
+    <aura:include name="classnames"/>
+</aura:library>

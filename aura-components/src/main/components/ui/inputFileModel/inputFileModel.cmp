@@ -1,0 +1,12 @@
+<aura:component>
+    <aura:attribute name="model" type="Object" />
+
+    <aura:handler name="init"  value="{! this }"  action="{! c.init }" />
+
+    <aura:registerEvent name="modelHasChange" type="ui:inputFileChangeEvent" description=""/>
+
+    <aura:method name="openDialog" action="{! c.openDialog }"></aura:method>
+
+
+
+</aura:component>

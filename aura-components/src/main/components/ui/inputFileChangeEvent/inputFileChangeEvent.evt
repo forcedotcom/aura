@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" support="GA" description="Indicates that the content of a input file model has changed.">
+    <aura:attribute name="files" type="Object" />
+</aura:event>

@@ -1,0 +1,4 @@
+<aura:component>
+    <aura:import library="ui:classNamesLibrary" property="lib" />
+    Testing classNamesLibrary !
+</aura:component>

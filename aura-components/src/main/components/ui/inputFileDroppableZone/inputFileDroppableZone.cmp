@@ -1,0 +1,23 @@
+<aura:component>
+    <aura:import library="ui:classNamesLibrary" property="lib" />
+
+    <!--Public attributes -->
+    <aura:attribute name="accept"    type="String"  default="*/*" />
+    <aura:attribute name="multiple"  type="Boolean" default="true" />
+    <aura:attribute name="disabled"  type="Boolean" default="false" />
+    <aura:attribute name="class"     type="String"  default="" />
+    <aura:attribute name="classOver" type="String"  default="" />
+
+    <!-- Private attributes -->
+    <aura:attribute name="dropZoneClassList" type="string" default="" access="private" />
+
+    <aura:handler name="init" value="{! this}" action="{! c.init }" />
+
+    <div class="{! v.dropZoneClassList }"
+         ondragover="{! c.allowDrop }"
+         ondragenter="{! c.handleDragEnter }"
+         ondragleave="{! c.handleDragLeave }"
+         ondrop="{! c.handleOnDrop }">
+        {! v.body }
+    </div>
+</aura:component>

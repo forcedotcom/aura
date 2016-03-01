@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /*jslint sub: true */
 
 //#include aura.locker.SecureWindow
@@ -24,6 +23,19 @@ function LockerService() {
 
 	var lockers = [];
 	var keyToEnvironmentMap = {};
+	var lockerShadows;
+
+	// This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
+	// which, by definition, do not provide authority or access to globals.
+	// TODO: grow this list...
+	var whitelist = [
+			'undefined', 'NaN', 'Date', 'Number', 'Boolean', 'alert', 'confirm',
+			'Intl', 'Error', 'console',
+			'clearTimeout', 'clearInterval', 'setTimeout', 'setInterval'
+		];
+
+	// TODO: attempt to lock down Object.prototype
+	// https://github.com/tc39/ecma262/issues/272
 
 	var service = {
 		createForDef : function(code, def) {
@@ -45,13 +57,27 @@ function LockerService() {
 			return env;
 		},
 
-		create : function(code, key, imports) {
+		create : function(code, key) {
 			var envRec = this.getEnv(key);
 			var locker;
+			if (!lockerShadows) {
+				// one time operation to lazily create this giant object with
+				// the value of `undefined` to shadow every global binding in
+				// `window`, except for those with no authority defined in the
+				// `whitelist`. this object will be used as the base lexical
+				// scope when evaluating all non-privilege components.
+				lockerShadows = {};
+				Object.getOwnPropertyNames(window).forEach(function (name) {
+					// apply whitelisting to the lockerShadows
+					if (whitelist.indexOf(name) === -1) {
+						lockerShadows[name] = undefined;
+					}
+				});
+			}
 			try {
 				locker = {
 					"$envRec": envRec,
-					"$result": window['$$safe-eval$$'](code, envRec, imports)
+					"$result": window['$$safe-eval$$'](code, envRec, lockerShadows)
 				};
 			} catch (x) {
 				throw new Error("Unable to create locker IIFE: " + x);
@@ -174,12 +200,12 @@ function LockerService() {
 
 		var util = {
 			getKeyForNamespace : function(namespace) {
-		    	// Get the locker key for this namespace
+				// Get the locker key for this namespace
 				var key = lockerNamespaceKeys[namespace];
 				if (!key) {
-		    		key = lockerNamespaceKeys[namespace] = Object.freeze({
-		    			namespace: namespace
-		    		});
+					key = lockerNamespaceKeys[namespace] = Object.freeze({
+						namespace: namespace
+					});
 				}
 
 				return key;

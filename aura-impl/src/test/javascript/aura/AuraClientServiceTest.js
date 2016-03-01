@@ -20,7 +20,7 @@ Test.Aura.AuraClientServiceTest = function() {
     var $A = {};
     var Aura = {Services: {}, Controller: {}, Utils: {Util:{prototype:{on:function(){}}}}};
     var document = {
-    	getElementById : function(id) { 
+    	getElementById : function(id) {
     		return id === "safeEvalWorker" ? {} : undefined;
     	}
     };
@@ -38,11 +38,11 @@ Test.Aura.AuraClientServiceTest = function() {
     });
 
     var mockGlobal = Mocks.GetMocks(Object.Global(), {
-    	"Date": {
-    		now : function() {
-    			return 70000;
-    		}
-    	},
+        "Date": {
+            now : function() {
+                return 70000;
+            }
+        },
         "$A": {
             log : function() {},
             assert : function(condition, message) {
@@ -58,15 +58,24 @@ Test.Aura.AuraClientServiceTest = function() {
                 isUndefined : function() {},
                 isArray : function() {},
                 json : {
-                    encode :function(errorText) {
+                    encode : function(errorText) {
                         return "mockedJson:"+errorText;
                     },
-                    orderedEncode: function(obj) {
+                    orderedEncode : function(obj) {
                         return obj;
                     }
+                },
+                isFiniteNumber: function(n) {
+                    return typeof n === 'number' && isFinite(n);
                 }
             },
-            mark : function() {}
+            mark : function() {},
+            getContext : function() {
+                return {
+                    encodeForServer: function(){},
+                    getCurrentAccess: function(){}
+                };
+            }
         },
         window:{},
         document:document,
@@ -75,33 +84,33 @@ Test.Aura.AuraClientServiceTest = function() {
 
     [Fixture]
     function testSendOutForegroundActions() {
-    	[Fact]
-    	function returnsTrueWhen60sPass() {
-    		// Arrange
-    		 var target;
+        [Fact]
+        function returnsTrueWhen60sPass() {
+            // Arrange
+             var target;
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
                 target.lastSendTime = 0;
             });
-    		// Act
+            // Act
             var actual;
             mockGlobal(function() {
         		actual = target.shouldSendOutForegroundActions([], 1);
             });
-            
+
             // Assert : we send out caboose action if it has been longer then 60s since last send
             Assert.Equal(true, actual);
-    	}
+        }
 
-    	[Fact]
-    	function returnsTrueMoreForegroundThanCaboose() {
-    		// Arrange
-    		var target;
+        [Fact]
+        function returnsTrueMoreForegroundThanCaboose() {
+            // Arrange
+            var target;
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
                 target.lastSendTime = Date.now();//make sure we won't send it out because of 60s has passed
             });
-    		// Act
+            // Act
             var actual;
             var action1 = new MockAction("server", true);
             var action2 = new MockAction("server", true);
@@ -110,15 +119,15 @@ Test.Aura.AuraClientServiceTest = function() {
             });
             // Assert : we send out caboose action if there are more foreground actions than caboose ones
             Assert.Equal(true, actual);
-    	}
+        }
     }
 
 
     [Fixture]
     function testDupes() {
-    	[Fact]
-    	function getAndClearDupesNoKey() {
-    		// Arrange
+        [Fact]
+        function getAndClearDupesNoKey() {
+            // Arrange
             var target;
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
@@ -130,7 +139,7 @@ Test.Aura.AuraClientServiceTest = function() {
             });
             // Assert : we return undefined when calling getAndClearDupes without key
             Assert.Equal(undefined, actual);
-    	}
+        }
 
         [Fact]
         function deDupeNewEntry() {
@@ -258,13 +267,13 @@ Test.Aura.AuraClientServiceTest = function() {
         this.id = id;
         this.getId = function() { return this.id; } ;
         this.resetId = function() {
-        	id = 1; this.id = 1;
+            id = 1; this.id = 1;
         }
         if (type === undefined) {
             type = "server";
         }
         if (isStorable === undefined) {
-        	isStorable = false;
+            isStorable = false;
         }
         this.storable = isStorable;
         this.getStorageKey = function() { return "fakeKey"; };
@@ -1222,5 +1231,209 @@ Test.Aura.AuraClientServiceTest = function() {
                 '}',
                 JSON.stringify(actual));
         }
+
+        [Fact]
+        function SetsStatusToINCOMPLETEWhenTimedOut() {
+            var actual;
+            var target;
+            mocksForDecode(function() {
+                target = new Aura.Services.AuraClientService();
+                target.setConnected = function() {}
+            });
+
+            mocksForDecode(function() {
+                actual = target.decode(undefined, undefined, true);
+            });
+
+            Assert.Equal("INCOMPLETE", actual["status"]);
+        }
+
+        [Fact]
+        function SetsOfflineFlagWhenTimedOut() {
+            var actual;
+            var target;
+            mocksForDecode(function() {
+                target = new Aura.Services.AuraClientService();
+                target.setConnected = function() {
+                    actual = true;
+                }
+            });
+
+            mocksForDecode(function() {
+                target.decode(undefined, undefined, true);
+            });
+
+            Assert.True(actual);
+        }
     }
+
+    [Fixture]
+    function receive() {
+        [Fact]
+        function PassesTimedOutParamThroughToDecode() {
+            var expected = "expected";
+            var actual;
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            target.decode = function(response, noStrip, timedOut) {
+                actual = timedOut;
+                return response;
+            };
+            target.fireDoneWaiting = function(){};
+            target.auraStack = {
+                    push: function(){},
+                    pop: function(){}
+            };
+            target.releaseXHR = function(){};
+            target.process = function(){};
+
+            target.receive({request:{status: "nothing"}}, expected);
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function setXHRTimeout() {
+        [Fact]
+        function ThrowsWhenInputIsNonFiniteNumber() {
+            var actual;
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            var mockIsFiniteNumber = Mocks.GetMock(Object.Global(), "$A", {
+                util: {
+                    isFiniteNumber: function() {
+                        return false;
+                    }
+                },
+                assert : function(condition, message) {
+                    if(!condition){
+                        throw message;
+                    }
+                }
+            })
+
+            mockIsFiniteNumber(function(){
+                actual = Record.Exception(function() {
+                    target.setXHRTimeout("asdf");
+                });
+            });
+
+            Assert.Equal("Timeout must be a positive number", actual);
+        }
+
+        [Fact]
+        function ThrowsWhenInputIsZero() {
+            var actual;
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            var mockIsFiniteNumber = Mocks.GetMock(Object.Global(), "$A", {
+                util: {
+                    isFiniteNumber: function() {
+                        return true;
+                    }
+                },
+                assert : function(condition, message) {
+                    if(!condition){
+                        throw message;
+                    }
+                }
+            })
+
+            mockIsFiniteNumber(function(){
+                actual = Record.Exception(function() {
+                    target.setXHRTimeout(0);
+                });
+            });
+
+            Assert.Equal("Timeout must be a positive number", actual);
+        }
+    }
+
+
+    [Fixture]
+    function send() {
+        var auraXHR = {
+            addAction: function() {},
+            request: {}
+        };
+
+        var actions = [{
+            callAllAboardCallback: function() { return true; },
+            isChained: function() { return false; },
+            prepareToSend: function() {}
+        }];
+
+        function setOverrides(target) {
+            target.deDupe = function() {
+                return false;
+            };
+            target.buildParams = function() {
+                return "";
+            };
+            target.createXHR = function() {
+                return {
+                    open: function(){},
+                    send: function(){}
+                }
+            };
+        }
+
+
+        var mockSetTimeout = Mocks.GetMocks(Object.Global(), {
+            setTimeout : function(cb, time) {
+            }
+        });
+
+
+        [Fact]
+        function SendDoesNotSetTimerWhenNoXHRTimeoutSet() {
+            var actual = false;
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                setOverrides(target);
+            });
+            target.xhrSetTimeout = function(f) {
+                actual = true;
+            };
+
+            mockSetTimeout(function() {
+                mockGlobal(function() {
+                    target.send(auraXHR, actions, "POST", {});
+                });
+            });
+
+            Assert.False(actual);
+        }
+        [Fact]
+        function SendSetsTimerWhenXHRTimeoutSet() {
+            var actual = false;
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                setOverrides(target);
+                target.setXHRTimeout(1000);
+            });
+            target.xhrSetTimeout = function(f) {
+                actual = true;
+            };
+
+            mockSetTimeout(function() {
+                mockGlobal(function() {
+                    target.send(auraXHR, actions, "POST", {});
+                });
+            });
+
+            Assert.True(actual);
+        }
+    }
+
+
 }

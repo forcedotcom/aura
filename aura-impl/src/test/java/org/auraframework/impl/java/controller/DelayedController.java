@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.controller.java;
+package org.auraframework.impl.java.controller;
 
 import java.util.Map;
 
@@ -39,5 +39,15 @@ public class DelayedController {
         } catch (Exception e) {
         }
         return new Component[] { cmp };
+    }
+
+    @AuraEnabled
+    public static boolean delayAction(@Key("delayMs") long delayMs) {
+        try {
+            Thread.sleep(delayMs);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 }

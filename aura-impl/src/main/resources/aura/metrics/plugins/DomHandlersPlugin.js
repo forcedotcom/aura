@@ -66,22 +66,24 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
 
     // Only if we have a uniquely identier send the interaction
     if (localCmpId && dispatchCmpId) { 
-        var contextId = localCmpId + ':' + dispatchCmpId;
         var target = cmp["getElement"]();
         var meta = target && target.getAttribute('data-meta-state'); // optional metadata
 
         var context = {
-            "id" : contextId,
+            "locator" : {
+                "cmpId"    : cmp.getGlobalId(),
+                "root"     : localCmpId,
+                "parent"   : dispatchCmpId,
+                "selector" : target.nodeName + ' ' + target.className.trim()
+            },
             "type" : event.type,
-            "action" : action.getDef().getDescriptor().toString(),
-            "selector" : target.nodeName + ' ' + target.className,
-            "cmpId" : cmp.getGlobalId()
+            "action" : action.getDef().getDescriptor().toString()
         };
 
         if (meta) {
             var state = {};
             state[meta] = target.getAttribute('data-' + meta);
-            context["interactionState"] = state;
+            context["locator"]["context"] = state;
         }
 
         this.metricsService.transaction('aura', 'interaction', { "context": context });

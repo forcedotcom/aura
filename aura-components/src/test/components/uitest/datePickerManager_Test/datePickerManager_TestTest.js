@@ -90,9 +90,11 @@
     testNumberOfDatepickersOnPage : {
 	browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET"],
         test : function(cmp) {
-                 var datePickerSize = $A.test.getElementByClass("uiDatePicker").length;
-                 $A.test.assertEquals(2, datePickerSize, "There should be two datePickers on the screen and there aren't");
-	       }
+            // inputDate becomes inputDateHtml, so on mobile the test has 1 less datePicker displayed
+            var expectedDatePickerSize = this.isViewDesktop() ? 2 : 1;
+            var datePickerSize = $A.test.getElementByClass("uiDatePicker").length;
+            $A.test.assertEquals(expectedDatePickerSize, datePickerSize, "There should be two datePickers on the screen and there aren't");
+        }
     },
 
     //HELPER FUNCTIONS

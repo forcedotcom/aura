@@ -323,7 +323,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
     //console.time('>>>> TRANSACTIONPROCESSING > ' + ns + ':' + name);
     var id             = ns + ':' + name,
         transaction    = this.transactions[id],
-        transactionCfg = $A.util.apply((transaction && transaction["config"]) || {}, config, true, false),
+        transactionCfg = $A.util.apply((transaction && transaction["config"]) || {}, config, true, true),
         beacon         = this.beaconProviders[ns]|| this.beaconProviders[Aura.Services.MetricsService.DEFAULT];
 
     postProcess = typeof config === 'function' ? config : postProcess || transactionCfg["postProcess"];

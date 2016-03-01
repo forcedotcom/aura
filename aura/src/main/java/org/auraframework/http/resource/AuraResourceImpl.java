@@ -31,15 +31,18 @@ import org.auraframework.system.AuraResource;
 public abstract class AuraResourceImpl implements AuraResource {
     private final String name;
     private final Format format;
-    private final boolean CSRFProtect;
 
     protected DefinitionService definitionService = Aura.getDefinitionService();
     protected ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
+
+    public AuraResourceImpl(String name, Format format) {
+        this(name, format, false);
+    }
     
+    @Deprecated
     public AuraResourceImpl(String name, Format format, boolean CSRFProtect) {
         this.name = name;
         this.format = format;
-        this.CSRFProtect = CSRFProtect;
     }
 
     @Override
@@ -60,11 +63,6 @@ public abstract class AuraResourceImpl implements AuraResource {
         return format;
     }
 
-    @Override
-    public boolean isCSRFProtect() {
-        return CSRFProtect;
-    }
-
     /**
      * Injection override.
      *
@@ -83,5 +81,10 @@ public abstract class AuraResourceImpl implements AuraResource {
         this.servletUtilAdapter = servletUtilAdapter;
     }
 
+    @Deprecated
+	@Override
+	public boolean isCSRFProtect() {
+		return false;
+	}
 };
 

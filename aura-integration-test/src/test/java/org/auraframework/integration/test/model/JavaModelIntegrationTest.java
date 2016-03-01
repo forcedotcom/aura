@@ -21,7 +21,6 @@ import org.auraframework.def.ModelDef;
 import org.auraframework.def.ValueDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Model;
 import org.auraframework.system.Location;
 import org.auraframework.test.source.StringSourceLoader;
@@ -43,7 +42,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
      * Verify that class level annotation is required for a java model.
      */
     public void testClassLevelAnnotationForJavaModel() throws Exception {
-        DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
+        DefDescriptor<ModelDef> javaModelDefDesc = definitionService.getDefDescriptor(
                 "java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
 
         ModelDef actual = definitionService.getDefinition(javaModelDefDesc);
@@ -54,7 +53,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
      * Verify that InvalidDefinitionException is thrown when getting definition of a Java model without Model annotation.
      */
     public void testExceptionIsThrownWhenModelWithoutAnnotation() {
-        DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
+        DefDescriptor<ModelDef> javaModelDefDesc = definitionService.getDefDescriptor(
                 "java://org.auraframework.impl.java.model.TestModelWithoutAnnotation", ModelDef.class);
         try {
             definitionService.getDefinition(javaModelDefDesc);
@@ -65,12 +64,11 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
         }
     }
 
-
     /**
      * Verify that a Java model can extend another Java model.
      */
     public void testJavaModelInheritance() throws Exception {
-        DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
+        DefDescriptor<ModelDef> javaModelDefDesc = definitionService.getDefDescriptor(
                 "java://org.auraframework.components.test.java.model.TestModelSubclass", ModelDef.class);
         ModelDef def = definitionService.getDefinition(javaModelDefDesc);
         assertNotNull(def);
@@ -115,10 +113,10 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
      * Verify that DefinitionNotFoundException is thrown if model doesn't exist
      */
     public void testExceptionIsThrownWhenModelNotFound() throws Exception {
-        DefDescriptor<ComponentDef> javaModelDefDesc = addSourceAutoCleanup(ComponentDef.class,
+        DefDescriptor<ComponentDef> cmpDefDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component model='java://DoesNotExist'/>");
         try {
-            definitionService.getDefinition(javaModelDefDesc);
+            definitionService.getDefinition(cmpDefDesc);
             fail("Expected DefinitionNotFoundException when Java model doest not exist.");
         } catch (Exception e) {
             String expectedMessage = "No MODEL named java://DoesNotExist found";
@@ -161,7 +159,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
      * Verify AuraExecutionException is thrown when accessing value of a non existing property from Java model.
      */
     public void testNonExistingPropertiesOnModel() throws Exception {
-        DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
+        DefDescriptor<ModelDef> javaModelDefDesc = definitionService.getDefDescriptor(
                 "java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
         ModelDef mDef = definitionService.getDefinition(javaModelDefDesc);
         assertNotNull(mDef);

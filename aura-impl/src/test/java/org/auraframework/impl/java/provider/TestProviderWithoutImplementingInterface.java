@@ -16,19 +16,12 @@
 package org.auraframework.impl.java.provider;
 
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.Annotations.Provider;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
-/**
- * An interface provider used for testing.
- */
 @Provider
-public class TestProviderThrowsQFEDuringProvide implements ComponentDescriptorProvider {
-
-    @Override
-    public DefDescriptor<ComponentDef> provide() throws InvalidDefinitionException {
-        throw new InvalidDefinitionException("From TestProviderThrowsQFEDuringProvide", null);
+public class TestProviderWithoutImplementingInterface{
+    public DefDescriptor<ComponentDef> provide() {
+        return null;
     }
 }

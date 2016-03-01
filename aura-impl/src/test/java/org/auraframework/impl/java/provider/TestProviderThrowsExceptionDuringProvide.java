@@ -15,23 +15,20 @@
  */
 package org.auraframework.impl.java.provider;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.Annotations.Provider;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
- * A simple provider to ensure concrete instantiation.
- *
- * This provider is part of the test to ensure that concrete components always
- * instantiate as such. It always provides 'provider:javaProviderImpl' to allow us to
- * test 'provider:javaProviderAbstract' instantiating.
+ * An interface provider used for testing.
  */
 @Provider
-public class TestBaseProvider implements ComponentDescriptorProvider {
+public class TestProviderThrowsExceptionDuringProvide implements ComponentDescriptorProvider {
+
     @Override
-    public DefDescriptor<ComponentDef> provide() {
-        return Aura.getDefinitionService().getDefDescriptor("provider:javaProviderImpl", ComponentDef.class);
+    public DefDescriptor<ComponentDef> provide() throws InvalidDefinitionException {
+        throw new InvalidDefinitionException("Exception from TestProviderThrowsExceptionDuringProvide", null);
     }
 }

@@ -15,12 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="provider:providerBase">
-    <aura:attribute name="attB" type="Boolean" default="true" />
-    <aura:attribute name="new1" type="String" default="1" />
-    <aura:attribute name="new2" type="String" default="2" />
-    <aura:attribute name="new3" type="String" default="3" />
-    <div>This is providerB</div>
-    <div>parent attribute [type]: {!v.type}</div>
-    <div>own attribute [attB]: {!v.attB}</div>
+<aura:component abstract="true" provider="java://org.auraframework.impl.java.provider.TestBaseProvider">
+    <aura:attribute name="stringAttribute" type="String" default="default value from javaProviderAbstract" />
+    <aura:attribute name="overriddenAttribute" type="String" default="value from javaProviderAbstract" />
 </aura:component>

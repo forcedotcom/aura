@@ -15,10 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component extends="provider:providerBase" >
-    <aura:attribute name="attA" type="Boolean" default="false" />
-    <aura:attribute name="type" type="String" default="A" />
-    <div>This is providerA</div>
-    <div>parent attribute [type]: {!v.type}</div>
-    <div>own attribute [attA]: {!v.attA}</div>
+<aura:component extends="provider:settingComponentAttributesInComponentConfigProvider">
+        <aura:attribute name="stringValue" type="String"/>
+        <aura:attribute name="numberValue" type="Integer"/>
+        <aura:attribute name="nullValue" type="String"/>
+        <aura:attribute name="arrayValue" type="String[]"/>
+
+        <aura:attribute name="existingValue" type="String" default="existing string value"/>
 </aura:component>

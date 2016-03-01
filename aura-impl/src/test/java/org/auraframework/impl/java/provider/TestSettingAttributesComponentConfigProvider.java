@@ -21,33 +21,36 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
+ * Testing Java Provider used in component provider:settingAttributesComponentConfigProvider
  */
 
 @Provider
-public class TestJavaProviderSettingAttributeValues implements ComponentConfigProvider {
+public class TestSettingAttributesComponentConfigProvider implements ComponentConfigProvider {
     @Override
     public ComponentConfig provide() throws QuickFixException {
         ComponentConfig config = new ComponentConfig();
+        DefDescriptor<ComponentDef> cmpDefDesc = Aura.getDefinitionService().getDefDescriptor(
+                "provider:settingComponentAttributesInComponentConfigProviderImpl", ComponentDef.class);
+        config.setDescriptor(cmpDefDesc);
 
-        config.setDescriptor(DefDescriptorImpl.getInstance("test:testJavaProviderSettingAttributeValuesHelper",
-                    ComponentDef.class));
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("a1", "a1Provider");
-        attributes.put("a2", null);
-        attributes.put("b1", "b1Provider");
-        attributes.put("ar1", new String[] { "ar1Provider0", "ar1Provider1" });
+        attributes.put("stringValue", "String from Java provider");
+        attributes.put("numberValue", 123);
+        attributes.put("nullValue", null);
+        attributes.put("arrayValue", new String[] { "val1", "val2" });
 
+        // setting stringValue attribute as the value on abstract component can be used in provide()
         BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
-
-        if (component.getAttributes().getValue("a3") != null) {
-            attributes.put("b2", "b2Provider");
+        Object existingValue = component.getAttributes().getValue("existingValue");
+        if (existingValue != null && existingValue.toString().equals("existing string value")) {
+            attributes.put("stringValue", existingValue);
         }
 
         config.setAttributes(attributes);

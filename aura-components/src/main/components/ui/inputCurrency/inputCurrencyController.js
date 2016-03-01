@@ -15,43 +15,6 @@
  */
 ({
     initialize : function (cmp, event, helper) {
-        var formatter = cmp.get('v.format');
-        var value = cmp.get('v.value');
-
-        if (!formatter) {
-            formatter = $A.get("$Locale.currencyFormat");
-            cmp.set('v.format',formatter);
-        }
-
-        cmp.set('v.updateOnDisabled', true);
-
-        if (helper.isValueValid(value, formatter)) {
-            helper.handleNewValue(cmp);
-        } else {
-            helper.setInvalidValueError(cmp, value);
-        }
-    },
-    handleInputChange : function (cmp, event, helper) {
-        var inputValue = event.target.value;
-        var lib = helper.inputNumberLibrary.number;
-        var formatter = cmp.get('v.format');
-
-        // is input empty ? empty isn't consider 0
-        if (!inputValue) {
-            helper.setValue(cmp,'');
-            return;
-        }
-
-        if (lib.isFormattedNumber(inputValue,formatter) && helper.isNumberInRange(inputValue, cmp)) {
-            helper.setValue(cmp, lib.unFormatNumber(inputValue));
-        } else {
-            event.target.value = cmp.get('v.lastValue');
-        }
-    },
-    handleOnBlur : function (cmp, event, helper) {
-        helper.setAttributes(cmp);
-    },
-    valueHasChanged : function (cmp, event, helper) {
-        helper.handleNewValue(cmp);
+        helper.setDefaultAttrs(cmp);
     }
 });

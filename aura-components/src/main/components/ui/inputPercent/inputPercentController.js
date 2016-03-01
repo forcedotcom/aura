@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 ({
-    afterRender : function (cmp, helper) {
-        var element = helper.getInputElement(cmp);
-        this.superAfterRender();
-        $A.util.on(element,'focus', function () {
-            helper.removeErrors(cmp);
-        });
+    initialize : function (cmp, event, helper) {
+        helper.setDefaultAttrs(cmp);
     }
 });

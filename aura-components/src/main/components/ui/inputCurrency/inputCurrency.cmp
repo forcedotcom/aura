@@ -18,29 +18,23 @@
 <aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputNumberComponent,ui:inputTextComponent" extensible="true"
                 defaultFlavor="default, input" description="An input field for entering a currency.">
 
-    <aura:import library="ui:inputNumberLibrary" property="inputNumberLibrary"/>
-
-    <!-- Attributes -->
-    <aura:attribute name="inputValue"           type="string"  access="private" default="" />
-    <aura:attribute name="lastValue"            type="string"  access="private" default="" />
-    <aura:attribute name="updateWasFromOutside"  type="boolean" access="private" default="true" />
 
     <!-- Envents handler -->
     <aura:handler name="init"   value="{! this }"    action="{! c.initialize }" />
-    <aura:handler name="change" value="{! v.value }" action="{! c.valueHasChanged }" />
 
-    <input type="text"
-           aura:id="input"
-           id="{!v.domId}"
-           oninput="{! c.handleInputChange }"
-           onblur="{! c.handleOnBlur }"
-           class="{!v.class + ' input'}"
-           value="{! v.inputValue }"
-           max="{!v.max}"
-           min="{!v.min}"
-           step="{!v.step}"
-           placeholder="{!v.placeholder}"
-           required="{!v.required}"
-           disabled="{!v.disabled}"
-           aria-describedby="{!v.ariaDescribedBy}"/>
+    <ui:inputSmartNumber
+            value="{! v.value }"
+            updateOn="{! v.updateOn }"
+            style="currency"
+            format="{! v.format }"
+            max="{!v.max}"
+            min="{!v.min}"
+            id="{! v.domId }"
+            class="{! v.class }"
+            step="{!v.step}"
+            placeholder="{! v.placeholder }"
+            required="{!v.required}"
+            disabled="{!v.disabled}"
+            ariaDescribedBy="{!v.ariaDescribedBy}"/>
+
 </aura:component>

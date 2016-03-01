@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 ({
-
-    afterRender: function(component, helper) {
-        var value = helper.getNumber(component);
-        var formatter = component.get('v.format') || $A.get("$Locale.numberFormat");
-        var el    = helper.getInputElement(component);
-
-        this.superAfterRender();
-        if (component.get("v.doFormat")) {
-            el.value = helper.inputNumberLibrary.number.formatNumber(value, formatter) || '';
-        }
+    initialize : function (cmp, event, helper) {
+        helper.setDefaultAttrs(cmp);
     }
-
-})// eslint-disable-line semi
+});

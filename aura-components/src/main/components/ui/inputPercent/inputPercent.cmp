@@ -17,16 +17,24 @@
 -->
 <aura:component extends="ui:input" implements="ui:inputNumberComponent,ui:inputTextComponent" extensible="true" support="GA"
                 defaultFlavor="default, input" description="An input field for entering a percentage.">
-    <aura:import library="ui:inputNumberLibrary" property="inputNumberLibrary"/>
-    <input type="{!v.type}"
-           id="{!v.domId}"
-           class="{!v.class + ' input'}"
-           value="{!v.value}"
-           max="{!v.max}"
-           min="{!v.min}"
-           step="{!v.step}"
-           placeholder="{!v.placeholder}"
-           required="{!v.required}"
-           disabled="{!v.disabled}"
-           aria-describedby="{!v.ariaDescribedBy}"/>
+
+    <aura:handler name="init"   value="{! this }"    action="{! c.initialize }" />
+
+    <ui:inputSmartNumber
+            aura:id="smart"
+            value="{! v.value }"
+            updateOn="{! v.updateOn }"
+            style="percent"
+            valueScale="{! v.valueScale }"
+            format="{! v.format }"
+            max="{!v.max}"
+            min="{!v.min}"
+            id="{! v.domId }"
+            class="{! v.class }"
+            step="{!v.step}"
+            placeholder="{! v.placeholder }"
+            required="{!v.required}"
+            disabled="{!v.disabled}"
+            ariaDescribedBy="{!v.ariaDescribedBy}"/>
+
 </aura:component>

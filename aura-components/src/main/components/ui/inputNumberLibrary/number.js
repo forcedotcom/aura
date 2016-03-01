@@ -13,35 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function lib() { //eslint-disable-line no-unused-vars
 
-    // Todo : Make abbreviations dynamic
-    var abbreviations = {thousand: 'k', million: 'm', billion: 'b', trillion: 't'};
+function lib() { // eslint-disable-line no-unused-vars
+
+    var abbreviations = {
+        thousand : 'k',
+        million  : 'm',
+        billion  : 'b',
+        trillion : 't'
+    };
 
     function getMaxFractionDigits (pattern, symbols) {
         var decimalSeparator = symbols && symbols.decimalSeparator ? symbols.decimalSeparator : '.';
         var zero = symbols && symbols.zero ? symbols.zero : '0';
         var patternSplit = pattern.split(decimalSeparator);
         var reg = new RegExp('[^(#'+ zero + ']','g');
-        if (patternSplit.length) {
+        if (patternSplit.length > 1) {
             return patternSplit[1].replace(reg,'').length;
         }
         return 0;
     }
 
-    return { //eslint-disable-line no-shadow, no-unused-vars
-        /**
-         * @method formatNumber
-         * @desc Convert a computer number in formatted number base on localization or a defined format
-         * @param number
-         * 20000 => 20,000.00 (in US)
-         * 20000 => 20.000,00 (in Spain)
-         */
+
+    return {
         formatNumber: function (number, formatter) {
             var numberFormat = this.getNumberFormat(formatter);
-            if (number) {
+
+            if (!$A.util.isUndefinedOrNull(number) && !isNaN(number)) {
                 return numberFormat.format(number);
             }
+            return '';
         },
         getNumberFormat: function (formatter) {
             if (typeof formatter === 'string') {
@@ -91,12 +92,10 @@ function lib() { //eslint-disable-line no-unused-vars
             return $A.util.isNumber(number);
         },
         isFormattedNumber: function (string, formatter) {
-            var numberFormat      = this.getNumberFormat(formatter);
             var zero              = $A.get("$Locale.zero");
             var decimalSeparator  = $A.get("$Locale.decimal");
             var groupingSeparator = $A.get("$Locale.grouping");
             var maxFractionDigits = getMaxFractionDigits(formatter, { decimalSeparator : decimalSeparator, zero : zero});
-            var prefix = numberFormat.prefix;
 
             var const1 = '(?!(K|B|M|T|\\' + decimalSeparator + '))';
 
@@ -108,11 +107,12 @@ function lib() { //eslint-disable-line no-unused-vars
             // follow decimalSeparator #{0,maxFractionDigits} (not required)
             // ended by any shortcut (K|B|M|T)
             // it not case sensitive
-            var regString = '^(\\' + prefix + ')?' +
-                            const1 + '((\\s*(\\+|\\-)?\\s*)' + const1 + ')?' +
+            var regString = '^' + const1 + '((\\s*(\\+|\\-)?\\s*)' + const1 + ')?' +
                             '(\\d+(\\' + groupingSeparator + '\\d*)*)*' +
                             '(\\' + decimalSeparator + '\\d{0,' + maxFractionDigits + '})?' +
-                            '(K|B|M|T)?\\s*$';
+                            '(K|B|M|T)?$';
+
+
             var reg = new RegExp(regString, 'i');
             return reg.test(string);
         }

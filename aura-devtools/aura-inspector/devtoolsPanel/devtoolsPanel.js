@@ -357,6 +357,10 @@
             });
         };
 
+        /*
+         * Not a fan of these ID methods. Need to figure these out better. 
+         */
+
         this.isComponentId = function(id) {
             return typeof id === "string" && id.startsWith(COMPONENT_CONTROL_CHAR);
         };
@@ -416,6 +420,14 @@
          */
         this.addErrorMessage = function(msg) {
             console.error(msg);
+        };
+
+        /** 
+         * Slower than just JSON.parse because it tries to resolve any 
+         * circular references.
+         */
+        this.jsonParse = function(jsonString) {
+            return ResolveJSONReferences(JSON.parse(jsonString));
         };
 
         /*
@@ -531,7 +543,9 @@
 
         function Help_OnClick(event) {
             if(event.target.tagName === "A") {
-                chrome.devtools.inspectedWindow.eval("window.open('" + event.target.href + "');");
+                chrome.devtools.inspectedWindow.eval("window.open('" + event.target.getAttribute("href") + "');");
+                event.stopPropagation();
+                event.preventDefault();
             }
         }
 

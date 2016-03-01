@@ -337,6 +337,7 @@
                         "globalId": component._$getSelfGlobalId$(),
                         "localId": component.getLocalId(),
                         "rendered": component.isRendered(),
+                        "isConcrete": component.isConcrete(),
                         "valid": true,
                         "expressions": {},
                         "attributes": {},
@@ -425,7 +426,9 @@
                         output["supers"] = supers;
                     }
 
-                    if(configuration.elementCount) {
+                    // Concrete is the only one with elements really, so doing it at the super
+                    // level is duplicate work.
+                    if(component.isConcrete() && configuration.elementCount) {
                         var elements = component.getElements() || [];
                         var elementCount = 0;
                         for(var c=0,length=elements.length;c<length;c++) {

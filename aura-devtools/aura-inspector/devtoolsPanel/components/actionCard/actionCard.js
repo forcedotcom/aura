@@ -59,6 +59,12 @@
 
     		this.shadowRoot.querySelector("#statsCreated").textContent = statsInfo.created;
     	}
+
+    	if(model.isStorable === "false" || model.isStorable === false) {
+    		// Hide the storable sub info columns
+    		this.shadowRoot.querySelector(".attributes").classList.add("storable-false");
+    	}
+
     	if(this.getAttribute("toWatch") === "true") {
     		//let people decide what they would like to do once the actionCard is created inside watch list    	
     		this.shadowRoot.querySelector(".span_removeActionCard").style.display = "inline-block";
@@ -80,6 +86,8 @@
 			this.shadowRoot.querySelector(".div_errorResponse").style.display = "none";	
     		this.shadowRoot.querySelector(".dropOrModify").style.display = "none";
     	}
+
+
     	//Edit action parameter is not working yet, hide it
     	//this.shadowRoot.querySelector("#button_editActionParameter").style.display = "none";
 		//this.shadowRoot.querySelector(".matchActionParameter").style.display = "none";

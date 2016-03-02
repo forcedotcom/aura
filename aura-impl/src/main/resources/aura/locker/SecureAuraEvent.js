@@ -14,29 +14,21 @@
  * limitations under the License.
  */
 
+//#include aura.locker.SecureThing
+
 var SecureAuraEvent = (function() {
   "use strict";
 
-  function getEvent(ae) {
-    return ae._get("event", $A.lockerService.masterKey);
-  }
-
-  function getKey(ae) {
-    return $A.lockerService.util._getKey(ae, $A.lockerService.masterKey);
-  }
-
   function SecureAuraEvent(event, key) {
-    SecureThing.call(this, key, "event");
-    $A.lockerService.util.applyKey(event, key);
-    // keying the event in case it is passed around by the component logic
-    this._set("event", event, $A.lockerService.masterKey);
+    setLockerSecret(this, "key", key);
+    setLockerSecret(this, "ref", event);
     Object.freeze(this);
   }
 
-  SecureAuraEvent.prototype = Object.create(SecureThing.prototype, {
+  SecureAuraEvent.prototype = Object.create(null, {
     toString: {
       value: function() {
-        return "SecureAuraEvent: " + getEvent(this).getName() + " { key: " + JSON.stringify(getKey(this)) + " }";
+        return "SecureAuraEvent: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
       }
     },
     "fire": SecureThing.createPassThroughMethod("fire"),

@@ -16,19 +16,11 @@
 
 /*jslint sub: true */
 
-//#include aura.locker.SecureThing
 //#include aura.locker.SecureDocument
 //#include aura.locker.SecureAura
+
 var SecureWindow = (function() {
 	"use strict";
-
-	function getWindow(sw) {
-		return sw._get("window", $A.lockerService.masterKey);
-	}
-
-	function getKey(sw) {
-		return $A.lockerService.util._getKey(sw, $A.lockerService.masterKey);
-	}
 
 	/**
 	 * Construct a new SecureWindow.
@@ -43,9 +35,8 @@ var SecureWindow = (function() {
 	 *            key - the key to apply to the secure window
 	 */
 	function SecureWindow(win, key) {
-		SecureThing.call(this, key, "window");
-
-		this._set("window", win, $A.lockerService.masterKey);
+		setLockerSecret(this, "key", key);
+		setLockerSecret(this, "ref", win);
 		Object.defineProperties(this, {
 			document: {
 				value: new SecureDocument(win.document, key)
@@ -63,10 +54,10 @@ var SecureWindow = (function() {
 		Object.freeze(this);
 	}
 
-	SecureWindow.prototype = Object.create(SecureThing.prototype, {
+	SecureWindow.prototype = Object.create(null, {
 		toString: {
 			value: function() {
-				return "SecureWindow: " + getWindow(this) + "{ key: " + JSON.stringify(getKey(this)) + " }";
+				return "SecureWindow: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
 			}
 		}
 	});

@@ -20,19 +20,17 @@
 var SecureComponent = (function() {
   "use strict";
 
-  function getKey(sc) {
-    return $A.lockerService.util._getKey(sc, $A.lockerService.masterKey);
-  }
-
-  function getComponent(sc) {
-    return sc._get("component", $A.lockerService.masterKey);
-  }
-
-  function SecureComponent(component, referencingKey) {
-    SecureThing.call(this, referencingKey, "component");
-
-    this._set("component", component, $A.lockerService.masterKey);
-
+  function SecureComponent(component, key) {
+    // Storing a reusable reference to the corresponding secure component into
+    // the original component via the locker secret mechanism.
+    var sc = getLockerSecret(component, "secure");
+    if (sc) {
+      return sc;
+    }
+    setLockerSecret(component, "secure", this); // backpointer
+    // regular initialization:
+    setLockerSecret(this, "key", key);
+    setLockerSecret(this, "ref", component);
     // The shape of the component depends on the methods exposed in the definitions:
     var defs = component.getDef().methodDefs;
     if (defs) {
@@ -42,10 +40,10 @@ var SecureComponent = (function() {
     }
   }
 
-  SecureComponent.prototype = Object.create(SecureThing.prototype, {
+  SecureComponent.prototype = Object.create(null, {
     toString: {
       value : function() {
-        return "SecureComponent: " + getComponent(this) + "{ referencingKey: " + getKey(this) + " }";
+        return "SecureComponent: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
       }
     },
 
@@ -77,12 +75,12 @@ var SecureComponent = (function() {
     "getEvent": {
       value: function(name) {
         // system call to collect the low level aura event
-        var event = getComponent(this).getEvent(name);
+        var event = getLockerSecret(this, "ref").getEvent(name);
         if (!event) {
           return event;
         }
         // shadowing the low level aura event with the component's key
-        return new SecureAuraEvent(event, getKey(this));
+        return new SecureAuraEvent(event, getLockerSecret(this, "key"));
       }
     }
 

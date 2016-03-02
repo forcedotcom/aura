@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-//#include aura.locker.SecureThing
 var SecureAura = (function() {
   "use strict";
-
-  function getAuraInstance(sa) {
-		return sa._get("aura", $A.lockerService.masterKey);
-	}
-
-  function getKey(sa) {
-    return $A.lockerService.util._getKey(sa, $A.lockerService.masterKey);
-  }
 
   /**
    * Construct a new SecureAura.
@@ -39,14 +30,14 @@ var SecureAura = (function() {
    *            key - the key to apply to the secure aura
    */
   function SecureAura(AuraInstance, key) {
-    SecureThing.call(this, key, "aura");
-    this._set("aura", AuraInstance, $A.lockerService.masterKey);
+    setLockerSecret(this, "key", key);
+    setLockerSecret(this, "ref", AuraInstance);
     // Creating a proxy of the Aura Instance to preserve backward compatibility, but
     // eventually we want to ignore any API that is not a public API in Aura. For now,
     // we settle on only enumerable properties (whether they are own or inherited).
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties
     for (var name in AuraInstance) {
-      if (SecureAura.prototype.hasOwnProperty(name)) {
+      if (Object.hasOwnProperty(SecureAura.prototype, name)) {
         // ignoring anything that SecureAura already implements
         return;
       }
@@ -55,18 +46,17 @@ var SecureAura = (function() {
     Object.freeze(this);
   }
 
-  SecureAura.prototype = Object.create(SecureThing.prototype, {
+  SecureAura.prototype = Object.create(null, {
     toString: {
       value: function() {
-        return "SecureAura: " + getAuraInstance(this) + "{ key: " + JSON.stringify(getKey(this)) + " }";
+        return "SecureAura: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
       }
     },
     getComponent: {
       value: function(globalId) {
-        var key = getKey(this);
-        var c = getAuraInstance(this).getComponent(globalId);
-        $A.lockerService.util.verifyAccess(key, c);
-        return $A.lockerService.wrapComponent(c);
+        var cmp = getLockerSecret(this, "ref").getComponent(globalId);
+        $A.lockerService.util.verifyAccess(this, cmp);
+        return $A.lockerService.wrapComponent(cmp);
       }
     }
   });

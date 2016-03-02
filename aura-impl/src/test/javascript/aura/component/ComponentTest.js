@@ -44,6 +44,7 @@ Test.Aura.Component.ComponentTest=function(){
             "Component": Aura.Component.Component,
             "InvalidComponent": Aura.Component.InvalidComponent,
             "AttributeSet": Aura.Attribute.AttributeSet,
+            "getLockerSecret": function () {},
             "$A": {
                 assert:function(condition,message){if(!condition)throw new Error(message)},
                 error:function(message){throw new Error(message)},
@@ -121,25 +122,17 @@ Test.Aura.Component.ComponentTest=function(){
                     isUndefinedOrNull:function(){
                     }
                 },
-	            lockerService: {
-	              unwrap: function(elements) {
-	                return elements;
-	              },
-	              wrapComponent: function(component) {
-	                return component;
-	              },
-	              util: {
-	                  _getKey: function() {
-	                      return undefined;
-	                  }
-	              },
-	              masterKey: {
-	                  name: "master"
-	              }
-	            }
+                lockerService: {
+                    unwrap: function(elements) {
+                        return elements;
+                    },
+                    wrapComponent: function(component) {
+                        return component;
+                    }
+                }
             }
         };
-        
+
         return Mocks.GetMocks(Object.Global(),mock)(during);
     }
     [Fixture]

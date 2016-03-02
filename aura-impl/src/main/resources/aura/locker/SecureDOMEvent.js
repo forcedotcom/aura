@@ -17,14 +17,6 @@
 var SecureDOMEvent = (function() {
   "use strict";
 
-  function getEvent(se) {
-    return se._get("event", $A.lockerService.masterKey);
-  }
-
-  function getKey(se) {
-    return $A.lockerService.util._getKey(se, $A.lockerService.masterKey);
-  }
-
   function isDOMElementOrNode(o) {
     return typeof o === "object" &&
         ((typeof HTMLElement === "object" && o instanceof HTMLElement) ||
@@ -38,7 +30,7 @@ var SecureDOMEvent = (function() {
     return {
       get: function() {
         // perf hard-wired in case there is not a touches to wrap
-        var event = getEvent(this);
+        var event = getLockerSecret(this, "event");
         var touches = event[propName];
         if (!touches) {
           return touches;
@@ -55,7 +47,7 @@ var SecureDOMEvent = (function() {
               get: function () {
                 if (isDOMElementOrNode(touch[p])) {
                   $A.lockerService.util.verifyAccess(event, touch[p]);
-                  return SecureDocument.wrap(touch[p]);
+                  return new SecureElement(touch[p], getLockerSecret(event, "key"));
                 }
                 return touch[p];
               }
@@ -98,14 +90,11 @@ var SecureDOMEvent = (function() {
   };
 
   function SecureDOMEvent(event, key) {
-    SecureThing.call(this, key, "event");
-    $A.lockerService.util.applyKey(event, key);
-    // keying the event in case it is passed around by the component logic
-    this._set("event", event, $A.lockerService.masterKey);
-
+    setLockerSecret(this, "key", key);
+    setLockerSecret(this, "ref", event);
     // re-exposing externals
     for (var name in event) {
-      if (SecureDOMEvent.prototype.hasOwnProperty(name)) {
+      if (Object.hasOwnProperty(SecureDOMEvent.prototype, name)) {
         // ignoring anything that SecureDOMEvent already implements
         return;
       }
@@ -116,10 +105,10 @@ var SecureDOMEvent = (function() {
     Object.freeze(this);
   }
 
-  SecureDOMEvent.prototype = Object.create(SecureThing.prototype, {
+  SecureDOMEvent.prototype = Object.create(null, {
     toString: {
       value: function() {
-        return "SecureDOMEvent: " + getEvent(this) + "{ key: " + JSON.stringify(getKey(this)) + " }";
+        return "SecureDOMEvent: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
       }
     }
   });

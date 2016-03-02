@@ -53,7 +53,7 @@ public class Manifest extends AuraResourceImpl {
     private ManifestUtil manifestUtil = new ManifestUtil();
 
     public Manifest() {
-        super("app.manifest", Format.MANIFEST, false);
+        super("app.manifest", Format.MANIFEST);
     }
 
     /**

@@ -109,16 +109,11 @@ public class AuraResourceServlet extends AuraBaseServlet {
         if (servletUtil.resourceServletGetPre(request, response, resource)) {
             return;
         }
+        
         resource.setContentType(response);
+        
         setBasicHeaders(context.getApplicationDescriptor(), request, response);
-        if (resource.isCSRFProtect()) {
-            try {
-                Aura.getConfigAdapter().validateCSRFToken(csrfToken.get(request));
-            } catch (Throwable t) {
-                servletUtil.handleServletException(t, true, context, request, response, false);
-                return;
-            }
-        }
+        
         resource.write(request, response, context);
     }
 

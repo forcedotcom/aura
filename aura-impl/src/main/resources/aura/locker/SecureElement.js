@@ -78,6 +78,7 @@ var SecureElement = (function() {
 				var sCallback = function(e) {
 					var se = new SecureDOMEvent(e, key);
 					// Wrap the source event in "this" in a secure element
+					// TODO: we might need to check if we have access to context object
 					var secureEventContext = new SecureElement(this, key);
 					callback.call(secureEventContext, se);
 				};

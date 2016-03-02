@@ -94,7 +94,7 @@ var SecureDOMEvent = (function() {
     setLockerSecret(this, "ref", event);
     // re-exposing externals
     for (var name in event) {
-      if (Object.hasOwnProperty(SecureDOMEvent.prototype, name)) {
+      if (name in SecureDOMEvent.prototype) {
         // ignoring anything that SecureDOMEvent already implements
         return;
       }

@@ -17,6 +17,7 @@
 //#include aura.locker.SecureThing
 //#include aura.locker.SecureElement
 //#include aura.locker.SecureScriptElement
+
 var SecureDocument = (function() {
   "use strict";
 
@@ -54,18 +55,23 @@ var SecureDocument = (function() {
 
         default:
           var el = getLockerSecret(this, "ref").createElement(tag);
+          $A.lockerService.trust(this, el);
           return new SecureElement(el, key);
         }
       }
     },
     createDocumentFragment: {
       value: function() {
-        return new SecureElement(getLockerSecret(this, "ref").createDocumentFragment(), getLockerSecret(this, "key"));
+        var frag = getLockerSecret(this, "ref").createDocumentFragment();
+        $A.lockerService.trust(this, frag);
+        return new SecureElement(frag, getLockerSecret(this, "key"));
       }
     },
     createTextNode: {
       value: function(text) {
-        return new SecureElement(getLockerSecret(this, "ref").createTextNode(text), getLockerSecret(this, "key"));
+        var node = getLockerSecret(this, "ref").createTextNode(text);
+        $A.lockerService.trust(this, node);
+        return new SecureElement(node, getLockerSecret(this, "key"));
       }
     },
 

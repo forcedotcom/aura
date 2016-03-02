@@ -2,19 +2,19 @@
     getDocumentFragment: function(cmp) {
         cmp.set("v.log", document.createDocumentFragment());
     },
-    
+
     getScriptElement: function(cmp) {
         cmp.set("v.log", document.createElement("script"));
     },
-    
+
     getIframeElement: function(cmp) {
         cmp.set("v.log", document.createElement("iframe"));
     },
-    
+
     getTextNode: function(cmp) {
         cmp.set("v.log", document.createTextNode());
     },
-    
+
     createElementsPushToMarkup: function(cmp) {
         var docFragment = document.createDocumentFragment();
         var span = document.createElement("span");
@@ -23,11 +23,11 @@
         var content = cmp.find("content").getElement();
         content.appendChild(docFragment);
     },
-    
+
     getElementById: function(cmp) {
         cmp.set("v.log", document.getElementById("title"));
     },
-    
+
     /**
      * Create our own div before finding it to guarantee we have access
      */
@@ -38,7 +38,7 @@
         markupDiv.appendChild(newDiv);
         cmp.set("v.log", document.querySelector("#foo"));
     },
-    
+
     getCookie: function(cmp) {
         cmp.set("v.log", document.cookie);
     }

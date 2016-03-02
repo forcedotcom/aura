@@ -37,7 +37,7 @@ var SecureAura = (function() {
     // we settle on only enumerable properties (whether they are own or inherited).
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties
     for (var name in AuraInstance) {
-      if (Object.hasOwnProperty(SecureAura.prototype, name)) {
+      if (name in SecureAura.prototype) {
         // ignoring anything that SecureAura already implements
         return;
       }

@@ -9,8 +9,8 @@
         test: function(cmp) {
             cmp.helper.accessDocumentBody(cmp);
             var wrapped = cmp.get("v.log");
-            $A.test.assertStartsWith("ObscureThing", wrapped.toString(), "Expected document.body passed to helper"
-                    + " to be an ObscureThing");
+            $A.test.assertStartsWith("SecureThing", wrapped.toString(), "Expected document.body passed to helper"
+                    + " to be an SecureThing");
         }
     },
 
@@ -47,7 +47,7 @@
                     + " to be a SecureAura");
         }
     },
-    
+
     testComponentLockerInController: {
         test: function(cmp) {
             cmp.getWrappersFromController();
@@ -169,7 +169,7 @@
         	cmp.testEvalBlocking($A.test);
 
         	// DCHASMAN TOOD Port these to cmp.testEvalBlocking()
-        	
+
             // eval attempts that result in an error
             /*try {
                 var symbol = "toString.constructor.prototype";

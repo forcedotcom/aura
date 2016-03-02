@@ -14,10 +14,10 @@
             cmp.getIframe();
             var iframe = cmp.get("v.log");
             this.AttributesWhitelist.forEach(function(name) {
-                $A.test.assertTrue(iframe.hasOwnProperty(name));
+                $A.test.assertTrue(name in iframe);
             });
             this.AttributesBlacklist.forEach(function(name) {
-                $A.test.assertFalse(iframe.hasOwnProperty(name));
+                $A.test.assertFalse(name in iframe);
             });
         }
     },

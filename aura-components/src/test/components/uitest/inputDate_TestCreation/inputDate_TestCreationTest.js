@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- ({
+({
     testCreateComponent: {
         test : function(cmp) {
             cmp.addInputDate();
@@ -27,9 +27,16 @@
                         var body = holder.get("v.body");
                         $A.test.assertEquals(1, body.length, "expected a single element in the body");
                         var elt = body[0];
-                        $A.test.assertEquals("markup://ui:inputDate", elt.getDef().getDescriptor().getQualifiedName());
+                        var expectedMarkupName = this.isDesktop() 
+                                                 ? "markup://ui:inputDate" 
+                                                 : "markup://ui:inputDateHtml";
+                        $A.test.assertEquals(expectedMarkupName, elt.getDef().getDescriptor().getQualifiedName());
                     }
             );
         }
+    },
+
+    isDesktop : function() {
+        return ($A.get('$Browser.formFactor').toLowerCase() === "desktop");
     }
 })

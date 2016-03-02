@@ -93,7 +93,8 @@
             // inputDate becomes inputDateHtml, so on mobile the test has 1 less datePicker displayed
             var expectedDatePickerSize = this.isViewDesktop() ? 2 : 1;
             var datePickerSize = $A.test.getElementByClass("uiDatePicker").length;
-            $A.test.assertEquals(expectedDatePickerSize, datePickerSize, "There should be two datePickers on the screen and there aren't");
+            $A.test.assertEquals(expectedDatePickerSize, datePickerSize,
+                                 "Expected "+expectedDatePickerSize+" datePicker(s) on the screen but there aren't");
         }
     },
 

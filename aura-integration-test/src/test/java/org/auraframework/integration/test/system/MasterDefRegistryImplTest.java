@@ -1238,7 +1238,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * PostConditions: (1) registry.find() should be called. (2) We should get exactly one descriptor. (3) It should
      * contain the def descriptor. (4) There should be no cache.
      */
-    public void testDescriptorFilterNameWildcardWithoutCache() throws Exception {
+    public void _testDescriptorFilterNameWildcardWithoutCache() throws Exception {
         DefRegistry<?> mockedRegistry = Mockito.mock(DefRegistry.class);
         DefDescriptor<?> dd = DefDescriptorImpl.getInstance("markup", "aura", "mocked", DefType.COMPONENT);
         Set<DefDescriptor<?>> findable = Sets.newHashSet();

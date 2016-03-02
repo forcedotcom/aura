@@ -1401,9 +1401,16 @@ AuraComponentService.prototype.findDependencies = function (key, defConfig, stor
  * - dependencies: array of action/def descriptors this item depends on.
  */
 AuraComponentService.prototype.buildDependencyGraph = function() {
-    // list of actions to never evict
-    var actionsBlackList = ["globalValueProviders",
-                            "aura://ComponentController/ACTION$getApplication"];
+    // NOTE: this is really, really important to get right. if we ever evict
+    // data required by aura framework, especially data for it to boot, then regardless
+    // of what userland actions you have, the framework won't boot. so never evict these!
+    //
+    // NOTE: AuraClientService.js' "$AuraClientService.token$" goes directly to the adapter, bypassing
+    // the isolation key, so will never be returned by storage.getAll().
+    var actionsBlackList = ["globalValueProviders",                                 /* GlobalValueProviders.js */
+                            "aura://ComponentController/ACTION$getApplication",     /* AuraClientService.js */
+                            "$AuraContext$"];                                       /* AuraContext.js */
+
 
     var promises = [];
     var actionStorage = Action.getStorage();

@@ -645,41 +645,41 @@ AuraClientService.prototype.isDevMode = function() {
     return !$A.util.isUndefined(context) && context.getMode() === "DEV";
 };
 
+
+/**
+ * Clears actions and ComponentDefStorage stores then reloads the page.
+ */
+AuraClientService.prototype.dumpCachesAndReload = function() {
+    // reload even if storage clear fails
+    var actionStorage = Action.getStorage();
+    var actionClear = actionStorage && actionStorage.isPersistent() ? actionStorage.clear() : Promise["resolve"]([]);
+
+    actionClear.then(
+        undefined, // noop on success
+        function(e) {
+            $A.log("Failed to clear persistent actions cache", e);
+            // do not rethrow to return to resolve state
+        }
+    ).then(
+        function() {
+            return $A.componentService.clearDefsFromStorage();
+        }
+    ).then(
+        undefined, // noop on success
+        function(e) {
+            $A.log("Failed to clear persistent component def storage", e);
+            // do not rethrow to return to resolve state
+        }
+    ).then(
+        function() {
+            window.location.reload(true);
+        }
+    );
+};
+
 AuraClientService.prototype.handleAppCache = function() {
 
     var acs = this;
-
-
-    /**
-     * Clears actions and ComponentDefStorage stores then reloads the page.
-     */
-    function dumpCachesAndReload() {
-        // reload even if storage clear fails
-        var actionStorage = Action.getStorage();
-        var actionClear = actionStorage && actionStorage.isPersistent() ? actionStorage.clear() : Promise["resolve"]([]);
-
-        actionClear.then(
-            undefined, // noop on success
-            function() {
-                $A.log("Failed to clear persistent actions cache");
-                // do not rethrow to return to resolve state
-            }
-        ).then(
-            function() {
-                return $A.componentService.clearDefsFromStorage();
-            }
-        ).then(
-            undefined, // noop on success
-            function() {
-                $A.log("Failed to clear persistent component def storage");
-                // do not rethrow to return to resolve state
-            }
-        ).then(
-            function() {
-                window.location.reload(true);
-            }
-        );
-    }
 
     function showProgress(progress) {
         var progressContEl = document.getElementById("auraAppcacheProgress");
@@ -709,7 +709,7 @@ AuraClientService.prototype.handleAppCache = function() {
                 // protect against InvalidStateError with swapCache even when UPDATEREADY (weird)
             }
         }
-        dumpCachesAndReload();
+        acs.dumpCachesAndReload();
     }
 
     function handleAppcacheError(e) {
@@ -741,7 +741,7 @@ AuraClientService.prototype.handleAppCache = function() {
         if (acs.appcacheDownloadingEventFired && acs.isOutdated) {
             // Hard reload if we error out trying to download new appcache
             $A.log("Outdated.");
-            dumpCachesAndReload();
+            acs.dumpCachesAndReload();
         }
     }
 
@@ -800,7 +800,7 @@ AuraClientService.prototype.setOutdated = function() {
     this.isOutdated = true;
     var appCache = window.applicationCache;
     if (!appCache || (appCache && (appCache.status === appCache.UNCACHED || appCache.status === appCache.OBSOLETE))) {
-        window.location.reload(true);
+        this.dumpCachesAndReload();
     } else if (appCache.status === appCache.IDLE || appCache.status > appCache.DOWNLOADING) {
         // call update when there is a cache ie IDLE (status = 1) or cache is not being checked (status = 2) or downloaded (status = 3)
         appCache.update();
@@ -2189,7 +2189,7 @@ AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, 
             }
 
 	        var element = $A.util.getElement(locatorDomId);
-	
+
 	        // Check for bogus locatorDomId
 	        var errors;
 	        if (!element) {
@@ -2203,7 +2203,7 @@ AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, 
 	        } else {
 	            errors = a.getState() === "SUCCESS" ? undefined : action.getError();
 	        }
-	
+
 	        var componentConfig;
 	        if (!errors) {
 	            componentConfig = a.getReturnValue();
@@ -2217,29 +2217,29 @@ AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, 
 	            //
 	            componentConfig = self.createIntegrationErrorConfig(errors);
 	        }
-		
+
 	        $A.util.apply(componentConfig, {
 	            "localId" : localId,
 	            "attributes" : {
 	                "valueProvider" : root
 	            }
 	        }, null, true);
-	
+
 	        var c = $A.componentService.createComponentPriv(componentConfig);
-	
+
 	        if (!errors) {
 	            // Wire up event handlers
 	            self.addComponentHandlers(c, config["actionEventHandlers"]);
 	        }
-	
+
 	        var body = root.get("v.body");
 	        body.push(c);
-	
+
 	        // Do not let Aura consider this initial setting into the surrogate app as a candiadate for rerendering
 	        root.set("v.body", body, true);
-	
+
 	        $A.render(c, element);
-	
+
 	        $A.afterRender(c);
         } finally {
         	if (!priorAccess) {
@@ -2339,19 +2339,19 @@ AuraClientService.prototype.injectComponentAsync = function(config, locator, eve
     if (!priorAccess) {
     	context.setCurrentAccess(root);
     }
-    
+
     $A.componentService.newComponentAsync(undefined, function(component) {
         if (callback) {
             callback(component);
         }
 
         acs.renderInjection(component, locator, eventHandlers);
-        
+
         if (!priorAccess) {
         	context.releaseCurrentAccess();
         }
     }, config, root, false, false, true);
-    
+
     // Now we go ahead and stick a label load on the request.
     var labelAction = $A.get("c.aura://ComponentController.loadLabels");
     labelAction.setCallback(this, function() {});

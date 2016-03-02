@@ -305,9 +305,9 @@
 
             // Execute the collected handlers in order
             while ((actionHandlerScope = handlers.shift())) {
-                actionHandler = actionHandlerScope["handler"];
+                actionHandler = actionHandlerScope.handler;
                 if ($A.util.isExpression(actionHandler)) {
-                    this._dispatchAction(actionHandler.evaluate(), e, actionHandlerScope["cmp"]);
+                    this._dispatchAction(actionHandler.evaluate(), e, actionHandlerScope.cmp);
                 }
             }
             

@@ -16,11 +16,6 @@
 ({
     buildBody: function (cmp, shouldClearBody) {
         var anchorElement = cmp.find("anchor").getElement();
-
-        if (!anchorElement.onclick) {
-            anchorElement.onclick = this.select.bind(this, cmp);
-        }
-
         var label = cmp.get("v.label");
         var isDisabled = cmp.get("v.disabled");
 
@@ -44,14 +39,5 @@
                 $A.renderingService.rerenderFacet(cmp, bodyAttribute);
             }
         }
-    },
-
-    // Since there's no way to specify that the concrete implementation of a method should be called, this is
-    // a workaround that achieves this functionality.
-    select: function(cmp) {
-        if (cmp.isValid()) {
-            cmp.getConcreteComponent().select();
-        }
     }
-
 })// eslint-disable-line semi

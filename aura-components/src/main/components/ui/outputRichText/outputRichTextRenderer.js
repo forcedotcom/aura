@@ -16,18 +16,17 @@
 ({
     render: function(component) {
         if (component) {
-            var concrete = component.getConcreteComponent();
-            var concreteHelper = concrete.getDef().getHelper();
-            concreteHelper.validate(component);
+            var concreteHelper = component.getConcreteComponent().getDef().getHelper();
+            concreteHelper.escapeAndLinkifyText(component, concreteHelper);
         }
         return this.superRender();
     },
 
     rerender: function(component) {
-        if (component) {
-            var concrete = component.getConcreteComponent();
-            var concreteHelper = concrete.getDef().getHelper();
-            concreteHelper.validate(component);
+        if (component &&
+            (component.isDirty("v.value") || component.isDirty("v.dir"))) {
+            var concreteHelper = component.getConcreteComponent().getDef().getHelper();
+            concreteHelper.escapeAndLinkifyText(component, concreteHelper);
         }
         return this.superRerender();
     }

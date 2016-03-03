@@ -1,35 +1,38 @@
 ({
 
-    setup : function(cmp, event, helper) {
-        
-        var done = event.getParam('arguments').done;
-        var finishSetup = done.async();
-        
-        var NUM_ITEMS = 500;
+    setup: function(cmp, event, helper) {
+        cmp.NUM_ITEMS = 1400;
         cmp.newActionMenuItemComponents = [];
+    },
 
-        for (var i = 0; i < NUM_ITEMS; i++) {
-            $A.createComponent("ui:actionMenuItem", {
-                'aura:id' : 'item' + 12 + i,
-                'label' : 'D' + (i + 1)
-            }, function(actionMenuItem, status, statusMessagesList) {
-                cmp.newActionMenuItemComponents.push(actionMenuItem);
-                if(cmp.newActionMenuItemComponents.length == NUM_ITEMS - 1){
-                    finishSetup();
+    run: function(cmp, event, helper) {
+
+        var done = event.getParam('arguments').done;
+       
+        if (cmp.get("v.testManyItems")) {
+            var finishRun = done.async();
+            
+            $A.getDefinition("ui:actionMenuItem", function() {
+                for (var i = 0; i < cmp.NUM_ITEMS; i++) {
+                    $A.createComponent("ui:actionMenuItem", {
+                        'aura:id': 'item' + 12 + i,
+                        'label': 'D' + (i + 1)
+                    }, function(actionMenuItem, status, statusMessagesList) {
+                        cmp.newActionMenuItemComponents.push(actionMenuItem);
+                        if (cmp.newActionMenuItemComponents.length == cmp.NUM_ITEMS - 1) {
+                            cmp.find("actionMenu").set("v.body", cmp.newActionMenuItemComponents);
+                            finishRun();
+                        }
+                    })
                 }
             });
         }
-    },
-
-    run : function(cmp, event, helper) {
-        if (cmp.get("v.testManyItems")) {
-            cmp.find("actionMenu").set("v.body",
-                    cmp.newActionMenuItemComponents);
+        else{
+            done.immediate();
         }
-        event.getParam('arguments').done.immediate();
     },
 
-    postProcessing : function(cmp, event, helper) {
+    postProcessing: function(cmp, event, helper) {
 
     }
 

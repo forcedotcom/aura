@@ -215,13 +215,10 @@
 
         delete this.PANELS_OWNER[panelId];
         delete this.PANELS_INSTANCE[panelId];
-
-        // TODO: commented out to work around bug
-        // in the app, return when that is fixed: W-2942958
-        // 
-        // if (cmp.returnFocus) {
-        //     cmp.returnFocus.focus();
-        // }
+        
+        if (cmp.returnFocus) {
+            cmp.returnFocus.focus();
+        }
 
         // Notify the destroy
         config.onDestroy && config.onDestroy();

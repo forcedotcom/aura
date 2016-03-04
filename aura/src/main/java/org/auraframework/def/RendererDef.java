@@ -23,13 +23,13 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
-public interface RendererDef extends Definition {
+public interface RendererDef extends CodeDefinition {
     @Override
     DefDescriptor<RendererDef> getDescriptor();
 
     /**
      * Render the component.
-     * 
+     *
      * @param component the component to render.
      * @param out the output stream.
      * @throws IOException if the output stream does.
@@ -37,6 +37,4 @@ public interface RendererDef extends Definition {
      *             component.
      */
     void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException;
-
-    boolean isLocal();
 }

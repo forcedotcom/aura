@@ -72,12 +72,12 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             finish();
             return new ApplicationDefImpl(this);
         }
-    }
 
-    @Override
-    public DefDescriptor<ApplicationDef> getDefaultExtendsDescriptor() {
-        return ApplicationDefImpl.PROTOTYPE_APPLICATION;
-    }
+         @Override
+        public DefDescriptor<ApplicationDef> getDefaultExtendsDescriptor() {
+            return ApplicationDefImpl.PROTOTYPE_APPLICATION;
+        }
+   }
 
     /**
      * @return Returns the locationChangeEventDescriptor.

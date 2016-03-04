@@ -115,13 +115,13 @@ public class TextTokenizerTest extends AuraImplTestCase {
 
     public void testWhitespacePreserve() throws Exception {
         String[] descNames = new String[] { //
-        "text", //
+        		"text", //
                 "expression", //
                 "text", //
                 "expression", //
                 "text" };
         String[] testResults = new String[] { //
-        "[value=     ]", //
+        		"[value=     ]", //
                 "[value=org.auraframework.impl.expression.LiteralImpl", //
                 "[value=     ]", //
                 "[value=org.auraframework.impl.expression.LiteralImpl", //

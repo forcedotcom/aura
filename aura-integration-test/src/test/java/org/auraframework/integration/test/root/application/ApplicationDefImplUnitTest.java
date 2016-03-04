@@ -16,7 +16,10 @@
 package org.auraframework.integration.test.root.application;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionAccess;
+import org.auraframework.def.EventDef;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl.Builder;
 import org.auraframework.impl.root.component.BaseComponentDefImplUnitTest;
@@ -38,6 +41,7 @@ public class ApplicationDefImplUnitTest extends
 
     public ApplicationDefImplUnitTest(String name) {
         super(name);
+        descriptorName = "application";
         qualifiedDescriptorName = "test:application";
     }
 

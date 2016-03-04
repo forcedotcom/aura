@@ -29,6 +29,7 @@ import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 /**
  * Integration tests for Java Model
@@ -140,6 +141,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
     /**
      * Verify model can NOT be accessed in non-privileged (custom) namespace
      */
+    @UnAdaptableTest("namespace start with c means something special in core")
     public void testExceptionIsThrownWhenUsingJavaModelInNonPriviledgedNamespace() throws Exception {
         String resourceSource = "<aura:component model='java://org.auraframework.impl.java.model.TestModel'>Hello World!</aura:component>";
         DefDescriptor<ComponentDef> cmpDefDesc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,

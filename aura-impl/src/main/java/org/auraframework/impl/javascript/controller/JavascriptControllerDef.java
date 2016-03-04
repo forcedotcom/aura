@@ -16,7 +16,6 @@
 package org.auraframework.impl.javascript.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +57,7 @@ public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> imple
     public void serialize(Json json) throws IOException {
         json.writeMap(actions);
     }
-    
+
     @Override
     public Map<String, JavascriptActionDef> getActionDefs() {
         return actions;
@@ -101,11 +100,11 @@ public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> imple
         public Builder() {
             super(ControllerDef.class);
         }
-        
+
         public void addAction(String name, JavascriptActionDef action) {
             actions.put(name, action);
         }
-        
+
         @Override
         public JavascriptControllerDef build() {
             return new JavascriptControllerDef(this);

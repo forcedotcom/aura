@@ -6,7 +6,7 @@
 
     // TODO(tbliss): make these lists on SecureElement accessible here for maintainablility
     ElementPropertiesWhitelist: ['attributes', 'childElementCount', 'classList', 'className', 'id', 'tagName'],
-    ElementProperitesBlacklast: ['children', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
+    ElementProperitesBlacklast: ['firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
                                  'nextElementSibling', 'previousElementSibling'],
 
     HTMLPropertiesWhitelist: ['accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable',
@@ -24,10 +24,10 @@
             cmp.getDiv();
             var element = cmp.get("v.log");
             this.ElementPropertiesWhitelist.forEach(function(name) {
-                $A.test.assertTrue(element.hasOwnProperty(name));
+                $A.test.assertTrue(name in element);
             });
             this.ElementProperitesBlacklast.forEach(function(name) {
-                $A.test.assertFalse(element.hasOwnProperty(name));
+                $A.test.assertFalse(name in element);
             });
         }
     },
@@ -37,21 +37,21 @@
             cmp.getDiv();
             var element = cmp.get("v.log");
             this.HTMLPropertiesWhitelist.forEach(function(name) {
-                $A.test.assertTrue(element.hasOwnProperty(name));
+                $A.test.assertTrue(name in element);
             });
             this.HTMLPropertiesBlacklist.forEach(function(name) {
-                $A.test.assertFalse(element.hasOwnProperty(name));
+                $A.test.assertFalse(name in element);
             });
         }
     },
-    
+
     // TODO(tbliss): Need special setup to get some of these to be available, need to revisit
     _testOtherProperties: {
         test: function(cmp) {
             cmp.getDiv();
             var element = cmp.get("v.log");
             this.OtherPropertiesWhitelist.forEach(function(name) {
-                $A.test.assertTrue(element.hasOwnProperty(name));
+                $A.test.assertTrue(name in element);
             });
         }
     },

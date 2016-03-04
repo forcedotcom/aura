@@ -15,9 +15,9 @@
  */
 
 //#include aura.locker.SecureThing
-//#include aura.locker.ObscureThing
 //#include aura.locker.SecureElement
 //#include aura.locker.SecureScriptElement
+
 var SecureDocument = (function() {
   "use strict";
 
@@ -34,49 +34,44 @@ var SecureDocument = (function() {
    *            key - the key to apply to the secure document
    */
   function SecureDocument(document, key) {
-    SecureThing.call(this, key, "document");
-
-    this._set("document", document, $A.lockerService.masterKey);
-
+    setLockerSecret(this, "key", key);
+    setLockerSecret(this, "ref", document);
     Object.freeze(this);
   }
 
-  function getDocument(sd) {
-    return sd._get("document", $A.lockerService.masterKey);
-  }
-
-  function getKey(sd) {
-    return $A.lockerService.util._getKey(sd, $A.lockerService.masterKey);
-  }
-
-  SecureDocument.prototype = Object.create(SecureThing.prototype, {
+  SecureDocument.prototype = Object.create(null, {
     toString: {
       value: function() {
-        return "SecureDocument: " + getDocument(this) + "{ key: " + JSON.stringify(getKey(this)) + " }";
+        return "SecureDocument: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
       }
     },
 
     createElement: {
       value: function(tag) {
-        var key = getKey(this);
+        var key = getLockerSecret(this, "key");
         switch (tag.toLowerCase()) {
         case "script":
           return new SecureScriptElement(key);
 
         default:
-          var el = getDocument(this).createElement(tag);
+          var el = getLockerSecret(this, "ref").createElement(tag);
+          $A.lockerService.trust(this, el);
           return new SecureElement(el, key);
         }
       }
     },
     createDocumentFragment: {
       value: function() {
-        return new SecureElement(getDocument(this).createDocumentFragment(), getKey(this));
+        var frag = getLockerSecret(this, "ref").createDocumentFragment();
+        $A.lockerService.trust(this, frag);
+        return new SecureElement(frag, getLockerSecret(this, "key"));
       }
     },
     createTextNode: {
       value: function(text) {
-        return new SecureElement(getDocument(this).createTextNode(text), getKey(this));
+        var node = getLockerSecret(this, "ref").createTextNode(text);
+        $A.lockerService.trust(this, node);
+        return new SecureElement(node, getLockerSecret(this, "key"));
       }
     },
 
@@ -96,10 +91,6 @@ var SecureDocument = (function() {
   });
 
   SecureDocument.prototype.constructor = SecureDocument;
-
-  SecureDocument.wrap = function(el) {
-    return new SecureElement(el, $A.lockerService.util._getKey(el, $A.lockerService.masterKey));
-  };
 
   return SecureDocument;
 })();

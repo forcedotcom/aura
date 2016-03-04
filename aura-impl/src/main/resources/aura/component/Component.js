@@ -1574,9 +1574,14 @@ Component.prototype.render = function() {
     if(render){
         var context = $A.getContext();
         context.setCurrentAccess(this);
-
-        var result = render($A.lockerService.wrapComponent(this), this["helper"]);
-
+        var secureThis = $A.lockerService.wrapComponent(this);
+        var result = render(secureThis, this["helper"]);
+        // Locker: anytime framework receive DOM elements from a locked down component
+        // it should unwrap them before using them. For regular components, this is
+        // a non-opt:
+        if (secureThis !== this) {
+            result = $A.lockerService.unwrap(result);
+        }
         context.releaseCurrentAccess();
 
         return result;
@@ -1613,7 +1618,14 @@ Component.prototype.rerender = function() {
     if(rerender){
         var context=$A.getContext();
         context.setCurrentAccess(this);
-        var result = rerender($A.lockerService.wrapComponent(this), this["helper"]);
+        var secureThis = $A.lockerService.wrapComponent(this);
+        var result = rerender(secureThis, this["helper"]);
+        // Locker: anytime framework receive DOM elements from a locked down component
+        // it should unwrap them before using them. For regular components, this is
+        // a non-opt:
+        if (secureThis !== this) {
+            result = $A.lockerService.unwrap(result);
+        }
         context.releaseCurrentAccess();
         return result;
      } else {
@@ -1764,7 +1776,7 @@ Component.prototype.setupComponentDef = function(config) {
         this.replaceComponentClass(componentDef.getDescriptor().getQualifiedName());
     }
 
-    var key = $A.lockerService.util._getKey(this.componentDef, $A.lockerService.masterKey);
+    var key = getLockerSecret(this.componentDef, "key");
 	if (key) {
     	$A.lockerService.util.applyKey(this, key);
 	}

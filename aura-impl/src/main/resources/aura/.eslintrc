@@ -91,8 +91,11 @@
     "valueFactory": true,
     "ValueDef": true,
     "WallTime": true,
+    "getLockerSecret": true,
+    "setLockerSecret": true,
     "SecureAura": true,
     "SecureThing": true,
+    "SecureComponentRef": true,
     "SecureComponent": true,
     "SecureWindow": true,
     "SecureDocument": true,
@@ -100,8 +103,7 @@
     "SecureScriptElement": true,
     "SecureIFrameElement": true,
     "SecureDOMEvent": true,
-    "SecureAuraEvent": true,
-    "ObscureThing": true
+    "SecureAuraEvent": true
   },
 
   "rules": {

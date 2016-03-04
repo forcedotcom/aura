@@ -26,7 +26,7 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
  * from a controller that the component definition needs to know like what
  * actions and types of data are exposed.
  */
-public interface ControllerDef extends ValueProvider, Definition {
+public interface ControllerDef extends ValueProvider, CodeDefinition {
     /**
      * Get the descriptor for this def.
      */
@@ -58,6 +58,4 @@ public interface ControllerDef extends ValueProvider, Definition {
      * @return the action def, or null if none.
      */
     ActionDef getSubDefinition(String name);
-    
-	boolean isLocal();
 }

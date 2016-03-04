@@ -15,16 +15,17 @@
  */
 package org.auraframework.impl.javascript.parser.handler;
 
+import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ProviderDef;
-import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.javascript.provider.JavascriptProviderDef.Builder;
+import org.auraframework.impl.util.JavascriptTokenizer;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.JsFunction;
+import org.auraframework.util.json.JsonHandlerProvider;
 
 /**
  * This is a basic handler for a javascript provider def.
@@ -35,28 +36,29 @@ import org.auraframework.util.json.JsFunction;
 public class JavascriptProviderDefHandler extends JavascriptHandler<ProviderDef, ProviderDef> {
 
     private final Builder builder = new Builder();
-    private final String[] ALLOWED_METHODS = {"provide"};
 
     public JavascriptProviderDefHandler(DefDescriptor<ProviderDef> descriptor, Source<?> source) {
         super(descriptor, source);
     }
 
     @Override
-    protected ProviderDef createDefinition(Map<String, Object> map) throws QuickFixException {
-        setDefBuilderFields(builder);
-        for (String key : ALLOWED_METHODS) {
-            Object value = map.get(key);
-            if (value != null && value instanceof JsFunction) {
-                ((JsFunction) value).setName(key);
-                builder.addFunction(key, value);
-            }
-        }
-        return builder.build();
+    protected JsonHandlerProvider getHandlerProvider() {
+        return new JavascriptProviderHandlerProvider();
     }
 
     @Override
-    public void addExpressionReferences(Set<PropertyReference> propRefs) {
-        builder.addExpressionRefs(propRefs);
+    protected ProviderDef createDefinition(String code) throws QuickFixException, IOException {
+    	setDefBuilderFields(builder);
+        new JavascriptTokenizer(getParentDescriptor(), code, getLocation()).process(builder);
+
+        Map<String, Object> map = codeToMap(code);
+    	if (map.isEmpty()) {
+    		throw new InvalidDefinitionException("No provide function was found", getLocation());
+    	}
+    	String recode = mapToCode(map);
+    	builder.setCode(recode);
+
+        return builder.build();
     }
 
     @Override
@@ -65,5 +67,4 @@ public class JavascriptProviderDefHandler extends JavascriptHandler<ProviderDef,
         builder.setParseError(error);
         return builder.build();
     }
-
 }

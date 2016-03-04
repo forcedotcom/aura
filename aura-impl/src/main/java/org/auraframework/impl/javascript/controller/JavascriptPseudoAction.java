@@ -59,7 +59,7 @@ public class JavascriptPseudoAction implements Action {
 
     @Override
     public void serialize(Json json) throws IOException {
-        throw new UnsupportedOperationException("client-side Javascript actions do not serialze back from the server");
+        throw new UnsupportedOperationException("client-side Javascript actions do not serialize back from the server");
     }
 
     @Override

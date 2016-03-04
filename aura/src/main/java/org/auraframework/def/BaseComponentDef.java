@@ -15,7 +15,6 @@
  */
 package org.auraframework.def;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * Common base for ComponentDef and ApplicationDef
  */
-public interface BaseComponentDef extends RootDefinition {
+public interface BaseComponentDef extends RootDefinition, MinifiedCodeDefinition {
 
     @Override
     DefDescriptor<? extends BaseComponentDef> getDescriptor();
@@ -78,7 +77,6 @@ public interface BaseComponentDef extends RootDefinition {
 
     ControllerDef getControllerDef() throws QuickFixException;
     ControllerDef getLocalControllerDef() throws QuickFixException;
-    ControllerDef getRemoteControllerDef() throws QuickFixException;
 
     DefDescriptor<? extends BaseComponentDef> getExtendsDescriptor();
 
@@ -134,8 +132,6 @@ public interface BaseComponentDef extends RootDefinition {
     public static final WhitespaceBehavior DefaultWhitespaceBehavior = WhitespaceBehavior.OPTIMIZE;
 
     WhitespaceBehavior getWhitespaceBehavior();
-
-    DefDescriptor<? extends BaseComponentDef> getDefaultExtendsDescriptor();
 
     /**
      * Adds specified client libraries to definition
@@ -198,13 +194,4 @@ public interface BaseComponentDef extends RootDefinition {
      * @throws QuickFixException If there is a problem loading a flavor or parent def.
      */
     Set<String> getAllFlavorNames() throws QuickFixException;
-
-    /**
-     * Get the generated JavaScript class for this component.
-     *
-     * @return the generated code.
-     * @throws QuickFixException
-     * @throws IOException
-     */
-    String getComponentClass() throws QuickFixException, IOException;
 }

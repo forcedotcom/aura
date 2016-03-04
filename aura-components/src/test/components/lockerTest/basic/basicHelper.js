@@ -3,9 +3,15 @@
 		alert("{ document: " + document.toString() + " }");
 	},
 	
-	log : function(component, message) {
+	log : function(component, message, blockedExploit) {
 		var content = component.find("content");
 		var messageDiv = document.createElement("div");
+        if (blockedExploit) {
+            messageDiv.style.color = "white";
+            messageDiv.style.backgroundColor = "green";
+            messageDiv.style.opacity = "0.4";
+        }
+        
 		messageDiv.appendChild(document.createTextNode(message));
 		content.getElement().appendChild(messageDiv);
 	},
@@ -16,7 +22,7 @@
 		// Test out eval, self, and Function tricks
 		try {
 			var result = testCase();
-			this.helper.log(this.component, "Global window via " + symbol + ": " + result);
+			this.helper.log(this.component, "Global window via " + symbol + ": " + result, !result);
 		} catch (x) {
 			var error = x.toString();
 			if (error.indexOf("TypeError") < 0 && error.indexOf("ReferenceError") < 0 && error.indexOf("Security violation: use of __pro" + "to__") < 0
@@ -26,7 +32,7 @@
 				throw new Error("Unexpected exception: " + x.toString());
 			}
 			
-			this.helper.log(this.component, "Blocked: " + symbol);
+			this.helper.log(this.component, "Blocked: " + symbol, true);
 		}
 	},
 

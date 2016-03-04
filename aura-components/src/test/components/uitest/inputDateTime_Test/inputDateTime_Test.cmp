@@ -24,7 +24,6 @@
     <aura:attribute name="useSingleInput" type="Boolean"/>
 
     <ui:inputDateTime aura:id="dateTimePickerTest"
-                      label="label"
                       displayDatePicker="true"
                       class="date_input_box"
                       value="{!v.value}"

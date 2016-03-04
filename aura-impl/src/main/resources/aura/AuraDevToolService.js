@@ -576,6 +576,84 @@ var AuraDevToolService = function() {
 
         	 return accessAideFuncs.formatOutput(imgErrorMsg, errorArray);
             },
+            
+            /**
+             * Function that checks all descendants of an element for a matching tag and retrieves the specified property 
+             * from the first encountered element - May need refactoring
+             * 
+             * @param element - element whose descendants to check
+             * @param property - the property to retrieve from the child element
+             * @param childTag - the tag to match with the child elements
+             * @returns property - property to be retrieved or null if property does not exist
+             */
+            getPropertyFromDescendantTag : function (element, property, childTag) {	
+            	if(!$A.util.isUndefinedOrNull(element)) {
+            		var matchingChildren = element.getElementsByTagName(childTag);
+            		//if(!$A.util.isEmpty(matchingChildren)) {		
+            		if(matchingChildren.length > 0) {
+            			return $A.util.getElementAttributeValue(matchingChildren[0], property) || 
+            				   $A.util.getElementAttributeValue(matchingChildren[0], "data-aura-rendered-by");
+            		}
+            	}
+            	return null;
+            },
+            
+            /**
+             * Function that goes through all the labels and checks that they are associated with an input through the 'for' attribute 
+             * or that they have a child input tag.
+             * 
+             * @param lbls          -  All the labels to go over
+             * @returns errorArray  -  Returns all the erroneous labels
+             */
+            matchLabelToInput : function(lbls) {
+            	
+            	var errorArray = [];
+            	var atrib = null;
+            	var isParent = false;
+            	var dict = {};
+            	var inputID = null;
+                var label = null;
+            	var accessAideFuncs = aura.devToolService.accessbilityAide;
+            	
+            	 for(var i = 0; i < lbls.length; i++){
+            		 label = lbls[i];
+                     atrib = $A.util.getElementAttributeValue(label, "for");
+                     isParent = (accessAideFuncs.getPropertyFromDescendantTag(label, "id", "INPUT") || 
+                 		 		 accessAideFuncs.getPropertyFromDescendantTag(label, "id", "TEXTAREA") || 
+                 		 		 accessAideFuncs.getPropertyFromDescendantTag(label, "id", "SELECT"));
+                     
+                     // if label is not associated through a 'for' and is not a parent of an input - ERROR
+                     if($A.util.isEmpty(atrib) && (!isParent)) {
+                    	 errorArray.push(label);
+                     }
+
+                     // if label is associated to an input,
+                     // check if multiple labels are associated to a single input
+                     else
+                     {
+                        inputID = atrib || isParent; 
+                         if($A.util.isUndefinedOrNull(dict[inputID])){
+                             dict[inputID] = label;
+                         }
+                         else {
+                             errorArray.push(dict[inputID]);
+                             errorArray.push(label);
+                         }
+                     }
+
+                     // Get the element that label's 'for' points to
+                     // Element's id must match the for attribute value and check if its tag is an input
+                     if(!$A.util.isEmpty(atrib)) {	  
+                    	var inputElem = document.getElementById(atrib);
+                        if(($A.util.isUndefinedOrNull(inputElem)) || (inputElem.tagName !== "INPUT" && inputElem.tagName !== "TEXTAREA" && inputElem.tagName !== "SELECT")){
+                        	errorArray.push(label);
+                        }
+                     }
+                  }
+            	 
+            	return errorArray; 
+            },
+            
             /**
              * Function that goes through all labels and check for either the for attribute and the label id, or if a parent tag is a label
              * This function skips over several input types: submit, reset, image, hidden, and button. All of these have labels associated
@@ -1017,7 +1095,7 @@ var AuraDevToolService = function() {
             checkInputsHaveLabel : {
                 "tag"  : "A11Y_DOM_02",
                 "func" : function(domElem) {
-                     var inputLabelMsg   = "[A11Y_DOM_02] Labels are required for all input controls.\n  More info http://sfdc.co/a11y_dom_02";
+                     var inputLabelMsg   = "[A11Y_DOM_02] There must be a one-to-one relationship between labels and inputs. There can be no unlabeled <input> elements. There can be no orphaned <label> elements.\n  More info http://sfdc.co/a11y_dom_02";
                      var accessAideFuncs = aura.devToolService.accessbilityAide;
                      var inputTextTags   = domElem.getElementsByTagName('input');
                      var textAreaTags    = domElem.getElementsByTagName('textarea');
@@ -1028,6 +1106,7 @@ var AuraDevToolService = function() {
                      errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, inputTextTags));
                      errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, textAreaTags));
                      errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, selectTags));
+                     errorArray = errorArray.concat(accessAideFuncs.matchLabelToInput(lbls));
 
                      return accessAideFuncs.formatOutput(inputLabelMsg, errorArray);
                  }

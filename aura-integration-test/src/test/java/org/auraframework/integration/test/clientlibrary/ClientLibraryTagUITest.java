@@ -19,8 +19,6 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.CheckAccessibility;
 import org.junit.Ignore;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 
 @CheckAccessibility(false)
 public class ClientLibraryTagUITest extends WebDriverTestCase {
@@ -32,7 +30,7 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
     /**
      * Verify that Javascript and Style resources marked as uncombinable are available at the client. WalltimeLocale is
      * an uncombinable JS resource.
-     * 
+     *
      * @throws Exception
      */
     public void testNonCombinableResources() throws Exception {

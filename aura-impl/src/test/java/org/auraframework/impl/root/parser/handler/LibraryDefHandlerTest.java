@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -44,14 +45,18 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
     @Mock(answer = Answers.RETURNS_MOCKS)
     DefDescriptor<LibraryDef> descriptor;
 
+    @Mock
+    DefDescriptor<IncludeDef> includeDescriptor;
+    private String filename = "sanity";
+
     public void testGetElement() throws Exception {
         StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format(
-                "<%s><%s name='sanity'/></%1$s>",
-                LibraryDefHandler.TAG, IncludeDefRefHandler.TAG), "myID", Format.XML);
+                "<%s><%s name=\"%s\"/></%1$s>",
+                LibraryDefHandler.TAG, IncludeDefRefHandler.TAG, filename), "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(descriptor).getDefType();
         LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source));
-
-        LibraryDef actualDef = handler.getElement();
+        
+    	LibraryDef actualDef = handler.getElement();
         assertSame(descriptor, actualDef.getDescriptor());
         List<IncludeDefRef> includes = actualDef.getIncludes();
         assertEquals(1, includes.size());

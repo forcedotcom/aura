@@ -19,10 +19,10 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
+import org.auraframework.impl.root.library.JavascriptIncludeClass;
 import org.auraframework.impl.root.library.IncludeDefRefImpl;
 import org.auraframework.impl.root.library.IncludeDefRefImpl.Builder;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
-import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.mockito.Answers;
 import org.mockito.Mock;
@@ -53,10 +53,9 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
     }
 
     public void testValidateDefintionAliasIsInvalidIdentifier() throws Exception {
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
         String name = "invalidSource";
-        builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, libDesc, IncludeDef.class));
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().addSourceAutoCleanup(IncludeDef.class, "function(){}", name);
+        builder.setDescriptor(includeDesc);
         builder.setAliases(ImmutableList.of("who/came/up/with/this"));
         IncludeDefRef def = builder.build();
 
@@ -72,10 +71,9 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
     }
 
     public void testValidateDefintionAliasesIsJs() throws Exception {
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
         String name = "invalidSource";
-        builder.setDescriptor(definitionService.getDefDescriptor(name, IncludeDef.class, libDesc));
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().addSourceAutoCleanup(IncludeDef.class, "function(){}", name);
+        builder.setDescriptor(includeDesc);
         builder.setAliases(ImmutableList.of("(function(){alert('boo!')})()"));
         IncludeDefRef def = builder.build();
 
@@ -91,10 +89,9 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
     }
 
     public void testValidateDefintionExportIsInvalidIdentifier() throws Exception {
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
         String name = "invalidSource";
-        builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, libDesc, IncludeDef.class));
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().addSourceAutoCleanup(IncludeDef.class, "function(){}", name);
+        builder.setDescriptor(includeDesc);
         builder.setExport("who/came/up/with/this");
         IncludeDefRef def = builder.build();
 
@@ -110,10 +107,9 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
     }
 
     public void testValidateDefintionExportIsJs() throws Exception {
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
         String name = "invalidSource";
-        builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, libDesc, IncludeDef.class));
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().addSourceAutoCleanup(IncludeDef.class, "function(){}", name);
+        builder.setDescriptor(includeDesc);
         builder.setExport("(function(){alert('boo!')})()");
         IncludeDefRef def = builder.build();
 
@@ -127,4 +123,91 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
                     String.format("%s 'export' attribute must be a valid javascript identifier", IncludeDefRefHandler.TAG));
         }
     }
+
+	public void testInvalidTryToBreakOut() throws Exception {
+	    String source = "function(){\n}}) alert('watch out')";
+
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
+                null);
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("dummy",
+                IncludeDef.class, libDesc);
+        addSourceAutoCleanup(includeDesc, source);
+
+        builder.setDescriptor(includeDesc.getDef().getDescriptor());
+        IncludeDefRef def = builder.build();
+
+	    try {
+	        def.validateDefinition();
+	        fail("Invalid breaking JS wasn't validated");
+	    } catch (InvalidDefinitionException t) {
+	        assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
+	        		String.format("JS Processing Error: %s (line 2, char 1) : Parse error. missing ) after argument list\n",
+	                JavascriptIncludeClass.getClientDescriptor(includeDesc), source));
+	    }
+	}
+
+	public void testExtraCurlyBrace() throws Exception {
+		String source = "var a=66;\n}";
+
+		// source will have an extra curly brace at the end
+		DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
+              null);
+		DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("dummy",
+              IncludeDef.class, libDesc);
+		addSourceAutoCleanup(includeDesc, source);
+
+		builder.setDescriptor(includeDesc.getDef().getDescriptor());
+        IncludeDefRef def = builder.build();
+
+		try {
+			def.validateDefinition();
+          	fail("Invalid unclosed JS wasn't validated");
+		} catch (InvalidDefinitionException t) {
+			assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
+                  String.format("JS Processing Error: %s (line 2, char 0) : Parse error. syntax error\n",
+                  JavascriptIncludeClass.getClientDescriptor(includeDesc), source));
+		}
+	}
+
+	public void testUnClosed() throws Exception {
+		// Put the error online to to avoid running into fluctuation in client descriptor length.
+		// During hrh course of the test, several "dummy" descriptors are created an not cleaned.
+        String source = "function(){\nreturn 66;";
+
+     	DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
+              null);
+     	DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("dummy",
+              IncludeDef.class, libDesc);
+     	addSourceAutoCleanup(includeDesc, source);
+
+     	builder.setDescriptor(includeDesc.getDef().getDescriptor());
+        IncludeDefRef def = builder.build();
+
+     	try {
+     		def.validateDefinition();
+     		fail("Invalid unclosed JS wasn't validated");
+     	} catch (InvalidDefinitionException t) {
+     		assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
+                String.format("JS Processing Error: %s (line 2, char 12) : Parse error. missing } after function body\n",
+                JavascriptIncludeClass.getClientDescriptor(includeDesc), source));
+     	}
+	}
+
+	public void testWarningIgnoredForNonStandardJsDoc() throws Exception {
+		String source = "function(){return 'x'}\n/*!\n * @version 1\n */";
+
+		DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
+              null);
+		DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("dummy",
+              IncludeDef.class, libDesc);
+		addSourceAutoCleanup(includeDesc, source);
+
+		builder.setDescriptor(includeDesc.getDef().getDescriptor());
+        IncludeDefRef def = builder.build();
+
+		def.validateDefinition();
+		assertEquals(String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s);\n",
+    		  JavascriptIncludeClass.getClientDescriptor(includeDesc), source), def.getCode(false));
+	}
 }
+

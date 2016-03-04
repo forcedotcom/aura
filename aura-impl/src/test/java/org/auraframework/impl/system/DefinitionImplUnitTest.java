@@ -40,6 +40,7 @@ import com.google.common.collect.ImmutableMap;
 public abstract class DefinitionImplUnitTest<I extends DefinitionImpl<D>, D extends Definition, R extends Definition, B extends RefBuilderImpl<D, R>>
 extends UnitTestCase {
 
+    protected String descriptorName;
     protected String qualifiedDescriptorName;
     @Mock
     protected DefDescriptor<D> descriptor;
@@ -76,7 +77,7 @@ extends UnitTestCase {
 
     public void testGetName() throws Exception {
         String actual = buildDefinition().getName();
-        assertEquals(this.qualifiedDescriptorName, actual);
+        assertEquals(this.descriptorName, actual);
     }
 
     public void testGetNameNullDescriptor() throws Exception {
@@ -217,7 +218,8 @@ extends UnitTestCase {
 
     protected R buildDefinition(B builder) throws Exception {
         if (this.qualifiedDescriptorName != null && this.descriptor != null) {
-            Mockito.doReturn(this.qualifiedDescriptorName).when(this.descriptor).getName();
+            Mockito.doReturn(this.descriptorName).when(this.descriptor).getName();
+            Mockito.doReturn(this.qualifiedDescriptorName).when(this.descriptor).getQualifiedName();
         }
         builder.setDescriptor(this.descriptor);
         builder.setLocation(this.location);

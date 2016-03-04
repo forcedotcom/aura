@@ -354,13 +354,13 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
      * @param props the collection of properties to scan.
      */
     protected void retrieveLabels(Collection<PropertyReference> props) throws QuickFixException {
-        GlobalValueProvider labelProvider;
-
-        labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders().get(LABEL.getPrefix());
-        for (PropertyReference e : props) {
-            if (e.getRoot().equals(LABEL.getPrefix())) {
-                labelProvider.validate(e.getStem());
-                labelProvider.getValue(e.getStem());
+        if (props != null && !props.isEmpty()) {
+            GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders().get(LABEL.getPrefix());
+            for (PropertyReference e : props) {
+                if (e.getRoot().equals(LABEL.getPrefix())) {
+                    labelProvider.validate(e.getStem());
+                    labelProvider.getValue(e.getStem());
+                }
             }
         }
     }

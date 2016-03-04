@@ -15,47 +15,35 @@
  */
 package org.auraframework.impl.javascript.controller;
 
-import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.impl.javascript.BaseJavascriptDef;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
 
 /**
  * def for client controllers
  */
-public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> implements ControllerDef {
-
+public class JavascriptControllerDef extends BaseJavascriptDef<ControllerDef> implements ControllerDef {
     private static final long serialVersionUID = 133829572661899255L;
+
     private final Map<String, JavascriptActionDef> actions;
-    private final Set<PropertyReference> expressionRefs;
 
     protected JavascriptControllerDef(Builder builder) {
         super(builder);
         this.actions = AuraUtil.immutableMap(builder.actions);
-        this.expressionRefs = builder.expressionRefs;
     }
 
     @Override
     public JavascriptActionDef getSubDefinition(String name) {
         return actions.get(name);
-    }
-
-    @Override
-    public void serialize(Json json) throws IOException {
-        json.writeMap(actions);
     }
 
     @Override
@@ -88,31 +76,24 @@ public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> imple
         return getSubDefinition(key.toString());
     }
 
-    @Override
-    public void retrieveLabels() throws QuickFixException {
-        retrieveLabels(expressionRefs);
-    }
+    public static class Builder extends BaseJavascriptDef.Builder<ControllerDef> {
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ControllerDef> {
-        public Map<String, JavascriptActionDef> actions = new TreeMap<>();
-        public Set<PropertyReference> expressionRefs = new HashSet<>();
+        public Map<String, JavascriptActionDef> actions;
 
         public Builder() {
             super(ControllerDef.class);
         }
 
-        public void addAction(String name, JavascriptActionDef action) {
-            actions.put(name, action);
+        public void addActions(Map<String, JavascriptActionDef> actions) {
+            if (this.actions == null) {
+                this.actions = new TreeMap<>();
+            }
+            this.actions.putAll(actions);
         }
 
         @Override
         public JavascriptControllerDef build() {
             return new JavascriptControllerDef(this);
         }
-    }
-
-    @Override
-    public boolean isLocal() {
-        return false;
     }
 }

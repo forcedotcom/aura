@@ -25,6 +25,7 @@
 			isAbortable:	this.getAttribute("isAbortable"),
 			returnValue:	this.getAttribute("returnValue"),
 			returnError:    this.getAttribute("returnError") === '[]'? undefined : this.getAttribute("returnError"),
+			howDidWeModifyResponse: this.getAttribute("howDidWeModifyResponse"),//responseModified_modify, responseModified_drop, responseModified_error
 			fromStorage:	this.getAttribute("isStorable") === "true" ? this.getAttribute("isFromStorage") : "-",
             //storageKey could be very long, I want people be able to see it when they want to, hide it like other JSON object when no one cares
 			storageKey:	this.getAttribute("isStorable") === "true" ? "{\"storageKey\":"+JSON.stringify(this.getAttribute("storageKey"))+"}" : "-",

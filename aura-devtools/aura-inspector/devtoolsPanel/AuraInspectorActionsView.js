@@ -144,9 +144,10 @@ function AuraInspectorActionsView(devtoolsPanel) {
     }
 
     function AuraInspectorActionsView_OnActionStateChange(data) {
-        //we successfully modify the response, now remove the action card from Watch List to Processed
+        //for action card on the right side, we successfully modify the response, now move the action card from Watch List to Processed
         if(data && data.state && data.state === "RESPONSEMODIFIED") {
             upsertCard(data);
+        //for action card on the left side
         } else {
             if(!actions.has(data.id)) {
                 return;
@@ -238,6 +239,9 @@ function AuraInspectorActionsView(devtoolsPanel) {
             card.setAttribute("toWatch", "false");
             //let's make it draggable again, so people can drag already processed action back to watch list
             card.setAttribute("draggable","true");
+            card.classList.add("draggable");
+            card.classList.remove("dropped");
+            card.classList.remove("actionsToWatch-list");
             card.addEventListener("dragstart", drag.bind(this) );
             card.addEventListener("dragend", endDrag.bind(this) );
         } else { //card on the left side
@@ -251,6 +255,12 @@ function AuraInspectorActionsView(devtoolsPanel) {
                 card.setAttribute("fromStorage", action.fromStorage);
                 card.setAttribute("storageKey", action.storageKey);
                 card.setAttribute("returnError", action.error);
+                //let's give user some idea if the action result was modified, and if so, in which way
+                //responseModified_modify, responseModified_drop or responseModified_error
+                card.setAttribute("howDidWeModifyResponse", action.howDidWeModifyResponse);
+                if(action.howDidWeModifyResponse != undefined) {
+                    card.classList.add(action.howDidWeModifyResponse);
+                }
                 if(action.stats) {
                     card.setAttribute("stats", JSON.stringify(action.stats));
                 }
@@ -266,9 +276,6 @@ function AuraInspectorActionsView(devtoolsPanel) {
                 break;
             case "NEW":
                 _pending.appendChild(card);
-                break;
-            case "DROPPED":
-                _processed.appendChild(card);
                 break;
             case "RESPONSEMODIFIED":
                 _processed.appendChild(card);
@@ -331,6 +338,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
             } else {
                 //we allow people to drag the card when the card is on the left side
                 card.setAttribute("draggable","true");
+                card.classList.add("draggable");
                 card.addEventListener("dragstart", drag.bind(this) );
                 card.addEventListener("dragend", endDrag.bind(this) );
                 card.setAttribute("toWatch", false);
@@ -362,6 +370,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
       } else {
         event.target.classList.add("dropped");
         event.target.setAttribute("draggable","false");
+        event.target.classList.remove("draggable");
       }
     }
 
@@ -397,6 +406,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
             if(card) {
                 card.setAttribute("draggable","true");  
                 card.classList.remove("dropped");
+                card.classList.add("draggable");
             } else {
                 console.log("AuraInspectorActionsView_OnRemoveActionFromWatchList, couldn't find actionCard on leftside for :", actionInfo);
             }

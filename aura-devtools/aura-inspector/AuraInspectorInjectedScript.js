@@ -880,7 +880,7 @@
                                         "error": actionWatched.nextError,//we don't show error on processed actionAcard, but pass it anyway
                                         "sentTime": performance.now()//do we need this?
                                 });
-                                delete actionsWatched[actionWatchedId];
+                                //delete actionsWatched[actionWatchedId];
                                 break;//get out of looping over actionsWatched
                             } else if(responseModified === true) {
                                 oldResponseObj.actions = actionsFromOldResponse;
@@ -893,7 +893,7 @@
                                         "state": "RESPONSEMODIFIED",
                                         "sentTime": performance.now()//do we need this?
                                 });
-                                delete actionsWatched[actionWatchedId];
+                                //delete actionsWatched[actionWatchedId];
                                 break;//get out of looping over actionsWatched
                             } else if(responseWithIncomplete === true) {
                                 //move the actionCard from watch list to Processed
@@ -904,7 +904,7 @@
                                         "state": "RESPONSEMODIFIED",
                                         "sentTime": performance.now()//do we need this?
                                 });
-                                delete actionsWatched[actionWatchedId];
+                                //delete actionsWatched[actionWatchedId];
                                 break;//get out of looping over actionsWatched
                             }
                         }//end of actionWatched has nextResponse and oldResponseText start with 'while(1);'
@@ -1023,12 +1023,26 @@
 
             var action = config["self"];
 
+            var howDidWeModifyResponse = undefined;
+            if(actionsWatched[action.getId()]) {
+                var actionWatched = actionsWatched[action.getId()];
+                if(actionWatched.nextError != undefined) {
+                    howDidWeModifyResponse = "responseModified_error";
+                } else if (actionWatched.nextResponse != undefined) {
+                    howDidWeModifyResponse = "responseModified_modify";
+                } else {
+                    howDidWeModifyResponse = "responseModified_drop"
+                }
+                delete actionsWatched[action.getId()];
+            }
+
             var data = {
                 "id": action.getId(),
                 "state": action.getState(),
                 "fromStorage": action.isFromStorage(),
                 "returnValue": $Aura.Inspector.safeStringify(action.getReturnValue()),
                 "error": $Aura.Inspector.safeStringify(action.getError()),
+                "howDidWeModifyResponse": howDidWeModifyResponse,
                 "finishTime": performance.now(),
                 "stats": {
                     "created": $Aura.Inspector.getCount("component_created") - startCounts.created

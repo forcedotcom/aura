@@ -649,10 +649,25 @@ h1{
   margin: .5rem;
   padding-bottom: .5rem;
 }
-.actions-list .action-card:hover {
+.action-card.draggable:hover {
   background: #f4f6f9;
   cursor: move;
 }
+.action-card.dropped:hover {
+  background-color: #fff;
+  cursor: default;
+}
+
+.action-card.responseModified_modify {
+  background-color: #BFEEA8;
+}
+.action-card.responseModified_error {
+  background-color: #F2E005;
+}
+.action-card.responseModified_drop {
+  background-color: #ECAB7C;
+}
+
 #tab-body-actions #filter-text { width: 150px; }
 .actionsToWatch-list {
   margin: 0;
@@ -660,10 +675,7 @@ h1{
 .actions-list .action-card.dropped, .action-card.dragging {
   opacity: .6;
 }
-.actions-list .action-card.dropped:hover {
-  background-color: #fff;
-  cursor: default;
-}
+
 
 
 /* Storage Panel */

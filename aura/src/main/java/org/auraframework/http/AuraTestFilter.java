@@ -79,7 +79,9 @@ import com.google.common.collect.Lists;
 public class AuraTestFilter implements Filter {
     private static final Log LOG = LogFactory.getLog(AuraTestFilter.class);
 
-    private static final String GET_URI = "/aura?aura.tag=%s:%s&aura.format=HTML&aura.deftype=%s&aura.mode=%s&aura.access=%s";
+    private static final String BASE_URI = "/aura";
+    private static final String GET_URI = BASE_URI
+            + "?aura.tag=%s:%s&aura.format=HTML&aura.deftype=%s&aura.mode=%s&aura.access=%s";
 
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
 
@@ -131,23 +133,8 @@ public class AuraTestFilter implements Filter {
 
         // Check for requests to execute a JSTest, i.e. initial component GETs with particular parameters.
         if ("GET".equals(request.getMethod())) {
-            String contextPath = request.getContextPath();
-            String uri = request.getRequestURI();
-            String path;
-            if (uri.startsWith(contextPath)) {
-                path = uri.substring(contextPath.length());
-            } else {
-                path = uri;
-            }
-            Matcher matcher = AuraRewriteFilter.DESCRIPTOR_PATTERN.matcher(path);
-            if (matcher.matches()) {
-                // Extract the target component since AuraContext usually does not have the app descriptor set yet.
-                DefType type = "app".equals(matcher.group(3)) ? DefType.APPLICATION : DefType.COMPONENT;
-                String namespace = matcher.group(1);
-                String name = matcher.group(2);
-                DefDescriptor<?> targetDescriptor = Aura.getDefinitionService().getDefDescriptor(
-                        String.format("%s:%s", namespace, name), type.getPrimaryInterface());
-
+            DefDescriptor<?> targetDescriptor = getTargetDescriptor(request);
+            if (targetDescriptor != null) {
                 // Check if a single jstest is being requested.
                 String testToRun = jstestToRun.get(request);
                 if (testToRun != null && !testToRun.isEmpty()) {
@@ -213,7 +200,8 @@ public class AuraTestFilter implements Filter {
 
                     mode = mode.toString().endsWith("DEBUG") ? Mode.AUTOJSTESTDEBUG : Mode.AUTOJSTEST;
 
-                    String qs = String.format("descriptor=%s:%s&defType=%s", namespace, name, type.name());
+                    String qs = String.format("descriptor=%s&defType=%s", targetDescriptor.getDescriptorName(),
+                            targetDescriptor.getDefType().name());
                     String testName = null;
                     if (jstestAppRequest != null && !jstestAppRequest.isEmpty()) {
                         testName = jstestAppRequest;
@@ -492,5 +480,45 @@ public class AuraTestFilter implements Filter {
                 testTimeout));
         out.append(suiteDef.getCode());
         out.append("\n);"); // handle trailing single-line comments with newline
+    }
+
+    private DefDescriptor<?> getTargetDescriptor(HttpServletRequest request) {
+        String namespace = null;
+        String name = null;
+        DefType type = null;
+
+        try {
+            String contextPath = request.getContextPath();
+            String uri = request.getRequestURI();
+            String path;
+            if (uri.startsWith(contextPath)) {
+                path = uri.substring(contextPath.length());
+            } else {
+                path = uri;
+            }
+
+            if (BASE_URI.equals(path)) {
+                String[] tagName = AuraServlet.tag.get(request).split(":", 2);
+                type = AuraServlet.defTypeParam.get(request, DefType.COMPONENT);
+                namespace = tagName[0];
+                name = tagName[1];
+            }
+            if (name == null) {
+                Matcher matcher = AuraRewriteFilter.DESCRIPTOR_PATTERN.matcher(path);
+                if (matcher.matches()) {
+                    type = "app".equals(matcher.group(3)) ? DefType.APPLICATION : DefType.COMPONENT;
+                    namespace = matcher.group(1);
+                    name = matcher.group(2);
+                }
+            }
+
+            if (name != null) {
+                return Aura.getDefinitionService().getDefDescriptor(
+                        String.format("%s:%s", namespace, name), type.getPrimaryInterface());
+            }
+        } catch (Throwable t) {
+            // Ignore. Pass request onto core servlets.
+        }
+        return null;
     }
 }

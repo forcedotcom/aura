@@ -2623,7 +2623,7 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                 return (definition.isInstanceOf && definition.isInstanceOf("aura:application")) ||
                 // #if {"excludeModes" : ["PRODUCTION","PRODUCTIONDEBUG"]}
                 // This check allows components to be loaded directly in the browser in DEV/TEST
-                 !(context&&context.getCurrentAccess()) ||
+                (!$A.getRoot() || !$A.getRoot().isInstanceOf('aura:application')) && !(context&&context.getCurrentAccess()) ||
                 // #end
                 false;
         }

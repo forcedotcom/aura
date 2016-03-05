@@ -657,10 +657,10 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
             $A.initialized = true;
             $A.addDefaultErrorHandler(app);
             // Restore component definitions from AuraStorage into memory (if persistent)
-            $A.componentService.restoreDefsFromStorage().then(function () {
+            $A.componentService.restoreDefsFromStorage().then($A.getCallback(function () {
                 $A.getContext().pruneLoaded();
                 $A.finishInit(doNotInitializeServices);
-            });
+            }));
         }
 
     }

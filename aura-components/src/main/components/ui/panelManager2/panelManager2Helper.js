@@ -197,8 +197,7 @@
     * Destroy panel instance
     * @private
     */
-    destroyPanelInstance: function (cmp, config, doActivateNext) {
-        
+    destroyPanel: function (cmp, config, doActivateNext) {
         var stack      = this.PANELS_STACK,
             panelParam = config.panelInstance,
             panelId    = $A.util.isComponent(panelParam) ? panelParam.getGlobalId() : panelParam,

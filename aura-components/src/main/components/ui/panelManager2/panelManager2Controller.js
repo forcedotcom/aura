@@ -18,18 +18,22 @@
         helper.initialize(cmp);
     },
     createPanel: function (cmp, event, helper) {
+        helper = cmp.getConcreteComponent().helper;
         helper.createPanel(cmp, event.getParams());
     },
     destroyPanel: function (cmp, event, helper) {
-        helper.destroyPanelInstance(cmp, event.getParams());
+        helper = cmp.getConcreteComponent().helper;
+        helper.destroyPanel(cmp, event.getParams());
     },
     handleNotify: function (cmp, event, helper) {
         var action = event.getParam('action'),
             intf   = event.getParam('typeOf');
-        
+
+        helper = cmp.getConcreteComponent().helper;
+
         if (action === 'destroyPanel' && intf === 'ui:destroyPanel') {
             event.stopPropagation();
-            helper.destroyPanelInstance(cmp, event.getParam('payload'));
+            helper.destroyPanel(cmp, event.getParam('payload'));
         } else if (action === 'beforeShow' && intf === 'ui:panel') {
             helper.beforeShow(cmp, event.getParam('payload'));
         } else {

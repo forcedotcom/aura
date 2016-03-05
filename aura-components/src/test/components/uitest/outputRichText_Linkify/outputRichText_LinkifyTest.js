@@ -104,7 +104,7 @@
                 return $A.test.contains(htmlValue, hrefText);
             }, "couldn't find " + hrefText + " in: "  + cmp.find("richTextComp").getElement().innerHTML,
             function() {
-                var textValue = cmp.find("richTextComp").getElement().innerText;
+                var textValue = $A.test.getText(cmp.find("richTextComp").getElement());
                 $A.test.assertEquals(textValue, cmp.get("v.textValue"));
             }
         )

@@ -285,6 +285,7 @@ CryptoAdapter.prototype.executeQueue = function(readyState) {
  * @private
  */
 CryptoAdapter.prototype.getInitializationError = function() {
+    // should use same format as log()
     return "CryptoAdapter '" + this.instanceName + "' adapter failed to initialize";
 };
 
@@ -382,12 +383,13 @@ CryptoAdapter.prototype.getItemInternal = function(key, resolve, reject) {
  */
 CryptoAdapter.prototype.decrypt = function(value) {
     var that = this;
+
     return CryptoAdapter.engine["decrypt"]({
             "name": CryptoAdapter.ALGO,
-            "iv": value["value"].iv
+            "iv": value["value"]["iv"]
         },
         that.key,
-        value["value"].cipher
+        value["value"]["cipher"]
     ).then(
         function(decrypted) {
             var obj = that.arrayBufferToObject(new Uint8Array(decrypted));
@@ -548,7 +550,7 @@ CryptoAdapter.prototype.setItemInternal = function(key, item, size, resolve, rej
             function (encrypted) {
                 var storable = {
                     "expires": item["expires"],
-                    "value": new CryptoAdapter.Entry(iv, encrypted)
+                    "value": {"iv": iv, "cipher": encrypted}
                 };
                 resolve(that.adapter.setItem(key, storable, size));
             },
@@ -635,19 +637,6 @@ CryptoAdapter.prototype.log = function (msg, obj) {
                 (this.mode === CryptoAdapter.NAME ? "" : " (fallback mode)") +
                 " '" + this.instanceName + "' " + msg, obj);
     }
-};
-
-/**
- * @description The value object used in the backing store of the CryptoAdapter.
- * @constructor
- */
-CryptoAdapter.Entry = function Entry(iv, cipher) {
-    this.iv = iv;
-    this.cipher = cipher;
-};
-
-CryptoAdapter.Entry.prototype.toString = function() {
-    return $A.util.json.encode(this);
 };
 
 

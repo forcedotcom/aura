@@ -30,6 +30,12 @@ function AuraError() {
     this.stackTrace = "";
     this.errorCode  = "";
 
+    // the component that throws the error
+    this.component = "";
+
+    // the action that errors out
+    this.action = null;
+
     function AuraErrorInternal(message, innerError) {
         // for IE8
         function getName(method) {
@@ -98,5 +104,21 @@ function AuraError() {
 
 AuraError.prototype = new Error();
 AuraError.prototype.constructor = AuraError;
+
+AuraError.prototype.setComponent = function(cmp) {
+    this.component = cmp;
+};
+
+AuraError.prototype.getComponent = function() {
+    return this.component;
+};
+
+AuraError.prototype.setAction = function(action) {
+    this.action = action;
+};
+
+AuraError.prototype.getAction = function() {
+    return this.action;
+};
 
 Aura.Errors.AuraError = AuraError;

@@ -40,7 +40,7 @@
     });
 
     $A.logger.subscribe("ERROR", function(level, message, e) {
-        $A.handleError(message, e);
+        $A.reportError(message, e);
     });
 
     window.onerror = (function() {

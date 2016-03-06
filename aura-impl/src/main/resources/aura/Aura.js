@@ -795,7 +795,9 @@ AuraInstance.prototype.handleError = function(message, e) {
 AuraInstance.prototype.reportError = function(message, error) {
     $A.handleError(message, error);
     if ($A.initialized) {
-        $A.logger.reportError(error || new Error("[NoErrorObjectAvailable] " + message));
+        $A.getCallback(function() {
+            $A.logger.reportError(error || new Error("[NoErrorObjectAvailable] " + message));
+        })();
         $A.services.client.postProcess();
     }
 };
@@ -846,19 +848,22 @@ AuraInstance.prototype.getCallback = function(callback) {
     $A.assert($A.util.isFunction(callback),"$A.getCallback(): 'callback' must be a valid Function");
     var context=$A.getContext().getCurrentAccess();
     return function(){
-        var nested = $A.clientService.inAuraLoop();
         $A.getContext().setCurrentAccess(context);
         $A.clientService.pushStack(name);
         try {
             return callback.apply(this,Array.prototype.slice.call(arguments));
         } catch (e) {
-            // Should we even allow 'nested'?
-            // no need to wrap AFE with auraError as customers who throw AFE would want to handle it with their
-            // own custom experience.
-            if (nested || e instanceof $A.auraFriendlyError) {
+            // no need to wrap AFE with auraError as 
+            // customers who throw AFE would want to handle it with their own custom experience.
+            if (e instanceof $A.auraFriendlyError) {
                 throw e;
             } else {
-                throw new $A.auraError("Uncaught error in "+name, e);
+                var errorWrapper = new $A.auraError("Uncaught error in "+name, e);
+                if (context && context.getDef) {
+                    errorWrapper.setComponent(context.getDef().getDescriptor().toString());
+                }
+
+                throw errorWrapper;
             }
         } finally {
             $A.clientService.popStack(name);

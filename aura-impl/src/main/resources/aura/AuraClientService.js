@@ -492,7 +492,9 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
                     if (errorHandler && $A.util.isFunction(errorHandler)) {
                         errorHandler(e);
                     } else {
-                        $A.logger.auraErrorHelper(e, action);
+                        var errorWrapper = new $A.auraError(null, e);
+                        errorWrapper.setAction(action);
+                        $A.logger.reportError(errorWrapper);
                     }
                     return;
                 }
@@ -517,8 +519,13 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
             }
         }
     } catch (e) {
-        $A.logger.auraErrorHelper(e, action);
-        throw e;
+        if (e instanceof $A.auraError) {
+            throw e;
+        } else {
+            var wrapper = new $A.auraError(null, e);
+            wrapper.setAction(action);
+            throw wrapper;
+        }
     }
 };
 
@@ -1324,7 +1331,9 @@ AuraClientService.prototype.continueProcessing = function() {
                 this.collector.clientActions.push(action);
             }
         } catch (e) {
-            $A.logger.auraErrorHelper(e, action);
+            var errorWrapper = new $A.auraError(null, e);
+            errorWrapper.setAction(action);
+            $A.logger.reportError(errorWrapper);
         }
     }
     this.collector.actionsToCollect -= 1;
@@ -1408,7 +1417,9 @@ AuraClientService.prototype.executeStoredAction = function(action, response, col
             }
         }
     } catch (e) {
-        $A.logger.auraErrorHelper(e, action);
+        var errorWrapper = new $A.auraError(null, e);
+        errorWrapper.setAction(action);
+        $A.logger.reportError(errorWrapper);
     } finally {
         this.clearInCollection();
     }
@@ -1971,7 +1982,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         try {
             this.saveTokenToStorage();
         } catch (e) {
-            $A.logger.auraErrorHelper(e);
+            $A.logger.reportError(e);
         }
     }
     var context=$A.getContext();
@@ -1982,7 +1993,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         }
         context['merge'](responseMessage["context"]);
     } catch (e) {
-        $A.logger.auraErrorHelper(e);
+        $A.logger.reportError(e);
     }finally{
         if(!priorAccess){
             context.releaseCurrentAccess();
@@ -1996,7 +2007,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             try {
                 this.parseAndFireEvent(events[en]);
             } catch (e) {
-                $A.logger.auraErrorHelper(e);
+                $A.logger.reportError(e);
             }
         }
     }
@@ -2036,8 +2047,13 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
                 }
             }
         } catch (e) {
-            $A.logger.auraErrorHelper(e, action);
-            throw (e instanceof $A.auraError) ? e : new $A.auraError("Error processing action response", e);
+            if (e instanceof $A.auraError) {
+                throw e;
+            } else {
+                var errorWrapper = new $A.auraError("Error processing action response", e);
+                errorWrapper.setAction(action);
+                throw errorWrapper;
+            }
         }
     }
 };

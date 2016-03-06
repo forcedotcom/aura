@@ -57,25 +57,32 @@ public class ComponentController {
 
         private final Action action;
         private final String jsStack;
+        private String causeDescriptor;
 
         public AuraClientException(String desc, String id, String message, String jsStack) {
             super(message);
             Action action = null;
+            this.causeDescriptor = null;
             if (desc != null && id != null) {
                 try {
                     action = Aura.getInstanceService().getInstance(desc, ActionDef.class);
-                } catch (QuickFixException e) {
-                    // Uh... okay, we fell over running an action we now can't even define.
+                    if (action instanceof JavascriptPseudoAction) {
+                        JavascriptPseudoAction jpa = (JavascriptPseudoAction) action;
+                        jpa.setId(id);
+                        jpa.addError(this);
+                    } else if (action instanceof JavaAction) {
+                        JavaAction ja = (JavaAction) action;
+                        ja.setId(id);
+                        ja.addException(this, Action.State.ERROR, false, false);
+                    }
+                } catch (Exception e) {
+                    this.causeDescriptor = desc;
                 }
-                if (action instanceof JavascriptPseudoAction) {
-                    JavascriptPseudoAction jpa = (JavascriptPseudoAction)action;
-                    jpa.setId(id);
-                    jpa.addError(this);
-                } else if (action instanceof JavaAction) {
-                    JavaAction ja = (JavaAction)action;
-                    ja.setId(id);
-                    ja.addException(this, Action.State.ERROR, false, false);
-                }
+            }
+
+            // use cause to track failing component markup if action is not sent.
+            if (this.causeDescriptor == null && desc != null && desc.startsWith("markup://")) {
+                this.causeDescriptor = desc;
             }
 
             this.action = action;
@@ -90,6 +97,9 @@ public class ComponentController {
             return jsStack;
         }
 
+        public String getCauseDescriptor() {
+            return causeDescriptor;
+        }
     }
 
     @AuraEnabled

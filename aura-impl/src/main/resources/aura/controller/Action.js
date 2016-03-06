@@ -1139,7 +1139,15 @@ Action.prototype.markException = function(e) {
     $A.warning("Action failed: " + (this.def?this.def.toString():"") , e);
     $A.logger.reportError(e, this.getDef().getDescriptor(), this.getId());
     if ($A.clientService.inAuraLoop()) {
-        throw e;
+        // we don't want to wrap AFE that's thrown by components intending to do custom error experience.
+        if (e instanceof $A.auraFriendlyError) {
+            e["reported"] = true;
+            throw e;
+        } else {
+            var errorWrapper = new $A.auraError(null, e);
+            errorWrapper["reported"] = true;
+            throw errorWrapper;
+        }
     }
 };
 

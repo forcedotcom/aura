@@ -22,7 +22,7 @@
     <aura:attribute name="id" type="String" description="id of the menu item"/>
 
     <li role="presentation" class="{!v.class}">
-        <a aura:id="anchor" onclick="{!c.onclick}" role="menuitem"><!-- The body is added on render --></a>
+        <a aura:id="anchor" role="menuitem" onclick="{!c.onClick}"/>
     </li>
 
 </aura:component>

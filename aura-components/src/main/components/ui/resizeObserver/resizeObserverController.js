@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 ({
-    updateSize: function(component, event, helper) {
-        helper.updateSize(component);
+    update : function(component, event, helper) {
+        helper.update(component);
+    },
+
+    updateSize: function (component, event, helper) {
+        if (component.isValid()) {
+            helper.updateSize(component);
+        }
     }
-})// eslint-disable-line semi
+});// eslint-disable-line semi

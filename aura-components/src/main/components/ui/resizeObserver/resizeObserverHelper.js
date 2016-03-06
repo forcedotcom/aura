@@ -31,17 +31,16 @@
             resizer._resizerComponentSet = {};
             resizer._resizing = false;
 
-            var helper = this;
-            resizer._resizer = $A.getCallback(function() {
+            resizer._resizer = function() {
                 if (!resizer._resizing) {
                     resizer._resizing = true;
 
-                    setTimeout($A.getCallback(function() {
+                    setTimeout(function() {
                         try {
                             for (var n in resizer._resizerComponentSet) {
                                 var c = resizer._resizerComponentSet[n];
                                 if (c.isValid()) {
-                                    helper.update(c);
+                                    c.update();
                                 }
                             }
                         } catch (e) {
@@ -49,9 +48,9 @@
                         } finally {
                             resizer._resizing = false;
                         }
-                    }), 0);
+                    }, 0);
                 }
-            });
+            };
 
             $A.util.on(window, "resize", resizer._resizer, false, 400);
         }
@@ -62,12 +61,9 @@
     update : function(component) {
         if (component.isValid()) {
             // Invoke this observer's onresize action
-            var a = component.get("v.onresize");
-            if (a) {
-            	
-            	//$A.log("ui:resizeObserver.update()", component);
-            	
-                a.runDeprecated();
+            var onresizeAction = component.get("v.onresize");
+            if (onresizeAction) {
+                onresizeAction.runDeprecated();
             }
         }
     },

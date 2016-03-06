@@ -21,6 +21,6 @@
     <aura:method name="select" action="{!c.select}"/>
 
     <li role="presentation" class="{!v.class}">
-        <a aura:id="anchor" role="menuitemcheckbox"><!-- The body is added on render --></a>
+        <a aura:id="anchor" role="menuitemcheckbox" onclick="{!c.onClick}"/>
     </li>
 </aura:component>

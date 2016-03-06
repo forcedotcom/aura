@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 ({
-    buildBody: function (cmp, shouldClearBody) {
+    buildBody: function (cmp) {
         var anchorElement = cmp.find("anchor").getElement();
-
-        if (!anchorElement.onclick) {
-            anchorElement.onclick = this.select.bind(this, cmp);
-        }
 
         var label = cmp.get("v.label");
         var isDisabled = cmp.get("v.disabled");
@@ -33,35 +29,19 @@
         var bodyAttribute = cmp.get("v.body");
         var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
 
-        if (shouldClearBody) {
-            $A.util.clearNode(anchorElement);
+        $A.util.clearNode(anchorElement);
 
-            if (hasBodyAttribute) {
-                $A.renderingService.renderFacet(cmp, bodyAttribute, anchorElement);
-            } else {
-                var iconElement = document.createElement("b");
-                $A.util.addClass(iconElement, "icon--left");
-                anchorElement.appendChild(iconElement);
-                anchorElement.appendChild(document.createTextNode(label));
-            }
+        if (hasBodyAttribute) {
+            $A.renderingService.renderFacet(cmp, bodyAttribute, anchorElement);
         } else {
-            if (hasBodyAttribute) {
-                $A.renderingService.rerenderFacet(cmp, bodyAttribute);
-            }
+            anchorElement.appendChild(document.createElement("b"));
+            anchorElement.appendChild(document.createTextNode(label));
         }
 
         if (isSelected === true) {
             $A.util.addClass(anchorElement, "selected");
         } else {
             $A.util.removeClass(anchorElement, "selected");
-        }
-    },
-
-    // Since there's no way to specify that the concrete implementation of a method should be called, this is
-    // a workaround that achieves this functionality.
-    select: function(cmp) {
-        if (cmp.isValid()) {
-            cmp.getConcreteComponent().select();
         }
     }
 

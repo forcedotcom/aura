@@ -57,6 +57,89 @@
         return {options: opts, strategy: strat};
     },
 
+    menuOptionSelected: function (cmp) {
+        var multiSelect = cmp.get("v.multiple");
+
+        var selectedLabel = "";
+        var newValue = "";
+        var menuItems = cmp.find("options").get("v.childMenuItems");
+        var options = cmp.get("v.options");
+
+        for (var i = 0; i < menuItems.length; i++) {
+            var menuItem = menuItems[i];
+            var isSelected = menuItem.get("v.selected");
+
+            options[i].selected = isSelected;
+
+            if (isSelected) {
+                if (multiSelect) {
+                    if (selectedLabel.length > 0) {
+                        selectedLabel += this.optionSeparator;
+                        newValue += this.optionSeparator;
+                    }
+
+                    selectedLabel += menuItem.get("v.label");
+                    newValue += options[i].value;
+                } else {
+                    selectedLabel = menuItem.get("v.label");
+                    newValue = options[i].value;
+                    break;
+                }
+            }
+        }
+        cmp.set("v.selectedLabel", selectedLabel);
+        cmp._suspendChangeHandlers = true;
+        cmp.set("v.value", newValue);
+        cmp.get("e.change").fire();
+        cmp._suspendChangeHandlers = false;
+    },
+
+    createMenuItems: function(cmp) {
+        var options = cmp.get("v.options");
+        var menuItems = [];
+
+        var handleCreatedMenuItem = function (menuItem) {
+            menuItems.push(menuItem);
+            if (menuItems.length === options.length) {
+                cmp.find("options").set("v.body", menuItems);
+                cmp.find("options").get("e.refresh").fire();
+            }
+        };
+        var multiSelect = cmp.get("v.multiple");
+        var menuItemComponentName = multiSelect ? "ui:checkboxMenuItem" : "ui:radioMenuItem";
+
+        $A.getDefinition(menuItemComponentName, function () {
+            for (var i = 0; i < options.length; i++) {
+                $A.createComponent(menuItemComponentName, {
+                    "label": options[i].label,
+                    "selected": options[i].selected,
+                    "hideMenuAfterSelected": !multiSelect
+                }, handleCreatedMenuItem);
+            }
+        });
+    },
+
+    updateMenuLabel: function(cmp) {
+        var multiSelect = cmp.get("v.multiple");
+        var options = cmp.get("v.options");
+        var newLabel = "";
+
+        for (var i = 0; i < options.length; i++) {
+            var option = options[i];
+            if (option.selected === true) {
+                if (multiSelect && newLabel.length > 0) {
+                    newLabel += this.optionSeparator;
+                }
+                newLabel += option.label;
+
+                if (!multiSelect) {
+                    break;
+                }
+            }
+        }
+        cmp.set("v.selectedLabel", newLabel);
+    },
+
     /**
      * Updates all options' "selected" attributes in the select element, based on the semicolon-delimited newValue string
      */

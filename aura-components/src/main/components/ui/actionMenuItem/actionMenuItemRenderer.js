@@ -17,7 +17,7 @@
     render: function (cmp, helper) {
         var ret = this.superRender();
 
-        helper.buildBody(cmp, true);
+        helper.buildBody(cmp);
 
         return ret;
     },
@@ -25,8 +25,7 @@
     rerender: function (cmp, helper) {
         this.superRerender();
 
-        var shouldClearBody = cmp.isDirty("v.label") || cmp.isDirty("v.body");
-        helper.buildBody(cmp, shouldClearBody);
+        helper.buildBody(cmp);
     },
 
     afterRender: function (cmp) {

@@ -15,9 +15,9 @@
  */
 ({
 	select : function(component, event, helper) {
-		var current = component.get("v.selected");
+		var current = component.getConcreteComponent().get("v.selected");
 		if (current === false) {
-			component.set("v.selected", !current);
+			component.getConcreteComponent().set("v.selected", !current);
 		} else {
 			helper.toggleState(component);
 		}

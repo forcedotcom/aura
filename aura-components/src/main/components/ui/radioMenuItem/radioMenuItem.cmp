@@ -23,7 +23,7 @@
     <aura:method name="select" action="{!c.select}"/>
 
     <li aura:id="listitem" class="{!v.class}" role="presentation">
-        <a aura:id="anchor" role="menuitemradio"><!-- The body is added on render --></a>
+        <a aura:id="anchor" role="menuitemradio" onclick="{!c.onClick}"/>
     </li>
 
 </aura:component>

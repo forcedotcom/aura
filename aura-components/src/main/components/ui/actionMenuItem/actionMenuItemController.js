@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    onclick: function (cmp) {
+    onClick: function (cmp) {
         if (cmp.isValid()) {
             cmp.getConcreteComponent().select();
         }

@@ -104,6 +104,11 @@
 			}
 		}
 
+		if (element.tagName === "A" && !element.getAttribute("href")) {
+			/*eslint-disable no-script-url*/
+			element.setAttribute("href", "javascript:void(0);");
+		}
+
 		if (helper.canHaveBody(component)) {
             $A.renderingService.rerenderFacet(component,component.get("v.body"),element);
 		}

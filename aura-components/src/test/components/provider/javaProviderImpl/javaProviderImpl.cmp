@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component provider="java://org.auraframework.impl.java.provider.TestProviderThrowsQFEDuringProvide">
-
+<aura:component extends="provider:javaProviderAbstract">
+    <aura:attribute name="overriddenAttribute" type="String" default="value from javaProviderImpl"/>
 </aura:component>

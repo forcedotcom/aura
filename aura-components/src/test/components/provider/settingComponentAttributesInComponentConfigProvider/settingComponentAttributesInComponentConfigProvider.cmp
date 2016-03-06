@@ -15,5 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component abstract="true" extensible="true" provider="java://org.auraframework.impl.java.provider.TestProviderAbstractNoExtends">
+<aura:component abstract="true" provider="java://org.auraframework.impl.java.provider.TestSettingAttributesComponentConfigProvider">
+        <aura:attribute name="stringValue" type="String"/>
+        <aura:attribute name="numberValue" type="Integer"/>
+        <aura:attribute name="nullValue" type="String"/>
+        <aura:attribute name="arrayValue" type="String[]"/>
+
+        <aura:attribute name="existingValue" type="String"/>
 </aura:component>

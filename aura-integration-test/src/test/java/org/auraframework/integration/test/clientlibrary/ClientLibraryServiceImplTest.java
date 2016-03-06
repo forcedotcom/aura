@@ -33,7 +33,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.clientlibrary.ClientLibraryResolverRegistryImpl;
 import org.auraframework.impl.clientlibrary.ClientLibraryServiceImpl;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;

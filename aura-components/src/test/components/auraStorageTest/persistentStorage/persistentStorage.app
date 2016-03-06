@@ -1,4 +1,6 @@
 <aura:application>
+    <aura:attribute name="log" type="String" default="" description="Required attribute by auraStorageTest:iframeTestLib:iframeTest.js" />
+
     <aura:attribute name="secure" type="Boolean" default="false" />
     <aura:attribute name="key" type="String" default="default key"/>
     <aura:attribute name="value" type="String" default="default value" />

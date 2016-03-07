@@ -37,9 +37,6 @@ function LockerService() {
 			'clearTimeout', 'clearInterval'
 		];
 
-	// TODO: attempt to lock down Object.prototype
-	// https://github.com/tc39/ecma262/issues/272
-
 	var nsKeys = {};
 	var validLockSet = typeof WeakSet !== "undefined" ? new WeakSet() : {
 			/*WeakSet dummy polyfill that does not enforce any verification on the locks */

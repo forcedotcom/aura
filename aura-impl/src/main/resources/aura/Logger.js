@@ -157,15 +157,15 @@ Logger.prototype.reportError = function(e, action, id){
     }
 
     // get action from AuraError
-    var errorAction = e.getAction ? e.getAction() : null;
+    var errorAction = action || (e.getAction ? e.getAction() : null);
     var actionName = undefined;
     var actionId = undefined;
-    if (!action && errorAction) {
+    if (errorAction) {
         if (errorAction.getDef && errorAction.getDef()) {
             actionName = errorAction.getDef().getDescriptor();
         }
         if (errorAction.getId) {
-            actionId = action.getId();
+            actionId = errorAction.getId();
         }
     }
 

@@ -4,4 +4,4 @@
         helper.updateInputFile(cmp,files);
         helper.updateFilesAttr(cmp,files);
     }
-})
+});

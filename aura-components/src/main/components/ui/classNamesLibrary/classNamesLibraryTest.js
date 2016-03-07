@@ -37,7 +37,7 @@
                     class6 : true
                 };
                 obj1['class-5'] = true;
-                $A.test.assertEquals('class3 class-5 class4 class6',classnames.ObjectToString(obj1,obj2),'Classnames was created wrong from the object.')
+                $A.test.assertEquals('class3 class-5 class4 class6',classnames.ObjectToString(obj1,obj2),'Classnames was created wrong from the object.');
 
             },
             function (cmp) {
@@ -64,4 +64,4 @@
             }
         ]
     }
-})
+});

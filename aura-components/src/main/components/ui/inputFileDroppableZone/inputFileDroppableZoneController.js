@@ -35,4 +35,4 @@
         event.preventDefault();
         helper.setElementOverStyleClass(cmp);
     }
-})
+});

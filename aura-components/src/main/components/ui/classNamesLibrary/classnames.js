@@ -1,6 +1,6 @@
 
 
-function classNamesLibrary () {
+function classNamesLibrary () {  // eslint-disable-line no-unused-vars
     var hasOwn = {}.hasOwnProperty;
     var SPACE = /\s+/;
 
@@ -8,7 +8,7 @@ function classNamesLibrary () {
         var length = array.length;
 
         for (var i = 0; i < length; ++i) {
-            _parse(resultSet, array[i]);
+            _parse(resultSet, array[i]); // eslint-disable-line no-use-before-define
         }
     }
 
@@ -39,7 +39,7 @@ function classNamesLibrary () {
     }
 
     function _parse (resultSet, arg) {
-        if (!arg) return;
+        if (!arg) { return; }
         var argType = typeof arg;
 
         // 'foo bar'
@@ -68,7 +68,7 @@ function classNamesLibrary () {
 
         for (var k in classSet) {
             if (hasOwn.call(classSet, k) && classSet[k]) {
-                list.push(k)
+                list.push(k);
             }
         }
 
@@ -78,5 +78,5 @@ function classNamesLibrary () {
 
     return {
         ObjectToString : _classNames
-    }
+    };
 }

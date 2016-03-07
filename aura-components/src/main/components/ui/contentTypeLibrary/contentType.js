@@ -1,5 +1,5 @@
 
-
+/*eslint-disable */
 function contentTypeLibrary () {
     var SEPARATOR = '/';
     var COMA      = ',';
@@ -81,8 +81,8 @@ function contentTypeLibrary () {
         return {
             type    : contentType.split(SEPARATOR)[0],
             subType : contentType.split(SEPARATOR)[1]
-        }
+        };
     }
 
     return Factory;
-}
+} /*eslint-enable */

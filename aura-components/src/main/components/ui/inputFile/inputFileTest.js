@@ -1,4 +1,4 @@
-({
+({  // eslint-disable-line no-undef
     JPG_FILE : {
         name : 'file.jpg',
         type : 'image/jpg',
@@ -53,7 +53,7 @@
         // We can not create FilesList Object with javascript for security reasons
         // then we fake FilesList === array-like
         return [].slice.call(arguments).reduce(function (prev, file) {
-            prev[prev.length] = new File(this.fakeSize(file.size),file.name, { type : file.type });
+            prev[prev.length] = new File(this.fakeSize(file.size),file.name, { type : file.type }); // eslint-disable-line no-undef
             prev.length++;
             return prev;
         }.bind(this), this.createArrayLike());
@@ -82,7 +82,7 @@
         test : [
             function (cmp) {
                 var elem = cmp.find('dropZone').getElement();
-                this.fireDomEvent(elem,this.DROP_EVENT_1())
+                this.fireDomEvent(elem,this.DROP_EVENT_1());
             },
             function (cmp) {
                 var files = cmp.get('v.files');
@@ -123,7 +123,7 @@
             // Drop single file
             function (cmp) {
                 var elem = cmp.find('dropZone').getElement();
-                this.fireDomEvent(elem,this.DROP_EVENT_1())
+                this.fireDomEvent(elem,this.DROP_EVENT_1());
             },
             // Allowed
             function (cmp) {
@@ -159,7 +159,7 @@
             // Drop single file
             function (cmp) {
                 var elem = cmp.find('dropZone').getElement();
-                this.fireDomEvent(elem,this.DROP_EVENT_1())
+                this.fireDomEvent(elem,this.DROP_EVENT_1());
             },
             // Allowed
             function (cmp) {
@@ -194,4 +194,4 @@
         ]
     }
 
-})
+});

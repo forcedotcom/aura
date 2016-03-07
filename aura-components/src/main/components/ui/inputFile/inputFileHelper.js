@@ -5,4 +5,4 @@
     updateFilesAttr : function (cmp, files) {
         cmp.set('v.files', files);
     }
-})
+});

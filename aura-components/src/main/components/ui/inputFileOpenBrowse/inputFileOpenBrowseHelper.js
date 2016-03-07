@@ -28,11 +28,11 @@
         var size = cmp.get('v.maxSizeAllowed') || Infinity;
         return this._getFilesArr(files).every(function (file) {
             return file.size <= size;
-        })
+        });
     },
     _getFilesArr : function (files) {
         return Object.keys(files).map(function (index) {
             return files[index];
-        })
+        });
     }
-})
+});

@@ -30,12 +30,12 @@
         var myContentType = new ContentType(accept);
         return  this._getFileArr(event).every(function (file) {
             return myContentType.accept(file) && this._fileMeetsSize(file,size);
-        }.bind(this))
+        }.bind(this));
     },
     _getFileArr : function (dragEvent) {
         return Object.keys(dragEvent.dataTransfer.files).map(function (index) {
             return dragEvent.dataTransfer.files[index];
-        })
+        });
     },
     _fileMeetsSize : function (file, size) {
         return file.size <= size;
@@ -45,4 +45,4 @@
             files : event.dataTransfer.files
         }).fire();
     }
-})
+});

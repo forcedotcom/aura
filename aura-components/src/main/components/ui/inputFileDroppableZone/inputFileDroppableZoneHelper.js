@@ -17,17 +17,32 @@
     },
     filesAreValid : function (cmp, event) {
         return this.meetsMultipleConditions(cmp,event) &&
-               this.meetsAcceptConditions(cmp, event);
+               this.meetsAcceptAndSizeConditions(cmp, event);
     },
     meetsMultipleConditions : function (cmp, event) {
         var multiple = cmp.get('v.multiple');
         return multiple ? multiple : event.dataTransfer.files.length === 1;
     },
-    meetsAcceptConditions : function (cmp, event) {
+    meetsAcceptAndSizeConditions : function (cmp, event) {
+        var ContentType = this.ct.contentType;
         var accept = cmp.get('v.accept');
-
+        var size   = Number(cmp.get('v.maxSizeAllowed')) || Infinity;
+        var myContentType = new ContentType(accept);
+        return  this._getFileArr(event).every(function (file) {
+            return myContentType.accept(file) && this._fileMeetsSize(file,size);
+        }.bind(this))
+    },
+    _getFileArr : function (dragEvent) {
+        return Object.keys(dragEvent.dataTransfer.files).map(function (index) {
+            return dragEvent.dataTransfer.files[index];
+        })
+    },
+    _fileMeetsSize : function (file, size) {
+        return file.size <= size;
     },
     fireDropEvent : function (cmp, event) {
-        debugger;
+        cmp.getEvent('change').setParams({
+            files : event.dataTransfer.files
+        }).fire();
     }
 })

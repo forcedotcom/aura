@@ -1,8 +1,8 @@
 ({
-    handleOpenClick : function (cmp, event, helper) {
-        cmp.find('model').openDialog();
+    init : function (cmp, event, helper) {
+        helper.createHTMLElement(cmp);
     },
-    handleChangeFiles : function () {
-
+    handleOpenClick : function (cmp,event, helper) {
+        cmp.get('v.inputFileHtmlElement').click();
     }
 })

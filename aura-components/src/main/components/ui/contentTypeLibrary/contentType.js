@@ -25,7 +25,7 @@ function contentTypeLibrary () {
         this.setAccepted(contentTypes);
     }
 
-    ContentType.prototype.isAccepted = function (contentType) {
+    ContentType.prototype.accept = function (contentType) {
         var type = _isValidContentType(contentType) ? contentType : _isFile(contentType) ? contentType.type : false;
         return type && this._contentTypes.some(function (contentType) {
                 return _isSubset(type, contentType);

@@ -28,7 +28,6 @@
         helper.removeElementOverStyleClass(cmp);
 
         if (helper.thereAreFiles(event) && helper.filesAreValid(cmp,event)) {
-
             helper.fireDropEvent(cmp,event);
         }
     },

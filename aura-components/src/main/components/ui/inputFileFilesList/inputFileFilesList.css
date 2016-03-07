@@ -1,4 +1,19 @@
-.THIS.files-list-header {
-    margin: 10px 0 5px 0;
+.THIS.input-file-header {
+    margin: 15px 0 5px 0;
     font-weight: bold;
+}
+
+.THIS.input-file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.THIS.input-file-list li:not(:last-child) {
+    margin-bottom: 5px;
+}
+
+.THIS .input-file-file-size {
+    color : #ccc;
+    font-style: italic;
 }

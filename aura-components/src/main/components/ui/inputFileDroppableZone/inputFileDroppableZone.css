@@ -16,8 +16,7 @@
 
 .THIS.droppable-zone {
     padding: 15px;
-    border: 4px dashed #ccc;
-    margin: 15px;
+    border: 2px dashed #ccc;
 }
 
 .THIS.droppable-zone.drag-over {

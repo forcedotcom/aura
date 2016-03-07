@@ -1,0 +1,11 @@
+<aura:interface support="BETA" description="Interface for input file components">
+    <!--Public Attributes-->
+    <aura:attribute name="accept"         type="String"  default="*/*"   />
+    <aura:attribute name="multiple"       type="Boolean" default="true"  />
+    <aura:attribute name="maxSizeAllowed" type="Integer"                 />
+    <aura:attribute name="class"          type="String"  default=""      />
+    <aura:attribute name="classOver"      type="String"  default=""      />
+    <aura:attribute name="disabled"       type="Boolean" default="false" />
+    <!--Events -->
+    <aura:registerEvent name="change" type="ui:inputFileChangeEvent" />
+</aura:interface>

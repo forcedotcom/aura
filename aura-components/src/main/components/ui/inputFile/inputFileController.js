@@ -1,6 +1,7 @@
 ({
-    handleOpenBrowseChange : function (cmp, event, helper) {
+    handleChange : function (cmp, event, helper) {
         var files = event.getParam('files');
-        cmp.set('v.files', files);
+        helper.updateInputFile(cmp,files);
+        helper.updateFilesAttr(cmp,files);
     }
 })

@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS.uiInputFile {
-
+.THIS > .hidden-input-file {
+    position: absolute;
+    width: 1px;
+    height: 1px;
 }
 
 

@@ -1,12 +1,7 @@
-<aura:component>
-    <aura:import library="ui:classNamesLibrary" property="lib" />
+<aura:component implements="ui:inputFileInterface">
 
-    <!--Public attributes -->
-    <aura:attribute name="accept"    type="String"  default="*/*" />
-    <aura:attribute name="multiple"  type="Boolean" default="true" />
-    <aura:attribute name="disabled"  type="Boolean" default="false" />
-    <aura:attribute name="class"     type="String"  default="" />
-    <aura:attribute name="classOver" type="String"  default="" />
+    <aura:import library="ui:classNamesLibrary"  property="lib" />
+    <aura:import library="ui:contentTypeLibrary" property="ct"  />
 
     <!-- Private attributes -->
     <aura:attribute name="dropZoneClassList" type="string" default="" access="private" />

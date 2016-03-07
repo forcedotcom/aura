@@ -1,5 +1,5 @@
-// eslint-disable no-undef
-({
+
+({ /* eslint-disable */
     JPG_FILE : {
         name : 'file.jpg',
         type : 'image/jpg',
@@ -195,4 +195,4 @@
         ]
     }
 })
-// eslint-enable no-undef
+/* eslint-enable */

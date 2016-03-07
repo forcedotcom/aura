@@ -1,4 +1,5 @@
-({  // eslint-disable-line no-undef
+// eslint-disable no-undef
+({
     JPG_FILE : {
         name : 'file.jpg',
         type : 'image/jpg',
@@ -53,7 +54,7 @@
         // We can not create FilesList Object with javascript for security reasons
         // then we fake FilesList === array-like
         return [].slice.call(arguments).reduce(function (prev, file) {
-            prev[prev.length] = new File(this.fakeSize(file.size),file.name, { type : file.type }); // eslint-disable-line no-undef
+            prev[prev.length] = new File(this.fakeSize(file.size),file.name, { type : file.type });
             prev.length++;
             return prev;
         }.bind(this), this.createArrayLike());
@@ -193,5 +194,5 @@
             }
         ]
     }
-
-});
+})
+// eslint-enable no-undef

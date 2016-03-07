@@ -855,7 +855,11 @@ AuraInstance.prototype.getCallback = function(callback) {
         } catch (e) {
             // no need to wrap AFE with auraError as 
             // customers who throw AFE would want to handle it with their own custom experience.
-            if (e instanceof $A.auraFriendlyError) {
+            if (e instanceof $A.auraFriendlyError || e instanceof $A.auraError) {
+                if (context && context.getDef) {
+                    e.setComponent(context.getDef().getDescriptor().toString());
+                }
+
                 throw e;
             } else {
                 var errorWrapper = new $A.auraError("Uncaught error in "+name, e);

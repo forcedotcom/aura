@@ -62,7 +62,14 @@
          "Tracing.Memory.nodes":10
       }
    ],
-   "customOptions":[  
+   "customOptions":[
+      {
+         "testDefault":{
+         	"_lazyRenderTabs":false,
+         	"_userOverflowMenu":false,
+         	"testDynamicLoading":false
+         }    
+      },   	  
       {  
          "testLazyRenderTabs":{  
             "_lazyRenderTabs":true

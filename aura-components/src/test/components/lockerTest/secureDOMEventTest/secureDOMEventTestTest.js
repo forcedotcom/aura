@@ -10,7 +10,6 @@
             var event = cmp.get("v.log");
             $A.test.assertStartsWith("SecureElement", event.target.toString(), "Expected event.target to return SecureElement");
             $A.test.assertStartsWith("SecureElement", event.srcElement.toString(), "Expected event.srcElement to return SecureElement");
-            $A.test.assertEquals("SecureDOMEvent test", event.target.innerText, "Unexpected text on event.target");
             // Verify non-wrapped method is still accessible
             $A.test.assertEquals("number", typeof event.timeStamp);
         }

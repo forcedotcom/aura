@@ -26,7 +26,30 @@
             cmp.getWindow();
             var wrapped = cmp.get("v.log");
             $A.test.assertStartsWith("SecureWindow", wrapped["window"].toString(), "Expected window.window to"
-                    + " return SecureWindoe");
+                    + " return SecureWindow");
+        }
+    },
+
+    testNoAccessToWindowViaSetTimeout: {
+        test: function(cmp) {
+            var actual;
+            var completed = false;
+            cmp.getWindow();
+            var wrapped = cmp.get("v.log");
+
+            wrapped.setTimeout(function() {
+                actual = this;
+                completed = true;
+            }, 0);
+
+            $A.test.addWaitFor(
+                    true,
+                    function() { return completed },
+                    function() {
+                        $A.test.assertStartsWith("SecureWindow", wrapped["window"].toString(), "Expected 'this' inside" +
+                                " setTimeout callback to be SecureWidow");
+                    }
+            );
         }
     }
 })

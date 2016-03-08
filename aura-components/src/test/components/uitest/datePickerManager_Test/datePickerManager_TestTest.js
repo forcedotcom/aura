@@ -69,7 +69,7 @@
      * Ignored in IE7 because ie7 handles bounding rectangle differently and the datepicker ends up be askewed
      */
     testCheckDatePickerPosition : {
-	browsers: ["-IE7", "-ANDROID_PHONE", "-ANDROID_TABLET"],
+	browsers: ["-IE7", "-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
         test : [function(cmp) {
                     this.openDatePicker(cmp, this.defValueID);
 	        },
@@ -88,10 +88,10 @@
      * Test verifying that there are two datepickers on the screen (1 from manager, and the other from a normal inputDate components)
      */
     testNumberOfDatepickersOnPage : {
-	browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET"],
+	browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
         test : function(cmp) {
             // inputDate becomes inputDateHtml, so on mobile the test has 1 less datePicker displayed
-            var expectedDatePickerSize = this.isViewDesktop() ? 2 : 1;
+            var expectedDatePickerSize = 2;
             var datePickerSize = $A.test.getElementByClass("uiDatePicker").length;
             $A.test.assertEquals(expectedDatePickerSize, datePickerSize,
                                  "Expected "+expectedDatePickerSize+" datePicker(s) on the screen but there aren't");

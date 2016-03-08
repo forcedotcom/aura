@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.expression.functions;
 
+import com.google.common.base.Joiner;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.expression.Expression;
@@ -33,6 +34,7 @@ public class UtilFunctions {
 	public static final Function EMPTY = new Empty();
 	public static final Function FORMAT = new Format();
 	public static final Function TOKEN = new Token();
+	public static final Function JOIN = new Join();
 
 	/**
 	 * Checks if the object is empty. An empty object"s value is undefined (only
@@ -189,6 +191,59 @@ public class UtilFunctions {
 		@Override
 		public String[] getKeys() {
 			return new String[] { "token","t" };
+		}
+	}
+
+	/**
+	 * Join is meant to concatenate an iterable with a separator
+	 */
+	public static class Join implements Function {
+		private static final long serialVersionUID = -8834318318368762326L;
+
+		@Override
+		public Object evaluate(List<Object> args) {
+            int size=args.size();
+            if(size<2){
+                return "";
+            }
+            if(size==2){
+                return JavascriptHelpers.stringify(args.get(1));
+            }
+            Object a0=args.get(0);
+            String separator=JavascriptHelpers.stringify(a0!=null?a0:"");
+            Object[] formatArguments = new Object[size - 1];
+            for (int index = 1; index < size; index++) {
+                formatArguments[index - 1] = JavascriptHelpers.stringify(args.get(index));
+            }
+
+            return Joiner.on(separator).skipNulls().join(formatArguments);
+		}
+
+		@Override
+		public void compile(Appendable out, List<Expression> args) throws IOException {
+            int size = args.size();
+            if (size < 2) {
+                out.append(JS_EMPTY);
+                return;
+            }
+            if(size==2){
+                args.get(1).compile(out);
+                return;
+            }
+			out.append(JS_FN_JOIN);
+			out.append("(");
+            for (int index = 0; index < size; index++) {
+                if (index > 0) {
+                    out.append(",");
+                }
+                args.get(index).compile(out);
+            }
+			out.append(")");
+		}
+
+		@Override
+		public String[] getKeys() {
+			return new String[] { "join" };
 		}
 	}
 }

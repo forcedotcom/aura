@@ -877,6 +877,24 @@ AuraInstance.prototype.getCallback = function(callback) {
 };
 
 /**
+ * Returns the application token referenced by name.
+ * @function
+ * @param {String} token The name of the application configuration token to retrieve, for example, <code>$A.getToken("section.configuration")</code>.
+ * @public
+ * @platform
+ */
+AuraInstance.prototype.getToken = function(token){
+    var context=$A.getContext();
+    var tokens=context&&context.getTokens();
+    if(tokens){
+        if(tokens.hasOwnProperty(token)){
+            return tokens[token];
+        }
+        throw new Error("Unknown token: '"+token+"'. Are you missing a tokens file or declaration?");
+    }
+};
+
+/**
  * Returns the value referenced using property syntax. Gets the value from the specified global value provider.
  * @public
  * @function

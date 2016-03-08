@@ -35,6 +35,7 @@ import static org.auraframework.impl.expression.functions.MultiFunctions.NOTEQUA
 import static org.auraframework.impl.expression.functions.UtilFunctions.EMPTY;
 import static org.auraframework.impl.expression.functions.UtilFunctions.FORMAT;
 import static org.auraframework.impl.expression.functions.UtilFunctions.TOKEN;
+import static org.auraframework.impl.expression.functions.UtilFunctions.JOIN;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -79,6 +80,7 @@ public class ExpressionFactory {
         l.add(EMPTY);
         l.add(FORMAT);
         l.add(TOKEN);
+        l.add(JOIN);
         Builder<String, Function> b = ImmutableMap.builder();
         for (Function f : l) {
             for (String k : f.getKeys()) {

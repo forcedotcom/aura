@@ -32,6 +32,7 @@ public interface Function extends Serializable {
     static final String JS_FN_EMPTY = "fn.empty";
     static final String JS_FN_FORMAT = "fn.format";
     static final String JS_FN_TOKEN = "fn.token";
+    static final String JS_FN_JOIN = "fn.join";
 
     static final String JS_EMPTY = "\"\"";
 

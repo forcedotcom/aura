@@ -19,9 +19,7 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.adapter.RegistryAdapter;
-import org.auraframework.impl.context.TestLoggingAdapterImpl;
 import org.auraframework.integration.test.configuration.JettyTestServletConfig;
 import org.auraframework.integration.test.service.DefinitionServiceImplTest.AuraTestRegistryProviderWithNulls;
 import org.auraframework.integration.test.util.SeleniumServerLauncher;
@@ -31,7 +29,6 @@ import org.auraframework.test.util.SauceUtil;
 import org.auraframework.test.util.WebDriverProvider;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
-import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
 import org.auraframework.util.test.configuration.TestServletConfig;
 import org.auraframework.util.test.util.TestInventory;
 import org.openqa.selenium.net.PortProber;
@@ -44,12 +41,6 @@ public class AuraIntegrationTestConfig {
     @Impl(name = "auraIntegrationTestInventory")
     public static TestInventory auraIntegrationTestInventory() throws Exception {
         return new TestInventory(AuraIntegrationTestConfig.class);
-    }
-
-    @Impl
-    @PrimaryImpl
-    public static LoggingAdapter auraImplTestLoggingAdapter() {
-        return new TestLoggingAdapterImpl();
     }
 
     @Impl

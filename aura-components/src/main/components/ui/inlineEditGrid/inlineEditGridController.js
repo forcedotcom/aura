@@ -60,17 +60,19 @@
 			if (editLayout) {
 				// TODO: Need check that editLayout follows a certain interface so we can attach the appropriate
 				// attributes and events.
-				$A.createComponent(editLayout, {
-					value : payload.value,
-					updateOn : "input"
-				}, function (inputComponent) {
+				var attributes = editLayout.attributes || {};
+				
+				attributes.value = payload.value;
+				attributes.updateOn = 'input';
+				
+				$A.createComponent(editLayout.descriptor, attributes, function (inputComponent) {
 					var panelBodyAttributes = {
 							index : index,
 							key : payload.name,
 							inputComponent : inputComponent
-					}
+					};
 					
-					helper.generateEditPanel(cmp, panelBodyAttributes, payload.targetElement);
+					helper.displayEditPanel(cmp, panelBodyAttributes, payload.targetElement);
 				});
 			}
 		}
@@ -90,6 +92,6 @@
 		item.status[payload.key] = true;
 		
 		cmp.set("v.items", items);
-		cmp._panelCmp.close();
+		cmp._panelCmp.hide();
 	}
 })// eslint-disable-line semi

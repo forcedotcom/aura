@@ -53,19 +53,19 @@
 .THIS .inline-edit-example .panel-content input {
 	box-sizing: border-box;
 	padding: 0 1rem 0 0.75rem;
-	width: 100%;
+	width: 90%;
 }
 
 .THIS .inline-edit-example .uiPanel {
 	border-radius: initial;
 }
 
-.THIS .inline-edit-example tr td .content {
+.THIS .inline-edit-example tr td .content,
+.THIS .inline-edit-example .panel-content input {
 	background-color: white;
     color: #16325c;
     display: inline-block;
     padding: 0 1rem 0 0.75rem;
-    font-size: inherit;
     font-weight: 400;
     line-height: 1.75em;
     max-height: calc(1.875rem - 2px);
@@ -86,7 +86,7 @@
 	vertical-align: middle;
 }
 
-.THIS .inline-edit-example .footer button {
+.THIS .inline-edit-example button {
 	background: white;
 	box-shadow: none;
     color: #16325c;

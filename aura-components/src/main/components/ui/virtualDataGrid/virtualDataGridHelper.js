@@ -246,7 +246,7 @@
                 	delete actionHandlerScope.targetCmp.getElement;
                 }
             }
-            
+
             if (ptv.dirty) {
                 this._rerenderDirtyElement(cmp, item, target);
             }

@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 ({
-	
 	init : function(cmp, evt, helper) {
-		var items = [];
-		
-		for (var i = 0; i < 10; i++) {
-			items.push({
-				id : i,
-				name : "Name" + i,
-				grade : i,
-				status : {},
-				errors : {}
-			});
-		}
+		var items = helper.generateItems();
 		
 		cmp.set("v.items", items);
 		
 		// Generate edit layouts:
 		cmp.find("grid").set("v.editLayouts", helper.EDIT_LAYOUTS);
 	}
-})
+})// eslint-disable-line semi

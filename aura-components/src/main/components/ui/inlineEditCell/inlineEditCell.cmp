@@ -22,7 +22,7 @@
 	<div class="{! 'cellContainer' + (v.edited ? ' edited' : '')}">
 		<span aura:id="contentSpan" class="content">{!v.body}</span>
 		<span class="triggerContainer">
-			<button class="trigger" onclick="{!c.trigger}"/>
+			<ui:button class="trigger" press="{!c.trigger}"/>
 		</span>
 	</div>
 </aura:component>

@@ -33,4 +33,4 @@
 		// Generate edit layouts:
 		cmp.find("grid").set("v.editLayouts", helper.EDIT_LAYOUTS);
 	}
-})
+})// eslint-disable-line semi

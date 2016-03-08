@@ -15,8 +15,14 @@
  */
 ({
 	EDIT_LAYOUTS : {
-		id : 'markup://ui:inputNumber',
-		name : 'markup://ui:inputText',
-		grade : 'markup://ui:inputNumber'
+		id : {
+			descriptor: 'markup://ui:inputNumber',
+		},
+		name : {
+			descriptor: 'markup://ui:inputText',
+		},
+		grade : {
+			descriptor: 'markup://ui:inputNumber'
+		}
 	}
-})
+})// eslint-disable-line semi

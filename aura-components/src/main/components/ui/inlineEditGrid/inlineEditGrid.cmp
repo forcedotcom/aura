@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component support="PROTO">
 	<aura:dependency resource="markup://ui:inlineEditPanelBody" type="COMPONENT" />
 	
 	<aura:attribute name="items" type="Object[]" />

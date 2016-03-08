@@ -15,8 +15,37 @@
  */
 ({
 	EDIT_LAYOUTS : {
-		id : 'markup://ui:inputNumber',
-		name : 'markup://ui:inputText',
-		grade : 'markup://ui:inputNumber'
+		id : {
+			descriptor : 'markup://ui:inputNumber'
+		},
+		name : {
+			descriptor : 'markup://ui:inputText'
+		},
+		grade : {
+			descriptor : 'markup://ui:inputNumber'
+		},
+		date : {
+			descriptor : 'markup://ui:inputDate',
+			attributes : {
+				displayDatePicker : true
+			}
+		}
+	},
+	
+	generateItems : function() {
+		var items = [];
+		
+		for (var i = 0; i < 10; i++) {
+			items.push({
+				id : i,
+				name : "Name" + i,
+				grade : i,
+				date : "2016-3-" + (i + 1),
+				status : {},
+				errors : {}
+			});
+		}
+		
+		return items;
 	}
-})
+})// eslint-disable-line semi

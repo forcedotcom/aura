@@ -18,6 +18,7 @@
 <aura:component>
 	<aura:dependency resource="markup://ui:inputText" type="COMPONENT" />
 	<aura:dependency resource="markup://ui:inputNumber" type="COMPONENT" />
+	<aura:dependency resource="markup://ui:inputDate" type="COMPONENT" />
 	
 	<aura:attribute name="items" type="Object[]" />
 
@@ -29,6 +30,7 @@
 				<ui:dataGridColumn name="id"	label="Id" sortable="true"/>
 				<ui:dataGridColumn name="name"	label="Name"/>
 				<ui:dataGridColumn name="grade" label="Grade"/>
+				<ui:dataGridColumn name="date"  label="Date"/>
 				<ui:dataGridColumn name=""      label="Actions" hideLabel="true"/>
 			</aura:set>
 			
@@ -42,6 +44,12 @@
 				<ui:inlineEditCell name="grade" edited="{!item.status.grade}">
 					<ui:outputText value="{!item.grade}"/>
 				</ui:inlineEditCell>
+				<ui:inlineEditCell name="date" edited="{!item.status.date}">
+					<ui:outputDate value="{!item.date}"/>
+				</ui:inlineEditCell>
+				<div>
+					<span>.</span>
+				</div>
 			</aura:set>
 		</ui:inlineEditGrid>
 	</div>

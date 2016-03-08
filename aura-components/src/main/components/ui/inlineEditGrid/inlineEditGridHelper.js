@@ -41,14 +41,29 @@
 			}
 		}).fire();
 	},
-	generateEditPanel : function(cmp, panelBodyAttributes, referenceElement) {
+	displayEditPanel : function(cmp, panelBodyAttributes, referenceElement) {
 		var self = this;
-		$A.createComponent('markup://ui:inlineEditPanelBody',
-			panelBodyAttributes,
-			function(newPanelBody) {
-				self.createEditPanel(cmp, newPanelBody, referenceElement);
-			});
 		
+		// TODO: Unable to reuse panels due to W-2802284
+		/*if (cmp._panelCmp && cmp._panelCmp.isValid()) {
+			var panelCmp = cmp._panelCmp;
+			var panelBody = cmp._panelBody;
+			
+			panelCmp.set("v.referenceElement", referenceElement);
+			
+			panelBody.set("v.index", panelBodyAttributes.index);
+			panelBody.set("v.key", panelBodyAttributes.key);
+			panelBody.set("v.inputComponent", panelBodyAttributes.inputComponent);
+			
+			panelCmp.show();
+		} else {*/
+			$A.createComponent('markup://ui:inlineEditPanelBody',
+				panelBodyAttributes,
+				function(newPanelBody) {
+					cmp._panelBody = newPanelBody;
+					self.createEditPanel(cmp, newPanelBody, referenceElement);
+				});
+		//}
 	},
 	
 	cacheStaleItem : function(cmp, item, index) {

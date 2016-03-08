@@ -361,6 +361,7 @@ function AuraInstance () {
 
     this.enqueueAction             = this.clientService.enqueueAction.bind(this.clientService);
     this.deferAction               = this.clientService.deferAction.bind(this.clientService);
+    this.deferPendingActions       = this.clientService.deferPendingActions.bind(this.clientService);
 
     this.render                    = this.renderingService.render.bind(this.renderingService);
     this.rerender                  = this.renderingService.rerender.bind(this.renderingService);
@@ -449,6 +450,7 @@ function AuraInstance () {
     this["services"] = this.services;
     this["enqueueAction"] = this.enqueueAction;
     this["deferAction"] = this.deferAction;
+    this["deferPendingActions"] = this.deferPendingActions;
     this["render"] = this.render;
     this["rerender"] = this.rerender;
     this["unrender"] = this.unrender;

@@ -28,7 +28,7 @@ function AuraError() {
     this.name       = "AuraError";
     this.message    = "";
     this.stackTrace = "";
-    this.errorCode  = "";
+    this.severity  = "";
 
     // the component that throws the error
     this.component = "";
@@ -36,7 +36,22 @@ function AuraError() {
     // the action that errors out
     this.action = null;
 
-    function AuraErrorInternal(message, innerError) {
+    // client side error id
+    this.id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var crypto = window.crypto || window.msCrypto;
+            var r;
+            if (crypto && crypto.getRandomValues) {
+                var rands = new Unit8Array(1);//eslint-disable-line no-undef
+                crypto.getRandomValues(rands);
+                r = rands[0] % 16;
+            } else {
+                r = Math.random() * 16 | 0;//eslint-disable-line no-bitwise
+            }
+            var v = c === 'x' ? r : (r & 0x3 | 0x8);//eslint-disable-line no-bitwise
+            return v.toString(16);
+        });
+
+    function AuraErrorInternal(message, innerError, severity) {
         // for IE8
         function getName(method) {
             var funcStr = method.toString();
@@ -89,6 +104,7 @@ function AuraError() {
         this.number = error.number;
         this.message = error.message || message;
         this.stackTrace = getStackTrace(error);
+        this.severity = severity;
     }
 
     AuraErrorInternal.apply(this,arguments);
@@ -96,10 +112,11 @@ function AuraError() {
     this["name"] = this.name;
     this["message"] = this.message;
     this["stackTrace"] = this.stackTrace;
-    this["errorCode"] = this.errorCode;
+    this["severity"] = this.severity;
     this["handled"] = false;
     this["reported"] = false;
     this["data"] = null;
+    this["id"] = this.id;
 }
 
 AuraError.prototype = new Error();
@@ -119,6 +136,10 @@ AuraError.prototype.setAction = function(action) {
 
 AuraError.prototype.getAction = function() {
     return this.action;
+};
+
+AuraError.prototype.getId = function() {
+    return this.id;
 };
 
 Aura.Errors.AuraError = AuraError;

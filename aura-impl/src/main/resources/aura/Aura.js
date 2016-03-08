@@ -759,12 +759,12 @@ AuraInstance.prototype.handleError = function(message, e) {
         }
 
         if (e["name"] === "AuraError") {
-            var format = "Something has gone wrong. {0}.\nPlease try again.\n{1}";
+            var format = "Something has gone wrong. {0}.\nPlease try again.\n";
             var displayMessage = e.message || e.name;
             //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             displayMessage += "\n" + e.stackTrace;
             //#end
-            dispMsg = $A.util.format(format, displayMessage, e.errorCode+"");
+            dispMsg = $A.util.format(format, displayMessage);
         }
 
         if (e["name"] === "AuraFriendlyError") {

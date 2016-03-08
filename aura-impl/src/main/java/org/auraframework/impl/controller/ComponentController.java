@@ -58,6 +58,7 @@ public class ComponentController {
         private final Action action;
         private final String jsStack;
         private String causeDescriptor;
+        private String errorId;
 
         public AuraClientException(String desc, String id, String message, String jsStack) {
             super(message);
@@ -85,6 +86,11 @@ public class ComponentController {
                 this.causeDescriptor = desc;
             }
 
+            // if we don't have an action, that means the id is a clientErrorId
+            if (action == null && id != null) {
+                this.errorId = id;
+            }
+
             this.action = action;
             this.jsStack = jsStack;
         }
@@ -99,6 +105,10 @@ public class ComponentController {
 
         public String getCauseDescriptor() {
             return causeDescriptor;
+        }
+
+        public String getClientErrorId() {
+            return errorId;
         }
     }
 

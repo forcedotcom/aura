@@ -15,21 +15,14 @@
  */
 package org.auraframework.test.perf.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.auraframework.util.test.perf.metrics.PerfMetric;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
-import org.auraframework.util.test.perf.rdp.RDPAnalyzer;
-import org.auraframework.util.test.perf.rdp.RDPNotification;
-import org.auraframework.util.test.perf.rdp.TraceEventStats;
-import org.auraframework.util.test.perf.rdp.TraceEventUtil;
+import org.auraframework.util.test.perf.rdp.*;
 import org.json.JSONException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -158,7 +151,7 @@ public class PerfMetricsUtil {
     private void handleCustomMetrics(PerfMetrics metrics, String name) {
         Map<String, Map<String, Object>> customMap = auraStats.get(name);
         for (String method : customMap.keySet()) {
-                if(customMap.get(method) instanceof Map) {
+                if(customMap.get(method) != null) {
                     Map<String, Object> methodValue = customMap.get(method);
                     for (String what : methodValue.keySet()) {
                         Object value = methodValue.get(what);

@@ -119,7 +119,9 @@
                         stored.delete(tabId);
                     }
                 }
-            }else{
+            } else if(message.open){
+              chrome.tabs.create({url: message.open});
+            } else {
                 var tabId = event.sender.tab.id;
                 if(tabId !== -1) {
                     passMessageToDevTools(message, tabId);

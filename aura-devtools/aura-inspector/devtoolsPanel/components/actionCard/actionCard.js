@@ -411,16 +411,6 @@
 		}
 	}
 
-	function parseJSON(jsonString, errorMsg) {
-		var extraMsg = ""; 
-		if(errorMsg) { extraMsg = ''+errorMsg; }
-		try {
-			return JSON.parse(jsonString);
-		} catch(e) {
-			console.error(extraMsg+" error out during passing JSON string:"+jsonString);
-		}
-	}
-
 	/*function editActionParameter() {
 		toggleActionParameter.call(this);
 		this.shadowRoot.querySelector("#textarea_ActionParameter").value =

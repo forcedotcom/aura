@@ -2,7 +2,7 @@ chrome.devtools.inspectedWindow.eval("!!window[Symbol.for('AuraDevTools')] && !!
 
     // So we don't include Aura when inspecting an Inspector
     if(isAuraPresent) {
-        chrome.devtools.panels.create("Aura",
+        chrome.devtools.panels.create(chrome.i18n.getMessage("devtools_tabname"),
                                       "icon24.png",
                                       "devtoolsPanel/devtoolsPanel.html",
                                       function(/*ExtensionPanel*/ panel) {

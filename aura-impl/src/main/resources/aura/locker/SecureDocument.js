@@ -48,6 +48,8 @@ var SecureDocument = (function() {
 
     createElement: {
       value: function(tag) {
+    	// Insure that no object to string coercion tricks can be applied to evade tag name based logic
+    	tag = tag + "";
         var key = getLockerSecret(this, "key");
         switch (tag.toLowerCase()) {
         case "script":

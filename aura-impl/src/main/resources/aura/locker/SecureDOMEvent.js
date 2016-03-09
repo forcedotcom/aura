@@ -70,7 +70,7 @@ var SecureDOMEvent = (function() {
     // Events properties that are DOM Elements were compiled from
     // https://developer.mozilla.org/en-US/docs/Web/Events
     target: SecureThing.createFilteredProperty("target"),
-    curretTarget: SecureThing.createFilteredProperty("currentTarget"),
+    currentTarget: SecureThing.createFilteredProperty("currentTarget"),
     relatedTarget: SecureThing.createFilteredProperty("relatedTarget"),
 
     // Touch Events are special on their own:
@@ -92,16 +92,19 @@ var SecureDOMEvent = (function() {
   function SecureDOMEvent(event, key) {
     setLockerSecret(this, "key", key);
     setLockerSecret(this, "ref", event);
+    
     // re-exposing externals
     for (var name in event) {
       if (name in SecureDOMEvent.prototype) {
         // ignoring anything that SecureDOMEvent already implements
         return;
       }
+      
       // every DOM event has a different shape, we apply filters when possible,
       // and bypass when no secure filter is found.
-      Object.defineProperty(this, name, DOMEventSecureDescriptors[name] || SecureThing.createPassThroughProperty(name));
+      Object.defineProperty(this, name, DOMEventSecureDescriptors[name] || SecureThing.createFilteredProperty(name));
     }
+    
     Object.freeze(this);
   }
 

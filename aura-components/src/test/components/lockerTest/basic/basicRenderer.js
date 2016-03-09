@@ -64,7 +64,7 @@
 		scripts.forEach(function(script) {
 			contentEl.appendChild(script);
 		});
-
+		
 		// No visible divs actually added to the DOM Document yet
 		helper.verifyElementCount("smoothAsButter", 0);
 
@@ -76,6 +76,18 @@
 
 		// Visible div should now exist in the DOM Document
 		helper.verifyElementCount("smoothAsButter", 1);
+		
+		// Attempt to directly access window from events
+		var nodes = document.querySelectorAll("div.smoothAsButter");
+		var sel = nodes[0];
+		sel.addEventListener('click', function(sev) {
+			// DCHASMAN TODO W-2966000 This throws a stack overflow inside of filterEverything()
+			// helper.log(component, "sev.path[sev.path.length-1]: " + sev.path[sev.path.length-1]);
+
+			helper.log(component, "sev.toElement: " + sev.toElement);
+			helper.log(component, "sev.currentTarget: " + sev.currentTarget); 
+		}); 
+		sel.click(); 
 
 		try {
 			var content = component.find("content");

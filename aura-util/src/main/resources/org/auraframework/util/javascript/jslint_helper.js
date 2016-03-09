@@ -33,7 +33,7 @@ var jslintHelper = function(javaSourceLines, allowDebugger, allowUnfilteredForIn
     var jsOptions = {
                         laxbreak : true,
                         ass       : true,
-                        bitwise   : false,
+                        bitwise   : true,
                         browser   : true,
                         closure   : false,
                         'continue'  : true,

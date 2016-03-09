@@ -95,9 +95,20 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
             }
             if (th instanceof AuraClientException) {
                 AuraClientException ace = (AuraClientException) th;
-                extended.append("Failing descriptor: ");
-                extended.append(ace.getCauseDescriptor());
-                extended.append("\n");
+                String errorId = ace.getClientErrorId();
+                if (errorId != null && !errorId.isEmpty()) {
+                    extended.append("Client error id: ");
+                    extended.append(errorId);
+                    extended.append("\n");
+                }
+
+                String errorDescriptor = ace.getCauseDescriptor();
+                if (errorDescriptor != null && !errorDescriptor.isEmpty()) {
+                    extended.append("Failing descriptor: ");
+                    extended.append(errorDescriptor);
+                    extended.append("\n");
+                }
+
                 extended.append("Javascript stack: ");
                 extended.append(ace.getClientStack());
                 extended.append("\n");

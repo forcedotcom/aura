@@ -1,0 +1,3 @@
+<aura:tokens>
+  <aura:token name="uiButton.button" value=""/>
+</aura:tokens>

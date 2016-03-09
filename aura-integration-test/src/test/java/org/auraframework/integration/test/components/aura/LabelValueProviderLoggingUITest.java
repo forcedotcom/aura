@@ -15,50 +15,48 @@
  */
 package org.auraframework.integration.test.components.aura;
 
-import java.util.Map;
+import java.util.List;
 
-import org.auraframework.test.controller.TestLoggingAdapterController;
-import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.util.test.annotation.ThreadHostileTest;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.apache.log4j.spi.LoggingEvent;
+import org.auraframework.integration.test.logging.AbstractLoggingUITest;
 import org.openqa.selenium.By;
 
 /**
- * UI Test for LabelValueProvider.js
+ * Logging UI Test for LabelValueProvider.js
  */
-public class LabelValueProviderUITest extends WebDriverTestCase {
+public class LabelValueProviderLoggingUITest extends AbstractLoggingUITest {
 
     // URL string to go to
     private final String URL = "/gvpTest/labelProvider.cmp";
     private By label1 = By.xpath("//div[@id='div1']");
 
-    public LabelValueProviderUITest(String name) {
+    public LabelValueProviderLoggingUITest(String name) {
         super(name);
     }
 
     /**
      * Test we have one java call for each valid label request.
-     * @throws Exception
      */
-    @ThreadHostileTest("TestLoggingAdapter not thread-safe")
-    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
-    @UnAdaptableTest
     public void testEfficientActionRequests() throws Exception {
-        TestLoggingAdapterController.beginCapture();
         open(URL);
         auraUITestingUtil.waitForElementText(label1, "simplevalue1: Today", true);
-        
+
         Long callCount = 0L;
         boolean isLabelControllerCalled = false;
-        for (Map<String, Object> log : TestLoggingAdapterController.endCapture()) {
-            if(log.containsKey("action_1$aura://LabelController/ACTION$getLabel")) {
-                callCount = (Long) log.get("JavaCallCount");
+        String message;
+        List<LoggingEvent> logs = appender.getLog();
+        for(LoggingEvent le : logs) {
+            message = le.getMessage().toString();
+            while (message.contains("aura://LabelController/ACTION$getLabel")) {
                 isLabelControllerCalled = true;
+                message = message.substring(message.indexOf("getLabel")+8, message.length()-1);
+                callCount ++;
+            }
+            if(callCount > 0) {
                 break;
             }
         }
         assertTrue("Fail: LabelController should be called", isLabelControllerCalled);
         assertTrue("Fail: There should be two calls to LabelController "+callCount.toString(), callCount == 2L);
     }
-
 }

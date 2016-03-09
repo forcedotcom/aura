@@ -358,6 +358,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertEquals("value", masterDefReg.getCachedString(uid, houseboat, "test1"));
     }
 
+    @UnAdaptableTest("Particular permission is needed to retrieve non-priviledged cmp in autobuild.")
     public void testNonPrivilegedStringCache() throws Exception {
         String namespace = "testNonPrivilegedStringCache" + getAuraTestingUtil().getNonce();
 

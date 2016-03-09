@@ -17,20 +17,18 @@ package org.auraframework.impl.java.controller;
 
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
-import org.auraframework.system.Annotations.Key;
 
 @Controller
-public class TestControllerWithProtectedAction {
+public class TestControllerWithNonPublicMethods {
     @AuraEnabled
-    protected static String appendStrings(@Key("a") String a, @Key("b") String b) {
-        return a + b;
+    protected void protectedMethod() {
     }
 
     @AuraEnabled
-    static void doSomething() {
+    void packagePrivateMethod() {
     }
 
     @AuraEnabled
-    public static void doNothing() {
+    private void privateMethod() {
     }
 }

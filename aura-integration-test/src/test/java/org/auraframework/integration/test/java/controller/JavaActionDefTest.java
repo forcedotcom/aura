@@ -15,80 +15,135 @@
  */
 package org.auraframework.integration.test.java.controller;
 
+import java.util.List;
+
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
-import org.auraframework.def.ActionDef.ActionType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.java.controller.JavaActionDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.system.SubDefDescriptorImpl;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 public class JavaActionDefTest extends AuraImplTestCase {
+
     public JavaActionDefTest(String name){
         super(name);
     }
-    
-    public void testCreatingJavaActionDef(){
-        DefDescriptor<ControllerDef> controllerDesc = DefDescriptorImpl.getInstance("java://org.auraframework.components.test.java.controller.TestController", ControllerDef.class);
-        DefDescriptor<ActionDef> actionDefDesc = SubDefDescriptorImpl.getInstance("getString", controllerDesc, ActionDef.class);
-        try{
-            ActionDef actionDef = actionDefDesc.getDef();
-            assertNotNull(actionDef);
-            assertTrue(actionDef instanceof JavaActionDef);
-            assertTrue(actionDef.getParameters().isEmpty());
-            assertEquals(DefDescriptorImpl.getInstance("java://java.lang.String", TypeDef.class), actionDef.getReturnType());
-            assertEquals(ActionType.SERVER,actionDef.getActionType());
-        }catch(Exception e){
-            fail("Failed to create a valid java actiondef without parameters");
-        }
-        controllerDesc = DefDescriptorImpl.getInstance("java://org.auraframework.impl.java.controller.TestControllerWithParameters", ControllerDef.class);
-        actionDefDesc = SubDefDescriptorImpl.getInstance("sumValues", controllerDesc, ActionDef.class);
-        try{
-            ActionDef actionDef = actionDefDesc.getDef();
-            assertNotNull(actionDef);
-            assertEquals(2, actionDef.getParameters().size());
-            assertEquals("a", actionDef.getParameters().get(0).getName());
-            assertEquals("java://java.lang.Integer", actionDef.getParameters().get(0).getType().toString());
-            assertEquals("b", actionDef.getParameters().get(1).getName());
-            assertEquals("java://java.lang.Integer", actionDef.getParameters().get(0).getType().toString());
-            assertEquals(DefDescriptorImpl.getInstance("java://java.lang.Integer", TypeDef.class), actionDef.getReturnType());
-        }catch(Exception e){
-            fail("Failed to create a valid java actiondef with parameters");
-        }
+
+    /**
+     * Verify Java action without background annotation is not background
+     */
+    @Test
+    public void testJavaActionDefIsNotBackgroundByDefault() throws Exception {
+        String controllerName = "java://org.auraframework.impl.java.controller.ParallelActionTestController";
+        String actionName = "executeInForeground";
+        ActionDef actionDef = getJavaActionDef(controllerName, actionName);
+
+        boolean actual = ((JavaActionDef) actionDef).isBackground();
+        assertFalse("JavaActionDef should NOT be background by default", actual);
     }
-    
-    public void testGetLoggableParams()throws Exception{
-        //No annotation specified for logging
-        JavaActionDef actionDef = getJavaActionDef("java://org.auraframework.components.test.java.controller.TestController", "getString");
-        assertEquals("Action with no parameters should not have any loggable parameters", 0, actionDef.getLoggableParams().size());
-        
-        //@key annotation is marked for logging
-        actionDef = getJavaActionDef("java://org.auraframework.components.test.java.controller.JavaTestController", "getLoggableString");
-        assertEquals("Action with parameters marked as loggable should be logged", 
-                1, actionDef.getLoggableParams().size());
-        assertEquals("param", actionDef.getLoggableParams().get(0));
-        
-        //Selected param set as loggable
-        actionDef = getJavaActionDef("java://org.auraframework.components.test.java.controller.JavaTestController", "getSelectedParamLogging");
-        assertEquals("Only parameters marked as loggable should be logged", 
-                1, actionDef.getLoggableParams().size());
-        assertEquals("strparam", actionDef.getLoggableParams().get(0));
-        
-        //Param explicitly set as not loggable
-        actionDef = getJavaActionDef("java://org.auraframework.components.test.java.controller.JavaTestController", "getExplicitExcludeLoggable");
-        assertEquals("parameters marked as loggable should not be logged", 
-                0, actionDef.getLoggableParams().size());
+
+    /**
+     * Verify Java action with background annotation is background
+     */
+    @Test
+    public void testJavaActionDefIsBackgroundWithAnnotation() throws Exception {
+        String controllerName = "java://org.auraframework.impl.java.controller.ParallelActionTestController";
+        String actionName = "executeInBackground";
+        ActionDef actionDef = getJavaActionDef(controllerName, actionName);
+
+        boolean actual = ((JavaActionDef) actionDef).isBackground();
+        assertTrue("ActionDef should be background when class has Background annotation", actual);
     }
-    
-    private JavaActionDef getJavaActionDef(String controller, String actionName) throws QuickFixException {
-        DefDescriptor<ControllerDef> controllerDesc = DefDescriptorImpl.getInstance(controller, 
-                ControllerDef.class);
-        DefDescriptor<ActionDef> actionDefDesc = SubDefDescriptorImpl.getInstance(actionName, controllerDesc, ActionDef.class);
-        ActionDef actionDef = actionDefDesc.getDef();
+
+    @Test
+    public void testJavaActionDefWithMethodHasNoParams() throws Exception{
+        String controllerName = "java://org.auraframework.components.test.java.controller.TestController";
+        String actionName = "getString";
+
+        ActionDef actionDef = getJavaActionDef(controllerName, actionName);
+
+        assertNotNull(actionDef);
         assertTrue(actionDef instanceof JavaActionDef);
+        assertEquals(definitionService.getDefDescriptor("java://java.lang.String", TypeDef.class), actionDef.getReturnType());
+        assertTrue(actionDef.getParameters().isEmpty());
+    }
+
+    @Test
+    public void testJavaActionDefWithMethodHasParams() throws Exception {
+        String controllerName = "java://org.auraframework.impl.java.controller.TestControllerWithParameters";
+        String actionName = "sumValues";
+
+        ActionDef actionDef = getJavaActionDef(controllerName, actionName);
+
+        assertNotNull(actionDef);
+        assertEquals(2, actionDef.getParameters().size());
+        assertEquals("a", actionDef.getParameters().get(0).getName());
+        assertEquals("java://java.lang.Integer", actionDef.getParameters().get(0).getType().toString());
+        assertEquals("b", actionDef.getParameters().get(1).getName());
+        assertEquals("java://java.lang.Integer", actionDef.getParameters().get(0).getType().toString());
+        assertEquals(definitionService.getDefDescriptor("java://java.lang.Integer", TypeDef.class), actionDef.getReturnType());
+    }
+
+    @Test
+    public void testGetLoggableParamsForActionWithoutLoggableParams() throws Exception {
+        String controllerName = "java://org.auraframework.components.test.java.controller.TestController";
+        // no param is marked as loggable
+        String actionName = "getString";
+
+        JavaActionDef actionDef = getJavaActionDef(controllerName, actionName);
+
+        List<String> loggableParams = actionDef.getLoggableParams();
+        assertEquals("The action should NOT contain any loggable parameter.", 0, loggableParams.size());
+    }
+
+    @Test
+    public void testGetLoggableParamsForActionHasAllLoggableParams() throws Exception {
+        String controllerName = "java://org.auraframework.components.test.java.controller.JavaTestController";
+        // "param" is marked as loggable in @key annotation
+        String actionName = "getLoggableString";
+
+        JavaActionDef actionDef = getJavaActionDef(controllerName, actionName);
+
+        List<String> loggableParams = actionDef.getLoggableParams();
+        assertEquals("The action should contain a loggable parameter.", 1, loggableParams.size());
+        assertEquals("param", loggableParams.get(0));
+    }
+
+    /**
+     * Verify that getLoggableParams returns loggable parameters when some of parameters
+     * on an action are marked as loggable.
+     */
+    @Test
+    public void testGetLoggableParamsForActionHasSomeLoggableParams() throws Exception {
+        String controllerName = "java://org.auraframework.components.test.java.controller.JavaTestController";
+        // "strparam" is marked as loggable in @key annotation
+        String actionName = "getSelectedParamLogging";
+
+        JavaActionDef actionDef = getJavaActionDef(controllerName, actionName);
+
+        List<String> loggableParams = actionDef.getLoggableParams();
+        assertEquals("The action has only one loggable parameter.", 1, loggableParams.size());
+        assertEquals("strparam", loggableParams.get(0));
+    }
+
+    @Test
+    public void testGetLoggableParamsForActionHasExplicitNonLoggableParams() throws Exception {
+        String controllerName = "java://org.auraframework.components.test.java.controller.JavaTestController";
+        // "param" is explicitly marked as non loggable
+        String actionName = "getExplicitExcludeLoggable";
+
+        JavaActionDef actionDef = getJavaActionDef(controllerName, actionName);
+
+        List<String> loggableParams = actionDef.getLoggableParams();
+        assertEquals("parameters marked as loggable should not be logged", 0, loggableParams.size());
+    }
+
+    private JavaActionDef getJavaActionDef(String controllerQualifiedName, String actionName) throws Exception {
+        ControllerDef controllerDef = definitionService.getDefinition(controllerQualifiedName, ControllerDef.class);
+        ActionDef actionDef = controllerDef.getSubDefinition(actionName);
+
+        assertTrue("Expecting a JavaActionDef", actionDef instanceof JavaActionDef);
         return (JavaActionDef)actionDef;
     }
 }

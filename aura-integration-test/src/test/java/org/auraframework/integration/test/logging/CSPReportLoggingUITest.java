@@ -21,60 +21,28 @@ import static org.junit.Assert.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.http.CSPReporterServlet;
-import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
-import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 @TargetBrowsers(BrowserType.GOOGLECHROME)
-@ThreadHostileTest
-public class CSPReportLoggingUITest extends WebDriverTestCase {
+public class CSPReportLoggingUITest extends AbstractLoggingUITest {
 
     public CSPReportLoggingUITest(String name) {
         super(name);
     }
 
-    private Logger logger;
-    private LoggingTestAppender appender;
-    private Level originalLevel;
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        appender = new LoggingTestAppender();
-
-        logger = Logger.getLogger("LoggingContextImpl");
-        // When we run integration tests, the logging level of logger LoggingContextImpl
-        // is WARN, setting it into INFO here so that we can get the log as we run the app.
-        originalLevel = logger.getLevel();
-        logger.setLevel(Level.INFO);
-        logger.addAppender(appender);
-        Logger.getRootLogger().addAppender(appender);
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        logger.removeAppender(appender);
-        logger.setLevel(originalLevel);
-        Logger.getRootLogger().removeAppender(appender);
-        super.tearDown();
-    }
-
-    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
-    @UnAdaptableTest
     public void testReportCSPViolationForClientRenderedCSS() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -95,13 +63,13 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
         assertThat("Could not find expected violated directive", cspReport, containsString(exptectedViolatedDirective));
     }
 
-    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
-    @UnAdaptableTest
     public void testReportCSPViolationForServerRenderedCSS() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "",
-                "<link href='http://www2.sfdcstatic.com/common/assets/css/min/standard-rwd-min.css' rel='stylesheet' type='text/css'/>"));
-        String uri = String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName());
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "render='server'",
+                "<link href='http://www2.sfdcstatic.com/common/assets/css/min/standard-rwd-min.css' rel='stylesheet' type='text/css'/>"
+                        +
+                "<script src='/auraFW/resources/codemirror/js/codemirror.js'></script>"));
+        String uri = String.format("/%s/%s.app", appDesc.getNamespace(), appDesc.getName());
 
         openNoAura(uri);
         List<String> logs = getCspReportLogs(appender, 1);
@@ -226,7 +194,6 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
      * Automation for the connect-src CSP policy. With connect-src set to 'self' and http://invalid.salesforce.com,
      * a report should be generated when an XHR is sent to invalid origin.
      */
-    // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
     @UnAdaptableTest
     public void testReportXHRConnect() throws Exception {
         String externalUri = "http://www.example.com";
@@ -270,27 +237,111 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
         assertThat("Could not find expected violated directive", cspReport, containsString(exptectedEffectiveDirective));
     }
 
+
+    /**
+     * This is a positive test (and the only positive test in this file).
+     * Automation for the connect-src CSP policy.
+     * http://invalid.salesforce.com is white-listed, getting it via XHR shouldn't give us CSP error
+     */
+    public void testReportXHRConnectWhitelistedUrl() throws Exception {
+        String urlString = "\"http://invalid.salesforce.com\"";
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(baseComponentTag, "",
+                        "<ui:button press='{!c.post}' label='Send XHR' class='button'/>"));
+        DefDescriptor<?> helperDesc = definitionService.getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
+                HelperDef.class);
+        addSourceAutoCleanup(
+                helperDesc,
+                "{createHttpRequest: function() {\n" +
+                        "    if (window.XMLHttpRequest) {\n" +
+                        "        return new XMLHttpRequest();\n" +
+                        "    } else if (window.ActiveXObject) {\n" +
+                        "        try {\n" +
+                        "            return new ActiveXObject(\"Msxml2.XMLHTTP\");\n" +
+                        "        } catch (e) {\n" +
+                        "            try {\n" +
+                        "                return new ActiveXObject(\"Microsoft.XMLHTTP\");\n" +
+                        "            } catch (ignore) {\n" +
+                        "            }\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "    return null;\n" +
+                        "},\n" +
+                        "request: function(url) {\n" +
+                        "     var request = this.createHttpRequest();\n" +
+                        "     request.open(\"GET\", url, true);\n" +
+                        "     request[\"onreadystatechange\"] = function() {\n" +
+                        "     if (request[\"readyState\"] == 4 && processed === false) {\n" +
+                        "             processed = true;\n" +
+                        "         console.log(\"from action callback\");\n" +
+                        "         }\n" +
+                        "     };\n" +
+                        "     request.send();\n" +
+                        "}}");
+
+        DefDescriptor<?> controllerDesc = definitionService.getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
+                ControllerDef.class);
+        addSourceAutoCleanup(
+                controllerDesc,
+                "{post:function(c,e,h){h.request(" + urlString + ");}}");
+        //'http://www.example.com' \"http://www.example.com\"
+
+        appender.clearLogs();
+        open(cmpDesc);
+        auraUITestingUtil.findDomElement(By.cssSelector(".button")).click();
+
+        List<String> cspLogs = getCspReportLogs(appender, 0);
+        if(cspLogs.size() != 0) {
+            System.out.println("get these logs:");
+            for(LoggingEvent le : appender.getLog()) {
+                System.out.println(le.getMessage().toString());
+            }
+        }
+        assertEquals("we shouldn't get any csp report, but we get "+cspLogs, 0, cspLogs.size());
+    }
+
+    /**
+     * check if we get the number of logs we are expecting.
+     * @param appender
+     * @param expectedLogsSize : needs to be bigger than 0
+     * @return
+     * @throws InterruptedException
+     */
     private List<String> getCspReportLogs(LoggingTestAppender appender, int expectedLogsSize) throws InterruptedException {
         List<String> cspRecords = new ArrayList<>();
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                List<LoggingEvent> logs = appender.getLog();
-                synchronized(logs) {
-                    while (!logs.isEmpty()) {
-                        LoggingEvent log = logs.remove(0);
-                        if (log.getMessage().toString().contains(CSPReporterServlet.JSON_NAME)) {
-                            cspRecords.add(log.getMessage().toString());
-                            return cspRecords.size() == expectedLogsSize;
-                        }
+        if(expectedLogsSize == 0 ) {
+            List<LoggingEvent> logs = appender.getLog();
+            synchronized(logs) {
+                while (!logs.isEmpty()) {
+                    LoggingEvent log = logs.remove(0);
+                    if (log.getMessage().toString().contains(CSPReporterServlet.JSON_NAME)) {
+                        cspRecords.add(log.getMessage().toString());
                     }
                 }
-                return false;
             }
-        },
-        10,
-        "Did not find expected number of log lines (expected " + expectedLogsSize + ", found " + cspRecords.size() + ").");
+        } else {
+            auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+                @Override
+                public Boolean apply(WebDriver d) {
+                    List<LoggingEvent> logs = appender.getLog();
+                        synchronized(logs) {
+                            while (!logs.isEmpty()) {
+                                LoggingEvent log = logs.remove(0);
+                                if (log.getMessage().toString().contains(CSPReporterServlet.JSON_NAME)) {
+                                    cspRecords.add(log.getMessage().toString());
+                                    return cspRecords.size() == expectedLogsSize;
+                                }
+                        }
+                        return false;
+                    }
+                }
+            },
+            10,
+            "Did not find expected number of log lines (expected " + expectedLogsSize + ", found " + cspRecords.size() + ").");
+        }
 
         return cspRecords;
     }
 }
+

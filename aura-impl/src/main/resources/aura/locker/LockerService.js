@@ -45,7 +45,7 @@ function LockerService() {
 			/*WeakSet dummy polyfill that does not enforce any verification on the locks */
 			"add": function () {},
 			"has": function (v) {
-				return v && true;
+				return !!v;
 			}
 		};
 

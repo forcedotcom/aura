@@ -18,6 +18,8 @@
         test: function(cmp) {
             cmp.getAlert();
             var alert = cmp.get("v.log");
+            // the string starts with line break in IE
+            alert = alert.trim();
             $A.test.assertStartsWith("function alert() {", alert, "alert() not exposed");
         }
     },

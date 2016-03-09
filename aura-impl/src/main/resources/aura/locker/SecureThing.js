@@ -37,13 +37,22 @@ var SecureThing = (function() {
 		if (!originalValue) {
 			return originalValue;
 		}
-		if (Array.isArray(originalValue)) {
+		
+		var isNodeList = originalValue instanceof NodeList;
+		if (Array.isArray(originalValue) || isNodeList) {
 			swallowed = [];
 			for (var n = 0; n < originalValue.length; n++) {
 				var newValue = filterEverything(st, originalValue[n]);
 				// TODO: NaN !== NaN
 				swallowed.push(newValue);
 				mutated = mutated || (newValue !== originalValue[n]);
+			}
+			
+			// Decorate with .item() to preserve NodeList shape
+			if (isNodeList && mutated) {
+				Object.defineProperty(swallowed, "item", {
+					value: function(index) { return this[index]; }
+				});
 			}
 		} else if (typeof originalValue === 'object') {
 			var key = getLockerSecret(st, "key");
@@ -68,6 +77,7 @@ var SecureThing = (function() {
 				}
 			}
 		}
+		
 		return mutated ? swallowed : originalValue;
 	}
 

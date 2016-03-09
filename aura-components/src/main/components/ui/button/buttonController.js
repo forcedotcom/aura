@@ -21,9 +21,6 @@
         var params = event.getParam('arguments');
         helper.addHandler(cmp, params);
     },
-    changeSelected: function (cmp, event, helper) {
-        helper.updateStatefulClasses(cmp, event);
-    },
     keydown : function(cmp, event){
         var keydownEvent = cmp.getEvent("keydown");
         keydownEvent.setParams({"domEvent": event});

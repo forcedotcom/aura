@@ -83,35 +83,5 @@
         }
 
         cmp.getEvent(eventName).fire({"domEvent": event});
-    },
-
-    getClassList: function (cmp) {
-        var vclass = cmp.get('v.class');
-        var stateful = cmp.get('v.stateful');
-        if(stateful) {
-            return this.updateStatefulClasses(cmp);
-        } else if (vclass) {
-            return vclass;
-        } else {
-            return '';
-        }
-    },
-
-    updateStatefulClasses: function (cmp) {
-        var classList = [];
-        var selected = cmp.get('v.selected');
-        var vClass = cmp.get('v.class');
-
-        if(vClass) {
-            classList.push(vClass);
-        }
-
-        if(selected) {
-            classList.push('is-selected');
-        } else {
-            classList.push('not-selected');
-        }
-
-        return classList.join(' ');
     }
 })// eslint-disable-line semi

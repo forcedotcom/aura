@@ -34,7 +34,7 @@ function LockerService() {
 	var whitelist = [
 			'undefined', 'NaN', 'Date', 'Number', 'Boolean', 'alert', 'confirm',
 			'Intl', 'Error', 'console',
-			'clearTimeout', 'clearInterval', 'setTimeout', 'setInterval'
+			'clearTimeout', 'clearInterval'
 		];
 
 	// TODO: attempt to lock down Object.prototype

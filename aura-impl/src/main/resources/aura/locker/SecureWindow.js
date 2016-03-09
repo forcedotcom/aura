@@ -39,15 +39,30 @@ var SecureWindow = (function() {
 		setLockerSecret(this, "ref", win);
 		Object.defineProperties(this, {
 			document: {
+				enumerable: true,
 				value: new SecureDocument(win.document, key)
 			},
 			"$A": {
+				enumerable: true,
 				value: new SecureAura(win['$A'], key)
 			},
 			window: {
+				enumerable: true,
 				get: function () {
 					// circular window references to match DOM API
 					return this;
+				}
+			},
+			setTimeout: {
+				enumerable: true,
+				value: function (callback) {
+					setTimeout.apply(win, [callback.bind(this)].concat(Array.prototype.slice.call(arguments, 1)));
+				}
+			},
+			setInterval: {
+				enumerable: true,
+				value: function (callback) {
+					setInterval.apply(win, [callback.bind(this)].concat(Array.prototype.slice.call(arguments, 1)));
 				}
 			}
 		});

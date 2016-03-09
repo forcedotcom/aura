@@ -43,9 +43,9 @@ function LockerService() {
 	var nsKeys = {};
 	var validLockSet = typeof WeakSet !== "undefined" ? new WeakSet() : {
 			/*WeakSet dummy polyfill that does not enforce any verification on the locks */
-			add: function () {},
-			has: function () {
-				return true;
+			"add": function () {},
+			"has": function (v) {
+				return !!v;
 			}
 		};
 

@@ -32,17 +32,7 @@ var SecureAura = (function() {
   function SecureAura(AuraInstance, key) {
     setLockerSecret(this, "key", key);
     setLockerSecret(this, "ref", AuraInstance);
-    // Creating a proxy of the Aura Instance to preserve backward compatibility, but
-    // eventually we want to ignore any API that is not a public API in Aura. For now,
-    // we settle on only enumerable properties (whether they are own or inherited).
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties
-    for (var name in AuraInstance) {
-      if (name in SecureAura.prototype) {
-        // ignoring anything that SecureAura already implements
-        return;
-      }
-      Object.defineProperty(this, name, SecureThing.createPassThroughProperty(name));
-    }
+    
     Object.freeze(this);
   }
 
@@ -52,16 +42,22 @@ var SecureAura = (function() {
         return "SecureAura: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
       }
     },
-    getComponent: {
-      value: function(globalId) {
-        var cmp = getLockerSecret(this, "ref").getComponent(globalId);
-        $A.lockerService.util.verifyAccess(this, cmp);
-        return $A.lockerService.wrapComponent(cmp);
-      }
-    }
+    
+    "createComponent": SecureThing.createPassThroughMethod("createComponent"),
+    "createComponents": SecureThing.createPassThroughMethod("createComponents"),
+    "enqueueAction": SecureThing.createPassThroughMethod("enqueueAction"),
+    "error": SecureThing.createPassThroughMethod("error"),
+    "get": SecureThing.createFilteredMethod("get"),
+    "getCallback": SecureThing.createFilteredMethod("getCallback"),
+    "getComponent": SecureThing.createFilteredMethod("getComponent"),
+    "getRoot": SecureThing.createFilteredMethod("getRoot"),
+    "log": SecureThing.createPassThroughMethod("log"),
+    "warning": SecureThing.createPassThroughMethod("warning"),
+
+    "util": SecureThing.createPassThroughProperty("util")
   });
 
   SecureAura.prototype.constructor = SecureAura;
-
+  
   return SecureAura;
 })();

@@ -178,7 +178,6 @@ AuraComponentService.prototype.newComponentArray = function(config, attributeVal
  *
  * @public
  * @platform
- * @function
  * @export
  */
 AuraComponentService.prototype.createComponent = function(type, attributes, callback) {
@@ -193,7 +192,7 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
         "flavor"       : (attributes && attributes["aura:flavor"])
     };
 
-    return this.createComponentPrivAsync(config, callback);
+    this.createComponentPrivAsync(config, callback);
 };
 
 

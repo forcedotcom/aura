@@ -71,6 +71,8 @@ var SecureThing = (function() {
 		return mutated ? swallowed : originalValue;
 	}
 
+	SecureThing.filterEverything = filterEverything;
+
 	SecureThing.createFilteredMethod = function(methodName) {
 		return {
 			enumerable: true,

@@ -16,6 +16,7 @@
 /*jslint sub: true*/
 
 //#include aura.locker.SecureAuraEvent
+//#include aura.locker.SecureAction
 
 var SecureComponent = (function() {
   "use strict";
@@ -31,6 +32,34 @@ var SecureComponent = (function() {
     // regular initialization:
     setLockerSecret(this, "key", key);
     setLockerSecret(this, "ref", component);
+    // special methods that require some extra work
+    Object.defineProperties(this, {
+      "get": {
+        enumerable: true,
+        value: function(name) {
+          var value = component["get"](name);
+          var type = name.split('.')[0];
+          if (!value) {
+            return value;
+          }
+          if (type === 'c') {
+              return new SecureAction(value, key);
+          } else {
+              return SecureThing.filterEverything(this, value);
+          }
+        }
+      },
+      "getEvent": {
+        enumerable: true,
+        value: function(name) {
+          var event = component["getEvent"](name);
+          if (!event) {
+            return event;
+          }
+          return new SecureAuraEvent(event, key);
+        }
+      }
+    });
     // The shape of the component depends on the methods exposed in the definitions:
     var defs = component.getDef().methodDefs;
     if (defs) {
@@ -52,7 +81,7 @@ var SecureComponent = (function() {
     "superAfterRender": SecureThing.createPassThroughMethod("superAfterRender"),
     "superRerender": SecureThing.createFilteredMethod("superRerender"),
     "superUnrender": SecureThing.createFilteredMethod("superUnrender"),
-
+    // component @platform methods
     "isValid": SecureThing.createPassThroughMethod("isValid"),
     "isInstanceOf": SecureThing.createPassThroughMethod("isInstanceOf"),
     "addHandler": SecureThing.createPassThroughMethod("addHandler"),
@@ -69,21 +98,8 @@ var SecureComponent = (function() {
     "getConcreteComponent": SecureThing.createFilteredMethod('getConcreteComponent'),
     "find": SecureThing.createFilteredMethod('find'),
     "set": SecureThing.createFilteredMethod("set"),
-    "get": SecureThing.createFilteredMethod("get"),
     "getElement": SecureThing.createFilteredMethod("getElement"),
-    "getElements": SecureThing.createFilteredMethod("getElements"),
-    "getEvent": {
-      value: function(name) {
-        // system call to collect the low level aura event
-        var event = getLockerSecret(this, "ref").getEvent(name);
-        if (!event) {
-          return event;
-        }
-        // shadowing the low level aura event with the component's key
-        return new SecureAuraEvent(event, getLockerSecret(this, "key"));
-      }
-    }
-
+    "getElements": SecureThing.createFilteredMethod("getElements")
   });
 
   SecureComponent.prototype.constructor = SecureComponent;

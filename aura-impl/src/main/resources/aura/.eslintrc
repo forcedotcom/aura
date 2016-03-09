@@ -102,6 +102,7 @@
     "SecureElement": true,
     "SecureScriptElement": true,
     "SecureIFrameElement": true,
+    "SecureAction": true,
     "SecureDOMEvent": true,
     "SecureAuraEvent": true
   },

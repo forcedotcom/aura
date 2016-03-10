@@ -476,14 +476,11 @@ public class AuraUITestingUtil {
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> errorsList = (List<Map<String, Object>>) new JsonReader().read(errors);
             StringBuilder errorMessage = new StringBuilder();
-            StringBuilder functions = new StringBuilder();
             for (Map<String, Object> error : errorsList) {
                 errorMessage.append(error.get("message") + "\n");
-                if (error.containsKey("lastStage")) {
-                    functions.append(error.get("lastStage") + "\n");
-                }
+                errorMessage.append(error.get("testState") + "\n");
             }
-            Assert.fail(errorMessage.toString() + functions.toString());
+            Assert.fail(errorMessage.toString());
         }
     }
 
@@ -756,11 +753,11 @@ public class AuraUITestingUtil {
                         if (dump.isEmpty()) {
                             dump = "no extra test information to display.";
                         }
-                        return "Test dump - " + dump;
+                        return "Test timed out on server.\n" + dump;
                     }
                 },
                 timeoutSecs,
-                "Test did not complete within " + timeoutSecs);
+                "Test did not complete within " + timeoutSecs + " seconds");
     }
 
     /**

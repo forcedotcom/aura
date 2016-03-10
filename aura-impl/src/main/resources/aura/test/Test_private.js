@@ -115,6 +115,8 @@ TestInstance.prototype.logError = function(msg, e) {
         }
     }
 
+    // Add current test state to all errors
+    err["testState"] = this.getDump();
     errors.push(err);
 };
 
@@ -151,13 +153,12 @@ TestInstance.prototype.doTearDown = function() {
                 });
             }
         }
-        setTimeout(function() {
-            that.inProgress--;
-        }, 100);
     } catch (e) {
         this.logError("Error during tearDown", e);
-        this.inProgress = 0;
     }
+    setTimeout(function() {
+        that.inProgress = 0;
+    }, 100);
 };
 
 /**
@@ -201,92 +202,72 @@ TestInstance.prototype.continueWhenReady = function() {
     }
     try {
         if ((this.inProgress > 1) && (new Date().getTime() > this.timeoutTime)) {
-            if (this.waits.length > 0) {
-                var texp = this.waits[0].expected;
-                if ($A.util.isFunction(texp)) {
-                	if(texp()) {
-                		texp = texp().toString();
-                	}
-                }
-                var tact = this.waits[0].actual;
-                var val = tact;
-                if ($A.util.isFunction(tact)) {
-                    val = tact();
-                    if(val) { val = val.toString(); }
-                    tact = tact.toString();
-                }
-                var failureMessage = "";
-                if (!$A.util.isUndefinedOrNull(this.waits[0].failureMessage)) {
-                    failureMessage = "; Failure Message: " + this.waits[0].failureMessage;
-                }
-                throw new Error("Test timed out waiting for: " + tact + "; Expected: " + texp + "; Actual: " + val
-                        + failureMessage);
-            } else {
-                throw new Error("Test timed out");
-            }
+			throw new Error("Test timed out");
         }
         if (this.inProgress > 2) {
             setTimeout(internalCWR, 50);
-        } else {
-            if (this.waits.length > 0) {
-                var exp = this.waits[0].expected;
-                if ($A.util.isFunction(exp)) {
-                    exp = exp();
-                }
-                var act = this.waits[0].actual;
-                if ($A.util.isFunction(act)) {
-                    act = act();
-                }
-                if (exp === act) {
-                    var callback = this.waits[0].callback;
-                    if (callback) {
-                        // Set the suite as scope for callback function.
-                        // Helpful to expose test suite as 'this' in callbacks for addWaitFor
-                        if (this.doNotWrapInAuraRun) {
-                            callback.call(this.suite, this.cmp);
-                        } else {
-                            $A.run(function() {
-                                callback.call(that.suite, that.cmp);
-                            });
-                        }
-                    }
-                    this.waits.shift();
-                    setTimeout(internalCWR, 1);
-                } else {
-                    setTimeout(internalCWR, 50);
-                }
-            } else {
-                this.logErrors(true, "Did not receive expected error: ", this.expectedErrors);
-                this.expectedErrors = [];
-
-                this.logErrors(true, "Did not receive expected warning: ", this.expectedWarnings);
-                this.expectedWarnings = [];
-
-                if (this.stages.length === 0) {
-                    this.doTearDown();
-                } else {
-                    this.lastStage = this.stages.shift();
+            return;
+        }
+        if (!this.currentWait) {
+            this.currentWait = this.waits.shift();
+        }
+        if (this.currentWait) {
+            var exp = this.currentWait.expected;
+            if ($A.util.isFunction(exp)) {
+                exp = exp();
+            }
+            var act = this.currentWait.actual;
+            if ($A.util.isFunction(act)) {
+                act = act();
+            }
+            if (exp === act) {
+                var callback = this.currentWait.callback;
+                this.currentWait = undefined;
+                if (callback) {
+                    // Set the suite as scope for callback function.
+                    // Helpful to expose test suite as 'this' in callbacks for addWaitFor
                     if (this.doNotWrapInAuraRun) {
-                        this.lastStage.call(that.suite, that.cmp);
+                        callback.call(this.suite, this.cmp);
                     } else {
                         $A.run(function() {
-                            that.lastStage.call(that.suite, that.cmp);
+                            callback.call(that.suite, that.cmp);
                         });
                     }
-                    setTimeout(internalCWR, 1);
                 }
+                setTimeout(internalCWR, 1);
+                return;
+            } else {
+                setTimeout(internalCWR, 50);
+                return;
+            }
+        } else {
+            this.logErrors(true, "Did not receive expected error: ", this.expectedErrors);
+            this.expectedErrors = [];
+
+            this.logErrors(true, "Did not receive expected warning: ", this.expectedWarnings);
+            this.expectedWarnings = [];
+
+            if (this.stages.length === 0) {
+                this.doTearDown();
+            } else {
+                this.lastStage = this.stages.shift();
+                if (this.doNotWrapInAuraRun) {
+                    this.lastStage.call(that.suite, that.cmp);
+                } else {
+                    $A.run(function() {
+                        that.lastStage.call(that.suite, that.cmp);
+                    });
+                }
+                setTimeout(internalCWR, 1);
             }
         }
     } catch (e) {
-        if (e instanceof $A.auraError) {
-            throw e;
-        } else {
-            if (this.lastStage) {
-                e["lastStage"] = this.lastStage;
-            }
-            this.logError("Test error", e);
-            this.doTearDown();
-        }
+    	if (e instanceof $A.auraError) {
+    		throw e;
+    	} else {
+    		this.logError("Test error", e);
+    		this.doTearDown();
+    	}
     }
 };
 
@@ -299,34 +280,61 @@ TestInstance.prototype.continueWhenReady = function() {
  * @function Test#getDump
  */
 TestInstance.prototype.getDump = function() {
-    var status = "";
-    var errors = TestInstance.prototype.errors;
-    if (errors.length > 0) {
-        status += "errors {" + $A.test.print($A.test.getErrors()) + "}\n";
-    }
-    if (this.preErrors.length > 0) {
-        status += "errors during init {" + $A.test.print(this.preErrors) + "}\n";
-    }
-    if (this.waits.length > 0) {
-        var actual;
-        try {
-            actual = this.waits[0].actual();
-        } catch (ignore) {/*do nothing*/}
-        var failureMessage = "";
-        if (!$A.util.isUndefinedOrNull(this.waits[0].failureMessage)) {
-            failureMessage = " Failure Message: {" + this.waits[0].failureMessage + "}";
-        }
-        status += "waiting for {" + $A.test.print(this.waits[0].expected) + "} currently {" + $A.test.print(actual)
-                + "}" + failureMessage + " from {" + $A.test.print(this.waits[0].actual) + "} after {"
-                + $A.test.print(this.lastStage) + "} ";
-    } else if (!$A.util.isUndefinedOrNull(this.lastStage)) {
-        status += "executing {" + $A.test.print(this.lastStage) + "} ";
-    }
-    return status;
+	try {
+		var status = "URL: " + window.location +  "\n";
+		
+		status += "Test status: ";
+		if (this.inProgress === -1) {
+			status += "did not start\n";
+		} else if (this.inProgress === 0) {
+			status += "completed\n";
+		} else if (this.inProgress === 1) {
+			status += "tearing down\n";
+		} else if (this.inProgress >= 2) {
+			status += "running\n";
+		}
+		status += "Elapsed time: " + (new Date().getTime() - this.initTime)
+				+ "ms\n";
+
+		var errors = TestInstance.prototype.errors;
+		if (errors.length > 0) {
+			status += "Errors: {" + this.print(this.getErrors()) + "}\n";
+		}
+		if (this.preErrors && this.preErrors.length > 0) {
+			status += "Errors during init: {" + this.print(this.preErrors)
+					+ "}\n";
+		}
+		if (this.currentWait) {
+			var actual = this.currentWait.actual;
+            if ($A.util.isFunction(actual)) {
+    			try {
+    				actual = actual();
+    			} catch (e) {
+    				actual = [ "<error evaluating>" ];
+    			}
+            }
+			if (!$A.util.isUndefinedOrNull(this.currentWait.failureMessage)) {
+				status += "Wait failure: {" + this.currentWait.failureMessage
+						+ "}\n";
+			}
+			status += "Waiting for: {" + this.print(this.currentWait.expected)
+					+ "} currently {" + this.print(actual) + "}\n";
+			status += "Wait function: " + this.print(this.currentWait.actual)
+					+ "\n";
+		}
+		if (!$A.util.isUndefinedOrNull(this.lastStage)) {
+			status += "Last function: " + this.print(this.lastStage) + "\n";
+		}
+		return status;
+	} catch (e) {
+		// Just in case
+		return "Unhandled error retrieving dump:" + e.toString();
+	}
 };
 
 /**
- * Set up AppCache event listeners. Not a complete set of events, but all the ones we care about in our current tests.
+ * Set up AppCache event listeners. Not a complete set of events, but all the
+ * ones we care about in our current tests.
  * 
  * @private
  * @function Test#appCacheEvents

@@ -54,6 +54,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.http.RequestParam.BooleanParam;
+import org.auraframework.http.RequestParam.IntegerParam;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
@@ -79,6 +80,7 @@ import com.google.common.collect.Lists;
 public class AuraTestFilter implements Filter {
     private static final Log LOG = LogFactory.getLog(AuraTestFilter.class);
 
+    private static final int DEFAULT_JSTEST_TIMEOUT = 30;
     private static final String BASE_URI = "/aura";
     private static final String GET_URI = BASE_URI
             + "?aura.tag=%s:%s&aura.format=HTML&aura.deftype=%s&aura.mode=%s&aura.access=%s";
@@ -98,6 +100,9 @@ public class AuraTestFilter implements Filter {
     // "testReset" is a signal to reset any mocks associated with the current TestContext, used primarily on the initial
     // request of a test to clean up in case a prior test did not clean up.
     private static final BooleanParam testReset = new BooleanParam(AuraServlet.AURA_PREFIX + "testReset", false);
+
+    // "testTimeout" sets the timeout for a test
+    private static final IntegerParam testTimeout = new IntegerParam(AuraServlet.AURA_PREFIX + "testTimeout", false);
 
     private static final Pattern bodyEndTagPattern = Pattern.compile("(?is).*(</body\\s*>).*");
     private static final Pattern htmlEndTagPattern = Pattern.compile("(?is).*(</html\\s*>).*");
@@ -180,7 +185,8 @@ public class AuraTestFilter implements Filter {
                         }
                     case JS:
                         res.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
-                        writeJsTestScript(res.getWriter(), targetDescriptor, testToRun);
+                        int timeout = testTimeout.get(request, DEFAULT_JSTEST_TIMEOUT);
+                        writeJsTestScript(res.getWriter(), targetDescriptor, testToRun, timeout);
                         return;
                     default:
                         // Pass it on.
@@ -461,7 +467,7 @@ public class AuraTestFilter implements Filter {
         out.append(originalResponse.substring(insertionPoint));
     }
 
-    private void writeJsTestScript(PrintWriter out, DefDescriptor<?> targetDescriptor, String testName)
+    private void writeJsTestScript(PrintWriter out, DefDescriptor<?> targetDescriptor, String testName, int testTimeout)
             throws IOException {
         TestSuiteDef suiteDef;
         TestCaseDef testDef;
@@ -475,7 +481,6 @@ public class AuraTestFilter implements Filter {
         }
 
         // TODO: Inject test framework here, before the test suite code, separately from framework code.
-        final int testTimeout = 90; // TODO: support TestCaseDef override for timeout
         out.append(String.format("(function(suite){$A.test.run('%s',suite,%s);})(", testName,
                 testTimeout));
         out.append(suiteDef.getCode());

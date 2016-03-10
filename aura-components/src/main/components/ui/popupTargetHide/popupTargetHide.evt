@@ -16,4 +16,5 @@
 
 -->
 <aura:event type="COMPONENT" support="PROTO" description="Indicates that the popup trigger is requesting to hide a target.">
+	<aura:attribute name="event" type="Object" description="The associated event that triggered the hiding of the popup." />
 </aura:event>

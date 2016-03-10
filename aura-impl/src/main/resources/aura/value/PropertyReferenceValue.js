@@ -27,6 +27,7 @@ function PropertyReferenceValue(path, valueProvider) {
     this.isGlobal=this.expression.charAt(0) === '$';
     this.valueProvider = valueProvider;
     this.context=(valueProvider instanceof PassthroughValue)?valueProvider:$A.getContext().getCurrentAccess();
+    this.lastResult=null;
 
     // #if {"modes" : ["STATS"]}
     valueFactory.index(this);
@@ -38,10 +39,12 @@ function PropertyReferenceValue(path, valueProvider) {
  */
 PropertyReferenceValue.prototype.evaluate = function(valueProvider) {
     if (this.isGlobal) {
-        return aura.get(this.expression);
+        this.lastResult=aura.get(this.expression);
+        return this.lastResult;
     }
     $A.getContext().setCurrentAccess(this.context);
     var result=(valueProvider || this.valueProvider).get(this.expression);
+    this.lastResult=result;
     $A.getContext().releaseCurrentAccess();
     return result;
 };

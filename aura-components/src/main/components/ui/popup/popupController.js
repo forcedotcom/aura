@@ -32,7 +32,7 @@
 
     onTargetHide: function(component, event, helper) {
         helper = component.getConcreteComponent().getDef().getHelper();
-        helper.handleTargetHide(component);
+        helper.handleTargetHide(component, event);
     },
 
     onKeyboardEvent: function(component, event, helper) {

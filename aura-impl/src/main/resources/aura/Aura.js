@@ -361,6 +361,7 @@ function AuraInstance () {
 
     this.enqueueAction             = this.clientService.enqueueAction.bind(this.clientService);
     this.deferAction               = this.clientService.deferAction.bind(this.clientService);
+    this.deferPendingActions       = this.clientService.deferPendingActions.bind(this.clientService);
 
     this.render                    = this.renderingService.render.bind(this.renderingService);
     this.rerender                  = this.renderingService.rerender.bind(this.renderingService);
@@ -449,6 +450,7 @@ function AuraInstance () {
     this["services"] = this.services;
     this["enqueueAction"] = this.enqueueAction;
     this["deferAction"] = this.deferAction;
+    this["deferPendingActions"] = this.deferPendingActions;
     this["render"] = this.render;
     this["rerender"] = this.rerender;
     this["unrender"] = this.unrender;
@@ -550,6 +552,8 @@ AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; 
  * @public
  */
 AuraInstance.prototype.initAsync = function(config) {
+    var regexpDetectURLProcotolSegment = /^(.*?:)?\/\//;
+
     function createAuraContext() {
         // Context is created async because of the GVPs go though async storage checks
         $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
@@ -566,7 +570,6 @@ AuraInstance.prototype.initAsync = function(config) {
         });
     }
 
-    var regexpDetectURLProcotolSegment = /^(.*?:)?\/\//;
     if (!window['$$safe-eval$$'] && !regexpDetectURLProcotolSegment.test(config["host"])) {
         // safe eval worker is an iframe that enables the page to run arbitrary evaluation,
         // if this iframe is still loading, we should wait for it before continue with

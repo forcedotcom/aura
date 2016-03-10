@@ -107,15 +107,14 @@ AuraExpressionService.prototype.clearReferences=function(valueProvider){
 AuraExpressionService.prototype.updateGlobalReference = function (expression, oldValue, value) {
     expression = $A.expressionService.normalize(expression);
     var reference=this.references[expression];
-    if(oldValue !== value) {
-        if(reference&&reference.consumers){
-            for(var consumer in reference.consumers){
-                var component=$A.getComponent(consumer);
-                if (component) {
-                    for(var targetExpression in reference.consumers[consumer]){
-                        component.markDirty(targetExpression);
-                        component.fireChangeEvent(targetExpression,oldValue,value);
-                    }
+    if(reference&&reference.consumers&&reference.reference&&reference.reference.lastResult!==value){
+        reference.reference.evaluate();
+        for(var consumer in reference.consumers){
+            var component=$A.getComponent(consumer);
+            if (component) {
+                for(var targetExpression in reference.consumers[consumer]){
+                    component.markDirty(targetExpression);
+                    component.fireChangeEvent(targetExpression,reference.reference.lastResult||oldValue,value);
                 }
             }
         }

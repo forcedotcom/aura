@@ -94,10 +94,18 @@ AttributeSet.prototype.get = function(key, component) {
     }
     var defs=AttributeSet.getDef(attribute,component);
     if(!$A.clientService.allowAccess(defs[0], defs[1])){
-        // #if {"excludeModes" : ["PRODUCTION"]}
-        $A.error("Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
-        // #end
-        return undefined;
+        var context=$A.getContext();
+        var message="Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+context.getCurrentAccess()+"'.";
+        if(context.enableAccessChecks){
+            if(context.logAccessFailures){
+                $A.error(message);
+            }
+            return undefined;
+        }else{
+            if(context.logAccessFailures){
+                $A.warning(message);
+            }
+        }
     }
 	if (!path) {
         var decorators=this.decorators[key];
@@ -174,11 +182,18 @@ AttributeSet.prototype.set = function(key, value, component) {
     }
     var defs=AttributeSet.getDef(attribute,component);
     if(!$A.clientService.allowAccess(defs[0],defs[1])){
-        // #if {"excludeModes" : ["PRODUCTION"]}
-        $A.error("Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
-        // #end
-
-        return;
+        var context=$A.getContext();
+        var message="Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+context.getCurrentAccess()+"'.";
+        if(context.enableAccessChecks){
+            if(context.logAccessFailures){
+                $A.error(message);
+            }
+            return;
+        }else{
+            if(context.logAccessFailures){
+                $A.warning(message);
+            }
+        }
     }
     if(!$A.util.isUndefinedOrNull(value) && !this.isValueValidForAttribute(key, value)) {
     	if(this.isTypeOfArray(key)) {

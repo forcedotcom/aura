@@ -1358,11 +1358,18 @@ Component.prototype.getEvent = function(name) {
         return null;
     }
     if (!$A.clientService.allowAccess(eventDef,this)) {
-        // #if {"excludeModes" : ["PRODUCTION"]}
-        $A.error("Access Check Failed! Component.getEvent():'" + name + "' of component '" + this + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
-        // #end
-
-        return null;
+        var context=$A.getContext();
+        var message="Access Check Failed! Component.getEvent():'" + name + "' of component '" + this + "' is not visible to '" + context.getCurrentAccess() + "'.";
+        if(context.enableAccessChecks) {
+            if(context.logAccessFailures){
+                $A.error(message);
+            }
+            return null;
+        }else{
+            if(context.logAccessFailures){
+                $A.warning(message);
+            }
+        }
     }
     return new Aura.Event.Event({
         "name" : name,
@@ -1854,10 +1861,18 @@ Component.prototype.setupSuper = function(configAttributes) {
                 for (var i = 0; i < facets.length; i++) {
                     var facetDef = AttributeSet.getDef(facets[i]["descriptor"], this.componentDef);
                     if (!$A.clientService.allowAccess(facetDef[0], facetDef[1])) {
-                        // #if {"excludeModes" : ["PRODUCTION"]}
-                        $A.error("Access Check Failed! Component.setupSuper():'" + facets[i]["descriptor"] + "' of component '" + this + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
-                        // #end
-                        continue;
+                        var context=$A.getContext();
+                        var message="Access Check Failed! Component.setupSuper():'" + facets[i]["descriptor"] + "' of component '" + this + "' is not visible to '" + context.getCurrentAccess() + "'.";
+                        if(context.enableAccessChecks) {
+                            if(context.logAccessFailures){
+                                $A.error(message);
+                            }
+                            continue;
+                        }else{
+                            if(context.logAccessFailures){
+                                $A.warning(message);
+                            }
+                        }
                     }
                     superAttributes["values"][facets[i]["descriptor"]] = facets[i]["value"];
                 }
@@ -1945,11 +1960,18 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
         if (!setByDefault[attribute]){
             var def=AttributeSet.getDef(attribute,cmp.getDef());
             if(!$A.clientService.allowAccess(def[0],def[1])) {
-                // #if {"excludeModes" : ["PRODUCTION"]}
-                $A.error("Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + cmp + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
-                // #end
-
-                continue;
+                var context=$A.getContext();
+                var message="Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + cmp + "' is not visible to '" + context.getCurrentAccess() + "'.";
+                if(context.enableAccessChecks){
+                    if(context.logAccessFailures){
+                        $A.error(message);
+                    }
+                    continue;
+                }else{
+                    if(context.logAccessFailures){
+                        $A.warning(message);
+                    }
+                }
             }
         }
 

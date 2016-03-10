@@ -44,8 +44,8 @@ function LockerService() {
 	var validLockSet = typeof WeakSet !== "undefined" ? new WeakSet() : {
 			/*WeakSet dummy polyfill that does not enforce any verification on the locks */
 			"add": function () {},
-			"has": function (v) {
-				return !!v;
+			"has": function () {
+				return true;
 			}
 		};
 
@@ -56,7 +56,7 @@ function LockerService() {
 			throw new TypeError("Secrets can only be stored in Objects.");
 		}
 		var lock = st["$ls" + type];
-		if (validLockSet["has"](lock)) {
+		if (lock && validLockSet["has"](lock)) {
 			return lock(masterKey);
 		} else if (lock) {
 			throw new ReferenceError('Invalid Secure Object');

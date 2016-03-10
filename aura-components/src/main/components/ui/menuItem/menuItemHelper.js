@@ -32,8 +32,6 @@
     },
 
     domEventHandler: function(component, event) {
-        event.preventDefault();
-
         if (!component.isValid() || this.isDisabled(component)) {
             return false;
         }
@@ -44,6 +42,7 @@
             concreteComponent.focus();
         } else if (event.type === "keydown") {
             if (event.keyCode === 32 || event.keyCode === 13) {  // space or enter key
+                event.preventDefault();
                 concreteComponent.select();
             }
         }

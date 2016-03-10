@@ -122,24 +122,4 @@ function AuraError() {
 AuraError.prototype = new Error();
 AuraError.prototype.constructor = AuraError;
 
-AuraError.prototype.setComponent = function(cmp) {
-    this.component = cmp;
-};
-
-AuraError.prototype.getComponent = function() {
-    return this.component;
-};
-
-AuraError.prototype.setAction = function(action) {
-    this.action = action;
-};
-
-AuraError.prototype.getAction = function() {
-    return this.action;
-};
-
-AuraError.prototype.getId = function() {
-    return this.id;
-};
-
 Aura.Errors.AuraError = AuraError;

@@ -23,7 +23,6 @@
     showErrorDialog: function(cmp, event) {
         var afe = event.getParam('auraError');
         if (afe) {
-            afe["handled"] = true;
             var output = cmp.find('errorText');
             var dialog = cmp.find('errorOverlay');
             var open = $A.get("e.ui:openDialog");
@@ -37,6 +36,7 @@
             });
             open.fire();
         }
+        event["handled"] = true;
     },
 
     hideErrorDialog: function(cmp){

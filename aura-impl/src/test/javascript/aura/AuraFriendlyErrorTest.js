@@ -22,7 +22,8 @@ Test.Aura.AuraFriendlyErrorTest = function() {
     Mocks.GetMocks(Object.Global(), {
         "Aura": Aura,
         "AuraError": function(){},
-        "AuraFriendlyError": function(){}
+        "AuraFriendlyError": function(){},
+        "window": {}
     })(function() {
         [Import("aura-impl/src/main/resources/aura/AuraError.js"),
          Import("aura-impl/src/main/resources/aura/AuraFriendlyError.js")]
@@ -34,7 +35,8 @@ Test.Aura.AuraFriendlyErrorTest = function() {
                 "Errors": {
                     "AuraError": Aura.Errors.AuraError
                 }
-            }
+            },
+            "window": {}
         };
         return Mocks.GetMocks(Object.Global(),mock)(during);
     }

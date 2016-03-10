@@ -15,16 +15,14 @@
     limitations under the License.
 
 -->
-<!--A test component that includes provider:clientProvider as the facet. provider:clientProvider has a clientside provider only. 
+<!--A test component that includes provider:clientProvider as the facet. provider:clientProvider has a clientside provider only.
     So the resolution of the abstract component doesn't happen until the config has reached the client. -->
 <aura:component>
     <aura:dependency resource="provider:cmpWithModel" type="COMPONENT"/>
-    <aura:dependency resource="provider:providerA" type="COMPONENT"/>
-    <aura:dependency resource="provider:providerB" type="COMPONENT"/>
+    <aura:dependency resource="provider:javaProviderImpl" type="COMPONENT"/>
     <div aura:id="simpleComponentProvided">
         <provider:clientProvider value="{componentDef:'markup://aura:text',attributes:{value:'resolver'}}" aura:id="provider1"/>
     </div>
 
-    <provider:clientProvider value="{componentDef:'markup://provider:providerA'}" aura:id="provider3" />
-    <provider:clientProvider value="{componentDef:'markup://provider:providerB'}" aura:id="provider4" />
+    <provider:clientProvider value="{componentDef:'markup://provider:javaProviderImpl'}" aura:id="javaProviderImpl" />
 </aura:component>

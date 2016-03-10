@@ -86,114 +86,97 @@ Logger.prototype.assert = function(condition, assertMessage) {
  */
 Logger.prototype.error = function(msg, e){
     var logMsg = msg || "";
-    if (e && e instanceof $A.auraError) {
-        this.auraErrorHelper(e);
-        // Give the component test error logging handler a more useful message so it can better track if the error
-        // received is expected or not.
-        logMsg = e.message;
-    } else {
-        if (!$A.util.isString(msg)) {
-            e = msg;
-            logMsg = "";
-            msg = "Unknown Error";
-        }
-        if (!e) {
-            e = undefined;
-        } else if (!$A.util.isError(e)) {
-            // Somebody has thrown something bogus, or we're on IE (else block, old IE does not implement .message),
-            // but either way we should do what we can...
-            if ($A.util.isObject(e) && e.message) {
-                var stk = e.stack;
-                e = new Error("caught " + e.message);
-                if (stk) {
-                    e.stack = stk;
-                }
-            } else {
-                e = new Error("caught " + $A.util.json.encode(e));
+    if (!$A.util.isString(msg)) {
+        e = msg;
+        logMsg = "";
+        msg = "Unknown Error";
+    }
+    if (!e) {
+        e = undefined;
+    } else if (!$A.util.isError(e)) {
+        // Somebody has thrown something bogus, or we're on IE (else block, old IE does not implement .message),
+        // but either way we should do what we can...
+        if ($A.util.isObject(e) && e.message) {
+            var stk = e.stack;
+            e = new Error("caught " + e.message);
+            if (stk) {
+                e.stack = stk;
             }
+        } else {
+            e = new Error("caught " + $A.util.json.encode(e));
         }
-        if (!logMsg.length) {
-            logMsg = "Unknown Error";
-        }
-        if (e && !$A.util.isUndefinedOrNull(e.message)) {
-            logMsg = logMsg + " : " + e.message;
-        }
+    }
+    if (!logMsg.length) {
+        logMsg = "Unknown Error";
+    }
+    if (e && !$A.util.isUndefinedOrNull(e.message)) {
+        logMsg = logMsg + " : " + e.message;
+    }
 
-        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        //
-        // Error objects in older versions of IE are represented as maps with multiple entries containing the error message
-        // string. Checking that the object here is not an Error object prevents the error message from being displayed
-        // multiple times.
-        //
-        if ($A.util.isObject(e) && !$A.util.isError(e)) {
-            for(var k in e) {
-                try {
-                    var val = e[k];
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //
+    // Error objects in older versions of IE are represented as maps with multiple entries containing the error message
+    // string. Checking that the object here is not an Error object prevents the error message from being displayed
+    // multiple times.
+    //
+    if ($A.util.isObject(e) && !$A.util.isError(e)) {
+        for(var k in e) {
+            try {
+                var val = e[k];
 
-                    if ($A.util.isString(val)) {
-                        if (logMsg === "Unknown Error") {
-                            logMsg = val;
-                        } else {
-                            logMsg = logMsg + '\n' + val;
-                        }
-                        msg = logMsg;
+                if ($A.util.isString(val)) {
+                    if (logMsg === "Unknown Error") {
+                        logMsg = val;
+                    } else {
+                        logMsg = logMsg + '\n' + val;
                     }
-                } catch (e2) {
-                    // Ignore serialization errors
-                    // We are in an error already, so we really don't want to publish this.
+                    msg = logMsg;
                 }
+            } catch (e2) {
+                // Ignore serialization errors
+                // We are in an error already, so we really don't want to publish this.
             }
         }
-        var stack = this.getStackTrace(e);
-        if (stack) {
-            logMsg = logMsg + "\n" + stack.join("\n");
-        }
-        //#end
+    }
+    var stack = this.getStackTrace(e);
+    if (stack) {
+        logMsg = logMsg + "\n" + stack.join("\n");
+    }
+    //#end
 
-        if (!$A.initialized) {
-            $A["hasErrors"] = true;
-        }
+    if (!$A.initialized) {
+        $A["hasErrors"] = true;
     }
 
     this.log(this.ERROR, logMsg, e);
-};
-
-/**
- * @private
- * @memberOf Aura.Utils.Logger
- *
- * @param {AuraError} [e] error
- * @param {Action} [action] the responsible action, if there is one.
- */
-Logger.prototype.auraErrorHelper = function(e, action){
-    if (e["handled"]) {
-        return;
-    }
-    var actionName = undefined;
-    var actionId = undefined;
-    if (action) {
-        if (action.getDef && action.getDef()) {
-            actionName = action.getDef().getDescriptor();
-        }
-        if (action.getId) {
-            actionId = action.getId();
-        }
-    }
-    this.reportError(e, actionName, actionId);
 };
 
 Logger.prototype.reportError = function(e, action, id){
     if (!e || e["reported"]) {
         return;
     }
+
+    // get action from AuraError
+    var errorAction = action || (e.getAction ? e.getAction() : null);
+    var actionName = undefined;
+    var actionId = undefined;
+    if (errorAction) {
+        if (errorAction.getDef && errorAction.getDef()) {
+            actionName = errorAction.getDef().getDescriptor();
+        }
+        if (errorAction.getId) {
+            actionId = errorAction.getId();
+        }
+    }
+
     // Post the action failure to the server, where we can keep track of it for bad client code.
     // But don't keep re-posting if the report of failure fails.  Do we want this to be production
     // mode only or similar?
     var reportAction = $A.get("c.aura://ComponentController.reportFailedAction");
     reportAction.setCaboose();
     reportAction.setParams({
-        "failedAction": action,
-        "failedId": id,
+        "failedAction": action || actionName || (e.getComponent ? e.getComponent() : null),
+        "failedId": id || actionId || (e.getId ? e.getId() : null),
         "clientError": e.toString(),
         // Note that stack is non-standard, and even if present, may be obfuscated
         // Also we only take the first 25k characters because stacks can get very large
@@ -419,14 +402,17 @@ Logger.prototype.devDebugConsoleLog = function(level, message, error) {
         var console = window["console"];
         var filter = level === "WARNING" ? "warn" : level.toLowerCase();
         if (console[filter]) {
-            console[filter](message);
+            console[filter]("%s", message);
             if (error) {
-                console[filter](error);
+                if (error.getComponent && error.getComponent()) {
+                    console[filter]("%s", "Failing component: " + error.getComponent());
+                }
+                console[filter]("%o", error);
                 showTrace = !(error.stack || error.stackTrace);
             }
             if (showTrace && trace) {
                 for ( var j = 0; j < trace.length; j++) {
-                    console[filter](trace[j]);
+                    console[filter]("%s", trace[j]);
                 }
             }
         } else if (console["group"]) {

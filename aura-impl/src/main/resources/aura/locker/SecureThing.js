@@ -18,93 +18,98 @@
 var SecureThing = (function() {
 	"use strict";
 
-	function primaryThing(st) {
-		return st._get(st._getPrimaryName($A.lockerService.masterKey), $A.lockerService.masterKey);
+	function SecureThing(thing, key) {
+		setLockerSecret(this, "key", key);
+		setLockerSecret(this, "ref", thing);
+		Object.freeze(this);
 	}
 
-	function getKey(st) {
-		return $A.lockerService.util._getKey(st, $A.lockerService.masterKey);
+	function isDOMElementOrNode(o) {
+		return typeof o === "object" &&
+			((typeof HTMLElement === "object" && o instanceof HTMLElement) ||
+			(typeof Node === "object" && o instanceof Node) ||
+			(typeof o.nodeType === "number" && typeof o.nodeName === "string"));
 	}
 
-	/**
-	 * Construct a new SecureThing.
-	 *
-	 * @public
-	 * @class
-	 * @constructor
-	 *
-	 * @param {String}
-	 *            name - name of the secure getter for the wrapped thing
-	 * @param {Object}
-	 *            thing - the thing to be securely wrapped
-	 */
-	function SecureThing(key, primaryName) {
-		var _things = {};
-		var _primaryName = primaryName;
-
-		$A.lockerService.util.applyKey(this, key);
-
-		Object.defineProperty(this, "_getPrimaryName", {
-			value : function(mk) {
-				if (mk !== $A.lockerService.masterKey) {
-					throw Error("Access denied");
-				}
-
-				return _primaryName;
+	function filterEverything(st, originalValue) {
+		var swallowed;
+		var mutated = false;
+		if (!originalValue) {
+			return originalValue;
+		}
+		
+		var isNodeList = originalValue instanceof NodeList;
+		if (Array.isArray(originalValue) || isNodeList) {
+			swallowed = [];
+			for (var n = 0; n < originalValue.length; n++) {
+				var newValue = filterEverything(st, originalValue[n]);
+				// TODO: NaN !== NaN
+				swallowed.push(newValue);
+				mutated = mutated || (newValue !== originalValue[n]);
 			}
-		});
-
-		Object.defineProperty(this, "_get", {
-			value : function(name, mk) {
-				if (mk !== $A.lockerService.masterKey) {
-					throw Error("Access denied");
-				}
-
-				return _things[name];
+			
+			// Decorate with .item() to preserve NodeList shape
+			if (isNodeList && mutated) {
+				Object.defineProperty(swallowed, "item", {
+					value: function(index) { return this[index]; }
+				});
 			}
-		});
-
-		Object.defineProperty(this, "_set", {
-			value : function(name, value, mk) {
-				if (mk !== $A.lockerService.masterKey) {
-					throw Error("Access denied");
+		} else if (typeof originalValue === 'object') {
+			var key = getLockerSecret(st, "key");
+			var hasAccess = $A.lockerService.util.hasAccess(st, originalValue);
+			$A.assert(key, "A secure object should always have a key.");
+			if ($A.util.isComponent(originalValue)) {
+				swallowed = hasAccess ?
+						new SecureComponent(originalValue, key) : new SecureComponentRef(originalValue, key);
+				mutated = originalValue !== swallowed;
+			} else if (isDOMElementOrNode(originalValue)) {
+				swallowed = hasAccess ?
+						new SecureElement(originalValue, key) : new SecureThing(originalValue, key);
+				mutated = true;
+			} else if ($A.lockerService.util.isKeyed(originalValue)) {
+				swallowed = new SecureThing(originalValue, key);
+				mutated = true;
+			} else {
+				swallowed = {};
+				for (var prop in originalValue) {
+					swallowed[prop] = filterEverything(st, originalValue[prop]);
+					mutated = mutated || (originalValue[prop] !== swallowed[prop]);
 				}
-
-				_things[name] = value;
 			}
-		});
-
-		this._getPrimaryName = this["_getPrimaryName"];
-		this._get = this["_get"];
-		this._set = this["_set"];
+		}
+		
+		return mutated ? swallowed : originalValue;
 	}
+
+	SecureThing.filterEverything = filterEverything;
 
 	SecureThing.createFilteredMethod = function(methodName) {
 		return {
+			enumerable: true,
 			value : function() {
-				var thing = primaryThing(this);
-				return this.filterNodes(thing[methodName].apply(thing, arguments));
+				var thing = getLockerSecret(this, "ref");
+				var raw = thing[methodName].apply(thing, arguments);
+				return filterEverything(this, raw);
 			}
 		};
 	};
 
 	SecureThing.createFilteredProperty = function(propertyName) {
 		return {
+			enumerable: true,
 			get : function() {
-				var thing = primaryThing(this);
+				var thing = getLockerSecret(this, "ref");
 				var raw = thing[propertyName];
-				$A.lockerService.util.verifyAccess(this, raw);
-
-				var key = getKey(this);
-				return new SecureElement(raw, key);
+				return filterEverything(this, raw);
 			}
 		};
 	};
 
 	SecureThing.createPassThroughMethod = function(methodName) {
 		return {
+			enumerable: true,
 			value : function() {
-				var thing = primaryThing(this);
+				var thing = getLockerSecret(this, "ref");
 				return thing[methodName].apply(thing, arguments);
 			}
 		};
@@ -112,37 +117,23 @@ var SecureThing = (function() {
 
 	SecureThing.createPassThroughProperty = function(name) {
 		return {
+			enumerable: true,
 			get : function() {
-				return primaryThing(this)[name];
+				return getLockerSecret(this, "ref")[name];
 			},
 			set : function(value) {
-				primaryThing(this)[name] = value;
+				getLockerSecret(this, "ref")[name] = value;
 			}
 		};
 	};
 
-	SecureThing.prototype = {
-		filterNodes: function(raw) {
-			if (!raw) {
-				return undefined;
-			}
-
-			var key = getKey(this);
-			if (raw.length !== undefined) {
-				var filtered = [];
-				for (var n = 0; n < raw.length; n++) {
-					var e = raw[n];
-					if ($A.lockerService.util.hasAccess(this, e)) {
-						filtered.push(new SecureElement(e, key));
-					}
-				}
-
-				return filtered;
-			} else {
-				return $A.lockerService.util.hasAccess(this, raw) ? new SecureElement(raw, key) : undefined;
+	SecureThing.prototype = Object.create(null, {
+		toString: {
+			value: function () {
+				return "SecureThing: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
 			}
 		}
-	};
+	});
 
 	SecureThing.prototype.constructor = SecureThing;
 

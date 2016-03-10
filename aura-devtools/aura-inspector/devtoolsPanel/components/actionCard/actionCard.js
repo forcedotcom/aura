@@ -25,6 +25,7 @@
 			isAbortable:	this.getAttribute("isAbortable"),
 			returnValue:	this.getAttribute("returnValue"),
 			returnError:    this.getAttribute("returnError") === '[]'? undefined : this.getAttribute("returnError"),
+			howDidWeModifyResponse: this.getAttribute("howDidWeModifyResponse"),//responseModified_modify, responseModified_drop, responseModified_error
 			fromStorage:	this.getAttribute("isStorable") === "true" ? this.getAttribute("isFromStorage") : "-",
             //storageKey could be very long, I want people be able to see it when they want to, hide it like other JSON object when no one cares
 			storageKey:	this.getAttribute("isStorable") === "true" ? "{\"storageKey\":"+JSON.stringify(this.getAttribute("storageKey"))+"}" : "-",
@@ -59,8 +60,14 @@
 
     		this.shadowRoot.querySelector("#statsCreated").textContent = statsInfo.created;
     	}
-    	//let people decide what they would like to do once the actionCard is created inside watch list
+
+    	if(model.isStorable === "false" || model.isStorable === false) {
+    		// Hide the storable sub info columns
+    		this.shadowRoot.querySelector(".attributes").classList.add("storable-false");
+    	}
+
     	if(this.getAttribute("toWatch") === "true") {
+    		//let people decide what they would like to do once the actionCard is created inside watch list    	
     		this.shadowRoot.querySelector(".span_removeActionCard").style.display = "inline-block";
     		this.shadowRoot.querySelector(".dropOrModify").style.display = "block";
 			this.shadowRoot.querySelector(".card").classList.add("watch");
@@ -75,10 +82,13 @@
 				this.shadowRoot.querySelector(".div_editActionResult").style.display = "none";
     		}
     	} else {
+    		//action card on the left side. 
     		this.shadowRoot.querySelector(".div_editActionResult").style.display = "none";
 			this.shadowRoot.querySelector(".div_errorResponse").style.display = "none";	
     		this.shadowRoot.querySelector(".dropOrModify").style.display = "none";
     	}
+
+
     	//Edit action parameter is not working yet, hide it
     	//this.shadowRoot.querySelector("#button_editActionParameter").style.display = "none";
 		//this.shadowRoot.querySelector(".matchActionParameter").style.display = "none";
@@ -398,16 +408,6 @@
 		} else {
 			console.log("saveNextResponse, either actionId is bogus, or bad value of key/value in nextResponse", 
 				actionId, nextResponseKey, nextResponseValue);
-		}
-	}
-
-	function parseJSON(jsonString, errorMsg) {
-		var extraMsg = ""; 
-		if(errorMsg) { extraMsg = ''+errorMsg; }
-		try {
-			return JSON.parse(jsonString);
-		} catch(e) {
-			console.error(extraMsg+" error out during passing JSON string:"+jsonString);
 		}
 	}
 

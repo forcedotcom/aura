@@ -21,11 +21,11 @@
 
     <aura:method name="getWrapperFromController" action="{!c.getWrapperFromController}"/>
     <aura:method name="dynamicallyCreateCmps" action="{!c.dynamicallyCreateCmps}"/>
-    <aura:method name="getElement" action="{!c.getElement}"/>
-    <aura:method name="getEvent" action="{!c.getEvent}"/>
+    <aura:method name="getElementTest" action="{!c.getElementTest}"/>
+    <aura:method name="getEventTest" action="{!c.getEventTest}"/>
 
     <aura:registerevent name="press" type="ui:press"/>
 
     <div>SecureComponent test</div>
-    <componentTest:accessAttributes aura:id="innerCmp"/>
+    <lockerTest:basicTest aura:id="innerCmp"/>
 </aura:component>

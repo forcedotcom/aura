@@ -161,13 +161,13 @@
 			   in IE11. So we collect content in an array while other calls to setData are pending. Then we unwind
 			   the array one at a time.
 			 */
-			if (this._settingContent) {
-				if (!this._nextContent) {
-					this._nextContent = [];
+			if (editorInstance._settingContent) {
+				if (!editorInstance._nextContent) {
+					editorInstance._nextContent = [];
 				}
-				this._nextContent.push(content);
+				editorInstance._nextContent.push(content);
 			} else {
-				this._settingContent = true;
+				editorInstance._settingContent = true;
 				this._setData(editorInstance, content);
 			}
 		}
@@ -176,10 +176,10 @@
 	_setData : function(editorInstance, content) {
 		var helper = this;
 		editorInstance.setData(content, function() {
-			if (!$A.util.isEmpty(helper._nextContent)) {
-				helper._setData(editorInstance,helper._nextContent.shift());
+			if (!$A.util.isEmpty(editorInstance._nextContent)) {
+				helper._setData(editorInstance,editorInstance._nextContent.shift());
 			} else {
-				helper._settingContent = false;
+				editorInstance._settingContent = false;
 			}
 		} );
 	},

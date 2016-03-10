@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 ({
+    onClick: function (cmp, event) {
+        if (cmp.isValid()) {
+            $A.util.squash(event, true);
+            cmp.getConcreteComponent().select();
+        }
+    },
 
     select : function(component, event, helper) {
         var concreteComponent = component.getConcreteComponent();

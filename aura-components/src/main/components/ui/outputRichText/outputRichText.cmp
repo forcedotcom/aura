@@ -18,9 +18,12 @@
 <aura:component access="GLOBAL" support="GA" implements="ui:visible" extensible="true" description="Displays richly-formatted text including tags such as paragraph, image, and hyperlink, as specified in the value attribute.">
 
 	<!-- Library which holds the sanitization library -->
-    <aura:import library="ui:securityLib" property="lib"/>
+    <aura:import library="ui:securityLib" property="securityLib"/>
+    <aura:import library="ui:urlLib" property="urlLib"/>
 
     <aura:attribute access="GLOBAL" name="value" type="String" description="The richly-formatted text used for output."/>
+	<aura:attribute access="PRIVATE" name="displayValue" type="String" description="The value after being escaped and activated."/>
+    <aura:attribute name="linkify" type="Boolean" default="true" description="Indicates if the URLs in the text should be rendered as hyperlinks."/>
 
     <aura:attribute name="supportedTags" type="String"
 	    description="A list of supported HTML tag names separated by comma; the list is stored in the helper file of this component. Certain tags, such as &lt;script&gt;, are removed. The default value is used if it is not specified."/>
@@ -29,7 +32,7 @@
 		description="A list of supported attributes separated by comma; the default list is stored in the helper file of this component and will be used if this attribute is not specified."/>
 
 	<div class="{!v.class}" dir="{!v.dir}" aura:id="div">
-		<aura:unescapedHTML value="{!v.value}" />
+		<aura:unescapedHTML value="{!v.displayValue}" />
 	</div>
 
 </aura:component>

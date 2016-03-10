@@ -13,139 +13,96 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*jslint sub: true*/
 
 //#include aura.locker.SecureAuraEvent
+//#include aura.locker.SecureAction
 
 var SecureComponent = (function() {
-	"use strict";
+  "use strict";
 
-	function getKey(sc) {
-		return $A.lockerService.util._getKey(sc, $A.lockerService.masterKey);
-	}
+  function SecureComponent(component, key) {
+    // Storing a reusable reference to the corresponding secure component into
+    // the original component via the locker secret mechanism.
+    var sc = getLockerSecret(component, "secure");
+    if (sc) {
+      return sc;
+    }
+    setLockerSecret(component, "secure", this); // backpointer
+    // regular initialization:
+    setLockerSecret(this, "key", key);
+    setLockerSecret(this, "ref", component);
+    // special methods that require some extra work
+    Object.defineProperties(this, {
+      "get": {
+        enumerable: true,
+        value: function(name) {
+          var value = component["get"](name);
+          var type = name.split('.')[0];
+          if (!value) {
+            return value;
+          }
+          if (type === 'c') {
+              return new SecureAction(value, key);
+          } else {
+              return SecureThing.filterEverything(this, value);
+          }
+        }
+      },
+      "getEvent": {
+        enumerable: true,
+        value: function(name) {
+          var event = component["getEvent"](name);
+          if (!event) {
+            return event;
+          }
+          return new SecureAuraEvent(event, key);
+        }
+      }
+    });
+    // The shape of the component depends on the methods exposed in the definitions:
+    var defs = component.getDef().methodDefs;
+    if (defs) {
+      defs.forEach(function (method) {
+        Object.defineProperty(this, method.name, SecureThing.createFilteredMethod(method.name));
+      }, this);
+    }
+  }
 
-	function getComponent(sc) {
-		return sc._get("component", $A.lockerService.masterKey);
-	}
+  SecureComponent.prototype = Object.create(null, {
+    toString: {
+      value : function() {
+        return "SecureComponent: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
+      }
+    },
 
-	function filterComponent(sc, value) {
-		if (!$A.util.isComponent(value)) {
-			return value;
-		}
+    // these four super* methods are exposed as a temporary solution until we figure how to re-arrange the render flow
+    "superRender": SecureThing.createFilteredMethod("superRender"),
+    "superAfterRender": SecureThing.createPassThroughMethod("superAfterRender"),
+    "superRerender": SecureThing.createFilteredMethod("superRerender"),
+    "superUnrender": SecureThing.createFilteredMethod("superUnrender"),
+    // component @platform methods
+    "isValid": SecureThing.createPassThroughMethod("isValid"),
+    "isInstanceOf": SecureThing.createPassThroughMethod("isInstanceOf"),
+    "addHandler": SecureThing.createPassThroughMethod("addHandler"),
+    "destroy": SecureThing.createPassThroughMethod("destroy"),
+    "isRendered": SecureThing.createPassThroughMethod("isRendered"),
+    "getGlobalId": SecureThing.createPassThroughMethod("getGlobalId"),
+    "getLocalId": SecureThing.createPassThroughMethod("getLocalId"),
+    "getSuper": SecureThing.createFilteredMethod('getSuper'),
+    "getReference": SecureThing.createFilteredMethod("getReference"),
+    "clearReference": SecureThing.createPassThroughMethod("clearReference"),
+    "autoDestroy": SecureThing.createPassThroughMethod("autoDestroy"),
+    "isConcrete": SecureThing.createPassThroughMethod("isConcrete"),
+    "addValueProvider": SecureThing.createPassThroughMethod("addValueProvider"),
+    "getConcreteComponent": SecureThing.createFilteredMethod('getConcreteComponent'),
+    "find": SecureThing.createFilteredMethod('find'),
+    "set": SecureThing.createFilteredMethod("set"),
+    "getElement": SecureThing.createFilteredMethod("getElement"),
+    "getElements": SecureThing.createFilteredMethod("getElements")
+  });
 
-		// DCHASMAN TODO W-2837797 Figure out if we want to filter out sometimes, all of the time does not make sense e.g. for component.find()
-		// return $A.lockerService.util.hasAccess(sc, value) ? $A.lockerService.wrapComponent(value, referencingKey) : undefined;
+  SecureComponent.prototype.constructor = SecureComponent;
 
-		return $A.lockerService.wrapComponent(value, getKey(sc));
-	}
-
-	function SecureComponent(component, referencingKey) {
-		SecureThing.call(this, referencingKey, "component");
-
-		this._set("component", component, $A.lockerService.masterKey);
-	}
-
-	SecureComponent.prototype = Object.create(SecureThing.prototype, {
-		toString : {
-			value : function() {
-				return "SecureComponent: " + getComponent(this) + "{ referencingKey: " + JSON.stringify($A.lockerService.util._getKey(this, $A.lockerService.masterKey)) + " }";
-			}
-		},
-
-		"superRender" : {
-			value : function() {
-				return getComponent(this).superRender();
-			}
-		},
-
-		"superRerender" : {
-			value : function() {
-				getComponent(this).superRerender();
-			}
-		},
-
-		"superAfterRender" : {
-			value : function() {
-				getComponent(this).superAfterRender();
-			}
-		},
-
-		"superUnender" : {
-			value : function() {
-				getComponent(this).superUnrender();
-			}
-		},
-
-		"find" : {
-			value : function(localId) {
-				return filterComponent(this, getComponent(this).find(localId));
-			}
-		},
-
-		"get" : {
-			value : function(expression) {
-				var value = getComponent(this).get(expression);
-				if ($A.util.isArray(value)) {
-					var result = [];
-					for (var n = 0; n < value.length; n++) {
-						var raw = value[n];
-						if (!raw) {
-							// Always
-							result.push(raw);
-						} else {
-							var filtered = filterComponent(this, raw);
-							if (filtered) {
-								result.push(filtered);
-							}
-						}
-					}
-
-					value = result;
-				} else {
-					value = filterComponent(this, value);
-				}
-
-				return value;
-			}
-		},
-
-		"set" : {
-			value : function(expression, value) {
-				// DCHASMAN TODO W-2837798 Figure out the correct access control model for set()
-				getComponent(this).set(expression, value);
-			}
-		},
-
-		"getElement" : {
-			value : function() {
-				var element = getComponent(this).getElement();
-				if (!element) {
-					return element;
-				}
-				$A.lockerService.util.verifyAccess(this, element);
-				return SecureDocument.wrap(element);
-			}
-		},
-
-		"getEvent" : {
-			value : function(name) {
-				// system call to collect the low level aura event
-				var event = getComponent(this).getEvent(name);
-				if (!event) {
-					return event;
-				}
-				// shadowing the low level aura event with the component's key
-				return new SecureAuraEvent(event, getKey(this));
-			}
-		},
-
-		"isValid" : {
-			value : function() {
-				return getComponent(this).isValid();
-			}
-		}
-	});
-
-	SecureComponent.prototype.constructor = SecureComponent;
-
-	return SecureComponent;
+  return SecureComponent;
 })();

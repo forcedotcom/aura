@@ -41,21 +41,14 @@
         }
     },
 
-    testExtendedComponentHasItsOwnAttributes: {
+    testClientProviderProvidesCmpExtendingAbstractCmp: {
         test: function(cmp) {
-            var providerA = cmp.find("provider3"),
-                providerB = cmp.find("provider4"),
-                defs = providerB.getDef().getAttributeDefs();
-
-            $A.test.assertEquals("A", providerA.get("v.type"), "providerA should have value set by itself");
-            $A.test.assertFalse(providerA.get("v.attA"), "providerA should have own attribute and value");
-            
-            $A.test.assertEquals("b", providerB.get("v.type"), "providerB should have value set by parent");
-            $A.test.assertTrue(providerB.get("v.attB"), "providerB should have own attribute and value");
-            
-            $A.test.assertNotUndefinedOrNull(defs.getDef("new1"), "new1 attribute should exist");
-            $A.test.assertNotUndefinedOrNull(defs.getDef("new2"), "new2 attribute should exist");
-            $A.test.assertNotUndefinedOrNull(defs.getDef("new3"), "new3 attribute should exist");
+            var targetCmp = cmp.find("javaProviderImpl");
+            var expected = "markup://provider:javaProviderImpl";
+            var actual = targetCmp.getDef().getDescriptor().getQualifiedName();
+            $A.test.assertEquals(expected, actual);
+            $A.test.assertEquals("value from javaProviderImpl", targetCmp.get("v.overriddenAttribute"));
+            $A.test.assertEquals("default value from javaProviderAbstract", targetCmp.get("v.stringAttribute"));
         }
     }
 })

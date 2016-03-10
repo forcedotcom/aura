@@ -208,8 +208,6 @@ ComponentDefStorage.prototype.restoreAll = function() {
     this.currentPromise = this.getAll()
         .then(
             function(items) {
-                // if any decode fails the dependency graph may be broken. therefore decode all items
-                // prior to inserting them.
                 var libCount = 0;
                 var cmpCount = 0;
 

@@ -70,12 +70,10 @@ AuraRenderingService.prototype.render = function(components, parent) {
         // JBUCH: HALO: TODO: END REMOVE ME
 
         if (cmp.isValid()) {
-            $A.getContext().setCurrentAccess(cmp);    
+            $A.getContext().setCurrentAccess(cmp);
             var renderedElements = cmp["render"]();
             $A.getContext().releaseCurrentAccess();
-            
             renderedElements=this.finishRender(cmp, renderedElements);
-            
             elements = elements.concat(renderedElements);
         }
     }

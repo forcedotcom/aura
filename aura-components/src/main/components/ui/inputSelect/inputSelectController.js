@@ -14,25 +14,45 @@
  * limitations under the License.
  */
 ({
-    doInit: function(cmp, evt, helper) {
-    	var concreteCmp = cmp.getConcreteComponent();
+    doInit: function (cmp, evt, helper) {
+        var concreteCmp = cmp.getConcreteComponent();
         var concreteHelper = concreteCmp.getDef().getHelper() || helper;
         concreteHelper.init(concreteCmp);
     },
 
-    valueChange: function(cmp, evt, helper) {
+    valueChange: function (cmp, evt, helper) {
         var concreteCmp = cmp.getConcreteComponent();
         helper.updateOptionsFromValue(concreteCmp);
     },
 
     // Update options from the current value if flag is set
-    optionsChange: function(cmp, evt, helper) {
-    	var concreteCmp = cmp.getConcreteComponent();
-    	if (concreteCmp._initOptionsFromValue) {
-    	    concreteCmp._initOptionsFromValue = false;
-    	    helper.updateOptionsFromValue(concreteCmp);
-    	} else {
-    	    helper.updateValueFromOptions(concreteCmp);
-    	}
+    optionsChange: function (cmp, evt, helper) {
+        var concreteCmp = cmp.getConcreteComponent();
+
+        if (concreteCmp._initOptionsFromValue) {
+            concreteCmp._initOptionsFromValue = false;
+            helper.updateOptionsFromValue(concreteCmp);
+        } else {
+            helper.updateValueFromOptions(concreteCmp);
+        }
+        if (cmp.get("v.useMenu") && !cmp._suspendChangeHandlers) {
+            helper.updateMenuLabel(concreteCmp);
+            cmp._createMenuItems = true;
+        }
+    },
+
+    menuOptionSelected: function (cmp, event, helper) {
+        helper.menuOptionSelected(cmp);
+    },
+
+    menuOpened: function (cmp, event, helper) {
+        if (!cmp._createMenuItems) {
+            return;
+        }
+
+        cmp._createMenuItems = false;
+
+        helper.createMenuItems(cmp);
     }
+
 })// eslint-disable-line semi

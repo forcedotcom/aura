@@ -94,13 +94,18 @@
                     //
                     // If a string is provided, we use it to validate the values in each column.
                     //
-
                     var expected = "#" + values[n] + ((typeof values[n] == "number")? "1101" : "");
-                    var actual = $A.test.getText(nodes[n]).replace(/[\t\s]/g, "");
-                    $A.test.assertEquals(expected, actual, message + ": invalid row #" + (n + 1) + "( " + expected + "vs " + actual + ")");
+                    this.waitForRowText(expected, nodes[n], n+1, message);
                 }
             }
         );
+    },
+
+    waitForRowText: function(expected, node, row, message) {
+        $A.test.addWaitForWithFailureMessage(true, function() {
+            var actual = $A.test.getText(node).replace(/[\t\s]/g, "");
+            return actual === expected;
+        }, message + ": invalid row #" + row + "( " + expected + " vs " + $A.test.getText(node).replace(/[\t\s]/g, "") + ")");
     },
 
     setUp : function(component) {

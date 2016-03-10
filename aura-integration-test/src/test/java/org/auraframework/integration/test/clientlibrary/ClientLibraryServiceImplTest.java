@@ -15,9 +15,7 @@
  */
 package org.auraframework.integration.test.clientlibrary;
 
-import java.net.URLDecoder;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,12 +33,11 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.clientlibrary.ClientLibraryResolverRegistryImpl;
 import org.auraframework.impl.clientlibrary.ClientLibraryServiceImpl;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.NoContextException;
-import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Ignore;
 

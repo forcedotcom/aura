@@ -17,16 +17,23 @@
 -->
 <aura:component extends="ui:input" implements="ui:inputNumberComponent,ui:inputTextComponent" extensible="true" support="GA" access="GLOBAL" defaultFlavor="default,input"
                 description="An input field for entering a number, taking advantage of client input assistance and validation when available.">
-    <aura:import library="ui:inputNumberLibrary" property="inputNumberLibrary"/>
-    <input type="{!v.type}"
-       		  id="{!v.domId}"
-              class="{!v.class + ' input'}"
-       		  value="{!v.value}"
-       		  max="{!v.max}"
-       		  min="{!v.min}"
-       		  step="{!v.step}"
-       		  placeholder="{!v.placeholder}"
-       		  required="{!v.required}"
-       		  disabled="{!v.disabled}"
-       		  aria-describedby="{!v.ariaDescribedBy}"/>
+
+	<!-- Envents handler -->
+	<aura:handler name="init"   value="{! this }"    action="{! c.initialize }" />
+
+	<ui:inputSmartNumber
+			value="{! v.value }"
+			updateOn="{! v.updateOn }"
+			style="number"
+			format="{! v.format }"
+			max="{!v.max}"
+			min="{!v.min}"
+			id="{! v.domId }"
+			class="{! v.class }"
+			step="{!v.step}"
+			placeholder="{! v.placeholder }"
+			required="{!v.required}"
+			disabled="{!v.disabled}"
+			ariaDescribedBy="{!v.ariaDescribedBy}" />
+
 </aura:component>

@@ -29,21 +29,39 @@
     <!-- The size attribute behaviors weird in Google Chrome and Safari. -->
     <aura:attribute name="size" type="Integer" default="1" description="The number of options displayed at one time. Default value is &#8220;1&#8221;."/>
 
+    <aura:attribute name="useMenu" type="Boolean" default="false"/>
+    <aura:attribute access="PRIVATE" name="selectedLabel" type="String"/>
+
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
     <aura:handler name="change" value="{!v.options}" action="{!c.optionsChange}"/>
-    
-    <select aura:id="select"
-    	    id="{!v.domId}"
-    	    class="{!v.class + ' select'}"
-    	    name="{!v.name}"
-    	    size="{!v.size}"
-    	    disabled="{!v.disabled}"
-    	    multiple="{!v.multiple}"
-            aria-describedby="{!v.ariaDescribedBy}">
-        <aura:if isTrue="{!and(v.options.length eq 0, v.body.length gt 0)}">
-           {!v.body}
-        </aura:if>
-    </select>
+
+    <aura:dependency resource="ui:radioMenuItem" />
+    <aura:dependency resource="ui:checkboxMenuItem" />
+
+    <aura:if isTrue="{!v.useMenu}">
+        <ui:menu>
+            <ui:menuTriggerLink class="{!v.class}" disabled="{!v.disabled}" ariaDescribedBy="{!v.ariaDescribedBy}"
+                                label="{!v.selectedLabel}"/>
+            <ui:menuList aura:id="options" autoPosition="false" aura:flavor="default,left"
+                         menuExpand="{!c.menuOpened}"
+                         menuSelect="{!c.menuOptionSelected}"/>
+        </ui:menu>
+        <aura:set attribute="else">
+            <select aura:id="select"
+                    id="{!v.domId}"
+                    class="{!v.class + ' select'}"
+                    name="{!v.name}"
+                    size="{!v.size}"
+                    disabled="{!v.disabled}"
+                    multiple="{!v.multiple}"
+                    aria-describedby="{!v.ariaDescribedBy}">
+                <aura:if isTrue="{!and(v.options.length eq 0, v.body.length gt 0)}">
+                    {!v.body}
+                </aura:if>
+            </select>
+        </aura:set>
+    </aura:if>
+
 
 </aura:component>

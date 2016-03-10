@@ -30,7 +30,7 @@
 	 * Test percent formated correclty with value scale
 	 */
     testValueScale: {
-    	attributes : {value : .12, valueScale : "5"},
+    	attributes : {value : .12, valueScale : "5" },
     	test : function(component){
     		var value = component.getElement().value;
     		$A.test.assertEquals(0.12, component.get("v.value"), "Cmp value does not equal expected");
@@ -81,11 +81,11 @@
     },
 
     testInvalidFormat: {
-        attributes : {value : 30, format: ',,'},
+        attributes : { value : 30, format: ',,'},
         test: function(component){
         	var value = component.getElement().value;
         	$A.test.assertEquals(30, component.get("v.value"), "Cmp: Expected value to use default format");
-            $A.test.assertEquals('30', value, "Element: Expected value to use default format");
+            $A.test.assertEquals('3,000%', value, "Element: Expected value to use default format");
         }
     },
 
@@ -120,7 +120,7 @@
         }, function(component){
             var value = component.getElement().value;
         	$A.test.assertEquals(965.21, component.get("v.value"), "Cmp: Value not formatted correctly");
-            $A.test.assertEquals('965.21', value, "Element: Value not formatted correctly");
+            $A.test.assertEquals('96,521%', value, "Element: Value not formatted correctly");
         }]
     },
 

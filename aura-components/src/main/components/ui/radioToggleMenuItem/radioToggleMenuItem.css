@@ -13,31 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-	padding: 14px;
-	background-color: #e8eaeb;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-color: #dfe0e1;
-}
- 
-.THIS a {
-	display: block;
-	padding: 0;
-	margin: 0;
-	text-align: left;
-	text-decoration: none;
-}
-
-.THIS a.menuItemAnchor:active,
-.THIS a.menuItemAnchor:focus {
-	padding: 0;
-	color: inherit;
-	border-radius: 0;
-	text-decoration: none;
-	background-color: transparent;
-}
-
 .THIS .labelSpan {
 	float: left;
 	width: 60%;

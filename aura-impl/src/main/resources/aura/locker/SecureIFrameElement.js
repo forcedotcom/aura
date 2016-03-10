@@ -17,46 +17,34 @@
 var SecureIFrameElement = (function() {
   "use strict";
 
-  // Standard list of iframe's properties from:
-  // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
-  var IFrameAttributes = ['height', 'name', 'src', 'width'];
-  // Note: ignoring 'contentDocument', 'contentWindow', 'sandbox' and 'srcdoc' from the list above.
-
-  function getElement(se) {
-    return se._get("el", $A.lockerService.masterKey);
-  }
-
-  function getKey(se) {
-    return $A.lockerService.util._getKey(se, $A.lockerService.masterKey);
-  }
-
   function SecureIFrameElement(el, key) {
-    SecureThing.call(this, key, "el");
-
-    $A.lockerService.util.applyKey(el, key);
-
-    this._set("el", el, $A.lockerService.masterKey);
-    // applying standard secure properties
+    setLockerSecret(this, "key", key);
+    setLockerSecret(this, "ref", el);
+    // applying standard secure element properties
     SecureElement.enableSecureProperties(this);
-    // applying iframe's specific attributes
-    IFrameAttributes.forEach(function (name) {
-      Object.defineProperty(this, name, SecureThing.createPassThroughProperty(name));
-    }, this);
-
     Object.freeze(this);
   }
 
-  SecureIFrameElement.prototype = Object.create(SecureThing.prototype, {
+  SecureIFrameElement.prototype = Object.create(null, {
     toString: {
       value : function() {
-        return "SecureIFrameElement: " + getElement(this) + "{ key: " + JSON.stringify(getKey(this)) + " }";
+        return "SecureIFrameElement: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
       }
     },
+
+    // Standard list of iframe's properties from:
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
+    // Note: ignoring 'contentDocument', 'contentWindow', 'sandbox' and 'srcdoc' from the list above.
+    height: SecureThing.createPassThroughProperty("height"),
+    width: SecureThing.createPassThroughProperty("width"),
+    name: SecureThing.createPassThroughProperty("name"),
+    src: SecureThing.createPassThroughProperty("src"),
 
     // Standard HTMLElement methods
     // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
     blur: SecureThing.createPassThroughMethod("blur"),
     focus: SecureThing.createPassThroughMethod("focus")
+
   });
 
   SecureIFrameElement.prototype.constructor = SecureIFrameElement;

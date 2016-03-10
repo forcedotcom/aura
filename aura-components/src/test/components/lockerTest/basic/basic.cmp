@@ -1,7 +1,6 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="xss" type="String"/>
 
-    <!-- DCHASMAN TODO using <script> instead of <ltng:require scripts="/resource/requireTest"/> -->
     Hello from the LockerService!
 
     <aura:registerevent name="foo" type="ui:selectDate" description="The event fired when foo."/>

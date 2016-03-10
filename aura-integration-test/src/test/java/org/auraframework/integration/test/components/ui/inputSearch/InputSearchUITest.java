@@ -28,7 +28,6 @@ public class InputSearchUITest extends WebDriverTestCase {
 
     public InputSearchUITest(String name) {
         super(name);
-
     }
 
     // W-1551076: Webdriver not firing search event in Safari, IPAD and IPHONE
@@ -46,7 +45,7 @@ public class InputSearchUITest extends WebDriverTestCase {
                 auraUITestingUtil.getBooleanEval(valueExpression));
         assertNull("Component value should not be updated yet", auraUITestingUtil.getEval(cmpValueExpression));
         auraUITestingUtil.pressEnter(input);
-        assertTrue("Search event should have been triggered", auraUITestingUtil.getBooleanEval(valueExpression));
+        waitForCondition(valueExpression);
         // test case for W-1545841
         assertEquals("Component value should be updated", "search", auraUITestingUtil.getEval(cmpValueExpression));
     }

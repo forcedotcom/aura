@@ -17,9 +17,10 @@ package org.auraframework.impl.java.provider;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Provider;
 
-public class TestProviderWithoutAnnotation {
-    public static DefDescriptor<ComponentDef> provide() {
+public class TestProviderWithoutAnnotation implements Provider{
+    public DefDescriptor<ComponentDef> provide() {
         return null;
     }
 }

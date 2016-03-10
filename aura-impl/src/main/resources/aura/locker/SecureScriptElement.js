@@ -18,45 +18,50 @@ var SecureScriptElement = (function() {
 	"use strict";
 
 	function SecureScriptElement(key) {
-		SecureThing.call(this, key, "src");
+		setLockerSecret(this, "key", key);
+		var src;
+		Object.defineProperty(this, 'src', {
+			enumerable: true,
+			get: function () {
+				return src;
+			},
+			set: function (value) {
+				src = value;
+			}
+		});
+		Object.freeze(this);
 	}
 
-	SecureScriptElement.prototype = Object.create(SecureThing.prototype, {
+	SecureScriptElement.prototype = Object.create(null, {
 		$run : {
 			value : function() {
+				if (!this.src) {
+					return;
+				}
 				// XHR in source and secure it using $A.lockerService.create()
 				var xhr = $A.services.client.createXHR();
 
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState === 4 && xhr.status === 200) {
-						$A.lockerService.create(xhr.responseText, $A.lockerService.util._getKey(this, $A.lockerService.masterKey));
+						$A.lockerService.create(xhr.responseText, getLockerSecret(this, "key"));
 					}
 
 					// DCHASMAN TODO W-2837800 Add in error handling for 404's etc
 				};
 
-				xhr.open("GET", this._get("src", $A.lockerService.masterKey), true);
+				xhr.open("GET", this.src, true);
 				xhr.send();
 			}
 		},
 
 		toString : {
 			value : function() {
-				return "SecureScriptElement: " + this._get("src", $A.lockerService.masterKey) + "{ key: " + JSON.stringify($A.lockerService.util._getKey(this, $A.lockerService.masterKey)) + " }";
-			}
-		},
-
-		src : {
-			get : function() {
-				return this._get("src", $A.lockerService.masterKey);
-			},
-
-			set : function(value) {
-				this._set("src", value, $A.lockerService.masterKey);
+				return "SecureScriptElement: " + this.src + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
 			}
 		},
 
 		addEventListener : {
+			enumerable: true,
 			value : function(/*event, callback*/) {
 				// DCHASMAN TOOD W-2837803 Add support for onload event
 			}

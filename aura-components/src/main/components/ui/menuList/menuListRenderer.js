@@ -15,24 +15,19 @@
  */
 ({
     afterRender: function(component, helper) {
-    	var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
-        
-    	_helper.setKeyboardEventHandlers(component);
-        _helper.setEventHandlersOnChildren(component);
+    	helper.setKeyboardEventHandlers(component);
+        helper.setEventHandlersOnChildren(component);
 
         var ret = this.superAfterRender();
 
-        _helper.setFocus(component);
+        helper.setFocus(component);
 
         return ret;
     },
 
     rerender: function(component, helper) {
         if (!component.isDirty("v.childMenuItems")) {
-            // The below will re-scan the body of the menu list to find any changes, and will update
-            // child menu items, hence why we don't re-scan when the chidlMenuItems attribute is changed.
-            var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
-            _helper.setEventHandlersOnChildren(component);
+            helper.setEventHandlersOnChildren(component);
         }
 
         helper.handleVisible(component);
@@ -43,8 +38,7 @@
 
     unrender: function(component, helper) {
         try {
-            var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
-            _helper.removeKeyboardEventHandlers(component);
+            helper.removeKeyboardEventHandlers(component);
         } finally {
             return this.superUnrender();
         }

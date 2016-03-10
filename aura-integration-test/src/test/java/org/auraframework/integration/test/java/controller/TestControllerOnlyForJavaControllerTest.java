@@ -16,17 +16,16 @@
 
 package org.auraframework.integration.test.java.controller;
 
-import org.auraframework.integration.test.java.controller.JavaControllerTest.JavaValueDefExt;
+import org.auraframework.impl.java.model.JavaValueDef;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 
 @Controller
 public class TestControllerOnlyForJavaControllerTest {
-	
-	@AuraEnabled
- 	public static String customErrorParam(@Key("keya") JavaValueDefExt keya) {
- 	     return "something";
-    }
 
+    @AuraEnabled
+    public String customErrorParam(@Key("keya") JavaValueDef keya) {
+        return "something";
+    }
 }

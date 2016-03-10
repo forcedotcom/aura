@@ -17,93 +17,82 @@
 //#include aura.locker.SecureThing
 //#include aura.locker.SecureElement
 //#include aura.locker.SecureScriptElement
+
 var SecureDocument = (function() {
-	"use strict";
+  "use strict";
 
-	/**
-	 * Construct a new SecureDocument.
-	 * 
-	 * @public
-	 * @class
-	 * @constructor
-	 * 
-	 * @param {Object}
-	 *            document - the DOM document
-	 * @param {Object}
-	 *            key - the key to apply to the secure document
-	 */
-	function SecureDocument(document, key) {
-		SecureThing.call(this, key, "document");
+  /**
+   * Construct a new SecureDocument.
+   *
+   * @public
+   * @class
+   * @constructor
+   *
+   * @param {Object}
+   *            document - the DOM document
+   * @param {Object}
+   *            key - the key to apply to the secure document
+   */
+  function SecureDocument(document, key) {
+    setLockerSecret(this, "key", key);
+    setLockerSecret(this, "ref", document);
+    Object.freeze(this);
+  }
 
-		this._set("document", document, $A.lockerService.masterKey);
+  SecureDocument.prototype = Object.create(null, {
+    toString: {
+      value: function() {
+        return "SecureDocument: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
+      }
+    },
 
-		Object.freeze(this);
-	}
+    createElement: {
+      value: function(tag) {
+    	// Insure that no object to string coercion tricks can be applied to evade tag name based logic
+    	tag = tag + "";
+        var key = getLockerSecret(this, "key");
+        switch (tag.toLowerCase()) {
+        case "script":
+          return new SecureScriptElement(key);
 
-	function getDocument(sd) {
-		return sd._get("document", $A.lockerService.masterKey);
-	}
+        default:
+          var el = getLockerSecret(this, "ref").createElement(tag);
+          $A.lockerService.trust(this, el);
+          return new SecureElement(el, key);
+        }
+      }
+    },
+    createDocumentFragment: {
+      value: function() {
+        var frag = getLockerSecret(this, "ref").createDocumentFragment();
+        $A.lockerService.trust(this, frag);
+        return new SecureElement(frag, getLockerSecret(this, "key"));
+      }
+    },
+    createTextNode: {
+      value: function(text) {
+        var node = getLockerSecret(this, "ref").createTextNode(text);
+        $A.lockerService.trust(this, node);
+        return new SecureElement(node, getLockerSecret(this, "key"));
+      }
+    },
 
-	function getKey(sd) {
-		return $A.lockerService.util._getKey(sd, $A.lockerService.masterKey);
-	}
+    body: SecureThing.createFilteredProperty("body"),
+    head: SecureThing.createFilteredProperty("head"),
 
-	SecureDocument.prototype = Object.create(SecureThing.prototype, {
-		toString : {
-			value : function() {
-				return "SecureDocument: " + getDocument(this) + "{ key: " + JSON.stringify(getKey(this)) + " }";
-			}
-		},
+    getElementById: SecureThing.createFilteredMethod("getElementById"),
+    getElementsByClassName: SecureThing.createFilteredMethod("getElementsByClassName"),
+    getElementsByName: SecureThing.createFilteredMethod("getElementsByName"),
+    getElementsByTagName: SecureThing.createFilteredMethod("getElementsByTagName"),
 
-		createDocumentFragment : {
-			value : function() {
-				return new SecureElement(getDocument(this).createDocumentFragment(), getKey(this));
-			}
-		},
+    querySelector: SecureThing.createFilteredMethod("querySelector"),
+    querySelectorAll: SecureThing.createFilteredMethod("querySelectorAll"),
 
-		createElement : {
-			value : function(tag) {
-				var key = getKey(this);
-				switch (tag.toLowerCase()) {
-				case "script":
-					return new SecureScriptElement(key);
+    // DCHASMAN TODO W-2839646 Figure out how much we want to filter cookie access???
+    cookie: SecureThing.createPassThroughProperty("cookie")
+  });
 
-				case "iframe":
-					throw new Error("SecureDocument: iframe element is not currently supported");
+  SecureDocument.prototype.constructor = SecureDocument;
 
-				default:
-					var el = getDocument(this).createElement(tag);
-					return new SecureElement(el, key);
-				}
-			}
-		},
-
-		createTextNode : {
-			value : function(text) {
-				return new SecureElement(getDocument(this).createTextNode(text), getKey(this));
-			}
-		},
-
-		body : SecureThing.createFilteredProperty("body"),
-		head : SecureThing.createFilteredProperty("head"),
-
-		getElementById : SecureThing.createFilteredMethod("getElementById"),
-		getElementsByClassName : SecureThing.createFilteredMethod("getElementsByClassName"),
-		getElementsByName : SecureThing.createFilteredMethod("getElementsByName"),
-		getElementsByTagName : SecureThing.createFilteredMethod("getElementsByTagName"),
-
-		querySelector : SecureThing.createFilteredMethod("querySelector"),
-		querySelectorAll : SecureThing.createFilteredMethod("querySelectorAll"),
-
-		// DCHASMAN TODO W-2839646 Figure out how much we want to filter cookie access???
-		cookie : SecureThing.createPassThroughProperty("cookie")
-	});
-
-	SecureDocument.prototype.constructor = SecureDocument;
-
-	SecureDocument.wrap = function(el) {
-		return new SecureElement(el, $A.lockerService.util._getKey(el, $A.lockerService.masterKey));
-	};
-
-	return SecureDocument;
+  return SecureDocument;
 })();

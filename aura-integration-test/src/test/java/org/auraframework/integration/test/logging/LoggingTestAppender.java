@@ -50,4 +50,11 @@ public class LoggingTestAppender extends AppenderSkeleton {
     public List<LoggingEvent> getLog() {
         return log;
     }
+
+    /**
+     * clear up logs, use this when you only want log between two operations
+     */
+    public void clearLogs() {
+        log.clear();
+    }
 }

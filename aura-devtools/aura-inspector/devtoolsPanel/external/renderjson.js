@@ -88,6 +88,8 @@ var module;
 
     function _renderjson(json, indent, dont_indent, show_level, max_string, sort_objects) {
         var my_indent = dont_indent ? "" : indent;
+        // If we encounter a key with one of these ID's, we'll simply skip over it.
+        var skipKeys = {"$serId$": true, "$serRefId$": true };
 
         var disclosure = function(open, placeholder, close, type, builder) {
             var content;
@@ -143,12 +145,14 @@ var module;
 
         return disclosure("{", "...", "}", "object", function () {
             var os = append(span("object"), themetext("object syntax", "{", null, "\n"));
-            for (var k in json) var last = k;
-            var keys = Object.keys(json);
-            if (sort_objects)
-                keys = keys.sort();
-            for (var i in keys) {
+            // This filters out $serId$ which may have snuck in during the serialization process.
+            var keys = Object.keys(json).filter(function(key){ return !skipKeys.hasOwnProperty(key); });
+            var length = keys.length;
+            if (sort_objects) { keys = keys.sort(); }
+            var last = keys[length -1];
+            for (var i=0;i<length;i++) {
                 var k = keys[i];
+                
                 append(os, themetext(null, indent+"    ", "key", '"'+k+'"', "object syntax", ': '),
                        _renderjson(json[k], indent+"    ", true, show_level-1, max_string, sort_objects),
                        k != last ? themetext("syntax", ",") : [],

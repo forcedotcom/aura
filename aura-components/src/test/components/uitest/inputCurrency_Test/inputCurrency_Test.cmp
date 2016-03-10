@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2013 salesforce.com, inc.
+    Copyright (C) 2016 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
 <aura:component>
 
     <!-- Attributes -->
-    <aura:attribute name="amount" type="string" default="3255"/>
+    <aura:attribute name="amount" type="string" default="12"/>
 
     <!--Layout -->
     <div style="padding:15px;">
-        <ui:inputCurrency aura:id="inputCurrency" value="{! v.amount }" label="amount: "/>
+        <ui:inputCurrency aura:id="inputCurrency" value="{! v.amount }" label="amount: " />
         <h1>The value is : {! v.amount }</h1>
         <hr/>
         <ui:button label="Set number - 1234" press="{! c.setNewValueAsNumber }"></ui:button>

@@ -357,6 +357,10 @@
             });
         };
 
+        /*
+         * Not a fan of these ID methods. Need to figure these out better. 
+         */
+
         this.isComponentId = function(id) {
             return typeof id === "string" && id.startsWith(COMPONENT_CONTROL_CHAR);
         };
@@ -416,6 +420,14 @@
          */
         this.addErrorMessage = function(msg) {
             console.error(msg);
+        };
+
+        /** 
+         * Slower than just JSON.parse because it tries to resolve any 
+         * circular references.
+         */
+        this.jsonParse = function(jsonString) {
+            return ResolveJSONReferences(JSON.parse(jsonString));
         };
 
         /*
@@ -507,13 +519,11 @@
 
         /**  BEGIN HELP BUTTON */
         function Dropdown_OnClick(event) {
-            if(event.target.classList.contains("trigger")) {
-                if(this.classList.contains("visible")) {
+                if(this.classList.contains("is-open")) {
                     hideHelp(this);
                 } else {
                     showHelp(this);
                 }
-            }
         }
 
         function Body_OnClick(event) {
@@ -531,51 +541,129 @@
 
         function Help_OnClick(event) {
             if(event.target.tagName === "A") {
-                chrome.devtools.inspectedWindow.eval("window.open('" + event.target.href + "');");
+                event.stopPropagation();
+                event.preventDefault();
+                var url = event.target.getAttribute("href");
+                if(url.startsWith("/")) {
+                    // Resolve to be absolute first.
+                    chrome.devtools.inspectedWindow.eval("window.location.origin", function(origin) {
+                        runtime.postMessage({ "open": origin + url });
+                    });
+                } else {
+                    runtime.postMessage({ "open": url });
+                }
             }
+        }
+
+        function Dropdown_OnKey(event){
+          if(event.keyCode){
+            if(event.keyCode === 27 || event.keyCode === 40 || event.keyCode === 9 || event.keyCode === 38){
+
+                if(this.classList.contains("is-open")) {
+                  event.stopPropagation();
+                  event.preventDefault();
+
+                  if(event.keyCode === 27){
+                    //Close the menu.
+                    hideHelp(this);
+                    this.getElementsByClassName("trigger")[0].focus();
+
+                  } else {
+                    //Focus next item.
+                    var offset = 0;
+                    if((event.keyCode === 40) || (event.keyCode === 9)) {
+                        // Down
+                        offset = 1;
+                    } else if((event.keyCode === 38) || (event.keyCode === 9 && event.shiftKey)) {
+                        // Up
+                        offset = -1;
+                    }
+                    // var d = 0;
+                    // d = (event.keyCode === 40) || (event.keyCode === 9) ? 1 : d; //down
+                    // d = (event.keyCode === 38) || (event.keyCode === 9 && event.shiftKey) ? -1 : d; //up
+                    if(offset != 0) {
+                        var links = Array.from(this.getElementsByTagName("a"));
+                        var currentIndex = links.indexOf(document.activeElement);
+                        var link = links[currentIndex+offset];
+                        if(link) {
+                            link.focus();
+                        }
+                    }
+                  }
+
+                } else if(event.keyCode != 27 && event.keyCode != 9){
+                    //Open the menu if it is closed.
+                    Dropdown_OnClick.call(this,event);
+                  }
+                }
+            }
+        }
+
+        function Dropdown_OnHover(event){
+          event.target.focus();
         }
 
         function drawHelp(helpLinks) {
             var header = document.querySelector("header.tabs");
             var dropdown = document.createElement("div");
             dropdown.id = "help";
-            dropdown.className = "dropdown";
+            dropdown.className = "dropdown-trigger dropdown-trigger--click";
             dropdown.addEventListener("click", Dropdown_OnClick);
+            dropdown.addEventListener("keydown", Dropdown_OnKey, false);
 
             var trigger = document.createElement("button");
             trigger.className = "trigger";
-            trigger.textContent="?";
+            trigger.setAttribute("aria-haspopup","true");
+            trigger.insertAdjacentHTML('beforeend', '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 52 52"><path d="m28.4 38h-5c-0.8 0-1.4-0.6-1.4-1.4v-1.5c0-4.2 2.7-8 6.7-9.4 1.2-0.4 2.3-1.1 3.2-2.1 5-6 0.4-13.2-5.6-13.4-2.2-0.1-4.3 0.7-5.9 2.2-1.3 1.2-2.1 2.7-2.3 4.4-0.1 0.6-0.7 1.1-1.5 1.1h-5c-0.9 0-1.6-0.7-1.5-1.6 0.4-3.8 2.1-7.2 4.8-9.9 3.2-3 7.3-4.6 11.7-4.5 8.3 0.3 15.1 7.1 15.4 15.4 0.3 7-4 13.3-10.5 15.7-0.9 0.4-1.5 1.1-1.5 2v1.5c0 0.9-0.8 1.5-1.6 1.5z m1.6 10.5c0 0.8-0.7 1.5-1.5 1.5h-5c-0.8 0-1.5-0.7-1.5-1.5v-5c0-0.8 0.7-1.5 1.5-1.5h5c0.8 0 1.5 0.7 1.5 1.5v5z"></path></svg>');
+
+            var label = document.createElement("span");
+            label.className = "assistive-text";
+            label.textContent = "Help";
+
+            trigger.appendChild(label);
             dropdown.appendChild(trigger);
 
-            var menu = document.createElement("menu");
+            var menu = document.createElement("div");
+                menu.className = "dropdown dropdown--right";
                 menu.addEventListener("click", Help_OnClick);
+
+            var menuList = document.createElement("ul");
+                menuList.className = "dropdown__list";
+                menuList.setAttribute("role","menu");
 
             var menuitem;
             var link;
             for(var c=0;c<helpLinks.length;c++) {
-                menuitem = document.createElement("menuitem");
+                menuitem = document.createElement("li");
+                menuitem.className = "dropdown__item";
                 menuitem.label = helpLinks[c].text;
 
                 link = document.createElement("a");
+                link.setAttribute("role","menuitem");
                 link.href = helpLinks[c].href;
                 link.textContent = helpLinks[c].text;
+                link.addEventListener("mousemove",Dropdown_OnHover);
 
                 menuitem.appendChild(link);
-                menu.appendChild(menuitem);
+                menuList.appendChild(menuitem);
             }
 
+            menu.appendChild(menuList)
             dropdown.appendChild(menu);
             header.appendChild(dropdown);
         }
 
         function showHelp(dropdown) {
             document.body.addEventListener("click", Body_OnClick.bind(dropdown));
-            dropdown.classList.add("visible");
+            dropdown.classList.add("is-open");
+            dropdown.setAttribute("aria-expanded","true");
+            dropdown.getElementsByTagName("a")[0].focus();
         }
 
         function hideHelp(dropdown) {
             document.body.removeEventListener("click", Body_OnClick.bind(dropdown));
-            dropdown.classList.remove("visible");
+            dropdown.classList.remove("is-open");
+            dropdown.setAttribute("aria-expanded","false");
         }
 
         /** END HELP BUTTON */

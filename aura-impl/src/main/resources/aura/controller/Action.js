@@ -587,7 +587,9 @@ Action.prototype.runDeprecated = function(evt) {
     this.state = "RUNNING";
     $A.getContext().setCurrentAccess(this.cmp);
     try {
-        this.returnValue = this.meth.call(this, $A.lockerService.wrapComponent(this.cmp), evt, this.cmp['helper']);
+        var secureCmp = $A.lockerService.wrapComponent(this.cmp);
+        var secureEvt = $A.lockerService.wrapComponentEvent(secureCmp, evt);
+        this.returnValue = this.meth.call(undefined, secureCmp, secureEvt, this.cmp['helper']);
         this.state = "SUCCESS";
     } catch (e) {
         this.markException(e);
@@ -1137,7 +1139,15 @@ Action.prototype.markException = function(e) {
     $A.warning("Action failed: " + (this.def?this.def.toString():"") , e);
     $A.logger.reportError(e, this.getDef().getDescriptor(), this.getId());
     if ($A.clientService.inAuraLoop()) {
-        throw e;
+        // we don't want to wrap AFE that's thrown by components intending to do custom error experience.
+        if (e instanceof $A.auraFriendlyError) {
+            e["reported"] = true;
+            throw e;
+        } else {
+            var errorWrapper = new $A.auraError(null, e);
+            errorWrapper["reported"] = true;
+            throw errorWrapper;
+        }
     }
 };
 

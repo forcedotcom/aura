@@ -80,9 +80,10 @@ import com.google.common.collect.Maps;
 public class AuraServlet extends AuraBaseServlet {
     private static final long serialVersionUID = 2218469644108785216L;
 
-    protected final static StringParam tag = new StringParam(AURA_PREFIX + "tag", 128, true);
-    private static final EnumParam<DefType> defTypeParam = new EnumParam<>(AURA_PREFIX + "deftype", false,
+    public final static StringParam tag = new StringParam(AURA_PREFIX + "tag", 128, true);
+    public final static EnumParam<DefType> defTypeParam = new EnumParam<>(AURA_PREFIX + "deftype", false,
             DefType.class);
+    
     private final static StringParam formatAdapterParam = new StringParam(AURA_PREFIX + "formatAdapter", 0, false);
 
     private final static StringParam messageParam = new StringParam("message", 0, false);

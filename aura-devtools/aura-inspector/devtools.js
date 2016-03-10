@@ -1,8 +1,8 @@
-chrome.devtools.inspectedWindow.eval("window.location.href", function(url){
+chrome.devtools.inspectedWindow.eval("!!window[Symbol.for('AuraDevTools')] && !!window.$A", function(isAuraPresent){
 
     // So we don't include Aura when inspecting an Inspector
-    if(!url.startsWith("chrome-")) {
-        chrome.devtools.panels.create("Aura",
+    if(isAuraPresent) {
+        chrome.devtools.panels.create(chrome.i18n.getMessage("devtools_tabname"),
                                       "icon24.png",
                                       "devtoolsPanel/devtoolsPanel.html",
                                       function(/*ExtensionPanel*/ panel) {
@@ -20,7 +20,4 @@ chrome.devtools.inspectedWindow.eval("window.location.href", function(url){
 
                                       });
     }
-
-
-
 });

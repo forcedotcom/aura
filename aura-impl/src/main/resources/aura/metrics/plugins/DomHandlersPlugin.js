@@ -32,6 +32,9 @@ var DomHandlersPlugin = function DomHandlersPlugin(config) {
 };
 
 DomHandlersPlugin.NAME = "domHandlers";
+DomHandlersPlugin.WHITELISTEVENTS = { 
+    "click" : true // only click for now
+};
 
 /** @export */
 DomHandlersPlugin.prototype.initialize = function (metricsService) {
@@ -65,23 +68,25 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
     var dispatchCmpId = action.getComponent().getConcreteComponent().getLocalId();
 
     // Only if we have a uniquely identier send the interaction
-    if (localCmpId && dispatchCmpId) { 
-        var contextId = localCmpId + ':' + dispatchCmpId;
+    if (localCmpId && dispatchCmpId && (event.type in DomHandlersPlugin.WHITELISTEVENTS)) { 
         var target = cmp["getElement"]();
-        var meta = target && target.getAttribute('data-meta-state'); // optional metadata
+        var meta = target && target.getAttribute('data-refid'); // optional metadata
 
         var context = {
-            "id" : contextId,
-            "type" : event.type,
-            "action" : action.getDef().getDescriptor().toString(),
-            "selector" : target.nodeName + ' ' + target.className,
-            "cmpId" : cmp.getGlobalId()
+            "locator" : {
+                "id"       : cmp.getGlobalId(),
+                "root"     : localCmpId,
+                "parent"   : dispatchCmpId,
+                "selector" : target.nodeName + ' ' + target.className.trim()
+            },
+            "actionType" : event.type,
+            "action"     : action.getDef().getDescriptor().toString()
         };
 
         if (meta) {
             var state = {};
             state[meta] = target.getAttribute('data-' + meta);
-            context["interactionState"] = state;
+            context["locator"]["context"] = state;
         }
 
         this.metricsService.transaction('aura', 'interaction', { "context": context });
@@ -128,6 +133,28 @@ DomHandlersPlugin.prototype.bind = function (metricsService) {
             metricsService.instrument(
                 defHelper, 
                 '_dispatchAction', 
+                DomHandlersPlugin.NAME,
+                false/*async*/,
+                null, 
+                null,
+                function (original) {
+                    var xargs = Array.prototype.slice.call(arguments, 1);
+                    self.dispatchVirtualActionHook.apply(self, xargs);
+                    return original.apply(this, xargs);
+                }
+            );
+        }
+
+
+        // Hooking special handling for virtualList
+        defConfig  = $A.componentService.createDescriptorConfig('markup://ui:virtualDataGrid');
+        def        = $A.componentService.getComponentDef(defConfig);
+        defHelper  = def && def.getHelper();
+
+        if (defHelper) {
+            metricsService.instrument(
+                defHelper, 
+                '_dispatchAction',
                 DomHandlersPlugin.NAME,
                 false/*async*/,
                 null, 

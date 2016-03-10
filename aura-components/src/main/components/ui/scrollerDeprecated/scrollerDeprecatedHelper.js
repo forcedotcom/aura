@@ -164,6 +164,8 @@
 
 					if ($A.util.isUndefined(window.iScroll)) {
 						this.initIScroll();
+						iScroll = window.iScroll;
+
 					}
 
 					this.trackActiveInstance(component);

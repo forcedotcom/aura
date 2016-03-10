@@ -46,7 +46,8 @@
         }
     },
 
-    testLogWarningWithError: {
+    /* disable because the override console doesn't support formatting %s */
+    _testLogWarningWithError: {
         auraWarningsExpectedDuringInit: ["Expected warning from auraWarningTestController init"],
         test: function(cmp) {
             var warningMsg = "Expected warning from test",
@@ -55,6 +56,7 @@
                 availableConsole = this.getAvailableConsole();
 
             $A.test.expectAuraWarning(warningMsg);
+            debugger;
             if (availableConsole) {
                 var override = $A.test.overrideFunction(window["console"], availableConsole, function(message) {
                     debugOutput += message;
@@ -70,7 +72,8 @@
         }
     },
 
-    testLogWarningWithDomException: {
+    /* disable because the override console doesn't support formatting %s */
+    _testLogWarningWithDomException: {
         auraWarningsExpectedDuringInit: ["Expected warning from auraWarningTestController init"],
         test: function(cmp) {
             var warningMsg = "Expected warning from test",

@@ -621,9 +621,12 @@ Test.Aura.Controller.ActionTest = function() {
                     actual = param;
                 },
                 lockerService : {
-                	wrapComponent: function(component) {
-                		return component;
-                	}
+                    wrapComponent: function(component) {
+                        return component;
+                    },
+                    wrapComponentEvent: function(component, event) {
+                        return event;
+                    }
                 }
             });
 
@@ -752,9 +755,12 @@ Test.Aura.Controller.ActionTest = function() {
                 assert : function(param) {
                 },
                 lockerService : {
-                	wrapComponent: function(component) {
-                		return component;
-                	}
+                    wrapComponent: function(component) {
+                        return component;
+                    },
+                    wrapComponentEvent: function(component, event) {
+                        return event;
+                    }
                 }
             });
             var def = {

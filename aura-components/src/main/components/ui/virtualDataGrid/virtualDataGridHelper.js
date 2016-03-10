@@ -171,7 +171,7 @@
         return id && $A.componentService.get(id);
     },
     _dispatchAction: function (actionHandler, event) {
-        actionHandler.evaluate().runDeprecated(event);
+        actionHandler.runDeprecated(event);
     },
     _getActionHandler: function (htmlCmp, eventType) {
         return htmlCmp.isInstanceOf("aura:html")&&htmlCmp.get("v.HTMLAttributes")["on"+eventType];
@@ -189,8 +189,9 @@
             templates = cmp._templates,
             handlers  = [],
             ptv       = cmp._ptv,
+            getElmt   = function (t) { return t; },
             position,
-            item, targetCmp, actionHandler;
+            item, targetCmp, actionHandler, actionHandlerScope;
 
         while (target) {
             targetCmp = this._getRenderingComponentForElement(target);
@@ -199,7 +200,11 @@
             if (targetCmp) { 
                 actionHandler = this._getActionHandler(targetCmp, type);
                 if (actionHandler) {
-                    handlers.push(actionHandler);
+                    targetCmp.getElement = getElmt.bind(targetCmp, target);
+                    handlers.push({
+                        "handler" : actionHandler,
+                        "cmp"     : targetCmp
+                    });
                 }
             }
 
@@ -232,9 +237,10 @@
             ptv.dirty = false;
 
             // Execute the collected handlers in order
-            while ((actionHandler = handlers.shift())) {
+            while ((actionHandlerScope = handlers.shift())) {
+                actionHandler = actionHandlerScope.handler;
                 if ($A.util.isExpression(actionHandler)) {
-                    this._dispatchAction(actionHandler, e);
+                    this._dispatchAction(actionHandler.evaluate(), e, actionHandlerScope.cmp);
                 }
             }
             

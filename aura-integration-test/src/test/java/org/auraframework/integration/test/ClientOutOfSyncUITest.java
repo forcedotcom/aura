@@ -15,7 +15,13 @@
  */
 package org.auraframework.integration.test;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.lang3.StringUtils;
+import org.auraframework.Aura;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -31,7 +37,9 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
@@ -673,5 +681,110 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                         "return $A.getRoot().getDef().getHelper().mylib.%s;", includeOtherDesc.getName())));
             }
         });
+    }
+
+    /**
+     * After every server action response we persist in storage what apps/cmps have been loaded from the server
+     * that weren't included in the initial load. When we start a new context on the client, we load this info
+     * from storage so the server can know on the next request if the client is out of sync or not.
+     *
+     * This test verifies that behavior by retrieving a component from the server, modifying its source on the server,
+     * reloading the page, then requesting the same component from the server, asserting that the new source is returned.
+     * Without persisting the context on the client, the server would never know the client's version of the component
+     * we're loading is out of date and after a page reload the old component would be displayed.
+     *
+     * See W-2909975 for additional details.
+     */
+    public void testReloadAfterMarkupChange() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(
+                        baseComponentTag,
+                        "",
+                        "<div>cmp" + new Date().getTime() + "</div>"));
+
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
+                ApplicationDef.class,
+                String.format(
+                        baseApplicationTag,
+                        "template='auraStorageTest:componentDefStorageTemplate'",
+                        "<ui:button label='loadCmp' press='{!c.loadCmp}'/><div id='container' aura:id='container'>app</div>"));
+
+        String cmpDefString = cmpDesc.getNamespace() + ":" + cmpDesc.getName();
+        DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
+                .getDefDescriptor(appDesc, DefDescriptor.JAVASCRIPT_PREFIX,
+                        ControllerDef.class);
+        addSourceAutoCleanup(
+                controllerDesc,
+                "{loadCmp:function(cmp){$A.createComponent('" + cmpDefString
+                        + "', {}, function(newCmp) {cmp.find('container').set('v.body', newCmp);});}}");
+
+        open(appDesc);
+
+        // Grab whatever context is currently persisted in storage to compare later
+        final String getPersistedContextScript = "var callback = arguments[arguments.length - 1];" +
+                "if ($A && $A.storageService.getStorage('actions')){" +
+                "var storage = $A.storageService.getStorage('actions');" +
+                "storage.get('$AuraContext$').then(function(item) { callback(item ? item.value : null) })" +
+                "} else { callback(null);}";
+
+        getDriver().manage().timeouts().setScriptTimeout(auraUITestingUtil.getTimeout(), TimeUnit.SECONDS);
+        final Object initialLoaded = ((JavascriptExecutor) getDriver()).executeAsyncScript(getPersistedContextScript);
+
+        // Retrieve cmp from server and wait for callback output
+        auraUITestingUtil.findDomElement(By.cssSelector("button")).click();
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                String text = getText(By.cssSelector("#container"));
+                return text.startsWith("cmp");
+            }
+        }, "Text of app never updated after retrieving component from server");
+
+        // Update the source of the component we retrieve from storage
+        String newCmpText = "<div>cmpNew" + new Date().getTime() + "</div>";
+        updateStringSource(cmpDesc, String.format(baseComponentTag, "", newCmpText));
+
+        // Wait for the context returned from server during the cmp retrieval to be persisted on the client. We wait
+        // until what was in the storage before the server call has changed.
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                Object newLoaded = ((JavascriptExecutor) getDriver()).executeAsyncScript(getPersistedContextScript);
+                return initialLoaded != newLoaded;
+            }
+        }, "Context never persisted on client after server call");
+
+        getDriver().navigate().refresh();
+
+        // After refresh, the page will fire the getApplication bootstrap action, which will get a ClientOutOfSync
+        // as the response, dump the storages and reload. Instead of trying to wait for the double reload, wait for
+        // the storages to clear.
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                String script = "var callback = arguments[arguments.length - 1];" +
+                        "if ($A && $A.storageService.getStorage('ComponentDefStorage')){" +
+                        "var storage = $A.storageService.getStorage('ComponentDefStorage');" +
+                        "storage.getAll().then(function(items){ callback(items) })" +
+                        "} else { callback(null);}";
+                Object result = null;
+                try {
+                    result = ((JavascriptExecutor) getDriver()).executeAsyncScript(script);
+                } catch (WebDriverException e) {
+                    // If the page reloads during our script WebDriver will throw an error.
+                    if (!e.getMessage().contains("document unloaded while waiting for result")) {
+                        throw e;
+                    }
+                }
+                return result != null && ((ArrayList<?>) result).size() == 0;
+            }
+        }, "Storages never cleared after reload");
+
+        // The page will reload after the storage is cleared so wait for it to be fully initialized then retrieve
+        // the original component from the server and verify it has the updated source.
+        auraUITestingUtil.waitForAuraInit();
+        auraUITestingUtil.findDomElement(By.cssSelector("button")).click();
+        auraUITestingUtil.waitForElementTextContains(By.cssSelector("#container"), "cmpNew", true);
     }
 }

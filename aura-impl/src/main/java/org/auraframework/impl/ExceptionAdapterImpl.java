@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.impl.controller.ComponentController.AuraClientException;
 import org.auraframework.instance.Action;
 import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.AuraHandledException;
@@ -90,6 +91,26 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
                     // totally ignore errors, and just put the action name on.
                     extended.append(action);
                 }
+                extended.append("\n");
+            }
+            if (th instanceof AuraClientException) {
+                AuraClientException ace = (AuraClientException) th;
+                String errorId = ace.getClientErrorId();
+                if (errorId != null && !errorId.isEmpty()) {
+                    extended.append("Client error id: ");
+                    extended.append(errorId);
+                    extended.append("\n");
+                }
+
+                String errorDescriptor = ace.getCauseDescriptor();
+                if (errorDescriptor != null && !errorDescriptor.isEmpty()) {
+                    extended.append("Failing descriptor: ");
+                    extended.append(errorDescriptor);
+                    extended.append("\n");
+                }
+
+                extended.append("Javascript stack: ");
+                extended.append(ace.getClientStack());
                 extended.append("\n");
             }
             if (th instanceof AuraExceptionInfo) {

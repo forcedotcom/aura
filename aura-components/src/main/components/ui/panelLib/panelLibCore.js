@@ -198,8 +198,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
             $A.get('e.ui:panelTransitionBegin').setParams(
                 { 
                     panel: cmp, 
-                    isOpening: true,
-                    action: 'show'
+                    isOpening: true
                 }
             ).fire();
 

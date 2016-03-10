@@ -26,6 +26,8 @@ Test.Aura.AuraErrorTest = function() {
         [Import("aura-impl/src/main/resources/aura/AuraError.js")]
     });
 
+    var windowMock=Test.Mocks.NeededMocks.getWindowMock();
+
     [Fixture]
     function Construct() {
         [Fact]
@@ -33,7 +35,9 @@ Test.Aura.AuraErrorTest = function() {
             var actual;
             var expected = "AuraError";
 
-            actual = new Aura.Errors.AuraError().name;
+            windowMock(function() {
+                actual = new Aura.Errors.AuraError().name;
+            });
 
             Assert.Equal(expected, actual);
         }
@@ -42,7 +46,9 @@ Test.Aura.AuraErrorTest = function() {
         function EmptyConstructorReturnsEmptyMessage() {
             var actual;
 
-            actual = new Aura.Errors.AuraError().message;
+            windowMock(function() {
+                actual = new Aura.Errors.AuraError().message;
+            });
 
             Assert.Empty(actual);
         }
@@ -52,7 +58,9 @@ Test.Aura.AuraErrorTest = function() {
             var actual;
             var expected = "test message";
 
-            actual = new Aura.Errors.AuraError(expected).message;
+            windowMock(function() {
+                actual = new Aura.Errors.AuraError(expected).message;
+            });
 
             Assert.Equal(expected, actual);
         }
@@ -61,9 +69,34 @@ Test.Aura.AuraErrorTest = function() {
         function ReturnsCallStack() {
             var actual;
 
-            actual = new Aura.Errors.AuraError().stackTrace;
+            windowMock(function() {
+                actual = new Aura.Errors.AuraError().stackTrace;
+            });
 
             Assert.NotNull(actual);
+        }
+
+        [Fact]
+        function ReturnsSeverity() {
+            var actual;
+            var expected = "FATAL";
+
+            windowMock(function() {
+                actual = new Aura.Errors.AuraError(null, null, expected).severity;
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsId() {
+            var actual;
+
+            windowMock(function() {
+                actual = new Aura.Errors.AuraError().id;
+            });
+
+            Assert.NotEmpty(actual);
         }
     }
 }

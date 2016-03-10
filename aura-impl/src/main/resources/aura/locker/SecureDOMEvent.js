@@ -17,14 +17,6 @@
 var SecureDOMEvent = (function() {
   "use strict";
 
-  function getEvent(se) {
-    return se._get("event", $A.lockerService.masterKey);
-  }
-
-  function getKey(se) {
-    return $A.lockerService.util._getKey(se, $A.lockerService.masterKey);
-  }
-
   function isDOMElementOrNode(o) {
     return typeof o === "object" &&
         ((typeof HTMLElement === "object" && o instanceof HTMLElement) ||
@@ -38,7 +30,7 @@ var SecureDOMEvent = (function() {
     return {
       get: function() {
         // perf hard-wired in case there is not a touches to wrap
-        var event = getEvent(this);
+        var event = getLockerSecret(this, "event");
         var touches = event[propName];
         if (!touches) {
           return touches;
@@ -55,32 +47,13 @@ var SecureDOMEvent = (function() {
               get: function () {
                 if (isDOMElementOrNode(touch[p])) {
                   $A.lockerService.util.verifyAccess(event, touch[p]);
-                  return SecureDocument.wrap(touch[p]);
+                  return new SecureElement(touch[p], getLockerSecret(event, "key"));
                 }
                 return touch[p];
               }
             });
           }, {});
         });
-      }
-    };
-  }
-
-  function filterTargetDescriptor(propName) {
-    // descriptor to produce a new target
-    return {
-      get: function() {
-        // perf hard-wired in case there is not a target to wrap
-        var event = getEvent(this);
-        var target = event[propName];
-        if (!target) {
-          return target;
-        }
-        if (isDOMElementOrNode(target)) {
-          $A.lockerService.util.verifyAccess(event, target);
-          return SecureDocument.wrap(target);
-        }
-        return target;
       }
     };
   }
@@ -96,9 +69,9 @@ var SecureDOMEvent = (function() {
   var DOMEventSecureDescriptors = {
     // Events properties that are DOM Elements were compiled from
     // https://developer.mozilla.org/en-US/docs/Web/Events
-    target: filterTargetDescriptor("target"),
-    curretTarget: filterTargetDescriptor("currentTarget"),
-    relatedTarget: filterTargetDescriptor("relatedTarget"),
+    target: SecureThing.createFilteredProperty("target"),
+    currentTarget: SecureThing.createFilteredProperty("currentTarget"),
+    relatedTarget: SecureThing.createFilteredProperty("relatedTarget"),
 
     // Touch Events are special on their own:
     // https://developer.mozilla.org/en-US/docs/Web/API/Touch
@@ -111,34 +84,34 @@ var SecureDOMEvent = (function() {
     view: throwAccessViolation("view"),
 
     // non-standard properties and aliases
-    srcElement: filterTargetDescriptor("srcElement"),
-    explicitOriginalTarget: filterTargetDescriptor("explicitOriginalTarget"),
-    originalTarget: filterTargetDescriptor("originalTarget")
+    srcElement: SecureThing.createFilteredProperty("srcElement"),
+    explicitOriginalTarget: SecureThing.createFilteredProperty("explicitOriginalTarget"),
+    originalTarget: SecureThing.createFilteredProperty("originalTarget")
   };
 
   function SecureDOMEvent(event, key) {
-    SecureThing.call(this, key, "event");
-    $A.lockerService.util.applyKey(event, key);
-    // keying the event in case it is passed around by the component logic
-    this._set("event", event, $A.lockerService.masterKey);
-
+    setLockerSecret(this, "key", key);
+    setLockerSecret(this, "ref", event);
+    
     // re-exposing externals
     for (var name in event) {
-      if (SecureDOMEvent.prototype.hasOwnProperty(name)) {
+      if (name in SecureDOMEvent.prototype) {
         // ignoring anything that SecureDOMEvent already implements
         return;
       }
+      
       // every DOM event has a different shape, we apply filters when possible,
       // and bypass when no secure filter is found.
-      Object.defineProperty(this, name, DOMEventSecureDescriptors[name] || SecureThing.createPassThroughProperty(name));
+      Object.defineProperty(this, name, DOMEventSecureDescriptors[name] || SecureThing.createFilteredProperty(name));
     }
+    
     Object.freeze(this);
   }
 
-  SecureDOMEvent.prototype = Object.create(SecureThing.prototype, {
+  SecureDOMEvent.prototype = Object.create(null, {
     toString: {
       value: function() {
-        return "SecureDOMEvent: " + getEvent(this) + "{ key: " + JSON.stringify(getKey(this)) + " }";
+        return "SecureDOMEvent: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
       }
     }
   });

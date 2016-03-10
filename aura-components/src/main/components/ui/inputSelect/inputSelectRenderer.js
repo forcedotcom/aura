@@ -17,7 +17,7 @@
 	afterRender: function(cmp, helper) {
 		var options = cmp.get("v.options");
 
-		if (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body"))) {
+		if (!cmp.get("v.useMenu") && (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body")))) {
 			var optionElements = helper.renderOptions(cmp, options);
 
 			cmp.find("select").getElement().appendChild(optionElements);
@@ -29,7 +29,7 @@
 	rerender: function(cmp, helper) {
 		var options = cmp.get("v.options");
 
-		if (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body"))) {
+		if (!cmp.get("v.useMenu") && (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body")))) {
 			var select = cmp.find("select").getElement();
 			var optionElements = select.children;
 

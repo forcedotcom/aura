@@ -657,9 +657,10 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
             $A.initialized = true;
             $A.addDefaultErrorHandler(app);
             // Restore component definitions from AuraStorage into memory (if persistent)
-            $A.componentService.restoreDefsFromStorage().then(function () {
+            $A.componentService.restoreDefsFromStorage().then($A.getCallback(function () {
+                $A.getContext().pruneLoaded();
                 $A.finishInit(doNotInitializeServices);
-            });
+            }));
         }
 
     }
@@ -758,12 +759,12 @@ AuraInstance.prototype.handleError = function(message, e) {
         }
 
         if (e["name"] === "AuraError") {
-            var format = "Something has gone wrong. {0}.\nPlease try again.\n{1}";
+            var format = "Something has gone wrong. {0}.\nPlease try again.\n";
             var displayMessage = e.message || e.name;
             //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             displayMessage += "\n" + e.stackTrace;
             //#end
-            dispMsg = $A.util.format(format, displayMessage, e.errorCode+"");
+            dispMsg = $A.util.format(format, displayMessage);
         }
 
         if (e["name"] === "AuraFriendlyError") {
@@ -794,7 +795,9 @@ AuraInstance.prototype.handleError = function(message, e) {
 AuraInstance.prototype.reportError = function(message, error) {
     $A.handleError(message, error);
     if ($A.initialized) {
-        $A.logger.reportError(error || new Error("[NoErrorObjectAvailable] " + message));
+        $A.getCallback(function() {
+            $A.logger.reportError(error || new Error("[NoErrorObjectAvailable] " + message));
+        })();
         $A.services.client.postProcess();
     }
 };
@@ -845,25 +848,50 @@ AuraInstance.prototype.getCallback = function(callback) {
     $A.assert($A.util.isFunction(callback),"$A.getCallback(): 'callback' must be a valid Function");
     var context=$A.getContext().getCurrentAccess();
     return function(){
-        var nested = $A.clientService.inAuraLoop();
         $A.getContext().setCurrentAccess(context);
         $A.clientService.pushStack(name);
         try {
             return callback.apply(this,Array.prototype.slice.call(arguments));
         } catch (e) {
-            // Should we even allow 'nested'?
-            // no need to wrap AFE with auraError as customers who throw AFE would want to handle it with their
-            // own custom experience.
-            if (nested || e instanceof $A.auraFriendlyError) {
+            // no need to wrap AFE with auraError as 
+            // customers who throw AFE would want to handle it with their own custom experience.
+            if (e instanceof $A.auraFriendlyError || e instanceof $A.auraError) {
+                if (context && context.getDef) {
+                    e.setComponent(context.getDef().getDescriptor().toString());
+                }
+
                 throw e;
             } else {
-                throw new $A.auraError("Uncaught error in "+name, e);
+                var errorWrapper = new $A.auraError("Uncaught error in "+name, e);
+                if (context && context.getDef) {
+                    errorWrapper.setComponent(context.getDef().getDescriptor().toString());
+                }
+
+                throw errorWrapper;
             }
         } finally {
             $A.clientService.popStack(name);
             $A.getContext().releaseCurrentAccess();
         }
     };
+};
+
+/**
+ * Returns the application token referenced by name.
+ * @function
+ * @param {String} token The name of the application configuration token to retrieve, for example, <code>$A.getToken("section.configuration")</code>.
+ * @public
+ * @platform
+ */
+AuraInstance.prototype.getToken = function(token){
+    var context=$A.getContext();
+    var tokens=context&&context.getTokens();
+    if(tokens){
+        if(tokens.hasOwnProperty(token)){
+            return tokens[token];
+        }
+        throw new Error("Unknown token: '"+token+"'. Are you missing a tokens file or declaration?");
+    }
 };
 
 /**

@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 ({
-    buildBody: function (cmp, shouldClearBody) {
+    buildBody: function (cmp) {
         var anchorElement = cmp.find("anchor").getElement();
-
-        if (!anchorElement.onclick) {
-            anchorElement.onclick = this.select.bind(this, cmp);
-        }
-
         var label = cmp.get("v.label");
         var isDisabled = cmp.get("v.disabled");
 
@@ -31,27 +26,12 @@
         var bodyAttribute = cmp.get("v.body");
         var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
 
-        if (shouldClearBody) {
-            $A.util.clearNode(anchorElement);
+        $A.util.clearNode(anchorElement);
 
-            if (hasBodyAttribute) {
-                $A.renderingService.renderFacet(cmp, bodyAttribute, anchorElement);
-            } else {
-                anchorElement.appendChild(document.createTextNode(label));
-            }
+        if (hasBodyAttribute) {
+            $A.renderingService.renderFacet(cmp, bodyAttribute, anchorElement);
         } else {
-            if (hasBodyAttribute) {
-                $A.renderingService.rerenderFacet(cmp, bodyAttribute);
-            }
-        }
-    },
-
-    // Since there's no way to specify that the concrete implementation of a method should be called, this is
-    // a workaround that achieves this functionality.
-    select: function(cmp) {
-        if (cmp.isValid()) {
-            cmp.getConcreteComponent().select();
+            anchorElement.appendChild(document.createTextNode(label));
         }
     }
-
 })// eslint-disable-line semi

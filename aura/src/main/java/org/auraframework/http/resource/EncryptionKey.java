@@ -32,7 +32,7 @@ public class EncryptionKey extends AuraResourceImpl {
     private ConfigAdapter configAdapter = Aura.getConfigAdapter();
 
     public EncryptionKey() {
-        super("app.encryptionkey", AuraContext.Format.HTML, false);
+        super("app.encryptionkey", AuraContext.Format.HTML);
     }
 
     @Override

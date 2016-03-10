@@ -19,7 +19,7 @@
                          	 "kbd", "li", "ol", "p", "param", "pre", "q", "s", "samp", "small",
                          	 "span", "strong", "sub", "sup", "table", "tbody", "td", "tfoot", "th",
                          	 "thead", "tr", "tt", "u", "ul", "var"],
-                         	 
+
     SUPPORTED_ATTRS:		['accept','action','align','alt','autocomplete','background','bgcolor',
                     	     'border','cellpadding','cellspacing','checked','cite','class','clear','color',
                     	     'cols','colspan','coords','datetime','default','dir','disabled',
@@ -29,9 +29,9 @@
                     	     'nowrap','open','optimum','pattern','placeholder','poster','preload','pubdate',
                     	     'radiogroup','readonly','rel','required','rev','reversed','rows',
                     	     'rowspan','spellcheck','scope','selected','shape','size','span',
-                    	     'srclang','start','src','step','style','summary','tabindex','title',
+                    	     'srclang','start','src','step','style','summary','tabindex','target', 'title',
                     	     'type','usemap','valign','value','width','xmlns'],
-    
+
     removeEventHandlers: function(element) {
         var attributes = element.attributes || [];
         for (var i = 0; i < attributes.length; i++) {
@@ -43,28 +43,26 @@
             }
         }
     },
-    
-    validate: function(component) {
-        var value = component.get("v.value");
-        if ($A.util.isUndefinedOrNull(value) || $A.util.isEmpty(value)) {
+
+    sanitize: function(component, value) {
+        if ($A.util.isEmpty(value)) {
             return;
         }
-        
+
         var supportedTags = this.getSupportedTags(component);
         var supportedAttrs = this.getSupportedAttributes(component);
-        
+
         try {
-            var sanitizedValue = this.lib.DOMPurify.sanitize(value, {ALLOWED_TAGS: supportedTags, ALLOWED_ATTR: supportedAttrs});
-            
-            if (sanitizedValue !== value) {
-                component.set("v.value", sanitizedValue);
+            var sanitizedValue = this.securityLib.DOMPurify.sanitize(value, {ALLOWED_TAGS: supportedTags, ALLOWED_ATTR: supportedAttrs});
+            if (sanitizedValue !== component.get("v.displayValue")) {
+                component.set("v.displayValue", sanitizedValue);
             }
         } catch (e) {
-        	$A.warning("Exception caught while attempting to validate " + component.getGlobalId() + "; " + e);
-        	component.set("v.value", $A.util.sanitizeHtml(value));
+        	$A.warning("Exception caught while attempting to sanitize " + component.getGlobalId() + "; " + e);
+        	component.set("v.displayValue", $A.util.sanitizeHtml(value));
         }
     },
-    
+
     validateElement: function(element, supportedTags) {
         if (element.nodeType === 3) { // text node
             return;
@@ -88,23 +86,23 @@
             }
         }
     },
-    
+
     /**
      * Retrieve the HTML tag whitelist
      */
     getSupportedTags: function(component) {
     	var supportedTags = component.get("v.supportedTags");
-    	
+
     	return supportedTags ? supportedTags.replace(/ /g,'').toLowerCase().split(",")
                 : this.getDefaultSupportedTags(component);
     },
-    
+
     /**
      * Retrieve the attribute whitelist
      */
     getSupportedAttributes: function(component) {
     	var supportedAttrs = component.get("v.supportedAttrs");
-    	
+
     	return supportedAttrs ? supportedAttrs.replace(/ /g,'').toLowerCase().split(",")
     						  : this.getDefaultSupportedAttributes(component);
     },
@@ -115,5 +113,15 @@
 
     getDefaultSupportedAttributes: function() {
         return this.SUPPORTED_ATTRS;
+    },
+
+    escapeAndLinkifyText: function (component) {
+        var value = component.get("v.value");
+
+        if (component.get("v.linkify")) {
+            value = this.urlLib.linkify.linkifyText(value);
+        }
+
+        this.sanitize(component, value);
     }
 })// eslint-disable-line semi

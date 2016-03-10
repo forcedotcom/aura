@@ -26,7 +26,7 @@
 
     testGetElementReturnsSecureElement: {
         test: function(cmp) {
-            cmp.getElement();
+            cmp.getElementTest();
             var element = cmp.get("v.log");
             $A.test.assertStartsWith("SecureElement", element.toString(), "Expected return of cmp.getElement()"
                     + " to be a SecureElement");
@@ -35,7 +35,7 @@
 
     testGetEventReturnsSecureEvent: {
         test: function(cmp) {
-            cmp.getEvent();
+            cmp.getEventTest();
             var event = cmp.get("v.log");
             $A.test.assertStartsWith("SecureAuraEvent", event.toString(), "Expected return of cmp.event()"
                     + " to be a SecureAuraEvent");

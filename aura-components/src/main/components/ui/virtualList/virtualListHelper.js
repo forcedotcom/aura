@@ -273,10 +273,10 @@
             if (targetCmp) { 
                 actionHandler = this._getActionHandler(targetCmp, type);
                 if (actionHandler) {
-                    targetCmp.getElement = getElmt.bind(targetCmp, target);
                     handlers.push({
-                        "handler" : actionHandler,
-                        "cmp"     : targetCmp
+                        "handler"   : actionHandler,
+                        "target"    : target,
+                        "targetCmp" : targetCmp
                     });
                 }
             }
@@ -305,9 +305,11 @@
 
             // Execute the collected handlers in order
             while ((actionHandlerScope = handlers.shift())) {
-                actionHandler = actionHandlerScope["handler"];
+                actionHandler = actionHandlerScope.handler;
                 if ($A.util.isExpression(actionHandler)) {
-                    this._dispatchAction(actionHandler.evaluate(), e, actionHandlerScope["cmp"]);
+                    actionHandlerScope.targetCmp.getElement = getElmt.bind(null, actionHandlerScope.target);
+                    this._dispatchAction(actionHandler.evaluate(), e, actionHandlerScope.targetCmp);
+                    delete actionHandlerScope.targetCmp.getElement;
                 }
             }
             
@@ -318,6 +320,7 @@
                 this._rerenderDirtyElement(cmp, item, target);
             }
 
+            delete shape.getElement;
             ptv.ignoreChanges = true;
             ptv.sync = false;
         }

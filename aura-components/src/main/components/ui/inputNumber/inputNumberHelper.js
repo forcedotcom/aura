@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    getNumber: function(cmp) {
-        return cmp.get("v.value");
+    setDefaultAttrs : function (cmp) {
+        cmp.set('v.updateOnDisabled', true);
     }
-})// eslint-disable-line semi
+});

@@ -101,16 +101,14 @@ header.tabs {
 header.tabs button {
   background: transparent;
   border: 1px solid transparent;
-  border-bottom: 0 none;
   border-radius: 0;
   color: #000;
-  margin: .6em .2em 0 .2em;
+  margin: .6em .2em -1px .2em;
   padding: 2px 6px 3px 6px;
   cursor: pointer;
 }
 header.tabs button:hover {
   border: 1px solid #DADEE2;
-  background: #fff;
   background: #F5F6F7;
   margin-bottom: -1px;
 }
@@ -122,34 +120,114 @@ header.tabs button.selected {
   border: 1px solid #DADEE2;
   margin-bottom:-1px;
 }
-header.tabs div.dropdown#help {
+
+/*-----dropdown menu styles---------*/
+header.tabs div.dropdown-trigger#help {
   float:right;
   position: relative;
   bottom: 0;
 }
-header.tabs div.dropdown#help .trigger {
+header.tabs div.dropdown-trigger#help .trigger {
   border: 1px solid #DADEE2;
-  border-bottom: 0 none;
 }
-header.tabs div.dropdown menu {
-  border-radius:.125rem;
-  box-shadow: 0px 2px 3px 0px rgba(0,0,0,.16);
-  display: none;
-  border: 1px solid #D8DDE6;
-  text-align:right;
-  position:absolute;
-  right:2px;
-  margin-top:0;
-  background:#fff;
-  white-space: nowrap;
-  z-index:10;
+#help .trigger svg{
+  width:14px;
+  height:14px;
+  fill:#54698d;
 }
-header.tabs div.dropdown.visible menu {
-  display:block;
+
+ol, ul {
+    list-style: none;
 }
-header.tabs div.dropdown menuitem {
-  display:block;
+/*.slds-dropdown-trigger*/
+.dropdown-trigger {
+    position: relative;
+    display: inline-block;
 }
+/*.slds-dropdown*/
+.dropdown {
+    position: absolute;
+    z-index: 7000;
+    left: 50%;
+    float: left;
+    min-width: 6rem;
+    max-width: 20rem;
+    margin-top: .125rem;
+    border: 1px solid #d8dde6;
+    border-radius: .25rem;
+    padding: .25rem 0;
+    font-size: .75rem;
+    background: #fff;
+    box-shadow: 0 2px 3px 0 rgba(0,0,0,.16);
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+}
+/*.slds-dropdown--right*/
+.dropdown--right {
+    left: auto;
+    right: 0;
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+}
+/*.slds-dropdown-trigger .slds-dropdown*/
+.slds-dropdown-trigger .slds-dropdown {
+    top: 100%;
+}
+/*.slds-dropdown-trigger--click .slds-dropdown*/
+.dropdown-trigger--click .dropdown {
+    display: none;
+}
+/*.slds-dropdown-trigger--click.is-open .slds-dropdown*/
+.dropdown-trigger--click.is-open .dropdown {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+/*.slds-dropdown__item*/
+.dropdown__item {
+    line-height: 1.5;
+}
+/*.slds-dropdown__item>a*/
+.dropdown__item>a {
+    position: relative;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    padding: .5rem .75rem;
+    color: #16325c;
+    white-space: nowrap;
+    cursor: pointer;
+}
+/*.slds-dropdown__item>a:focus, .slds-dropdown__item>a:hover*/
+.dropdown__item>a:hover {
+  text-decoration: none;
+}
+.dropdown__item>a:focus {
+    outline: 0;
+    text-decoration: none;
+    background-color: #f4f6f9;
+}
+/*.slds-dropdown__item>a:active*/
+.dropdown__item>a:active {
+    text-decoration: none;
+    background-color: #eef1f6;
+}
+/*.slds-assistive-text*/
+.assistive-text {
+    position: absolute!important;
+    margin: -1px!important;
+    border: 0!important;
+    padding: 0!important;
+    width: 1px!important;
+    height: 1px!important;
+    overflow: hidden!important;
+    clip: rect(0 0 0 0)!important;
+}
+/*---------------*/
+
 section.tab-body {
   display: none;
   width: 100%;
@@ -650,10 +728,25 @@ h1{
   margin: .5rem;
   padding-bottom: .5rem;
 }
-.actions-list .action-card:hover {
+.action-card.draggable:hover {
   background: #f4f6f9;
   cursor: move;
 }
+.action-card.dropped:hover {
+  background-color: #fff;
+  cursor: default;
+}
+
+.action-card.responseModified_modify {
+  background-color: #BFEEA8;
+}
+.action-card.responseModified_error {
+  background-color: #F2E005;
+}
+.action-card.responseModified_drop {
+  background-color: #ECAB7C;
+}
+
 #tab-body-actions #filter-text { width: 150px; }
 .actionsToWatch-list {
   margin: 0;
@@ -661,10 +754,7 @@ h1{
 .actions-list .action-card.dropped, .action-card.dragging {
   opacity: .6;
 }
-.actions-list .action-card.dropped:hover {
-  background-color: #fff;
-  cursor: default;
-}
+
 
 
 /* Storage Panel */

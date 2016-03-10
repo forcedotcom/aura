@@ -463,8 +463,9 @@
         test : [function(cmp) {
             this.fireErrorValidation(cmp.find("validate"), false);
         }, function(cmp) {
+            var inputId = this.isDesktop() ? "inputText" : "inputDateHtml";
+            var input = cmp.find("dateInvalid").find(inputId).getElement();
             var ul = $A.test.getElementByClass("uiInputDefaultError")[0];
-            var input = cmp.find("dateInvalid").find("inputText").getElement();
             this.verifyInputDefaultStructure(input, ul, 3);
         }]
     },
@@ -475,8 +476,9 @@
         test : [function(cmp) {
             this.fireErrorValidation(cmp.find("validate"), false);
         }, function(cmp) {
+            var inputId = this.isDesktop() ? "inputDate" : "inputDateTimeHtml";
+            var input = cmp.find("dateTimeInvalid").find(inputId).getElement();
             var ulArray = $A.test.getElementByClass("uiInputDefaultError");
-            var input = cmp.find("dateTimeInvalid").find("inputDate").getElement();
             var ul = [];
 
             for(var i = 0; i< ulArray.length; i++){
@@ -523,5 +525,9 @@
         }, function(cmp) {
             this.validateBasic(cmp, "autoCompleteTextInvalid");
         }]
+    },
+
+    isDesktop : function() {
+        return ($A.get('$Browser.formFactor').toLowerCase() === "desktop");
     }
 })

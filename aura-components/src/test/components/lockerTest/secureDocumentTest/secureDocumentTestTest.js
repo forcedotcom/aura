@@ -22,14 +22,12 @@
         }
     },
 
-    testCreateIframeElementThrowsError: {
+    testCreateIframeElementReturnsSecureIframeElement: {
         test: function(cmp) {
-            try {
-                cmp.getIframeElement();
-                $A.test.fail("Expected error to be thrown trying to create an iframe element");
-            } catch (e) {
-                $A.test.assertStartsWith("SecureDocument: iframe element is not currently supported", e.message);
-            }
+            cmp.getIframeElement();
+            var wrapped = cmp.get("v.log");
+            $A.test.assertStartsWith("SecureIFrameElement", wrapped.toString(), "Expected document.createElement('iframe')"
+                    + " to return a SecureIFrameElement");
         }
     },
 
@@ -46,8 +44,8 @@
         test: function(cmp) {
             cmp.createElementsPushToMarkup();
             var content = cmp.find("content").getElement();
-            $A.test.assertEquals("hello from the locker", content.innerText, "Unexpected text on document elements"
-                    + " created in controller");
+            $A.test.assertEquals("hello from the locker", content.getElementsByTagName("span")[0].getAttribute("lockerAttr"), "Unexpected attribute on document"
+                    + " elements created in controller");
         }
     },
 

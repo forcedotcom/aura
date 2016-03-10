@@ -58,6 +58,7 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.caboose = caboose;
     this.allAboardCallback = undefined;
     this.abortable = false;
+    this.deferred = false;
 
     this.returnValue = undefined;
     this.returnValueUnmodified = undefined;
@@ -165,6 +166,28 @@ Action.prototype.forceCreationPath = function(path) {
     var pathEntry = { relPath: "~FORCED~", absPath:newAbsPath, idx: undefined, startIdx: undefined };
     this.pathStack.push(pathEntry);
     return newAbsPath;
+};
+
+/**
+ * Mark an action as deferred if it is abortable.
+ *
+ * This is used to side-track actions that are queued when the primary display is refreshed. Since it
+ * is a heuristic, it has a few problems in that it may defer actions that should really not be.
+ *
+ * @private
+ */
+Action.prototype.setDeferred = function() {
+    this.deferred = this.abortable;
+};
+
+/**
+ * Check to see if an action has been deferred.
+ *
+ * @private
+ * @returns {Boolean} true if the action was marked deferred.
+ */
+Action.prototype.isDeferred = function() {
+    return this.deferred;
 };
 
 /**

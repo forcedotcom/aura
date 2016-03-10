@@ -184,10 +184,39 @@
         }
     },
 
-    // TODO(W-2701448): There are inconsistencies between Adapters on what can be stored. Formal evaluation needed.
-    _testGetFunctionValue: {
+    // function values are not supported by IndexedDB adapter unlike all other adapters
+    testPutFunctionValueFails: {
         test: function(cmp) {
-            cmp._storageLib.testGetFunctionValue(cmp, this.storage);
+            var completed = false;
+            var that = this;
+            this.storage.put("testFunctionValue", function(x){})
+                .then(
+                    function() {
+                        completed = true;
+                        $A.test.fail("Expected put() to fail but it succeeded");
+                    },
+                    function(e) {
+                        cmp._storageLib.appendLine(cmp, e.message);
+                    }
+                )
+                .then(function() { return that.storage.get("testFunctionValue"); })
+                .then(
+                    function(item){
+                        $A.test.assertUndefined(item, "Expected undefined because put() failed");
+                        completed = true;
+                    },
+                    function(e) {
+                        completed = true;
+                        $A.test.fail("Function value get failed: " + e.message);
+                    }
+                );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        }
+    },
+
+    testPutErrorValueFails: {
+        test: function(cmp) {
+            cmp._storageLib.testPutErrorValueFails(cmp, this.storage);
         }
     },
 
@@ -212,9 +241,26 @@
         }]
     },
 
-    testTwistedObject:{
+    // cyclic objects are supported by IndexedDB adapter unlike all other adapters
+    testCyclicObject:{
         test:function(cmp){
-            cmp._storageLib.testTwistedObject(cmp, this.storage);
+            var completed = false;
+            var stuff = { "a": 2 };
+            stuff["b"] = stuff;
+
+            var that = this;
+            this.storage.put("testCyclicObject", stuff)
+                .then(function() { return that.storage.get("testCyclicObject"); })
+                .then(function(item) {
+                    $A.test.assertEquals(2, item.value["a"], "testCyclicObject: constant is wrong");
+                    $A.test.assertEquals(item.value["b"], item.value, "testCyclicObject: looped value should be defined");
+                    completed = true;
+                })['catch'](function(e) {
+                   completed = true;
+                   $A.test.fail("Cyclic object put/get failed: " + e.message);
+                });
+
+            $A.test.addWaitFor(true, function() { return completed; });
         }
     },
 

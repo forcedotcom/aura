@@ -71,7 +71,7 @@
                 var storage = $A.storageService.getStorage("cmpStorage");
                 $A.test.assertEquals("setBeforeGlobal", storage.getVersion(), "Previously created store should not have version");
             }, function newStorage(cmp) {
-                var storage = $A.storageService.initStorage();
+                var storage = $A.storageService.initStorage("testSettingGlobalVersion");
                 $A.test.assertEquals("100", storage.getVersion(), "Newly created storage should inherit default version.");
             }
         ]

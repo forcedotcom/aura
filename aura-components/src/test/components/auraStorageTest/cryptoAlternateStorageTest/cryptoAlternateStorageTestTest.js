@@ -5,7 +5,7 @@
     labels : [ "UnAdaptableTest" ],
 
     setUp : function(cmp) {
-        $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this); 
+        $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this);
         $A.storageService.CryptoAdapter.register();
         if (!$A.storageService.isRegisteredAdapter($A.storageService.CryptoAdapter.NAME)) {
             $A.test.fail("CryptoAdapter failed to register. You must run these tests against localhost or with HTTPS (see http://sfdc.co/bO9Hok).");
@@ -130,6 +130,20 @@
         }
     },
 
+    // memory storage stores the actual object so functions are not serialized to strings
+    _testGetFunctionValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetFunctionValue(cmp, this.storage);
+        }
+    },
+
+    // memory storage stores the actual object so error values are possible
+    _testGetErrorValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetErrorValue(cmp, this.storage);
+        }
+    },
+
     testCacheMiss: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
@@ -155,13 +169,19 @@
         }]
     },
 
-    testTwistedObject:{
+    // memory storage stores the actual object so cyclic objects are possible
+    _testCyclicObjectFails: {
         test: function(cmp){
-            cmp.helper.lib.storageTest.testTwistedObject(cmp, this.storage);
+            cmp.helper.lib.storageTest.testCyclicObjectFails(cmp, this.storage);
         }
     },
 
-    // testModifyObject: memory storage stores the actual object so changing the object changes the storage
+    // memory storage stores the actual object so changing the object changes the persisted object
+    _testModifyObject: {
+        test:function(cmp){
+            cmp.helper.lib.storageTest.testModifyObject(cmp, this.storage);
+        }
+    },
 
     testUpdate: {
         test:function(cmp){

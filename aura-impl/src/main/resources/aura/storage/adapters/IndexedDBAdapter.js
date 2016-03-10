@@ -501,20 +501,24 @@ IndexedDBAdapter.prototype.setItemInternal = function(key, item, size, resolve, 
     var objectStore = transaction.objectStore(this.tableName);
     this.updateSize(size/2, size/2);
 
-    var objectStoreRequest = objectStore.put(storable);
-    transaction.onabort = function(event) {
-        var message = "setItemInternal(): transaction aborted for key "+key+": "+event.error;
-        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-        reject(new Error("IndexedDBAdapter."+message));
-    };
-    objectStoreRequest.onsuccess = function() {
-        resolve();
-    };
-    transaction.onerror = function(event) {
-        var message = "setItemInternal(): transaction error for key "+key+": "+event.error;
-        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-        reject(new Error("IndexedDBAdapter."+message));
-    };
+    try {
+        var objectStoreRequest = objectStore.put(storable);
+        transaction.onabort = function(event) {
+            var message = "setItemInternal(): transaction aborted for key "+key+": "+event.error;
+            that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+            reject(new Error("IndexedDBAdapter."+message));
+        };
+        objectStoreRequest.onsuccess = function() {
+            resolve();
+        };
+        transaction.onerror = function(event) {
+            var message = "setItemInternal(): transaction error for key "+key+": "+event.error;
+            that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+            reject(new Error("IndexedDBAdapter."+message));
+        };
+    } catch (e) {
+        reject(new Error("IndexedDBAdapter."+e.message));
+    }
 };
 
 /**

@@ -22,8 +22,8 @@ var SecureElement = (function() {
 
 	// Standard Element interface represents an object of a Document.
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
-	var ElementSecureProperties = ['attributes', 'childElementCount', 'classList', 'className', 'id', 'tagName'];
-	// Note: ignoring 'children', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
+	var ElementSecureProperties = ['childElementCount', 'classList', 'className', 'id', 'tagName'];
+	// Note: ignoring 'attributes', 'children', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
 	//      'nextElementSibling' and 'previousElementSibling' from the list above.
 
 	// Standard HTMLElement interface represents any HTML element
@@ -85,6 +85,7 @@ var SecureElement = (function() {
 				getLockerSecret(this, "ref").addEventListener(event, sCallback, useCapture);
 			}
 		},
+		
 		removeEventListener : SecureThing.createPassThroughMethod("removeEventListener"),
 		dispatchEvent : SecureThing.createPassThroughMethod("dispatchEvent"),
 

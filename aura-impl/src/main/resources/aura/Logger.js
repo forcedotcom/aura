@@ -151,7 +151,7 @@ Logger.prototype.error = function(msg, e){
     this.log(this.ERROR, logMsg, e);
 };
 
-Logger.prototype.reportError = function(e, action, id){
+Logger.prototype.reportError = function(e, action){
     if (!e || e["reported"]) {
         return;
     }
@@ -159,13 +159,9 @@ Logger.prototype.reportError = function(e, action, id){
     // get action from AuraError
     var errorAction = action || (e.getAction ? e.getAction() : null);
     var actionName = undefined;
-    var actionId = undefined;
     if (errorAction) {
         if (errorAction.getDef && errorAction.getDef()) {
             actionName = errorAction.getDef().getDescriptor();
-        }
-        if (errorAction.getId) {
-            actionId = errorAction.getId();
         }
     }
 
@@ -176,7 +172,7 @@ Logger.prototype.reportError = function(e, action, id){
     reportAction.setCaboose();
     reportAction.setParams({
         "failedAction": action || actionName || (e.getComponent ? e.getComponent() : null),
-        "failedId": id || actionId || (e.getId ? e.getId() : null),
+        "failedId": e.getId ? e.getId() : null,
         "clientError": e.toString(),
         // Note that stack is non-standard, and even if present, may be obfuscated
         // Also we only take the first 25k characters because stacks can get very large

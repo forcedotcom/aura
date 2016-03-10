@@ -64,16 +64,15 @@ public class ComponentController {
             super(message);
             Action action = null;
             this.causeDescriptor = null;
-            if (desc != null && id != null) {
+            this.errorId = id;
+            if (desc != null) {
                 try {
                     action = Aura.getInstanceService().getInstance(desc, ActionDef.class);
                     if (action instanceof JavascriptPseudoAction) {
                         JavascriptPseudoAction jpa = (JavascriptPseudoAction) action;
-                        jpa.setId(id);
                         jpa.addError(this);
                     } else if (action instanceof JavaAction) {
                         JavaAction ja = (JavaAction) action;
-                        ja.setId(id);
                         ja.addException(this, Action.State.ERROR, false, false);
                     }
                 } catch (Exception e) {
@@ -84,11 +83,6 @@ public class ComponentController {
             // use cause to track failing component markup if action is not sent.
             if (this.causeDescriptor == null && desc != null && desc.startsWith("markup://")) {
                 this.causeDescriptor = desc;
-            }
-
-            // if we don't have an action, that means the id is a clientErrorId
-            if (action == null && id != null) {
-                this.errorId = id;
             }
 
             this.action = action;
@@ -166,7 +160,7 @@ public class ComponentController {
      * record of the code error.
      *
      * @param desc The name of the client action failing
-     * @param id The id of the client action failing
+     * @param id The id of the client error
      * @param error The javascript error message of the failure
      * @param stack Not always available (it's browser dependent), but if present, a browser-dependent
      *      string describing the Javascript stack for the error.  Some frames may be obfuscated,

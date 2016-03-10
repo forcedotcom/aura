@@ -407,15 +407,13 @@
         }
     },
 
-    // memory storage stores the actual object so functions are not serialized to strings
-    _testGetFunctionValue: {
+    testGetFunctionValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetFunctionValue(cmp, this.storage);
         }
     },
 
-    // memory storage stores the actual object so error values are possible
-    _testGetErrorValue: {
+    testGetErrorValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetErrorValue(cmp, this.storage);
         }
@@ -464,15 +462,13 @@
         }
     },
 
-    // memory storage stores the actual object so cyclic objects are possible
-    _testCyclicObjectFails: {
+    testCyclicObjectFails: {
         test: function(cmp){
             cmp.helper.lib.storageTest.testCyclicObjectFails(cmp, this.storage);
         }
     },
 
-    // memory storage stores the actual object so changing the object changes the persisted object
-    _testModifyObject: {
+    testModifyObject: {
         test:function(cmp){
             cmp.helper.lib.storageTest.testModifyObject(cmp, this.storage);
         }

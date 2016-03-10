@@ -224,7 +224,7 @@ MemoryAdapter.prototype.expireCache = function(spaceNeeded) {
         var item;
 
         // first evict expired items
-        var now = +new Date();
+        var now = new Date().getTime();
         for (key in that.backingStore) {
             var expires = that.backingStore[key].getItem()["expires"];
             if (now > expires) {
@@ -289,11 +289,16 @@ MemoryAdapter.prototype.deleteStorage = function() {
 
 /**
  * @description A cache entry in the backing store of the MemoryAdapter.
+ * Items which are not JSON serializable (eg cyclic graphs) will throw.
+ * The caller must handle this.
+ *
  * @constructor
  * @private
  */
 MemoryAdapter.Entry = function Entry(item, size) {
-    this.item = item;
+    // force serialization to match behavior of other adapters.
+    // note that json.encode() will throw on cyclic graphs so caller must handle it.
+    this.item = JSON.parse($A.util.json.encode(item));
     this.size = size;
 };
 

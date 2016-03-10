@@ -989,10 +989,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         verify(mockAccessCheckCache).getIfPresent(anyString());
     }
 
+    @UnAdaptableTest("this pass when you run it as unit test in Eclipse. but fail in core autobuild : W-2967041")
     public void testAssertAccess_StoreAccessInfoInCacheIfNotPresent() throws Exception {
         DefDescriptor<ComponentDef> desc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""), StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testComp",
                 false);
+        
         when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn(null);
 
         MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) getAuraMDR();

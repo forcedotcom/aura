@@ -244,10 +244,6 @@
     _findContainedComponent: function(cmp, localId) {
     	var p = cmp;
     	var containedCmp = cmp.find(localId);
-    	while (!containedCmp && p.isInstanceOf("ui:panelDialog")) {
-    		p = p.getSuper();
-    		containedCmp = p.find(localId);
-    	}
     	return containedCmp;
     },
     

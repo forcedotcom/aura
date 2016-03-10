@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 ({
-	PANEL_TYPE : {DIALOG: "ui:panelDialog"},
-    
 	initialize: function(cmp) {
         // store management state on the component
         cmp._active = null; // current visible panel instance
@@ -145,29 +143,8 @@
     // creates panel if it does not already exist and then displays it
     openPanel: function(cmp, config) {
         var self = this,
-            manager = this.getManager(cmp),
-            panel = config.instance,
-            transitioningType,
-            transitioningIsModal;
+            panel = config.instance;
 
-        // This test is to guard against the user clicking fast on an element that triggers
-        // a panel and causing two panels to be displayed.  However, we need allow legitimate cases of two panels being shown
-        // at about the same time (the specific use case is when a force:showOfflineMessage
-        // event is fired on the heels of a showPanel event, the offline modal must be displayed).
-        // The check below is now looser to allow cases that we can be absolutely sure are not double-click
-        // related, that of which the two panels are of different types.
-        if (manager._transitioning === 'open') {
-        	if (manager._transitioningInstance.isValid()) {
-	        	transitioningType = manager._transitioningInstance.getDef().getDescriptor().getQualifiedName();
-	        	transitioningIsModal = this.isModal(transitioningType); 
-	        	if ((config.isModal && transitioningIsModal) || (!config.isModal && !transitioningIsModal)) {
-	        		return;
-	        	}
-        	}
-        	else {
-        		return;
-        	}
-        }
 
         function callback(panelToDisplay) {
             // give aura a chance to inject the new component into the dom
@@ -194,39 +171,11 @@
         }
     },
     
-    createPanel: function(cmp, config, callback) {
-        if (config.isModal || config.isDialog) {
-            this.createPanelDialog(cmp, config, callback);
-        }
+    createPanel: function() {
     },
 
-    // ui:createModal handler; creates PanelDialog cmp and inserts into dom
-    createPanelDialog: function(cmp, config, callback) {
-        var actionList = config.body;
-
-        // don't modify original config object; needed in testing code
-        config = this._copy(config);
-        this.beforeCreatePanel(cmp, config);
-        config.animation = config.animation || 'bottom';
-        config.closeAction = this.getCloseActionForModal(cmp);
-		
-		 // delay setting panel content until panel has been inserted into the dom (bad things happen otherwise)
-		 config.body = [];
-		
-		 // return the promise
-		 this._createPanel(cmp, this.PANEL_TYPE.DIALOG, config, function(panel) {
-			 panel.set('v.body', actionList);
-		     panel._isModal = config.isModal;
-		     callback && callback(panel);
-		 });
-    },
-    
     //Hook for subcomponent
     beforeCreatePanel: function() {
-    },
-    
-    isModal: function(panelType) {
-    	return  panelType === 'markup://ui:panelDialog';
     },
 
     getCloseActionForModal: function() {
@@ -317,7 +266,7 @@
     isPanel: function(component) {
     	var isPanel = component && 
     		$A.util.isComponent(component) &&
-    		/(ui\:panelOverlay|ui\:panelDialog)/.test(component.getDef().getDescriptor().getQualifiedName());
+    		/(ui\:panelOverlay)/.test(component.getDef().getDescriptor().getQualifiedName());
     	return isPanel;
     },
 
@@ -392,7 +341,7 @@
             stackedItems = container.get('v.body').length;
 
         // per Diego; keep one modal in the dom
-        if (!panel._isModal || forceImmediateDestroy) {
+        if (forceImmediateDestroy) {
             this.emptyDeleteQueue(cmp);
             this._removePanel(cmp, panel);
             return;
@@ -523,7 +472,7 @@
             }
             this.bindKeyHandler(manager);
             //TODO: need to decouple the logic here
-            if (panel.get("v.isModal") === false && panel.get("v.closeOnClickOut") && panel.getDef().getDescriptor().getQualifiedName().indexOf("panelSlider") === -1) {
+            if (panel.get("v.closeOnClickOut") && panel.getDef().getDescriptor().getQualifiedName().indexOf("panelSlider") === -1) {
                 this.bindClickHandler(manager);
             }
         } else {
@@ -660,24 +609,13 @@
                 shiftPressed = event.shiftKey,
                 current = document.activeElement,
                 active = manager._active,
-                isModal = active.get("v.isModal") !== false,
                 focusables;
 
             if (active && event.keyCode === 9) {
                 focusables = self.getFocusables(active);
-                if (isModal) {
-                    if (current === focusables.last && !shiftPressed) {
-                        $A.util.squash(event, true);
-                        focusables.first.focus();
-                    } else if (current === focusables.first && shiftPressed) {
-                        $A.util.squash(event, true);
-                        focusables.last.focus();
-                    }
-                } else {
-                    if (current === focusables.last && !shiftPressed) {
-                        $A.util.squash(event, true);
-                        $A.get('e.ui:closePanel').fire();
-                    }
+                if (current === focusables.last && !shiftPressed) {
+                    $A.util.squash(event, true);
+                    $A.get('e.ui:closePanel').fire();
                 }
             }
         };

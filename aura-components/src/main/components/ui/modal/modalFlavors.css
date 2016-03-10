@@ -14,14 +14,117 @@
  * limitations under the License.
  */
 
-.THIS .modal-container {
+.THIS {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.THIS.open {
+    display: flex;
+}
+
+.THIS .modal-glass {
+    transition: opacity .2s;
+    position: absolute;
+    display: block;
+    opacity: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #A8B7C7;
+}
+
+.THIS .modal-glass.fadein {
+    transition: opacity .2s;
+}
+
+.THIS .panel {
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 3rem 0;
+    transform: translate3d(0,200,0);
+}
+
+.THIS .modal-container {    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 auto;
+    border-radius: 0.25rem;
     width: 50%;
-    max-width: 640px;
-    min-width: 480px;
+    max-width: 40rem;
+    min-width: 20rem;
+    height: 100%;
+}
+
+.THIS .modal-header, .THIS .modal-body, .THIS .modal-footer {
+    background-color: #fff;
+}
+
+.THIS .modal-header {
+	border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    position: relative;
+    text-align: center;
+    flex-shrink: 0;
 }
 
 .THIS .modal-header .title {
-    padding: 1.5rem 1rem;
+    /*
+    The title is intended to wrap lines
+    but, per W-2816162, very long words
+    break this. This section is intended to fix
+    that by breaking words and using
+    hyphens where supported (safari, ie, ff and opera)
+    */
+     -ms-word-break: break-all;
+     word-break: break-all;
+     word-break: break-word;
+     hyphens: auto;
+     padding: 1.5rem 1rem;
+}
+
+.THIS .modal-header.empty + .modal-body {
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+}
+
+.THIS .modal-body {
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+.THIS .modal-footer {
+    flex-shrink: 0;
+}
+
+.THIS .modal-container > div:last-of-type {
+    border-bottom-right-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+
+.THIS .uiButton.closeBtn {
+    position: absolute;
+    top: -30px;
+    right: 4px;
+    font-family: Arial;
+    font-size: 25px;
+    padding: 12px;
+    margin: -12px;
+    overflow: visible; /* for outline */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: #FFFFFF;
 }
 
 .THIS--large .modal-container {

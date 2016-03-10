@@ -1,3 +1,15 @@
 <aura:tokens>
   <aura:token name="uiButton.button" value=""/>
+  <aura:token name="uiButton.is-selected" value=""/>
+  <aura:token name="uiButton.not-selected" value=""/>
+
+  <aura:token name="uiModal.modal" value=""/>
+  <aura:token name="uiModal.modalOpen" value=""/>
+  <aura:token name="uiModal.container" value=""/>
+  <aura:token name="uiModal.header" value=""/>
+  <aura:token name="uiModal.title" value=""/>
+  <aura:token name="uiModal.content" value=""/>
+  <aura:token name="uiModal.footer" value=""/>
+  <aura:token name="uiModal.backdrop" value=""/>
+  <aura:token name="uiModal.backdropOpen" value=""/>
 </aura:tokens>

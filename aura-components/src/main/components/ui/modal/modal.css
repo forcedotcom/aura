@@ -13,131 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-    display: none;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-}
-
-.THIS.open {
-    display: flex;
-}
-
-.THIS .modal-glass {
-
-    transition: opacity .2s;
-    /*-webkit-transition-delay: .2s;*/
-    position: absolute;
-    display: block;
-    opacity: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: #A8B7C7;
-
-}
-
-.THIS .modal-glass.fadein {
-
-    transition: opacity .2s;
-    /*opacity: .8;*/
-    /*background-color: green;*/
-}
 
 .THIS .hidden {
     display: none;
-}
-
-.THIS .modal-header {
-    position: relative;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.THIS .modal-footer {
-    flex-shrink: 0;
-}
-
-.THIS .modal-header, .THIS .modal-footer, .THIS .modal-body {
-    background-color: #FFFFFF;
-}
-
-
-.THIS .modal-header .title {
-    /*
-    The title is intended to wrap lines
-    but, per W-2816162, very long words
-    break this. This section is intended to fix
-    that by breaking words and using 
-    hyphens where supported (safari, ie, ff and opera)
-    */
-     -ms-word-break: break-all;
-     word-break: break-all;
-     word-break: break-word;
-    -webkit-hyphens: auto;
-    -moz-hyphens: auto;
-     hyphens: auto;
-}
-
-.THIS .modal-body {
-    overflow: hidden;
-    overflow-y: auto;
-}
-
-.THIS .panel {
-    display: flex;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    padding: 3rem 0;
-    transform: translate3d(0,200,0);
-}
-
-.THIS .modal-container{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin: 0 auto;
-    border-radius: 0.25rem;
-    max-width: 40rem;
-    min-width: 20rem;
-    height: 100%;
-}
-
-.THIS .modal-header {
-    border-top-left-radius: 0.25rem;
-    border-top-right-radius: 0.25rem;
-}
-
-.THIS .modal-header.empty + .modal-body {
-    border-top-left-radius: 0.25rem;
-    border-top-right-radius: 0.25rem;
-}
-
-.THIS .modal-container > div:last-of-type {
-    border-bottom-right-radius: 0.25rem;
-    border-bottom-left-radius: 0.25rem;
-}
-
-.THIS .uiButton.closeBtn {
-    position: absolute;
-    top: -30px;
-    right: 4px;
-    font-family: Arial;
-    font-size: 25px;
-    padding: 12px;
-    margin: -12px;
-    overflow: visible; /* for outline */
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    color: #FFFFFF;
 }
 
 /* ===== ANIMATION AND TRANSFORMS ======= */
@@ -160,7 +38,7 @@
     animation: movefromtop-modal .4s ease-in-out;
 }
 
-.THIS .panel.movetotop{
+.THIS .panel.movetotop {
     visibility: visible;
     animation: movetotop-modal .4s ease-in-out;
 }
@@ -205,119 +83,60 @@
     animation: movetopop-modal .2s ease-in-out;
 }
 
-
-
 /* ANIMATIONS */
+/**** to/from bottom top *****/
 @keyframes movetobottom-modal {
-    from {
-        -webkit-transform:translate3d(0px, 0px , 0px);
-		transform:translate3d(0px, 0px , 0px);
-    }
-    to {
-        -webkit-transform:translate3d(0px, 16px , 0px);
-		transform:translate3d(0px, 16px , 0px);
-    }
+    from { transform:translate3d(0px, 0px , 0px) }
+    to { transform:translate3d(0px, 16px , 0px) }
 }
+
 @keyframes movefrombottom-modal {
-    from {
-        -webkit-transform:translate3d(0px, 16px , 0px);
-		transform:translate3d(0px, 16px , 0px);
-    }
-    to {
-        -webkit-transform:translate3d(0px, 0px , 0px);
-		transform:translate3d(0px, 0px , 0px);
-    }
+    from { transform:translate3d(0px, 16px , 0px) }
+    to { transform:translate3d(0px, 0px , 0px) }
 }
 
+/**** to/from top *****/
 @keyframes movetotop-modal {
-    from {
-        -webkit-transform:translate3d(0px, 0px , 0px);
-		transform:translate3d(0px, 0px , 0px);
-    }
-    to {
-        -webkit-transform:translate3d(0px, -16px , 0px);
-		transform:translate3d(0px, -16px , 0px);
-    }
+    from { transform:translate3d(0px, 0px , 0px) }
+    to { transform:translate3d(0px, -16px , 0px) }
 }
+
 @keyframes movefromtop-modal {
-    from {
-        -webkit-transform:translate3d(0px, -16px , 0px);
-		transform:translate3d(0px, -16px , 0px);
-    }
-    to {
-        -webkit-transform:translate3d(0px, 0px , 0px);
-		transform:translate3d(0px, 0px , 0px);
-    }
+    from { transform:translate3d(0px, -16px , 0px) }
+    to { transform:translate3d(0px, 0px , 0px)  }
 }
 
+/**** to/from left *****/
 @keyframes movetoleft-modal {
-    from {
-        -webkit-transform:translate3d(0px, 0px , 0px);
-		transform:translate3d(0px, 0px , 0px);
-    }
-    to {
-        -webkit-transform:translate3d(-16px, 0px , 0px);
-		transform:translate3d(-16px, 0px , 0px);
-    }
+    from { transform:translate3d(0px, 0px , 0px) }
+    to { transform:translate3d(-16px, 0px , 0px) }
 }
+
 @keyframes movefromleft-modal {
-    from {
-        -webkit-transform:translate3d(-16px, 0px , 0px);
-		transform:translate3d(-16px, 0px , 0px);
-    }
-    to {
-        -webkit-transform:translate3d(0px, 0px , 0px);
-		transform:translate3d(0px, 0px , 0px);
-    }
+    from { transform:translate3d(-16px, 0px , 0px) }
+    to { transform:translate3d(0px, 0px , 0px) }
 }
 
+/**** to.from right *****/
 @keyframes movetoright-modal {
-    from {
-        -webkit-transform:translate3d(0px, 0px , 0px);
-		transform:translate3d(0px, 0px , 0px);
-    }
-    to {
-        -webkit-transform:translate3d(16px, 0px , 0px);
-		transform:translate3d(16px, 0 , 0px);
-    }
+    from { transform:translate3d(0px, 0px , 0px) }
+    to { transform:translate3d(16px, 0 , 0px) }
 }
+
 @keyframes movefromright-modal {
-    from {
-        -webkit-transform:translate3d(16px, 0px , 0px);
-		transform:translate3d(16px, 0px , 0px);
-    }
-    to {
-        -webkit-transform:translate3d(0px, 0px , 0px);
-		transform:translate3d(0px, 0px , 0px);
-    }
+    from { transform:translate3d(16px, 0px , 0px) }
+    to { transform:translate3d(0px, 0px , 0px) }
 }
 
+/**** to/from pop *****/
 @keyframes movetopop-modal {
-    from {
-       -webkit-transform:scale3d(1,1,1);
-       transform:scale3d(1,1,1);
-    }
-
-    to {
-        -webkit-transform:scale3d(.97,.97,1);
-        transform:scale3d(.97,.97,1);
-    }
+    from { transform:scale3d(1,1,1) }
+    to { transform:scale3d(.97,.97,1) }
 }
+
 @keyframes movefrompop-modal {
-
-    0% {
-        -webkit-transform:scale3d(.97,.97,1);
-        transform:scale3d(.97,.97,1);
-    }
-
-    60% {
-        -webkit-transform:scale3d(1.02,1.02,1);
-        transform:scale3d(1.02,1.02,1);
-    }
-
-    100% {
-       -webkit-transform:scale3d(1,1,1);
-       transform:scale3d(1,1,1);
-    }
+    0% { transform:scale3d(.97,.97,1) }
+    60% { transform:scale3d(1.02,1.02,1) }
+    100% { transform:scale3d(1,1,1) }
 }
 

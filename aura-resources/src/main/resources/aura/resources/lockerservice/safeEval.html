@@ -114,7 +114,7 @@
               });
               // Immutable Prototype Exotic Objects
               // https://github.com/tc39/ecma262/issues/272
-              o.freeze(o.prototype);
+              o.seal(o.prototype);
           });
       } catch (ignoring_bleaching_errors) {}
 

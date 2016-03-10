@@ -30,15 +30,17 @@
     preEventFiring: function(component, event) {
         if (event.type === "keydown") {
             if (event.keyCode === 32) { // space key
-                event.preventDefault();
+                $A.util.squash(event, true);
                 this.firePopupEvent(component, "e.popupTriggerPress");
             } else if (event.keyCode === 39 || event.keyCode === 40 || event.keyCode === 37 || event.keyCode === 38) { // right, down, left, or up key
-                event.preventDefault();
+                $A.util.squash(event, true);
                 this.firePopupEvent(component, "e.popupTargetShow", {
                     event : event
                 }); // for key arrows, we want to only show the target since the menu should stay visible so users can interact with it
-            } else if (event.keyCode === 9 || event.keyCode === 27) { // tab or escape 
-                this.firePopupEvent(component, "e.popupTargetHide");
+            } else if (event.keyCode === 9 || event.keyCode === 27) { // tab or escape
+                this.firePopupEvent(component, "e.popupTargetHide", {
+                    event: event
+                });
             }
             
             this.firePopupEvent(component, "e.popupKeyboardEvent", {

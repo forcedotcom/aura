@@ -52,7 +52,14 @@
         this.setTargetVisibility(component, true);
     },
 
-    handleTargetHide: function (component) {
+    handleTargetHide: function (component, event) {
+        var originalEvent = event.getParam("event");
+        var escapeKeyPressed = originalEvent && originalEvent.type === "keydown" && originalEvent.keyCode === 27;
+        if (escapeKeyPressed && this.getTargetComponent(component).get("v.visible")) {
+            // If the popup is showing and the Esc key is pressed we don't want it to be propagated as it
+            // could close a panel or some parent window.
+            $A.util.squash(originalEvent, true);
+        }
         this.setTargetVisibility(component, false);
     },
 
@@ -127,4 +134,4 @@
 
         return elem;
     }
-})// eslint-disable-line semi
+});// eslint-disable-line semi

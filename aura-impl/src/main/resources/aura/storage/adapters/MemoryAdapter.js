@@ -146,10 +146,12 @@ MemoryAdapter.prototype.setItem = function(key, item, size) {
         that.cachedSize += itemSize;
 
         // async evict
-        that.evict(spaceNeeded)
-            .then(undefined, function(e) {
-                that.log(MemoryAdapter.LOG_LEVEL.WARNING, "setItem(): error during eviction", e);
-            });
+        if (spaceNeeded > 0) {
+            that.expireCache(spaceNeeded)
+                .then(undefined, function(e) {
+                    that.log(MemoryAdapter.LOG_LEVEL.WARNING, "setItem(): error during eviction", e);
+                });
+        }
 
         resolve();
     });
@@ -202,45 +204,42 @@ MemoryAdapter.prototype.clear = function() {
     });
 };
 
-/**
- * Returns currently expired items.
- * @returns {Promise} a promise that resolves with an array of expired items
- */
-MemoryAdapter.prototype.getExpiredInternal = function() {
-    var that = this;
-    return new Promise(function(resolve) {
-        var now = new Date().getTime();
-        var expired = [];
-
-        for (var key in that.backingStore) {
-            var expires = that.backingStore[key].getItem()["expires"];
-            if (now > expires) {
-                expired.push(key);
-            }
-        }
-
-        resolve(expired);
-    });
-};
 
 /**
- * Removes items using an LRU algorithm until the requested space is freed.
- * @param {Number} spaceNeeded The amount of space to free.
+ * Evicts items. Expired items are evicted first. If additional space is required then
+ * items are evicted based on LRU.
+ * @param {Number} spaceNeeded The amount of space to free. Specify 0 to remove only expired items.
  * @returns {Promise} a promise that resolves when the requested space is freed.
  */
-MemoryAdapter.prototype.evict = function(spaceNeeded) {
-    if (spaceNeeded <= 0 || this.mru.length <= 0) {
+MemoryAdapter.prototype.expireCache = function(spaceNeeded) {
+    // no items to expire
+    if (this.mru.length <= 0) {
         return Promise["resolve"]();
     }
 
     var that = this;
     return new Promise(function(resolve) {
         var spaceReclaimed = 0;
+        var key;
+        var item;
+
+        // first evict expired items
+        var now = +new Date();
+        for (key in that.backingStore) {
+            var expires = that.backingStore[key].getItem()["expires"];
+            if (now > expires) {
+                item = that.removeItemInternal(key);
+                spaceReclaimed += item.getSize();
+                that.log(MemoryAdapter.LOG_LEVEL.INFO, "evict(): evicted expired item with key " + key);
+            }
+        }
+
+        // if more space is required then evict based on LRU
         while (spaceReclaimed < spaceNeeded && that.mru.length > 0) {
-            var key = that.mru[0];
-            var item = that.removeItemInternal(key);
+            key = that.mru[0];
+            item = that.removeItemInternal(key);
             spaceReclaimed += item.getSize();
-            that.log(MemoryAdapter.LOG_LEVEL.INFO, "evict(): evicted item with key " + key);
+            that.log(MemoryAdapter.LOG_LEVEL.INFO, "evict(): evicted for size item with key " + key);
         }
 
         resolve();
@@ -275,35 +274,8 @@ MemoryAdapter.prototype.log = function (level, msg, obj) {
  * @returns {Promise} when sweep completes
  */
 MemoryAdapter.prototype.sweep = function() {
-    var that = this;
-    return this.getExpiredInternal().then(function (expired) {
-        // note: expired includes any key prefix. and it may
-        // include items with different key prefixes which
-        // we want to expire first. thus remove directly from the
-        // adapter to avoid re-adding the key prefix.
-
-        if (expired.length === 0) {
-            return;
-        }
-
-        var promiseSet = [];
-        var key;
-        for (var n = 0; n < expired.length; n++) {
-            key = expired[n];
-            that.log(MemoryAdapter.LOG_LEVEL.INFO, "sweep(): expiring item with key " + key);
-            promiseSet.push(that.removeItem(key));
-        }
-
-        // When all of the remove promises have completed...
-        return Promise.all(promiseSet).then( //eslint-disable-line consistent-return
-            function () {
-                that.log(MemoryAdapter.LOG_LEVEL.INFO, "sweep(): complete");
-            },
-            function (e) {
-                that.log(MemoryAdapter.LOG_LEVEL.WARNING, "sweep(): error removing items", e);
-            }
-        );
-    });
+    // evict expired items; 0 indicates min space to free
+    return this.expireCache(0);
 };
 
 /**

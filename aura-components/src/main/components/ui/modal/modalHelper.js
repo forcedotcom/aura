@@ -63,7 +63,11 @@
         if(useTransition) {
             useTransition = this.validateAnimationName(cmp.get('v.animation'));
         }
+
         this.mask(cmp);
+
+        $A.util.addClass(panel, $A.getToken('uiModal.modalOpen'));
+
         if(useTransition) {
             panel.style.opacity = 0;
             containerEl.style.display = 'block';
@@ -126,8 +130,10 @@
             useTransition = $A.util.getBooleanValue(cmp.get('v.useTransition')),
             closeAnimation = cmp.get('v.closeAnimation'),
             panel = this._findContainedComponent(cmp, 'panel').getElement();
-        
+
         this.unmask(cmp, useTransition, panel);
+
+        $A.util.removeClass(panel, $A.getToken('uiModal.modalOpen'));
 
         if(closeAnimation) {
             animationName = closeAnimation;
@@ -179,9 +185,10 @@
             // prevent scrolling of the body when modals are open
             document.body.style.overflow = 'hidden';
         }
-        
-        $A.util.removeClass(mask, 'hidden');
-        $A.util.addClass(mask, 'fadein');
+
+        var toAdd = ['fadein', $A.getToken('uiModal.backdropOpen')];
+        $A.util.swapClass(mask, 'hidden', toAdd);
+
         if(useTransition) {
             setTimeout(function() {
                 mask.style.opacity = 0.8;

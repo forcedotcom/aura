@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*jslint sub: true*/
 
 var SecureAura = (function() {
   "use strict";
@@ -32,8 +33,20 @@ var SecureAura = (function() {
   function SecureAura(AuraInstance, key) {
     setLockerSecret(this, "key", key);
     setLockerSecret(this, "ref", AuraInstance);
-    
-    Object.freeze(this);
+    // creating a proxy for $A.util
+    var util = {};
+    ["isEmpty", "hasClass", "addClass", "removeClass", "toggleClass"].forEach(function (name) {
+        Object.defineProperty(util, name, {
+            enumerable: true,
+            value: AuraInstance["util"][name]
+        });
+    });
+    Object.preventExtensions(util);
+    Object.defineProperty(this, "util", {
+        enumerable: true,
+        value: util
+    });
+    Object.preventExtensions(this);
   }
 
   SecureAura.prototype = Object.create(null, {
@@ -42,7 +55,7 @@ var SecureAura = (function() {
         return "SecureAura: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
       }
     },
-    
+
     "createComponent": SecureThing.createPassThroughMethod("createComponent"),
     "createComponents": SecureThing.createPassThroughMethod("createComponents"),
     "enqueueAction": SecureThing.createPassThroughMethod("enqueueAction"),
@@ -52,12 +65,12 @@ var SecureAura = (function() {
     "getComponent": SecureThing.createFilteredMethod("getComponent"),
     "getRoot": SecureThing.createFilteredMethod("getRoot"),
     "log": SecureThing.createPassThroughMethod("log"),
-    "warning": SecureThing.createPassThroughMethod("warning"),
-
-    "util": SecureThing.createPassThroughProperty("util")
+    "warning": SecureThing.createPassThroughMethod("warning")
   });
 
   SecureAura.prototype.constructor = SecureAura;
-  
+  Object.preventExtensions(SecureAura);
+  Object.preventExtensions(SecureAura.prototype);
+
   return SecureAura;
 })();

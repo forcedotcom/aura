@@ -37,7 +37,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.throwable.NoContextException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Ignore;
 
@@ -108,25 +107,6 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         }
     }
 
-    public void testGetResolvedUrl() {
-        assertNull(clientLibraryService.getResolvedUrl(null));
-
-        // Null name and null type
-        ClientLibraryDef nullsClientLibrary = vendor.makeClientLibraryDef(null, null,
-                null, null, null);
-        assertNull(clientLibraryService.getResolvedUrl(nullsClientLibrary));
-    }
-
-    public void testGetUrlsWithoutEstablishingContext() throws Exception {
-        Aura.getContextService().endContext();
-        try {
-            clientLibraryService.getUrls(null, Type.JS);
-            fail("Should not be able to getUrls() without a context.");
-        } catch (Exception e) {
-            checkExceptionFull(e, NoContextException.class, "AuraContext was not established");
-        }
-    }
-
     public void testGetUrlsWithNullArgument() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
@@ -147,7 +127,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
     }
 
     // Should we do this with a simple string source?
-    @Ignore("Need more libraries to test this")
+    @Ignore("TODO: W-2970512 Need more libraries to test this")
     public void testCaseSensitiveName() throws Exception {
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.STATS, Format.JSON, Authentication.AUTHENTICATED);
@@ -201,7 +181,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertTrue(jsUrls.contains(url));
     }
 
-    @Ignore("Need test only injection of random1 & random2")
+    @Ignore("TODO: W-2970512 Need test only injection of random1 & random2")
     public void testGetUrlsForAppWithDependenciesInPTESTMode() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
@@ -223,6 +203,18 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         url = getResolver("randoem2", Type.JS).getUrl();
         assertEquals(url, it.next());
         it.remove();
+    }
+
+    /**
+     * Verify ClientLibraryService doesn't process ClientLibraryDef whose name contain separated library names.
+     * Each library name has to have its own aura:clientLibrary tag.
+     */
+    public void testCommaSeparatedStringInNameWillNotResolve() throws Exception {
+        ClientLibraryService tmpService = new ClientLibraryServiceImpl();
+        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("MyLib, MyLib2", ClientLibraryDef.Type.JS,
+                null, null, null);
+        String url = tmpService.getResolvedUrl(clientLibrary);
+        assertNull("Expected null if a invalid library name was specified", url);
     }
 
     private Set<String> getClientLibraryUrls(DefDescriptor<? extends BaseComponentDef> desc, Type libraryType)

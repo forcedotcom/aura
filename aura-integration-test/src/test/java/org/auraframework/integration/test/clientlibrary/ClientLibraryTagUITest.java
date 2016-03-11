@@ -41,9 +41,9 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify that resource change depending on Mode. Mixture of combinable and uncombinable resources
+     * Verify that resource change depending on Mode.
      */
-    @Ignore("missing resources to test - need to inject extra client libs")
+    @Ignore("TODO W-2970512 missing resources to test - need to inject extra client libs")
     public void testModeDependentResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
 

@@ -17,6 +17,7 @@
 
 //#include aura.locker.SecureWindow
 //#include aura.locker.SecureComponent
+//#include aura.locker.SecureComponentRef
 //#include aura.locker.SecureAuraEvent
 
 var getLockerSecret, setLockerSecret;

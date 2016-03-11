@@ -22,6 +22,7 @@
  */
 TestInstance = function() {
     this.waits = [];
+    this.currentWait = undefined;
     this.cleanups = [];
     this.completed = {}; // A map of action name to boolean for 'named' actions that have been queued
     this.inProgress = -1; // -1:uninitialized, 0:complete, 1:tearing down, 2:running, 3+:waiting
@@ -30,6 +31,7 @@ TestInstance = function() {
     this.expectedErrors = [];
     this.expectedWarnings = [];
     this.failOnWarning = false;
+    this.initTime = new Date().getTime();
     this.timeoutTime = 0;
     this.suite = undefined;
     this.stages = undefined;
@@ -1989,7 +1991,7 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
     if (!timeoutOverride) {
         timeoutOverride = 10;
     }
-    this.timeoutTime = new Date().getTime() + 1000 * timeoutOverride;
+    this.timeoutTime = this.initTime + 1000 * timeoutOverride;
 
     if (typeof code === "string") {
         this.suite = aura.util.json.decode(code);

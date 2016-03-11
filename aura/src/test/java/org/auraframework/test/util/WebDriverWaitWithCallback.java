@@ -27,14 +27,9 @@ import com.google.common.base.Function;
 public class WebDriverWaitWithCallback extends WebDriverWait {
     private final WebDriver driver;
 
-    public WebDriverWaitWithCallback(WebDriver driver, long timeOutInSeconds) {
-        super(driver, timeOutInSeconds);
-        this.driver = driver;
-    }
-
     public WebDriverWaitWithCallback(WebDriver driver, long timeOutInSeconds, String message) {
         super(driver, timeOutInSeconds);
-        super.withMessage(message);
+        withMessage(message);
         this.driver = driver;
     }
 
@@ -42,52 +37,10 @@ public class WebDriverWaitWithCallback extends WebDriverWait {
             Function<? super WebDriver, V2> callbackWhenTimeout) {
         try {
             return super.until(function);
-        } catch (TimeoutException et) {
+        } catch (TimeoutException e) {
             // catch timeout exception and throw exception with extra message from callback function
             V2 ret = callbackWhenTimeout.apply(driver);
-            TimeoutExceptionWithExtraMessage tecm = new TimeoutExceptionWithExtraMessage(et.getMessage(),
-                    et.getCause(), ret.toString());
-            throw tecm;
-        }
-        // let other exception (like WebDriverException) bubble up
-    }
-
-    /**
-     * Customized TimeoutException class, with extra message prepended to the original one
-     */
-    public class TimeoutExceptionWithExtraMessage extends TimeoutException {
-        private static final long serialVersionUID = 1L;
-        private final String extraMessage;
-
-        public TimeoutExceptionWithExtraMessage(String message, Throwable lastException, String extraMessage) {
-            super(message, lastException);
-            this.extraMessage = extraMessage;
-        }
-
-        public TimeoutExceptionWithExtraMessage(String message, String extraMessage) {
-            super(message);
-            this.extraMessage = extraMessage;
-        }
-
-        public TimeoutExceptionWithExtraMessage(Throwable lastException, String extraMessage) {
-            super(lastException);
-            this.extraMessage = extraMessage;
-        }
-
-        /**
-         * getExtraMessage return the result of callback function
-         */
-        public String getExtraMessage() {
-            return extraMessage;
-        }
-
-        /**
-         * return message with extra message append to the beginning (from callback function)
-         */
-        @Override
-        public String getMessage() {
-            return "\nExtra message from callback function when time out: " + this.extraMessage + ".\n"
-                    + super.getMessage();
+            throw new TimeoutException(e.getMessage() + "\n" + ret.toString(), e.getCause());
         }
     }
 }

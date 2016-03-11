@@ -533,7 +533,7 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
                         errorHandler(e);
                     } else {
                         var errorWrapper = new $A.auraError(null, e);
-                        errorWrapper.setAction(action);
+                        errorWrapper.action = action;
                         $A.logger.reportError(errorWrapper);
                     }
                     return;
@@ -563,7 +563,7 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
             throw e;
         } else {
             var wrapper = new $A.auraError(null, e);
-            wrapper.setAction(action);
+            wrapper.action = action;
             throw wrapper;
         }
     }
@@ -1373,7 +1373,7 @@ AuraClientService.prototype.continueProcessing = function() {
             }
         } catch (e) {
             var errorWrapper = new $A.auraError(null, e);
-            errorWrapper.setAction(action);
+            errorWrapper.action = action;
             $A.logger.reportError(errorWrapper);
         }
     }
@@ -1459,7 +1459,7 @@ AuraClientService.prototype.executeStoredAction = function(action, response, col
         }
     } catch (e) {
         var errorWrapper = new $A.auraError(null, e);
-        errorWrapper.setAction(action);
+        errorWrapper.action = action;
         $A.logger.reportError(errorWrapper);
     } finally {
         this.clearInCollection();
@@ -2152,7 +2152,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
                 throw e;
             } else {
                 var errorWrapper = new $A.auraError("Error processing action response", e);
-                errorWrapper.setAction(action);
+                errorWrapper.action = action;
                 throw errorWrapper;
             }
         }

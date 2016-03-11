@@ -151,21 +151,17 @@ Logger.prototype.error = function(msg, e){
     this.log(this.ERROR, logMsg, e);
 };
 
-Logger.prototype.reportError = function(e, action, id){
+Logger.prototype.reportError = function(e, action){
     if (!e || e["reported"]) {
         return;
     }
 
     // get action from AuraError
-    var errorAction = action || (e.getAction ? e.getAction() : null);
+    var errorAction = action || e.action;
     var actionName = undefined;
-    var actionId = undefined;
     if (errorAction) {
         if (errorAction.getDef && errorAction.getDef()) {
             actionName = errorAction.getDef().getDescriptor();
-        }
-        if (errorAction.getId) {
-            actionId = errorAction.getId();
         }
     }
 
@@ -175,8 +171,8 @@ Logger.prototype.reportError = function(e, action, id){
     var reportAction = $A.get("c.aura://ComponentController.reportFailedAction");
     reportAction.setCaboose();
     reportAction.setParams({
-        "failedAction": action || actionName || (e.getComponent ? e.getComponent() : null),
-        "failedId": id || actionId || (e.getId ? e.getId() : null),
+        "failedAction": action || actionName || e.component,
+        "failedId": e.id,
         "clientError": e.toString(),
         // Note that stack is non-standard, and even if present, may be obfuscated
         // Also we only take the first 25k characters because stacks can get very large
@@ -404,8 +400,8 @@ Logger.prototype.devDebugConsoleLog = function(level, message, error) {
         if (console[filter]) {
             console[filter]("%s", message);
             if (error) {
-                if (error.getComponent && error.getComponent()) {
-                    console[filter]("%s", "Failing component: " + error.getComponent());
+                if (error.component) {
+                    console[filter]("%s", "Failing component: " + error.component);
                 }
                 console[filter]("%o", error);
                 showTrace = !(error.stack || error.stackTrace);

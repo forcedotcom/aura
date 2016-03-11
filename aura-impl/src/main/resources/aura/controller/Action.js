@@ -1157,20 +1157,17 @@ Action.prototype.toJSON = function() {
  * @param e the exception with which we want to mark the action.
  */
 Action.prototype.markException = function(e) {
+    // if the error doesn't have id, we wrap it with auraError so that when displaying UI, it will have an id
+    if (!e.id) {
+        e = new $A.auraError(null, e);
+    }
+
     this.state = "ERROR";
     this.error = e;
     $A.warning("Action failed: " + (this.def?this.def.toString():"") , e);
-    $A.logger.reportError(e, this.getDef().getDescriptor(), this.getId());
+    $A.logger.reportError(e, this.getDef().getDescriptor());
     if ($A.clientService.inAuraLoop()) {
-        // we don't want to wrap AFE that's thrown by components intending to do custom error experience.
-        if (e instanceof $A.auraFriendlyError) {
-            e["reported"] = true;
-            throw e;
-        } else {
-            var errorWrapper = new $A.auraError(null, e);
-            errorWrapper["reported"] = true;
-            throw errorWrapper;
-        }
+        throw e;
     }
 };
 

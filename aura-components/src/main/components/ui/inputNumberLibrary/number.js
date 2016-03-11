@@ -84,7 +84,6 @@ function lib() { // eslint-disable-line no-unused-vars
                    ((stringOriginal.match(millionRegExp))  ? Math.pow(10, 6) : 1) *
                    ((stringOriginal.match(billionRegExp))  ? Math.pow(10, 9) : 1) *
                    ((stringOriginal.match(trillionRegExp)) ? Math.pow(10, 12) : 1) *
-                   ((string.indexOf('%') > -1) ? 0.01 : 1) *
                    (((string.split('-').length + Math.min(string.split('(').length - 1, string.split(')').length - 1)) % 2) ? 1 : -1) *
                    Number(string.replace(/[^0-9\.]+/g, ''));
         },

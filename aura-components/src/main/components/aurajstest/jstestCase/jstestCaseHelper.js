@@ -67,8 +67,8 @@
             for (var i = 0; i < errorsInCallbackFunc.length; i++) {
                 error = errorsInCallbackFunc[i];
                 msg += error.message;
-                if (error["lastStage"]) {
-                    msg += "<div class='lastStage'><pre>" + error["lastStage"] + "</pre></div>";
+                if (error["testState"]) {
+                    msg += "<pre class='testState'>" + error.testState + "</pre>";
                 }
             }
             cmp.find("results").getElement().innerHTML = msg;

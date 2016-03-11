@@ -33,6 +33,7 @@ TestInstance = function() {
     this.failOnWarning = false;
     this.initTime = new Date().getTime();
     this.timeoutTime = 0;
+    this.elapsedTime = 0;
     this.suite = undefined;
     this.stages = undefined;
     this.cmp = undefined;

@@ -158,6 +158,7 @@ TestInstance.prototype.doTearDown = function() {
     }
     setTimeout(function() {
         that.inProgress = 0;
+    	that.elapsedTime = new Date().getTime() - that.initTime;
     }, 100);
 };
 
@@ -293,8 +294,9 @@ TestInstance.prototype.getDump = function() {
 		} else if (this.inProgress >= 2) {
 			status += "running\n";
 		}
-		status += "Elapsed time: " + (new Date().getTime() - this.initTime)
-				+ "ms\n";
+		status += "Elapsed time: ";
+		status += this.elapsedTime || (new Date().getTime() - this.initTime);
+		status += "ms\n";
 
 		var errors = TestInstance.prototype.errors;
 		if (errors.length > 0) {

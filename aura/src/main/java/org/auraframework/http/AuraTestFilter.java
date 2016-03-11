@@ -178,7 +178,8 @@ public class AuraTestFilter implements Filter {
                                 // There was an error in the original response, so just write the response out.
                                 res.getWriter().write(capturedResponse);
                             } else {
-                                String testTag = buildJsTestScriptTag(targetDescriptor, testToRun, capturedResponse);
+                                int timeout = testTimeout.get(request, DEFAULT_JSTEST_TIMEOUT);
+                                String testTag = buildJsTestScriptTag(targetDescriptor, testToRun, timeout, capturedResponse);
                                 injectScriptTags(res.getWriter(), capturedResponse, testTag);
                             }
                             return;
@@ -427,7 +428,7 @@ public class AuraTestFilter implements Filter {
         return responseWrapper.getCapturedResponseString();
     }
 
-    private String buildJsTestScriptTag(DefDescriptor<?> targetDescriptor, String testName, String original) {
+    private String buildJsTestScriptTag(DefDescriptor<?> targetDescriptor, String testName, int timeout, String original) {
         String tag = "";
 
         // Inject test framework script tag if it isn't on page already. Unlikely, but framework may not
@@ -440,9 +441,9 @@ public class AuraTestFilter implements Filter {
         }
 
         // Inject tag to load and execute test.
-        String suiteSrcUrl = String.format("/%s/%s.%s?aura.jstestrun=%s&aura.format=JS&aura.nonce=%s",
+        String suiteSrcUrl = String.format("/%s/%s.%s?aura.jstestrun=%s&aura.format=JS&aura.testTimeout=%s&aura.nonce=%s",
                 targetDescriptor.getNamespace(), targetDescriptor.getName(),
-                targetDescriptor.getDefType() == DefType.APPLICATION ? "app" : "cmp", testName,
+                targetDescriptor.getDefType() == DefType.APPLICATION ? "app" : "cmp", testName, timeout,
                 System.nanoTime());
         tag = tag + String.format("\n<script src='%s'></script>\n", suiteSrcUrl);
         return tag;

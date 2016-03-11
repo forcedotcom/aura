@@ -33,12 +33,14 @@ import org.auraframework.integration.test.logging.AbstractLoggingHttpTest;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
 /**
  * Automation to verify the functioning of AuraResourceServlet. AuraResourceServlet is used to preload definitions of
  * components in a given namespace. It is also used to load CSS
  */
+@UnAdaptableTest("AbstractLoggingUITest has tag @ThreadHostileTest which is not supported in SFDC.")
 public class AuraResourceServletLoggingHttpTest extends AbstractLoggingHttpTest {
 
     public AuraResourceServletLoggingHttpTest(String name) {

@@ -32,6 +32,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.integration.test.logging.AbstractLoggingUITest;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.FreshBrowserInstance;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -50,6 +51,7 @@ import com.google.common.collect.Lists;
  * content is being used by the browser. AppCache only works for WebKit browsers.
  */
 @FreshBrowserInstance
+@UnAdaptableTest("AbstractLoggingUITest has tag @ThreadHostileTest which is not supported in SFDC.")
 public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
 
     private final boolean debug = false;

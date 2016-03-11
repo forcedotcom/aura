@@ -14,7 +14,7 @@
             $A.test.fail("CryptoAdapter failed to register. You must run these tests against localhost or with HTTPS (see http://sfdc.co/bO9Hok).");
         }
 
-        $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this); 
+        $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this);
         this.storage = this.createStorage("crypto-store", 32768, 2000, 3000);
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store"); });
     },
@@ -245,7 +245,7 @@
         function loadComponentInIframe(cmp) {
             cmp._expected = "expected value";
             cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true&value="
-                    + cmp._expected, "iframeContainer");
+                    + cmp._expected, "iframeContainer", "first load");
         },
         function resetDatabase(cmp) {
             var iframeCmp = cmp._iframeLib.getIframeRootCmp();
@@ -258,7 +258,7 @@
             cmp._iframeLib.waitForStatus("Adding", "Done Adding");
         },
         function reloadIframe(cmp) {
-            cmp._iframeLib.reloadIframe(cmp);
+            cmp._iframeLib.reloadIframe(cmp, false, "first reload");
         },
         function getItemFromDatabase(cmp) {
             var iframeCmp = cmp._iframeLib.getIframeRootCmp();
@@ -285,7 +285,7 @@
             function loadComponentInIframe(cmp) {
                 cmp._expected = "expected value";
                 cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true&value="
-                        + cmp._expected, "iframeContainer");
+                        + cmp._expected, "iframeContainer", "first load");
             },
             function resetDatabase(cmp) {
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
@@ -298,7 +298,7 @@
                 cmp._iframeLib.waitForStatus("Adding", "Done Adding");
             },
             function reloadFrame(cmp) {
-                cmp._iframeLib.reloadIframe(cmp);
+                cmp._iframeLib.reloadIframe(cmp, false, "first reload");
             },
             function verifyNoItemWithDifferentKey(cmp) {
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();

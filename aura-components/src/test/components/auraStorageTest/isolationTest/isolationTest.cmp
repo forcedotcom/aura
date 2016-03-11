@@ -1,4 +1,5 @@
 <aura:component>
+    <aura:attribute name="log" type="String" default="" description="Required attribute by auraStorageTest:iframeTestLib:iframeTest.js"/>
     <aura:attribute name="status" type="String" default="Waiting"/>
     <aura:attribute name="items" type="Object"/>
     <aura:attribute name="isolationKey" type="String" default="" />

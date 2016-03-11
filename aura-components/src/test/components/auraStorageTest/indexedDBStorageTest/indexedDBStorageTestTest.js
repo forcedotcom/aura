@@ -9,7 +9,7 @@
         cmp._storageLib = cmp.helper.storageLib.storageTest;
         cmp._iframeLib = cmp.helper.iframeLib.iframeTest;
 
-        $A.installOverride("StorageService.selectAdapter", function(){ return "indexeddb" }, this); 
+        $A.installOverride("StorageService.selectAdapter", function(){ return "indexeddb" }, this);
         this.storage = $A.storageService.initStorage(
                 "browserdb",    // name
                 true,           // persistent
@@ -298,7 +298,7 @@
         function loadComponentInIframe(cmp) {
             cmp._expected = "expected value";
             cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=false&value="+cmp._expected,
-                    "iframeContainer");
+                    "iframeContainer", "first load");
         },
         function resetDatabase(cmp) {
             cmp._iframeLib.getIframeRootCmp().resetStorage();
@@ -309,7 +309,7 @@
             cmp._iframeLib.waitForStatus("Adding", "Done Adding");
         },
         function reloadIframe(cmp) {
-            cmp._iframeLib.reloadIframe(cmp);
+            cmp._iframeLib.reloadIframe(cmp, false, "first reload");
         },
         function getItemFromDatabase(cmp) {
             var iframeCmp = cmp._iframeLib.getIframeRootCmp();
@@ -429,7 +429,7 @@
         test: [
         function putItemThenReplaceWithEntryTooLarge(cmp) {
             var maxSize = 5120;
-            $A.installOverride("StorageService.selectAdapter", function(){ return "indexeddb" }, this); 
+            $A.installOverride("StorageService.selectAdapter", function(){ return "indexeddb" }, this);
             cmp._storage = $A.storageService.initStorage("browserdb-testReplaceTooLarge",
                     true, false, maxSize, 2000, 3000, true, true);
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testReplaceTooLarge"); });

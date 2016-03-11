@@ -681,12 +681,11 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
             $A.initialized = true;
             $A.addDefaultErrorHandler(app);
             // Restore component definitions from AuraStorage into memory (if persistent)
-            $A.componentService.restoreDefsFromStorage().then($A.getCallback(function () {
+            $A.componentService.restoreDefsFromStorage().then(function () {
                 $A.getContext().pruneLoaded();
                 $A.finishInit(doNotInitializeServices);
-            }));
+            });
         }
-
     }
 };
 
@@ -880,7 +879,7 @@ AuraInstance.prototype.getCallback = function(callback) {
         try {
             return callback.apply(this,Array.prototype.slice.call(arguments));
         } catch (e) {
-            // no need to wrap AFE with auraError as 
+            // no need to wrap AFE with auraError as
             // customers who throw AFE would want to handle it with their own custom experience.
             if (e instanceof $A.auraFriendlyError || e instanceof $A.auraError) {
                 if (context && context.getDef) {
@@ -1248,7 +1247,7 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
         if(def) {
             returnDefinitions[c] = def;
         } else {
-            // Detect without access checks to see if
+            // detect without access checks
             if((isEvent && !this.eventService.hasDefinition(descriptor)) ||
                     (!isEvent && !this.componentService.getComponentDef(this.componentService.createDescriptorConfig(descriptor)))) {
 

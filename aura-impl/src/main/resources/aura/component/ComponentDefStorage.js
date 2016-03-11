@@ -220,7 +220,7 @@ ComponentDefStorage.prototype.restoreAll = function() {
                         }
                         libCount++;
                     } else {
-                        if (!$A.componentService.hasDefinition(config["descriptor"])) {
+                        if (!$A.componentService.getComponentDef(config)) {
                             $A.componentService.saveComponentConfig(config);
                         }
                         cmpCount++;

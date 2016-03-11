@@ -23,7 +23,9 @@
         var originalEvent = event.getParam("event");
         if (originalEvent && originalEvent.type === "keydown") {
             var downArrowKeyCode = 40;
-            if (originalEvent.keyCode === downArrowKeyCode) {
+            var upArrowKeyCode = 38;
+            var keyCode = originalEvent.keyCode;
+            if (keyCode === downArrowKeyCode || keyCode === upArrowKeyCode) {
                 originalEvent.preventDefault();
 
                 if (component.get("v.visible")) {

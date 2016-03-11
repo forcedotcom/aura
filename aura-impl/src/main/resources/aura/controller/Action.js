@@ -1158,7 +1158,7 @@ Action.prototype.toJSON = function() {
  */
 Action.prototype.markException = function(e) {
     // if the error doesn't have id, we wrap it with auraError so that when displaying UI, it will have an id
-    if (!e.getId) {
+    if (!e.id) {
         e = new $A.auraError(null, e);
     }
 

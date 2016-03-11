@@ -203,6 +203,26 @@ function AuraInstance () {
     this.auraFriendlyError    = Aura.Errors.AuraFriendlyError;
 
     /**
+     * Error severity for categorizing errors
+     * 
+     * ALERT [default error severity level if error thrower doesn’t explicitly specify a severity level] - 
+     * the current page has issues and we need to alert the user that an error has occurred.  The error(s) could potentially be corrected by a page reload
+     *
+     * FATAL - the user’s session is now completely broken and cannot continue being used. 
+     * The user should logout and contact Salesforce support or their administrator.
+     *
+     * QUIET - An error has occurred but it won’t affect the user/page. 
+     * This is likely something unexpected that a lower level component can just quietly log for later diagnostics by Salesforce (e.g. a perf issue or something else).
+     *
+     * @public
+     */
+    this.severity = Object.freeze({
+        "ALERT": "ALERT",
+        "FATAL": "FATAL",
+        "QUIET": "QUIET"
+    });
+
+    /**
      * Instance of the AuraLocalizationService which provides utility methods for localizing data or getting formatters for numbers, currencies, dates, etc.<br/>
      * See the documentation for <a href="#reference?topic=api:AuraLocalizationService">AuraLocalizationService</a> for the members.
      *
@@ -479,6 +499,7 @@ function AuraInstance () {
 
     this["auraError"] = this.auraError;
     this["auraFriendlyError"] = this.auraFriendlyError;
+    this["severity"] = this.severity;
     this["hasDefinition"] = this.hasDefinition;
     this["getDefinition"] = this.getDefinition;
     this["getDefinitions"] = this.getDefinitions;
@@ -764,6 +785,8 @@ AuraInstance.prototype.handleError = function(message, e) {
         if (e["name"] === "AuraError") {
             var format = "Something has gone wrong. {0}.\nPlease try again.\n";
             var displayMessage = e.message || e.name;
+            e.severity = e.severity || this.severity["ALERT"];
+
             //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             displayMessage += "\n" + e.stackTrace;
             //#end
@@ -771,6 +794,7 @@ AuraInstance.prototype.handleError = function(message, e) {
         }
 
         if (e["name"] === "AuraFriendlyError") {
+            e.severity = e.severity || this.severity["QUIET"];
             evtArgs = {"message":e["message"],"error":e["name"],"auraError":e};
         }
         else {
@@ -860,14 +884,14 @@ AuraInstance.prototype.getCallback = function(callback) {
             // customers who throw AFE would want to handle it with their own custom experience.
             if (e instanceof $A.auraFriendlyError || e instanceof $A.auraError) {
                 if (context && context.getDef) {
-                    e.setComponent(context.getDef().getDescriptor().toString());
+                    e.component = context.getDef().getDescriptor().toString();
                 }
 
                 throw e;
             } else {
                 var errorWrapper = new $A.auraError("Uncaught error in "+name, e);
                 if (context && context.getDef) {
-                    errorWrapper.setComponent(context.getDef().getDescriptor().toString());
+                    errorWrapper.component = context.getDef().getDescriptor().toString();
                 }
 
                 throw errorWrapper;

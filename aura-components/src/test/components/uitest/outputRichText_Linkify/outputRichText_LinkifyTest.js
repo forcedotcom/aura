@@ -23,6 +23,13 @@
             this.assertLinksPresent(cmp, "href=\"http://www.salesforce.com\"");
         }
     },
+    
+    testNoWWWLink:{
+        attributes : {textValue: 'visit salesforce.com for more details'},
+        test: function(cmp){
+            this.assertLinksPresent(cmp, "href=\"http://salesforce.com\"");
+        }
+    },
 
     testHttpLink:{
         attributes : {textValue: 'visit http://salesforce.com for more details'},
@@ -84,6 +91,34 @@
         attributes : {textValue: 'contact dude@aura.com for more details'},
         test: function(cmp){
             this.assertLinksPresent(cmp, "href=\"mailto:dude@aura.com\"");
+        }
+    },
+    
+    testIPAddressLink:{
+        attributes : {textValue: 'visit http://152.1.1.255 for more details'},
+        test: function(cmp){
+            this.assertLinksPresent(cmp, "href=\"http://152.1.1.255\"");
+        }
+    },
+    
+    testDomainAndPortLink:{
+        attributes : {textValue: 'visit http://user.salesforce.com:8080 for more details'},
+        test: function(cmp){
+            this.assertLinksPresent(cmp, "href=\"http://user.salesforce.com:8080\"");
+        }
+    },
+    
+    testIPAddressAndPortLink:{
+        attributes : {textValue: 'visit http://127.0.0.1:9090 for more details'},
+        test: function(cmp){
+            this.assertLinksPresent(cmp, "href=\"http://127.0.0.1:9090\"");
+        }
+    },
+    
+    testAnchorLink:{
+        attributes : {textValue: 'visit https://en.wikipedia.org/wiki/Salesforce.com#Lightning for more details'},
+        test: function(cmp){
+            this.assertLinksPresent(cmp, "href=\"https://en.wikipedia.org/wiki/Salesforce.com#Lightning\"");
         }
     },
 

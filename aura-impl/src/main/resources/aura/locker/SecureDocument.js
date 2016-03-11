@@ -87,6 +87,8 @@ var SecureDocument = (function() {
 
     querySelector: SecureThing.createFilteredMethod("querySelector"),
     querySelectorAll: SecureThing.createFilteredMethod("querySelectorAll"),
+    
+    title: SecureThing.createPassThroughProperty("title"),
 
     // DCHASMAN TODO W-2839646 Figure out how much we want to filter cookie access???
     cookie: SecureThing.createPassThroughProperty("cookie")

@@ -152,7 +152,7 @@ Test.Aura.AuraClientServiceTest = function() {
             var expect1 = { "action":newAction };
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
-                target.deDupe(newAction);
+                target.deDupe(newAction, true);
             });
 
             // Act
@@ -178,7 +178,7 @@ Test.Aura.AuraClientServiceTest = function() {
             var expect1 = { "action":newAction };
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
-                target.deDupe(newAction);
+                target.deDupe(newAction, true);
             });
 
             // Act

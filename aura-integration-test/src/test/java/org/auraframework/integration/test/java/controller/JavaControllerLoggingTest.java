@@ -34,6 +34,7 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.Message;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -42,6 +43,7 @@ import com.google.common.collect.Maps;
 /**
  * Integration tests for java Controllers loggings.
  */
+@UnAdaptableTest("AbstractLoggingUITest has tag @ThreadHostileTest which is not supported in SFDC.")
 public class JavaControllerLoggingTest extends AbstractLoggingTest {
 
     private ServerService serverService;

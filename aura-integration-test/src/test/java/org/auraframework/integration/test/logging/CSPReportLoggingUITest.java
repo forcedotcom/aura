@@ -37,6 +37,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 @TargetBrowsers(BrowserType.GOOGLECHROME)
+@UnAdaptableTest("AbstractLoggingUITest has tag @ThreadHostileTest which is not supported in SFDC.")
 public class CSPReportLoggingUITest extends AbstractLoggingUITest {
 
     public CSPReportLoggingUITest(String name) {

@@ -19,11 +19,13 @@ import java.util.List;
 
 import org.apache.log4j.spi.LoggingEvent;
 import org.auraframework.integration.test.logging.AbstractLoggingUITest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 
 /**
  * Logging UI Test for LabelValueProvider.js
  */
+@UnAdaptableTest("AbstractLoggingUITest has tag @ThreadHostileTest which is not supported in SFDC.")
 public class LabelValueProviderLoggingUITest extends AbstractLoggingUITest {
 
     // URL string to go to

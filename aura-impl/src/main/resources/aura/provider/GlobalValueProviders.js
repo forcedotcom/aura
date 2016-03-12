@@ -138,25 +138,26 @@ GlobalValueProviders.prototype.loadFromStorage = function(callback) {
     var storage = this.getStorage();
     var that = this;
     if (storage) {
-        storage.get("globalValueProviders").then(function (item) {
-            $A.run(function() {
-                if (item) {
-                    // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
-                    that.merge(item.value, true);
-                }
-                if(callback) { callback(!!item); }
-            });
-        }, function() {
-            // error retrieving from storage
-            $A.run(function() {
-                callback(false);
-            });
-        });
+        storage.get("globalValueProviders").then(
+            function (item) {
+                $A.run(function() {
+                    if (item) {
+                        // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
+                        that.merge(item.value, true);
+                    }
+                    callback(!!item);
+                });
+            },
+            function() {
+                $A.run(function() {
+                    // error retrieving from storage
+                    callback(false);
+                });
+            }
+        );
     } else {
         // nothing loaded from persistent storage
-        $A.run(function() {
-            if(callback) { callback(false); }
-        });
+        callback(false);
     }
 };
 

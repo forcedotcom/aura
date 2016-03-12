@@ -26,11 +26,17 @@ function iframeTest() {
             return this.getIframe().$A.getRoot();
         },
 
-        /** Creates a new iframe and insert into DOM at component containing the provided aura:id. */
-        loadIframe: function(cmp, src, iframeAuraId) {
+        /**
+         * Creates, inserts and waits for an iframe to load.
+         * @param {Component} cmp the component that will host the iframe
+         * @param {String} url the URL to load in the iframe
+         * @param {String} iframeAuraId the aura:id in cmp in which the iframe is inserted
+         * @param {String} errorMsg message prefix displayed when an error occurs
+         */
+        loadIframe: function(cmp, url, iframeAuraId, errorMsg) {
             cmp._frameLoaded = false;
             var frame = document.createElement("iframe");
-            frame.src = src;
+            frame.src = url;
             frame.scrolling = "auto";
             frame.id = "myFrame";
             frame.width = "100%";
@@ -40,27 +46,44 @@ function iframeTest() {
             });
             var content = cmp.find(iframeAuraId);
             $A.util.insertFirst(frame, content.getElement());
-            this.waitForIframeLoad(cmp);
+            this.waitForIframeLoad(cmp, errorMsg);
         },
 
-        /** Reloads the iframe, optionally saving the logs before reload so they're restored on load. */
-        reloadIframe: function(cmp, saveLogs) {
+        /**
+         * Reloads the iframe.
+         * @param {Component} cmp the component that will host the iframe
+         * @param {Boolean} saveLogs true to save the logs before reload so they're store after load
+         * @param {String} errorMsg message prefix displayed when an error occurs
+         */
+        reloadIframe: function(cmp, saveLogs, errorMsg) {
             cmp._frameLoaded = false;
             if (saveLogs) {
                 this.getIframeRootCmp().saveLog();
             }
             this.getIframe().location.reload();
-            this.waitForIframeLoad(cmp);
+            this.waitForIframeLoad(cmp, errorMsg);
         },
 
-        /** Waits for the iframe and Aura within it to load. */
-        waitForIframeLoad: function(cmp) {
+        /**
+         * Waits for the iframe and Aura within it to load.
+         * @param {Component} cmp the component that will host the iframe
+         * @param {String} errorMsg message prefix displayed when an error occurs
+         */
+        waitForIframeLoad: function(cmp, errorMsg) {
             var iframe = this.getIframe();
-            $A.test.addWaitFor(true, function() {
-                return cmp._frameLoaded
-                    && iframe.$A
-                    && iframe.$A.finishedInit === true;
-            });
+            $A.test.addWaitFor(true,
+                function() {
+                    return cmp._frameLoaded
+                        && iframe.$A
+                        && iframe.$A.finishedInit === true;
+                },
+                function() {
+                    if (iframe.$A.util.hasClass(iframe.document.body, "auraError")) {
+                        var error = iframe.$A.util.getText(iframe.$A.util.getElement("auraErrorMessage"))
+                        $A.test.fail("Error during iframe load: " + errorMsg + "\n" + error);
+                    }
+                }
+            );
         },
 
         /** Clears caches and logs. */

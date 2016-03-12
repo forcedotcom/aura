@@ -155,7 +155,7 @@ Aura.Context.AuraContext.prototype.getStorage = function () {
  * defs when eviction runs on persistent component def storage and then the app is
  * reloaded. The in-memory defs are lost due to the reload; the persisted defs may
  * be a subset of the loaded list. Rather than try to maintain a loaded blacklist
- * (which may grow and shrink) we prune the list once at startup.
+ * (which may grow and shrink) we prune the list once during framework initialization.
  *
  * @private
  */
@@ -163,7 +163,7 @@ Aura.Context.AuraContext.prototype.pruneLoaded = function() {
     var pruneCount = 0;
     for (var key in this.loaded) {
         if (key.indexOf("COMPONENT@") === 0) {
-            if (!$A.componentService.getDef(key.substr(10))) {
+            if (!$A.componentService.getComponentDef({"descriptor":key.substr(10)})) {
                 delete this.loaded[key];
                 pruneCount++;
             }

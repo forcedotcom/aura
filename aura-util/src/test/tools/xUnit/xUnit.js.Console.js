@@ -4992,7 +4992,7 @@ System.EnvironmentStrategy.Node=function(){
     };
 
     this.Exit=function(errorCode){
-        process.reallyExit(errorCode);
+        process.reallyExit(errorCode!=0?1:0);
     };
 
     this.GetNewLine=function(){

@@ -1440,10 +1440,16 @@ Test.Aura.AuraClientServiceTest = function() {
         [Fact]
         function testSendsAll() {
             var target;
-            var sentCount = 0;
-            var deDuped = 0;
-            var actions = [ "1", "2", "3", "4", "5" ];
-            var sentActions = [];
+            var expected={
+                actions:[ "1", "2", "3", "4", "5" ],
+                sent:5,
+                deDuped:5
+            };
+            var actual={
+                actions:[],
+                sent:0,
+                deDuped:0
+            };
 
             //
             // Set up.
@@ -1451,82 +1457,81 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
             });
-            target.deDupe = function() { deDuped += 1; return false; };
+            target.deDupe = function() { actual.deDuped += 1; return false; };
             target.getAvailableXHR = function() { return true; };
             target.send = function(auraXHR, actions, name) {
-                Assert.Equal(1, actions.length);
-                sentActions = sentActions.concat(actions);
-                sentCount += 1;
+                actual.actions = actual.actions.concat(actions);
+                actual.sent += 1;
                 return true;
             };
 
-            target.sendAsSingle(actions, actions.length);
+            target.sendAsSingle(expected.actions, expected.actions.length);
 
-            Assert.Equal(actions, sentActions);
-            Assert.Equal(actions.length, sentCount);
-            Assert.Equal(actions.length, deDuped);
+            Assert.Equal(expected,actual);
         }
 
         [Fact]
         function testSendsOneAndEnqueuesRest() {
             var target;
-            var sentCount = 0;
-            var deDuped = 0;
-            var actions = [ "1", "2", "3", "4", "5" ];
-            var sentActions = [];
-
-            //
-            // Set up.
-            //
+            var expected={
+                actions:[ "1"],
+                deferred:["2", "3", "4", "5" ],
+                sent:1,
+                deDuped:5
+            };
+            var actual={
+                actions:[],
+                deferred:[],
+                sent:0,
+                deDuped:0
+            };
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
             });
-            target.deDupe = function() { deDuped += 1; return false; };
+            target.deDupe = function() { actual.deDuped += 1; return false; };
             target.getAvailableXHR = function() { return true; };
             target.send = function(auraXHR, actions, name) {
-                Assert.Equal(1, actions.length);
-                sentActions = sentActions.concat(actions);
-                sentCount += 1;
+                actual.actions = actual.actions.concat(actions);
+                actual.sent += 1;
                 return true;
             };
 
-            target.sendAsSingle(actions, 1);
+            target.sendAsSingle(expected.actions.concat(expected.deferred), expected.sent);
+            actual.deferred=target.actionsDeferred;
 
-            Assert.Equal([ "1" ], sentActions);
-            Assert.Equal([ "2", "3", "4", "5" ], target.actionsDeferred);
-            Assert.Equal(1, sentCount);
-            Assert.Equal(actions.length, deDuped);
+            Assert.Equal(expected,actual);
         }
 
         [Fact]
         function testDupeIsDropped() {
             var target;
-            var sentCount = 0;
-            var deDuped = 0;
-            var actions = [ "1" ];
-            var sentActions = [];
-
-            //
-            // Set up.
-            //
+            var expected={
+                actions:[],
+                deferred:[],
+                sent:0,
+                deDuped:1
+            };
+            var actual={
+                actions:[],
+                deferred:[],
+                sent:0,
+                deDuped:0
+            };
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
             });
-            target.deDupe = function() { deDuped += 1; return true; };
+            target.deDupe = function() { actual.deDuped += 1; return true; };
             target.getAvailableXHR = function() { return true; };
             target.send = function(auraXHR, actions, name) {
-                Assert.Equal(1, actions.length);
-                sentActions = sentActions.concat(actions);
-                sentCount += 1;
+                actual.actions = actual.actions.concat(actions);
+                actual.sent += 1;
                 return true;
             };
 
-            target.sendAsSingle(actions, actions.length);
+            target.sendAsSingle(["1"], 1);
+            actual.deferred=target.actionsDeferred;
 
-            Assert.Equal([ ], sentActions);
-            Assert.Equal([ ], target.actionsDeferred);
-            Assert.Equal(0, sentCount);
-            Assert.Equal(actions.length, deDuped);
+            Assert.Equal(expected,actual);
         }
     }
 }

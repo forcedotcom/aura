@@ -19,6 +19,7 @@ Function.RegisterNamespace("Test.Aura.Controller");
 Test.Aura.Controller.ActionTest = function() {
     var Aura = {
         "Controller": {},
+        "Errors":{},
         "lockerService": {
         	wrapComponent: function(component) {
         		return component;
@@ -28,9 +29,11 @@ Test.Aura.Controller.ActionTest = function() {
 
     Mocks.GetMocks(Object.Global(), {
         "Aura": Aura,
-        "Action": function(){}
+        "Action": function(){},
+        "AuraError":function(){}
     })(function() {
         [Import("aura-impl/src/main/resources/aura/controller/Action.js")]
+        [Import("aura-impl/src/main/resources/aura/AuraError.js")]
     });
 
     var targetNextActionId = 123;
@@ -620,6 +623,7 @@ Test.Aura.Controller.ActionTest = function() {
                 assert : function(param) {
                     actual = param;
                 },
+                auraError:Aura.Errors.AuraError,
                 lockerService : {
                     wrapComponent: function(component) {
                         return component;
@@ -670,37 +674,41 @@ Test.Aura.Controller.ActionTest = function() {
             var expected = "Action failed: " + expectedQualifiedName + " -> " + expectedName;
             var reportErrorCalled = false;
 
-            var mockAura = Mocks.GetMock(Object.Global(), "$A", {
-                getContext: function() {
-                    return Test.Stubs.Aura.GetContext();
-                },
-                assert : function(param) {
-                },
-                warning : function(msg) {
-                    actual = msg;
-                },
-                get : function(actDesc) {
-                    return {
-                        setStorable : function() {
-                        },
-                        setAbortable : function() {
-                        },
-                        setParams : function() {
-                        },
-                        setCallback : function() {
+            var mockAura = Mocks.GetMocks(Object.Global(), {
+                "$A": {
+                    getContext: function () {
+                        return Test.Stubs.Aura.GetContext();
+                    },
+                    assert: function (param) {
+                    },
+                    auraError: Aura.Errors.AuraError,
+                    warning: function (msg) {
+                        actual = msg;
+                    },
+                    get: function (actDesc) {
+                        return {
+                            setStorable: function () {
+                            },
+                            setAbortable: function () {
+                            },
+                            setParams: function () {
+                            },
+                            setCallback: function () {
+                            }
+                        };
+                    },
+                    clientService: {
+                        inAuraLoop: function () {
+                            return false;
                         }
-                    };
-                },
-                clientService : {
-                    inAuraLoop : function() {
-                        return false;
+                    },
+                    logger: {
+                        reportError: function () {
+                            reportErrorCalled = true;
+                        }
                     }
                 },
-                logger : {
-                    reportError : function() {
-                        reportErrorCalled = true;
-                    }
-                }
+                window:Object.Global()
             });
             var cmp = {
                 getDef : function() {
@@ -797,28 +805,39 @@ Test.Aura.Controller.ActionTest = function() {
         function SetsStateToErrorOnException() {
             // Arrange
             var expectedState = "ERROR";
-            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                getContext: function() {
-                    return Test.Stubs.Aura.GetContext();
-                },
-                assert : function(param) {},
-                warning : function() {},
-                get : function(actDesc) {
-                    return {
-                        setStorable : function() {},
-                        setAbortable : function() {},
-                        setParams : function() {},
-                        setCallback : function() {}
-                    };
-                },
-                clientService : {
-                    inAuraLoop : function() {
-                        return false;
+            var mockAssert = Mocks.GetMocks(Object.Global(), {
+                "$A": {
+                    getContext: function () {
+                        return Test.Stubs.Aura.GetContext();
+                    },
+                    assert: function (param) {
+                    },
+                    auraError:Aura.Errors.AuraError,
+                    warning: function () {
+                    },
+                    get: function (actDesc) {
+                        return {
+                            setStorable: function () {
+                            },
+                            setAbortable: function () {
+                            },
+                            setParams: function () {
+                            },
+                            setCallback: function () {
+                            }
+                        };
+                    },
+                    clientService: {
+                        inAuraLoop: function () {
+                            return false;
+                        }
+                    },
+                    logger: {
+                        reportError: function () {
+                        }
                     }
                 },
-                logger : {
-                    reportError : function() {}
-                }
+                window: Object.Global()
             });
             var target = newAction();
             target.cmp = Test.Stubs.Aura.GetComponent();
@@ -851,25 +870,29 @@ Test.Aura.Controller.ActionTest = function() {
             // We also use this test to check that reportFailure failures are NOT re-sent
             var sentToServer = 0;
 
-            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                getContext: function() {
-                    return Test.Stubs.Aura.GetContext();
-                },
-                assert : function(param) {},
-                warning : function() {},
-                get : function(actDesc) {
-                    return Test.Stubs.Aura.GetAction();
-                },
-                clientService : {
-                    inAuraLoop : function() {
-                        return false;
+            var mockAssert = Mocks.GetMocks(Object.Global(), {
+                "$A":{
+                    getContext: function() {
+                        return Test.Stubs.Aura.GetContext();
+                    },
+                    assert : function(param) {},
+                    auraError:Aura.Errors.AuraError,
+                    warning : function() {},
+                    get : function(actDesc) {
+                        return Test.Stubs.Aura.GetAction();
+                    },
+                    clientService : {
+                        inAuraLoop : function() {
+                            return false;
+                        }
+                    },
+                    logger : {
+                        reportError : function() {
+                            sentToServer++;
+                        }
                     }
                 },
-                logger : {
-                    reportError : function() {
-                        sentToServer++;
-                    }
-                }
+                window:Object.Global()
             });
             var target = newAction();
             target.cmp = Test.Stubs.Aura.GetComponent();

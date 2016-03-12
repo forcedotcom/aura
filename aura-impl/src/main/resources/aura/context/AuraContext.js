@@ -376,14 +376,14 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     var i, defs;
 
     if (otherContext["mode"] !== this.getMode()) {
-        throw new Error("[Mode mismatch] Expected '" + this.getMode() + "' instead tried to merge mode '" + otherContext["mode"] + "'");
+        throw new $A.auraError("[Mode mismatch] Expected '" + this.getMode() + "' instead tried to merge mode '" + otherContext["mode"] + "'", null, $A.severity.QUIET);
     }
 
     if ($A.util.isUndefinedOrNull(this.fwuid)) {
         this.fwuid = otherContext["fwuid"];
     }
     if (otherContext["fwuid"] !== this.fwuid) {
-        throw new Error("framework mismatch");
+        throw new $A.auraError("framework mismatch", null, $A.severity.QUIET);
     }
     this.globalValueProviders.merge(otherContext["globalValueProviders"]);
     $A.localizationService.init();
@@ -598,7 +598,7 @@ Aura.Context.AuraContext.prototype.internalClear = function(actionId, logit) {
         this.componentConfigs = {};
     } else if (logit) {
         $A.log("leftover configs ", ccs);
-        throw new $A.auraError("leftover configs");
+        throw new $A.auraError("leftover configs", null, $A.severity.QUIET);
     }
     return removed;
 };

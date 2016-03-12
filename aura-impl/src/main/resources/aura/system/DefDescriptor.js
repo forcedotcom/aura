@@ -40,7 +40,7 @@ DefDescriptor.normalize=function(descriptor){
         descriptor=descriptor[DefDescriptor.DESCRIPTOR];
     }
     if(!descriptor){
-        throw new Error("DefDescriptor.normalize(): 'descriptor' must be a valid config Object or String.");
+        throw new $A.auraError("DefDescriptor.normalize(): 'descriptor' must be a valid config Object or String.", null, $A.severity.QUIET);
     }
     if((descriptor+'').indexOf("://")<0){
         descriptor="markup://"+descriptor;

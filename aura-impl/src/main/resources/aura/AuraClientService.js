@@ -43,7 +43,7 @@ Aura.Services.AuraClientService$AuraXHR.prototype.reset = function() {
 Aura.Services.AuraClientService$AuraXHR.prototype.addAction = function(action) {
     if (action) {
         if (this.actions[""+action.getId()]) {
-            throw new $A.auraError("Adding duplicate action");
+            throw new $A.auraError("Adding duplicate action", null, $A.severity.QUIET);
         }
         this.actions[""+action.getId()] = action;
     }
@@ -448,7 +448,7 @@ AuraClientService.prototype.throwExceptionEvent = function(resp) {
         try {
             $A.util.json.decodeString(resp["defaultHandler"])(values);
         } catch (e) {
-            throw new $A.auraError("Error in defaultHandler for event: " + descriptor, e);
+            throw new $A.auraError("Error in defaultHandler for event: " + descriptor, e, $A.severity.QUIET);
         }
     }
 };
@@ -989,7 +989,7 @@ AuraClientService.prototype.init = function(config, token, container) {
         // not on in dev modes to preserve stacktrace in debug tools
         //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     } catch (e) {
-        throw new $A.auraError("Error during init", e);
+        throw new $A.auraError("Error during init", e, $A.severity.QUIET);
     }
     //#end
 };
@@ -1313,7 +1313,7 @@ AuraClientService.prototype.postProcess = function() {
         try {
             this.process();
         } catch (e) {
-            throw (e instanceof $A.auraError) ? e : new $A.auraError("AuraClientService.popStack: error in processing", e);
+            throw (e instanceof $A.auraError) ? e : new $A.auraError("AuraClientService.postProcess: error in processing", e);
         }
         this.auraStack.pop();
     }
@@ -1980,7 +1980,7 @@ AuraClientService.prototype.createXHR = function() {
             return new ActiveXObject("Microsoft.XMLHTTP");
         }
     } else {
-        throw new Error("AuraClientService.createXHR: Unable to find an appropriate XHR");
+        throw new $A.auraError("AuraClientService.createXHR: Unable to find an appropriate XHR");
     }
 };
 

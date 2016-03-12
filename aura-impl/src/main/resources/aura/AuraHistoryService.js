@@ -293,7 +293,7 @@ AuraHistoryService.prototype.changeHandler = function(){
     var event = $A.eventService.newEvent(this.getEvent());
 
     if(!event) {
-        throw new Error("The event specified on the app for the locationChange (" + this.getEvent() + ") was not found.");
+        throw new $A.auraError("The event specified on the app for the locationChange (" + this.getEvent() + ") was not found.", null, $A.severity.QUIET);
     }
 
     if (loc) {

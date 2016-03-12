@@ -226,11 +226,11 @@ function AuraInstance () {
      *
      * @public
      */
-    this.severity = Object.freeze({
-        "ALERT": "ALERT",
-        "FATAL": "FATAL",
-        "QUIET": "QUIET"
-    });
+    this.severity = {
+        ALERT: "ALERT",
+        FATAL: "FATAL",
+        QUIET: "QUIET"
+    };
 
     /**
      * Instance of the AuraLocalizationService which provides utility methods for localizing data or getting formatters for numbers, currencies, dates, etc.<br/>
@@ -510,6 +510,13 @@ function AuraInstance () {
     this["auraError"] = this.auraError;
     this["auraFriendlyError"] = this.auraFriendlyError;
     this["severity"] = this.severity;
+    this["severity"]["ALERT"] = this.severity.ALERT;
+    this["severity"]["FATAL"] = this.severity.FATAL;
+    this["severity"]["QUIET"] = this.severity.QUIET;
+
+    // work around closure compiler
+    this["severity"] = Object.freeze(this["severity"]);
+
     this["hasDefinition"] = this.hasDefinition;
     this["getDefinition"] = this.getDefinition;
     this["getDefinitions"] = this.getDefinitions;
@@ -591,7 +598,7 @@ AuraInstance.prototype.initAsync = function(config) {
         // Context is created async because of the GVPs go though async storage checks
         $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
             if (!window["$$safe-eval$$"] && !regexpDetectURLProcotolSegment.test(config["host"])) {
-                throw new $A.auraError("Aura(): Failed to initialize locker worker.");
+                throw new $A.auraError("Aura(): Failed to initialize locker worker.", null, $A.severity.QUIET);
             }
             $A.context = context;
             $A.clientService.initHost(config["host"]);
@@ -611,7 +618,7 @@ AuraInstance.prototype.initAsync = function(config) {
         var el = document.getElementById("safeEvalWorker");
         if (!el) {
             if (!config["safeEvalWorker"]) {
-                throw new $A.auraError("Aura(): Missing 'safeEvalWorker' configuration.");
+                throw new $A.auraError("Aura(): Missing 'safeEvalWorker' configuration.", null, $A.severity.QUIET);
             }
             el = document.createElement("iframe");
             el.setAttribute("src", config["safeEvalWorker"]);
@@ -626,7 +633,7 @@ AuraInstance.prototype.initAsync = function(config) {
         }
         $A.util.on(el, "load", createAuraContext);
         $A.util.on(el, "error", function () {
-            throw new $A.auraError("Aura(): Failed to load locker worker.");
+            throw new $A.auraError("Aura(): Failed to load locker worker.", null, $A.severity.QUIET);
         });
     } else {
         // provision for an alternative safe evaluation. This will open the door to do some
@@ -805,7 +812,7 @@ AuraInstance.prototype.handleError = function(message, e) {
         }
 
         if (e["name"] === "AuraFriendlyError") {
-            e.severity = e.severity || this.severity["QUIET"];
+            e.severity = e.severity || this.severity.QUIET;
             evtArgs = {"message":e["message"],"error":e["name"],"auraError":e};
         }
         else {
@@ -928,7 +935,7 @@ AuraInstance.prototype.getToken = function(token){
         if(tokens.hasOwnProperty(token)){
             return tokens[token];
         }
-        throw new Error("Unknown token: '"+token+"'. Are you missing a tokens file or declaration?");
+        throw new $A.auraError("Unknown token: '"+token+"'. Are you missing a tokens file or declaration?");
     }
 };
 
@@ -1023,7 +1030,7 @@ AuraInstance.prototype.installOverride = function(name, fn, scope, priority) {
     }
     var override = Aura.OverrideMap$Instance.map[name];
     if (!override) {
-        throw new Error("$A.installOverride: Invalid name: "+name);
+        throw new $A.auraError("$A.installOverride: Invalid name: "+name, null, $A.severity.QUIET);
     }
     $A.assert(fn && $A.util.isFunction(fn), "Function must be a defined function");
     override.install(fn, scope, priority);
@@ -1040,7 +1047,7 @@ AuraInstance.prototype.uninstallOverride = function(name, fn) {
     }
     var override = Aura.OverrideMap$Instance.map[name];
     if (!override) {
-        throw new Error("$A.uninstallOverride: Invalid name: "+name);
+        throw new $A.auraError("$A.uninstallOverride: Invalid name: "+name, null, $A.severity.QUIET);
     }
     override.uninstall(fn);
 };

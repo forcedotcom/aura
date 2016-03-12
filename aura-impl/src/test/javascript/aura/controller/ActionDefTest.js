@@ -390,8 +390,11 @@ Test.Aura.Controller.ActionDefTest = function() {
 								}
 							}
 						},
-						auraError : function(message, err) {
+						auraError : function(message, err, severity) {
 							actual = message;
+						},
+						severity : {
+							"QUIET" : "QUIET"
 						}
 					});
 
@@ -427,8 +430,11 @@ Test.Aura.Controller.ActionDefTest = function() {
 								}
 							}
 						},
-						auraError : function(message, err) {
+						auraError : function(message, err, severity) {
 							actual = err;
+						},
+						severity : {
+							QUIET : "QUIET"
 						}
 					});
 

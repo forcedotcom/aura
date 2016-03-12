@@ -53,7 +53,7 @@ function ActionDef(config) {
         try {
             this.meth = $A.util.json.decodeString(config["code"]);
         } catch (e) {
-            throw new $A.auraError(config["code"], e);
+            throw new $A.auraError(config["code"], e, $A.severity.QUIET);
         }
     }
 }

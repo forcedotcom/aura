@@ -23,6 +23,16 @@ if (typeof Aura !== 'undefined') {//eslint-disable-line no-use-before-define
 var Aura = {};
 window["Aura"] = Aura;
 
+// -- Aura inlinning bootstrap
+Aura.time = window.performance && window.performance.now ? window.performance.now.bind(performance) : Date.now.bind(Date);
+Aura.bootstrap = {};
+Aura.bootstrapMark = function (mark, value) {
+    this.bootstrap[mark] = value || this.time();
+};
+
+Aura.bootstrapMark('frameworkInit');
+
+
 // -- Namespaces ------------------------------------------------------------
 Aura.Utils      = {};
 Aura.Errors     = {};
@@ -573,6 +583,8 @@ AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; 
  * @public
  */
 AuraInstance.prototype.initAsync = function(config) {
+    Aura.bootstrapMark("initAsync");
+
     var regexpDetectURLProcotolSegment = /^(.*?:)?\/\//;
 
     function createAuraContext() {
@@ -671,11 +683,11 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
  * @private
  */
 AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
-    $A.metricsService.bootstrapMark("metadataReady"); // we have loaded the app tree from the server
-
     if (!$A["hasErrors"]) {
+        Aura.bootstrapMark("createAndRenderAppInit");
         var app = $A.clientService["init"](config, token, $A.util.getElement(container));
         $A.setRoot(app);
+        Aura.bootstrapMark("createAndRenderAppReady");
 
         if (!$A.initialized) {
             $A.initialized = true;
@@ -1342,7 +1354,7 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
      * @borrows AuraInstance#util as util
      */
     window['$A'] = new AuraInstance();
-    $A.metricsService.bootstrapMark("frameworkReady");
+    Aura.bootstrapMark("frameworkReady");
 
 })();
 
@@ -1358,7 +1370,6 @@ window['aura'] = window['$A'];
 // #include aura.metrics.plugins.TransportMetricsPlugin
 // #include aura.metrics.plugins.PerfMetricsPlugin
 // #include aura.metrics.plugins.QueuedActionsMetricsPlugin
-// #include aura.metrics.plugins.ClientServiceMetricsPlugin
 // #include aura.metrics.plugins.AuraContextPlugin
 // #include aura.metrics.plugins.DomHandlersPlugin
 

@@ -64,8 +64,10 @@ QueuedActionsMetricsPlugin.prototype.enqueueActionOverride = function() {
         "background" : action.isBackground(),
         "state"      : action.getState(),
         "isRefresh"  : action.isRefreshAction(),
-        "defName"    : action.getDef().name
+        "def"        : action.getDef().toString()
     });
+
+    //console.log('>>> ActionEnqueue :: %s [%s]', action.getId(), action.getDef()+'');
 
     var ret = config["fn"].apply(config["scope"], arguments);
     return ret;
@@ -80,6 +82,7 @@ QueuedActionsMetricsPlugin.prototype.actionSendOverride = function() {
             "id" : actions[i].getId()
         });
     }
+    //console.log('>>> ActionSend :: [%s]', actions.map(function (a) {return a.getId(); }).join(','));
 
     return config["fn"].apply(config["scope"], arguments);
 };
@@ -89,15 +92,8 @@ QueuedActionsMetricsPlugin.prototype.actionFinishOverride = function() {
     this.metricsService["markEnd"](QueuedActionsMetricsPlugin.NAME, 'send', {
         "id" : config["self"].getId()
     });
-
-    return config["fn"].apply(config["scope"], arguments);
-};
-
-QueuedActionsMetricsPlugin.prototype.actionAbortOverride = function() {
-    var config = Array.prototype.shift.apply(arguments);
-    this.metricsService["markEnd"](QueuedActionsMetricsPlugin.NAME, 'send', {
-        "id" : config["self"].getId()
-    });
+    
+    //console.log('>>> ActionFinish :: ', config["self"].getId());
 
     return config["fn"].apply(config["scope"], arguments);
 };
@@ -112,7 +108,7 @@ QueuedActionsMetricsPlugin.prototype.markStart = function(action) {
         "background" : action.isBackground(),
         "state"      : action.getState(),
         "isRefresh"  : action.isRefreshAction(),
-        "defName"    : action.getDef().name
+        "def"        : action.getDef().toString()
     };
 };
 
@@ -129,18 +125,18 @@ QueuedActionsMetricsPlugin.prototype.bind = function () {
     // Time of $A.enqueue
     $A.installOverride("enqueueAction", this.enqueueActionOverride, this);
 
-    // Time when the action is sent or aborted
+    // Time when the action is sent
     $A.installOverride("ClientService.send", this.actionSendOverride, this);
-    $A.installOverride("Action.abort", this.actionAbortOverride, this);
 
     // Time when the action is done
     $A.installOverride("Action.finishAction", this.actionFinishOverride, this);
 };
 
 /** @export */
-QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks) {
+QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks, trxConfig) {
     var processedMarks = [];
     var queue  = {};
+    var scopeActionId = trxConfig["scopeAction"] && trxConfig["scopeAction"].getId();
 
     // This loop is to assemble the action time
     for (var i = 0; i < actionMarks.length; i++) {
@@ -149,20 +145,19 @@ QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks) {
         var phase = actionMark["phase"];
         var mark = queue[id];
 
-        if (phase === 'stamp') {
-            queue[id] = $A.util.apply({}, actionMark, true, true);
-        } else if (phase === 'start') {
-            if (mark) {
+        if (!scopeActionId || scopeActionId === id) {
+            if (phase === 'stamp') {
+                queue[id] = $A.util.apply({}, actionMark, true, true);
+
+            } else if (phase === 'start' && mark) {
                 mark["enqueueWait"] = actionMark["ts"] - mark["ts"];
-            } else {
-                // @TODO: @dval: We hit this sometimes, figure out when and why in PROD
-                queue[id] = $A.util.apply({ "wait" : 0 }, actionMark, true, true);
+
+            } else if (phase === 'end' && mark) {
+                mark["context"]["state"] = actionMark["context"]["state"];
+                mark["duration"] = Math.round((actionMark["ts"] - mark["ts"]) * 100) / 100;
+                processedMarks.push(mark);
+                delete queue[id];
             }
-        } else if (phase === 'end' && mark) {
-            mark["context"]["state"] = actionMark["context"]["state"];
-            mark["duration"] = Math.round((actionMark["ts"] - mark["ts"]) * 100) / 100;
-            processedMarks.push(mark);
-            delete queue[id];
         }
     }
 
@@ -172,7 +167,6 @@ QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks) {
 QueuedActionsMetricsPlugin.prototype.unbind = function () {
     $A.uninstallOverride("enqueueAction", this.enqueueActionOverride);
     $A.uninstallOverride("ClientService.send", this.actionSendOverride, this);
-    $A.uninstallOverride("Action.abort", this.actionAbortOverride);
     $A.uninstallOverride("Action.finishAction", this.actionFinishOverride);
 };
 

@@ -1026,6 +1026,7 @@ AuraClientService.prototype.areActionsWaiting = function() {
  */
 
 AuraClientService.prototype.initDefs = function(config) {
+    Aura.bootstrapMark("metadataInit");
     var i;
 
     var evtConfigs = $A.util.json.resolveRefsArray(config["eventDefs"]);
@@ -1053,6 +1054,7 @@ AuraClientService.prototype.initDefs = function(config) {
         this.namespaces[namespaces[i]] = true;
     }
 
+    Aura.bootstrapMark("metadataReady");
     // Let any interested parties know that defs have been initialized
     for ( var n = 0, olen = this.initDefsObservers.length; n < olen; n++) {
         this.initDefsObservers[n]();
@@ -1120,6 +1122,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
     );
 
     this.runAfterInitDefs(function () {
+        Aura.bootstrapMark("loadApplicationInit");
         $A.run(function () {
             var desc   = new DefDescriptor(descriptor);
             var tag    = desc.getNamespace() + ":" + desc.getName();
@@ -1176,6 +1179,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             //
             action.setCallback(acs,
                 function (a) {
+                    Aura.bootstrapMark("loadApplicationReady");
                     if (storage && a.isFromStorage()) {
                         stored = true;
                         if (!loaded) {
@@ -1668,7 +1672,7 @@ AuraClientService.prototype.sendAsSingle = function(actions, count) {
             sent += 1;
             auraXHR = this.getAvailableXHR(true);
             if (auraXHR) {
-                if (!this.send(auraXHR, [ action ], "POST")) {
+                if (!this.send(auraXHR, [ action ], "POST", { background: true })) {
                     this.releaseXHR(auraXHR);
                 }
             }

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.util.AuraTextUtil;
@@ -46,6 +47,8 @@ import com.google.common.collect.Lists;
  */
 
 public class AuraUITestingUtil {
+    private static final Logger LOG = Logger.getLogger("AuraUITestingUtil");
+
     private final WebDriver driver;
     private int timeoutInSecs;
     private int rerunCount = 0;
@@ -715,19 +718,26 @@ public class AuraUITestingUtil {
     }
 
     public void waitForAppCacheReady() {
+        final long start = System.currentTimeMillis();
+        LOG.info("---->AuraUITestingUtil.waitForAppCacheReady starting");
         waitUntilWithCallback(
                 new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
-                        return getBooleanEval("var cache=window.applicationCache;"
+                        boolean res = getBooleanEval("var cache=window.applicationCache;"
                                 + "return $A.util.isUndefinedOrNull(cache) || (cache.status===cache.UNCACHED)"
                                 + "||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
+                        if (res) {
+                            LOG.info("---->AuraUITestingUtil.waitForAppCacheReady finished " + (System.currentTimeMillis() - start));
+                        }
+                        return res;
                     }
                 },
                 new ExpectedCondition<String>() {
                     @Override
                     public String apply(WebDriver d) {
                         Object ret = getRawEval("return window.applicationCache.status");
+                        LOG.info("---->AuraUITestingUtil.waitForAppCacheReady timed_out " + (System.currentTimeMillis() - start));
                         return "Current AppCache status is " + appCacheStatusIntToString(((Long) ret).intValue());
                     }
                 },
@@ -739,11 +749,18 @@ public class AuraUITestingUtil {
      * @param timeoutSecs number of seconds to wait for test to finish
      */
     public void waitForAuraTestComplete(int timeoutSecs) {
+        final long start = System.currentTimeMillis();
+        LOG.info("---->AuraUITestingUtil.waitForAuraTestComplete starting");
         waitUntilWithCallback(
                 new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
-                        return getBooleanEval("return (window.$A && window.$A.test && window.$A.test.isComplete()) || false;");
+                        boolean res = getBooleanEval("return (window.$A && window.$A.test && window.$A.test.isComplete()) || false;");
+                        if (res) {
+                            LOG.info("---->AuraUITestingUtil.waitForAuraTestComplete finished "
+                                    + (System.currentTimeMillis() - start));
+                        }
+                        return res;
                     }
                 },
                 new ExpectedCondition<String>() {
@@ -753,6 +770,8 @@ public class AuraUITestingUtil {
                         if (dump.isEmpty()) {
                             dump = "no extra test information to display.";
                         }
+                        LOG.info("---->AuraUITestingUtil.waitForAuraTestComplete timed_out "
+                                + (System.currentTimeMillis() - start));
                         return "Test timed out on server.\n" + dump;
                     }
                 },
@@ -782,26 +801,43 @@ public class AuraUITestingUtil {
      * Wait until Aura has finished initialization or encountered an error.
      */
     public void waitForAuraInit(final Set<String> expectedErrors) {
-        waitForDocumentReady();
-        waitForAuraFrameworkReady(expectedErrors);
-        waitForAppCacheReady();
+        final long start = System.currentTimeMillis();
+        LOG.info("---->AuraUITestingUtil.waitForAuraInit starting");
+        try {
+            waitForDocumentReady();
+            waitForAuraFrameworkReady(expectedErrors);
+            waitForAppCacheReady();
+            LOG.info("---->AuraUITestingUtil.waitForAuraInit finished " + (System.currentTimeMillis() - start));
+        } catch (Throwable t) {
+            LOG.info("---->AuraUITestingUtil.waitForAuraInit failed " + (System.currentTimeMillis() - start));
+            throw t;
+        }
     }
 
     /**
      * Wait for the document to enter the complete readyState.
      */
     public void waitForDocumentReady() {
+        final long start = System.currentTimeMillis();
+        LOG.info("---->AuraUITestingUtil.waitForDocumentReady starting");
         waitUntilWithCallback(
                 new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
-                        return getBooleanEval("return document.readyState === 'complete'");
+                        boolean res = getBooleanEval("return document.readyState === 'complete'");
+                        if (res) {
+                            LOG.info("---->AuraUITestingUtil.waitForDocumentReady finished "
+                                    + (System.currentTimeMillis() - start));
+                        }
+                        return res;
                     }
                 },
                 new ExpectedCondition<String>() {
                     @Override
                     public String apply(WebDriver d) {
                         String ret = (String) getRawEval("return document.readyState");
+                        LOG.info("---->AuraUITestingUtil.waitForDocumentReady timed_out "
+                                + (System.currentTimeMillis() - start));
                         return "Current document.readyState is <" + ret + ">";
                     }
                 },
@@ -815,6 +851,8 @@ public class AuraUITestingUtil {
      * {@link #waitForDocumentReady()}.
      */
     public void waitForAuraFrameworkReady(final Set<String> expectedErrors) {
+        final long start = System.currentTimeMillis();
+        LOG.info("---->AuraUITestingUtil.waitForAuraFrameworkReady starting");
         String doNotAssign = "\nThis message means, you aren't even on Aura application at this point. " +
                 "Please do not assign this test failure to Aura team/s unless, Aura team/s is the owner of this test. ";
         WebDriverWait waitAuraPresent = new WebDriverWait(driver, timeoutInSecs);
@@ -823,7 +861,12 @@ public class AuraUITestingUtil {
                         new Function<WebDriver, Boolean>() {
                             @Override
                             public Boolean apply(WebDriver input) {
-                                return (Boolean) getRawEval("return !!window.$A");
+                                Boolean res = (Boolean) getRawEval("return !!window.$A");
+                                if (res) {
+                                    LOG.info("---->AuraUITestingUtil.waitForAuraFrameworkReady framework_loaded "
+                                            + (System.currentTimeMillis() - start));
+                                }
+                                return res;
                             }
                         });
 
@@ -835,7 +878,12 @@ public class AuraUITestingUtil {
                             @Override
                             public Boolean apply(WebDriver input) {
                                 assertNoAuraErrorMessage(expectedErrors);
-                                return isAuraFrameworkReady();
+                                boolean res = isAuraFrameworkReady();
+                                if (res) {
+                                    LOG.info("---->AuraUITestingUtil.waitForAuraFrameworkReady finished "
+                                            + (System.currentTimeMillis() - start));
+                                }
+                                return res;
                             }
                         });
     }

@@ -41,7 +41,7 @@
         }
     },
 
-   testGetMaxSize:{
+   testGetMaxSize: {
         test:function(cmp){
             cmp._storageLib.testGetMaxSize(this.storage, 32);
         }
@@ -131,6 +131,18 @@
         }
     },
 
+    testGetFunctionValue: {
+        test: function(cmp) {
+            cmp._storageLib.testGetFunctionValue(cmp, this.storage);
+        }
+    },
+
+    testGetErrorValue: {
+        test: function(cmp) {
+            cmp._storageLib.testGetErrorValue(cmp, this.storage);
+        }
+    },
+
     testSetItemUnderMaxSize : {
         test : [function(cmp) {
             cmp._storageLib.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
@@ -146,27 +158,13 @@
         }]
     },
 
-    testJsonErrorRejectsPut:{
+    testCyclicObjectFails: {
         test: function (cmp) {
-            var completed = false;
-            var stuff = { "a": 2 };
-            stuff["b"] = stuff;
-
-            this.storage.put("testTwistedObject", stuff)
-                .then(function() { return storage.get("testTwistedObject"); })
-                .then(function() {
-                    var fail = "Expecting JSON stringify error. JSON should NOT be able to encode circular references";
-                    $A.test.fail(fail);
-                }, function(e) {
-                    cmp._storageLib.appendLine(cmp, e.message);
-                    completed = true;
-                });
-
-            $A.test.addWaitFor(true, function() { return completed; });
+            cmp._storageLib.testCyclicObjectFails(cmp, this.storage);
         }
     },
 
-    testModifyObject:{
+    testModifyObject: {
         test:function(cmp){
             cmp._storageLib.testModifyObject(cmp, this.storage);
         }
@@ -222,7 +220,7 @@
         }
     },
 
-    testClear:{
+    testClear: {
         test:[function(cmp){
             cmp._storageLib.testClear_stage1(cmp, this.storage);
         },

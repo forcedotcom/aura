@@ -2170,9 +2170,10 @@ Aura.Utils.Util.prototype.supportsTouchEvents = function() {
 };
 
 /**
- * Estimate the amount of space that will be utilized by an object or primitive.
+ * Estimate the size of an object or primitive in bytes.
  *
  * @param {Object} item The object or primitive whose size to estimate.
+ * @return {Number} The estimated size of the item in bytes.
  * @export
  */
 Aura.Utils.Util.prototype.estimateSize = function(obj) {

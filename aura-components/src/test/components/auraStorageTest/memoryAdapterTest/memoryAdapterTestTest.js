@@ -26,7 +26,7 @@
         // must match AuraStorage.KEY_DELIMITER
         cmp.DELIMITER = ":";
 
-        $A.installOverride("StorageService.selectAdapter", function(){ return "memory" }, this); 
+        $A.installOverride("StorageService.selectAdapter", function(){ return "memory" }, this);
 
         this.storage = $A.storageService.initStorage(
                     "memory-store",
@@ -413,6 +413,12 @@
         }
     },
 
+    testGetErrorValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetErrorValue(cmp, this.storage);
+        }
+    },
+
     testCacheMiss: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
@@ -456,15 +462,13 @@
         }
     },
 
-    testTwistedObject:{
+    testCyclicObjectFails: {
         test: function(cmp){
-            cmp.helper.lib.storageTest.testTwistedObject(cmp, this.storage);
+            cmp.helper.lib.storageTest.testCyclicObjectFails(cmp, this.storage);
         }
     },
 
-    // TODO(tbliss): This fails because we just stick the javascript object in memory so changing it in the test
-    //               changes the reference in storage.
-    _testModifyObject:{
+    testModifyObject: {
         test:function(cmp){
             cmp.helper.lib.storageTest.testModifyObject(cmp, this.storage);
         }
@@ -488,7 +492,7 @@
         }
     },
 
-    testClear:{
+    testClear: {
         test:[function(cmp){
             cmp.helper.lib.storageTest.testClear_stage1(cmp, this.storage);
         },

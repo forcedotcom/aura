@@ -73,7 +73,7 @@ var AuraStorage = function AuraStorage(config) {
     //#end
 
 
-    // clear on init is special: it should complete before any subsequent operation
+    // clear on init is special: it must complete before any subsequent operation
     // is executed.
     if (clearStorageOnInit === true) {
         this.log("clearing " + this.getName() + " storage on init");
@@ -173,7 +173,8 @@ AuraStorage.prototype.getAll = function() {
                 var key = item["key"].replace(that.keyPrefix, "");
                 results.push({ "key": key, "value": item["value"], "isExpired": (now > item["expires"]) });
             }
-            // else: wrong isolationKey/version so ignore the entry
+            // wrong isolationKey/version so ignore the entry
+            // TODO - capture entries to be removed async
         }
 
         that.log("getAll() - found " + results.length + " items");
@@ -234,7 +235,7 @@ AuraStorage.prototype.remove = function(key, doNotFireModified) {
     var that = this;
     return this.adapter.removeItem(this.keyPrefix + key)
         .then(function(){
-            that.log("remove() - key: " + key);
+            that.log("remove(): key " + key);
             if (!doNotFireModified) {
                 $A.storageService.fireModified();
             }

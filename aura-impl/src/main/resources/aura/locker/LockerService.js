@@ -34,7 +34,7 @@ function LockerService() {
 	// TODO: grow this list...
 	var whitelist = [
 			'undefined', 'NaN', 'Date', 'Number', 'Boolean', 'alert', 'confirm',
-			'Intl', 'Error', 'console',
+			'Intl', 'Error', 'console', 'Object',
 			'clearTimeout', 'clearInterval'
 		];
 

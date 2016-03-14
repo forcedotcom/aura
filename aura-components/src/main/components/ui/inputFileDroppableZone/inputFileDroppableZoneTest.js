@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
+
+({ /* eslint-disable */
     JPG_FILE : {
         name : 'file.jpg',
         type : 'image/jpg'
@@ -38,7 +39,7 @@
     createFileList : function () {
          var index = 0;
          return [].slice.call(arguments).reduce(function (prev, file) {
-            prev[index] = new File([],file.name, { type : file.type }); // eslint-disable-line no-undef
+            prev[index] = new File([],file.name, { type : file.type });
             index++;
             return prev;
          },{});
@@ -95,5 +96,5 @@
             }
         ]
     }
-
-});
+})
+/* eslint-enable */

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
+({ /* eslint-disable */
     testObjectToStringMethod : {
         test : [
             function (cmp) {
@@ -79,4 +79,5 @@
             }
         ]
     }
-});
+})
+/* eslint-enable */

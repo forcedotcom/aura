@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS > .hidden-input-file {
-    position: absolute;
-    width: 1px;
-    height: 1px;
+
+.THIS.droppable-zone {
+    padding: 15px;
+    border: 2px dashed #ccc;
 }
 
-
+.THIS.droppable-zone.drag-over {
+    border-color: green;
+}
 

@@ -1,0 +1,5 @@
+<aura:component>
+    <aura:import library="ui:contentTypeLibrary" property="lib" />
+    <aura:attribute name="accept" type="String" />
+    Testing contentTypeLibrary !
+</aura:component>

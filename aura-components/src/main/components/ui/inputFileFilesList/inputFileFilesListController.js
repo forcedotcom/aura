@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS > .hidden-input-file {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-}
-
-
-
+({
+    mapFilesToArray : function (cmp) {
+        var files = cmp.get('v.files');
+        var mappedFiles = Object.keys(files).map(function (index) {
+            return files[index];
+        });
+        cmp.set('v.filesArr', mappedFiles);
+    }
+});

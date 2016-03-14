@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS > .hidden-input-file {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-}
-
-
-
+({
+    updateInputFile : function (cmp, files) {
+        cmp.getElement('input.hidden-input-file').files = files;
+    },
+    updateFilesAttr : function (cmp, files) {
+        cmp.set('v.files', files);
+    }
+});

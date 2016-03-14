@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS > .hidden-input-file {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-}
-
-
-
+({
+    init : function (cmp, event, helper) {
+        helper.createHTMLElement(cmp);
+    },
+    handleOpenClick : function (cmp) {
+        cmp.get('v.inputFileHtmlElement').click();
+    }
+});

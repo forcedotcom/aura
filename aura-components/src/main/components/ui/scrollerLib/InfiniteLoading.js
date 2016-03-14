@@ -110,9 +110,8 @@ function lib(w) { //eslint-disable-line no-unused-vars
         _triggerInfiniteLoadingDataProvider: function () {
             var self            = this,
                 ilDataProvider  = this.opts.infiniteLoadingConfig.dataProvider,
-                callback        = function() {
+                callback        = function() {                    
                     self._infiniteLoadingTriggerCallback.apply(self, arguments);
-                    Logger.log('InfiniteLoading callback called');
                 };
 
             if (ilDataProvider) {
@@ -149,9 +148,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             }
 
             this._setState(false/*loading*/);
-            w.requestAnimationFrame(function() {
-                this._ilFetchingData = false;
-            }.bind(this));
+            this._ilFetchingData = false;
         },
         // This check is done when surfaceManager is enabled
         _checkItemsthreshold: function () {

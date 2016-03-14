@@ -268,7 +268,12 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         DefDescriptor<StyleDef> styleDesc = createDef(StyleDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, namespace, cmpName),src_style);
 
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
-        assertRequests(getExpectedInitialRequests(), logs);
+        
+        Request sGif = new Request("/auraFW/resources/qa/images/s.gif", null, 200);
+        List<Request> expectedInitialRequests = Lists.newArrayList(getExpectedInitialRequests());
+		expectedInitialRequests.add(sGif);
+		assertRequests(expectedInitialRequests, logs);
+		
         assertAppCacheStatus(Status.IDLE);
 
         // update a component's css file
@@ -276,13 +281,12 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         updateStringSource(styleDesc, src_style.replace(TOKEN, replacement));
 
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
-        assertRequests(getExpectedChangeRequests(), logs);
+        
+        List<Request> expectedChangeRequests = Lists.newArrayList(getExpectedChangeRequests());
+        expectedChangeRequests.add(sGif);
+		assertRequests(expectedChangeRequests, logs);
+        
         assertAppCacheStatus(Status.IDLE);
-
- /*       logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
-        List<Request> expected = Lists.newArrayList(new Request("/auraResource", "manifest", 200));
-        assertRequests(expected, logs);
-        assertAppCacheStatus(Status.IDLE);*/
     }
 
     /**

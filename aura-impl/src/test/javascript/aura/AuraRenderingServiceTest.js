@@ -101,6 +101,12 @@ Test.Aura.AuraRenderingServiceTest = function(){
                     if (!condition) {
                         throw new Error(message);
                     }
+                },
+                auraError: function(message, error, severity) {
+                    return {message: message};
+                },
+                severity: {
+                    QUIET: "QUIET"
                 }
             })
         };

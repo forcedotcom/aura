@@ -1831,7 +1831,7 @@ Component.prototype.createComponentStack = function(facets, valueProvider){
                 $A.getContext().releaseCurrentAccess();
             } else {
                 // KRIS: HALO: This is hit, when you create a newComponentDeprec and use raw values, vs configs on the attribute values.
-                throw new $A.auraError("Component.createComponentStack: invalid config. Expected component definition, found '"+config+"'.");
+                throw new $A.auraError("Component.createComponentStack: invalid config. Expected component definition, found '"+config+"'.", null, $A.severity.QUIET);
             }
         }
         if (action) {
@@ -2096,7 +2096,7 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
                 + " client expected " + configCD
                 + " but got original " + partialConfigO
                 + " providing " + partialConfigCD + " from server "
-                + " for creationPath = "+this.creationPath);
+                + " for creationPath = "+this.creationPath, null, $A.severity.QUIET);
         }
     } else if (partialConfigCD) {
         if (partialConfigCD !== configCD) {
@@ -2106,7 +2106,7 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
             throw new $A.auraError("Mismatch at " + this.globalId
                 + " client expected " + configCD + " but got "
                 + partialConfigCD + " from server "
-                +" for creationPath = "+this.creationPath);
+                +" for creationPath = "+this.creationPath, null, $A.severity.QUIET);
         }
     }
 };

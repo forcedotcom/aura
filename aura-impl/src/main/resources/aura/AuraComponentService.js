@@ -489,7 +489,7 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
 
     var classConstructor = this.getComponentClass(desc);
     if (!classConstructor) {
-        throw new Error("Component class not found: " + desc);
+        throw new $A.auraError("Component class not found: " + desc, null, $A.severity.QUIET);
     }
     return new classConstructor(config, localCreation);
 };
@@ -593,7 +593,7 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
                 // clear dynamic namespaces so that the server can send it back.
                 $A.componentService.dynamicNamespaces = [];
                 // throw error instead of trying to requestComponent from server which is prohibited
-                throw new Error("Missing definition: " + desc);
+                throw new $A.auraError("Missing definition: " + desc, null, $A.severity.QUIET);
             }
 
             if ( !forceClient && (!def || (def && def.hasRemoteDependencies()) || forceServer )) {
@@ -1351,7 +1351,7 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
     if (def && (!def.hasRemoteDependencies() || forceClientCreation)) {
         var classConstructor = this.getComponentClass(descriptor);
         if (!classConstructor) {
-            throw new Error("Component class not found: " + descriptor);
+            throw new $A.auraError("Component class not found: " + descriptor, null, $A.severity.QUIET);
         }
 
         callback(new classConstructor(config, forceClientCreation), 'SUCCESS');
@@ -1501,7 +1501,7 @@ AuraComponentService.prototype.sortDependencyGraph = function(graph) {
         visited[idstr] = true;
         node["dependencies"].forEach(function(afterId) {
             if (ancestors.indexOf(afterId) >= 0) { // if already in ancestors, a closed chain exists.
-                throw new Error("AuraComponentService.sortDependencyGraph: Found a cycle in the graph: " + afterId + " is in " + id);
+                throw new $A.auraError("AuraComponentService.sortDependencyGraph: Found a cycle in the graph: " + afterId + " is in " + id, null, $A.severity.QUIET);
             }
             visit(afterId.toString(), ancestors.map(function(v) { return v; }));
         });

@@ -6,7 +6,7 @@
 
     // TODO(tbliss): make these lists on SecureElement accessible here for maintainablility
     ElementPropertiesWhitelist: ['childElementCount', 'classList', 'className', 'id', 'tagName'],
-    ElementProperitesBlacklast: ['firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
+    ElementProperitesBlacklast: ['attributes', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
                                  'nextElementSibling', 'previousElementSibling'],
 
     HTMLPropertiesWhitelist: ['accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable',
@@ -24,10 +24,10 @@
             cmp.getDiv();
             var element = cmp.get("v.log");
             this.ElementPropertiesWhitelist.forEach(function(name) {
-                $A.test.assertTrue(name in element);
+                $A.test.assertTrue(name in element, "Expected property '" + name + "' to be a property on SecureElement");
             });
             this.ElementProperitesBlacklast.forEach(function(name) {
-                $A.test.assertFalse(name in element);
+                $A.test.assertFalse(name in element, "Expected property '" + name + "' to not be exposed on SecureElement");
             });
         }
     },
@@ -37,10 +37,10 @@
             cmp.getDiv();
             var element = cmp.get("v.log");
             this.HTMLPropertiesWhitelist.forEach(function(name) {
-                $A.test.assertTrue(name in element);
+                $A.test.assertTrue(name in element, "Expected property '" + name + "' to be a property on SecureElement");
             });
             this.HTMLPropertiesBlacklist.forEach(function(name) {
-                $A.test.assertFalse(name in element);
+                $A.test.assertFalse(name in element, "Expected property '" + name + "' to not be exposed on SecureElement");
             });
         }
     },

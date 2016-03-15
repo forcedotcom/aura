@@ -17,8 +17,12 @@
 -->
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
+    <aura:attribute name="dynamicCmps" type="Object"/>
 
-	<aura:method name="getComponent" action="{!c.getComponent}"/>
+	<aura:method name="getSecureAura" action="{!c.getSecureAura}"/>
+	<aura:method name="getSecureComponent" action="{!c.getSecureComponent}"/>
+	<aura:method name="dynamicallyCreateCmpsDifferentNamespace" action="{!c.dynamicallyCreateCmpsDifferentNamespace}"/>
+	<aura:method name="dynamicallyCreateCmpSameNamespace" action="{!c.dynamicallyCreateCmpSameNamespace}"/>
 
     <div>SecureAura test</div>
 </aura:component>

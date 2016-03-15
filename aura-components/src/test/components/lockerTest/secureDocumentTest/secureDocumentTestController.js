@@ -1,4 +1,8 @@
 ({
+    getDocument: function(cmp) {
+        cmp.set("v.log", document);
+    },
+
     getDocumentFragment: function(cmp) {
         cmp.set("v.log", document.createDocumentFragment());
     },
@@ -41,5 +45,9 @@
 
     getCookie: function(cmp) {
         cmp.set("v.log", document.cookie);
+    },
+
+    setTitle: function(cmp) {
+        document.title = "secureDocumentTest";
     }
 })

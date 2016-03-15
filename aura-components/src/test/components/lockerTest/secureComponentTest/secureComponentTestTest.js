@@ -40,23 +40,5 @@
             $A.test.assertStartsWith("SecureAuraEvent", event.toString(), "Expected return of cmp.event()"
                     + " to be a SecureAuraEvent");
         }
-    },
-
-    // TODO: re-enable when $A.createComponents is exposed on SecureAura
-    _testDynamicallyCreatedComponentIsSecureComponent: {
-        test: [function(cmp) {
-            cmp.dynamicallyCreateCmps();
-            $A.test.addWaitFor(true, function() {
-                return cmp.get("v.dynamicCmps").length > 0;
-            });
-        }, function(cmp) {
-            cmp.getWrapperFromController();
-            var wrapped = cmp.get("v.log");
-            var dynamicCmps = wrapped.get("v.dynamicCmps");
-            dynamicCmps.forEach(function(component) {
-                $A.test.assertStartsWith("SecureComponent", component.toString(), "Expected dynamic component to be"
-                        + " a SecureComponent");
-            });
-        }]
     }
 })

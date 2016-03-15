@@ -73,5 +73,14 @@
             var cookie = cmp.get("v.log");
             $A.test.assertEquals(document.cookie, cookie);
         }
+    },
+
+    testDocumentTitle: {
+        test: function(cmp) {
+            cmp.setTitle();
+            cmp.getDocument();
+            var secureDoc = cmp.get("v.log");
+            $A.test.assertEquals("secureDocumentTest", secureDoc.title);
+        }
     }
 })

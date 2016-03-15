@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" description="A popup with a trigger that controls its visibility. This is a base component for ui:menu and ui:panelDialog." support="GA">
+<aura:component extensible="true" implements="ui:visible" description="A popup with a trigger that controls its visibility. This is a base component for ui:menu." support="GA">
     <aura:registerEvent name="popupTriggerPress" type="ui:popupTriggerPress" description="The event fired when the popup trigger is pressed. Other components may also fire this event to simulate a trigger press."/>
     <aura:registerEvent name="popupTargetShow" type="ui:popupTargetShow" description="The trigger fires this event to show the target. Other components may also fire this event to show the target."/>
     <aura:registerEvent name="popupTargetHide" type="ui:popupTargetHide" description="The trigger fires this event to hide the target. Other components may also fire this event to hide the target."/>

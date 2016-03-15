@@ -24,7 +24,7 @@ var Aura = {};
 window["Aura"] = Aura;
 
 // -- Aura inlinning bootstrap
-Aura.time = window.performance && window.performance.now ? window.performance.now.bind(performance) : Date.now.bind(Date);
+Aura.time = window.performance && window.performance.now ? window.performance.now.bind(performance) : function(){return Date.now();};
 Aura.bootstrap = {};
 Aura.bootstrapMark = function (mark, value) {
     this.bootstrap[mark] = value || this.time();

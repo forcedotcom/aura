@@ -209,45 +209,45 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         assertEquals("Framework uid is not correct", uid, "BJTaoiCDxoAF4Wbh0iC9lA");
     }
 
-    public void testIsPrivilegedNamespacesWithBadArguments() {
+    public void testIsInternalNamespaceWithBadArguments() {
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
-        assertFalse("null should not be a privileged namespace", impl.isPrivilegedNamespace(null));
-        assertFalse("Empty string should not be a privileged namespace", impl.isPrivilegedNamespace(""));
-        assertFalse("Wild characters should not be privileged namespace", impl.isPrivilegedNamespace("*"));
-        assertFalse(impl.isPrivilegedNamespace("?"));
+        assertFalse("null should not be an internal namespace", impl.isInternalNamespace(null));
+        assertFalse("Empty string should not be an internal namespace", impl.isInternalNamespace(""));
+        assertFalse("Wild characters should not be an internal namespace", impl.isInternalNamespace("*"));
+        assertFalse(impl.isInternalNamespace("?"));
     }
 
-    public void testIsPrivilegedNamespacesAfterRegistering() {
+    public void testIsInternalNamespaceAfterRegistering() {
         String namespace = this.getName() + System.currentTimeMillis();
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
-        impl.addPrivilegedNamespace(namespace);
-        assertTrue("Failed to register a privileged namespace.", impl.isPrivilegedNamespace(namespace));
-        assertTrue("Privileged namespace checks are case sensitive.",
-                impl.isPrivilegedNamespace(namespace.toUpperCase()));
+        impl.addInternalNamespace(namespace);
+        assertTrue("Failed to register an internal namespace.", impl.isInternalNamespace(namespace));
+        assertTrue("Internal namespace checks are case sensitive.",
+                impl.isInternalNamespace(namespace.toUpperCase()));
     }
 
-    public void testAddPrivilegedNamespacesWithBadArguments() {
+    public void testAddInternalNamespacesWithBadArguments() {
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
-        impl.addPrivilegedNamespace(null);
-        assertFalse(impl.isPrivilegedNamespace(null));
+        impl.addInternalNamespace(null);
+        assertFalse(impl.isInternalNamespace(null));
 
-        impl.addPrivilegedNamespace("");
-        assertFalse(impl.isPrivilegedNamespace(""));
+        impl.addInternalNamespace("");
+        assertFalse(impl.isInternalNamespace(""));
     }
 
-    public void testGetPrivilegedNamespacesReturnsSortedNamespaces() {
+    public void testGetInternalNamespacesReturnsSortedNamespaces() {
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
-        impl.getPrivilegedNamespaces().clear();
+        impl.getInternalNamespaces().clear();
         String[] namespaces = new String[] {"c", "a", "d", "b","e"};
         for(String namespace : namespaces) {
-            impl.addPrivilegedNamespace(namespace);
+            impl.addInternalNamespace(namespace);
         }
         // increasing order
         Arrays.sort(namespaces);
         List<String> expected = Arrays.asList(namespaces);
 
-        // keep the iterate order of the returned collection from getPrivilegedNamespaces()
-        List<String> actual = new ArrayList<>(impl.getPrivilegedNamespaces());
+        // keep the iterate order of the returned collection from getInternalNamespaces()
+        List<String> actual = new ArrayList<>(impl.getInternalNamespaces());
         assertEquals(expected, actual);
     }
 }

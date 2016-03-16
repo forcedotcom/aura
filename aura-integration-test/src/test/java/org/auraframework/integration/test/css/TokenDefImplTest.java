@@ -134,7 +134,7 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
 
     public void testUntrustedNamspaceAllowedTokenValues() throws Exception {
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
-        Mockito.when(configAdapter.isPrivilegedNamespace(parentDescriptor.getNamespace())).thenReturn(true);
+        Mockito.when(configAdapter.isInternalNamespace(parentDescriptor.getNamespace())).thenReturn(true);
 
         List<String> tests = ImmutableList.of(
                 "#111",
@@ -162,7 +162,7 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
 
     public void testUntrustedNamespaceDisallowedTokenValues() throws Exception {
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
-        Mockito.when(configAdapter.isPrivilegedNamespace(parentDescriptor.getNamespace())).thenReturn(true);
+        Mockito.when(configAdapter.isInternalNamespace(parentDescriptor.getNamespace())).thenReturn(true);
 
         List<String> tests = ImmutableList.of(
                 "blue;} body { color: red !important }",

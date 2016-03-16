@@ -153,7 +153,7 @@ function LockerService() {
 			}
 
 			var def = component.getDef();
-			if ($A.clientService.isPrivilegedNamespace(def.getDescriptor().getNamespace()) && !def.isInstanceOf("aura:requireLocker")) {
+			if ($A.clientService.isInternalNamespace(def.getDescriptor().getNamespace()) && !def.isInstanceOf("aura:requireLocker")) {
 				return component;
 			}
 

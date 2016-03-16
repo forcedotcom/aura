@@ -40,9 +40,9 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
             .add(ATTRIBUTE_ISTEMPLATE)
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 
-    private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+    private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .addAll(ALLOWED_ATTRIBUTES)
-            .addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
+            .addAll(BaseComponentDefHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();
     
     public ComponentDefHandler() {
@@ -66,7 +66,7 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return isInPrivilegedNamespace ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
+        return isInInternalNamespace ? INTERNAL_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override

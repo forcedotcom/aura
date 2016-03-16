@@ -93,12 +93,12 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                     ATTRIBUTE_EXTENSIBLE, ATTRIBUTE_ABSTRACT, RootTagHandler.ATTRIBUTE_API_VERSION)
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES).build();
 
-    protected static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
+    protected static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
             ATTRIBUTE_STYLE, ATTRIBUTE_HELPER, ATTRIBUTE_RENDERER,
             ATTRIBUTE_WHITESPACE, ATTRIBUTE_TOKEN_OVERRIDES, ATTRIBUTE_DEFAULT_FLAVOR,
             ATTRIBUTE_DYNAMICALLY_FLAVORABLE)
-            .addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
+            .addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();
 
     private int innerCount = 0;
@@ -128,7 +128,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return isInPrivilegedNamespace ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
+        return isInInternalNamespace ? RootTagHandler.INTERNAL_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override
@@ -157,7 +157,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             }
 
             builder.getAttributeDefs().put(attributeDef.getDescriptor(),attributeDef);
-        } else if (isInPrivilegedNamespace && RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
+        } else if (isInInternalNamespace && RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
         	RequiredVersionDefHandler<T> handler = new RequiredVersionDefHandler<>(this,xmlReader, source);
             RequiredVersionDefImpl requiredVersionDef = handler.getElement();
         	DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef.getDescriptor();

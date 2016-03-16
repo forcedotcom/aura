@@ -27,7 +27,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.system.PrivilegedNamespaceSourceLoader;
+import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -57,16 +57,16 @@ public final class SourceFactory {
             for (String namespace : loader.getNamespaces()) {
                 mutableNamespaces.add(namespace);
 
-                // Track and system/privileged namespaces
+                // Track and system/internal namespaces
                 //
                 // This code is rather broken, as this now assumes that we build source factories for every
                 // loader. It is not fully compatible with having compiled registries, and we now have a hack
                 // to make it work.
                 //
-                if (loader instanceof PrivilegedNamespaceSourceLoader) {
-                    PrivilegedNamespaceSourceLoader privilegedLoader = (PrivilegedNamespaceSourceLoader)loader;
-                    if (privilegedLoader.isPrivilegedNamespace(namespace)) {
-                        configAdapter.addPrivilegedNamespace(namespace);
+                if (loader instanceof InternalNamespaceSourceLoader) {
+                    InternalNamespaceSourceLoader internalLoader = (InternalNamespaceSourceLoader)loader;
+                    if (internalLoader.isInternalNamespace(namespace)) {
+                        configAdapter.addInternalNamespace(namespace);
                     }
                 }
 

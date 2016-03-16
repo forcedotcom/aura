@@ -29,7 +29,6 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.def.TokensImportDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.token.TokensDefImpl;
-import org.auraframework.impl.expression.functions.BooleanFunctions;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
@@ -53,10 +52,10 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES)
             .build();
 
-    private final static Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+    private final static Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_PROVIDER, ATTRIBUTE_MAP_PROVIDER)
             .addAll(ALLOWED_ATTRIBUTES)
-            .addAll(RootTagHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
+            .addAll(RootTagHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();
 
     private final TokensDefImpl.Builder builder = new TokensDefImpl.Builder();
@@ -79,7 +78,7 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return isInPrivilegedNamespace() ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
+        return isInInternalNamespace() ? INTERNAL_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override
@@ -134,7 +133,7 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
             }
             builder.addTokenDef(def);
 
-        } else if (isInPrivilegedNamespace && TokensImportDefHandler.TAG.equalsIgnoreCase(tag)) {
+        } else if (isInInternalNamespace && TokensImportDefHandler.TAG.equalsIgnoreCase(tag)) {
             // imports must come before tokens. This is mainly for simplifying the token lookup implementation,
             // while still matching the most common expected usages of imports vs. declared tokens.
             if (!builder.tokens().isEmpty()) {

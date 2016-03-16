@@ -22,7 +22,7 @@ public class TokensAccessAttributeTest extends BaseAccessAttributeTest {
 		testResource = TestResource.Tokens;
 	}
 	
-	// Stub out nonsensical combination (Tokens not supported in custom, non-privileged, namespaces at this time)
+	// Stub out nonsensical combination (Tokens not supported in custom, non-internal, namespaces at this time)
 
 	@Override
 	public void testSimpleAccessDynamicInCustomNamespace() throws Exception {

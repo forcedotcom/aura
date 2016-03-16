@@ -59,7 +59,7 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
     
     /**
      * verify basic aura:event 
-     * verify we can pass type/access/support/description to it, support is only available for privileged nameSpace
+     * verify we can pass type/access/support/description to it, support is only available for internal namespace
      * also we have have attributes and comments in the markup 
      * @throws Exception
      */

@@ -1,7 +1,6 @@
 {
   "s":1,
   "v":{
-    "xs":"P",
     "descriptor":"markup://fake:component",
     "superDef":{
       "s":2,

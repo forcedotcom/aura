@@ -135,10 +135,10 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify Java controller can be accessed in privileged (system) namespace.
+     * Verify Java controller can be accessed in internal (system) namespace.
      */
     @Test
-    public void testUsingJavaControllerInPriviledgedNamespace() throws Exception {
+    public void testUsingJavaControllerInInternalNamespace() throws Exception {
         String cmpMarkup = "<aura:component controller='java://org.auraframework.components.test.java.controller.TestController'></aura:component>";
         DefDescriptor<ComponentDef> cmpDefDesc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpMarkup, StringSourceLoader.DEFAULT_NAMESPACE + ":testComponent", true);
@@ -148,18 +148,18 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify Java controller can NOT be accessed in non-privileged (custom) namespace.
+     * Verify Java controller can NOT be accessed in non-internal (custom) namespace.
      */
     @Test
     @UnAdaptableTest("namespace start with c means something special in core")
-    public void testUsingJavaControllerInNonPrivilegedNamespace() throws Exception {
+    public void testUsingJavaControllerInExternalNamespace() throws Exception {
         String cmpMarkup = "<aura:component controller='java://org.auraframework.components.test.java.controller.TestController'></aura:component>";
         DefDescriptor<ComponentDef> cmpDefDesc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpMarkup, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testComponent", false);
 
         try {
             definitionService.getDefinition(cmpDefDesc);
-            fail("Expected NoAccessException when accessing Java controller in non-privileged namespace.");
+            fail("Expected NoAccessException when accessing Java controller in non-internal namespace.");
         } catch (Exception e) {
             String expectedMessage = String.format("Access to controller 'org.auraframework.components.test.java.controller:TestController' from namespace '%s' in '%s(COMPONENT)'"
                     , StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE, cmpDefDesc.getQualifiedName());

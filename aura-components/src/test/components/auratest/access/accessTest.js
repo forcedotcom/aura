@@ -69,7 +69,7 @@
         ]
     },
 
-    testComponentUseAttributesOfRemotePrivilegedComponentInController:{
+    testComponentUseAttributesOfRemoteInternalComponentInController:{
         test:[
             function canNotUsePrivateAttribute(cmp){
                 // No access private attribute on facet
@@ -162,7 +162,7 @@
         ]
     },
 
-    testComponentCanAccessEventsOfRemotePrivilegedComponentFromController: {
+    testComponentCanAccessEventsOfRemoteInternalComponentFromController: {
         test: [
            function canAccessGlobalEvent(cmp) {
                var expected = "markup://auratest:accessGlobalEvent";

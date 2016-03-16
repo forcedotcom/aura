@@ -33,8 +33,7 @@
           "s":4,
           "v":{
             "name":"value",
-            "type":"aura://String",
-            "xs":"P"
+            "type":"aura://String"
           }
         }
       ],
@@ -61,8 +60,7 @@
                       "s":7,
                       "v":{
                         "name":"truncate",
-                        "type":"aura://Integer",
-                        "xs":"P"
+                        "type":"aura://Integer"
                       }
                     },
                     {
@@ -70,7 +68,6 @@
                       "v":{
                         "name":"truncateByWord",
                         "type":"aura://Boolean",
-                        "xs":"P",
                         "default":false
                       }
                     },
@@ -79,7 +76,6 @@
                       "v":{
                         "name":"ellipsis",
                         "type":"aura://Boolean",
-                        "xs":"P",
                         "default":true
                       }
                     }
@@ -169,8 +165,7 @@
                                   "s":17,
                                   "v":{
                                     "name":"attr",
-                                    "type":"aura://String",
-                                    "xs":"P"
+                                    "type":"aura://String"
                                   }
                                 }
                               ],

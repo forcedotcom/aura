@@ -46,7 +46,7 @@ import com.google.common.collect.*;
  * represented. This could be fixed by providing a fixed view into the namespaces provided.
  *
  */
-public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSourceLoader {
+public class StringSourceLoader implements SourceLoader, InternalNamespaceSourceLoader {
     public static final String DEFAULT_NAMESPACE = "string";
     public static final String OTHER_NAMESPACE = "string1";
     public static final String DEFAULT_CUSTOM_NAMESPACE = "cstring";
@@ -143,13 +143,13 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
      * @param defClass the definition class that this source will represent
      * @param contents the source contents
      * @param namePrefix if non-null, then generate some name with the given prefix for the descriptor.
-     * @param isPrivilegedNamespace if true, namespace is privileged
+     * @param isInternalNamespace if true, namespace is internal
      * @return the created {@link StringSource}
      * @throws IllegalStateException when loading a definition that already exists with the same descriptor.
      */
     public final <D extends Definition> StringSource<D> addSource(Class<D> defClass, String contents,
-            @Nullable String namePrefix, boolean isPrivilegedNamespace) {
-        return putSource(defClass, contents, namePrefix, false, isPrivilegedNamespace);
+            @Nullable String namePrefix, boolean isInternalNamespace) {
+        return putSource(defClass, contents, namePrefix, false, isInternalNamespace);
     }
 
     /**
@@ -159,12 +159,12 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
      * @param contents the source contents
      * @param namePrefix if non-null, then generate some name with the given prefix for the descriptor.
      * @param overwrite if true, overwrite any previously loaded definition
-     * @param isPrivilegedNamespace if true, namespace is privileged
+     * @param isInternalNamespace if true, namespace is internal
      * @return the created {@link StringSource}
      */
     public final <D extends Definition> StringSource<D> putSource(Class<D> defClass, String contents,
-            @Nullable String namePrefix, boolean overwrite, boolean isPrivilegedNamespace) {
-        return putSource(defClass, contents, namePrefix, overwrite, isPrivilegedNamespace, null);
+            @Nullable String namePrefix, boolean overwrite, boolean isInternalNamespace) {
+        return putSource(defClass, contents, namePrefix, overwrite, isInternalNamespace, null);
     }
 
     /**
@@ -174,13 +174,13 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
      * @param contents the source contents
      * @param namePrefix if non-null, then generate some name with the given prefix for the descriptor.
      * @param overwrite if true, overwrite any previously loaded definition
-     * @param isPrivilegedNamespace if true, namespace is privileged
+     * @param isInternalNamespace if true, namespace is internal
      * @return the created {@link StringSource}
      */
     public final <D extends Definition, B extends Definition> StringSource<D> putSource(Class<D> defClass, String contents,
-            @Nullable String namePrefix, boolean overwrite, boolean isPrivilegedNamespace, @Nullable DefDescriptor<B> bundle) {
+            @Nullable String namePrefix, boolean overwrite, boolean isInternalNamespace, @Nullable DefDescriptor<B> bundle) {
         DefDescriptor<D> descriptor = createStringSourceDescriptor(namePrefix, defClass, bundle);
-        return putSource(descriptor, contents, overwrite, isPrivilegedNamespace);
+        return putSource(descriptor, contents, overwrite, isInternalNamespace);
     }
 
     /**
@@ -202,18 +202,18 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
      * @param descriptor the DefDescriptor key for the loaded definition
      * @param contents the source contents
      * @param overwrite if true, overwrite any previously loaded definition
-     * @param isPrivilegedNamespace if true, namespace is privileged
+     * @param isInternalNamespace if true, namespace is internal
      * @return the created {@link StringSource}
      */
     public final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor, String contents,
-            boolean overwrite, boolean isPrivilegedNamespace) {
+            boolean overwrite, boolean isInternalNamespace) {
         Format format = DescriptorInfo.get(descriptor.getDefType().getPrimaryInterface()).getFormat();
         StringSource<D> source = new StringSource<>(descriptor, contents, descriptor.getQualifiedName(), format);
-        return putSource(descriptor, source, overwrite, isPrivilegedNamespace);
+        return putSource(descriptor, source, overwrite, isInternalNamespace);
     }
 
     private final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor,
-            StringSource<D> source, boolean overwrite, boolean isPrivilegedNamespace) {
+            StringSource<D> source, boolean overwrite, boolean isInternalNamespace) {
         SourceMonitorEvent event = SourceMonitorEvent.CREATED;
 
         nsLock.lock();
@@ -221,7 +221,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
             String namespace = descriptor.getNamespace();
             Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap;
 
-            if (isPrivilegedNamespace) {
+            if (isInternalNamespace) {
                 sourceMap = namespaces.get(namespace);
             }
             else {
@@ -230,7 +230,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
 
             if (sourceMap == null) {
                 sourceMap = Maps.newHashMap();
-                if (isPrivilegedNamespace) {
+                if (isInternalNamespace) {
                     namespaces.put(namespace, sourceMap);
                 }
                 else {
@@ -454,7 +454,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
     }
 
     @Override
-    public boolean isPrivilegedNamespace(String namespace) {
+    public boolean isInternalNamespace(String namespace) {
         return namespace != null && namespaces.containsKey(namespace);
     }
 }

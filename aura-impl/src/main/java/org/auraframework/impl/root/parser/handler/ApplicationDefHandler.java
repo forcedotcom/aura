@@ -48,7 +48,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return isInPrivilegedNamespace ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
+        return isInInternalNamespace ? INTERNAL_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override
@@ -144,9 +144,9 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             .add(ATTRIBUTE_TEMPLATE)
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 
-    private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
+    private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_PRELOAD, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_FLAVOR_OVERRIDES)
             .addAll(ALLOWED_ATTRIBUTES)
-            .addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
+            .addAll(BaseComponentDefHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();
 }

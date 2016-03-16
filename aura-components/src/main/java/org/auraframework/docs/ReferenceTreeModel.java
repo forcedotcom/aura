@@ -51,9 +51,9 @@ public class ReferenceTreeModel {
         registry.assertAccess(getReferencingDescriptor(), def);
     }
 
-    public static boolean isRunningInPrivilegedNamespace() {
+    public static boolean isRunningInInternalNamespace() {
         String ns = Aura.getConfigAdapter().getDefaultNamespace();
-        return ns != null ? Aura.getConfigAdapter().isPrivilegedNamespace(ns) : true;
+        return ns != null ? Aura.getConfigAdapter().isInternalNamespace(ns) : true;
     }
 
     private static final <E extends Definition> List<TreeNode> makeTreeNodes(String prefix, DefType type)
@@ -134,7 +134,7 @@ public class ReferenceTreeModel {
             tree.add(new TreeNode(null, "Events", makeTreeNodes("markup", DefType.EVENT), false));
             tree.add(new TreeNode(null, "Libraries", makeTreeNodes("markup", DefType.LIBRARY), false));
 
-            if (isRunningInPrivilegedNamespace()) {
+            if (isRunningInInternalNamespace()) {
                 tree.add(new TreeNode(null, "Tests", makeTreeNodes("js", DefType.TESTSUITE), false));
             }
 

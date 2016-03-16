@@ -107,7 +107,7 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
         return builder;
     }
 
-    public Map<DefDescriptor<?>, Definition> getAll() {
+    public Map<DefDescriptor<? extends Definition>, Definition> getAll() {
         return allMap;
     }
 }

@@ -707,7 +707,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (cd.def != null) {
                 defs.put(cd.descriptor, cd.def);
                 if (cd.built) {
-                    if (cd.cacheable) { // false for non-privileged namespaces, or non-cacheable registries
+                    if (cd.cacheable) { // false for non-internal namespaces, or non-cacheable registries
                         defsCache.put(cd.descriptor, Optional.of(cd.def));
                     }
                     cd.def.markValid();
@@ -1303,8 +1303,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
             referencingNamespace = referencingDescriptor.getNamespace();
 
-            // The caller is in a system namespace let them through
-            if (configAdapter.isPrivilegedNamespace(referencingNamespace)) {
+            // The caller is in an internal namespace let them through
+            if (configAdapter.isInternalNamespace(referencingNamespace)) {
                 return null;
             }
         }
@@ -1563,10 +1563,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
         } else if (prefix == null) {
             ConfigAdapter configAdapter = Aura.getConfigAdapter();
-            cacheable = configAdapter.isPrivilegedNamespace(namespace);
+            cacheable = configAdapter.isInternalNamespace(namespace);
         } else {
             ConfigAdapter configAdapter = Aura.getConfigAdapter();
-            cacheable = configAdapter.isCacheablePrefix(prefix) || configAdapter.isPrivilegedNamespace(namespace);
+            cacheable = configAdapter.isCacheablePrefix(prefix) || configAdapter.isInternalNamespace(namespace);
         }
         return cacheable;
     }

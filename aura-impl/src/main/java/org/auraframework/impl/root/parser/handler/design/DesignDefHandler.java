@@ -97,10 +97,10 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
             }
             DesignTemplateDef template = new DesignTemplateDefHandler(this, xmlReader, source).getElement();
             builder.setDesignTemplateDef(template);
-        } else if (isInPrivilegedNamespace() && DesignLayoutDefHandler.TAG.equalsIgnoreCase(tag)) {
+        } else if (isInInternalNamespace() && DesignLayoutDefHandler.TAG.equalsIgnoreCase(tag)) {
             DesignLayoutDef layoutDesign = new DesignLayoutDefHandler(this, xmlReader, source).getElement();
             builder.addLayoutDesign(layoutDesign.getName(), layoutDesign);
-        } else if (isInPrivilegedNamespace() && DesignOptionDefHandler.TAG.equalsIgnoreCase(tag)) {
+        } else if (isInInternalNamespace() && DesignOptionDefHandler.TAG.equalsIgnoreCase(tag)) {
             DesignOptionDef option = new DesignOptionDefHandler(this, xmlReader, source).getElement();
             builder.addOption(option);
         } else {

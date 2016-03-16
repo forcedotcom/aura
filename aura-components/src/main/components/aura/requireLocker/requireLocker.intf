@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:interface description="Marker interface to request lockering for privileged namespace components.">
+<aura:interface description="Marker interface to request lockering for internal namespace components.">
 </aura:interface>

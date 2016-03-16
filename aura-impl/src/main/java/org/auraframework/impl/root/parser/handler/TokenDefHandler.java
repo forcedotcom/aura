@@ -45,7 +45,7 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES)
             .build();
 
-    private final static Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+    private final static Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .addAll(ALLOWED_ATTRIBUTES)
             .build();
 
@@ -68,7 +68,7 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return isInPrivilegedNamespace() ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
+        return isInInternalNamespace() ? INTERNAL_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override

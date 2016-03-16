@@ -111,10 +111,11 @@ public interface AuraContext {
     }
 
     enum Access {
-        PUBLIC,
         GLOBAL,
+        INTERNAL,
         PRIVATE,
-        INTERNAL
+        PRIVILEGED,
+        PUBLIC,
     }
 
     class GlobalValue implements JsonSerializable {

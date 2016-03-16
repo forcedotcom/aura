@@ -22,8 +22,7 @@
             "s":4,
             "v":{
               "name":"att1",
-              "type":"aura://String",
-              "xs":"P"
+              "type":"aura://String"
             }
           },
           "att2":{
@@ -31,7 +30,6 @@
             "v":{
               "name":"att2",
               "type":"aura://Boolean",
-              "xs":"P",
               "required":true
             }
           }

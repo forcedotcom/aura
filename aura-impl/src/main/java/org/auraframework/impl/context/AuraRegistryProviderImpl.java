@@ -253,7 +253,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
         }
         if (staticRegs != null) {
             //
-            // Ooh, now _this_ is ugly. Because privileged namespaces are tracked by the
+            // Ooh, now _this_ is ugly. Because internal namespaces are tracked by the
             // SourceFactory constructor, we'd best build a source factory for every loader.
             // This ensures that we do in the case of static registries. Note that it also
             // allows us to see source on static registries.

@@ -37,7 +37,9 @@ public interface MockConfigAdapter extends ConfigAdapter, MockBean {
 
     void setCSRFToken(String token);
 
-    void setUnprivilegedNamespace(String namespace);
+    void setUnPrivilegedNamespace(String namespace);
+
+    void setNonInternalNamespace(String namespace);
 
     void setLockerServiceEnabled(boolean isLockerServiceEnabled);
 }

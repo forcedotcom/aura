@@ -838,10 +838,13 @@ AuraInstance.prototype.handleError = function(message, e) {
  * @platform
  */
 AuraInstance.prototype.reportError = function(message, error) {
+    // when the method is called w/o error object, we create a dummy to have client error id.
+    error = error || new $A.auraError("[NoErrorObjectAvailable] " + message);
+
     $A.handleError(message, error);
     if ($A.initialized) {
         $A.getCallback(function() {
-            $A.logger.reportError(error || new Error("[NoErrorObjectAvailable] " + message));
+            $A.logger.reportError(error);
         })();
         $A.services.client.postProcess();
     }

@@ -39,7 +39,7 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
     public void testQueryLanguageNotAvailableInprodMode() throws Exception {
         ServletConfigController.setProductionConfig(true);
         open("/test/laxSecurity.app", Mode.PROD);
-        Object query = auraUITestingUtil.getEval("return window.$A.getQueryStatement");
+        Object query = getAuraUITestingUtil().getEval("return window.$A.getQueryStatement");
         assertNull("Query language should not be available in PROD mode.", query);
     }
 
@@ -49,9 +49,9 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
      */
     public void testQueryLanguageAvailableInNonprodMode() throws Exception {
         open("/test/laxSecurity.app");
-        Boolean query = auraUITestingUtil.getBooleanEval("return $A.hasOwnProperty('getQueryStatement');");
+        Boolean query = getAuraUITestingUtil().getBooleanEval("return $A.hasOwnProperty('getQueryStatement');");
         assertTrue("Query language should be available in non-PROD mode.", query);
-        query = auraUITestingUtil.getBooleanEval("return 'query' in $A.getQueryStatement();");
+        query = getAuraUITestingUtil().getBooleanEval("return 'query' in $A.getQueryStatement();");
         assertTrue("$A.getQueryStatement() should have 'query' property.", query);
     }
 
@@ -64,30 +64,30 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
         final String rowQuery = "return $A.getQueryStatement().from('rerenderings').query().rowCount;";
         open("/attributesTest/simpleValue.cmp", Mode.STATS);
 
-        Long rowCount = (Long) auraUITestingUtil.getEval(rowQuery);
+        Long rowCount = (Long) getAuraUITestingUtil().getEval(rowQuery);
         assertEquals("Rerenders query should be empty on load.", 0, rowCount.intValue());
 
         findDomElement(By.cssSelector(".uiButton")).click();
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                Long rowCount = (Long) auraUITestingUtil.getEval(rowQuery);
+                Long rowCount = (Long) getAuraUITestingUtil().getEval(rowQuery);
                 return rowCount.intValue() == 1;
             }
         }, "Expecting one rerender query entry after attribute value change.");
 
-        String descr = (String) auraUITestingUtil
+        String descr = (String) getAuraUITestingUtil()
                 .getEval("return $A.getQueryStatement().from('rerenderings').query().rows[0].components['1:2;a'].descr;");
         assertEquals("Unexpected component was rerendered.", "markup://attributesTest:simpleValue", descr);
-        String why = (String) auraUITestingUtil
+        String why = (String) getAuraUITestingUtil()
                 .getEval("return JSON.stringify($A.getQueryStatement().from('rerenderings').query().rows[0].components['1:2;a'].why);");
         assertEquals("Unexpected cause for rerender.", "{\"v.intAttribute\":true}", why);
 
         findDomElement(By.cssSelector(".uiButton")).click();
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                Long rowCount = (Long) auraUITestingUtil.getEval(rowQuery);
+                Long rowCount = (Long) getAuraUITestingUtil().getEval(rowQuery);
                 return rowCount.intValue() == 2;
             }
         }, "Expecting two rerender query entry after attribute value change.");

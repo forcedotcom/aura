@@ -73,7 +73,7 @@ public class PopupUITest extends WebDriverTestCase {
     }
     
     private String randString(int len) {
-		return auraUITestingUtil.randString(len);
+		return getAuraUITestingUtil().randString(len);
 	}
 
 	/**
@@ -334,7 +334,7 @@ public class PopupUITest extends WebDriverTestCase {
         waitForElementPresent("Popup did not launch", popContainerTgtElem);
         // Close the popup either by the TAB key or the close button
         if (closeOnTabKey) {
-            Actions builder = new Actions(this.currentDriver);
+            Actions builder = new Actions(this.getDriver());
             builder.sendKeys(Keys.TAB,Keys.NULL).build().perform();
         } else{
         	WebElement customTriggerButton = driver.findElement(By.className(buttonLocator));

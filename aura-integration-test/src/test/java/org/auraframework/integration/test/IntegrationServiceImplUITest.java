@@ -106,7 +106,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
         openIntegrationStub(stub, cmpToInject, attributes);
 
-        auraUITestingUtil.waitForElement("Injected component not found inside placeholder", 
+        getAuraUITestingUtil().waitForElement("Injected component not found inside placeholder", 
         		By.cssSelector(selectorForPlaceholder + ">" + "div.wrapper"));
         WebElement attrValue = findDomElement(By.cssSelector("div.dataFromAttribute"));
         assertEquals("Failed to see data from model of injected component", "Oranges", attrValue.getText());
@@ -116,13 +116,13 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
         WebElement button = findDomElement(By.cssSelector(".btnHandleClick"));
         button.click();
-        auraUITestingUtil.waitForElementText(By.cssSelector("div.dataFromController"), "TestController", true);
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div.dataFromController"), "TestController", true);
 
         // Access injected component through ClientSide API
-        assertTrue(auraUITestingUtil.getBooleanEval(String.format(
+        assertTrue(getAuraUITestingUtil().getBooleanEval(String.format(
                 "return window.$A.getRoot().find('%s')!== undefined ;", defaultLocalId)));
         assertEquals(cmpToInject.toString(),
-                (String) auraUITestingUtil.getEval(String.format(
+                (String) getAuraUITestingUtil().getEval(String.format(
                         "return window.$A.getRoot().find('%s').getDef().getDescriptor().toString()", defaultLocalId)));
 
         WebElement valueFromJsProvider = findDomElement(By.cssSelector("div.dataFromJSProvider"));
@@ -135,7 +135,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
         WebElement buttonShowStyle = findDomElement(By.cssSelector(".btnShowStyle"));
         buttonShowStyle.click();
-        auraUITestingUtil.waitForElementFunction(By.cssSelector("div.dataFromAttributeStyle"), 
+        getAuraUITestingUtil().waitForElementFunction(By.cssSelector("div.dataFromAttributeStyle"), 
         		new Function<WebElement, Boolean>() {
 		            @Override
 		            public Boolean apply(WebElement element) {
@@ -345,29 +345,29 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         openIntegrationStub(stub, cmpToInject, attributes);
 
         // Access injected component through ClientSide API
-        assertTrue(auraUITestingUtil.getBooleanEval(String.format(
+        assertTrue(getAuraUITestingUtil().getBooleanEval(String.format(
                 "return window.$A.getRoot().find('%s')!== undefined ;", defaultLocalId)));
 
         // Provided attributes
         assertEquals("Oranges",
-                auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "strAttr")));
-        assertFalse(auraUITestingUtil.getBooleanEval(String.format(attributeEvalScript, defaultLocalId, "booleanAttr")));
-        assertEquals("Object", auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "objAttr")));
-        assertEquals(strList, auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "strList")));
+                getAuraUITestingUtil().getEval(String.format(attributeEvalScript, defaultLocalId, "strAttr")));
+        assertFalse(getAuraUITestingUtil().getBooleanEval(String.format(attributeEvalScript, defaultLocalId, "booleanAttr")));
+        assertEquals("Object", getAuraUITestingUtil().getEval(String.format(attributeEvalScript, defaultLocalId, "objAttr")));
+        assertEquals(strList, getAuraUITestingUtil().getEval(String.format(attributeEvalScript, defaultLocalId, "strList")));
         assertEquals(stringList,
-                auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "stringList")));
+                getAuraUITestingUtil().getEval(String.format(attributeEvalScript, defaultLocalId, "stringList")));
 
         // Attributes with Default values
         assertEquals("Apple",
-                auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "strAttrDefault")));
-        assertTrue(auraUITestingUtil.getBooleanEval(String.format(attributeEvalScript, defaultLocalId,
+                getAuraUITestingUtil().getEval(String.format(attributeEvalScript, defaultLocalId, "strAttrDefault")));
+        assertTrue(getAuraUITestingUtil().getBooleanEval(String.format(attributeEvalScript, defaultLocalId,
                 "booleanAttrDefault")));
         assertEquals("Banana",
-                auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "objAttrDefault")));
+                getAuraUITestingUtil().getEval(String.format(attributeEvalScript, defaultLocalId, "objAttrDefault")));
         assertEquals(Lists.newArrayList("Apple", "Orange"),
-                auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "strListDefault")));
+                getAuraUITestingUtil().getEval(String.format(attributeEvalScript, defaultLocalId, "strListDefault")));
         assertEquals(Lists.newArrayList("Melon", "Berry", "Grapes"),
-                auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "stringListDefault")));
+                getAuraUITestingUtil().getEval(String.format(attributeEvalScript, defaultLocalId, "stringListDefault")));
 
     }
 
@@ -467,34 +467,34 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         WebElement clickNode = findDomElement(By.cssSelector("div.click_t"));
         clickNode.click();
         assertTrue("expect _clickHandlerCalled to be true",
-                auraUITestingUtil.getBooleanEval("return document._clickHandlerCalled"));
-        assertEquals("press", auraUITestingUtil.getEval("return document.__clickEvent.getName()"));
+                getAuraUITestingUtil().getBooleanEval("return document._clickHandlerCalled"));
+        assertEquals("press", getAuraUITestingUtil().getEval("return document.__clickEvent.getName()"));
 
         WebElement textNode = findDomElement(By.cssSelector("input.change_t"));
         textNode.sendKeys("YeeHa!");
         clickNode.click(); // This will take the focus out of input element and trigger the onchange handler
         waitForCondition("return !!document._changeHandlerCalled");
-        assertEquals("Custom JS Code", auraUITestingUtil.getEval("return document._changeHandlerCalled"));
-        assertEquals("change", auraUITestingUtil.getEval("return document.__changeEvent.getName()"));
+        assertEquals("Custom JS Code", getAuraUITestingUtil().getEval("return document._changeHandlerCalled"));
+        assertEquals("change", getAuraUITestingUtil().getEval("return document.__changeEvent.getName()"));
 
         // component event 2
         WebElement clickNode2 = findDomElement(By.cssSelector("div.click2_t"));
         clickNode2.click();
         assertTrue("clickHandler2Called should be true after container cmp handle the evt from injected cmp",
-                auraUITestingUtil.getBooleanEval("return document._click2HandlerCalled"));
+                getAuraUITestingUtil().getBooleanEval("return document._click2HandlerCalled"));
         assertEquals("didn't get expect event name from Click Me2",
                 "appEvtFromInjectedCmp",
-                auraUITestingUtil.getEval("return document.__click2Event.getName()"));
+                getAuraUITestingUtil().getEval("return document.__click2Event.getName()"));
 
         // application event
         if (checkAppEvt) {
             WebElement clickNode3 = findDomElement(By.cssSelector("div.click3_t"));
             clickNode3.click();
             assertTrue("clickHandler3Called should be true after container cmp handle the evt from injected cmp",
-                    auraUITestingUtil.getBooleanEval("return document._click3HandlerCalled"));
+                    getAuraUITestingUtil().getBooleanEval("return document._click3HandlerCalled"));
             assertEquals("didn't get expect event param from Click Me3",
                     "event fired from click3Hndlr",
-                    auraUITestingUtil.getEval("return document.__click3EventParam"));
+                    getAuraUITestingUtil().getEval("return document.__click3EventParam"));
         }
 
     }
@@ -524,7 +524,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
         // Access injected component through ClientSide API
         assertTrue("Failed to locate injected component on page.",
-                auraUITestingUtil.getBooleanEval(String.format("return window.$A.getRoot().find('%s')!== undefined ;",
+                getAuraUITestingUtil().getBooleanEval(String.format("return window.$A.getRoot().find('%s')!== undefined ;",
                         "localId")));
 
         // Default values for attributes of type Aura.Component[]
@@ -722,29 +722,29 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 getText(By.cssSelector("div.testDiv")));
 
         // historyService.set() to a new location - W-1506261
-        auraUITestingUtil.getEval("$A.historyService.set('forward')");
-        String url = (String) auraUITestingUtil.getEval("return window.location.href");
+        getAuraUITestingUtil().getEval("$A.historyService.set('forward')");
+        String url = (String) getAuraUITestingUtil().getEval("return window.location.href");
         assertTrue("Failed to change window location using set()", url.endsWith("#forward"));
 
         // historyService.get()
         assertEquals("get() failed to retrieve expected token",
-                "forward", auraUITestingUtil.getEval("return $A.historyService.get().token"));
+                "forward", getAuraUITestingUtil().getEval("return $A.historyService.get().token"));
 
         // historyService.back()
-        auraUITestingUtil.getEval("$A.historyService.back()");
+        getAuraUITestingUtil().getEval("$A.historyService.back()");
         assertEquals("Failed to revert back to previous URL", initialUrl, getDriver().getCurrentUrl());
         assertEquals("History service failed to go back",
-                "", auraUITestingUtil.getEval("return $A.historyService.get().token"));
+                "", getAuraUITestingUtil().getEval("return $A.historyService.get().token"));
 
         // historyService.forward()
-        auraUITestingUtil.getEval("$A.historyService.forward()");
+        getAuraUITestingUtil().getEval("$A.historyService.forward()");
         assertEquals("History service does provided unexpected # token",
-                "forward", auraUITestingUtil.getEval("return $A.historyService.get().token"));
+                "forward", getAuraUITestingUtil().getEval("return $A.historyService.get().token"));
         assertTrue("Window location does not end with expected #", getDriver().getCurrentUrl().endsWith("#forward"));
 
         // Manually firing locationChange event
         expectedTxt = "Location Change fired:1";
-        auraUITestingUtil.getEval("$A.eventService.newEvent('aura:locationChange').fire()");
+        getAuraUITestingUtil().getEval("$A.eventService.newEvent('aura:locationChange').fire()");
         assertEquals("Manully firing locationChange event failed",
                 expectedTxt, getText(By.cssSelector("div.testDiv")));
     }
@@ -793,7 +793,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         }
         openNoAura(url);
         // Wait for page to be ready
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
         // Wait for Aura framework(injected) to be ready
         waitForAuraFrameworkReady();
     }

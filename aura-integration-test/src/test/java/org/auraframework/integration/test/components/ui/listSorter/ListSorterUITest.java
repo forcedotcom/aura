@@ -86,7 +86,7 @@ public class ListSorterUITest extends WebDriverTestCase {
         assertFalse("list Sorter Dialog should not be visible", listSorter.getAttribute("class").contains("open"));
         openListSorter();
         focusOnListSorter();//need to focus on the list sorter first, or ESC won't work
-        WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+        WebElement activeElement = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
         activeElement.sendKeys(keysToSend);
         if (isOpen) {
             assertTrue("list Sorter Dialog should still be visible after pressing tab", listSorter

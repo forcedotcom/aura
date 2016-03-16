@@ -178,7 +178,7 @@ public class ComponentJSTestSuite extends TestSuite {
         public String getUrl() {
             DefType defType = caseDef.getDefType();
             return String.format("%s?aura.jstestrun=%s&aura.testReset=true&aura.testTimeout=%s",
-                    suite.getUrl(defType), caseDef.getName(), auraUITestingUtil.getTimeout());
+                    suite.getUrl(defType), caseDef.getName(), getAuraUITestingUtil().getTimeout());
         }
 
         /**
@@ -202,7 +202,7 @@ public class ComponentJSTestSuite extends TestSuite {
 
             // Actions run on servers need special handling because their call back methods are called asynchronously.
             // This check is to make sure all such calls were complete.
-            auraUITestingUtil.waitForAuraTestComplete(auraUITestingUtil.getTimeout());
+            getAuraUITestingUtil().waitForAuraTestComplete(getAuraUITestingUtil().getTimeout());
         }
 
         @Override

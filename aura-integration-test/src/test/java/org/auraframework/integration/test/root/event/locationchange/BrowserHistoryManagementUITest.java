@@ -47,7 +47,7 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
         findByCssSelector(".identifier").click();
         assertEquals("Contents on the page changed even though location change event was not handled", content,
                 getBodyText());
-        assertEquals("WillDoNothing", auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
+        assertEquals("WillDoNothing", getAuraUITestingUtil().getEval("return window.aura.historyService.get().token"));
     }
 
     private String getBodyText() {
@@ -67,8 +67,8 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
                 "test_LocChng_SimpleComponent#aura:locationChange".equals(findByCssSelector(".SimpleComponent")
                         .getText()));
         assertEquals("ButtonClickedSimpleComponent",
-                auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
-        assertEquals("1", auraUITestingUtil.getEval("return window.aura.historyService.get().num"));
+                getAuraUITestingUtil().getEval("return window.aura.historyService.get().token"));
+        assertEquals("1", getAuraUITestingUtil().getEval("return window.aura.historyService.get().num"));
     }
 
     /**
@@ -90,8 +90,8 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
          * .equals(this.getText("//div[contains(@class,'SimpleComponent')]"))
          */
         assertEquals("ButtonClickedCompositeComponent",
-                auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
-        assertEquals("1", auraUITestingUtil.getEval("return window.aura.historyService.get().locator"));
+                getAuraUITestingUtil().getEval("return window.aura.historyService.get().token"));
+        assertEquals("1", getAuraUITestingUtil().getEval("return window.aura.historyService.get().locator"));
 
     }
 
@@ -114,8 +114,8 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
                 "test_LocChng_SimpleComponent#test:test_LocChng_Event2",
                 findByCssSelector(".SimpleComponent").getText());
         assertEquals("ButtonClickedSimpleComponent",
-                auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
-        assertEquals("1", auraUITestingUtil.getEval("return window.aura.historyService.get().locator"));
+                getAuraUITestingUtil().getEval("return window.aura.historyService.get().token"));
+        assertEquals("1", getAuraUITestingUtil().getEval("return window.aura.historyService.get().locator"));
 
     }
 
@@ -147,8 +147,8 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
         i--;
         // 3
         waitForElementPresent(findByCssSelector(locationChangeIndicator));
-        assertEquals("ButtonClicked", auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
-        assertEquals(Integer.toString(i), auraUITestingUtil.getEval("return window.aura.historyService.get().num"));
+        assertEquals("ButtonClicked", getAuraUITestingUtil().getEval("return window.aura.historyService.get().token"));
+        assertEquals(Integer.toString(i), getAuraUITestingUtil().getEval("return window.aura.historyService.get().num"));
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         findByCssSelector(backLocator).click();
         i--;
@@ -222,7 +222,7 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
         waitForElementPresent(findByCssSelector(locationChangeIndicator));
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         // Using the browser's back button
-        auraUITestingUtil.getEval("window.history.back()");
+        getAuraUITestingUtil().getEval("window.history.back()");
         i--;
         // 1
         waitForElementPresent(findByCssSelector(locationChangeIndicator));
@@ -237,8 +237,8 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
         findByCssSelector(".SimpleComponent").click();
         index++;
         waitForElementPresent(findByCssSelector(".complete"));
-        assertEquals("ButtonClicked", auraUITestingUtil.getEval("return window.aura.historyService.get().token"));
-        assertEquals(Integer.toString(index), auraUITestingUtil.getEval("return window.aura.historyService.get().num"));
+        assertEquals("ButtonClicked", getAuraUITestingUtil().getEval("return window.aura.historyService.get().token"));
+        assertEquals(Integer.toString(index), getAuraUITestingUtil().getEval("return window.aura.historyService.get().num"));
         assertEquals(Integer.toString(index), findByCssSelector(".id").getText());
         return index;
     }

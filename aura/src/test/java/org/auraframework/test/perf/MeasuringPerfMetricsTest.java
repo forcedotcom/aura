@@ -85,7 +85,7 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
 
         // verify the component was loaded
         assertEquals("button loaded", LABEL_MOCK,
-                AuraTextUtil.urldecode(currentDriver.findElement(By.cssSelector(".uiButton")).getText()));
+                AuraTextUtil.urldecode(getDriver().findElement(By.cssSelector(".uiButton")).getText()));
 
         // TODO: check network metrics
         // MedianPerfMetric networkMetric = (MedianPerfMetric) median.getMetric("Network.encodedDataLength");
@@ -106,7 +106,7 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
 
         // verify the component was loaded
         assertEquals("label loaded", LABEL_MOCK,
-                AuraTextUtil.urldecode(currentDriver.findElement(By.cssSelector(".uiLabel")).getText()));
+                AuraTextUtil.urldecode(getDriver().findElement(By.cssSelector(".uiLabel")).getText()));
     }
 
     // perfTest:dummyPerf

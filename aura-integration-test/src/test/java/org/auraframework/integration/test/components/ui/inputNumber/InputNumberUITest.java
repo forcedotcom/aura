@@ -105,7 +105,7 @@ public class InputNumberUITest extends WebDriverTestCase {
         input.sendKeys("abcdef");
         submit.click();
         waitForElementTextPresent(output, "Got Error!");
-        auraUITestingUtil.waitForElementText(By.className("uiInputDefaultError"),
+        getAuraUITestingUtil().waitForElementText(By.className("uiInputDefaultError"),
                 "Invalid value for inVar: java://long", true, "Error element never inserted into DOM");
 
         // clear error

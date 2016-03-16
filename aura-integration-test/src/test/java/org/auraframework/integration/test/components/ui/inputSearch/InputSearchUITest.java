@@ -34,20 +34,20 @@ public class InputSearchUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
             BrowserType.SAFARI })
     public void testSearch() throws Exception {
-        String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.searched");
-        String cmpValueExpression = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil
+        String valueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.searched");
+        String cmpValueExpression = getAuraUITestingUtil().prepareReturnStatement(getAuraUITestingUtil()
                 .getValueFromRootExpr("v.value"));
-        valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
+        valueExpression = getAuraUITestingUtil().prepareReturnStatement(valueExpression);
         open("/uitest/inputSearch_HandlingSearchEvent.cmp");
 
-        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt("search");
+        WebElement input = getAuraUITestingUtil().findElementAndTypeEventNameInIt("search");
         assertFalse("Search event should not have been triggered yet",
-                auraUITestingUtil.getBooleanEval(valueExpression));
-        assertNull("Component value should not be updated yet", auraUITestingUtil.getEval(cmpValueExpression));
-        auraUITestingUtil.pressEnter(input);
+                getAuraUITestingUtil().getBooleanEval(valueExpression));
+        assertNull("Component value should not be updated yet", getAuraUITestingUtil().getEval(cmpValueExpression));
+        getAuraUITestingUtil().pressEnter(input);
         waitForCondition(valueExpression);
         // test case for W-1545841
-        assertEquals("Component value should be updated", "search", auraUITestingUtil.getEval(cmpValueExpression));
+        assertEquals("Component value should be updated", "search", getAuraUITestingUtil().getEval(cmpValueExpression));
     }
 
     // W-1551076: Webdriver not firing search event in Safari
@@ -55,21 +55,21 @@ public class InputSearchUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
             BrowserType.SAFARI, BrowserType.IE7, BrowserType.IE8 })
     public void testClearSelection() throws Exception {
-        String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.searched");
-        valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
+        String valueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.searched");
+        valueExpression = getAuraUITestingUtil().prepareReturnStatement(valueExpression);
         open("/uitest/inputSearch_HandlingSearchEvent.cmp?showClear=true");
 
-        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt("search");
+        WebElement input = getAuraUITestingUtil().findElementAndTypeEventNameInIt("search");
         assertEquals("The initial value in input Search is wrong", "search", input.getAttribute("value"));
 
         WebDriver d = getDriver();
         WebElement clearButton = d.findElement(By.cssSelector("button[class*='clear']"));
         assertTrue("input search clear button doesn't show up", clearButton.isDisplayed());
 
-        auraUITestingUtil.pressEnter(clearButton);
+        getAuraUITestingUtil().pressEnter(clearButton);
         assertEquals("The input search term should be cleared", "", input.getAttribute("value"));
         assertTrue("input Search Search event should have been triggered",
-                auraUITestingUtil.getBooleanEval(valueExpression));
+                getAuraUITestingUtil().getBooleanEval(valueExpression));
 
     }
 }

@@ -74,7 +74,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
 
         String url = "/auratest/componentClassParent.cmp?errorOutFromAfterRender_Parent=true";
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
@@ -89,7 +89,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
         String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromRender_Parent=true";
 
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
@@ -103,7 +103,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
         String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromRender_Child=true";
 
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
@@ -117,7 +117,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
         String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromHelper_Parent=true";
 
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
@@ -131,7 +131,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
         String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromHelper_Child=true";
 
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
@@ -150,7 +150,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
                 "requestAttributes={'errorOutFromHelper_Child':true}";
 
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
@@ -167,7 +167,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
                 "requestAttributes={'errorOutFromHelper_Parent':true}";
 
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
@@ -185,7 +185,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
                 "requestAttributes={'errorOutFromRender_Child':true}";
 
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
@@ -202,7 +202,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
                 "requestAttributes={'errorOutFromRender_Parent':true}";
 
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
@@ -220,7 +220,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
                 "requestAttributes={'errorOutFromHelper_Child':true}";
 
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
@@ -237,7 +237,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
                 "requestAttributes={'errorOutFromHelper_Parent':true}";
 
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
@@ -254,7 +254,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
                 "requestAttributes={'errorOutFromRender_Child':true}";
 
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
@@ -271,7 +271,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
                 "requestAttributes={'errorOutFromRender_Parent':true}";
 
         open(url, Mode.DEV, false);
-        auraUITestingUtil.waitForDocumentReady();
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));

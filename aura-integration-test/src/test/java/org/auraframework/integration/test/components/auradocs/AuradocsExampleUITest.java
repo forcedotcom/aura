@@ -34,11 +34,11 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
     }
 
     @Override
-    public void perBrowserSetUp() {
-        super.perBrowserSetUp();
+    public void setUp() throws Exception {
+        super.setUp();
         // This page, especially the reference tab, loads several components and
         // needs extra time in slower environments
-        auraUITestingUtil.setTimeoutInSecs(60);
+        getAuraUITestingUtil().setTimeoutInSecs(60);
     }
 
     public void testBaseProd() throws Exception {
@@ -87,7 +87,7 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
         long start = System.currentTimeMillis();
         open("/auradocs#reference", mode);
         
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
             	WebElement sidebar = getAuraUITestingUtil().findDomElement(
@@ -104,7 +104,7 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
         long start = System.currentTimeMillis();
         open("/auradocs#reference?descriptor=aura:component&defType=component",
                 mode);
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
             	WebElement tabset = getAuraUITestingUtil().findDomElement(

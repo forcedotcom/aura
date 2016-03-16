@@ -201,8 +201,8 @@ public class InputSelectUITest extends WebDriverTestCase {
     }
 
     private String getComponentValue(String componentId) {
-        String valueExpression = auraUITestingUtil.getValueFromCmpRootExpression(componentId, "v.value");
-        return (String) auraUITestingUtil.getEval(valueExpression);
+        String valueExpression = getAuraUITestingUtil().getValueFromCmpRootExpression(componentId, "v.value");
+        return (String) getAuraUITestingUtil().getEval(valueExpression);
     }
 
     /**

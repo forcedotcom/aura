@@ -133,16 +133,16 @@ public class PerfExecutorTest extends WebDriverTestCase {
         final By componentRendered = By.cssSelector(".perfTestFinish");
         final By auraErrorMessage = By.id("auraErrorMessage");
         ExpectedCondition<By> condition = prepareCondition(componentRendered, auraErrorMessage);
-        By locatorFound = new WebDriverWait(currentDriver, DEFAULT_TIMEOUT).withMessage("Error loading " + descriptor).until(
+        By locatorFound = new WebDriverWait(getDriver(), DEFAULT_TIMEOUT).withMessage("Error loading " + descriptor).until(
                 condition);
 
         if (locatorFound == auraErrorMessage) {
-            fail("Error loading " + descriptor.getName() + ": " + currentDriver.findElement(auraErrorMessage).getText());
+            fail("Error loading " + descriptor.getName() + ": " + getDriver().findElement(auraErrorMessage).getText());
         }
 
         // check for internal errors while rendering component
         if (locatorFound == componentRendered) {
-            String text = currentDriver.findElement(componentRendered).getText();
+            String text = getDriver().findElement(componentRendered).getText();
             if (text != null && text.contains("internal server error")) {
                 fail("Error loading " + descriptor.getDescriptorName() + ": " + text);
             }
@@ -296,7 +296,7 @@ public class PerfExecutorTest extends WebDriverTestCase {
     }
 
     public WebDriver getWebDriver(){
-        return currentDriver;
+        return getDriver();
     }
 
     @Override

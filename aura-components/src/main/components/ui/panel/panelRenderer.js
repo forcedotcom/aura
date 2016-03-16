@@ -17,15 +17,9 @@
 ({
     afterRender: function (cmp, helper) {
         this.superAfterRender();
-        var dom = cmp.getElement();
-        var scrollables = dom.querySelectorAll('.scrollable');
-        
-        for (var i = 0; i < scrollables.length; i++) {
-            helper.lib.panelLibCore.scopeScroll(scrollables[i]);
-        }
-
+        helper.scopeScrollables(cmp);
     },
-    rerender: function (cmp) {
+    rerender: function (cmp, helper) {
 
         /*
         This is to prevent losing the "state"
@@ -47,6 +41,6 @@
                 currentEl.classList.add(cl);
             });
         }
-
+        helper.scopeScrollables(cmp);
     }
 })// eslint-disable-line semi

@@ -406,7 +406,14 @@
             this.clickAnchor(trigger);
         }, function (cmp) {
             var menuItem3 = cmp.find("actionItem3");
-            menuItem3.getElement().dispatchEvent(new MouseEvent('mouseover'));
+            var mouseOverEvent;
+            if ($A.util.isIE) {
+                mouseOverEvent = document.createEvent("MouseEvent")
+                mouseOverEvent.initMouseEvent("mouseover", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            } else {
+               mouseOverEvent = new MouseEvent("mouseover")
+            }
+            menuItem3.getElement().dispatchEvent(mouseOverEvent);
             $A.test.addWaitForWithFailureMessage(menuItem3.get('v.label'), function () {
                 return $A.test.getActiveElementText()
             }, "Focus should be on item 3");

@@ -633,7 +633,7 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void registerComponent(BaseComponent<?, ?> component) {
         InstanceStack iStack = getInstanceStack();
-        if (iStack.isUnprivileged()) {
+        if (iStack.isExternal()) {
             if (componentCount++ > MAX_COMPONENT_COUNT) {
                 //
                 // This is bad, try to give the poor user an idea of what happened.

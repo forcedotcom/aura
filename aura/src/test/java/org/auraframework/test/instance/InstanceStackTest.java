@@ -46,7 +46,7 @@ public class InstanceStackTest extends UnitTestCase {
     public InstanceStackTest(String name) {
         super(name);
         mci = Mockito.mock(ConfigAdapter.class);
-        Mockito.when(mci.isPrivilegedNamespace((String) Mockito.any())).thenReturn(true);
+        Mockito.when(mci.isInternalNamespace((String) Mockito.any())).thenReturn(true);
     }
 
     //
@@ -344,48 +344,48 @@ public class InstanceStackTest extends UnitTestCase {
         verifyZeroInteractions(jsonMock);
     }
 
-    public void testPrivileged() throws Exception {
+    public void testInternal() throws Exception {
         // setting up
-        String namespace_Priv = "previlege";
-        String namespace_UnPriv = "unprevilege";
+        String namespace_Internal = "internal";
+        String namespace_External = "external";
         String name1 = "one";
         String name2 = "two";
         String name3 = "three";
         String name4 = "four";
-        Mockito.when(mci.isPrivilegedNamespace(namespace_Priv)).thenReturn(true);
-        Mockito.when(mci.isPrivilegedNamespace(namespace_UnPriv)).thenReturn(false);
+        Mockito.when(mci.isInternalNamespace(namespace_Internal)).thenReturn(true);
+        Mockito.when(mci.isInternalNamespace(namespace_External)).thenReturn(false);
         // create empty stack, sanity check
         InstanceStack iStack = new InstanceStack();
         iStack.setConfigAdapter(mci);
-        assertFalse("stack should has topUnprivileged=null at the beginning", iStack.isUnprivileged());
+        assertFalse("stack should have topExternal=null at the beginning", iStack.isExternal());
         // start pushing
-        TestInstance one = new TestInstance(namespace_Priv, name1);
+        TestInstance one = new TestInstance(namespace_Internal, name1);
         iStack.pushInstance(one, one.getDescriptor());
-        assertFalse("topUnprivileged is still null after pushing in one previleged instance:instance1",
-                iStack.isUnprivileged());
-        TestInstance two = new TestInstance(namespace_UnPriv, name2);
+        assertFalse("topExternal is still null after pushing in one internal instance:instance1",
+                iStack.isExternal());
+        TestInstance two = new TestInstance(namespace_External, name2);
         iStack.pushInstance(two, two.getDescriptor());
-        assertTrue("topUnprivileged should become first unprivilege instance:instance2", iStack.isUnprivileged());
-        TestInstance three = new TestInstance(namespace_Priv, name3);
+        assertTrue("topExternal should become first external instance:instance2", iStack.isExternal());
+        TestInstance three = new TestInstance(namespace_Internal, name3);
         iStack.pushInstance(three, three.getDescriptor());
-        assertTrue("topUnprivileged should remain unchanged after pushing in a new privilege instance:instance3",
-                iStack.isUnprivileged());
-        TestInstance four = new TestInstance(namespace_UnPriv, name4);
+        assertTrue("topExternal should remain unchanged after pushing in a new internal instance:instance3",
+                iStack.isExternal());
+        TestInstance four = new TestInstance(namespace_External, name4);
         iStack.pushInstance(four, four.getDescriptor());
-        assertTrue("topUnprivileged should be unchanged after pushing in a new unprivilege instance:instance4",
-                iStack.isUnprivileged());
+        assertTrue("topExternal should be unchanged after pushing in a new external instance:instance4",
+                iStack.isExternal());
         // start poping
         iStack.popInstance(four);
-        assertTrue("topUnprivileged should be unchanged after poping out unprivilege instance:instance4",
-                iStack.isUnprivileged());
+        assertTrue("topExternal should be unchanged after popping out external instance:instance4",
+                iStack.isExternal());
         iStack.popInstance(three);
-        assertTrue("topUnprivileged should be unchanged after poping out privilege instance:instance3",
-                iStack.isUnprivileged());
+        assertTrue("topExternal should be unchanged after popping out internal instance:instance3",
+                iStack.isExternal());
         iStack.popInstance(two);
-        assertFalse("topUnprivileged should become null after poping out first unprivilege instance:instance2",
-                iStack.isUnprivileged());
+        assertFalse("topExternal should become null after popping out first external instance:instance2",
+                iStack.isExternal());
         iStack.popInstance(one);
-        assertFalse("topUnprivileged should be unchanged(null) after poping out instance1", iStack.isUnprivileged());
+        assertFalse("topExternal should be unchanged(null) after popping out instance1", iStack.isExternal());
     }
 
     public void testPeekAtEmptyStackReturnsNull() throws Exception {

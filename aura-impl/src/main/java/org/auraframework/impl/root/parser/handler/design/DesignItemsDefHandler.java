@@ -55,8 +55,8 @@ public class DesignItemsDefHandler extends ParentedTagHandler<DesignItemsDef, De
         if (DesignLayoutAttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
             DesignLayoutAttributeDef item = new DesignLayoutAttributeDefHandler(getParentHandler(), xmlReader, source).getElement();
             builder.addAttribute(item);
-        } else if(isInPrivilegedNamespace() && DesignLayoutComponentDefHandler.TAG.equalsIgnoreCase(tag)) {
-            //Component injection is only allowed in privileged namespaces
+        } else if(isInInternalNamespace() && DesignLayoutComponentDefHandler.TAG.equalsIgnoreCase(tag)) {
+            //Component injection is only allowed in internal namespaces
             DesignLayoutComponentDef cmp = new DesignLayoutComponentDefHandler(getParentHandler(), xmlReader, source).getElement();
             builder.addComponent(cmp);
         } else {

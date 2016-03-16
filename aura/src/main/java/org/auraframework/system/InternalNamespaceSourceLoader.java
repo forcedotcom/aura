@@ -18,6 +18,6 @@ package org.auraframework.system;
 
 /**
  */
-public interface PrivilegedNamespaceSourceLoader {
-    boolean isPrivilegedNamespace(String namespace);    
+public interface InternalNamespaceSourceLoader {
+    boolean isInternalNamespace(String namespace);
 }

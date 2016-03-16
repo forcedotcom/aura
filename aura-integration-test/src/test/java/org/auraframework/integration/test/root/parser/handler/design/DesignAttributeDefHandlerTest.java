@@ -138,7 +138,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
     }
 
     @UnAdaptableTest("namespace cxxx means something special in core")
-    public void testDesignWithDefaultBlockNonPriviledgedFails() throws Exception {
+    public void testDesignWithDefaultBlockNonInternalFails() throws Exception {
         final String attr = "attr";
         String cmp = "<aura:attribute name=\"" + attr +"\" type=\"String\" />";
         String design = "<design:component>" +
@@ -212,13 +212,13 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         return createAuraDefinitionWithDesignFile(cmpAttributes, designSource, false);
     }
 
-    private DefDescriptor<ComponentDef> createAuraDefinitionWithDesignFile(String cmpAttributes, String designSource, boolean isPriviledged) {
+    private DefDescriptor<ComponentDef> createAuraDefinitionWithDesignFile(String cmpAttributes, String designSource, boolean isInternal) {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":",
                 ComponentDef.class, null);
-        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpAttributes), isPriviledged);
+        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpAttributes), isInternal);
         DefDescriptor<DesignDef> desc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
-        getAuraTestingUtil().addSourceAutoCleanup(desc, designSource, isPriviledged);
+        getAuraTestingUtil().addSourceAutoCleanup(desc, designSource, isInternal);
         return cmpDesc;
     }
 }

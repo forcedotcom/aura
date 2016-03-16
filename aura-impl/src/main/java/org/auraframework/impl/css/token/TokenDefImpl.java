@@ -120,7 +120,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
             }
         }
 
-        // for non-privileged namespaces, enforce extra security measures to prevent XSS attacks or other abuse:
+        // for external namespaces, enforce extra security measures to prevent XSS attacks or other abuse:
 
         // 1) only allow a whitelist of characters. This notably EXCLUDES blackslashes used for escape sequences, html
         // entities (&...;), comments (could be used to work around the blacklist, below), and : (necessary for url protocols).
@@ -137,7 +137,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         // also note that if the value does not parse as valid syntax for where the token is referenced, the value
         // will not be included in the output. This is handled by nature of how the substitution is performed.
 
-        if (!Aura.getConfigAdapter().isPrivilegedNamespace(parentDescriptor.getNamespace())) {
+        if (!Aura.getConfigAdapter().isInternalNamespace(parentDescriptor.getNamespace())) {
             // expressions, e.g., cross refs
             if (value instanceof Expression) {
                 // currently only a single PropertyReference is valid, but this most likely will not hold true.

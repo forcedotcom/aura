@@ -60,10 +60,10 @@ public class DesignLayoutDefHandlerTest extends AuraImplTestCase {
         }
     }
 
-    public void testLayoutInNonPrivilegedNS() throws Exception {
+    public void testLayoutInNonInternalNS() throws Exception {
         try {
             setupDesignLayoutDef(LAYOUT, false);
-            fail("Un-privileged NS should not be allowed to add a layout component");
+            fail("Non-Internal NS should not be allowed to add a layout component");
         } catch (Exception e) {
             assertExceptionType(e, InvalidDefinitionException.class);
             assertTrue("Exception message was unexpected", e.getMessage().contains("<design:component> can not contain tag"));
@@ -71,15 +71,15 @@ public class DesignLayoutDefHandlerTest extends AuraImplTestCase {
     }
 
 
-    private DesignDef setupDesignLayoutDef(String markup, boolean addToPrivileged) throws Exception {
+    private DesignDef setupDesignLayoutDef(String markup, boolean addToInternal) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":",
                 ComponentDef.class, null);
-        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", ""), addToPrivileged);
+        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", ""), addToInternal);
 
         DefDescriptor<DesignDef> designDesc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
         getAuraTestingUtil().addSourceAutoCleanup(designDesc,
-                String.format("<design:component>%s</design:component>", markup), addToPrivileged);
+                String.format("<design:component>%s</design:component>", markup), addToInternal);
 
         return designDesc.getDef();
     }

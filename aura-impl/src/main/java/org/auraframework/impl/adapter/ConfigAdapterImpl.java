@@ -29,6 +29,7 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Properties;
@@ -84,6 +85,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     private static final Set<String> SYSTEM_NAMESPACES = Sets.newHashSet();
     private static final Set<String> CANONICAL_NAMESPACES = Sets.newTreeSet();
+    private static final Set<String> PRIVILEGED_NAMESPACES = Sets.newTreeSet();
 
     private static final Set<String> UNSECURED_PREFIXES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("aura", "layout").build();
 
@@ -205,13 +207,23 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
-    public boolean isPrivilegedNamespace(String namespace) {
+    public boolean isInternalNamespace(String namespace) {
         return namespace != null && SYSTEM_NAMESPACES.contains(namespace.toLowerCase());
     }
 
     @Override
-    public Set<String> getPrivilegedNamespaces(){
+    public Set<String> getInternalNamespaces(){
         return CANONICAL_NAMESPACES;
+    }
+
+    @Override
+    public boolean isPrivilegedNamespace(String namespace) {
+        return namespace != null && PRIVILEGED_NAMESPACES.contains(namespace);
+    }
+
+    @Override
+    public Set<String> getPrivilegedNamespaces(){
+        return PRIVILEGED_NAMESPACES;
     }
 
     @Override
@@ -608,7 +620,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
-    public void addPrivilegedNamespace(String namespace) {
+    public void addInternalNamespace(String namespace) {
         if(namespace != null && !namespace.isEmpty()){
             SYSTEM_NAMESPACES.add(namespace.toLowerCase());
             CANONICAL_NAMESPACES.add(namespace);
@@ -616,11 +628,22 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
-    public void removePrivilegedNamespace(String namespace) {
+    public void removeInternalNamespace(String namespace) {
         SYSTEM_NAMESPACES.remove(namespace.toLowerCase());
         CANONICAL_NAMESPACES.remove(namespace);
     }
 
+    @Override
+    public void addPrivilegedNamespace(String namespace) {
+        if(namespace != null && !namespace.isEmpty()){
+            PRIVILEGED_NAMESPACES.add(namespace);
+        }
+    }
+
+    @Override
+    public void removePrivilegedNamespace(String namespace) {
+        PRIVILEGED_NAMESPACES.remove(namespace);
+    }
     @Override
     public boolean isDocumentedNamespace(String namespace) {
         return !UNDOCUMENTED_NAMESPACES.contains(namespace) && !namespace.toLowerCase().endsWith("test");

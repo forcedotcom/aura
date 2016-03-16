@@ -141,7 +141,7 @@ AuraClientService = function AuraClientService () {
     this.initDefsObservers = [];
     this.finishedInitDefs = false;
     this.protocols={"layout":true};
-    this.namespaces={};
+    this.namespaces={internal:{},privileged:{}};
     this.lastSendTime = Date.now();
 
     // XHR timeout (milliseconds)
@@ -1049,11 +1049,21 @@ AuraClientService.prototype.initDefs = function(config) {
         $A.componentService.saveComponentConfig(comConfigs[i]);
     }
 
-    var namespaces = config["namespaces"];
-    for (i = 0; i < namespaces.length; i++){
-        this.namespaces[namespaces[i]] = true;
-    }
+    var namespaces = {
+        "internal":this.namespaces.internal,
+        "privileged":this.namespaces.privileged
+    };
+    var sentNs=config["ns"];
 
+    if(sentNs){
+        for(var x in namespaces) {
+            if(sentNs[x]){
+                for (i = 0; i < sentNs[x].length; i++) {
+                    namespaces[x][sentNs[x][i]] = true;
+                }
+            }
+        }
+    }
     Aura.bootstrapMark("metadataReady");
     // Let any interested parties know that defs have been initialized
     for ( var n = 0, olen = this.initDefsObservers.length; n < olen; n++) {
@@ -2672,65 +2682,81 @@ AuraClientService.prototype.invalidateAction = function(descriptor, params, succ
     );
 };
 
+AuraClientService.prototype.isInternalNamespace = function(namespace) {
+    return this.namespaces.internal.hasOwnProperty(namespace);
+};
+
 AuraClientService.prototype.isPrivilegedNamespace = function(namespace) {
-	return this.namespaces.hasOwnProperty(namespace);
+	return this.namespaces.privileged.hasOwnProperty(namespace);
 };
 
 AuraClientService.prototype.allowAccess = function(definition, component) {
     if(definition&&definition.getDescriptor){
         var context;
         var currentAccess;
-        switch(definition.access){
-            case 'G':
-                // GLOBAL means accessible from anywhere
-                return true;
-            case 'p':
-                // PRIVATE means "same component only".
-                context=$A.getContext();
-                currentAccess=context&&context.getCurrentAccess();
-                return currentAccess&&(currentAccess===component||currentAccess.getComponentValueProvider()===component||currentAccess.getDef()===component);
-            default:
-                // INTERNAL, PUBLIC, or absence of value means "same namespace only".
-                context=$A.getContext();
-                currentAccess=(context&&context.getCurrentAccess())||component;
-                if(currentAccess){// && currentAccess.isValid()){
-                    var accessDef=null;
-                    var accessFacetDef=null;
-                    if(currentAccess.getComponentValueProvider&&currentAccess.getDef){
-                        var accessFacetValueProvider = currentAccess.getComponentValueProvider();
-                        accessFacetDef=accessFacetValueProvider&&accessFacetValueProvider.getDef();
-                        accessDef=currentAccess.getDef();
-                    }else{
-                        accessDef=currentAccess;
-                    }
+        if(definition.access==='G'){
+            // GLOBAL means accessible from anywhere
+            return true;
+        }else if(definition.access==='p'){
+            // PRIVATE means "same component only".
+            context=$A.getContext();
+            currentAccess=context&&context.getCurrentAccess();
+            return currentAccess&&(currentAccess===component||currentAccess.getComponentValueProvider()===component||currentAccess.getDef()===component);
+        }else{
+            // Compute PRIVILEGED, INTERNAL, PUBLIC, and default (omitted)
+            context=$A.getContext();
+            currentAccess=(context&&context.getCurrentAccess())||component;
+            if(currentAccess){
+                var accessDef=null;
+                var accessFacetDef=null;
+                if(currentAccess.getComponentValueProvider&&currentAccess.getDef){
+                    var accessFacetValueProvider = currentAccess.getComponentValueProvider();
+                    accessFacetDef=accessFacetValueProvider&&accessFacetValueProvider.getDef();
+                    accessDef=currentAccess.getDef();
+                }else{
+                    accessDef=currentAccess;
+                }
 
-                    var accessDescriptor=accessDef&&accessDef.getDescriptor();
-                    var accessFacetDescriptor=accessFacetDef&&accessFacetDef.getDescriptor();
-                    var accessNamespace=accessDescriptor&&accessDescriptor.getNamespace();
-                    var accessFacetNamespace=accessFacetDescriptor&&accessFacetDescriptor.getNamespace();
-                    // JBUCH: ACCESS: TODO: DETERMINE IF THIS IS THE CORRECT DEFAULT BEHAVIOR; FOR NOW, TREAT PUBLIC/OMITTED AS INTERNAL
-                    // if(definition.access!=="P"){
-                    // INTERNAL / DEFAULT
-                    var allowProtocol=this.protocols.hasOwnProperty(accessDescriptor&&accessDescriptor.getPrefix()) || this.protocols.hasOwnProperty(accessFacetDescriptor&&accessFacetDescriptor.getPrefix());
-                    var allowNamespace=this.namespaces.hasOwnProperty(accessNamespace) || this.namespaces.hasOwnProperty(accessFacetNamespace);
-                    if(allowProtocol || allowNamespace){
+                var accessDescriptor=accessDef&&accessDef.getDescriptor();
+                var accessFacetDescriptor=accessFacetDef&&accessFacetDef.getDescriptor();
+                var accessNamespace=accessDescriptor&&accessDescriptor.getNamespace();
+                var accessFacetNamespace=accessFacetDescriptor&&accessFacetDescriptor.getNamespace();
+
+                var allowProtocol=this.protocols.hasOwnProperty(accessDescriptor&&accessDescriptor.getPrefix()) || this.protocols.hasOwnProperty(accessFacetDescriptor&&accessFacetDescriptor.getPrefix());
+                var isInternal=allowProtocol || this.namespaces.internal.hasOwnProperty(accessNamespace) || this.namespaces.internal.hasOwnProperty(accessFacetNamespace);
+
+                if(definition.access==='PP') {
+                    // PRIVILEGED means accessible to namespaces marked PRIVILEGED, as well as to INTERNAL
+                    var isPrivileged=this.namespaces.privileged.hasOwnProperty(accessNamespace) || this.namespaces.privileged.hasOwnProperty(accessFacetNamespace);
+                    if(isPrivileged || isInternal){
                         // Privileged Namespace
                         return true;
                     }
-                    //}
-                    // Not a privileged namespace or explicitly set to PUBLIC
-                    var targetNamespace=definition.getDescriptor().getNamespace();
-                    if(currentAccess===component || accessNamespace===targetNamespace || accessFacetNamespace===targetNamespace){
+                }
+
+                var effectiveAccess=definition.access||isInternal?'I':'P';
+                if(effectiveAccess==='P') {
+                    // PUBLIC means "same namespace only"
+                    var targetNamespace = definition.getDescriptor().getNamespace();
+                    if (currentAccess === component || accessNamespace === targetNamespace || accessFacetNamespace === targetNamespace) {
                         return true;
                     }
                 }
-                // JBUCH: HACK: THIS DELIGHTFUL BLOCK IS BECAUSE OF LEGACY UNAUTHENTICATED/AUTHENTICATED ABUSE OF ACCESS ATTRIBUTE. COOL.
-                return (definition.isInstanceOf && definition.isInstanceOf("aura:application")) ||
-                // #if {"excludeModes" : ["PRODUCTION","PRODUCTIONDEBUG"]}
-                // This check allows components to be loaded directly in the browser in DEV/TEST
-                (!$A.getRoot() || !$A.getRoot().isInstanceOf('aura:application')) && !(context&&context.getCurrentAccess()) ||
-                // #end
-                false;
+
+                // INTERNAL / DEFAULT means namespaces marked INTERNAL by the host
+                if(effectiveAccess==="I"){
+                    // Internal Namespace
+                    return isInternal;
+                }
+
+            }
+            // JBUCH: HACK: THIS DELIGHTFUL BLOCK IS BECAUSE OF LEGACY UNAUTHENTICATED/AUTHENTICATED ABUSE OF ACCESS ATTRIBUTE. COOL.
+            return (definition.isInstanceOf && definition.isInstanceOf("aura:application")) ||
+            // #if {"excludeModes" : ["PRODUCTION","PRODUCTIONDEBUG"]}
+            // This check allows components to be loaded directly in the browser in DEV/TEST
+            (!$A.getRoot() || !$A.getRoot().isInstanceOf('aura:application')) && !(context&&context.getCurrentAccess()) ||
+            // #end
+            false;
         }
     }
     return false;

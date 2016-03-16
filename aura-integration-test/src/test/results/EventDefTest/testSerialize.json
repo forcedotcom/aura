@@ -3,7 +3,6 @@
   "v":{
     "descriptor":"markup://fake:event",
     "type":"COMPONENT",
-    "xs":"P",
     "superDef":{
       "s":2,
       "v":{
@@ -21,7 +20,6 @@
         "v":{
           "name":"testString",
           "type":"aura://String",
-          "xs":"P",
           "required":true
         }
       },
@@ -30,7 +28,6 @@
         "v":{
           "name":"testInt",
           "type":"aura://Integer",
-          "xs":"P",
           "required":true
         }
       }

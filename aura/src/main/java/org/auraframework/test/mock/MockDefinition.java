@@ -131,6 +131,11 @@ public abstract class MockDefinition<D extends Definition> implements Definition
         }
 
         @Override
+        public boolean isPrivileged() {
+            return false;
+        }
+
+        @Override
         public boolean isInternal() {
             return false;
         }

@@ -55,16 +55,16 @@ public class InstanceStack {
         setAttributeIndex(0);
         this.current.top = true;
         this.base = path.toString();
-        this.topUnprivileged = null;
+        this.topExternal = null;
     }
 
     /**
      * start processing a component.
      */
     public void pushInstance(Instance<?> instance, DefDescriptor<?> desc) {
-        if (topUnprivileged == null) {
-            if (!configAdapter.isPrivilegedNamespace(desc.getNamespace())) {
-                topUnprivileged = instance;
+        if (topExternal == null) {
+            if (!configAdapter.isInternalNamespace(desc.getNamespace())) {
+                topExternal = instance;
             }
         }
         stack.add(current);
@@ -78,8 +78,8 @@ public class InstanceStack {
         if (current.instance != instance) {
             throw new AuraRuntimeException("mismatched instance pop");
         }
-        if (topUnprivileged == instance) {
-            topUnprivileged = null;
+        if (topExternal == instance) {
+            topExternal = null;
         }
         current = stack.remove(stack.size() - 1);
         if (current.top) {
@@ -295,12 +295,12 @@ public class InstanceStack {
     }
 
     /**
-     * Is the stack currently in an unprivileged state?
+     * Is the stack currently in an external state?
      *
-     * @return true if we have passed through an unprivileged namespace on the way here.
+     * @return true if we have passed through an external namespace on the way here.
      */
-    public boolean isUnprivileged() {
-        return topUnprivileged != null;
+    public boolean isExternal() {
+        return topExternal != null;
     }
 
     /**
@@ -442,7 +442,7 @@ public class InstanceStack {
     private List<Entry> stack;
     private Entry current;
     private final String base;
-    private Instance<?> topUnprivileged;
+    private Instance<?> topExternal;
 
     /**
      * Injection override.

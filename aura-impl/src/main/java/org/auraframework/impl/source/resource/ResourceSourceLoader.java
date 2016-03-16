@@ -23,7 +23,7 @@ import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.system.PrivilegedNamespaceSourceLoader;
+import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
@@ -39,7 +39,7 @@ import com.google.common.collect.Sets;
 
 /**
  */
-public class ResourceSourceLoader extends BaseSourceLoader implements PrivilegedNamespaceSourceLoader {
+public class ResourceSourceLoader extends BaseSourceLoader implements InternalNamespaceSourceLoader {
 
     private final static Logger _log = LoggerFactory.getLogger(ResourceSourceLoader.class);
 
@@ -208,8 +208,8 @@ public class ResourceSourceLoader extends BaseSourceLoader implements Privileged
     }
 
     @Override
-    public boolean isPrivilegedNamespace(String namespace) {
-        // All resource based namespaces are considered system by default
+    public boolean isInternalNamespace(String namespace) {
+        // All resource based namespaces are considered internal by default
         return true;
     }
 }

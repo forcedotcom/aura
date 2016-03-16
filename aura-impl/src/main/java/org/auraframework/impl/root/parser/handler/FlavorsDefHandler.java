@@ -51,7 +51,7 @@ public class FlavorsDefHandler extends RootTagHandler<FlavorsDef> {
             builder.setOwnHash(source.getHash());
         }
 
-        if (!isInPrivilegedNamespace()) {
+        if (!isInInternalNamespace()) {
             throw new DefinitionNotFoundException(defDescriptor);
         }
     }

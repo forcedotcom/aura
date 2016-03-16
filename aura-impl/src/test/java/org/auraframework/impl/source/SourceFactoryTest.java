@@ -24,7 +24,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.system.PrivilegedNamespaceSourceLoader;
+import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.test.source.StringSourceLoader;
@@ -50,35 +50,35 @@ public class SourceFactoryTest extends AuraImplTestCase {
     }
     
     /**
-     * Verify that SourceFactory registers Privileged namespaces based on loader information. 
-     * SourceLoaders that implement PrivilegedNamespaceSourceLoaders are considered for determining if a namespace is privileged.
-     * Namespaces served by SourceLoaders that do not implement PrivilegedNamespaceSourceLoaders are not privileged. 
+     * Verify that SourceFactory registers internal namespaces based on loader information.
+     * SourceLoaders that implement InternalNamespaceSourceLoaders are considered for determining if a namespace is internal.
+     * Namespaces served by SourceLoaders that do not implement InternalNamespaceSourceLoaders are not internal.
      */
-    public void testPrivilegedNamespaceSourceLoadersAreRegisteredWithConfigAdapter(){
+    public void testInternalNamespaceSourceLoadersAreRegisteredWithConfigAdapter(){
         SourceLoader friendlyLoader = new FriendlySourceLoader();
         SourceLoader selectiveLoader = new SelectiveSourceLoader();
-        SourceLoader unprivilegedLoader = new UnprivilegedSourceLoader();
-        List<SourceLoader> loaders = Lists.newArrayList(friendlyLoader, selectiveLoader, unprivilegedLoader);
+        SourceLoader externalLoader = new ExternalSourceLoader();
+        List<SourceLoader> loaders = Lists.newArrayList(friendlyLoader, selectiveLoader, externalLoader);
         SourceFactory sf = new SourceFactory(loaders);
         assertEquals(Sets.newHashSet("VIP", "Guest", "Friend1", "Friend2", "Custom_1","Custom_2"), sf.getNamespaces());
-        
+
         ConfigAdapter c = Aura.getConfigAdapter();
-        //Assert namespaces of PrivilegedNamespaceSourceLoaders are privileged based on isPrivilegedNamespace()
-        assertTrue(c.isPrivilegedNamespace("Friend1"));
-        assertTrue(c.isPrivilegedNamespace("Friend2"));
-        
-        assertTrue(c.isPrivilegedNamespace("VIP"));
-        assertFalse(c.isPrivilegedNamespace("Guest"));
-        
-        //Assert namspaces of non-PrivilegedNamespaceSourceLoaders are not privileged
-        assertFalse(c.isPrivilegedNamespace("Custom_1"));
-        assertFalse(c.isPrivilegedNamespace("Custom_2"));
+        //Assert namespaces of InternalNamespaceSourceLoaders are internal based on isInternalNamespace()
+        assertTrue(c.isInternalNamespace("Friend1"));
+        assertTrue(c.isInternalNamespace("Friend2"));
+
+        assertTrue(c.isInternalNamespace("VIP"));
+        assertFalse(c.isInternalNamespace("Guest"));
+
+        //Assert namespaces of non-InternalNamespaceSourceLoaders are not internal
+        assertFalse(c.isInternalNamespace("Custom_1"));
+        assertFalse(c.isInternalNamespace("Custom_2"));
     }
     
-    //SelectiveSourceLoader considered chosen namespace as privileged
-    private class SelectiveSourceLoader extends BaseSourceLoader implements PrivilegedNamespaceSourceLoader{
+    //SelectiveSourceLoader considered chosen namespace as internal
+    private class SelectiveSourceLoader extends BaseSourceLoader implements InternalNamespaceSourceLoader {
         @Override
-        public boolean isPrivilegedNamespace(String namespace) {
+        public boolean isInternalNamespace(String namespace) {
             return namespace.equals("VIP")? true : false; 
         }
         @Override
@@ -93,10 +93,10 @@ public class SourceFactoryTest extends AuraImplTestCase {
         public <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace) {return null;}
     }
     
-    //FriendlySourceLoader considered everything as privileged namespace
-    private class FriendlySourceLoader extends BaseSourceLoader implements PrivilegedNamespaceSourceLoader{
+    //FriendlySourceLoader considered everything as internal namespace
+    private class FriendlySourceLoader extends BaseSourceLoader implements InternalNamespaceSourceLoader {
         @Override
-        public boolean isPrivilegedNamespace(String namespace) {
+        public boolean isInternalNamespace(String namespace) {
             return true;
         }
         @Override
@@ -110,8 +110,8 @@ public class SourceFactoryTest extends AuraImplTestCase {
         @Override
         public <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace) {return null;}
     }
-    //UnprivilegedSourceLoader considered everything as unprivileged namespace
-    private class UnprivilegedSourceLoader extends BaseSourceLoader{
+    //ExternalSourceLoader considered everything as non-internal namespace
+    private class ExternalSourceLoader extends BaseSourceLoader{
         @Override
         public Set<String> getNamespaces() {
             return Sets.newHashSet("Custom_1","Custom_2");

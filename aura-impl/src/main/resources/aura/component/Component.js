@@ -145,7 +145,7 @@ function Component(config, localCreation) {
     this.injectComponent(config, localCreation);
 
     // instantiates this components methods
-    this.setupMethods(config, this);
+    this.setupMethods(config);
 
     // sets up component level events
     this.setupComponentEvents(this, configAttributes);
@@ -2113,7 +2113,7 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
 
 Component.prototype.getMethodHandler = function(valueProvider,name,action,attributes){
     var observer=this.getActionCaller(valueProvider,action||("c."+name));
-    return function(param1,param2,paramN){//eslint-disable-line no-unused-vars
+    return function(/*param1,param2,paramN*/){
         var eventDef = $A.get("e").getEventDef("aura:methodCall");
         var dispatcher = {};
         dispatcher[eventDef.getDescriptor().getQualifiedName()] = [observer];
@@ -2291,13 +2291,13 @@ Component.prototype.setupValueEventHandlers = function(cmp) {
     }
 };
 
-Component.prototype.setupMethods = function(config, cmp) {
+Component.prototype.setupMethods = function() {
     var defs = this.componentDef.methodDefs;
     if (defs) {
         var method;
         for(var i=0;i<defs.length;i++){
             method=defs[i];
-            cmp[method.name]=this.getMethodHandler(cmp,method.name,method.action,method.attributes);
+            this[method.name]=this.getMethodHandler(this,method.name,method.action,method.attributes);
         }
     }
 };

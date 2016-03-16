@@ -169,14 +169,14 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     }
     
     /**
-     * All namespaces loaded by FileSourceLoader are privileged, verify that FileSourceLoader says so.
+     * All namespaces loaded by FileSourceLoader are internal, verify that FileSourceLoader says so.
      */
-    public void testIsPrivilegedNamespace(){
+    public void testIsInternalNamespace(){
         FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
-        assertTrue("All namespaces loaded by FileSourceLoader are to be privileged", 
-                loader.isPrivilegedNamespace(null));
-        assertTrue("All namespaces loaded by FileSourceLoader are to be privileged," +
-        		"Regardless of the namespace.", loader.isPrivilegedNamespace("fooBared"));
-        assertTrue(loader.isPrivilegedNamespace("aura"));
+        assertTrue("All namespaces loaded by FileSourceLoader are to be intenal",
+                loader.isInternalNamespace(null));
+        assertTrue("All namespaces loaded by FileSourceLoader are to be internal," +
+        		"Regardless of the namespace.", loader.isInternalNamespace("fooBared"));
+        assertTrue(loader.isInternalNamespace("aura"));
     }
 }

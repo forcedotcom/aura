@@ -55,7 +55,7 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
             ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE,
             ATTRIBUTE_MIN, ATTRIBUTE_MAX, ATTRIBUTE_PLACEHOLDER, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_DEFAULT );
 
-    private final static Set<String> PRIVILEGED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
+    private final static Set<String> INTERNAL_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
             ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE,
             ATTRIBUTE_MIN, ATTRIBUTE_MAX, ATTRIBUTE_PLACEHOLDER, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_DEFAULT,
             ATTRIBUTE_MAX_API, ATTRIBUTE_MIN_API, ATTRIBUTE_TRANSLATABLE );
@@ -115,14 +115,14 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
         builder.setMaxApi(maxApi);
         builder.setTranslatable(translatable);
         builder.setParentDescriptor(getParentDefDescriptor());
-        builder.setIsPriviledgedNamespace(isInPrivilegedNamespace());
+        builder.setIsInternalNamespace(isInInternalNamespace());
 
     }
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
-        if (isInPrivilegedNamespace() && DesignAttributeDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
+        if (isInInternalNamespace() && DesignAttributeDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
             DesignAttributeDefaultDef def = new DesignAttributeDefaultDefHandler(getParentHandler(), xmlReader, source).getElement();
             builder.setDefault(def);
         } else {
@@ -139,7 +139,7 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return isInPrivilegedNamespace() ? PRIVILEGED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
+        return isInInternalNamespace() ? INTERNAL_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override

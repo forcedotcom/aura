@@ -34,7 +34,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
     
     /**
      * sanity test. 
-     * check we can pass support/description to aura:interface (support only works for privilege namespace)
+     * check we can pass support/description to aura:interface (support only works for internal namespace)
      * also in the markup, we can have aura:attribute
      * @throws Exception
      */
@@ -106,10 +106,10 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
     }
     
     /**
-     * verify support is not allowed with non-privileged namespace
+     * verify support is not allowed with non-internal namespace
      * @throws QuickFixException
      */
-    public void testSupportNotAllowedWithNonPrivilegeNamespace() throws QuickFixException {
+    public void testSupportNotAllowedWithNonInternalNamespace() throws QuickFixException {
     	String namespace = "fakeNamespace";
     	DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance(namespace+":fakeparser", InterfaceDef.class);
         StringSource<InterfaceDef> source = new StringSource<>(
@@ -120,7 +120,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
     	InterfaceDef def = parser.parse(descriptor, source);
     	try {
     		def.validateDefinition(); 
-    		fail("we don't allow 'support' with non-privileged namespace");
+    		fail("we don't allow 'support' with non-internal namespace");
     	} catch (InvalidDefinitionException e) {
             	checkExceptionContains(e, InvalidDefinitionException.class, 
                         "Invalid attribute \"support\"");

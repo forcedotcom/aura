@@ -125,9 +125,9 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify Java model can be accessed in privileged (system) namespace
+     * Verify Java model can be accessed in internal (system) namespace
      */
-    public void testModelInPrivilegedNamespace() throws Exception {
+    public void testModelInInternalNamespace() throws Exception {
         String resourceSource = "<aura:component model='java://org.auraframework.impl.java.model.TestModel'>Hello World!</aura:component>";
         DefDescriptor<ComponentDef> cmpDefDesc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testComponent", true);
@@ -137,17 +137,17 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify model can NOT be accessed in non-privileged (custom) namespace
+     * Verify model can NOT be accessed in non-internal (custom) namespace
      */
     @UnAdaptableTest("namespace start with c means something special in core")
-    public void testExceptionIsThrownWhenUsingJavaModelInNonPriviledgedNamespace() throws Exception {
+    public void testExceptionIsThrownWhenUsingJavaModelInExternalNamespace() throws Exception {
         String resourceSource = "<aura:component model='java://org.auraframework.impl.java.model.TestModel'>Hello World!</aura:component>";
         DefDescriptor<ComponentDef> cmpDefDesc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testComponent", false);
 
         try {
             definitionService.getDefinition(cmpDefDesc);
-            fail("Expected NoAccessException when using Java model in non-privileged namespace.");
+            fail("Expected NoAccessException when using Java model in non-internal namespace.");
         } catch (Exception e) {
             String errorMessage = String.format("Access to model 'org.auraframework.impl.java.model:TestModel' from namespace '%s' in '%s(COMPONENT)'",
                     StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE, cmpDefDesc.getQualifiedName());

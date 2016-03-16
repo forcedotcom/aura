@@ -41,7 +41,11 @@ public class TestAccessMethods {
 	public static Access allowPrivate() {
 		return Access.PRIVATE;
 	}
-	
+
+	public static Access allowPrivileged() {
+		return Access.PRIVILEGED;
+	}
+
 	public static Access allowInternal() {
 		return Access.INTERNAL;
 	}

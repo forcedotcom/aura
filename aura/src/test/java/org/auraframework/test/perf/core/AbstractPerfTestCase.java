@@ -154,17 +154,17 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
                 return null;
             }
         };
-        By locatorFound = new WebDriverWait(currentDriver, 60).withMessage("Error loading " + descriptor).until(
+        By locatorFound = new WebDriverWait(getDriver(), 60).withMessage("Error loading " + descriptor).until(
                 condition);
 
         if (locatorFound == auraErrorMessage) {
             fail("Error loading " + descriptor.getName() + ": "
-                    + currentDriver.findElement(auraErrorMessage).getText());
+                    + getDriver().findElement(auraErrorMessage).getText());
         }
 
         // check for internal errors
         if (locatorFound == componentRendered) {
-            String text = currentDriver.findElement(componentRendered).getText();
+            String text = getDriver().findElement(componentRendered).getText();
             if (text != null && text.contains("internal server error")) {
                 fail("Error loading " + descriptor.getDescriptorName() + ": " + text);
             }
@@ -192,10 +192,10 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
     }
 
     protected void profileStart(String name) {
-        auraUITestingUtil.getRawEval(String.format("$A.PERFCORE.profileStart('%s');", name));
+        getAuraUITestingUtil().getRawEval(String.format("$A.PERFCORE.profileStart('%s');", name));
     }
 
     protected void profileEnd(String name) {
-        auraUITestingUtil.getRawEval(String.format("$A.PERFCORE.profileEnd('%s');", name));
+        getAuraUITestingUtil().getRawEval(String.format("$A.PERFCORE.profileEnd('%s');", name));
     }
 }

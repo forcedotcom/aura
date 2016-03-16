@@ -58,13 +58,13 @@ public class BaseInputSelectUI extends WebDriverTestCase{
         assertEquals(4, selectOptionsSize());
         verifyOptionSelected(oldOption);
         
-        String aura_selected_item =  auraUITestingUtil.getValueFromCmpRootExpression(SELECT_ID, "v.value");
-        assertEquals(auraUITestingUtil.getEval(aura_selected_item), oldOption);
+        String aura_selected_item =  getAuraUITestingUtil().getValueFromCmpRootExpression(SELECT_ID, "v.value");
+        assertEquals(getAuraUITestingUtil().getEval(aura_selected_item), oldOption);
         // Select Option1
         selectOption(newOption);
 
         verifyOptionSelected(newOption);         
-        assertEquals(auraUITestingUtil.getEval(aura_selected_item), newOption);          
+        assertEquals(getAuraUITestingUtil().getEval(aura_selected_item), newOption);          
     }
     /**
      * Selecting first option should work

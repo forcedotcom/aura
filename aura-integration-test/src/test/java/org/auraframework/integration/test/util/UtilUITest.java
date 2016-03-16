@@ -38,9 +38,9 @@ public class UtilUITest extends WebDriverTestCase {
 		getDriver().findElement(target).click();
 		assertEquals(
 				true,
-				auraUITestingUtil
+				getAuraUITestingUtil()
 						.getBooleanEval("return window['handledByTest'] === undefined"));
-		auraUITestingUtil
+		getAuraUITestingUtil()
 				.getEval("var handler=function(){window['handledByTest']=true;};window['testHandler']=handler;var elem=$A.getRoot().find('div').getElement();$A.util.on(elem, 'click', handler, false);");
 
 		// trigger handler, then check that test property is now set
@@ -48,20 +48,20 @@ public class UtilUITest extends WebDriverTestCase {
 		getDriver().findElement(target).click();
 		assertEquals(
 				true,
-				auraUITestingUtil
+				getAuraUITestingUtil()
 						.getBooleanEval("var res = window['handledByTest'];window['handledByTest'] = undefined;return res===true;"));
 		assertEquals(
 				true,
-				auraUITestingUtil
+				getAuraUITestingUtil()
 						.getBooleanEval("return window['handledByTest'] === undefined"));
 
 		// remove the handler, then check that test property is not set on next event
-		auraUITestingUtil
+		getAuraUITestingUtil()
 				.getEval("$A.util.removeOn($A.getRoot().find('div').getElement(), 'click', window['testHandler'], false);");
 		getDriver().findElement(target).click();
 		assertEquals(
 				true,
-				auraUITestingUtil
+				getAuraUITestingUtil()
 						.getBooleanEval("return window['handledByTest'] === undefined"));
 	}
 }

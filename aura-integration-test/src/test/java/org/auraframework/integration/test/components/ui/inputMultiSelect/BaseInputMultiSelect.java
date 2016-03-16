@@ -85,7 +85,7 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
         verifyOptionDeselected("Option3");
 
         findDomElement(submitLocator).click();
-        auraUITestingUtil.waitForElementText(outputLocator, "option1", true);
+        getAuraUITestingUtil().waitForElementText(outputLocator, "option1", true);
         verifyOptionSelected("Option1");
         verifyOptionDeselected("Option2");
         verifyOptionDeselected("Option3");
@@ -96,7 +96,7 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
         verifyOptionDeselected("Option2");
 
         findDomElement(submitLocator).click();
-        auraUITestingUtil.waitForElementText(outputLocator, "option3", true);
+        getAuraUITestingUtil().waitForElementText(outputLocator, "option3", true);
         verifyOptionSelected("Option3");
         verifyOptionDeselected("Option1");
         verifyOptionDeselected("Option2");
@@ -114,7 +114,7 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
 
         // find the element a 2nd time which helps get around the IE hover issues by focusing the element
         findDomElement(submitLocator).click();
-        auraUITestingUtil.waitForElementText(outputLocator, "option1;option2", true);
+        getAuraUITestingUtil().waitForElementText(outputLocator, "option1;option2", true);
         verifyOptionSelected("Option1");
         verifyOptionSelected("Option2");
         verifyOptionDeselected("Option3");
@@ -123,7 +123,7 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
         verifyOptionSelected("Option1");
 
         findDomElement(submitLocator).click();
-        auraUITestingUtil.waitForElementText(outputLocator, "option1", true);
+        getAuraUITestingUtil().waitForElementText(outputLocator, "option1", true);
         verifyOptionSelected("Option1");
         verifyOptionDeselected("Option2");
     }
@@ -140,7 +140,7 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
         selectOption("Option3");
 
         findDomElement(submitLocator).click();
-        auraUITestingUtil.waitForElementText(outputLocator, "option1;option2;option3", true);
+        getAuraUITestingUtil().waitForElementText(outputLocator, "option1;option2;option3", true);
         verifyOptionSelected("Option1");
         verifyOptionSelected("Option2");
         verifyOptionSelected("Option3");
@@ -154,6 +154,6 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
         verifyOptionDeselected("Option3");
 
         findDomElement(submitLocator).click();
-        auraUITestingUtil.waitForElementText(outputLocator, "", true);
+        getAuraUITestingUtil().waitForElementText(outputLocator, "", true);
     }
 }

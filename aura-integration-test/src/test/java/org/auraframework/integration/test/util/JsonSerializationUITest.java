@@ -33,9 +33,9 @@ public class JsonSerializationUITest extends WebDriverTestCase {
                 definitionService.getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
                 "({countDown:function(){if(!document.counter)document.counter=3;return !--document.counter?'done':'continue'}})");
         open(cmpdd);
-        assertEquals("continue",auraUITestingUtil.getEval("return $A.getRoot().getDef().getHelper().countDown()"));
-        assertEquals("continue",auraUITestingUtil.getEval("return $A.getRoot().getDef().getHelper().countDown()"));
-        assertEquals("done",auraUITestingUtil.getEval("return $A.getRoot().getDef().getHelper().countDown()"));
+        assertEquals("continue",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().countDown()"));
+        assertEquals("continue",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().countDown()"));
+        assertEquals("done",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().countDown()"));
     }
     
     public void testJsStringBangMinusMinus() throws Exception {
@@ -45,7 +45,7 @@ public class JsonSerializationUITest extends WebDriverTestCase {
                 definitionService.getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
                 "({getComment:function(){return '<!-- inside -->'}})");
         open(cmpdd);
-        assertEquals("<!-- inside -->",auraUITestingUtil.getEval("return $A.getRoot().getDef().getHelper().getComment()"));
+        assertEquals("<!-- inside -->",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().getComment()"));
     }
 
     // fails to match because */ gets encoded to \u002A/
@@ -56,7 +56,7 @@ public class JsonSerializationUITest extends WebDriverTestCase {
                 definitionService.getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
                 "({replaceStar:function(str){return str.replace(/\\*/,'evil')}})");
         open(cmpdd);
-        assertEquals("evildoer",auraUITestingUtil.getEval("return $A.getRoot().getDef().getHelper().replaceStar('*doer')"));
+        assertEquals("evildoer",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().replaceStar('*doer')"));
     }
 
     public void testJsStringStarSlash() throws Exception {
@@ -66,7 +66,7 @@ public class JsonSerializationUITest extends WebDriverTestCase {
                 definitionService.getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
                 "({getComment:function(){return '/* non-comment */'}})");
         open(cmpdd);
-        assertEquals("/* non-comment */",auraUITestingUtil.getEval("return $A.getRoot().getDef().getHelper().getComment()"));
+        assertEquals("/* non-comment */",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().getComment()"));
     }
 
     // W-2427098
@@ -78,6 +78,6 @@ public class JsonSerializationUITest extends WebDriverTestCase {
                 definitionService.getDefDescriptor(cmpdd, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class),
                 "({replaceQuotes:function(str){return str.replace(/\"/g,'\\'')}})");
         open(cmpdd);
-        assertEquals("'exactly'",auraUITestingUtil.getEval("return $A.getRoot().getDef().getHelper().replaceQuotes('\"exactly\"')"));
+        assertEquals("'exactly'",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().replaceQuotes('\"exactly\"')"));
     }
 }

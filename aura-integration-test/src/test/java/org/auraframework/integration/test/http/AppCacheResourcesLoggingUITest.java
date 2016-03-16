@@ -99,14 +99,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     }
 
     @Override
-    public void perBrowserSetUp() {
-        super.perBrowserSetUp();
-        auraUITestingUtil.setTimeoutInSecs(60);
-    }
-
-    @Override
     public void setUp() throws Exception {
         super.setUp();
+        getAuraUITestingUtil().setTimeoutInSecs(60);
         namespace = "appCacheResourcesUITest" + getAuraTestingUtil().getNonce();
         appName = "cacheapplication";
         cmpName = "cachecomponent";
@@ -429,7 +424,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     }
 
     private void waitForStorage(final String waitForText, String failMessage) {
-        auraUITestingUtil.waitUntil(new Function<WebDriver, String>() {
+        getAuraUITestingUtil().waitUntil(new Function<WebDriver, String>() {
             @Override
             public String apply(WebDriver input) {
                 try {
@@ -457,11 +452,11 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     }
 
     private void assertAppCacheStatus(final Status status) {
-        auraUITestingUtil.waitUntil(
+        getAuraUITestingUtil().waitUntil(
                 new Function<WebDriver, Boolean>() {
                     @Override
                     public Boolean apply(WebDriver input) {
-                        return status.name().equals(Status.values()[Integer.parseInt(auraUITestingUtil.getEval(
+                        return status.name().equals(Status.values()[Integer.parseInt(getAuraUITestingUtil().getEval(
                                 "return window.applicationCache.status;").toString())].name());
                     }
                 },
@@ -557,11 +552,11 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         url = addUrlParams(url, params);
         getDriver().get(getAbsoluteURI(url).toString());
 
-        auraUITestingUtil.waitUntilWithCallback(
+        getAuraUITestingUtil().waitUntilWithCallback(
                 new Function<WebDriver, Integer>() {
                     @Override
                     public Integer apply(WebDriver input) {
-                        Integer appCacheStatus = Integer.parseInt(auraUITestingUtil.getEval(
+                        Integer appCacheStatus = Integer.parseInt(getAuraUITestingUtil().getEval(
                                 "return window.applicationCache.status;").toString());
                         if (appCacheStatus != 3 && appCacheStatus != 2) {
                             return appCacheStatus;
@@ -573,15 +568,15 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
                 new ExpectedCondition<String>() {
                     @Override
                     public String apply(WebDriver d) {
-                        Object ret = auraUITestingUtil.getRawEval("return window.applicationCache.status");
+                        Object ret = getAuraUITestingUtil().getRawEval("return window.applicationCache.status");
                         return "Current AppCache status is "
-                                + auraUITestingUtil.appCacheStatusIntToString(((Long) ret).intValue());
+                                + getAuraUITestingUtil().appCacheStatusIntToString(((Long) ret).intValue());
                     }
                 },
                 10,
                 "fail waiting on application cache not to be Downloading or Checking before clicking on 'clickableme'");
 
-        auraUITestingUtil
+        getAuraUITestingUtil()
                 .waitUntil(
                         new Function<WebDriver, WebElement>() {
                             @Override
@@ -602,7 +597,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         Thread.sleep(200);
         List<Request> logs = parseLogs(appender.getLog());
 
-        String output = auraUITestingUtil.waitUntil(
+        String output = getAuraUITestingUtil().waitUntil(
                 new Function<WebDriver, String>() {
                     @Override
                     public String apply(WebDriver input) {
@@ -865,6 +860,6 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         String expiryFormatted = sd.format(expiry);
         String command = "document.cookie = '" + name + "=" + value + "; expires=" + expiryFormatted + "; path=" + path
                 + "';";
-        auraUITestingUtil.getEval(command);
+        getAuraUITestingUtil().getEval(command);
     }
 }

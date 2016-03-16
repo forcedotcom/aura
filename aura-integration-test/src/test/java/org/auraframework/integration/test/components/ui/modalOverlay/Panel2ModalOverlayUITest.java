@@ -116,7 +116,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
             waitTillFocusOnParticularElement(CLOSE_BTN, "Focus should be on closeBtn");
         }
 
-        WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+        WebElement activeElement = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
         activeElement.sendKeys(Keys.ESCAPE);
         if (isPanel) {
             waitForPanelDialogClose();
@@ -129,10 +129,10 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
      * Wait till the focus is on the top input element for panel/modal.
      */
     private void waitTillFocusOnTopElement() {
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+                WebElement activeElement = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
                 String activeElementValue = activeElement.getAttribute("value");
                 return activeElementValue.equals("modal");
             }
@@ -146,10 +146,10 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
      * @param failureMessage
      */
     private void waitTillFocusOnParticularElement(String elementClassName, String failureMessage) {
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+                WebElement activeElement = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
                 String activeElementClassName = activeElement.getAttribute("class");
                 return activeElementClassName.contains(elementClassName);
             }
@@ -181,13 +181,13 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
 
     private void verifyCustomCloseActionMethodCalled(String actionType) {
         String panelGlobalId = findDomElements(By.cssSelector(".info .idCurrent")).get(0).getText();
-        String attrValueExp = auraUITestingUtil.getValueFromCmpExpression(panelGlobalId, "v.closeActionCalled");
+        String attrValueExp = getAuraUITestingUtil().getValueFromCmpExpression(panelGlobalId, "v.closeActionCalled");
         String expectedText = String.format("CloseActionCustomMethodCalled when %s", actionType);
 
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                String attrValueText = (String) auraUITestingUtil.getEval(attrValueExp);
+                String attrValueText = (String) getAuraUITestingUtil().getEval(attrValueExp);
                 return attrValueText.contains(expectedText);
             }
         }, "Custom close on Action method was not called");
@@ -224,7 +224,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
         openPanel();
         waitForModalOpen();
         String bodyClassName = "modal-body";
-        boolean hasScroll = auraUITestingUtil.hasScrollBar(bodyClassName);
+        boolean hasScroll = getAuraUITestingUtil().hasScrollBar(bodyClassName);
         assertEquals(errorMessage, hasScrollbar, hasScroll);
     }
 
@@ -285,20 +285,20 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
 
         waitTillFocusOnTopElement();
 
-        WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+        WebElement activeElement = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
         activeElement.sendKeys(Keys.ESCAPE);
         waitForNumberOfPanels(locator, 1);
 
         verifyModalPanelIsActive(String.format("First %s should have class active after press ESC on 2nd %s", errorMessage, errorMessage), locator, true, 0);
 
-        activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+        activeElement = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
         activeElement.sendKeys(Keys.ESCAPE);
         waitForNumberOfPanels(locator, 0);
     }
 
     private void verifyModalPanelIsActive(String failureMessage, String locator, boolean isActive, int modalPanelNumber) {
         WebElement element = findDomElements(By.cssSelector(locator)).get(modalPanelNumber);
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 return element.getAttribute("class").contains("active") == isActive;
@@ -425,7 +425,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
         waitTillFocusOnParticularElement(CLOSE_BTN, "Focus should be on closeBtn");
 
         // tab out to close
-        WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+        WebElement activeElement = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
         activeElement.sendKeys(Keys.TAB);
         waitForPanelDialogClose();
 
@@ -457,18 +457,18 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
         }
         List<WebElement> firstInput = findDomElements(By.cssSelector(INPUT_PANELTYPE));
         firstInput.get(1).click();
-        WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+        WebElement activeElement = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
         // assertEquals("Focus should be on first element", panelType, auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
         int numElements = 24;
         // cycle through input elements on panel
         for (int i = 1; i < numElements; i++) {
             WebElement prevActiveElement = activeElement;
             activeElement.sendKeys(Keys.TAB);
-            activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
-            auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            activeElement = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
+            getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
                 @Override
                 public Boolean apply(WebDriver d) {
-                    WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+                    WebElement activeElement = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
                     return activeElement != prevActiveElement;
                 }
             }, String.format("Tab event was not fired for element with className: %s", prevActiveElement.getAttribute("class")));
@@ -525,7 +525,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private void waitForPanel(final String panelType, final boolean isOpen) throws InterruptedException {
         By locator = By.cssSelector(panelType);
         if (isOpen) {
-            auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
                 @Override
                 public Boolean apply(WebDriver d) {
                     List<WebElement> panels = findDomElements(locator);
@@ -541,7 +541,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private void waitForNumberOfPanels(String panelType, int numPanels) throws InterruptedException {
         By locator = By.cssSelector(panelType);
         if (numPanels != 0) {
-            auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
                 @Override
                 public Boolean apply(WebDriver d) {
                     List<WebElement> elements = findDomElements(locator);
@@ -555,7 +555,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     }
 
     private void isPanelPresent(String failureMessage, boolean isElemPresent, By locator) {
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 return isElementPresent(locator) == isElemPresent;

@@ -143,7 +143,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
 
         openNoAura(uri);
         // trigger script violation to generate CSP logs.
-        auraUITestingUtil.getRawEval("var s=document.createElement('script');s.type='text/javascript';s.async=true;s.src='http://expectedreport.salesforce.com/';document.getElementsByTagName('head')[0].appendChild(s);");
+        getAuraUITestingUtil().getRawEval("var s=document.createElement('script');s.type='text/javascript';s.async=true;s.src='http://expectedreport.salesforce.com/';document.getElementsByTagName('head')[0].appendChild(s);");
 
         List<String> logs = getCspReportLogs(appender, 1);
         // only grab the first CSP log line. if hitting fonts violation,
@@ -223,7 +223,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
         String uri = getUrl(cmpDesc);
 
         open(uri);
-        auraUITestingUtil.findDomElement(By.cssSelector(".button")).click();
+        getAuraUITestingUtil().findDomElement(By.cssSelector(".button")).click();
 
         List<String> logs = getCspReportLogs(appender, 1);
         String cspReport = logs.get(0);
@@ -290,7 +290,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
 
         appender.clearLogs();
         open(cmpDesc);
-        auraUITestingUtil.findDomElement(By.cssSelector(".button")).click();
+        getAuraUITestingUtil().findDomElement(By.cssSelector(".button")).click();
 
         List<String> cspLogs = getCspReportLogs(appender, 0);
         if(cspLogs.size() != 0) {
@@ -322,7 +322,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
                 }
             }
         } else {
-            auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
                 @Override
                 public Boolean apply(WebDriver d) {
                     List<LoggingEvent> logs = appender.getLog();

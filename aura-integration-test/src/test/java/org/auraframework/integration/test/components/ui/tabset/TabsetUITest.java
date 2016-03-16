@@ -101,7 +101,7 @@ public class TabsetUITest extends WebDriverTestCase {
     }
 
     private void waitForTabSelected(String msg, final WebElement element) {
-        WebDriverWait wait = new WebDriverWait(getDriver(), auraUITestingUtil.getTimeout());
+        WebDriverWait wait = new WebDriverWait(getDriver(), getAuraUITestingUtil().getTimeout());
         wait.withMessage(msg);
         wait.until(new ExpectedCondition<Boolean>() {
             @Override
@@ -203,7 +203,7 @@ public class TabsetUITest extends WebDriverTestCase {
 
     public void verifyElementFocus(String itemToVerifyAgainst) {
         // Verify correct element is focused (verified with with the class that we are expecting the element to contain)
-        String activeElementClass = (String) auraUITestingUtil
+        String activeElementClass = (String) getAuraUITestingUtil()
                 .getEval("return $A.test.getActiveElement().getAttribute('class')");
         assertTrue("Focus is not on ther correct element", activeElementClass.contains(itemToVerifyAgainst));
     }
@@ -304,22 +304,22 @@ public class TabsetUITest extends WebDriverTestCase {
         // Focus on tab and move to next focusable element
         WebElement element = findDomElement(By.partialLinkText("Accounts"));
         element.click();
-        auraUITestingUtil.pressTab(element);
+        getAuraUITestingUtil().pressTab(element);
 
         // Verify anchor is focused on
-        String activeElementText = auraUITestingUtil.getActiveElementText();
+        String activeElementText = getAuraUITestingUtil().getActiveElementText();
         assertTrue("Focus is not on ther correct element", activeElementText.contains("Close"));
 
         // Move from anchor to next item (inputTextBox)
         element = findDomElement(By.xpath(createXPath(1) + "/a"));
-        auraUITestingUtil.pressTab(element);
+        getAuraUITestingUtil().pressTab(element);
 
         // Verify inputTextBox (in tab section) is focused
         verifyElementFocus("inputTabTitle");
 
         // Tab to the next focusable area
         element = findDomElement(By.cssSelector("input[class*='inputTabTitle']"));
-        auraUITestingUtil.pressTab(element);
+        getAuraUITestingUtil().pressTab(element);
 
         // Verify inputTextArea (outside of the tab) is focused
         verifyElementFocus("inputTabContent");

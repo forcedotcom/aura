@@ -94,7 +94,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
             verifyOptionDeselected("Option3");
 
             findDomElement(submitLocator).click();
-            auraUITestingUtil.waitForElementText(outputLocator, "option1", true);
+            getAuraUITestingUtil().waitForElementText(outputLocator, "option1", true);
             verifyOptionSelected("Option1");
             verifyOptionDeselected("Option2");
             verifyOptionDeselected("Option3");
@@ -106,7 +106,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
             verifyOptionDeselected("Option2");
 
             findDomElement(submitLocator).click();
-            auraUITestingUtil.waitForElementText(outputLocator, "option3", true);
+            getAuraUITestingUtil().waitForElementText(outputLocator, "option3", true);
             verifyOptionSelected("Option3");
             verifyOptionDeselected("Option1");
             verifyOptionDeselected("Option2");

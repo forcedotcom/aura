@@ -33,10 +33,10 @@ public class ButtonUITest extends WebDriverTestCase {
         final String errorMsg = "COMPONENT markup://uitest:button_LabelRequiredTest is missing required attribute 'label'";
         openNoAura("/uitest/button_LabelRequiredTest.cmp");
 
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                return auraUITestingUtil.getAuraErrorMessage().contains(errorMsg);
+                return getAuraUITestingUtil().getAuraErrorMessage().contains(errorMsg);
             }
         }, "Required label error not displayed");
     }
@@ -46,9 +46,9 @@ public class ButtonUITest extends WebDriverTestCase {
         WebElement btn = findDomElement(By.cssSelector(".testDomEventBtn"));
         btn.click();
 
-        String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.isDomEventSet");
-        valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
+        String valueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.isDomEventSet");
+        valueExpression = getAuraUITestingUtil().prepareReturnStatement(valueExpression);
         assertTrue("domEvent attribute on event should have been set",
-                auraUITestingUtil.getBooleanEval(valueExpression));
+                getAuraUITestingUtil().getBooleanEval(valueExpression));
     }
 }

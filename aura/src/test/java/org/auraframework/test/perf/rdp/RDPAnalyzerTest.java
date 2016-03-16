@@ -68,7 +68,7 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
     public void testProtocol() throws Exception {
         // run WebDriver test
         openTotallyRaw("/ui/label.cmp?label=foo");
-        auraUITestingUtil.waitForAuraInit();
+        getAuraUITestingUtil().waitForAuraInit();
 
         // UC: verify raw protocol notifications:
         List<RDPNotification> notifications = getRDPNotifications();

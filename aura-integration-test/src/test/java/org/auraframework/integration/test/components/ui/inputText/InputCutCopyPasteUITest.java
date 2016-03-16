@@ -52,32 +52,32 @@ public class InputCutCopyPasteUITest extends WebDriverTestCase {
         input.sendKeys(Keys.CONTROL, "a");
 
         // Fire Copy Event
-        String copyValueExpression = auraUITestingUtil.getValueFromRootExpr("v.copyEventFired");
-        copyValueExpression = auraUITestingUtil.prepareReturnStatement(copyValueExpression);
+        String copyValueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.copyEventFired");
+        copyValueExpression = getAuraUITestingUtil().prepareReturnStatement(copyValueExpression);
         assertFalse("Copy event should not have been triggered yet",
-                auraUITestingUtil.getBooleanEval(copyValueExpression));
+                getAuraUITestingUtil().getBooleanEval(copyValueExpression));
         input.sendKeys(Keys.CONTROL, "c");
-        assertTrue("Copy event should have been triggered", auraUITestingUtil.getBooleanEval(copyValueExpression));
+        assertTrue("Copy event should have been triggered", getAuraUITestingUtil().getBooleanEval(copyValueExpression));
         waitForElementTextPresent(output, "Copy Event Fired");
 
         // Fire Cut Event
-        String cutValueExpression = auraUITestingUtil.getValueFromRootExpr("v.cutEventFired");
-        cutValueExpression = auraUITestingUtil.prepareReturnStatement(cutValueExpression);
+        String cutValueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.cutEventFired");
+        cutValueExpression = getAuraUITestingUtil().prepareReturnStatement(cutValueExpression);
         assertFalse("Cut event should not have been triggered yet",
-                auraUITestingUtil.getBooleanEval(cutValueExpression));
+                getAuraUITestingUtil().getBooleanEval(cutValueExpression));
         input.sendKeys(Keys.CONTROL, "a");
         input.sendKeys(Keys.CONTROL, "x");
-        assertTrue("Cut event should have been triggered", auraUITestingUtil.getBooleanEval(cutValueExpression));
+        assertTrue("Cut event should have been triggered", getAuraUITestingUtil().getBooleanEval(cutValueExpression));
         waitForElementTextPresent(output, "Cut Event Fired");
 
         // Fire Paste Event
-        String pasteValueExpression = auraUITestingUtil.getValueFromRootExpr("v.pasteEventFired");
-        pasteValueExpression = auraUITestingUtil.prepareReturnStatement(pasteValueExpression);
+        String pasteValueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.pasteEventFired");
+        pasteValueExpression = getAuraUITestingUtil().prepareReturnStatement(pasteValueExpression);
         assertFalse("Paste event should not have been triggered yet",
-                auraUITestingUtil.getBooleanEval(pasteValueExpression));
+                getAuraUITestingUtil().getBooleanEval(pasteValueExpression));
         input.click();
         input.sendKeys(Keys.CONTROL, "v");
-        assertTrue("Paste event should have been triggered", auraUITestingUtil.getBooleanEval(pasteValueExpression));
+        assertTrue("Paste event should have been triggered", getAuraUITestingUtil().getBooleanEval(pasteValueExpression));
         waitForElementTextPresent(output, "Paste Event Fired");
     }
 }

@@ -23,6 +23,13 @@
 	<aura:method name="getSecureComponent" action="{!c.getSecureComponent}"/>
 	<aura:method name="dynamicallyCreateCmpsDifferentNamespace" action="{!c.dynamicallyCreateCmpsDifferentNamespace}"/>
 	<aura:method name="dynamicallyCreateCmpSameNamespace" action="{!c.dynamicallyCreateCmpSameNamespace}"/>
+	<aura:method name="callEnqueueAction" action="{!c.callEnqueueAction}"/>
+    <aura:method name="callGetCallback" action="{!c.callGetCallback}"/>
+    <aura:method name="getGVP" action="{!c.getGVP}"/>
+    <aura:method name="callGetComponentDifferentNamespace" action="{!c.callGetComponentDifferentNamespace}"/>
+    <aura:method name="callGetComponentSameNamespace" action="{!c.callGetComponentSameNamespace}"/>
 
     <div>SecureAura test</div>
+    <aura:text value="Differnet namespace component" aura:id="textCmp"/>
+    <lockerTest:basicTest aura:id="lockerCmp"/>
 </aura:component>

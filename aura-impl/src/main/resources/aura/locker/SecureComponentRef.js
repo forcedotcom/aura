@@ -15,34 +15,28 @@
  */
 /*jslint sub: true*/
 
-var SecureComponentRef = (function() {
-  "use strict";
+function SecureComponentRef(component, key) {
+    "use strict";
 
-  function SecureComponentRef(component, key) {
-    setLockerSecret(this, "key", key);
-    setLockerSecret(this, "ref", component);
-    Object.freeze(this);
-  }
+    var o = Object.create(null, {
+        toString: {
+            value: function() {
+                return "SecureComponentRef: " + component + "{ key: " + JSON.stringify(key) + " }";
+            }
+        },
 
-  SecureComponentRef.prototype = Object.create(null, {
-    toString: {
-      value : function() {
-        return "SecureComponentRef: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
-      }
-    },
+        "isValid": SecureThing.createPassThroughMethod(component, "isValid"),
+        "isInstanceOf": SecureThing.createPassThroughMethod(component, "isInstanceOf"),
+        "isRendered": SecureThing.createPassThroughMethod(component, "isRendered"),
+        "getGlobalId": SecureThing.createPassThroughMethod(component, "getGlobalId"),
+        "getLocalId": SecureThing.createPassThroughMethod(component, "getLocalId"),
+        "addValueProvider": SecureThing.createPassThroughMethod(component, "addValueProvider"),
+        "set": SecureThing.createFilteredMethod(component, "set"),
+        "get": SecureThing.createFilteredMethod(component, "get")
 
-    "isValid": SecureThing.createPassThroughMethod("isValid"),
-    "isInstanceOf": SecureThing.createPassThroughMethod("isInstanceOf"),
-    "isRendered": SecureThing.createPassThroughMethod("isRendered"),
-    "getGlobalId": SecureThing.createPassThroughMethod("getGlobalId"),
-    "getLocalId": SecureThing.createPassThroughMethod("getLocalId"),
-    "addValueProvider": SecureThing.createPassThroughMethod("addValueProvider"),
-    "set": SecureThing.createFilteredMethod("set"),
-    "get": SecureThing.createFilteredMethod("get")
+    });
 
-  });
-
-  SecureComponentRef.prototype.constructor = SecureComponentRef;
-
-  return SecureComponentRef;
-})();
+    setLockerSecret(o, "key", key);
+    setLockerSecret(o, "ref", component);
+    return Object.seal(o);
+}

@@ -15,98 +15,87 @@
  */
 /*jslint sub: true*/
 
-//#include aura.locker.SecureAuraEvent
-//#include aura.locker.SecureAction
+function SecureComponent(component, key) {
+    "use strict";
 
-var SecureComponent = (function() {
-  "use strict";
-
-  function SecureComponent(component, key) {
     // Storing a reusable reference to the corresponding secure component into
     // the original component via the locker secret mechanism.
     var sc = getLockerSecret(component, "secure");
     if (sc) {
-      return sc;
+        return sc;
     }
-    setLockerSecret(component, "secure", this); // backpointer
-    // regular initialization:
-    setLockerSecret(this, "key", key);
-    setLockerSecret(this, "ref", component);
     // special methods that require some extra work
-    Object.defineProperties(this, {
-      "get": {
-        enumerable: true,
-        value: function(name) {
-          var path = name.split('.');
-          // protection against `cmp.get('c')`
-          if (typeof path[1] !== "string" || path[1] === "") {
-              throw new SyntaxError('Invalid key '+ name);
-          }
-          var value = component["get"](name);
-          if (!value) {
-            return value;
-          }
-          if (path[0] === 'c') {
-              return new SecureAction(value, key);
-          } else {
-              return SecureThing.filterEverything(this, value);
-          }
-        }
-      },
-      "getEvent": {
-        enumerable: true,
-        value: function(name) {
-          var event = component["getEvent"](name);
-          if (!event) {
-            return event;
-          }
-          return new SecureAuraEvent(event, key);
-        }
-      }
+    var o = Object.create(null, {
+        "get": {
+            enumerable: true,
+            value: function(name) {
+                var path = name.split('.');
+                // protection against `cmp.get('c')`
+                if (typeof path[1] !== "string" || path[1] === "") {
+                    throw new SyntaxError('Invalid key '+ name);
+                }
+                var value = component["get"](name);
+                if (!value) {
+                  return value;
+                }
+                if (path[0] === 'c') {
+                    return SecureAction(value, key);
+                } else {
+                    return SecureThing.filterEverything(o, value);
+                }
+            }
+        },
+        "getEvent": {
+            enumerable: true,
+            value: function(name) {
+                var event = component["getEvent"](name);
+                if (!event) {
+                    return event;
+                }
+                return SecureAuraEvent(event, key);
+            }
+        },
+        toString: {
+            value: function() {
+                return "SecureComponent: " + component + "{ key: " + JSON.stringify(key) + " }";
+            }
+        },
+
+        // these four super* methods are exposed as a temporary solution until we figure how to re-arrange the render flow
+        "superRender": SecureThing.createFilteredMethod(component, "superRender"),
+        "superAfterRender": SecureThing.createPassThroughMethod(component, "superAfterRender"),
+        "superRerender": SecureThing.createFilteredMethod(component, "superRerender"),
+        "superUnrender": SecureThing.createFilteredMethod(component, "superUnrender"),
+        // component @platform methods
+        "isValid": SecureThing.createPassThroughMethod(component, "isValid"),
+        "isInstanceOf": SecureThing.createPassThroughMethod(component, "isInstanceOf"),
+        "addHandler": SecureThing.createPassThroughMethod(component, "addHandler"),
+        "destroy": SecureThing.createPassThroughMethod(component, "destroy"),
+        "isRendered": SecureThing.createPassThroughMethod(component, "isRendered"),
+        "getGlobalId": SecureThing.createPassThroughMethod(component, "getGlobalId"),
+        "getLocalId": SecureThing.createPassThroughMethod(component, "getLocalId"),
+        "getSuper": SecureThing.createFilteredMethod(component, "getSuper"),
+        "getReference": SecureThing.createFilteredMethod(component, "getReference"),
+        "clearReference": SecureThing.createPassThroughMethod(component, "clearReference"),
+        "autoDestroy": SecureThing.createPassThroughMethod(component, "autoDestroy"),
+        "isConcrete": SecureThing.createPassThroughMethod(component, "isConcrete"),
+        "addValueProvider": SecureThing.createPassThroughMethod(component, "addValueProvider"),
+        "getConcreteComponent": SecureThing.createFilteredMethod(component, "getConcreteComponent"),
+        "find": SecureThing.createFilteredMethod(component, "find"),
+        "set": SecureThing.createFilteredMethod(component, "set"),
+        "getElement": SecureThing.createFilteredMethod(component, "getElement"),
+        "getElements": SecureThing.createFilteredMethod(component, "getElements")
     });
     // The shape of the component depends on the methods exposed in the definitions:
     var defs = component.getDef().methodDefs;
     if (defs) {
-      defs.forEach(function (method) {
-        Object.defineProperty(this, method.name, SecureThing.createFilteredMethod(method.name));
-      }, this);
+        defs.forEach(function(method) {
+            Object.defineProperty(o, method.name, SecureThing.createFilteredMethod(component, method.name));
+        }, o);
     }
-  }
 
-  SecureComponent.prototype = Object.create(null, {
-    toString: {
-      value : function() {
-        return "SecureComponent: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
-      }
-    },
-
-    // these four super* methods are exposed as a temporary solution until we figure how to re-arrange the render flow
-    "superRender": SecureThing.createFilteredMethod("superRender"),
-    "superAfterRender": SecureThing.createPassThroughMethod("superAfterRender"),
-    "superRerender": SecureThing.createFilteredMethod("superRerender"),
-    "superUnrender": SecureThing.createFilteredMethod("superUnrender"),
-    // component @platform methods
-    "isValid": SecureThing.createPassThroughMethod("isValid"),
-    "isInstanceOf": SecureThing.createPassThroughMethod("isInstanceOf"),
-    "addHandler": SecureThing.createPassThroughMethod("addHandler"),
-    "destroy": SecureThing.createPassThroughMethod("destroy"),
-    "isRendered": SecureThing.createPassThroughMethod("isRendered"),
-    "getGlobalId": SecureThing.createPassThroughMethod("getGlobalId"),
-    "getLocalId": SecureThing.createPassThroughMethod("getLocalId"),
-    "getSuper": SecureThing.createFilteredMethod('getSuper'),
-    "getReference": SecureThing.createFilteredMethod("getReference"),
-    "clearReference": SecureThing.createPassThroughMethod("clearReference"),
-    "autoDestroy": SecureThing.createPassThroughMethod("autoDestroy"),
-    "isConcrete": SecureThing.createPassThroughMethod("isConcrete"),
-    "addValueProvider": SecureThing.createPassThroughMethod("addValueProvider"),
-    "getConcreteComponent": SecureThing.createFilteredMethod('getConcreteComponent'),
-    "find": SecureThing.createFilteredMethod('find'),
-    "set": SecureThing.createFilteredMethod("set"),
-    "getElement": SecureThing.createFilteredMethod("getElement"),
-    "getElements": SecureThing.createFilteredMethod("getElements")
-  });
-
-  SecureComponent.prototype.constructor = SecureComponent;
-
-  return SecureComponent;
-})();
+    setLockerSecret(component, "secure", o); // backpointer
+    setLockerSecret(o, "key", key);
+    setLockerSecret(o, "ref", component);
+    return Object.seal(o);
+}

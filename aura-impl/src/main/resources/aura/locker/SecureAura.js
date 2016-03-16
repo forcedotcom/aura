@@ -15,62 +15,65 @@
  */
 /*jslint sub: true*/
 
-var SecureAura = (function() {
-  "use strict";
+/**
+ * Factory for SecureAura objects.
+ *
+ * @param {Object}
+ *            AuraInstance - the Aura Instance to be secured
+ * @param {Object}
+ *            key - the key to apply to the secure aura
+ */
+function SecureAura(AuraInstance, key) {
+    "use strict";
 
-  /**
-   * Construct a new SecureAura.
-   *
-   * @public
-   * @class
-   * @constructor
-   *
-   * @param {Object}
-   *            AuraInstance - the Aura Instance to be secured
-   * @param {Object}
-   *            key - the key to apply to the secure aura
-   */
-  function SecureAura(AuraInstance, key) {
-    setLockerSecret(this, "key", key);
-    setLockerSecret(this, "ref", AuraInstance);
     // creating a proxy for $A.util
-    var util = {};
-    ["isEmpty", "hasClass", "addClass", "removeClass", "toggleClass"].forEach(function (name) {
+    var util = Object.create(null);
+    ["isEmpty", "hasClass", "addClass", "removeClass", "toggleClass"].forEach(function(name) {
         Object.defineProperty(util, name, {
             enumerable: true,
             value: AuraInstance["util"][name]
         });
     });
-    Object.preventExtensions(util);
-    Object.defineProperty(this, "util", {
-        enumerable: true,
-        value: util
+    Object.seal(util);
+    var o = Object.create(null, {
+        "util": {
+            enumerable: true,
+            value: util
+        },
+        "createComponent": {
+            enumerable: true,
+            value: function(type, attributes, callback) {
+                $A.assert(callback && typeof callback === 'function' , 'Callback');
+                AuraInstance["createComponent"](type, attributes, function () {
+                    callback.apply(undefined, SecureThing.filterEverything(o, SecureThing.ArrayPrototypeSlice.call(arguments)));
+                });
+            }
+        },
+        "createComponents": {
+            enumerable: true,
+            value: function(components, callback) {
+                $A.assert(callback && typeof callback === 'function' , 'Callback');
+                AuraInstance["createComponent"](components, function () {
+                    callback.apply(undefined, SecureThing.filterEverything(o, SecureThing.ArrayPrototypeSlice.call(arguments)));
+                });
+            }
+        },
+        toString: {
+            value: function() {
+                return "SecureAura: " + AuraInstance + "{ key: " + JSON.stringify(key) + " }";
+            }
+        },
+        "enqueueAction": SecureThing.createPassThroughMethod(AuraInstance, "enqueueAction"),
+        "errorReport": SecureThing.createPassThroughMethod(AuraInstance, "errorReport"),
+        "get": SecureThing.createFilteredMethod(AuraInstance, "get"),
+        "getCallback": SecureThing.createFilteredMethod(AuraInstance, "getCallback"),
+        "getComponent": SecureThing.createFilteredMethod(AuraInstance, "getComponent"),
+        "getRoot": SecureThing.createFilteredMethod(AuraInstance, "getRoot"),
+        "log": SecureThing.createPassThroughMethod(AuraInstance, "log"),
+        "warning": SecureThing.createPassThroughMethod(AuraInstance, "warning")
     });
-    Object.preventExtensions(this);
-  }
 
-  SecureAura.prototype = Object.create(null, {
-    toString: {
-      value: function() {
-        return "SecureAura: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
-      }
-    },
-
-    "createComponent": SecureThing.createPassThroughMethod("createComponent"),
-    "createComponents": SecureThing.createPassThroughMethod("createComponents"),
-    "enqueueAction": SecureThing.createPassThroughMethod("enqueueAction"),
-    "error": SecureThing.createPassThroughMethod("error"),
-    "get": SecureThing.createFilteredMethod("get"),
-    "getCallback": SecureThing.createFilteredMethod("getCallback"),
-    "getComponent": SecureThing.createFilteredMethod("getComponent"),
-    "getRoot": SecureThing.createFilteredMethod("getRoot"),
-    "log": SecureThing.createPassThroughMethod("log"),
-    "warning": SecureThing.createPassThroughMethod("warning")
-  });
-
-  SecureAura.prototype.constructor = SecureAura;
-  Object.preventExtensions(SecureAura);
-  Object.preventExtensions(SecureAura.prototype);
-
-  return SecureAura;
-})();
+    setLockerSecret(o, "key", key);
+    setLockerSecret(o, "ref", AuraInstance);
+    return Object.seal(o);
+}

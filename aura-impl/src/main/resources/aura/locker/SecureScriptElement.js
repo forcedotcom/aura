@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-var SecureScriptElement = (function() {
+function SecureScriptElement(key) {
 	"use strict";
 
-	function SecureScriptElement(key) {
-		setLockerSecret(this, "key", key);
-		var src;
-		Object.defineProperty(this, 'src', {
+	var src;
+	var o = Object.create(null, {
+		src : {
 			enumerable: true,
 			get: function () {
 				return src;
@@ -28,14 +27,10 @@ var SecureScriptElement = (function() {
 			set: function (value) {
 				src = value;
 			}
-		});
-		Object.freeze(this);
-	}
-
-	SecureScriptElement.prototype = Object.create(null, {
+		},
 		$run : {
 			value : function() {
-				if (!this.src) {
+				if (!src) {
 					return;
 				}
 				// XHR in source and secure it using $A.lockerService.create()
@@ -43,20 +38,20 @@ var SecureScriptElement = (function() {
 
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState === 4 && xhr.status === 200) {
-						$A.lockerService.create(xhr.responseText, getLockerSecret(this, "key"));
+						$A.lockerService.create(xhr.responseText, key);
 					}
 
 					// DCHASMAN TODO W-2837800 Add in error handling for 404's etc
 				};
 
-				xhr.open("GET", this.src, true);
+				xhr.open("GET", src, true);
 				xhr.send();
 			}
 		},
 
 		toString : {
 			value : function() {
-				return "SecureScriptElement: " + this.src + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
+				return "SecureScriptElement: " + src + "{ key: " + JSON.stringify(key) + " }";
 			}
 		},
 
@@ -68,7 +63,6 @@ var SecureScriptElement = (function() {
 		}
 	});
 
-	SecureScriptElement.prototype.constructor = SecureScriptElement;
-
-	return SecureScriptElement;
-})();
+	setLockerSecret(o, "key", key);
+	return Object.seal(o);
+}

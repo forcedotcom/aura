@@ -37,7 +37,7 @@ var SecureComponent = (function() {
       "get": {
         enumerable: true,
         value: function(name) {
-          var path = name.split('.')[0];
+          var path = name.split('.');
           // protection against `cmp.get('c')`
           if (typeof path[1] !== "string" || path[1] === "") {
               throw new SyntaxError('Invalid key '+ name);

@@ -129,7 +129,7 @@
     },
 
     getInputElement: function(component) {
-        var inputComponent = component.getSuper().find('input');
+        var inputComponent = component.getConcreteComponent().getSuper().find('input');
         if (inputComponent) {
             var inputHelper = inputComponent.getDef().getHelper();
             return inputHelper.getInputElement(inputComponent);

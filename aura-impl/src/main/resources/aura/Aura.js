@@ -1083,13 +1083,14 @@ AuraInstance.prototype.getContext = function() {
 /**
  * Runs a function within the standard Aura lifecycle.
  *
- * This insures that <code>enqueueAction</code> methods and rerendering are handled properly.
+ * This ensures that <code>enqueueAction</code> methods and rerendering are handled properly.
  *
  * from JavaScript outside of controllers, renderers, providers.
  * @param {Function} func The function to run.
  * @param {String} name an optional name for the stack.
  * @public
  * @platform
+ * @deprecated Use <code>getCallback()</code> instead.
  */
 AuraInstance.prototype.run = function(func, name) {
     $A.assert(func && $A.util.isFunction(func), "The parameter 'func' for $A.run() must be a function!");

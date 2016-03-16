@@ -49,5 +49,10 @@
 
     setTitle: function(cmp) {
         document.title = "secureDocumentTest";
+    },
+
+    doQuerySelectorAll: function(cmp) {
+        var result = document.querySelectorAll('*');
+        cmp.set("v.log", result);
     }
 })

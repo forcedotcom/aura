@@ -44,14 +44,14 @@ public class DefinitionAccessImpl implements DefinitionAccess {
         this.accessString = access;
         this.isInternalNamespace = Aura.getConfigAdapter().isInternalNamespace(namespace);
         parseAccess(namespace, access);
-        defaultAccess();
+        defaultAccess(this.isInternalNamespace);
     }
     
     private DefinitionAccessImpl(boolean isInternalNamespace) {
         this.namespace = null;
         this.accessString = null;
         this.isInternalNamespace=isInternalNamespace;
-        defaultAccess();
+        defaultAccess(isInternalNamespace);
     }
 
     private void parseAccess(String namespace, String accessValue) throws InvalidAccessValueException {
@@ -199,10 +199,10 @@ public class DefinitionAccessImpl implements DefinitionAccess {
         }
     }
 
-    protected void defaultAccess() {
+    protected void defaultAccess(boolean internalNamespace) {
         // Default access if necessary
         if (access == null && accessMethod == null) {
-            access = this.isInternalNamespace ? Access.INTERNAL : Access.PUBLIC;
+            access = internalNamespace ? Access.INTERNAL : Access.PUBLIC;
         }
     }
 

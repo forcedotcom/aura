@@ -536,6 +536,112 @@
     		this.waitForPanelDialogClose();
     	}]
     },
+
+    /**
+    * Test app ecents
+    * W-2964732
+    */
+    testOpenPanelTransitionEndEvent: {
+        attributes : {"testPanelType" : "panel", "testCloseDialogLabel" : "CloseLabel"},
+        test: [function(cmp) {
+            var self = this;
+            $A.test.addEventHandler('ui:panelTransitionEnd',
+                function(e) {
+                    var params = e.getParams();
+                    $A.test.assertEquals('show', params.action);
+                    $A.test.assertEquals(self.getGlobalIdForPanelModal(1), params.panelId);
+                });
+            this.createPanel(cmp);
+        }]
+    },
+
+    testClosePanelTransitionEndEvent: {
+        attributes : {"testPanelType" : "panel", "testCloseDialogLabel" : "CloseLabel"},
+        test: [function(cmp) {
+            this.createPanel(cmp);
+        }, function(cmp) {
+            var shownEventFinished = false;
+            $A.test.addEventHandler('ui:panelTransitionEnd',
+                    function(e) {
+                        var params = e.getParams();
+                        if(!shownEventFinished && params.action === 'show') {
+                            shownEventFinished = true;
+                        } else if (!shownEventFinished) {
+                            $A.test.fail('Hide event caught before show event');
+                        }
+                    }
+            );
+            $A.test.addWaitFor(true, function() {
+                return shownEventFinished;
+            }, function() {
+                var globalId = this.getGlobalIdForPanelModal(1);
+                var closeCount = 0;
+                $A.test.addEventHandler('ui:panelTransitionEnd',
+                    function(e) {
+                        var params = e.getParams();
+
+                        closeCount++;
+
+                        $A.test.assertEquals(1, closeCount, 'TranstionEnd event should be fired only once');
+                        $A.test.assertEquals('hide', params.action, 'expected hide');
+                        $A.test.assertEquals(globalId, params.panelId, 'panel id should be panel that closed');
+                    }
+                );
+                this.closePanel(cmp);
+            })         
+        }]
+    },
+
+    testClosePanelTransitionEndEventDestroy: {
+        attributes : {"testPanelType" : "panel", "testCloseDialogLabel" : "CloseLabel"},
+        test: [function(cmp) {
+            var endEvent = false;
+            var globalId;
+
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return endEvent;
+            }, "No transition end event was recieved");
+
+            $A.get('e.ui:createPanel').setParams({
+                panelType: 'panel',
+                visible: true,
+                panelConfig: {
+                    body: $A.createComponentFromConfig({
+                        componentDef : { descriptor: "markup://ui:outputText"},
+                        attributes : {
+                            values : {
+                                value : "PANELS ARE GREAT"
+                            }
+                        }
+                    })
+                },
+
+                onAfterShow: function(panel) {
+                    var closeCount = 0; 
+                    globalId = panel.getGlobalId();
+
+                    
+
+                    $A.test.addEventHandler('ui:panelTransitionEnd',
+                        function(e) {
+                            endEvent = true;
+                            var params = e.getParams();
+
+                            closeCount++;
+                            $A.test.assertEquals(1, closeCount, 'TranstionEnd event should be fired only once');
+                            $A.test.assertEquals('hide', params.action, 'expected hide');
+                            $A.test.assertEquals(globalId, params.panelId, 'panel id should be panel that closed');
+                        }
+                    );
+
+                    $A.get('e.ui:destroyPanel').setParams({
+                        panelInstance: panel.getGlobalId(),
+                    }).fire();
+                }
+            }).fire();
+            
+        }]
+    },
     
     /**************************************************PANEL POSITION TEST**************************************************/
     

@@ -321,8 +321,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
         }
         var resp = $A.util.json.decode(text, true);
 
-        // if the error on the server is meant to trigger a client-side
-        // event...
+        // if the error on the server is meant to trigger a client-side event...
         if ($A.util.isUndefinedOrNull(resp)) {
             //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             ret["message"] = "Communication error, invalid JSON: " + text;
@@ -335,7 +334,14 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             // in case stale application cache, handling old exception code
             var appCache = window.applicationCache;
             if (appCache && (appCache.status === appCache.IDLE || appCache.status > appCache.DOWNLOADING)) {
-                appCache.update();
+                try {
+                    appCache.update();
+                } catch (ignore) {
+                    //
+                    // not sure what we should do here. but since this seems to only happen in corner cases
+                    // we'll ignore this one for now.
+                    //
+                }
             }
             return ret;
         } else if (resp["exceptionEvent"] === true) {
@@ -850,8 +856,19 @@ AuraClientService.prototype.setOutdated = function() {
     if (!appCache || (appCache && (appCache.status === appCache.UNCACHED || appCache.status === appCache.OBSOLETE))) {
         this.dumpCachesAndReload();
     } else if (appCache.status === appCache.IDLE || appCache.status > appCache.DOWNLOADING) {
-        // call update when there is a cache ie IDLE (status = 1) or cache is not being checked (status = 2) or downloaded (status = 3)
-        appCache.update();
+        // call update when there is a cache ie IDLE (status = 1) or cache is not being checked (status = 2)
+        // or downloaded (status = 3) But have a care, as there are cases (e.g. chrome) where it claims you have
+        // an appcache, but appcache.update() will fail (The only known way to reproduce is to use chrome dev
+        // tools and disable caching.
+        try {
+            appCache.update();
+        } catch (e) {
+            //
+            // whoops. something is inconsistent, but we don't really want to hard fail.
+            // so, instead, try a different route.
+            //
+            this.dumpCachesAndReload();
+        }
     }
 };
 

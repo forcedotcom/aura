@@ -1,5 +1,0 @@
-<aura:component extends="performance:perfTest">
-	<!--Deprecated: use the testDynamicTabLoading attribute of performanceTest:tabSetTest instead -->
-	<ui:tabset aura:id="myTabSet" >
-	</ui:tabset>
-</aura:component>  

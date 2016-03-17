@@ -99,7 +99,6 @@
         }
     },
 
-
     testGetStoragesReturnsCopy : {
         test: function (cmp){
             var storages = $A.storageService.getStorages();
@@ -118,40 +117,5 @@
             $A.test.assertEquals(4, Object.keys(storages).length, "Storage created with imperative API not returned");
             $A.test.assertTruthy(storages["imperative"], "Storage created with imperative API not returned");
         }
-    },
-
-    /**
-     * Test case to verify the behavior of $A.storageService.initStorage()
-     * function(name, persistent, secure, maxSize, defaultExpiration,
-     * defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit)
-     */
-    // TODO W-1560185 - Validation needed
-    _testInitStorage:{
-    	test : [
-	        function(cmp){
-        		// Bad values for name
-        	    $A.test.assertFalsy($A.storageService.initStorage(undefined, false, true,100, 200, 300, true, true),
-        		    "Name of storage cannot be undefined");
-        	    $A.test.assertFalsy($A.storageService.initStorage("", false, true,100, 200, 300, true, true),
-        		    "Storage needs a name");
-        	    $A.test.assertFalsy($A.storageService.initStorage(null, false, true,100, 200, 300, true, true),
-        		    "Name of storage cannot be null");
-        	},function(cmp){
-        		// Bad values for maxSize
-        	    $A.test.assertFalsy($A.storageService.initStorage("oranges1", false, true, -100, 200, 300, true, true),
-        		    "Storage maxSize cannot be negative");
-        	    $A.test.assertFalsy($A.storageService.initStorage("oranges2", false, true, undefined, 200, 300, true, true),
-        		    "Storage maxSize cannot be undefined");
-        	},function(cmp){
-        	    $A.test.assertFalsy($A.storageService.initStorage("apples1", false, true, 100, -200, 300, true, true),
-        		    "defaultExpiration cannot be negative");
-        	    $A.test.assertFalsy($A.storageService.initStorage("apples2", false, true, 100, undefined, 300, true, true),
-        		    "defaultExpiration cannot be undefined");
-        	    $A.test.assertFalsy($A.storageService.initStorage("apples3", false, true, 100, 200, undefined, true, true),
-        		    "defaultRefreshInterval cannot be undefined");
-        	    $A.test.assertFalsy($A.storageService.initStorage("apples4", false, true, 100, 200, -300, true, true),
-        		    "defaultRefreshInterval cannot be negative");
-        	}
-    	]
     }
 })

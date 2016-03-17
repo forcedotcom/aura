@@ -56,11 +56,11 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
         targetService.selectAdapter = function() {};
 
         [Fact]
-        function RequiresName() {
+        function RequiresTruthyName() {
             var expected = new Error("expected");
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
                 assert: function(value, msg) {
-                    if (value === undefined) {
+                    if (!value) {
                         throw expected;
                     }
                 }
@@ -140,7 +140,7 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
         }
 
         [Fact]
-        function MaxSizeDefaults1MB() {
+        function UndefinedMaxSizeDefaults1MB() {
             var actual;
             var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
                 "AuraStorage": function(config) {
@@ -150,6 +150,22 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
 
             mockA(function() { mockAuraStorage(function() {
                 targetService.initStorage("name", true, true);
+            })});
+
+            Assert.Equal(1000*1024, actual);
+        }
+
+        [Fact]
+        function NegativeMaxSizeDefaults1MB() {
+            var actual;
+            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
+                "AuraStorage": function(config) {
+                    actual = config.maxSize;
+                }
+            });
+
+            mockA(function() { mockAuraStorage(function() {
+                targetService.initStorage("name", true, true, -1);
             })});
 
             Assert.Equal(1000*1024, actual);
@@ -173,7 +189,7 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
         }
 
         [Fact]
-        function DefaultExpirationDefaults10() {
+        function UndefinedExpirationDefaults10() {
             var actual;
             var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
                 "AuraStorage": function(config) {
@@ -183,6 +199,22 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
 
             mockA(function() { mockAuraStorage(function() {
                 targetService.initStorage("name", true, true, 1);
+            })});
+
+            Assert.Equal(10, actual);
+        }
+
+        [Fact]
+        function NegativeExpirationDefaults10() {
+            var actual;
+            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
+                "AuraStorage": function(config) {
+                    actual = config.defaultExpiration;
+                }
+            });
+
+            mockA(function() { mockAuraStorage(function() {
+                targetService.initStorage("name", true, true, 1, -1);
             })});
 
             Assert.Equal(10, actual);
@@ -206,7 +238,7 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
         }
 
         [Fact]
-        function DefaultAutoRefreshIntervalDefaults30() {
+        function UndefinedAutoRefreshIntervalDefaults30() {
             var actual;
             var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
                 "AuraStorage": function(config) {
@@ -216,6 +248,22 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
 
             mockA(function() { mockAuraStorage(function() {
                 targetService.initStorage("name", true, true, 1, 2);
+            })});
+
+            Assert.Equal(30, actual);
+        }
+
+        [Fact]
+        function NegativeAutoRefreshIntervalDefaults30() {
+            var actual;
+            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
+                "AuraStorage": function(config) {
+                    actual = config.defaultAutoRefreshInterval;
+                }
+            });
+
+            mockA(function() { mockAuraStorage(function() {
+                targetService.initStorage("name", true, true, 1, 2, -1);
             })});
 
             Assert.Equal(30, actual);
@@ -338,5 +386,70 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
 
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        function NamePassed() {
+            var expected = "name";
+            var actual;
+
+            targetService.createAdapter = function(adapter, name, maxSize, debugLoggingEnabled, defaultExpiration) {
+                actual = name;
+            };
+
+            mockA(function() {
+                targetService.initStorage(expected);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function MaxSizePassed() {
+            var expected = 1;
+            var actual;
+
+            targetService.createAdapter = function(adapter, name, maxSize, debugLoggingEnabled, defaultExpiration) {
+                actual = maxSize;
+            };
+
+            mockA(function() {
+                targetService.initStorage("name", true, true, expected);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function DefaultExpirationPassed() {
+            var expected = 1;
+            var actual;
+
+            targetService.createAdapter = function(adapter, name, maxSize, debugLoggingEnabled, defaultExpiration) {
+                actual = defaultExpiration;
+            };
+
+            mockA(function() {
+                targetService.initStorage("name", true, true, 1, expected);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function DebugLoggingEnabledPassed() {
+            var expected = true;
+            var actual;
+
+            targetService.createAdapter = function(adapter, name, maxSize, debugLoggingEnabled, defaultExpiration) {
+                actual = debugLoggingEnabled;
+            };
+
+            mockA(function() {
+                targetService.initStorage("name", false, false, 1, 2, 3, expected);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
     }
 }

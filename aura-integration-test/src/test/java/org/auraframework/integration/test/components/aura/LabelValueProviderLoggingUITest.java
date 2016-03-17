@@ -33,7 +33,7 @@ public class LabelValueProviderLoggingUITest extends AbstractLoggingUITest {
     private By label1 = By.xpath("//div[@id='div1']");
 
     public LabelValueProviderLoggingUITest(String name) {
-        super(name);
+        super(name, "LoggingContextImpl");
     }
 
     /**

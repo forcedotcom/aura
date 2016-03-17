@@ -186,8 +186,6 @@
                     }
                 }, this.NAMES.hashHandler);
 
-                element.setAttribute("target", target);
-                element.setAttribute("href", value);
             } else if (!$A.util.isUndefinedOrNull(value) && (lowerName === "role" || lowerName.lastIndexOf("aria-", 0) === 0)) {
                 // use setAttribute to render accessibility attributes to markup
                 // do not set the property on the HTMLElement if value is null or undefined to avoid accessibility confusion.

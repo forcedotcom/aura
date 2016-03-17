@@ -59,7 +59,7 @@
          tabindex="-1"
          class="{!v.class}"
          role="dialog"
-         aria-labeledby="{!'title_' + globalId}"
+         aria-labelledby="{!'title_' + globalId}"
          aura:flavorable="true">
 
         <div aura:id="content" class="container">

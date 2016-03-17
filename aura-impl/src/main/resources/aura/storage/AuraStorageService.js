@@ -50,17 +50,18 @@ AuraStorageService.prototype.getStorages = function() {
     return $A.util.apply({}, this.storages);
 };
 
+
 /**
  * Initializes and returns new storage.
- * @param {String} name Required. The unique name of the storage to be initialized.
- * @param {Boolean} persistent Set to true if the requested storage is persistent.
- * @param {Boolean} secure Set to true if the requested storage is secure.
- * @param {number} maxSize Specifies the maximum storage size (bytes).
- * @param {number} defaultExpiration Specifies the default time (seconds) after which the cache expires. When an item is requested that has gone past the default cache expiration time, it will not be used.
- * @param {number} defaultAutoRefreshInterval Specifies the default interval (seconds) after which cached data is to be refreshed.
- * @param {Boolean} debugLoggingEnabled Set to true to enable debug logging in the JavaScript console for the Aura Storage Service.
- * @param {Boolean} clearStorageOnInit Set to true to clear storage when storage is initialized.
- * @param {String} version The version of storage. for any item in the storage. This is useful if you want to avoid retrieving stale cached items for a newer version of your application.
+ * @param {String} name The unique name of the storage to be initialized.
+ * @param {Boolean} [persistent] Set to true if the requested storage is persistent.
+ * @param {Boolean} [secure] Set to true if the requested storage is secure.
+ * @param {number} [maxSize] Specifies the maximum storage size (bytes).
+ * @param {number} [defaultExpiration] Specifies the default time (seconds) after which the cache expires. When an item is requested that has gone past the default cache expiration time, it will not be used.
+ * @param {number} [defaultAutoRefreshInterval] Specifies the default interval (seconds) after which cached data is to be refreshed.
+ * @param {Boolean} [debugLoggingEnabled] Set to true to enable debug logging in the JavaScript console for the Aura Storage Service.
+ * @param {Boolean} [clearStorageOnInit] Set to true to clear storage when storage is initialized.
+ * @param {String} [version] The version of storage. for any item in the storage. This is useful if you want to avoid retrieving stale cached items for a newer version of your application.
  * @memberOf AuraStorageService
  * @returns {AuraStorage} Returns an AuraStorage object for the new storage.
  * @export
@@ -72,9 +73,9 @@ AuraStorageService.prototype.initStorage = function(name, persistent, secure, ma
     // default values come from <auraStorage:init/>
     persistent = !!persistent;
     secure = !!secure;
-    maxSize = $A.util.isFiniteNumber(maxSize) ? maxSize : 1000 * 1024;
-    defaultExpiration = $A.util.isFiniteNumber(defaultExpiration) ? defaultExpiration : 10;
-    defaultAutoRefreshInterval = $A.util.isFiniteNumber(defaultAutoRefreshInterval) ? defaultAutoRefreshInterval : 30;
+    maxSize = $A.util.isFiniteNumber(maxSize) && maxSize > 0 ? maxSize : 1000 * 1024;
+    defaultExpiration = $A.util.isFiniteNumber(defaultExpiration) && defaultExpiration >= 0 ? defaultExpiration : 10;
+    defaultAutoRefreshInterval = $A.util.isFiniteNumber(defaultAutoRefreshInterval) && defaultAutoRefreshInterval >= 0 ? defaultAutoRefreshInterval : 30;
     debugLoggingEnabled = !!debugLoggingEnabled;
     clearStorageOnInit = $A.util.isBoolean(clearStorageOnInit) ? clearStorageOnInit : true;
 
@@ -83,7 +84,7 @@ AuraStorageService.prototype.initStorage = function(name, persistent, secure, ma
         version = this.version;
     }
 
-    var adapter = this.createAdapter(this.selectAdapter(persistent, secure), name, maxSize, debugLoggingEnabled);
+    var adapter = this.createAdapter(this.selectAdapter(persistent, secure), name, maxSize, debugLoggingEnabled, defaultExpiration);
 
     var config = {
         "name": name,
@@ -145,14 +146,15 @@ AuraStorageService.prototype.getAdapterConfig = function(adapter) {
  * <code>$A.storageService.createAdapter("memory", "test", 4096, true);</code>
  * @param {String} adapter The new adapter to create.
  * @param {String} name The name of the adapter.
- * @param {Integer} maxSize The maximum size (bytes) to allocate to the storage adapter.
+ * @param {number} maxSize The maximum size (bytes) to allocate to the storage adapter.
  * @param {Boolean} debugLoggingEnabled Set to true to enable logging, or false otherwise.
+ * @param {number} expiration Specifies the expiration time (seconds) for entries.
  * @memberOf AuraStorageService
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 	@export
  //#end
  */
-AuraStorageService.prototype.createAdapter = function(adapter, name, maxSize, debugLoggingEnabled) {
+AuraStorageService.prototype.createAdapter = function(adapter, name, maxSize, debugLoggingEnabled, expiration) {
     var config = this.adapters[adapter];
     $A.assert(config, "AuraStorageService.createAdapter() unknown adapter '" + adapter + "'!");
 
@@ -161,7 +163,8 @@ AuraStorageService.prototype.createAdapter = function(adapter, name, maxSize, de
     var adapterConfig = {
         "name": name,
         "maxSize": maxSize,
-        "debugLoggingEnabled": debugLoggingEnabled
+        "debugLoggingEnabled": debugLoggingEnabled,
+        "expiration": expiration
     };
 
     return new AdapterClass(adapterConfig);

@@ -121,7 +121,7 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
  * @private
  */
 GlobalValueProviders.prototype.getStorage = function () {
-    var storage = $A.storageService.getStorage("actions");
+    var storage = Action.getStorage();
     if (!storage) {
         return undefined;
     }

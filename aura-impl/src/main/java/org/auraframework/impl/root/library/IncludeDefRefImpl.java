@@ -81,11 +81,11 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
             throw new InvalidDefinitionException(String.format(
             		"%s must specify a name", IncludeDefRefHandler.TAG), getLocation());
         }
-        // if (!AuraTextUtil.isValidNCNameIdentifier(getName())) {
-        //     throw new InvalidDefinitionException(String.format(
-        //             "%s 'name' attribute must be a valid NCName identifier", IncludeDefRefHandler.TAG),
-        //             getLocation());
-        // }
+        if (!AuraTextUtil.isValidNCNameIdentifier(getName())) {
+            throw new InvalidDefinitionException(String.format(
+                    "%s 'name' attribute must be a valid NCName identifier", IncludeDefRefHandler.TAG),
+                    getLocation());
+        }
         if (aliases != null && !aliases.isEmpty()) {
         	for (String alias : aliases) {
         		if (!AuraTextUtil.isValidJsIdentifier(alias)) {

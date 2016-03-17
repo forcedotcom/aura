@@ -19,10 +19,14 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
 
+/**
+ * The tests extending from this class have to be running in single thread.
+ * The logs can be messed up when running with other tests.
+ * The derived test class may have to has tag UnAdaptableTest, since ThreadHostileTest
+ * is for standalone only.
+ */
 @ThreadHostileTest("The logs can be messed up when running with other tests.")
-@UnAdaptableTest("@ThreadHostileTest is not supported in SFDC.")
 public abstract class AbstractLoggingUITest extends WebDriverTestCase {
 
     private Logger logger;

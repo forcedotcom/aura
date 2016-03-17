@@ -19,7 +19,9 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Authentication;
 
 /**
- * Static Methods for testing access attribute 
+ * During the construction of DefinitionAccessImpl, we allow passing in some className.methodName, store it as "accessMethod", 
+ * then invoke the function later in getAccess(). 
+ * This class is for testing above logic in DefinitionImplUnitTest.java and its child classes. Also DefinitionAccessImplTest.java
  */
 public class TestAccessMethods {
 
@@ -41,7 +43,11 @@ public class TestAccessMethods {
 	public static Access allowPrivate() {
 		return Access.PRIVATE;
 	}
-	
+
+	public static Access allowPrivileged() {
+		return Access.PRIVILEGED;
+	}
+
 	public static Access allowInternal() {
 		return Access.INTERNAL;
 	}

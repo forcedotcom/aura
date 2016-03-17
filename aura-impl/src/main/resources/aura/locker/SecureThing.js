@@ -51,7 +51,9 @@ var SecureThing = (function() {
 			// Decorate with .item() to preserve NodeList shape
 			if (isNodeList && mutated) {
 				Object.defineProperty(swallowed, "item", {
-					value: function(index) { return this[index]; }
+					value: function(index) {
+						return swallowed[index]; 
+					}
 				});
 			}
 		} else if (typeof originalValue === 'object') {

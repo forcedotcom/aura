@@ -82,13 +82,15 @@ var IndexedDBAdapter = function IndexedDBAdapter(config) {
 IndexedDBAdapter.NAME = "indexeddb";
 
 /** Log levels */
-IndexedDBAdapter.LOG_LEVEL = { INFO: 0, WARNING: 1 };
+IndexedDBAdapter.LOG_LEVEL = {
+    INFO:    { id: 0, fn: "log" },
+    WARNING: { id: 1, fn: "warning" }
+};
 
 
 /**
- * Returns the name of the adapter, "indexeddb".
- * @return {String} the name of this adapter ("indexeddb")
- * @public
+ * Returns the name of the adapter.
+ * @returns {String} name of adapter
  */
 IndexedDBAdapter.prototype.getName = function() {
     return IndexedDBAdapter.NAME;
@@ -139,42 +141,41 @@ IndexedDBAdapter.prototype.initialize = function(version) {
 
 
 /**
- * Returns an approximate size for the ObjectStore.
- * @return {Promise} a promise that resolves with the size.
- * @public
+ * Returns adapter size.
+ * @returns {Promise} a promise that resolves with the size in bytes
  */
 IndexedDBAdapter.prototype.getSize = function() {
     var that = this;
     if (this.sizeAge < 50) {
         return Promise["resolve"](this.sizeGuess);
     } else {
-        return this.enqueue(function(success, error) {
-            that.walkInternal(success, error, false);
+        return this.enqueue(function(resolve, reject) {
+            that.walkInternal(resolve, reject, false);
         });
     }
 };
 
 /**
- * Gets an item from the ObjectStore.
- * @param {String} key storage key of item to retrieve.
- * @return {Promise} a promise that resolves with the item or null if not found.
+ * Retrieves an item from storage.
+ * @param {String} key key for item to retrieve
+ * @returns {Promise} a promise that resolves with the item or undefined if not found
  */
 IndexedDBAdapter.prototype.getItem = function(key) {
     var that = this;
-    var execute = function getIem(success, error) {
-        that.getItemInternal(key, success, error);
+    var execute = function getIem(resolve, reject) {
+        that.getItemInternal(key, resolve, reject);
     };
     return this.enqueue(execute);
 };
 
 /**
- * Gets all items from the ObjectStore.
- * @returns {Promise} a promise that resolves with an array of all items in the ObjectStore.
+ * Gets all items in storage.
+ * @returns {Promise} a promise that resolves with the an array of all items
  */
 IndexedDBAdapter.prototype.getAll = function() {
     var that = this;
-    var execute = function getAll(success, error) {
-        that.walkInternal(success, error, true);
+    var execute = function getAll(resolve, reject) {
+        that.walkInternal(resolve, reject, true);
     };
     return this.enqueue(execute);
 };
@@ -194,62 +195,62 @@ IndexedDBAdapter.prototype.resumeSweeping = function() {
 };
 
 /**
- * Stores an item in the ObjectStore.
- * @param {String} key the key of the item.
- * @param {Object} item the item to store.
- * @param {Number} size size of item.
- * @return {Promise} a promise that resolves when the item is stored.
+ * Stores an item in storage.
+ * @param {String} key key for item
+ * @param {Object} item item to store
+ * @param {Number} size size of key + item in bytes
+ * @returns {Promise} a promise that resolves when the item is stored
  */
 IndexedDBAdapter.prototype.setItem = function(key, item, size) {
     var that = this;
-    var execute = function setItem(success, error) {
-        that.setItemInternal(key, item, size, success, error);
+    var execute = function setItem(resolve, reject) {
+        that.setItemInternal(key, item, size, resolve, reject);
     };
     return this.enqueue(execute);
 };
 
 /**
- * Removes an item from the ObjectStore.
- * @param {String} key the key of the item to remove.
- * @return {Promise} a promise that resolves with the removed object or null if the item was not found.
+ * Removes an item from storage.
+ * @param {String} key key for item to remove
+ * @returns {Promise} a promise that resolves when the item is removed
  */
 IndexedDBAdapter.prototype.removeItem = function(key) {
     var that = this;
-    var execute = function removeItem(success, error) {
-        that.removeItemInternal(key, success, error);
+    var execute = function removeItem(resolve, reject) {
+        that.removeItemInternal(key, resolve, reject);
     };
     return this.enqueue(execute);
 };
 
 /**
- * Clears the ObjectStore on initialization, before any other operation is performed.
+ * Clears storage on initialization, before any other operation is performed.
  */
 IndexedDBAdapter.prototype.clearOnInit = function() {
     this.clearBeforeReady = true;
 };
 
 /**
- * Clears the ObjectStore.
- * @returns {Promise} a promise that resolves when clearing is complete.
+ * Clears storage.
+ * @returns {Promise} a promise that resolves when the store is cleared
  */
 IndexedDBAdapter.prototype.clear = function() {
     var that = this;
-    var execute = function(success, error) {
-        that.clearInternal(success, error);
+    var execute = function(resolve, reject) {
+        that.clearInternal(resolve, reject);
     };
     return this.enqueue(execute);
 };
 
 /**
  * Sweeps over the store to evict expired items.
- * @return {Promise} a promise that resolves when the sweep is complete.
+ * @returns {Promise} a promise that resolves when the sweep is complete.
  */
 IndexedDBAdapter.prototype.sweep = function() {
     var that = this;
-    var execute = function(success, error) {
+    var execute = function(resolve, reject) {
         // 0 because we don't need any space freed. this causes expired items
         // to be evicted + brings the store size below max size (see evictMaxStoreSize).
-        that.expireCache(0, success, error);
+        that.expireCache(0, resolve, reject);
     };
     return this.enqueue(execute);
 };
@@ -315,13 +316,8 @@ IndexedDBAdapter.prototype.createTables = function(event) {
 };
 
 /**
- * Runs the queue of requests.
- *
- * This method is part of the startup sequence, wherein we queue actions as they come in until the database is
- * ready. Once the database is ready, this function executes everything in the queue.
- *
- * @param {Boolean} ready true if the adapter is now ready; false if the adapter is in a permanent
- *  error state due to failed setup.
+ * Runs the stored queue of requests.
+ * @param {Boolean} readyState true if the adapter is ready; false if the adapter is in permanent error state
  * @private
  */
 IndexedDBAdapter.prototype.executeQueue = function(ready) {
@@ -349,10 +345,10 @@ IndexedDBAdapter.prototype.executeQueue = function(ready) {
         for (var i = 0; i < queue.length; i++) {
             if (!that.ready) {
                 // adapter is in permanent error state, reject all queued promises
-                queue[i]["error"](new Error(that.getInitializationError()));
+                queue[i]["reject"](new Error(that.getInitializationError()));
             } else {
                 // run the queued logic, which will resolve the promises
-                queue[i]["execute"](queue[i]["success"], queue[i]["error"]);
+                queue[i]["execute"](queue[i]["resolve"], queue[i]["reject"]);
             }
         }
     });
@@ -368,8 +364,8 @@ IndexedDBAdapter.prototype.getInitializationError = function() {
 
 /**
  * Enqueues a function to execute.
- * @param {function} execute the function to execute.
- * @return {Promise} a promise that resolves when the provided function executes.
+ * @param {function} execute the function to execute
+ * @return {Promise} a promise that resolves when the provided function executes
  */
 IndexedDBAdapter.prototype.enqueue = function(execute) {
     var that = this;
@@ -378,27 +374,28 @@ IndexedDBAdapter.prototype.enqueue = function(execute) {
     if (this.ready === false) {
         promise = Promise["reject"](new Error("IndexedDBStorageAdapte.enqueue: database failed to initialize"));
     } else if (this.ready === undefined) {
-        promise = new Promise(function(success, error) {
-            that.pendingRequests.push({ "execute":execute, "success":success, "error":error });
+        promise = new Promise(function(resolve, reject) {
+            that.pendingRequests.push({ "execute":execute, "resolve":resolve, "reject":reject });
             if (that.ready !== undefined) {
                 // rare race condition.
                 that.executeQueue();
             }
         });
     } else {
-        promise = new Promise(function(success, error) { execute(success, error); });
+        promise = new Promise(function(resolve, reject) { execute(resolve, reject); });
     }
     return promise;
 };
 
 
 /**
- * Internal routine to complete the promise.
- * @param {String} key The key to retrieve.
- * @param {function} success the success callback from the promise
- * @param {function} error the error callback from the promise
+ * Retrieves an item from storage.
+ * @param {String} key key for item to retrieve
+ * @param {Function} resolve promise resolve function
+ * @param {Function} reject promise resolve function
+ * @private
  */
-IndexedDBAdapter.prototype.getItemInternal = function(key, success, error) {
+IndexedDBAdapter.prototype.getItemInternal = function(key, resolve, reject) {
     var transaction = this.db.transaction([this.tableName], "readonly");
     var objectStore = transaction.objectStore(this.tableName);
     var objectStoreRequest = objectStore.get(key);
@@ -406,27 +403,27 @@ IndexedDBAdapter.prototype.getItemInternal = function(key, success, error) {
     transaction.onabort = function(event) {
         var message = "getItemInternal(): transaction aborted for key "+key+": "+event.error;
         that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-        error(new Error("IndexedDBAdapter."+message));
+        reject(new Error("IndexedDBAdapter."+message));
     };
     objectStoreRequest.onsuccess = function(event) {
         var item = event.target.result && event.target.result.item;
-        item = item || null;
-        success(item);
+        item = item || undefined;
+        resolve(item);
     };
     transaction.onerror = function(event) {
         var message = "getItemInternal(): transaction error for key "+key+": "+event.error;
         that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-        error(new Error("IndexedDBAdapter."+message));
+        reject(new Error("IndexedDBAdapter."+message));
     };
 };
 
 /**
  * Walks everything in the DB (read only).
- * @param {function} success the success callback from the promise
- * @param {function} error the error callback from the promise
- * @param {boolean} sendResult true to resolve the promise with the full set of results; false to resolve with the size.
+ * @param {Function} resolve promise resolve function
+ * @param {Function} reject promise reject function
+ * @param {Boolean} sendResult true to resolve the promise with the full set of results; false to resolve with the size.
  */
-IndexedDBAdapter.prototype.walkInternal = function(success, error, sendResult) {
+IndexedDBAdapter.prototype.walkInternal = function(resolve, reject, sendResult) {
     var transaction = this.db.transaction([this.tableName], "readonly");
     var objectStore = transaction.objectStore(this.tableName);
     var cursor = objectStore.openCursor();
@@ -458,36 +455,36 @@ IndexedDBAdapter.prototype.walkInternal = function(success, error, sendResult) {
                 that.expireCache(0);
             }
             if (sendResult) {
-                success(result);
+                resolve(result);
             } else {
-                success(that.sizeGuess);
+                resolve(that.sizeGuess);
             }
         }
     };
     cursor.onerror = function(event) {
-        error(new Error("IndexedDBAdapter.walkInternal: Transaction failed: "+event.error));
+        reject(new Error("IndexedDBAdapter.walkInternal: Transaction failed: "+event.error));
     };
     cursor.onabort = function(event) {
-        error(new Error("IndexedDBAdapter.walkInternal: Transaction aborted: "+event.error));
+        reject(new Error("IndexedDBAdapter.walkInternal: Transaction aborted: "+event.error));
     };
 };
 
 /**
- * Sets an item in the ObjectStore.
- * @param {String} key the key to set.
- * @param {String} item the item to set for the key.
- * @param {Number} size of item value
- * @param {function} success the promise success callback.
- * @param {function} error the promise error callback.
+ * Stores an item in storage.
+ * @param {String} key key for item
+ * @param {Object} item item to store
+ * @param {Number} size size of key + item in bytes
+ * @param {Function} resolve promise resolve function
+ * @param {Function} reject promise resolve function
  */
-IndexedDBAdapter.prototype.setItemInternal = function(key, item, size, success, error) {
+IndexedDBAdapter.prototype.setItemInternal = function(key, item, size, resolve, reject) {
     var expires = +item["expires"];
     var that = this;
 
     // TODO W-2795489 AuraStorage should always provide an expires value so each adapter
     // doesn't set its own default
     if (!expires) {
-        expires = new Date().getTime()+60000;
+        expires = new Date().getTime() + 60000;
     }
     var storable = {
         "key":key,
@@ -504,83 +501,89 @@ IndexedDBAdapter.prototype.setItemInternal = function(key, item, size, success, 
     var objectStore = transaction.objectStore(this.tableName);
     this.updateSize(size/2, size/2);
 
-    var objectStoreRequest = objectStore.put(storable);
-    transaction.onabort = function(event) {
-        var message = "setItemInternal(): transaction aborted for key "+key+": "+event.error;
-        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-        error(new Error("IndexedDBAdapter."+message));
-    };
-    objectStoreRequest.onsuccess = function() {
-        success();
-    };
-    transaction.onerror = function(event) {
-        var message = "setItemInternal(): transaction error for key "+key+": "+event.error;
-        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-        error(new Error("IndexedDBAdapter."+message));
-    };
+    try {
+        var objectStoreRequest = objectStore.put(storable);
+        transaction.onabort = function(event) {
+            var message = "setItemInternal(): transaction aborted for key "+key+": "+event.error;
+            that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+            reject(new Error("IndexedDBAdapter."+message));
+        };
+        objectStoreRequest.onsuccess = function() {
+            resolve();
+        };
+        transaction.onerror = function(event) {
+            var message = "setItemInternal(): transaction error for key "+key+": "+event.error;
+            that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+            reject(new Error("IndexedDBAdapter."+message));
+        };
+    } catch (e) {
+        reject(new Error("IndexedDBAdapter."+e.message));
+    }
 };
 
 /**
- * Removes an item from the ObjectStore.
- * @param {String} key the key to remove.
- * @param {function} success the success callback from the promise.
- * @param {function} error the error callback from the promise.
+ * Removes an item from storage.
+ * @param {String} key key for item to remove
+ * @param {Function} resolve promise resolve function
+ * @param {Function} reject promise resolve function
  */
-IndexedDBAdapter.prototype.removeItemInternal = function(key, success, error) {
+IndexedDBAdapter.prototype.removeItemInternal = function(key, resolve, reject) {
     var transaction = this.db.transaction([this.tableName], "readwrite");
     var objectStore = transaction.objectStore(this.tableName);
     this.updateSize(-this.sizeAvg, this.sizeAvg);
     var removeRequest = objectStore['delete'](key);
     transaction.onabort = function(event) {
-        error(new Error("IndexedDBAdapter.removeItem: Transaction aborted: "+event.error));
+        reject(new Error("IndexedDBAdapter.removeItem: Transaction aborted: "+event.error));
     };
     removeRequest.onsuccess = function() {
-        success();
+        resolve();
     };
     transaction.onerror = function(event) {
-        error(new Error("IndexedDBAdapter.removeItem: Transaction failed: "+event.error));
+        reject(new Error("IndexedDBAdapter.removeItem: Transaction failed: "+event.error));
     };
 };
 
 /**
- * Internal function to clear the ObjectStore.
- * @param {function} success the success callback for the promise.
- * @param {function} error the error callback from the promise.
+ * Clears storage.
+ * @param {Function} resolve promise resolve function
+ * @param {Function} reject promise reject function
  */
-IndexedDBAdapter.prototype.clearInternal = function(success, error) {
+IndexedDBAdapter.prototype.clearInternal = function(resolve, reject) {
     var transaction = this.db.transaction([this.tableName], "readwrite");
     var objectStore = transaction.objectStore(this.tableName);
     //FIXME: probably should do an object here.
     objectStore.clear();
     transaction.onabort = function(event) {
-        error(new Error("IndexedDBAdapter.clear: Transaction aborted: "+event.error));
+        reject(new Error("IndexedDBAdapter.clear: Transaction aborted: "+event.error));
     };
     transaction.oncomplete = function() {
-        success();
+        resolve();
     };
     transaction.onerror = function(event) {
-        error(new Error("IndexedDBAdapter.clear: Transaction failed: "+event.error));
+        reject(new Error("IndexedDBAdapter.clear: Transaction failed: "+event.error));
     };
     this.setSize(0, 0);
 };
 
 /**
- * Evicts cache entries and updates the cached size of the ObjectStore.
+ * Evicts cache entries and updates the cached size of the store.
  *
  * Cache entries are evicted until requested size is freed. Algorithm evicts
  * items based on age; an LRU algorithm is not used which differentiates this
  * adapter from others.
  *
- * The rest of the ObjectStore is traversed to calculate the real size of the
+ * The rest of the store is traversed to calculate the real size of the
  * persisted data.
  *
- * @param {number} requestedSize the size we want to free.
+ * @param {Number} requestedSize the size to free in bytes
+ * @param {Function} resolve promise resolve function
+ * @param {Function} reject promise reject function
  */
-IndexedDBAdapter.prototype.expireCache = function(requestedSize, success, error) {
+IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject) {
     var now = new Date().getTime();
     if (this.sweepingSuspended || (this.lastSweep + this.sweepInterval > now && this.sizeGuess < this.limitSweepHigh)) {
-        if (success) {
-            success();
+        if (resolve) {
+            resolve();
         }
         return;
     }
@@ -619,8 +622,11 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, success, error)
                 icursor['continue']();
             } else {
                 that.refreshSize(size, count);
-                if (success) {
-                    success();
+
+                if (resolve) {
+                    // intentionally don't return: the sweep is done so resolve the promise
+                    // but then check if we need to do an async sweep due to size
+                    resolve();
                 }
                 if (size > that.limitSweepHigh) {
                     that.expireCache(0);
@@ -628,13 +634,13 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, success, error)
             }
         };
         cursor.onerror = function(event) {
-            if (error) {
-                error(new Error("IndexedDBAdapter.getAll: Transaction failed: "+event.error));
+            if (reject) {
+                reject(new Error("IndexedDBAdapter.getAll: Transaction failed: "+event.error));
             }
         };
         cursor.onabort = function(event) {
-            if (error) {
-                error(new Error("IndexedDBAdapter.getAll: Transaction aborted: "+event.error));
+            if (reject) {
+                reject(new Error("IndexedDBAdapter.getAll: Transaction aborted: "+event.error));
             }
         };
     } catch (e) {
@@ -643,9 +649,9 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, success, error)
 };
 
 /**
- * Updates the guessed size of the ObjectStore.
- * @param {number} sizeChange the amount to change the size of the db.
- * @param {number} error a really random guess of the size of the error.
+ * Updates the guessed size of the store.
+ * @param {Number} sizeChange the amount to change the size of the store.
+ * @param {Number} error a really random guess of the size of the error.
  */
 IndexedDBAdapter.prototype.updateSize = function(sizeChange, error) {
     this.sizeGuess += sizeChange;
@@ -654,9 +660,9 @@ IndexedDBAdapter.prototype.updateSize = function(sizeChange, error) {
 };
 
 /**
- * Refreshes the cached size of the ObjectStore from real data.
- * @param {number} size the actual calculated size.
- * @param {number} count the number of items in the ObjectStore.
+ * Refreshes the cached size of the store from real data.
+ * @param {Number} size the actual calculated size.
+ * @param {Number} count the number of items in the store.
  * @private
  */
 IndexedDBAdapter.prototype.refreshSize = function(size, count) {
@@ -680,11 +686,10 @@ IndexedDBAdapter.prototype.refreshSize = function(size, count) {
 };
 
 /**
- * Sets the cached size of the ObjectStore. Callers must provide sizes based
+ * Sets the cached size of the store. Callers must provide sizes based
  * on real data, not estimates.
- *
  * @param {number} size the actual calculated size.
- * @param {number} count the number of items in the ObjectStore.
+ * @param {number} count the number of items in the store.
  * @private
  */
 IndexedDBAdapter.prototype.setSize = function(size, count) {
@@ -699,23 +704,27 @@ IndexedDBAdapter.prototype.setSize = function(size, count) {
 
 /**
  * Logs a message.
+ * @param {IndexedDBAdapter.LOG_LEVEL} level log line level
+ * @param {String} msg the log message
+ * @param {Object} [obj] optional log payload
  * @private
  */
 IndexedDBAdapter.prototype.log = function (level, msg, obj) {
-    if (this.debugLoggingEnabled) {
-        level = level === IndexedDBAdapter.LOG_LEVEL.WARNING ? "warning" : "log";
-        $A[level]("IndexedDBAdapter '"+this.instanceName+"' "+msg+":", obj);
+    if (this.debugLoggingEnabled || level.id >= IndexedDBAdapter.LOG_LEVEL.WARNING.id) {
+        $A[level.fn]("IndexedDBAdapter '"+this.instanceName+"' "+msg, obj);
     }
 };
 
 /**
  * Deletes the ENTIRE DB which may contain ObjectStores belonging to other app/cmp.
- * @return {Promise} promise that deletes the entire database
+ * TODO W-2691320 - change db vs store name to avoid this issue.
+ *
+ * @return {Promise} a promise that deletes the entire database
  */
 IndexedDBAdapter.prototype.deleteStorage = function() {
     var that = this;
-    var execute = function deleteStorage(success, error) {
-        that.deleteStorageInternal(success, error);
+    var execute = function deleteStorage(resolve, reject) {
+        that.deleteStorageInternal(resolve, reject);
     };
     return this.enqueue(execute);
 };
@@ -724,7 +733,7 @@ IndexedDBAdapter.prototype.deleteStorage = function() {
  * Internal routine to delete the DB.
  * @private
  */
-IndexedDBAdapter.prototype.deleteStorageInternal = function(success, error) {
+IndexedDBAdapter.prototype.deleteStorageInternal = function(resolve, reject) {
     var that = this;
 
     // IE and Safari need to be explicitly closed otherwise may end up stuck in a blocked state
@@ -734,11 +743,11 @@ IndexedDBAdapter.prototype.deleteStorageInternal = function(success, error) {
     dbRequest.onerror = function() {
         var message = "deleteStorageInternal(): delete database error";
         that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-        error(new Error("IndexedDBAdapter."+message));
+        reject(new Error("IndexedDBAdapter."+message));
     };
     dbRequest.onsuccess = function() {
         that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "deleteStorageInternal(): deleted successfully");
-        success();
+        resolve();
     };
     dbRequest.onblocked = function(/*error*/) {
         // Cannot error here because IE may come to this callback before success
@@ -747,7 +756,7 @@ IndexedDBAdapter.prototype.deleteStorageInternal = function(success, error) {
 };
 
 /**
- * Registers the indexedDB adapter.
+ * Registers IndexedDB adapter.
  */
 IndexedDBAdapter.register = function() {
     // Always disable support for Safari (including embedded Safari eg Outlook) because its implementation is not reliable in iframe.

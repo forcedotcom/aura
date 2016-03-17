@@ -48,14 +48,14 @@ implements ExpressionContainerHandler {
     protected Location startLocation;
     protected WhitespaceBehavior whitespaceBehavior = BaseComponentDef.DefaultWhitespaceBehavior;
     protected DefDescriptor<T> defDescriptor;
-    protected final boolean isInPrivilegedNamespace;
+    protected final boolean isInInternalNamespace;
     public static final String SCRIPT_TAG = "script";
     public static final String ATTRIBUTE_ACCESS = "access";
 
     public ContainerTagHandler() {
         super();
         this.defDescriptor = null;
-        this.isInPrivilegedNamespace = true;
+        this.isInInternalNamespace = true;
     }
 
     public ContainerTagHandler(XMLStreamReader xmlReader, Source<?> source) {
@@ -65,11 +65,11 @@ implements ExpressionContainerHandler {
     public ContainerTagHandler(DefDescriptor<T> defDescriptor, XMLStreamReader xmlReader, Source<?> source) {
         super(xmlReader, source);
         this.defDescriptor = defDescriptor;
-        this.isInPrivilegedNamespace = defDescriptor != null ? Aura.getConfigAdapter().isPrivilegedNamespace(defDescriptor.getNamespace()) : true;
+        this.isInInternalNamespace = defDescriptor != null ? Aura.getConfigAdapter().isInternalNamespace(defDescriptor.getNamespace()) : true;
     }
 
-    public boolean isInPrivilegedNamespace() {
-        return isInPrivilegedNamespace;
+    public boolean isInInternalNamespace() {
+        return isInInternalNamespace;
     }
 
     protected DefDescriptor<T> getDefDescriptor() {

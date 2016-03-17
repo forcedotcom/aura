@@ -14,7 +14,7 @@
             $A.test.fail("CryptoAdapter failed to register. You must run these tests against localhost or with HTTPS (see http://sfdc.co/bO9Hok).");
         }
 
-        $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this); 
+        $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this);
         this.storage = this.createStorage("crypto-store", 32768, 2000, 3000);
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store"); });
     },
@@ -41,7 +41,7 @@
         }
     },
 
-   testGetMaxSize:{
+   testGetMaxSize: {
         test:function(cmp){
             cmp._storageLib.testGetMaxSize(this.storage, 32);
         }
@@ -131,6 +131,18 @@
         }
     },
 
+    testGetFunctionValue: {
+        test: function(cmp) {
+            cmp._storageLib.testGetFunctionValue(cmp, this.storage);
+        }
+    },
+
+    testGetErrorValue: {
+        test: function(cmp) {
+            cmp._storageLib.testGetErrorValue(cmp, this.storage);
+        }
+    },
+
     testSetItemUnderMaxSize : {
         test : [function(cmp) {
             cmp._storageLib.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
@@ -146,27 +158,13 @@
         }]
     },
 
-    testJsonErrorRejectsPut:{
+    testCyclicObjectFails: {
         test: function (cmp) {
-            var completed = false;
-            var stuff = { "a": 2 };
-            stuff["b"] = stuff;
-
-            this.storage.put("testTwistedObject", stuff)
-                .then(function() { return storage.get("testTwistedObject"); })
-                .then(function() {
-                    var fail = "Expecting JSON stringify error. JSON should NOT be able to encode circular references";
-                    $A.test.fail(fail);
-                }, function(e) {
-                    cmp._storageLib.appendLine(cmp, e.message);
-                    completed = true;
-                });
-
-            $A.test.addWaitFor(true, function() { return completed; });
+            cmp._storageLib.testCyclicObjectFails(cmp, this.storage);
         }
     },
 
-    testModifyObject:{
+    testModifyObject: {
         test:function(cmp){
             cmp._storageLib.testModifyObject(cmp, this.storage);
         }
@@ -222,7 +220,7 @@
         }
     },
 
-    testClear:{
+    testClear: {
         test:[function(cmp){
             cmp._storageLib.testClear_stage1(cmp, this.storage);
         },
@@ -245,7 +243,7 @@
         function loadComponentInIframe(cmp) {
             cmp._expected = "expected value";
             cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true&value="
-                    + cmp._expected, "iframeContainer");
+                    + cmp._expected, "iframeContainer", "first load");
         },
         function resetDatabase(cmp) {
             var iframeCmp = cmp._iframeLib.getIframeRootCmp();
@@ -258,7 +256,7 @@
             cmp._iframeLib.waitForStatus("Adding", "Done Adding");
         },
         function reloadIframe(cmp) {
-            cmp._iframeLib.reloadIframe(cmp);
+            cmp._iframeLib.reloadIframe(cmp, false, "first reload");
         },
         function getItemFromDatabase(cmp) {
             var iframeCmp = cmp._iframeLib.getIframeRootCmp();
@@ -285,7 +283,7 @@
             function loadComponentInIframe(cmp) {
                 cmp._expected = "expected value";
                 cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true&value="
-                        + cmp._expected, "iframeContainer");
+                        + cmp._expected, "iframeContainer", "first load");
             },
             function resetDatabase(cmp) {
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
@@ -298,7 +296,7 @@
                 cmp._iframeLib.waitForStatus("Adding", "Done Adding");
             },
             function reloadFrame(cmp) {
-                cmp._iframeLib.reloadIframe(cmp);
+                cmp._iframeLib.reloadIframe(cmp, false, "first reload");
             },
             function verifyNoItemWithDifferentKey(cmp) {
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();

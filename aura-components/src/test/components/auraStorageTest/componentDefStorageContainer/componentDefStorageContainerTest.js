@@ -10,7 +10,7 @@
         test: [
             function loadIframe(cmp) {
                 var iframeSrc = "/auraStorageTest/componentDefStorage.app";
-                cmp.helper.lib.iframeTest.loadIframe(cmp, iframeSrc, "iframeContainer");
+                cmp.helper.lib.iframeTest.loadIframe(cmp, iframeSrc, "iframeContainer", "first load");
             },
             function clearStorages(cmp) {
                 cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
@@ -18,7 +18,7 @@
             function reloadPage(cmp) {
                 // Need to reload the page here to clear any items that may have been restored on initial load and are
                 // now in memory
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, false);
+                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
             },
             function fetchComponentFromServer(cmp) {
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
@@ -33,7 +33,7 @@
                 cmp.helper.lib.iframeTest.verifyDefStorage("ui:scopedScroll", true);
             },
             function reloadIframe(cmp) {
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, true)
+                cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload")
             },
             function createOriginalComponentAndVerify(cmp) {
                 cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
@@ -48,7 +48,7 @@
         labels : ["flapper"],
         test: [
             function loadIframe(cmp) {
-                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/componentDefStorage.app?overrideStorage=true", "iframeContainer");
+                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/componentDefStorage.app?overrideStorage=true", "iframeContainer", "first load");
             },
             function clearStorages(cmp) {
                 cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
@@ -56,7 +56,7 @@
             function reloadPage(cmp) {
                 // Need to reload the page here to clear any items that may have been restored on initial load and are
                 // now in memory
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, false);
+                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
             },
             function fetchComponentFromServer(cmp) {
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
@@ -78,7 +78,7 @@
             },
             function reloadPage(cmp) {
                 // Reload page to clear anything saved in javascript memory
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, true);
+                cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload");
             },
             function fetchOriginalComponentAgain(cmp) {
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");

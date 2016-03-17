@@ -45,7 +45,7 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
     protected static final String ATTRIBUTE_API_VERSION = "apiVersion";
 
     protected static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_DESCRIPTION);
-    protected static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(ATTRIBUTE_SUPPORT).addAll(ALLOWED_ATTRIBUTES).build();
+    protected static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(ATTRIBUTE_SUPPORT).addAll(ALLOWED_ATTRIBUTES).build();
 
     protected RootTagHandler() {
         super();
@@ -57,7 +57,7 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return isInPrivilegedNamespace ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
+        return isInInternalNamespace ? INTERNAL_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     /**

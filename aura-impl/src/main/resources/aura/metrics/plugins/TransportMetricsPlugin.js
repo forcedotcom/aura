@@ -58,7 +58,7 @@ TransportMetricsPlugin.prototype.disable = function () {
 TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, actions, method, options */) {
     var config = Array.prototype.shift.apply(arguments);
     var auraXHR = arguments[0];
-    var options = arguments[3];
+    var options = arguments[3] || {};
     var ret = config["fn"].apply(config["scope"], arguments);
 
     if (ret) {
@@ -66,15 +66,16 @@ TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, ac
         var actionDefs = [];
         for (var id in auraXHR.actions) {
             if (auraXHR.actions.hasOwnProperty(id)) {
-                actionDefs.push(auraXHR.actions[id].getDef() + '[' + id + ']');
+                actionDefs.push(auraXHR.actions[id].getDef().name + '$' + id);
             }
         }
 
         startMark["context"] = {
             "auraXHRId"     : auraXHR.marker,
             "requestLength" : auraXHR.length,
+            "background"    : !!options.background,
             "actionDefs"    : actionDefs,
-            "requestId"     : auraXHR["requestId"] || (options && options["requestId"])
+            "requestId"     : auraXHR["requestId"] || options["requestId"]
         };
     }
     return ret;
@@ -95,8 +96,8 @@ TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR *
     if (this.metricsService.microsecondsResolution()/*timing API is supported*/ && window.performance.getEntriesByName) {
         var resource = window.performance.getEntriesByName(TransportMetricsPlugin.AURA_URL)[auraXHR.marker];
         if (resource) {
-            endMark["context"]["xhrDuration"] = resource.duration;
-            endMark["context"]["xhrLatency"] = resource.responseStart - resource.fetchStart;
+            endMark["context"]["xhrDuration"] = Math.round(resource.duration * 100) / 100;
+            endMark["context"]["xhrLatency"] = Math.round((resource.responseStart - resource.fetchStart) * 100) / 100;
         }
     }
 

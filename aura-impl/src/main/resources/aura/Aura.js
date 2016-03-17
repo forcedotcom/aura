@@ -23,6 +23,16 @@ if (typeof Aura !== 'undefined') {//eslint-disable-line no-use-before-define
 var Aura = {};
 window["Aura"] = Aura;
 
+// -- Aura inlinning bootstrap
+Aura.time = window.performance && window.performance.now ? window.performance.now.bind(performance) : function(){return Date.now();};
+Aura.bootstrap = {};
+Aura.bootstrapMark = function (mark, value) {
+    this.bootstrap[mark] = value || this.time();
+};
+
+Aura.bootstrapMark('frameworkInit');
+
+
 // -- Namespaces ------------------------------------------------------------
 Aura.Utils      = {};
 Aura.Errors     = {};
@@ -216,11 +226,11 @@ function AuraInstance () {
      *
      * @public
      */
-    this.severity = Object.freeze({
-        "ALERT": "ALERT",
-        "FATAL": "FATAL",
-        "QUIET": "QUIET"
-    });
+    this.severity = {
+        ALERT: "ALERT",
+        FATAL: "FATAL",
+        QUIET: "QUIET"
+    };
 
     /**
      * Instance of the AuraLocalizationService which provides utility methods for localizing data or getting formatters for numbers, currencies, dates, etc.<br/>
@@ -500,6 +510,13 @@ function AuraInstance () {
     this["auraError"] = this.auraError;
     this["auraFriendlyError"] = this.auraFriendlyError;
     this["severity"] = this.severity;
+    this["severity"]["ALERT"] = this.severity.ALERT;
+    this["severity"]["FATAL"] = this.severity.FATAL;
+    this["severity"]["QUIET"] = this.severity.QUIET;
+
+    // work around closure compiler
+    this["severity"] = Object.freeze(this["severity"]);
+
     this["hasDefinition"] = this.hasDefinition;
     this["getDefinition"] = this.getDefinition;
     this["getDefinitions"] = this.getDefinitions;
@@ -573,13 +590,15 @@ AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; 
  * @public
  */
 AuraInstance.prototype.initAsync = function(config) {
+    Aura.bootstrapMark("initAsync");
+
     var regexpDetectURLProcotolSegment = /^(.*?:)?\/\//;
 
     function createAuraContext() {
         // Context is created async because of the GVPs go though async storage checks
         $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
             if (!window["$$safe-eval$$"] && !regexpDetectURLProcotolSegment.test(config["host"])) {
-                throw new $A.auraError("Aura(): Failed to initialize locker worker.");
+                throw new $A.auraError("Aura(): Failed to initialize locker worker.", null, $A.severity.QUIET);
             }
             $A.context = context;
             $A.clientService.initHost(config["host"]);
@@ -599,7 +618,7 @@ AuraInstance.prototype.initAsync = function(config) {
         var el = document.getElementById("safeEvalWorker");
         if (!el) {
             if (!config["safeEvalWorker"]) {
-                throw new $A.auraError("Aura(): Missing 'safeEvalWorker' configuration.");
+                throw new $A.auraError("Aura(): Missing 'safeEvalWorker' configuration.", null, $A.severity.QUIET);
             }
             el = document.createElement("iframe");
             el.setAttribute("src", config["safeEvalWorker"]);
@@ -614,7 +633,7 @@ AuraInstance.prototype.initAsync = function(config) {
         }
         $A.util.on(el, "load", createAuraContext);
         $A.util.on(el, "error", function () {
-            throw new $A.auraError("Aura(): Failed to load locker worker.");
+            throw new $A.auraError("Aura(): Failed to load locker worker.", null, $A.severity.QUIET);
         });
     } else {
         // provision for an alternative safe evaluation. This will open the door to do some
@@ -671,22 +690,21 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
  * @private
  */
 AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
-    $A.metricsService.bootstrapMark("metadataReady"); // we have loaded the app tree from the server
-
     if (!$A["hasErrors"]) {
+        Aura.bootstrapMark("createAndRenderAppInit");
         var app = $A.clientService["init"](config, token, $A.util.getElement(container));
         $A.setRoot(app);
+        Aura.bootstrapMark("createAndRenderAppReady");
 
         if (!$A.initialized) {
             $A.initialized = true;
             $A.addDefaultErrorHandler(app);
             // Restore component definitions from AuraStorage into memory (if persistent)
-            $A.componentService.restoreDefsFromStorage().then($A.getCallback(function () {
+            $A.componentService.restoreDefsFromStorage().then(function () {
                 $A.getContext().pruneLoaded();
                 $A.finishInit(doNotInitializeServices);
-            }));
+            });
         }
-
     }
 };
 
@@ -794,7 +812,7 @@ AuraInstance.prototype.handleError = function(message, e) {
         }
 
         if (e["name"] === "AuraFriendlyError") {
-            e.severity = e.severity || this.severity["QUIET"];
+            e.severity = e.severity || this.severity.QUIET;
             evtArgs = {"message":e["message"],"error":e["name"],"auraError":e};
         }
         else {
@@ -820,10 +838,13 @@ AuraInstance.prototype.handleError = function(message, e) {
  * @platform
  */
 AuraInstance.prototype.reportError = function(message, error) {
+    // when the method is called w/o error object, we create a dummy to have client error id.
+    error = error || new $A.auraError("[NoErrorObjectAvailable] " + message);
+
     $A.handleError(message, error);
     if ($A.initialized) {
         $A.getCallback(function() {
-            $A.logger.reportError(error || new Error("[NoErrorObjectAvailable] " + message));
+            $A.logger.reportError(error);
         })();
         $A.services.client.postProcess();
     }
@@ -880,7 +901,7 @@ AuraInstance.prototype.getCallback = function(callback) {
         try {
             return callback.apply(this,Array.prototype.slice.call(arguments));
         } catch (e) {
-            // no need to wrap AFE with auraError as 
+            // no need to wrap AFE with auraError as
             // customers who throw AFE would want to handle it with their own custom experience.
             if (e instanceof $A.auraFriendlyError || e instanceof $A.auraError) {
                 if (context && context.getDef) {
@@ -917,7 +938,7 @@ AuraInstance.prototype.getToken = function(token){
         if(tokens.hasOwnProperty(token)){
             return tokens[token];
         }
-        throw new Error("Unknown token: '"+token+"'. Are you missing a tokens file or declaration?");
+        throw new $A.auraError("Unknown token: '"+token+"'. Are you missing a tokens file or declaration?");
     }
 };
 
@@ -1012,7 +1033,7 @@ AuraInstance.prototype.installOverride = function(name, fn, scope, priority) {
     }
     var override = Aura.OverrideMap$Instance.map[name];
     if (!override) {
-        throw new Error("$A.installOverride: Invalid name: "+name);
+        throw new $A.auraError("$A.installOverride: Invalid name: "+name, null, $A.severity.QUIET);
     }
     $A.assert(fn && $A.util.isFunction(fn), "Function must be a defined function");
     override.install(fn, scope, priority);
@@ -1029,7 +1050,7 @@ AuraInstance.prototype.uninstallOverride = function(name, fn) {
     }
     var override = Aura.OverrideMap$Instance.map[name];
     if (!override) {
-        throw new Error("$A.uninstallOverride: Invalid name: "+name);
+        throw new $A.auraError("$A.uninstallOverride: Invalid name: "+name, null, $A.severity.QUIET);
     }
     override.uninstall(fn);
 };
@@ -1065,13 +1086,14 @@ AuraInstance.prototype.getContext = function() {
 /**
  * Runs a function within the standard Aura lifecycle.
  *
- * This insures that <code>enqueueAction</code> methods and rerendering are handled properly.
+ * This ensures that <code>enqueueAction</code> methods and rerendering are handled properly.
  *
  * from JavaScript outside of controllers, renderers, providers.
  * @param {Function} func The function to run.
  * @param {String} name an optional name for the stack.
  * @public
  * @platform
+ * @deprecated Use <code>getCallback()</code> instead.
  */
 AuraInstance.prototype.run = function(func, name) {
     $A.assert(func && $A.util.isFunction(func), "The parameter 'func' for $A.run() must be a function!");
@@ -1248,7 +1270,7 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
         if(def) {
             returnDefinitions[c] = def;
         } else {
-            // Detect without access checks to see if
+            // detect without access checks
             if((isEvent && !this.eventService.hasDefinition(descriptor)) ||
                     (!isEvent && !this.componentService.getComponentDef(this.componentService.createDescriptorConfig(descriptor)))) {
 
@@ -1343,7 +1365,7 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
      * @borrows AuraInstance#util as util
      */
     window['$A'] = new AuraInstance();
-    $A.metricsService.bootstrapMark("frameworkReady");
+    Aura.bootstrapMark("frameworkReady");
 
 })();
 
@@ -1359,7 +1381,6 @@ window['aura'] = window['$A'];
 // #include aura.metrics.plugins.TransportMetricsPlugin
 // #include aura.metrics.plugins.PerfMetricsPlugin
 // #include aura.metrics.plugins.QueuedActionsMetricsPlugin
-// #include aura.metrics.plugins.ClientServiceMetricsPlugin
 // #include aura.metrics.plugins.AuraContextPlugin
 // #include aura.metrics.plugins.DomHandlersPlugin
 

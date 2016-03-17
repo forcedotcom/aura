@@ -48,7 +48,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInput.click();
         elementInput.clear();
         elementInput.sendKeys("Sep 23, 2005");
-        auraUITestingUtil.pressTab(elementInput);
+        getAuraUITestingUtil().pressTab(elementInput);
 
         assertEquals("InputDate component rendered with wrong value", "Sep 23, 2005",
                 elementInput.getAttribute("value"));
@@ -89,11 +89,11 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInputDate.clear();
         elementInputTime.clear();
         elementInputDate.sendKeys("Oct 23, 2005");
-        auraUITestingUtil.pressTab(elementInputDate);
+        getAuraUITestingUtil().pressTab(elementInputDate);
         elementInputTime.click();
         elementInputTime.clear();
         elementInputTime.sendKeys("9:30 AM");
-        auraUITestingUtil.pressTab(elementInputTime);
+        getAuraUITestingUtil().pressTab(elementInputTime);
 
         assertEquals("InputDateTime component rendered with wrong value", "Oct 23, 2005",
                 elementInputDate.getAttribute("value"));
@@ -107,11 +107,11 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInputDate.clear();
         elementInputTime.clear();
         elementInputDate.sendKeys("Oct 23, 2006");
-        auraUITestingUtil.pressTab(elementInputDate);
+        getAuraUITestingUtil().pressTab(elementInputDate);
         elementInputTime.click();
         elementInputTime.clear();
         elementInputTime.sendKeys("9:30 AM");
-        auraUITestingUtil.pressTab(elementInputTime);
+        getAuraUITestingUtil().pressTab(elementInputTime);
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='DateTime']"));
         elementButton.click();
 
@@ -140,7 +140,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInput.click();
         elementInput.clear();
         elementInput.sendKeys("511");
-        auraUITestingUtil.pressTab(elementInput);
+        getAuraUITestingUtil().pressTab(elementInput);
 
         assertEquals("InputNumber component rendered with wrong value", "511", elementInput.getAttribute("value"));
         assertEquals("outputNumber component rendered with wrong value", "511", elementoutput.getText());
@@ -173,7 +173,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInput.click();
         elementInput.clear();
         elementInput.sendKeys("22.35");
-        auraUITestingUtil.pressTab(elementInput);
+        getAuraUITestingUtil().pressTab(elementInput);
 
         assertEquals("InputPercent component rendered with wrong value", "22%", elementInput.getAttribute("value"));
         assertEquals("outputPercent component rendered with wrong value", "22%", elementoutput.getText());
@@ -208,7 +208,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInput.click();
         elementInput.clear();
         elementInput.sendKeys("123456");
-        auraUITestingUtil.pressTab(elementInput);
+        getAuraUITestingUtil().pressTab(elementInput);
 
         assertEquals("InputCurrency component rendered with wrong value", "$123,456.00", elementInput.getAttribute("value"));
         assertEquals("outputCurrency component rendered with wrong value", "$123,456.00", elementoutput.getText());

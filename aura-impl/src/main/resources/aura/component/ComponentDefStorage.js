@@ -182,7 +182,7 @@ ComponentDefStorage.prototype.getAll = function () {
                 var item = items[i];
                 var config = $A.util.json.decode(item["value"]);
                 if (config === null) {
-                    throw new Error("Error decoding definition from storage: " + item["key"]);
+                    throw new $A.auraError("Error decoding definition from storage: " + item["key"], null, $A.severity.QUIET);
                 }
                 result.push({ "key": item["key"], "value" : config });
             }
@@ -220,7 +220,7 @@ ComponentDefStorage.prototype.restoreAll = function() {
                         }
                         libCount++;
                     } else {
-                        if (!$A.componentService.hasDefinition(config["descriptor"])) {
+                        if (!$A.componentService.getComponentDef(config)) {
                             $A.componentService.saveComponentConfig(config);
                         }
                         cmpCount++;

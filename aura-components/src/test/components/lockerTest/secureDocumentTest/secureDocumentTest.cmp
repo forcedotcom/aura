@@ -18,6 +18,7 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
 
+    <aura:method name="getDocument" action="{!c.getDocument}"/>
     <aura:method name="getDocumentFragment" action="{!c.getDocumentFragment}"/>
     <aura:method name="getScriptElement" action="{!c.getScriptElement}"/>
     <aura:method name="getIframeElement" action="{!c.getIframeElement}"/>
@@ -26,6 +27,8 @@
     <aura:method name="getElementById" action="{!c.getElementById}"/>
     <aura:method name="getQuerySelector" action="{!c.getQuerySelector}"/>
     <aura:method name="getCookie" action="{!c.getCookie}"/>
+    <aura:method name="setTitle" action="{!c.setTitle}"/>
+    <aura:method name="doQuerySelectorAll" action="{!c.doQuerySelectorAll}"/>
 
     <div id="title">SecureDocument test</div>
     

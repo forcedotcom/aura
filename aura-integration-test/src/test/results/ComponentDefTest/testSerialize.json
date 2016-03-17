@@ -33,7 +33,6 @@
         "v":{
           "name":"testAttributeDescriptorName",
           "type":"aura://String",
-          "xs":"P",
           "default":"testValue"
         }
       }

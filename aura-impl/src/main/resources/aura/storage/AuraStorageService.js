@@ -66,14 +66,24 @@ AuraStorageService.prototype.getStorages = function() {
  * @export
  */
 AuraStorageService.prototype.initStorage = function(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit, version) {
+    $A.assert(name, "Storage name is a required argument");
     $A.assert(!this.storages[name], "Storage named '" + name + "' already exists!");
 
-    var adapter = this.createAdapter(this.selectAdapter(persistent, secure), name, maxSize, debugLoggingEnabled);
+    // default values come from <auraStorage:init/>
+    persistent = !!persistent;
+    secure = !!secure;
+    maxSize = $A.util.isFiniteNumber(maxSize) ? maxSize : 1000 * 1024;
+    defaultExpiration = $A.util.isFiniteNumber(defaultExpiration) ? defaultExpiration : 10;
+    defaultAutoRefreshInterval = $A.util.isFiniteNumber(defaultAutoRefreshInterval) ? defaultAutoRefreshInterval : 30;
+    debugLoggingEnabled = !!debugLoggingEnabled;
+    clearStorageOnInit = $A.util.isBoolean(clearStorageOnInit) ? clearStorageOnInit : true;
 
     // apply the default version if one is not specified (falsey values, like <auraStorage:init/>'s default empty string, is treated as not specified)
     if (!version) {
         version = this.version;
     }
+
+    var adapter = this.createAdapter(this.selectAdapter(persistent, secure), name, maxSize, debugLoggingEnabled);
 
     var config = {
         "name": name,

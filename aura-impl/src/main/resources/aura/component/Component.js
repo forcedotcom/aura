@@ -145,7 +145,7 @@ function Component(config, localCreation) {
     this.injectComponent(config, localCreation);
 
     // instantiates this components methods
-    this.setupMethods(config, this);
+    this.setupMethods(config);
 
     // sets up component level events
     this.setupComponentEvents(this, configAttributes);
@@ -1831,7 +1831,7 @@ Component.prototype.createComponentStack = function(facets, valueProvider){
                 $A.getContext().releaseCurrentAccess();
             } else {
                 // KRIS: HALO: This is hit, when you create a newComponentDeprec and use raw values, vs configs on the attribute values.
-                throw new $A.auraError("Component.createComponentStack: invalid config. Expected component definition, found '"+config+"'.");
+                throw new $A.auraError("Component.createComponentStack: invalid config. Expected component definition, found '"+config+"'.", null, $A.severity.QUIET);
             }
         }
         if (action) {
@@ -2096,7 +2096,7 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
                 + " client expected " + configCD
                 + " but got original " + partialConfigO
                 + " providing " + partialConfigCD + " from server "
-                + " for creationPath = "+this.creationPath);
+                + " for creationPath = "+this.creationPath, null, $A.severity.QUIET);
         }
     } else if (partialConfigCD) {
         if (partialConfigCD !== configCD) {
@@ -2106,14 +2106,14 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
             throw new $A.auraError("Mismatch at " + this.globalId
                 + " client expected " + configCD + " but got "
                 + partialConfigCD + " from server "
-                +" for creationPath = "+this.creationPath);
+                +" for creationPath = "+this.creationPath, null, $A.severity.QUIET);
         }
     }
 };
 
 Component.prototype.getMethodHandler = function(valueProvider,name,action,attributes){
     var observer=this.getActionCaller(valueProvider,action||("c."+name));
-    return function(param1,param2,paramN){//eslint-disable-line no-unused-vars
+    return function(/*param1,param2,paramN*/){
         var eventDef = $A.get("e").getEventDef("aura:methodCall");
         var dispatcher = {};
         dispatcher[eventDef.getDescriptor().getQualifiedName()] = [observer];
@@ -2291,13 +2291,13 @@ Component.prototype.setupValueEventHandlers = function(cmp) {
     }
 };
 
-Component.prototype.setupMethods = function(config, cmp) {
+Component.prototype.setupMethods = function() {
     var defs = this.componentDef.methodDefs;
     if (defs) {
         var method;
         for(var i=0;i<defs.length;i++){
             method=defs[i];
-            cmp[method.name]=this.getMethodHandler(cmp,method.name,method.action,method.attributes);
+            this[method.name]=this.getMethodHandler(this,method.name,method.action,method.attributes);
         }
     }
 };

@@ -65,7 +65,7 @@ ClientServiceMetricsPlugin.prototype.bind = function (metricsService) {
 	}
 	
 	function afterHook(markEnd) {
-	    metricsService.bootstrapMark("appCreationTime", markEnd["ts"] - startTime);
+	    Aura.bootstrapMark("appCreationTime", markEnd["ts"] - startTime);
 	}
 	
 	metricsService.instrument(

@@ -39,7 +39,7 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
     private static final Set<String> VALID_DATASOURCE_ATTRIBUTE_TYPES = Sets.newHashSet("string");
     private static final long serialVersionUID = 3290806856269872853L;
 
-    private final boolean isInPriviledgedNamespace;
+    private final boolean isInInternalNamespace;
     private final DefDescriptor<? extends RootDefinition> parentDescriptor;
 
     private final Boolean required;
@@ -54,7 +54,7 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
     private final String placeholder;
     private final String description;
     private final String defaultValue;
-    //Privledged
+    //Privileged
     private final String minApi;
     private final String maxApi;
     private final boolean translatable;
@@ -79,7 +79,7 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
         this.maxApi = builder.maxApi;
         this.translatable = builder.translatable;
         this.defaultFacet = builder.defaultFacet;
-        this.isInPriviledgedNamespace = builder.isInPriviledgedNamespace;
+        this.isInInternalNamespace = builder.isInInternalNamespace;
         this.parentDescriptor = builder.parentDescriptor;
     }
 
@@ -179,13 +179,13 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
             throw new DefinitionNotFoundException(DefDescriptorImpl.getInstance(getName(),
                     AttributeDef.class));
         }
-        if(!isInPriviledgedNamespace && getDataSource() != null){
+        if(!isInInternalNamespace && getDataSource() != null){
             if(!VALID_DATASOURCE_ATTRIBUTE_TYPES.contains(
                     attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
                 throw new InvalidDefinitionException("Only String attributes may have a datasource in the design file.", getLocation());
             }
 
-        } else if(!isInPriviledgedNamespace && !VALID_DESIGN_ATTRIBUTE_TYPES.contains(
+        } else if(!isInInternalNamespace && !VALID_DESIGN_ATTRIBUTE_TYPES.contains(
                 attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
             throw new InvalidDefinitionException("Only Boolean, Integer or String attributes may be exposed in design files.", getLocation());
         }
@@ -233,7 +233,7 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
         private String maxApi;
         private boolean translatable;
         private DesignAttributeDefaultDef defaultFacet;
-        private boolean isInPriviledgedNamespace;
+        private boolean isInInternalNamespace;
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
 
         /**
@@ -345,8 +345,8 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
         }
 
         @Override
-        public DesignAttributeDefBuilder setIsPriviledgedNamespace(boolean priviledgedNamespace) {
-            this.isInPriviledgedNamespace = priviledgedNamespace;
+        public DesignAttributeDefBuilder setIsInternalNamespace(boolean internalNamespace) {
+            this.isInInternalNamespace = internalNamespace;
             return this;
         }
     }

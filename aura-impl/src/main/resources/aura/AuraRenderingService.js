@@ -64,7 +64,7 @@ AuraRenderingService.prototype.render = function(components, parent) {
             components[i] = cmp;
 
             if(!$A.util.isComponent(cmp)) {
-                throw new Error("AuraRenderingService.render: 'cmp' must be a valid Component, found '" + cmp + "'.");
+                throw new $A.auraError("AuraRenderingService.render: 'cmp' must be a valid Component, found '" + cmp + "'.", null, $A.severity.QUIET);
             }
         }
         // JBUCH: HALO: TODO: END REMOVE ME
@@ -127,7 +127,7 @@ AuraRenderingService.prototype.rerender = function(components) {
             var addExistingElements=visited[id];
             if(!visited[id]) {
                 if(!cmp.isRendered()) {
-                    throw new Error("Aura.RenderingService.rerender: attempt to rerender component that has not been rendered.");
+                    throw new $A.auraError("Aura.RenderingService.rerender: attempt to rerender component that has not been rendered.", null, $A.severity.QUIET);
                 }
                 var rerenderedElements = undefined;
                 try {
@@ -188,7 +188,7 @@ AuraRenderingService.prototype.afterRender = function(components) {
     for(var i=0;i<components.length;i++){
         var cmp = components[i];
         if(!$A.util.isComponent(cmp)) {
-            throw new Error("AuraRenderingService.afterRender: 'cmp' must be a valid Component, found '"+cmp+"'.");
+            throw new $A.auraError("AuraRenderingService.afterRender: 'cmp' must be a valid Component, found '"+cmp+"'.", null, $A.severity.QUIET);
         }
         if(cmp.isValid()) {
             try {
@@ -283,13 +283,13 @@ AuraRenderingService.prototype.unrender = function(components) {
  */
 AuraRenderingService.prototype.storeFacetInfo = function(component, facet) {
     if(!$A.util.isComponent(component)) {
-        throw new Error("Aura.RenderingService.storeFacet: 'component' must be a valid Component. Found '" + component + "'.");
+        throw new $A.auraError("Aura.RenderingService.storeFacet: 'component' must be a valid Component. Found '" + component + "'.", null, $A.severity.QUIET);
     }
     if($A.util.isComponent(facet)){
         facet=[facet];
     }
     if(!$A.util.isArray(facet)) {
-        throw new Error("Aura.RenderingService.storeFacet: 'facet' must be a valid Array. Found '" + facet + "'.");
+        throw new $A.auraError("Aura.RenderingService.storeFacet: 'facet' must be a valid Array. Found '" + facet + "'.", null, $A.severity.QUIET);
     }
     component._facetInfo=facet.slice(0);
 };
@@ -300,7 +300,7 @@ AuraRenderingService.prototype.storeFacetInfo = function(component, facet) {
  */
 AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) {
     if(!$A.util.isComponent(component)) {
-        throw new Error("Aura.RenderingService.getUpdatedFacetInfo: 'component' must be a valid Component. Found '" + component + "'.");
+        throw new $A.auraError("Aura.RenderingService.getUpdatedFacetInfo: 'component' must be a valid Component. Found '" + component + "'.", null, $A.severity.QUIET);
     }
     if($A.util.isComponent(facet)){
         facet=[facet];

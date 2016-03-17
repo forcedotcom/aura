@@ -27,7 +27,6 @@
     <aura:handler event="ui:panelTransitionEnd" action="{!c._onPanelTransitionEnd}" description="The event fired when a panel transition is ended."/>
 	<aura:handler event="ui:panelDestroy" action="{!c.destroyAllPanels}" description="The event fired when all panels are destroyed from the DOM."/>
 
-	<aura:dependency resource="markup://ui:panelDialog" />
 	<aura:dependency resource="markup://ui:hidePanel" type="EVENT" />
 	<aura:dependency resource="markup://ui:button" type="COMPONENT"/>
 	

@@ -32,14 +32,14 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
-import org.auraframework.system.PrivilegedNamespaceSourceLoader;
+import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
 
 /**
  */
-public class FileSourceLoader extends BaseSourceLoader implements PrivilegedNamespaceSourceLoader, SourceListener {
+public class FileSourceLoader extends BaseSourceLoader implements InternalNamespaceSourceLoader, SourceListener {
 
     protected final File base;
     protected final int baseLen;
@@ -218,7 +218,7 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
          * The constructor.
          *
          * @param dset the set of descriptors to be filled.
-         * @param dm the matcher to check the descriptors.
+         * @param dt the DefType to accept.
          */
         public OneTypeFilter(Set<DefDescriptor<T>> dset, DefType dt) {
             this.dt = dt;
@@ -312,8 +312,8 @@ public class FileSourceLoader extends BaseSourceLoader implements PrivilegedName
     }
 
     @Override
-    public boolean isPrivilegedNamespace(String namespace) {
-        // All file based namespaces are considered system by default
+    public boolean isInternalNamespace(String namespace) {
+        // All file based namespaces are considered internal by default
         return true;
     }
 

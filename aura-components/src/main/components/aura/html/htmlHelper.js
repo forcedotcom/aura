@@ -147,9 +147,9 @@
         if (lowerName.indexOf("on") === 0) {
             var eventName = lowerName.substring(2);
             if (eventName === "click") {
-                this.addNamedClickHandler(element, this.domEventHandler.bind(this), this.NAMES.domHandler);
+                this.addNamedClickHandler(element, $A.getCallback(this.domEventHandler.bind(this)), this.NAMES.domHandler);
             } else {
-                $A.util.on(element, eventName, this.domEventHandler.bind(this));
+                $A.util.on(element, eventName, $A.getCallback(this.domEventHandler.bind(this)));
             }
         } else {
             var isSpecialBoolean = this.SPECIAL_BOOLEANS.hasOwnProperty(lowerName);
@@ -186,6 +186,8 @@
                     }
                 }, this.NAMES.hashHandler);
 
+                element.setAttribute("target", target);
+                element.setAttribute("href", value);
             } else if (!$A.util.isUndefinedOrNull(value) && (lowerName === "role" || lowerName.lastIndexOf("aria-", 0) === 0)) {
                 // use setAttribute to render accessibility attributes to markup
                 // do not set the property on the HTMLElement if value is null or undefined to avoid accessibility confusion.

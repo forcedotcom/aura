@@ -97,7 +97,7 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
         	//update the test_Library.lib source, then refresh
         	source.addOrUpdate(newSource);
         	//refresh the testApp, until it pick up the source change in test_Library.lib
-        	auraUITestingUtil.waitUntilWithCallback(
+        	getAuraUITestingUtil().waitUntilWithCallback(
                     new Function<WebDriver, Integer>() {
                         @Override
                         public Integer apply(WebDriver driver) {

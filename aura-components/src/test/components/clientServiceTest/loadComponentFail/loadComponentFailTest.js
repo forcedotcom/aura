@@ -9,7 +9,7 @@
     _testOfflineLaunchFailureDisplaysError: {
         test: [
             function loadIframe(cmp) {
-                cmp.helper.lib.iframeTest.loadIframe(cmp, "/clientServiceTest/loadComponentFailApp.app", "iframeContainer");
+                cmp.helper.lib.iframeTest.loadIframe(cmp, "/clientServiceTest/loadComponentFailApp.app", "iframeContainer", "first load");
             },
             function reloadIframeOfflineAndVerifyError(cmp) {
                 // Emulate being offline. This value will be picked up by the template

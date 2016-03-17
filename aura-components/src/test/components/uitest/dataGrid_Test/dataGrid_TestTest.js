@@ -46,6 +46,7 @@
      * Row creation and rendering takes too long for FF need to reduce size of page.
      */
     testWithLargeDataFF : {
+    	labels : ["extended"],
     	browsers : ["Firefox"],
         attributes : {"pageSize" : 1500, "currentPage" : 1},
         test : function(cmp){

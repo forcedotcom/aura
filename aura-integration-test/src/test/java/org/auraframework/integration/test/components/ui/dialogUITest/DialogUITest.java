@@ -71,13 +71,13 @@ public class DialogUITest extends WebDriverTestCase {
         if (BrowserType.SAFARI.equals(getBrowserType())) {
             elm.click();
         } else {
-            auraUITestingUtil.pressEnter(elm);
+            getAuraUITestingUtil().pressEnter(elm);
         }
     }
 
     public void openDialogBox(WebDriver driver) {
         WebElement element = driver.findElement(By.cssSelector(RESULT_LABEL));
-        auraUITestingUtil.pressTab(element);
+        getAuraUITestingUtil().pressTab(element);
         element = driver.findElement(By.cssSelector("button[class*='" + LAUNCH_DIALOG + "']"));
 
         clickOnElementOrPressEnter(element);
@@ -104,7 +104,7 @@ public class DialogUITest extends WebDriverTestCase {
     }
 
     public WebElement moveToNextActiveElement(WebDriver driver) {
-        String classOfActiveElem = "button[title^='" + auraUITestingUtil.getEval(TITLE) + "']";
+        String classOfActiveElem = "button[title^='" + getAuraUITestingUtil().getEval(TITLE) + "']";
         return driver.findElement(By.cssSelector(classOfActiveElem));
     }
 
@@ -171,16 +171,16 @@ public class DialogUITest extends WebDriverTestCase {
         WebDriver driver = getDriver();
         openDialogBox(driver);
 
-        String classOfActiveElem = "input[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']";
+        String classOfActiveElem = "input[class*='" + getAuraUITestingUtil().getEval(CLASSNAME) + "']";
         WebElement element = driver.findElement(By.cssSelector(classOfActiveElem));
-        Boolean obj = (Boolean) auraUITestingUtil.getEval("return $A.util.hasClass(arguments[0],\"checkbox1\")",
+        Boolean obj = (Boolean) getAuraUITestingUtil().getEval("return $A.util.hasClass(arguments[0],\"checkbox1\")",
                 element);
         assertTrue("Did not move to next checkbox", obj.booleanValue());
         element.click();
 
         classOfActiveElem = "button[title*='" + CONFIRM_STR + "']";
         element = driver.findElement(By.cssSelector(classOfActiveElem));
-        auraUITestingUtil.pressEnter(element);
+        getAuraUITestingUtil().pressEnter(element);
 
         // Getting the input text box to grab the value that was put in it
         element = driver.findElement(By.cssSelector(RESULT_LABEL));
@@ -201,22 +201,22 @@ public class DialogUITest extends WebDriverTestCase {
         assertEquals("Went through all check boxees but did not get to the cancel button", CANCEL_STR,
                 element.getAttribute("title"));
 
-        auraUITestingUtil.pressTab(element);
+        getAuraUITestingUtil().pressTab(element);
 
         // Getting Ok button
         element = moveToNextActiveElement(driver);
         assertEquals("Got to the cancel button but did not tab to confirm button", CONFIRM_STR,
                 element.getAttribute("title"));
-        auraUITestingUtil.pressTab(element);
+        getAuraUITestingUtil().pressTab(element);
 
         // Getting close button
         element = moveToNextActiveElement(driver);
         assertEquals("Got to the confirm button but did not tab to close button", CLOSE_STR,
                 element.getAttribute("title"));
-        auraUITestingUtil.pressTab(element);
+        getAuraUITestingUtil().pressTab(element);
 
         // Getting the item that called it
-        String classOfActiveElem = "button[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']";
+        String classOfActiveElem = "button[class*='" + getAuraUITestingUtil().getEval(CLASSNAME) + "']";
         element = driver.findElement(By.cssSelector(classOfActiveElem));
 
         assertClassesSame("Hitting tab did not go to item that called the dialog box",
@@ -241,7 +241,7 @@ public class DialogUITest extends WebDriverTestCase {
         waitForComponentToChangeStatus("div[class*='dialog']", "className", "hidden", false);
 
         // Make sure focus is back on the ok button
-        element = driver.findElement(By.cssSelector("button[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']"));
+        element = driver.findElement(By.cssSelector("button[class*='" + getAuraUITestingUtil().getEval(CLASSNAME) + "']"));
         assertClassesSame("Hitting tab did not go to item that called the dialog box",
                 LAUNCH_DIALOG, element.getAttribute("className"));
     }
@@ -261,7 +261,7 @@ public class DialogUITest extends WebDriverTestCase {
         assertEquals("Went through all check boxees but did not get to the cancel button", CANCEL_STR,
                 element.getAttribute("title"));
 
-        auraUITestingUtil.pressTab(element);
+        getAuraUITestingUtil().pressTab(element);
 
         // Getting Ok button
         element = moveToNextActiveElement(driver);
@@ -288,7 +288,7 @@ public class DialogUITest extends WebDriverTestCase {
         WebDriver driver = getDriver();
         openDialogBox(driver);
         // Grab the focused element, then press escape to close dialog box
-        String classOfActiveElem = "button[title*='" + auraUITestingUtil.getEval(TITLE) + "']";
+        String classOfActiveElem = "button[title*='" + getAuraUITestingUtil().getEval(TITLE) + "']";
         WebElement element = driver.findElement(By.cssSelector(classOfActiveElem));
 
         element.sendKeys(Keys.ESCAPE);
@@ -312,13 +312,13 @@ public class DialogUITest extends WebDriverTestCase {
         openDialogBox(driver);
 
         // Grab the focused element, then shift-tab to close dialog box
-        String classOfActiveElem = "button[title*='" + auraUITestingUtil.getEval(TITLE) + "']";
+        String classOfActiveElem = "button[title*='" + getAuraUITestingUtil().getEval(TITLE) + "']";
         WebElement element = driver.findElement(By.cssSelector(classOfActiveElem));
         assertEquals("Did not focus on the cancel button", element.getAttribute("title"), CANCEL_STR);
         element.sendKeys(SHIFT_TAB);
 
         // Getting the item that called it
-        classOfActiveElem = "button[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']";
+        classOfActiveElem = "button[class*='" + getAuraUITestingUtil().getEval(CLASSNAME) + "']";
         element = driver.findElement(By.cssSelector(classOfActiveElem));
 
         assertClassesSame("Hitting tab did not go to item that called the dialog box",

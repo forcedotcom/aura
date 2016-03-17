@@ -22,6 +22,7 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Authentication;
@@ -32,22 +33,25 @@ import org.auraframework.util.json.Json;
 
 public class DefinitionAccessImpl implements DefinitionAccess {
     private static final long serialVersionUID = 8409052764733035151L;
+    private static final String accessKey=Json.ApplicationKey.ACCESS.toString();
 
     static public DefinitionAccess defaultAccess(String namespace) {
-        return new DefinitionAccessImpl(Aura.getConfigAdapter().isPrivilegedNamespace(namespace));
+        return new DefinitionAccessImpl(Aura.getConfigAdapter().isInternalNamespace(namespace));
     }
 
     public DefinitionAccessImpl(String namespace, String access) throws InvalidAccessValueException {
         this.namespace = namespace;
         this.accessString = access;
+        this.isInternalNamespace = Aura.getConfigAdapter().isInternalNamespace(namespace);
         parseAccess(namespace, access);
-        defaultAccess(Aura.getConfigAdapter().isPrivilegedNamespace(namespace));
+        defaultAccess(this.isInternalNamespace);
     }
     
-    private DefinitionAccessImpl(boolean isPrivilegedNamespace) {
+    private DefinitionAccessImpl(boolean isInternalNamespace) {
         this.namespace = null;
         this.accessString = null;
-        defaultAccess(isPrivilegedNamespace);
+        this.isInternalNamespace=isInternalNamespace;
+        defaultAccess(isInternalNamespace);
     }
 
     private void parseAccess(String namespace, String accessValue) throws InvalidAccessValueException {
@@ -75,7 +79,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
         try {
             Access acc = Access.valueOf(ucItem);
             if (access != null && access != acc) {
-                throw new InvalidAccessValueException("Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE"); // or internal
+                throw new InvalidAccessValueException("Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE"); // or internal or privileged
             }
             access = acc;
             return;
@@ -135,6 +139,11 @@ public class DefinitionAccessImpl implements DefinitionAccess {
     }
 
     @Override
+    public boolean isPrivileged() {
+        return getAccess() == Access.PRIVILEGED;
+    }
+
+    @Override
     public boolean isInternal() {
         return getAccess() == Access.INTERNAL;
     }
@@ -142,20 +151,25 @@ public class DefinitionAccessImpl implements DefinitionAccess {
     @Override
     public void validate(String namespace, boolean allowAuth, boolean allowPrivate)
             throws InvalidAccessValueException {
-        boolean isPrivNamespace = Aura.getConfigAdapter().isPrivilegedNamespace(namespace);
-        if (authentication != null && (!allowAuth || !isPrivNamespace)) {
+        ConfigAdapter config=Aura.getConfigAdapter();
+        boolean isInternalNamespace = config.isInternalNamespace(namespace);
+        boolean isPrivilegedNamespace = config.isPrivilegedNamespace(namespace);
+        if (authentication != null && (!allowAuth || !isInternalNamespace)) {
             throw new InvalidAccessValueException("Invalid access attribute value \"" + authentication.name() + "\"");
         }
         if (access == Access.PRIVATE  && !allowPrivate) {
             throw new InvalidAccessValueException("Invalid access attribute value \"" + access.name() + "\"");
         }
-        if (access == Access.INTERNAL && !isPrivNamespace) {
+        if (access == Access.INTERNAL && !isInternalNamespace) {
+            throw new InvalidAccessValueException("Invalid access attribute value \"" + access.name() + "\"");
+        }
+        if (access == Access.PRIVILEGED && !(isInternalNamespace || isPrivilegedNamespace)) {
             throw new InvalidAccessValueException("Invalid access attribute value \"" + access.name() + "\"");
         }
         if (access != null && accessMethod != null) {
             throw new InvalidAccessValueException("Access attribute may not specify \"" + access.name() + "\" when a static method is also specified");
         }
-        if (!isPrivNamespace && accessMethod != null) {
+        if (!isInternalNamespace && accessMethod != null) {
             throw new InvalidAccessValueException("Access attribute may not use a static method");
         }
         
@@ -163,19 +177,32 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 
     @Override
     public void serialize(Json json) throws IOException{
-        if(this.isGlobal()||this.isPublic()){
-            // "G" - GLOBAL, "P" - PUBLIC, " " - DEFAULT
-            json.writeMapEntry(Json.ApplicationKey.ACCESS.toString(), getAccess().name().charAt(0));
+        if(this.isGlobal()) {
+            // "G" - GLOBAL
+            json.writeMapEntry(accessKey, 'G');
+        }
+        if(this.isPrivileged()){
+            // "PP" - PRIVILEGED
+            json.writeMapEntry(accessKey, "PP");
         }
         if(this.isPrivate()){
-            json.writeMapEntry(Json.ApplicationKey.ACCESS.toString(), 'p');
+            // "p" - PRIVATE
+            json.writeMapEntry(accessKey, 'p');
+        }
+        if(this.isPublic()||this.isInternal()){
+            // "P" - PUBLIC, "I" - INTERNAL, "" - DEFAULT DEPENDING ON NAMESPACE
+            Access defaultAccess=this.isInternalNamespace?Access.INTERNAL:Access.PUBLIC;
+            Access currentAccess=getAccess();
+            if(currentAccess!=defaultAccess){
+                json.writeMapEntry(accessKey, currentAccess.name().charAt(0));
+            }
         }
     }
 
-    protected void defaultAccess(boolean sysNamespace) {
+    protected void defaultAccess(boolean internalNamespace) {
         // Default access if necessary
         if (access == null && accessMethod == null) {
-            access = sysNamespace ? Access.INTERNAL : Access.PUBLIC;
+            access = internalNamespace ? Access.INTERNAL : Access.PUBLIC;
         }
     }
 
@@ -210,6 +237,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
     private Authentication authentication = null;
     private Access access = null;
     private transient Method accessMethod = null;
+    private boolean isInternalNamespace=false;
     private final String namespace;
     private final String accessString;
 

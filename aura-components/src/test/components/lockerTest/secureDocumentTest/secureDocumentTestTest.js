@@ -73,5 +73,24 @@
             var cookie = cmp.get("v.log");
             $A.test.assertEquals(document.cookie, cookie);
         }
+    },
+
+    testDocumentTitle: {
+        test: function(cmp) {
+            cmp.setTitle();
+            cmp.getDocument();
+            var secureDoc = cmp.get("v.log");
+            $A.test.assertEquals("secureDocumentTest", secureDoc.title);
+        }
+    },
+    
+    testQuerySelectorAllReturnsSecureNodeList: {
+        test: function(cmp) {
+            cmp.doQuerySelectorAll();
+            var result = cmp.get("v.log");
+            $A.test.assertTrue($A.util.isArray(result), "Expected document.querySelectorAll('*') to return an Array");
+            $A.test.assertStartsWith("SecureThing", result[0].toString(), "Expected document.querySelectorAll('*') to" +
+            		" return SecureThing elements");
+        }
     }
 })

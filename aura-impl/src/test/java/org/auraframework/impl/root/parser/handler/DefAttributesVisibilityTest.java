@@ -35,21 +35,21 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     }
 
     protected Set<String> publicAttrs;
-    protected Set<String> privilegedAttrs;
-    protected Set<String> publicAndPrivilegedAttrs;
+    protected Set<String> internalAttrs;
+    protected Set<String> publicAndInternalAttrs;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        publicAndPrivilegedAttrs = Sets.newHashSet(privilegedAttrs);
-        publicAndPrivilegedAttrs.addAll(publicAttrs);
+        publicAndInternalAttrs = Sets.newHashSet(internalAttrs);
+        publicAndInternalAttrs.addAll(publicAttrs);
     }
 
-    protected <D extends Definition> DefDescriptor<D> getDescriptor(boolean privileged, Class<D> clazz) {
+    protected <D extends Definition> DefDescriptor<D> getDescriptor(boolean internal, Class<D> clazz) {
         StringSourceLoader loader = StringSourceLoader.getInstance();
         String prefix;
 
-        if (privileged) {
+        if (internal) {
             prefix = StringSourceLoader.DEFAULT_NAMESPACE + ":";
         } else {
             prefix = StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":";
@@ -57,18 +57,18 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         return loader.createStringSourceDescriptor(prefix, clazz, null);
     }
 
-    protected abstract XMLHandler<?> getHandler(boolean privileged);
+    protected abstract XMLHandler<?> getHandler(boolean internal);
 
     public void testAttributeSettings() throws Exception {
-        Set<String> intersect = Sets.intersection(publicAttrs, privilegedAttrs);
-        assertTrue("Privileged and private sets must not intersect" + intersect, intersect.size() == 0);
+        Set<String> intersect = Sets.intersection(publicAttrs, internalAttrs);
+        assertTrue("Internal and private sets must not intersect" + intersect, intersect.size() == 0);
     }
 
-    public void testPrivilegedAttributeSet() throws Exception {
-        compareExpectedWithActual(publicAndPrivilegedAttrs, getHandler(true));
+    public void testInternalAttributeSet() throws Exception {
+        compareExpectedWithActual(publicAndInternalAttrs, getHandler(true));
     }
 
-    public void testNonPrivilegedAttributeSet() throws Exception {
+    public void testNonInternalAttributeSet() throws Exception {
         compareExpectedWithActual(publicAttrs, getHandler(false));
     }
 
@@ -82,15 +82,15 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
             publicAttrs = Sets.newHashSet("access", "description", "implements", "useAppcache",
                         "additionalAppCacheURLs", "controller", "model", "apiVersion", "abstract", "extensible",
                         "extends", "template");
-            privilegedAttrs = Sets.newHashSet("preload", "locationChangeEvent", "isOnePageApp",
+            internalAttrs = Sets.newHashSet("preload", "locationChangeEvent", "isOnePageApp",
                     "render", "provider", "style", "helper", "renderer", "whitespace",
                     "support", "tokens", "flavorOverrides", "defaultFlavor", "dynamicallyFlavorable");
             super.setUp();
         }
 
         @Override
-        protected XMLHandler<?> getHandler(boolean privileged) {
-            return new ApplicationDefHandler(getDescriptor(privileged, ApplicationDef.class), null, null);
+        protected XMLHandler<?> getHandler(boolean internal) {
+            return new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null);
         }
     }
 
@@ -103,15 +103,15 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "implements", "controller",
                     "model", "apiVersion", "abstract", "extensible", "extends", "isTemplate");
-            privilegedAttrs = Sets.newHashSet("render", "template", "provider", "style", "helper",
+            internalAttrs = Sets.newHashSet("render", "template", "provider", "style", "helper",
                     "renderer", "whitespace", "support", "tokens", "defaultFlavor",
                     "dynamicallyFlavorable");
             super.setUp();
         }
 
         @Override
-        protected XMLHandler<?> getHandler(boolean privileged) {
-            return new ComponentDefHandler(getDescriptor(privileged, ComponentDef.class), null, null);
+        protected XMLHandler<?> getHandler(boolean internal) {
+            return new ComponentDefHandler(getDescriptor(internal, ComponentDef.class), null, null);
         }
     }
 
@@ -123,13 +123,13 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "extends", "type", "apiVersion");
-            privilegedAttrs = Sets.newHashSet("support");
+            internalAttrs = Sets.newHashSet("support");
             super.setUp();
         }
 
         @Override
-        protected XMLHandler<?> getHandler(boolean privileged) {
-            return new EventDefHandler(getDescriptor(privileged, EventDef.class), null, null);
+        protected XMLHandler<?> getHandler(boolean internal) {
+            return new EventDefHandler(getDescriptor(internal, EventDef.class), null, null);
         }
     }
 
@@ -141,13 +141,13 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "extends", "apiVersion");
-            privilegedAttrs = Sets.newHashSet("support");
+            internalAttrs = Sets.newHashSet("support");
             super.setUp();
         }
 
         @Override
-        protected XMLHandler<?> getHandler(boolean privileged) {
-            return new InterfaceDefHandler(getDescriptor(privileged, InterfaceDef.class), null, null);
+        protected XMLHandler<?> getHandler(boolean internal) {
+            return new InterfaceDefHandler(getDescriptor(internal, InterfaceDef.class), null, null);
         }
     }
 
@@ -159,14 +159,14 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "default", "description", "name", "required", "type");
-            privilegedAttrs = Sets.newHashSet("serializeTo");
+            internalAttrs = Sets.newHashSet("serializeTo");
             super.setUp();
         }
 
         @Override
-        protected XMLHandler<?> getHandler(boolean privileged) {
+        protected XMLHandler<?> getHandler(boolean internal) {
             ApplicationDefHandler parentHandler;
-            parentHandler = new ApplicationDefHandler(getDescriptor(privileged, ApplicationDef.class), null, null);
+            parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null);
             return new AttributeDefHandler<>(parentHandler, null, null);
         }
     }
@@ -179,14 +179,14 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "name", "type");
-            privilegedAttrs = Sets.newHashSet();
+            internalAttrs = Sets.newHashSet();
             super.setUp();
         }
 
         @Override
-        protected XMLHandler<?> getHandler(boolean privileged) {
+        protected XMLHandler<?> getHandler(boolean internal) {
             ApplicationDefHandler parentHandler;
-            parentHandler = new ApplicationDefHandler(getDescriptor(privileged, ApplicationDef.class), null, null);
+            parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null);
             return new RegisterEventHandler<>(parentHandler, null, null);
         }
     }
@@ -199,14 +199,14 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("attribute", "value");
-            privilegedAttrs = Sets.newHashSet();
+            internalAttrs = Sets.newHashSet();
             super.setUp();
         }
 
         @Override
-        protected XMLHandler<?> getHandler(boolean privileged) {
+        protected XMLHandler<?> getHandler(boolean internal) {
             ApplicationDefHandler parentHandler;
-            parentHandler = new ApplicationDefHandler(getDescriptor(privileged, ApplicationDef.class), null, null);
+            parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null);
             return new AttributeDefRefHandler<>(parentHandler, null, null);
         }
     }
@@ -219,14 +219,14 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("action", "description", "event", "name", "value");
-            privilegedAttrs = Sets.newHashSet();
+            internalAttrs = Sets.newHashSet();
             super.setUp();
         }
 
         @Override
-        protected XMLHandler<?> getHandler(boolean privileged) {
+        protected XMLHandler<?> getHandler(boolean internal) {
             ApplicationDefHandler parentHandler;
-            parentHandler = new ApplicationDefHandler(getDescriptor(privileged, ApplicationDef.class), null, null);
+            parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null);
             return new EventHandlerDefHandler(parentHandler, null, null);
         }
     }

@@ -18,6 +18,7 @@ package org.auraframework.impl.root.parser.handler;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -46,22 +47,19 @@ public class ClientLibraryDefHandler<P extends RootDefinition> extends ParentedT
 
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_TYPE = "type";
-    private static final String ATTRIBUTE_URL = "url";
     private static final String ATTRIBUTE_MODES = "modes";
-    private static final String ATTRIBUTE_COMBINE = "combine";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_TYPE, ATTRIBUTE_URL,
-            ATTRIBUTE_MODES, ATTRIBUTE_COMBINE);
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_TYPE, ATTRIBUTE_MODES);
 
     private ClientLibraryDefImpl.Builder builder;
 
     public ClientLibraryDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) throws DefinitionNotFoundException {
         super(parentHandler, xmlReader, source);
-        
-        if (!isInPrivilegedNamespace()) {
+
+        if (!isInInternalNamespace()) {
             throw new DefinitionNotFoundException(Aura.getDefinitionService().getDefDescriptor(TAG, ComponentDef.class));
         }
-        
+
         this.builder = new ClientLibraryDefImpl.Builder();
         this.builder.setLocation(getLocation());
         this.builder.setParentDescriptor(parentHandler.getDefDescriptor());

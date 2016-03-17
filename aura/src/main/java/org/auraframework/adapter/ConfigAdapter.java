@@ -90,16 +90,22 @@ public interface ConfigAdapter extends AuraAdapter {
      */
     String getEncryptionKey();
 
+    boolean isInternalNamespace(String namespace);
+    Set<String> getInternalNamespaces();
+    void addInternalNamespace(String namespace);
+    void removeInternalNamespace(String namespace);
+
     boolean isPrivilegedNamespace(String namespace);
     Set<String> getPrivilegedNamespaces();
+    void addPrivilegedNamespace(String namespace);
+    void removePrivilegedNamespace(String namespace);
+
     String getDefaultNamespace();
 	boolean isUnsecuredPrefix(String prefix);
 
 	@Deprecated
 	boolean isUnsecuredNamespace(String namespace);
 
-	void addPrivilegedNamespace(String namespace);
-	void removePrivilegedNamespace(String namespace);
 
 	boolean isDocumentedNamespace(String namespace);
 

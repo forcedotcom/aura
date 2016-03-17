@@ -23,13 +23,13 @@ public class ResourceSourceLoaderTest extends AuraImplTestCase {
     }
     
     /**
-     * All namespaces loaded by ResourceSourceLoader are privileged, verify that ResourceSourceLoader says so.
+     * All namespaces loaded by ResourceSourceLoader are internal, verify that ResourceSourceLoader says so.
      */
-    public void testIsPrivilegedNamespace(){
+    public void testIsInternalNamespace(){
         ResourceSourceLoader rs = new ResourceSourceLoader(null);
-        assertTrue("All namespaces loaded by ResourceSourceLoader are to be privileged",
-                rs.isPrivilegedNamespace(null));
-        assertTrue("All namespaces loaded by ResourceSourceLoader are to be privileged," +
-                "Regardless of the namespace.", rs.isPrivilegedNamespace("fooBared"));
+        assertTrue("All namespaces loaded by ResourceSourceLoader are to be internal",
+                rs.isInternalNamespace(null));
+        assertTrue("All namespaces loaded by ResourceSourceLoader are to be internal," +
+                "Regardless of the namespace.", rs.isInternalNamespace("fooBared"));
     }
 }

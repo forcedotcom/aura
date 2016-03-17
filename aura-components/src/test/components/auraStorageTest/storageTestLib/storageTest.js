@@ -48,7 +48,7 @@ function storageTest () {
 
     function runUnsureKey(cmp, storage, key) {
         var completed = false;
-        var die = function(error) { completed = true; dieDie(cmp, error); }.bind(this);
+        var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
         append(cmp, "put("+key+",value);");
         storage.put(key, "value")
             .then(function() {
@@ -82,7 +82,9 @@ function storageTest () {
                 return storage.get(key);
             }).then(function(item) {
                 append(cmp, "value="+item);
-                if ($A.util.isObject(value)) {
+                if (value instanceof Error) {
+                    $A.test.assertUndefined(item.value.message, "Expected an empty object because errors are not JSON serializable");
+                } else if ($A.util.isObject(value)) {
                     for (var x in value) {
                         if (value.hasOwnProperty(x)) {
                             $A.test.assertEquals(value[x], item.value[x], "Failed object match on property "+x);
@@ -93,6 +95,8 @@ function storageTest () {
                     for (var i =0; i < value.length; i++) {
                         $A.test.assertEquals(value[i], item.value[i], "Failed match on array index "+i);
                     }
+                } else if ($A.util.isFunction(value)) {
+                    $A.test.assertEquals(value+"", item.value, "Failed match on serialized function definition");
                 } else {
                     $A.test.assertEquals(value, item.value, "Failed initial get for "+value);
                 }
@@ -114,9 +118,9 @@ function storageTest () {
         testSizeInitial: function(storage) {
             var completed = false;
             storage.getSize()
-            .then(function(size) { $A.test.assertEquals(0, size); })
-            .then(function() { completed = true; })
-            ["catch"](function(error) { $A.test.fail(error.toString()); });
+                .then(function(size) { $A.test.assertEquals(0, size); })
+                .then(function() { completed = true; })
+                ["catch"](function(error) { $A.test.fail(error.toString()); });
 
             $A.test.addWaitFor(true, function() { return completed; });
         },
@@ -191,11 +195,41 @@ function storageTest () {
             runFullCycle(cmp, storage, "testValues_Function", function(x){});
         },
 
+        /**
+         * Tests storing an item of value error works.
+         */
+        testGetErrorValue: function(cmp, storage, putFails) {
+            runFullCycle(cmp, storage, "testValues_Error", new Error("hello, error"));
+        },
+
+        /**
+         * Tests storing an item of value error fails.
+         */
+        testPutErrorValueFails: function(cmp, storage, putFails) {
+            var completed = false;
+            storage.put("testErrorValue", new Error("hello, error"))
+                .then(function() {
+                    completed = true;
+                    $A.test.fail("Expected put() to fail but it succeeded");
+                }, function(e) {
+                    append(cmp, e.message);
+                })
+                .then(function() { return storage.get("testErrorValue"); })
+                .then(
+                    function(item){
+                        $A.test.assertUndefined(item, "Expected undefined because put() failed");
+                        completed = true;
+                    },
+                    function(err) { dieDie(cmp, err); }
+                );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+
         testCacheMiss: function(cmp, storage) {
             var completed = false;
             storage.get("iDontExist")
                 .then(function(item){
-                    $A.test.assertUndefined(item, "Expectd to receive undefined on cache miss");
+                    $A.test.assertUndefined(item, "Expected to receive undefined on cache miss");
                     completed = true;
                 },
                 function(err) { dieDie(cmp, err); });
@@ -211,7 +245,7 @@ function storageTest () {
                 .then(
                     function() { completed = true; },
                     function(error) {
-                        dieDie(cmp, "Promise to put item under max size shouldnot reject");
+                        dieDie(cmp, "Promise to put item under max size should not reject");
                     }
                 );
 
@@ -326,25 +360,35 @@ function storageTest () {
             $A.test.assertEquals(secure, storage.isSecure(), "Unexpected value for secure");
         },
 
-        testTwistedObject: function(cmp, storage) {
-            var die = function(error) { dieDie(cmp, error); }.bind(this);
+        /**
+         * Tests that an item with cycles can not be stored.
+         */
+        testCyclicObjectFails: function(cmp, storage) {
             var completed = false;
             var stuff = { "a": 2 };
             stuff["b"] = stuff;
-
-            storage.put("testTwistedObject", stuff)
-                .then(function() { return storage.get("testTwistedObject"); })
-                .then(function(item) {
-                    $A.test.assertEquals(2, item.value["a"], "testTwistedObject: constant is wrong");
-                    $A.test.assertEquals(item.value["b"], item.value, "testTwistedObject: looped value is wrong");
-                    completed = true;
-                })['catch'](die);
-
-            $A.test.addWaitFor(true, function() { return completed; });
+            storage.put("testCyclicObject", stuff)
+                .then(
+                    function() {
+                        $A.test.fail("Expecting JSON stringify error. JSON should NOT be able to encode circular references");
+                    },
+                    function(e) {
+                        append(cmp, e.message);
+                    }
+                )
+                .then(function() { return storage.get("testCyclicObject"); })
+                .then(
+                    function(item){
+                        $A.test.assertUndefined(item, "Expected to receive undefined on twisted object");
+                        completed = true;
+                    },
+                    function(err) { dieDie(cmp, err); }
+                );
+            $A.test.addWaitFor(true, function(){ return completed; });
         },
 
         testModifyObject: function(cmp, storage) {
-            var die = function(error) { dieDie(cmp, error); }.bind(this);
+            var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
             var completed = false;
             var stuff = { "changeling": 2 };
             storage.put("testModifyObject", stuff)
@@ -360,7 +404,7 @@ function storageTest () {
         },
 
         testUpdate: function(cmp, storage) {
-            var die = function(error) { dieDie(cmp, error); }.bind(this);
+            var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
             var completed = false;
 
             storage.put("testUpdate", "ORIGINAL")
@@ -383,7 +427,7 @@ function storageTest () {
          * so max size is not exceeded.
          */
         testOverflow: function(cmp, storage) {
-            var die = function(error) { dieDie(cmp, error); }.bind(this);
+            var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
             var completed = false;
             var chunk = new Array(512).join("x");
             var keyLength = 14;
@@ -420,7 +464,7 @@ function storageTest () {
         },
 
         testClear_stage1: function(cmp, storage) {
-            var die = function(error) { dieDie(cmp, error); }.bind(this);
+            var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
             var completed = false;
 
             storage.clear()
@@ -440,7 +484,7 @@ function storageTest () {
         },
 
         testClear_stage2: function(cmp, storage) {
-            var die = function(error) { dieDie(cmp, error); }.bind(this);
+            var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
             var completed = false;
 
             storage.put("key1" , new Array(1024).join("x"))

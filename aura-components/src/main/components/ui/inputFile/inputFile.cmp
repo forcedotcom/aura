@@ -15,6 +15,50 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" extensible="true" support="PROTO" description="An HTML input element for specifying or uploading a file.">
-    <ui:underConstruction/>
+<aura:component support="PROTO" implements="ui:inputFileInterface" description="An HTML input element for select uploading files.">
+
+    <!-- Attributes -->
+    <aura:attribute name="files"          type="Object" />
+    <aura:attribute name="name"     type="String"  />
+    <aura:attribute name="disabled" type="Boolean" default="false" />
+    <aura:attribute name="required" type="Boolean" default="false" />
+    <aura:attribute name="browseButton" type="Aura.Component[]"    />
+    <aura:attribute name="bodyText"     type="Aura.Component[]"    />
+
+    <!--Handlers -->
+    <aura:handler name="change" event="ui:inputFileChangeEvent" action="{! c.handleChange }" />
+
+
+
+    <ui:inputFileDroppableZone multiple="{!v.multiple}" accept="{!v.accept}" maxSizeAllowed="{!v.maxSizeAllowed}"
+                               disabled="{!v.disabled}" class="{!v.class}"   classOver="{!v.classOver}" aura:id="dropZone">
+
+        <!--Hidden HTML input file-->
+        <input type="file" multiple="{!v.multiple}" accept="{!v.accept}" tabindex="-1"
+               class="hidden-input-file" name="{! v.name}" />
+
+        <!-- Body -->
+        <div class="input-file-body">
+            <!--Body text-->
+            <span class="input-file-body-text">
+                <aura:if isTrue="{! v.bodyText.length > 0 }">
+                    {! v.bodyText }
+                    <aura:set attribute="else">
+                        Drag and Drop files here or
+                    </aura:set>
+                </aura:if>
+            </span>
+            <!-- Browse button -->
+            <ui:inputFileOpenBrowse multiple="{!v.multiple}" accept="{!v.accept}">
+                <aura:if isTrue="{! v.browseButton.length > 0 }">
+                    {! v.browseButton }
+                    <aura:set attribute="else">
+                        <a>Browse</a>
+                    </aura:set>
+                </aura:if>
+            </ui:inputFileOpenBrowse>
+        </div>
+        <!--Footer -->
+        <ui:inputFileFilesList files="{! v.files }"/>
+    </ui:inputFileDroppableZone>
 </aura:component>

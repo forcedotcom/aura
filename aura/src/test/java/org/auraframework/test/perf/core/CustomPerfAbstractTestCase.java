@@ -86,7 +86,7 @@ public abstract class CustomPerfAbstractTestCase extends AbstractPerfTestCase {
     };
 
     protected final <V> V waitUntil(final Function<? super WebDriver, V> function) {
-        return new WebDriverWait(currentDriver, auraUITestingUtil.getTimeout())
+        return new WebDriverWait(getDriver(), getAuraUITestingUtil().getTimeout())
                 .until(new Function<WebDriver, V>() {
                     @Override
                     public V apply(WebDriver d) {

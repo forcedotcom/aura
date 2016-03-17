@@ -108,7 +108,7 @@ public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
         String interfaceSource = "<aura:interface/>";
         DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
-        //create component implements the interface, the component is in a custom namespace ( non-privileged )
+        //create component implements the interface, the component is in a custom namespace ( non-internal )
         String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
@@ -365,7 +365,7 @@ verifyAccess for Component,SystemOther,CustomOther
     	String interfaceSource = "<aura:interface access='PUBLIC'/>";
     	DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
     			StringSourceLoader.DEFAULT_NAMESPACE+":testinterface", true);
-    	//create component implements the interface, the component is in a custom namespace ( non-privileged )
+    	//create component implements the interface, the component is in a custom namespace ( non-internal )
     	String source = "<aura:component implements='"+interfaceDescriptor.getNamespace()+":"+interfaceDescriptor.getName()+"' /> ";
     	DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
     			StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent", false);
@@ -622,7 +622,7 @@ verifyAccess for Component,SystemOther,CustomOther
     	String interfaceSource = "<aura:interface access='GLOBAL'/>";
     	DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
     			StringSourceLoader.DEFAULT_NAMESPACE+":testinterface", true);
-    	//create component implements the interface, the component is in a custom namespace ( non-privileged )
+    	//create component implements the interface, the component is in a custom namespace ( non-internal )
     	String source = "<aura:component implements='"+interfaceDescriptor.getNamespace()+":"+interfaceDescriptor.getName()+"' /> ";
     	DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
     			StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent", false);

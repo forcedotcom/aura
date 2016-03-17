@@ -51,7 +51,7 @@ public class InputTextUITest extends WebDriverTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, baseTag.replaceAll("%s", event));
         open(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
         String value = getCurrentModelValue();
-        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(event);
+        WebElement input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(event);
         WebElement outputDiv = findDomElement(By.id("output"));
         assertModelValue(value, "Value shouldn't be updated yet.");
         input.click();
@@ -80,7 +80,7 @@ public class InputTextUITest extends WebDriverTestCase {
         open(url);
         WebElement outputDiv = findDomElement(By.id("output"));
         String eventName = "change";
-        auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
         outputDiv.click();
         assertModelValue(eventName);
     }
@@ -103,7 +103,7 @@ public class InputTextUITest extends WebDriverTestCase {
         WebElement outputDiv = findDomElement(By.id("output"));
 
         String eventName = "blur";
-        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        WebElement input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value, "Value shouldn't be updated yet.");
         input.click();
         outputDiv.click(); // to simulate tab behavior for touch browsers
@@ -114,7 +114,7 @@ public class InputTextUITest extends WebDriverTestCase {
         // so skip click check.
         if (!BrowserType.IPAD.equals(getBrowserType()) && !BrowserType.IPHONE.equals(getBrowserType())) {
             eventName = "click";
-            input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+            input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
             assertModelValue(value);
             outputDiv.click();
             assertModelValue(value, "Clicking an element without the updateOn attribute should not change the value");
@@ -124,24 +124,24 @@ public class InputTextUITest extends WebDriverTestCase {
         }
 
         eventName = "focus";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
         outputDiv.click();
         input.click();
         value = assertModelValue(eventName);
         assertDomEventSet();
 
         eventName = "keydown";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
         value = assertModelValue(eventName.substring(0, eventName.length() - 1));
         assertDomEventSet();
 
         eventName = "keypress";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
         value = assertModelValue(eventName.substring(0, eventName.length() - 1));
         assertDomEventSet();
 
         eventName = "keyup";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
         value = assertModelValue(eventName);
         assertDomEventSet();
     }
@@ -166,28 +166,28 @@ public class InputTextUITest extends WebDriverTestCase {
         WebElement outputDiv = findDomElement(By.id("output"));
 
         String eventName = "dblclick";
-        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        WebElement input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value, "Value shouldn't be updated yet.");
         a.doubleClick(input).build().perform();
         value = assertModelValue(eventName);
         assertDomEventSet();
 
         eventName = "mousemove";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value, "Value shouldn't be updated yet.");
         a.moveToElement(input).moveByOffset(0, 100).build().perform();
         value = assertModelValue(eventName);
         assertDomEventSet();
 
         eventName = "mouseout";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value, "Value shouldn't be updated yet.");
         a.moveToElement(input).moveToElement(outputDiv).build().perform();
         value = assertModelValue(eventName);
         assertDomEventSet();
 
         eventName = "mouseover";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value, "Value shouldn't be updated yet.");
         outputDiv.click();
         a.moveToElement(input).build().perform();
@@ -195,14 +195,14 @@ public class InputTextUITest extends WebDriverTestCase {
         assertDomEventSet();
 
         eventName = "mouseup";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value, "Value shouldn't be updated yet.");
         input.click();
         value = assertModelValue(eventName);
         assertDomEventSet();
 
         eventName = "select";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        input = getAuraUITestingUtil().findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value, "Value shouldn't be updated yet.");
         a.doubleClick(input).build().perform();
         value = assertModelValue(eventName);
@@ -270,7 +270,7 @@ public class InputTextUITest extends WebDriverTestCase {
 
     private String assertModelValue(final String expectedValue, final String errorMsg) {
         try {
-            return auraUITestingUtil.waitUntil(new ExpectedCondition<String>() {
+            return getAuraUITestingUtil().waitUntil(new ExpectedCondition<String>() {
                 @Override
                 public String apply(WebDriver d) {
                     String actual = getCurrentModelValue();
@@ -280,7 +280,7 @@ public class InputTextUITest extends WebDriverTestCase {
                         return null;
                     }
                 }
-            }, (auraUITestingUtil.getTimeout() * 3));
+            }, (getAuraUITestingUtil().getTimeout() * 3));
         } catch (TimeoutException e) {
             assertEquals(errorMsg, expectedValue, getCurrentModelValue());
             return getCurrentModelValue();
@@ -288,16 +288,16 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     private String getCurrentModelValue() {
-        String valueExpression = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil
+        String valueExpression = getAuraUITestingUtil().prepareReturnStatement(getAuraUITestingUtil()
                 .getValueFromRootExpr("m.string"));
-        String value = (String) auraUITestingUtil.getEval(valueExpression);
+        String value = (String) getAuraUITestingUtil().getEval(valueExpression);
         return value;
     }
 
     private void assertDomEventSet() {
-        String valueExpression = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil
+        String valueExpression = getAuraUITestingUtil().prepareReturnStatement(getAuraUITestingUtil()
                 .getValueFromRootExpr("v.isDomEventSet"));
-        boolean value = auraUITestingUtil.getBooleanEval(valueExpression);
+        boolean value = getAuraUITestingUtil().getBooleanEval(valueExpression);
         assertTrue("domEvent attribute on event should have been set.", value);
     }
 
@@ -358,8 +358,8 @@ public class InputTextUITest extends WebDriverTestCase {
         WebElement outputDiv = findDomElement(By.id("output"));
 
         String inputAuraId = "inputwithLabel";
-        String valueExpression = auraUITestingUtil.getValueFromCmpRootExpression(inputAuraId, "v.value");
-        String defExpectedValue = (String) auraUITestingUtil.getEval(valueExpression);
+        String valueExpression = getAuraUITestingUtil().getValueFromCmpRootExpression(inputAuraId, "v.value");
+        String defExpectedValue = (String) getAuraUITestingUtil().getEval(valueExpression);
         assertEquals("Default value should be the same", inputAuraId, defExpectedValue);
 
         // AndroidDriver likes to type things in all caps so modify input to accommodate.
@@ -368,7 +368,7 @@ public class InputTextUITest extends WebDriverTestCase {
         input.click();
         input.sendKeys(inputText);
         outputDiv.click(); // to simulate tab behavior for touch browsers
-        String actualText = (String) auraUITestingUtil.getEval(valueExpression);
+        String actualText = (String) getAuraUITestingUtil().getEval(valueExpression);
         assertEquals("Value of Input text shoud be updated", inputText, actualText);
     }
 
@@ -377,7 +377,7 @@ public class InputTextUITest extends WebDriverTestCase {
         open(TEST_CMP_WITH_LABELS);
         String value = getCurrentModelValue();
         WebElement outputDiv = findDomElement(By.id("output"));
-        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt("empty");
+        WebElement input = getAuraUITestingUtil().findElementAndTypeEventNameInIt("empty");
         assertModelValue(value, "Value should not be updated yet.");
         input.click();
         outputDiv.click(); // to simulate tab behavior for touch browsers

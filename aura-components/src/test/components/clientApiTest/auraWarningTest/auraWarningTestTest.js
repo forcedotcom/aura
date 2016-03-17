@@ -20,7 +20,7 @@
     failOnWarning: true,
 
     /**
-     * This case inherits the suite level failOnWarning so we need to declare auraWarningsExpectedDuringInit to account 
+     * This case inherits the suite level failOnWarning so we need to declare auraWarningsExpectedDuringInit to account
      * for warning in the controller's init function and have $A.test.expectAuraWarning for any warnings in the test
      * block itself.
      */
@@ -46,64 +46,85 @@
         }
     },
 
-    /* disable because the override console doesn't support formatting %s */
-    _testLogWarningWithError: {
+    testLogWarningWithError: {
         auraWarningsExpectedDuringInit: ["Expected warning from auraWarningTestController init"],
         test: function(cmp) {
-            var warningMsg = "Expected warning from test",
-                error = new Error("Error from test"),
-                debugOutput = "",
-                availableConsole = this.getAvailableConsole();
+            var warningMsg = "Expected warning from test";
+            var errorMsg = "testing error message";
+            var availableConsole = this.getAvailableConsole();
+            var actualMsg;
+            var actualError;
 
             $A.test.expectAuraWarning(warningMsg);
-            debugger;
-            if (availableConsole) {
-                var override = $A.test.overrideFunction(window["console"], availableConsole, function(message) {
-                    debugOutput += message;
+            var override = $A.test.overrideFunction(window["console"], availableConsole, function(format, message) {
+                    // "console" uses particular format to create log message.
+                    // Referring to the implementation of devDebugConsoleLog in Logger.js
+                    // to mock the function.
+                    if(format === "%s") {
+                        actualMsg += message;
+                    } else if(format === "%o") {
+                        actualError = message;
+                    } else {
+                        $A.test.fail("Unexpected logging format string: " + format);
+                    }
                 });
-                $A.test.addCleanup(function() { override.restore() });
-            }
+            $A.test.addCleanup(function() { override.restore() });
 
-            $A.warning(warningMsg, error);
+            $A.warning(warningMsg, new Error(errorMsg));
 
-            if (availableConsole) {
-                $A.test.assertTrue(debugOutput.indexOf("Error from test") !== -1, "Unexpected warning message logged");
-            }
+            // we got more warnings in IE
+            $A.test.assertTrue(actualMsg.indexOf(warningMsg) > -1,
+                    "Expected warning message didn't get logged: " + actualMsg);
+            $A.test.assertTrue(actualError instanceof Error);
+            $A.test.assertEquals(errorMsg, actualError.message);
         }
     },
 
-    /* disable because the override console doesn't support formatting %s */
-    _testLogWarningWithDomException: {
+    testLogWarningWithDomException: {
         auraWarningsExpectedDuringInit: ["Expected warning from auraWarningTestController init"],
         test: function(cmp) {
-            var warningMsg = "Expected warning from test",
-                debugOutput = "",
-                domException,
-                availableConsole = this.getAvailableConsole();
+            var warningMsg = "Expected warning from test";
+            var availableConsole = this.getAvailableConsole();
+            var actualMsg;
+            var actualError;
 
             $A.test.expectAuraWarning(warningMsg);
-            if (availableConsole) {
-                var override = $A.test.overrideFunction(window["console"], availableConsole, function(message) {
-                    debugOutput += message;
+            var override = $A.test.overrideFunction(window["console"], availableConsole, function(format, message) {
+                    // "console" uses particular format to create log message.
+                    // Referring to the implementation of devDebugConsoleLog in Logger.js
+                    // to mock the function.
+                    // debugger;
+                    if(format === "%s") {
+                        actualMsg += message;
+                    } else if(format === "%o") {
+                        actualError = message;
+                    } else {
+                        $A.test.fail("Unexpected logging format string: " + format);
+                    }
                 });
-                $A.test.addCleanup(function() { override.restore() });
-            }
+            $A.test.addCleanup(function() { override.restore() });
 
             // Cannot instantiate a DOMException, so force and catch one
             try {
-                document.querySelectorAll("div:derp");
+                document.querySelectorAll("div:notExisted");
             } catch(e) {
                 $A.warning(warningMsg, e);
             }
 
-            // Ideally this would check more of the log, but stacktraces vary widely across browsers
-            if (availableConsole) {
-                $A.test.assertTrue(debugOutput.indexOf("SyntaxError") !== -1, "Unexpected warning message logged");
-                $A.test.assertTrue(debugOutput.length > 105, "Stacktrace not present");
+            $A.test.assertTrue(actualError instanceof DOMException,
+                    "Expecting a SyntaxError:" + actualError);
+
+            // IE uses %s to log stack trace
+            if($A.util.isUndefined(actualError.stack)) {
+                $A.test.assertTrue(actualMsg.length > 150,
+                    "Failed to find stack track in the error: " + actualMsg);
+            } else {
+                $A.test.assertFalse($A.util.isEmpty(actualError.stack),
+                    "Failed to find stack track in the error: " + actualError.stack);
             }
         }
     },
-    
+
     /**
      * Aura logs to different spots depending on what's available on the current browser. Mimic logic in
      * Logging.js#devDebugConsoleLog to determine where logs will be sent.

@@ -54,5 +54,5 @@ public interface DesignAttributeDefBuilder extends DefBuilder<DesignAttributeDef
 
     DesignAttributeDefBuilder setParentDescriptor(DefDescriptor<? extends RootDefinition> parent);
 
-    DesignAttributeDefBuilder setIsPriviledgedNamespace(boolean priviledgedNamespace);
+    DesignAttributeDefBuilder setIsInternalNamespace(boolean internalNamespace);
 }

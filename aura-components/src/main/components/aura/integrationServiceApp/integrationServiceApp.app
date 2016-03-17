@@ -16,6 +16,8 @@
 
 -->
 <aura:application extensible="true" access="global" template="aura:integrationServiceTemplate" render="CLIENT">
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
     <aura:dependency resource="aura:*" />
     <aura:dependency resource="ui:message" />
     <aura:dependency resource="ui:outputText" />

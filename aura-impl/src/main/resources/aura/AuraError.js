@@ -38,15 +38,7 @@ function AuraError() {
 
     // client side error id
     this.id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var crypto = window.crypto || window.msCrypto;
-            var r;
-            if (crypto && crypto.getRandomValues) {
-                var rands = new Unit8Array(1);//eslint-disable-line no-undef
-                crypto.getRandomValues(rands);
-                r = rands[0] % 16;
-            } else {
-                r = Math.random() * 16 | 0;//eslint-disable-line no-bitwise
-            }
+            var r = Math.random() * 16 | 0;//eslint-disable-line no-bitwise
             var v = c === 'x' ? r : (r & 0x3 | 0x8);//eslint-disable-line no-bitwise
             return v.toString(16);
         });

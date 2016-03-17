@@ -35,7 +35,7 @@ Aura.Services.MetricsService = function MetricsService() {
 };
 
 // Version
-Aura.Services.MetricsService.VERSION  = '2.0.0';
+Aura.Services.MetricsService.VERSION  = '2.1.0';
 
 Aura.Services.MetricsService.PERFTIME = !!(window.performance && window.performance.now);
 Aura.Services.MetricsService.TIMER    = Aura.Services.MetricsService.PERFTIME ? window.performance.now.bind(performance) : Date.now.bind(Date);
@@ -151,7 +151,7 @@ Aura.Services.MetricsService.prototype.initializePlugin = function (pluginName, 
  * @private
 **/
 Aura.Services.MetricsService.prototype.applicationReady = function () {
-    this.bootstrapMark("applicationReady");
+    Aura.bootstrapMark("bootstrapEPT");
     this.doneBootstrap = true;
 
     var bootstrap = this.getBootstrapMetrics();
@@ -164,11 +164,12 @@ Aura.Services.MetricsService.prototype.applicationReady = function () {
         transaction["duration"] = Math.round((now - bootstrapStart) * 100) / 100;
     });
 
+    this.clearMarks();
+
     // #if {"modes" : ["PRODUCTION"]}
     var beacons = this.beaconProviders;
     if ($A.util.isEmpty(beacons)) {
         this.disablePlugins();
-        this.clearMarks();
     }
     // #end
 };
@@ -362,6 +363,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
                 }
             }
         }
+
         // 1. postProcess at the transaction level
         if (postProcess) {
             postProcess(parsedTransaction);
@@ -491,9 +493,6 @@ Aura.Services.MetricsService.prototype.getVersion = function (includePlugins) {
     };
 };
 
-
-//#if {"excludeModes" : ["PRODUCTION"]}
-
 /**
  * Default post processing for marks (only enabled in non production environments)
  * @private
@@ -519,6 +518,8 @@ Aura.Services.MetricsService.prototype.defaultPostProcessing = function (customM
     }
     return procesedMarks;
 };
+
+//#if {"excludeModes" : ["PRODUCTION"]}
 
 /**
  * Get all internal stored transactions
@@ -719,16 +720,6 @@ Aura.Services.MetricsService.prototype.microsecondsResolution = function () {
     return Aura.Services.MetricsService.PERFTIME;
 };
 
-/**
- * Generates a bootstrap mark
- * @param {string} mark Key of the mark
- * @param {?} value Value of the mark
- * @private
-**/
-Aura.Services.MetricsService.prototype.bootstrapMark = function (mark, value) {
-    this.bootstrap[mark] = value || 
-    (Aura.Services.MetricsService.PERFTIME ? this.time() : Date.now() - this.getPageStartTime());
-};
 
 /**
  * Disable all plugins
@@ -811,11 +802,15 @@ Aura.Services.MetricsService.prototype.registerBeacon = function (beacon) {
  * @export
 **/
 Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
-    var bootstrap     = this.bootstrap,
-        pageStartTime = bootstrap["pageStartTime"];
+    var bootstrap = this.bootstrap;
+    var pageStartTime = bootstrap["pageStartTime"];
 
     // We cache it after the first call
     if (!pageStartTime) {
+        for (var m in Aura.bootstrap) {
+            bootstrap[m] = Math.round(Aura.bootstrap[m] * 100) / 100;
+        }
+
         pageStartTime = this.getPageStartTime();
         bootstrap["pageStartTime"] = pageStartTime;
 
@@ -827,8 +822,6 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
                 "redirects"       : pn.redirectCount,
                 "type"            : pn.type,
                 "navigationStart" : pt.navigationStart,
-                "redirectStart"   : pt.redirectStart,
-                "redirectEnd"     : pt.redirectEnd,
                 "fetchStart"      : pt.fetchStart,
                 "dnsStart"        : pt.domainLookupStart,
                 "dnsEnd"          : pt.domainLookupEnd,
@@ -845,13 +838,16 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
                 "loadEventStart"  : pt.loadEventStart,
                 "loadEventEnd"    : pt.loadEventEnd,
                 "unloadEventStart": pt.unloadEventStart,
-                "unloadEventEnd"  : pt.unloadEventEnd
+                "unloadEventEnd"  : pt.unloadEventEnd,
+                "appCache"        : pt.domainLookupStart - pt.fetchStart,
+                "redirectTime"    : pt.redirectEnd - pt.redirectStart
             };
 
             if (performance.getEntries) {
-                bootstrap["requests"] = ($A.util.filter(performance.getEntries(),
+                var frameworkRequests = {};
+                var bootstrapRequests = ($A.util.filter(performance.getEntries(),
                     function (resource) {
-                        return resource.responseEnd < bootstrap["applicationReady"];
+                        return resource.responseEnd < bootstrap["bootstrapEPT"];
                     })).map(function (resource) {
                         return {
                             "name"         : resource.name,
@@ -864,6 +860,21 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
                         };
                     }
                 );
+
+                frameworkRequests["appCSS"] = bootstrapRequests.filter(function (r) { return r.name.indexOf('app.css') !== -1; })[0];
+                frameworkRequests["appJS"]  = bootstrapRequests.filter(function (r) { return r.name.indexOf('app.js') !== -1; })[0];
+                frameworkRequests["auraJS"] = bootstrapRequests.filter(function (r) { return r.name.indexOf('/aura_') !== -1; })[0];
+
+                for (var i in frameworkRequests) {
+                    var entry = frameworkRequests[i];
+                    if (entry) {
+                        bootstrap[i + 'Init'] = Math.round(entry["startTime"] * 100) / 100;
+                        bootstrap[i + 'Ready'] = Math.round(entry["responseEnd"] * 100) / 100;
+                    }
+                }
+
+
+                bootstrap["requests"] = bootstrapRequests;
             }
         }
     }

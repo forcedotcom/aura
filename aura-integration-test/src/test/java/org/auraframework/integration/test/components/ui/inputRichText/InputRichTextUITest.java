@@ -50,10 +50,10 @@ public class InputRichTextUITest extends WebDriverTestCase {
             BrowserType.IPAD, BrowserType.IPHONE })
     public void testRichTextTabbing() throws Exception {
         open(URL);
-        WebElement beforeLink = auraUITestingUtil.waitForElement(By.cssSelector(LINKBEFORE_LOCATOR));
-        WebElement ckEditor = auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
+        WebElement beforeLink = getAuraUITestingUtil().waitForElement(By.cssSelector(LINKBEFORE_LOCATOR));
+        WebElement ckEditor = getAuraUITestingUtil().waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
         WebElement ckEditorInput = ckEditor.findElement(By.tagName("iframe"));
-        WebElement submitBtn = auraUITestingUtil.findDomElement(By.cssSelector(SUBMIT_BUTTON_LOCATOR));
+        WebElement submitBtn = getAuraUITestingUtil().findDomElement(By.cssSelector(SUBMIT_BUTTON_LOCATOR));
 
         String inputText = "im here";
 
@@ -61,7 +61,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
         beforeLink.click();
 
         // tab into
-        auraUITestingUtil.pressTab(beforeLink);
+        getAuraUITestingUtil().pressTab(beforeLink);
 
         // type into ck editor
         ckEditorInput.sendKeys(inputText);
@@ -81,7 +81,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
     @ThreadHostileTest("testHtmlContentEscaped is not thread-safe")
     public void testHtmlContentEscaped() throws Exception {
         open(URL);
-        WebElement ckEditor = auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
+        WebElement ckEditor = getAuraUITestingUtil().waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
         WebElement ckEditorInput = ckEditor.findElement(By.tagName("iframe"));
 
         String html = "</html>";
@@ -101,26 +101,26 @@ public class InputRichTextUITest extends WebDriverTestCase {
         String defaultText = "testing text";
         WebDriver driver = this.getDriver();
         open(String.format("%s?value=%s", CMP_URL, defaultText));
-        WebElement ckEditor = auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
+        WebElement ckEditor = getAuraUITestingUtil().waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
         WebElement ckEditorInput = ckEditor.findElement(By.tagName("iframe"));
         driver.switchTo().frame(ckEditorInput);
         waitForElementPresent(driver.findElement(By.cssSelector(IN_RICHTEXT_BODY)));
-        auraUITestingUtil.waitForElementText(By.cssSelector(IN_RICHTEXT_BODY), defaultText, true);
+        getAuraUITestingUtil().waitForElementText(By.cssSelector(IN_RICHTEXT_BODY), defaultText, true);
         driver.switchTo().defaultContent();
     }
 
     private void waitForTextInRichText(final String auraId, final String text) {
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                String expr = auraUITestingUtil.getValueFromCmpRootExpression(auraId, "v.value");
-                String rtText = (String) auraUITestingUtil.getEval(expr);
+                String expr = getAuraUITestingUtil().getValueFromCmpRootExpression(auraId, "v.value");
+                String rtText = (String) getAuraUITestingUtil().getEval(expr);
                 return text.equals(rtText);
             }
         });
     }
 
     private void assertOutputText(String expectedText) {
-        auraUITestingUtil.waitForElementText(By.cssSelector(OUTPUT_LOCATOR), expectedText, true);
+        getAuraUITestingUtil().waitForElementText(By.cssSelector(OUTPUT_LOCATOR), expectedText, true);
     }
 }

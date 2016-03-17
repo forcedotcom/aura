@@ -10,9 +10,9 @@
     /**
      * This test verifies that when the application is loaded from storage it fires a refresh action and if that
      * action response is different from what is currently in storage than the page is refreshed.
-     * 
+     *
      * The app is loaded in an iframe so that we can manually reload it to force the load from storage.
-     * 
+     *
      * The test takes the following steps:
      * - Load the test app in an iframe and wait for the bootstrap action to return from the server where it's saved
      *   saved to storage.
@@ -28,7 +28,7 @@
             function loadIframe(cmp) {
                 $A.test.setTestTimeout(100000);
                 cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/applicationTest.app?aura.mode=SELENIUMDEBUG",
-                        "iframeContainer");
+                        "iframeContainer", "first load");
                 // To account for refresh actions, even though it'd be ideal if there weren't any, wait for the flag
                 // to be set that tells us the bootstrap action has returned from the server.
                 $A.test.addWaitFor("true", function() {
@@ -40,7 +40,7 @@
                 cmp.helper.lib.iframeTest.waitForStatus("Adding", "Done Adding");
             },
             function reloadIframe(cmp) {
-                cmp.helper.lib.iframeTest.reloadIframe(cmp);
+                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
             },
             function verifyApplicationRefreshed(cmp) {
                 $A.test.addWaitFor("YES", function() {

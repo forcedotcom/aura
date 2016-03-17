@@ -122,7 +122,7 @@ public class InputDateTimeUITest extends WebDriverTestCase {
 
         // focus is on timePicker, just press ENTER to select a time
         WebElement activeElement = findDomElement(By.xpath(TIME_1200_XPATH));
-        auraUITestingUtil.pressEnter(activeElement);
+        getAuraUITestingUtil().pressEnter(activeElement);
 
         waitForTimePickerDisappear();
 
@@ -150,7 +150,7 @@ public class InputDateTimeUITest extends WebDriverTestCase {
 
         // open inputDate calendar and select a date
         inputDateIcon.click();
-        auraUITestingUtil.pressEnter(inputDateIcon);
+        getAuraUITestingUtil().pressEnter(inputDateIcon);
 
         // selecting a date should set the default time
         outputTime = inputTimeBox.getAttribute("value");
@@ -221,8 +221,8 @@ public class InputDateTimeUITest extends WebDriverTestCase {
         activeElem.sendKeys(arrow);
 
         // since focus is changed to the next time value, get the focus
-        activeElem = (WebElement)auraUITestingUtil.getEval(ACTIVE_ELEM);
-        auraUITestingUtil.pressEnter(activeElem);
+        activeElem = (WebElement)getAuraUITestingUtil().getEval(ACTIVE_ELEM);
+        getAuraUITestingUtil().pressEnter(activeElem);
 
         waitForTimePickerDisappear();
 
@@ -275,7 +275,7 @@ public class InputDateTimeUITest extends WebDriverTestCase {
         waitForTimePickerDisappear();
 
         // check if active element is the inputTimeBox
-        activeElement = (WebElement)auraUITestingUtil.getEval(ACTIVE_ELEM);
+        activeElement = (WebElement)getAuraUITestingUtil().getEval(ACTIVE_ELEM);
         WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));
         assertEquals("Focus is not on input time box", activeElement, inputTimeBox);
     }

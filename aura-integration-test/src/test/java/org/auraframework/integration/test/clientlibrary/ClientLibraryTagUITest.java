@@ -36,24 +36,24 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
     public void testNonCombinableResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app");
         waitForAuraFrameworkReady();
-        Boolean walltimeLocale = (Boolean)auraUITestingUtil.getEval("return !!WallTime");
+        Boolean walltimeLocale = (Boolean)getAuraUITestingUtil().getEval("return !!WallTime");
         assertTrue(walltimeLocale);
     }
 
     /**
-     * Verify that resource change depending on Mode. Mixture of combinable and uncombinable resources
+     * Verify that resource change depending on Mode.
      */
-    @Ignore("missing resources to test - need to inject extra client libs")
+    @Ignore("TODO W-2970512 missing resources to test - need to inject extra client libs")
     public void testModeDependentResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
 
         // Mode independent resources
-        Object minuteThruMoment = auraUITestingUtil.getEval("return moment(new Date()).minutes()");
+        Object minuteThruMoment = getAuraUITestingUtil().getEval("return moment(new Date()).minutes()");
         assertNotNull(minuteThruMoment);
 
-        Boolean walltime = (Boolean)auraUITestingUtil.getEval("return !!WallTime");
+        Boolean walltime = (Boolean)getAuraUITestingUtil().getEval("return !!WallTime");
         assertTrue(walltime);
 
-        assertEquals("awesome", auraUITestingUtil.getEval("return clientLibraryTest.cool;"));
+        assertEquals("awesome", getAuraUITestingUtil().getEval("return clientLibraryTest.cool;"));
     }
 }

@@ -48,7 +48,7 @@ Test.Aura.Context.AuraContextTest = function () {
                 "$A" : {
                     log : function(msg) { },
                     componentService : {
-                        getDef : function(desc) {
+                        getComponentDef : function(desc) {
                             return getDefReturnValue;
                         }
                     },

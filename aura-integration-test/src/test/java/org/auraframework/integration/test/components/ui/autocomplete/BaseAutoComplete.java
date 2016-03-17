@@ -89,17 +89,17 @@ public class BaseAutoComplete extends WebDriverTestCase {
     public void testAutoCompleteWithUpdateOnAttributeSet() throws Exception {
         open(URL);
         String inputAutoComplete = "autoCompleteUpdateOn";
-        String expr = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil.getFindAtRootExpr(inputAutoComplete)
+        String expr = getAuraUITestingUtil().prepareReturnStatement(getAuraUITestingUtil().getFindAtRootExpr(inputAutoComplete)
                 + ".find('input').get('v.value')");
-        String autoCompleteText = (String) auraUITestingUtil.getEval(expr);
+        String autoCompleteText = (String) getAuraUITestingUtil().getEval(expr);
         assertNull("Auto complete Text for input should be undefined", autoCompleteText);
         WebDriver driver = getDriver();
         WebElement inputElement = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("autoCompleteUpdateOn"));
         inputElement.click();
         String expectedText = "testing";
         inputElement.sendKeys(expectedText);
-        auraUITestingUtil.pressEnter(inputElement);
-        autoCompleteText = (String) auraUITestingUtil.getEval(expr);
+        getAuraUITestingUtil().pressEnter(inputElement);
+        autoCompleteText = (String) getAuraUITestingUtil().getEval(expr);
         assertEquals("Input Value was not change after pressing Enter", expectedText, autoCompleteText);
     }
 
@@ -196,11 +196,11 @@ public class BaseAutoComplete extends WebDriverTestCase {
         WebElement list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, true);
 
-        auraUITestingUtil.pressTab(input);
+        getAuraUITestingUtil().pressTab(input);
         list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, false);
         assertEquals("Focus should be on the next input", nextInput.getAttribute("data-aura-rendered-by"),
-                auraUITestingUtil.getUniqueIdOfFocusedElement());
+                getAuraUITestingUtil().getUniqueIdOfFocusedElement());
     }
 
     /**
@@ -220,7 +220,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
 
         // go to second option in list.
         input.sendKeys(Keys.ARROW_DOWN + "");
-        auraUITestingUtil.pressEnter(input);
+        getAuraUITestingUtil().pressEnter(input);
         list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, false);
         assertEquals("Wrong option was selected", "hello world2", input.getAttribute("value"));
@@ -399,7 +399,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     }
 
     private void waitForOptionHighlighted(final WebElement o) {
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 return hasCssClass(o, "highlighted");
@@ -408,7 +408,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     }
 
     private void waitForInputValue(final WebElement input, final String expectedOption) {
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 return expectedOption.equals(input.getAttribute("value"));

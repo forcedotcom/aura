@@ -13,11 +13,11 @@
         labels: ["flapper"],
         test: [
             function loadIframe(cmp) {
-                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/noGetApplicationCache.app", "iframeContainer");
+                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/noGetApplicationCache.app", "iframeContainer", "first load");
             },
             function reloadIframeOffline(cmp) {
                 document.getElementById("myFrame").contentWindow.location.hash = "launchOffline";
-                cmp.helper.lib.iframeTest.reloadIframe(cmp);
+                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
             },
             function verifyApplicationLoaded(cmp) {
                 $A.test.addWaitFor("Loaded", function() {
@@ -36,10 +36,10 @@
         test: [
             function loadIframe(cmp) {
                 $A.test.setTestTimeout(100000);
-                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/noGetApplicationCache.app", "iframeContainer");
+                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/noGetApplicationCache.app", "iframeContainer", "first load");
             },
             function reloadIframeOnline(cmp) {
-                cmp.helper.lib.iframeTest.reloadIframe(cmp);
+                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
             },
             function verifyApplicationLoaded(cmp) {
                 $A.test.addWaitFor("Loaded", function() {

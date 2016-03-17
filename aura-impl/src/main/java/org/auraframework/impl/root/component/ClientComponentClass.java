@@ -177,7 +177,7 @@ public class ClientComponentClass {
 
     	ConfigAdapter configAdapter = Aura.getConfigAdapter();
     	if (configAdapter.isLockerServiceEnabled()) {
-			requireLocker = !configAdapter.isPrivilegedNamespace(descriptor.getNamespace());
+			requireLocker = !configAdapter.isInternalNamespace(descriptor.getNamespace());
         	if (!requireLocker) {
 	            DefDescriptor<InterfaceDef> requireLockerDescr = Aura.getDefinitionService().getDefDescriptor(REQUIRE_LOCKER, InterfaceDef.class);
 	        	requireLocker = componentDef.isInstanceOf(requireLockerDescr);

@@ -44,8 +44,11 @@
         ]
     },
 
-    // This test will _not_ work in general... too many assumptions
-    _testComponentDefStorageEviction: {
+    // TODO(W-2979502): this test should keep adding defs until something is evicted instead of adding a set amount and
+    // assuming it will get evicted.
+    testComponentDefStorageEviction: {
+        // This may be unreliable because of a flapper with the server sometimes not sending down a def when it should,
+        // because Context.loaded is incorrect.
         labels : ["flapper"],
         test: [
             function loadIframe(cmp) {
@@ -72,14 +75,21 @@
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:block");
             },
             function fetchCmpFromServerToEvictFirstCmp(cmp) {
-                // Why in the world would we believe that fetching this will knock out the first
-                // entry. The storage size is 400K, which means we are assuming that somehow the
-                // combined sizes are magically going to overflow that. If anyone changes the markup
-                // that assumption will fail.
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:menu");
             },
             function verifyOriginalFetchedCmpEvicted(cmp) {
-                cmp.helper.lib.iframeTest.verifyDefStorage("ui:scroller", false, "First component fetched from server (ui:scroller) never evicted from component def storage");
+                // Ideally we would keep adding defs until the original got evicted instead of just waiting here (W-2979502)
+                var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
+                $A.test.addWaitFor(true, function() {
+                    var defs = iframeCmp._ComponentDefStorage.split(',');
+                    for (var i = 0; i < defs; i++) {
+                        var def = defs[i].trim();
+                        if (def === "markup://ui:scroller") {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
             },
             function reloadPage(cmp) {
                 // Reload page to clear anything saved in javascript memory

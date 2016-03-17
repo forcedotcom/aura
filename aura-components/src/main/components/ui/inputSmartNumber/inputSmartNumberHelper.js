@@ -51,15 +51,15 @@
         }
     },
     isNumberInRange: function (cmp) {
-        var lib =       this.inputNumberLibrary.number;
-        var min =      +cmp.get('v.min');
-        var max =      +cmp.get('v.max');
-        var formatter = cmp.get('v.format');
-        var number =    cmp.get('v.inputValue');
+        var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || 9007199254740991
+          , MIN_SAFE_INTEGER = Number.MIN_SAFE_INTEGER || 9007199254740991
+          , lib              = this.inputNumberLibrary.number
+          , formatter        = cmp.get('v.format')
+          , number           = cmp.get('v.inputValue');
 
         number = lib.isNumber(number) ? number : lib.unFormatNumber(number, formatter);
 
-        return number <= max && number >= min;
+        return number <= MAX_SAFE_INTEGER && number >= MIN_SAFE_INTEGER;
     },
     isValidValue: function (number, formatter) {
         var lib = this.inputNumberLibrary.number;

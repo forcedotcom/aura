@@ -70,12 +70,14 @@ Test.Aura.Value.ExpressionFunctionsTest = function(){
     	[Fact]
     	function JoinArrayUsingSeperator(){
     		// Arrange
-            var expected = "Wind,Rain,Fire";
+            var expected = "Snow;Wind,Rain,Fire;Rain";
             var actual;
             var expressionFunctions = new Aura.Value.ExpressionFunctions();
             Importer(function() {
+            	var value1 = 'Snow';
             	var array = ['Wind', 'Rain', 'Fire'];
-            	actual = expressionFunctions.join(",",array);
+            	var value2 = "Rain";
+            	actual = expressionFunctions.join(";",value1, array, value2);
             });
             // Assert
             Assert.Equal(expected, actual);

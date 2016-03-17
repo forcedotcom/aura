@@ -53,7 +53,7 @@ function SecureAura(AuraInstance, key) {
             enumerable: true,
             value: function(components, callback) {
                 $A.assert(callback && typeof callback === 'function' , 'Callback');
-                AuraInstance["createComponent"](components, function () {
+                AuraInstance["createComponents"](components, function () {
                     callback.apply(undefined, SecureThing.filterEverything(o, SecureThing.ArrayPrototypeSlice.call(arguments)));
                 });
             }

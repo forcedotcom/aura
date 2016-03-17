@@ -13,8 +13,11 @@
                  ["aura:text",{value:'SecondText'}], 
                  ["aura:text",{value:'ThirdText'}]],
                  function(components, status, statusMessagesList){
-                     if (newCmp.toString().indexOf("SecureComponentRef") !== 0) {
-                         throw new Error("Created components (via $A.createComponents) should be of type SecureComponentRef");
+                     for (var i = 0; i < components.length; i++) {
+                         var newCmp = components[i];
+                         if (newCmp.toString().indexOf("SecureComponentRef") !== 0) {
+                             throw new Error("Created components (via $A.createComponents) should be of type SecureComponentRef");
+                         }
                      }
                      cmp.set("v.dynamicCmps", components);
                  }

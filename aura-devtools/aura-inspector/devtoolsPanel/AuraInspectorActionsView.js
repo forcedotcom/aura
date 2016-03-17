@@ -26,42 +26,68 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
     var actions = new Map();
 
+    var labels = {
+        "record": chrome.i18n.getMessage("menu_record"),
+        "filter": chrome.i18n.getMessage("menu_filter"),
+        "clear": chrome.i18n.getMessage("menu_clear"),
+        "storable": chrome.i18n.getMessage("actions_menu_storable"),
+        "cached": chrome.i18n.getMessage("actions_menu_cached"),
+        "background": chrome.i18n.getMessage("actions_menu_background"),
+        "success": chrome.i18n.getMessage("actions_menu_success"),
+        "incomplete": chrome.i18n.getMessage("actions_menu_incomplete"),
+        "error": chrome.i18n.getMessage("actions_menu_error"),
+        "aborted": chrome.i18n.getMessage("actions_menu_aborted"),
+        "record_tooltip": chrome.i18n.getMessage("actions_menu_record_tooltip"),
+        "storable_tooltip": chrome.i18n.getMessage("actions_menu_storable_tooltip"),
+        "cached_tooltip": chrome.i18n.getMessage("actions_menu_cached_tooltip"),
+        "background_tooltip": chrome.i18n.getMessage("actions_menu_background_tooltip"),
+        "success_tooltip": chrome.i18n.getMessage("actions_menu_success_tooltip"),
+        "incomplete_tooltip": chrome.i18n.getMessage("actions_menu_incomplete_tooltip"),
+        "error_tooltip": chrome.i18n.getMessage("actions_menu_error_tooltip"),
+        "pendingoverrides": chrome.i18n.getMessage("actions_section_pendingoverrides"),
+        "pendingoverrides_desc": chrome.i18n.getMessage("actions_section_pendingoverrides_description"),
+        "processedoverrides": chrome.i18n.getMessage("actions_section_processedoverrides"),
+        "pending": chrome.i18n.getMessage("actions_section_pending"),
+        "running": chrome.i18n.getMessage("actions_section_running"),
+        "completed": chrome.i18n.getMessage("actions_section_completed")
+    };
+
     var markup = `
         <menu type="toolbar">
-            <li class="record-button"><aurainspector-onOffButton class="circle on" data-filter="all" title="Toggle recording"><span>Recording</span></aurainspector-onOffButton></li>
-            <li><button id="clear-button" class="clear-status-bar-item status-bar-item" title="Clear"><div class="glyph"></div><div class="glyph shadow"></div></button></li>
+            <li class="record-button"><aurainspector-onOffButton class="circle on" data-filter="all" title="${labels.record_tooltip}"><span>${labels.record}</span></aurainspector-onOffButton></li>
+            <li><button id="clear-button" class="clear-status-bar-item status-bar-item" title="${labels.clear}"><div class="glyph"></div><div class="glyph shadow"></div></button></li>
             <li class="divider" style="margin-left: -3px;"></li>
-            <li><input id="filter-text" type="search" placeholder="Filter"/></li>
+            <li><input id="filter-text" type="search" placeholder="${labels.filter}"/></li>
             <li class="divider"></li>
-            <li><aurainspector-onOffButton class="on" data-filter="storable" title="Show storable actions"><span>Storable</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="stored" title="Show storable actions served from cache"><span>Cached</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="background" title="Show background actions"><span>Background</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="success" title="Show actions that succeeded"><span>Success</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="incomplete" title="Show actions in incomplete state"><span>Incomplete</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="error" title="Show actions that errored"><span>Error</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="aborted" title="Show aborted actions"><span>Aborted</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="storable" title="${labels.storable_tooltip}"><span>${labels.storable}</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="stored" title="${labels.cached_tooltip}"><span>${labels.cached}</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="background" title="${labels.background_tooltip}"><span>${labels.background}</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="success" title="${labels.success_tooltip}"><span>${labels.success}</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="incomplete" title="${labels.incomplete_tooltip}"><span>${labels.incomplete}</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="error" title="${labels.error_tooltip}"><span>${labels.error}</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="aborted" title="${labels.aborted_tooltip}"><span>${labels.aborted}</span></aurainspector-onOffButton></li>
         </menu>
         <div class="actions-tab">
             <div id="actionsToWatch-list" class="actionsToWatch-list">
                 <section>
-                    <h1>Pending Overrides</h1>
+                    <h1>${labels.pendingoverrides}</h1>
                     <div id="actionsToWatch-pending" class="drop-zone">
-                        <span class="description">Drag actions here. Next time we see action with same name, we will either drop it, send back modified response, or error response.</span>
+                        <span class="description">${labels.pendingoverrides_desc}</span>
                     </div>
                 </section>
                 <section id="actionsToWatch-completed">
-                    <h1>Processed Overrides</h1>
+                    <h1>${labels.processedoverrides}</h1>
                 </section>
             </div>
             <div id="actions-list" class="actions-list">
                 <section id="actions-pending">
-                    <h1>Pending</h1>
+                    <h1>${labels.pending}</h1>
                 </section>
                 <section id="actions-running">
-                    <h1>Running</h1>
+                    <h1>${labels.running}</h1>
                 </section>
                 <section id="actions-completed">
-                    <h1>Completed</h1>
+                    <h1>${labels.completed}</h1>
                 </section>
             </div>
         </div>

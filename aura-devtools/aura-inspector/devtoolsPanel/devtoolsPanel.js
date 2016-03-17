@@ -101,12 +101,12 @@
                 var actions = new AuraInspectorActionsView(this);
                 var storage = new AuraInspectorStorageView(this);
 
-                this.addPanel("component-tree", tree, "Component Tree");
-                this.addPanel("performance", perf, "Performance");
-                this.addPanel("transaction", transaction, "Transactions");
-                this.addPanel("event-log", eventLog, "Event Log");
-                this.addPanel("actions", actions, "Actions");
-                this.addPanel(storage.panelId, storage, "Storage");
+                this.addPanel("component-tree", tree, chrome.i18n.getMessage("tabs_componenttree"));
+                this.addPanel("performance", perf, chrome.i18n.getMessage("tabs_performance"));
+                this.addPanel("transaction", transaction, chrome.i18n.getMessage("tabs_transactions"));
+                this.addPanel("event-log", eventLog, chrome.i18n.getMessage("tabs_eventlog"));
+                this.addPanel("actions", actions, chrome.i18n.getMessage("tabs_actions"));
+                this.addPanel(storage.panelId, storage, chrome.i18n.getMessage("tabs_storage"));
 
                 // Sidebar Panel
                 // The AuraInspectorComponentView adds the sidebar class
@@ -618,7 +618,7 @@
 
             var label = document.createElement("span");
             label.className = "assistive-text";
-            label.textContent = "Help";
+            label.textContent = chrome.i18n.getMessage("tabs_help");
 
             trigger.appendChild(label);
             dropdown.appendChild(trigger);

@@ -16,17 +16,29 @@ function AuraInspectorEventLog(devtoolsPanel) {
     var _currentContext = null;
     var _handled = new Map();
 
+    var labels = {
+        toggle_recording: chrome.i18n.getMessage("menu_record"),
+        clear: chrome.i18n.getMessage("menu_clear"),
+        filter: chrome.i18n.getMessage("menu_filter"),
+        appEvents: chrome.i18n.getMessage("eventlog_menu_appevents"),
+        cmpEvents: chrome.i18n.getMessage("eventlog_menu_cmpevents"),
+        unhandledEvents: chrome.i18n.getMessage("eventlog_menu_unhandled"),
+        appEvents_tooltip: chrome.i18n.getMessage("eventlog_menu_appevents_tooltip"),
+        cmpEvents_tooltip: chrome.i18n.getMessage("eventlog_menu_cmpevents_tooltip"),
+        unhandledEvents_tooltip: chrome.i18n.getMessage("eventlog_menu_unhandled_tooltip")
+    };
+
     var markup = `
         <div class="grid grid-columns scroll-wrapper">
         <menu type="toolbar no-flex">
-            <li class="record-button"><aurainspector-onOffButton class="circle" data-filter="all" title="Toggle recording"><span>Recording</span></aurainspector-onOffButton></li>
-            <li><button id="clear-button" class="clear-status-bar-item status-bar-item" title="Clear"><div class="glyph"></div><div class="glyph shadow"></div></button></li>
+            <li class="record-button"><aurainspector-onOffButton class="circle" data-filter="all" title="${labels.toggle_recording}"><span>${labels.toggle_recording}</span></aurainspector-onOffButton></li>
+            <li><button id="clear-button" class="clear-status-bar-item status-bar-item" title="${labels.clear}"><div class="glyph"></div><div class="glyph shadow"></div></button></li>
             <li class="divider" style="margin-left: -3px;"></li>
-            <li><input id="filter-text" type="search" placeholder="Filter"/></li>
+            <li><input id="filter-text" type="search" placeholder="${labels.filter}"/></li>
             <li class="divider"></li>
-            <li><aurainspector-onOffButton class="on" data-filter="application" title="Show application events"><span>App Events</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="component" title="Show component events"><span>Cmp Events</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="" data-filter="unhandled" title="Show unhandled events"><span>Unhandled</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="application" title="${labels.appEvents_tooltip}"><span>${labels.appEvents}</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="component" title="${labels.cmpEvents_tooltip}"><span>${labels.cmpEvents}</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="" data-filter="unhandled" title="${labels.unhandledEvents_tooltip}"><span>${labels.unhandledEvents}</span></aurainspector-onOffButton></li>
         </menu>
         <ol class="event-log flex scroll" id="event-log"></ol>
         </div>

@@ -28,6 +28,10 @@
     		childList: true,
     		characterData: true
     	});
+
+    	if(oldValue != "") {
+    		this.update();
+    	}
 	};
 
 	jsonPrototype.update = function() {

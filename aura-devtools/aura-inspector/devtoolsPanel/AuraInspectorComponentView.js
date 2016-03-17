@@ -2,19 +2,19 @@ function AuraInspectorComponentView(devtoolsPanel) {
     var container;
     // Generic properties to show for the concrete component
     var concretePropertyMap = {
-        "globalId": "Global ID",
-        "rendered": "IsRendered",
-        "valid": "IsValid",
+        "globalId": chrome.i18n.getMessage("componentview_globalid"),
+        "rendered": chrome.i18n.getMessage("componentview_isrendered"),
+        "valid": chrome.i18n.getMessage("componentview_isvalid"),
         "localId": "aura:id",
-        "descriptor": "Descriptor",
-        "elementCount": "HTML Elements",
-        "rerender_count": "Rerendered"
+        "descriptor": chrome.i18n.getMessage("componentview_descriptor"),
+        "elementCount": chrome.i18n.getMessage("componentview_elements"),
+        "rerender_count": chrome.i18n.getMessage("componentview_rerendered")
     };
     // When we render the super, show these properties instead of the ones above.
     var superPropertyMap = {
-        "globalId": "Global ID",
+        "globalId": chrome.i18n.getMessage("componentview_globalid"),
         "localId": "aura:id",
-        "descriptor": "Descriptor"
+        "descriptor": chrome.i18n.getMessage("componentview_descriptor")
     };
     var treeComponent;
     var _componentId = null;
@@ -64,20 +64,20 @@ function AuraInspectorComponentView(devtoolsPanel) {
         // Should probably use a FacetFormatter, but how do I easily specify that info to TreeNode.create()
         // that is compatible with every other TreeNode.create() call.
         if(current.attributeValueProvider == current.facetValueProvider) {
-            var attributeValueProvider = TreeNode.create("Attribute & Facet Value Provider", "attributeValueProvider");
+            var attributeValueProvider = TreeNode.create(chrome.i18n.getMessage("componentview_avpfvp"), "attributeValueProvider");
             treeComponent.addChild(attributeValueProvider);
 
             componentId = devtoolsPanel.cleanId(typeof current.attributeValueProvider == "string" ? current.attributeValueProvider : current.attributeValueProvider.globalId);
             
             attributeValueProvider.addChild(TreeNode.create(componentId, "attributeValueProvider_" + current.globalId, "globalId"));
         } else {
-            var attributeValueProvider = TreeNode.create("Attribute Value Provider", "attributeValueProvider");
+            var attributeValueProvider = TreeNode.create(chrome.i18n.getMessage("componentview_avp"), "attributeValueProvider");
             treeComponent.addChild(attributeValueProvider);
 
             componentId = devtoolsPanel.cleanId(typeof current.attributeValueProvider == "string" ? current.attributeValueProvider : current.attributeValueProvider.globalId);
             attributeValueProvider.addChild(TreeNode.create(componentId, "attributeValueProvider_" + current.globalId, "globalId"));
 
-            var facetValueProvider = TreeNode.create("Facet Value Provider", "facetValueProvider");
+            var facetValueProvider = TreeNode.create(chrome.i18n.getMessage("componentview_fvp"), "facetValueProvider");
             treeComponent.addChild(facetValueProvider);
 
             componentId = devtoolsPanel.cleanId(typeof current.facetValueProvider == "string" ? current.facetValueProvider : current.facetValueProvider.globalId);
@@ -87,14 +87,14 @@ function AuraInspectorComponentView(devtoolsPanel) {
         var bodies = current.attributes.body || {};
         // Do attributes only at the concrete level
         if(current.isConcrete) {
-            treeComponent.addChild(TreeNode.create("Attributes", "Attributes", "header"));
+            treeComponent.addChild(TreeNode.create(chrome.i18n.getMessage("componentview_attributes"), "Attributes", "header"));
 
             current.attributes.body = bodies[current.globalId] || [];
             parentNode = TreeNode.create();
             generateAttributeNodes(current, parentNode);
             treeComponent.addChildren(parentNode.getChildren());
         } else {
-            treeComponent.addChild(TreeNode.create("Attributes", "Attributes", "header"));
+            treeComponent.addChild(TreeNode.create(chrome.i18n.getMessage("componentview_attributes"), "Attributes", "header"));
             // We still want to inspect the body at the super levels,
             // since they get composted together and output.
             var body = bodies[current.globalId] || [];
@@ -104,7 +104,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
         }
 
         if(current.model) {
-            treeComponent.addChild(TreeNode.create("Model", "Model", "header"));
+            treeComponent.addChild(TreeNode.create(chrome.i18n.getMessage("componentview_model"), "Model", "header"));
             parentNode = TreeNode.create();
             generateNodes(current.model, parentNode);
             treeComponent.addChildren(parentNode.getChildren());
@@ -114,7 +114,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
     function renderForComponentSuper(component, callback) {
         if(component.supers && component.supers.length) {
             devtoolsPanel.getComponent(component.supers[0], function(superComponent) {
-                treeComponent.addChild(TreeNode.create("[[Super]]", "Super" + superComponent.globalId, "header"));
+                treeComponent.addChild(TreeNode.create("[[" + chrome.i18n.getMessage("componentview_super") + "]]", "Super" + superComponent.globalId, "header"));
                 renderForComponent(superComponent);
                 renderForComponentSuper(superComponent, function() {
                     if(callback) { 

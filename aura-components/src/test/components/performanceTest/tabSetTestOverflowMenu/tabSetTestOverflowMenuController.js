@@ -31,7 +31,6 @@
         }, function(tabset) {
             cmp.find("tabsetContainer").set("v.body", tabset);
             finishRun();
-        });
-        
+        });       
     }
 })

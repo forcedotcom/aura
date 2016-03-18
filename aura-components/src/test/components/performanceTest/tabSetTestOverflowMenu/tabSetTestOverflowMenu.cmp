@@ -1,4 +1,7 @@
 <aura:component extends="performance:perfTest">
+    <!-- the difference between using this test and setting performanceTest:tabSet's _useOverflowMenu attribute to true, is that here we are including the dynamic creation of the tabset in the measurement
+     whereas in performanceTest:tabSet the tabset is created in markup before the measumrent (run() callback) starts.
+     -->
 	<aura:attribute name="NUM_TABS" type="Integer" default="100"/>
 	<div aura:id="tabsetContainer" class="tabsetContainer"/>
 </aura:component>

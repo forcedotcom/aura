@@ -18,26 +18,29 @@
             }, function(newDataGridColumn) {
                 dataGridColumns.push(newDataGridColumn);
             });
-
+            
             var columnTemplate = {
-                "componentDef" : "markup://ui:outputText",
-                "attributes" : {
-                    "values" : {
-                        value : i
+                    "componentDef": {
+                        "descriptor":"markup://ui:outputText"
+                    },
+                    "attributes" : {
+                        "values" : {
+                            "value": "{"  + "!item.c" + i + "}"
+                        }
                     }
-                }
-            }
+                }        
             columnTemplates.push(columnTemplate);
         }
         
-
         cmp.find('myData').set("v.headerColumns", dataGridColumns);
         cmp.find('myData').set("v.columns", columnTemplates);
 
-        // generate empty data for NUM_ROWS rows
-        // empty since the data is being provided in columnTemplate.attributes.values.value
+        // generate data for NUM_ROWS rows
         for (var i = 0; i < NUM_ROWS; i++) {
             var gridRow = {};
+            for(var j = 0; j< NUM_COLUMNS;j++){
+                gridRow["c" + j] = j;
+            }
             cmp.gridData.push(gridRow);
         }
 

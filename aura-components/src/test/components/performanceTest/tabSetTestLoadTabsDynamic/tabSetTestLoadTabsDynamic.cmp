@@ -1,4 +1,0 @@
-<aura:component extends="performance:perfTest">
-	<ui:tabset aura:id="myTabSet" >
-	</ui:tabset>
-</aura:component>  

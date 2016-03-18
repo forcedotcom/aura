@@ -10,9 +10,10 @@
 ,{"name":"Aura.coql.rerender.removed","value":0}
 ,{"name":"Aura.coql.unrender.added","value":0}
 ,{"name":"Aura.coql.unrender.removed","value":0}
-,{"name":"Network.encodedDataLength","value": 404203,"units":"bytes"}
+,{"name":"Network.encodedDataLength","value":404618,"units":"bytes"}
 ,{"name":"Network.numRequests","value":9}
-,{"name":"Tracing.Painting.Paint","value":0}
-,{"name":"Tracing.Memory.jsHeapSizeUsed","value": 18953968,"units":"bytes"}
+,{"name":"Tracing.Painting.Paint","value":1}
+,{"name":"Tracing.Memory.jsHeapSizeUsed","value": 18600352,"units":"bytes"}
+,{"name":"Tracing.Memory.jsEventListeners","value":15}
 ,{"name":"Tracing.Memory.documents","value":1 }
 ,{"name":"Tracing.Memory.nodes","value":214 }]

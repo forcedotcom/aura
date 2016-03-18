@@ -818,7 +818,7 @@ AuraInstance.prototype.handleError = function(message, e) {
             e.severity = e.severity || this.severity["ALERT"];
 
             //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-            displayMessage += "\n" + e.stackTrace;
+            displayMessage += "\n" + (e.component ? "Failing descriptor: {" + e.component + "}\n" : "") + e.stackTrace;
             //#end
             dispMsg = $A.util.format(format, displayMessage);
         }
@@ -909,7 +909,7 @@ AuraInstance.prototype.getCallback = function(callback) {
     var context=$A.getContext().getCurrentAccess();
     return function(){
         $A.getContext().setCurrentAccess(context);
-        $A.clientService.pushStack(name);
+        $A.clientService.pushStack("$A.getCallback()");
         try {
             return callback.apply(this,Array.prototype.slice.call(arguments));
         } catch (e) {
@@ -922,7 +922,7 @@ AuraInstance.prototype.getCallback = function(callback) {
 
                 throw e;
             } else {
-                var errorWrapper = new $A.auraError("Uncaught error in "+name, e);
+                var errorWrapper = new $A.auraError("Uncaught error in $A.getCallback()", e);
                 if (context && context.getDef) {
                     errorWrapper.component = context.getDef().getDescriptor().toString();
                 }
@@ -930,7 +930,7 @@ AuraInstance.prototype.getCallback = function(callback) {
                 throw errorWrapper;
             }
         } finally {
-            $A.clientService.popStack(name);
+            $A.clientService.popStack("$A.getCallback()");
             $A.getContext().releaseCurrentAccess();
         }
     };

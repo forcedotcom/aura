@@ -14,57 +14,34 @@
  * limitations under the License.
  */
 
-//#include aura.locker.SecureDOMEvent
-//#include aura.locker.SecureIFrameElement
-
-var SecureElement = (function() {
+function SecureElement(el, key) {
 	"use strict";
 
-	// Standard Element interface represents an object of a Document.
-	// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
-	var ElementSecureProperties = ['childElementCount', 'classList', 'className', 'id', 'tagName'];
-	// Note: ignoring 'attributes', 'children', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
-	//      'nextElementSibling' and 'previousElementSibling' from the list above.
-
-	// Standard HTMLElement interface represents any HTML element
-	// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
-	var HTMLElementSecureProperties = ['accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable',
-			'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang', 'spellcheck',
-			'style', 'tabIndex', 'title'];
-	// Note: ignoring 'offsetParent' from the list above.
-
-	function SecureElement(el, key) {
-		// A secure element can have multiple forms, this block allows us to apply
-		// some polymorphic behavior to SecureElement depending on the tagName
-		var tagName = el.tagName && el.tagName.toUpperCase();
-		if (tagName === 'IFRAME') {
-			return new SecureIFrameElement(el, key);
-		}
-
-		// SecureElement is it then!
-		setLockerSecret(this, "key", key);
-	    setLockerSecret(this, "ref", el);
-		SecureElement.enableSecureProperties(this);
-		Object.freeze(this);
+	// A secure element can have multiple forms, this block allows us to apply
+	// some polymorphic behavior to SecureElement depending on the tagName
+	var tagName = el.tagName && el.tagName.toUpperCase();
+	if (tagName === 'IFRAME') {
+		return SecureIFrameElement(el, key);
 	}
 
-	SecureElement.prototype = Object.create(null, {
+	// SecureElement is it then!
+	var o = Object.create(null, {
 		toString : {
 			value : function() {
-				return "SecureElement: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
+				return "SecureElement: " + el + "{ key: " + JSON.stringify(key) + " }";
 			}
 		},
 
 		appendChild : {
 			value : function(child) {
-				$A.lockerService.util.verifyAccess(this, child);
+				$A.lockerService.util.verifyAccess(o, child);
 
 				if (child.$run) {
 					// special case for SecureScriptElement to execute without insertion.
 					// TODO: improve
 					child.$run();
 				} else {
-					getLockerSecret(this, "ref").appendChild(getLockerSecret(child, "ref"));
+					el.appendChild(getLockerSecret(child, "ref"));
 				}
 			}
 		},
@@ -74,44 +51,55 @@ var SecureElement = (function() {
 				if (!callback) {
 					return; // by spec, missing callback argument does not throw, just ignores it.
 				}
-				var key = getLockerSecret(this, "key");
 				var sCallback = function(e) {
-					var se = new SecureDOMEvent(e, key);
-					// Wrap the source event in "this" in a secure element
-					// TODO: we might need to check if we have access to context object
-					var secureEventContext = new SecureElement(this, key);
-					callback.call(secureEventContext, se);
+					var se = SecureDOMEvent(e, key);
+					callback.call(o, se);
 				};
-				getLockerSecret(this, "ref").addEventListener(event, sCallback, useCapture);
+				el.addEventListener(event, sCallback, useCapture);
 			}
 		},
-		
-		removeEventListener : SecureThing.createPassThroughMethod("removeEventListener"),
-		dispatchEvent : SecureThing.createPassThroughMethod("dispatchEvent"),
 
-		childNodes : SecureThing.createFilteredProperty("childNodes"),
-		children : SecureThing.createFilteredProperty("children"),
+		removeEventListener : SecureThing.createPassThroughMethod(el, "removeEventListener"),
+		dispatchEvent : SecureThing.createPassThroughMethod(el, "dispatchEvent"),
 
-		getAttribute: SecureThing.createPassThroughMethod("getAttribute"),
-		setAttribute: SecureThing.createPassThroughMethod("setAttribute"),
+		childNodes : SecureThing.createFilteredProperty(el, "childNodes"),
+		children : SecureThing.createFilteredProperty(el, "children"),
 
-		ownerDocument : SecureThing.createFilteredProperty("ownerDocument"),
-		parentNode : SecureThing.createFilteredProperty("parentNode"),
+		getAttribute: SecureThing.createPassThroughMethod(el, "getAttribute"),
+		setAttribute: SecureThing.createPassThroughMethod(el, "setAttribute"),
+
+		ownerDocument : SecureThing.createFilteredProperty(el, "ownerDocument"),
+		parentNode : SecureThing.createFilteredProperty(el, "parentNode"),
 
 		// Standard HTMLElement methods
 		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
-		blur: SecureThing.createPassThroughMethod("blur"),
-		click: SecureThing.createPassThroughMethod("click"),
-		focus: SecureThing.createPassThroughMethod("focus")
+		blur: SecureThing.createPassThroughMethod(el, "blur"),
+		click: SecureThing.createPassThroughMethod(el, "click"),
+		focus: SecureThing.createPassThroughMethod(el, "focus")
 	});
+	// applying standard secure element properties
+	SecureElement.addSecureProperties(o, el);
 
-	SecureElement.prototype.constructor = SecureElement;
+	setLockerSecret(o, "key", key);
+	setLockerSecret(o, "ref", el);
+	return Object.seal(o);
+}
 
-	SecureElement.enableSecureProperties = function (se) {
-		[].concat(ElementSecureProperties, HTMLElementSecureProperties).forEach(function (name) {
-			Object.defineProperty(se, name, SecureThing.createPassThroughProperty(name));
-		});
-	};
+SecureElement.addSecureProperties = function (se, raw) {
+	[
+		// Standard Element interface represents an object of a Document.
+		// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
+		'childElementCount', 'classList', 'className', 'id', 'tagName',
+		// Note: ignoring 'attributes', 'children', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
+		//      'nextElementSibling' and 'previousElementSibling' from the list above.
 
-	return SecureElement;
-})();
+		// Standard HTMLElement interface represents any HTML element
+		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
+		'accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable',
+		'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang', 'spellcheck',
+		'style', 'tabIndex', 'title'
+		// Note: ignoring 'offsetParent' from the list above.
+	].forEach(function (name) {
+		Object.defineProperty(se, name, SecureThing.createPassThroughProperty(raw, name));
+	});
+};

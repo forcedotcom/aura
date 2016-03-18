@@ -14,87 +14,73 @@
  * limitations under the License.
  */
 
-//#include aura.locker.SecureThing
-//#include aura.locker.SecureElement
-//#include aura.locker.SecureScriptElement
+/**
+ * Factory for SecureDocument objects.
+ *
+ * @public
+ *
+ * @param {Object}
+ *            doc - the DOM document
+ * @param {Object}
+ *            key - the key to apply to the secure document
+ */
+function SecureDocument(doc, key) {
+    "use strict";
 
-var SecureDocument = (function() {
-  "use strict";
+    var o = Object.create(null, {
+        toString: {
+            value: function() {
+                return "SecureDocument: " + doc + "{ key: " + JSON.stringify(key) + " }";
+            }
+        },
+        createElement: {
+            value: function(tag) {
+                // Insure that no object to string coercion tricks can be applied to evade tag name based logic
+                tag = tag + "";
+                switch (tag.toLowerCase()) {
+                    case "script":
+                        return SecureScriptElement(key);
 
-  /**
-   * Construct a new SecureDocument.
-   *
-   * @public
-   * @class
-   * @constructor
-   *
-   * @param {Object}
-   *            document - the DOM document
-   * @param {Object}
-   *            key - the key to apply to the secure document
-   */
-  function SecureDocument(document, key) {
-    setLockerSecret(this, "key", key);
-    setLockerSecret(this, "ref", document);
-    Object.freeze(this);
-  }
+                    default:
+                        var el = doc.createElement(tag);
+                        $A.lockerService.trust(o, el);
+                        return SecureElement(el, key);
+                }
+            }
+        },
+        createDocumentFragment: {
+            value: function() {
+                var frag = doc.createDocumentFragment();
+                $A.lockerService.trust(o, frag);
+                return SecureElement(frag, key);
+            }
+        },
+        createTextNode: {
+            value: function(text) {
+                var node = doc.createTextNode(text);
+                $A.lockerService.trust(o, node);
+                return SecureElement(node, key);
+            }
+        },
 
-  SecureDocument.prototype = Object.create(null, {
-    toString: {
-      value: function() {
-        return "SecureDocument: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
-      }
-    },
+        body: SecureThing.createFilteredProperty(doc, "body"),
+        head: SecureThing.createFilteredProperty(doc, "head"),
 
-    createElement: {
-      value: function(tag) {
-    	// Insure that no object to string coercion tricks can be applied to evade tag name based logic
-    	tag = tag + "";
-        var key = getLockerSecret(this, "key");
-        switch (tag.toLowerCase()) {
-        case "script":
-          return new SecureScriptElement(key);
+        getElementById: SecureThing.createFilteredMethod(doc, "getElementById"),
+        getElementsByClassName: SecureThing.createFilteredMethod(doc, "getElementsByClassName"),
+        getElementsByName: SecureThing.createFilteredMethod(doc, "getElementsByName"),
+        getElementsByTagName: SecureThing.createFilteredMethod(doc, "getElementsByTagName"),
 
-        default:
-          var el = getLockerSecret(this, "ref").createElement(tag);
-          $A.lockerService.trust(this, el);
-          return new SecureElement(el, key);
-        }
-      }
-    },
-    createDocumentFragment: {
-      value: function() {
-        var frag = getLockerSecret(this, "ref").createDocumentFragment();
-        $A.lockerService.trust(this, frag);
-        return new SecureElement(frag, getLockerSecret(this, "key"));
-      }
-    },
-    createTextNode: {
-      value: function(text) {
-        var node = getLockerSecret(this, "ref").createTextNode(text);
-        $A.lockerService.trust(this, node);
-        return new SecureElement(node, getLockerSecret(this, "key"));
-      }
-    },
+        querySelector: SecureThing.createFilteredMethod(doc, "querySelector"),
+        querySelectorAll: SecureThing.createFilteredMethod(doc, "querySelectorAll"),
 
-    body: SecureThing.createFilteredProperty("body"),
-    head: SecureThing.createFilteredProperty("head"),
+        title: SecureThing.createPassThroughProperty(doc, "title"),
 
-    getElementById: SecureThing.createFilteredMethod("getElementById"),
-    getElementsByClassName: SecureThing.createFilteredMethod("getElementsByClassName"),
-    getElementsByName: SecureThing.createFilteredMethod("getElementsByName"),
-    getElementsByTagName: SecureThing.createFilteredMethod("getElementsByTagName"),
+        // DCHASMAN TODO W-2839646 Figure out how much we want to filter cookie access???
+        cookie: SecureThing.createPassThroughProperty(doc, "cookie")
+    });
 
-    querySelector: SecureThing.createFilteredMethod("querySelector"),
-    querySelectorAll: SecureThing.createFilteredMethod("querySelectorAll"),
-    
-    title: SecureThing.createPassThroughProperty("title"),
-
-    // DCHASMAN TODO W-2839646 Figure out how much we want to filter cookie access???
-    cookie: SecureThing.createPassThroughProperty("cookie")
-  });
-
-  SecureDocument.prototype.constructor = SecureDocument;
-
-  return SecureDocument;
-})();
+    setLockerSecret(o, "key", key);
+    setLockerSecret(o, "ref", doc);
+    return Object.seal(o);
+}

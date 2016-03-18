@@ -17,9 +17,8 @@
         test: function(cmp) {
             // Few notes
             // (1) These are only @platform APIs exposed in Aura.js, not everything you can potentially get to from $A
-            // (2) "error" is deprecated so may need to be removed from this list
-            // (3) @platform APIs not exposed: localizationService, reportError, getToken, set, getReference, run
-            var exposedAPIs = ["util", "error", "warning", "getCallback", "get", "getRoot", "log"];
+            // (2) @platform APIs not exposed: localizationService, reportError, getToken, set, getReference, run, error (deprecated)
+            var exposedAPIs = ["util", "warning", "getCallback", "get", "getRoot", "log"];
             cmp.getSecureAura();
             var secureAura = cmp.get("v.log");
 
@@ -66,7 +65,6 @@
             cmp.getSecureComponent();
             var secureComponenet = cmp.get("v.log");
             var dynamicCmps = secureComponenet.get("v.dynamicCmps");
-            debugger;
             dynamicCmps.forEach(function(component) {
                 $A.test.assertStartsWith("SecureComponent", component.toString(), "Expected dynamic component to be"
                         + " a SecureComponent");

@@ -14,109 +14,87 @@
  * limitations under the License.
  */
 
-var SecureDOMEvent = (function() {
-  "use strict";
+function SecureDOMEvent(event, key) {
+    "use strict";
 
-  function isDOMElementOrNode(o) {
-    return typeof o === "object" &&
-        ((typeof HTMLElement === "object" && o instanceof HTMLElement) ||
-        (typeof Node === "object" && o instanceof Node) ||
-        (typeof o.nodeType === "number" && typeof o.nodeName === "string"));
-  }
+    var DOMEventSecureDescriptors = {
+        // Events properties that are DOM Elements were compiled from
+        // https://developer.mozilla.org/en-US/docs/Web/Events
+        target: SecureThing.createFilteredProperty(event, "target"),
+        currentTarget: SecureThing.createFilteredProperty(event, "currentTarget"),
+        relatedTarget: SecureThing.createFilteredProperty(event, "relatedTarget"),
 
-  function filterTouchesDescriptor(propName) {
+        // Touch Events are special on their own:
+        // https://developer.mozilla.org/en-US/docs/Web/API/Touch
+        touches: SecureDOMEvent.filterTouchesDescriptor(event, "touch"),
+        targetTouches: SecureDOMEvent.filterTouchesDescriptor(event, "targetTouches"),
+        changedTouches: SecureDOMEvent.filterTouchesDescriptor(event, "changedTouches"),
+
+        // WindowProxy for events like compositionupdate
+        // disabling this capability seems to be the right thing to do for now.
+        view: {
+            get: function() {
+                throw Error("Access denied for insecure view");
+            }
+        },
+
+        // non-standard properties and aliases
+        srcElement: SecureThing.createFilteredProperty(event, "srcElement"),
+        explicitOriginalTarget: SecureThing.createFilteredProperty(event, "explicitOriginalTarget"),
+        originalTarget: SecureThing.createFilteredProperty(event, "originalTarget")
+    };
+
+    var o = Object.create(null, {
+        toString: {
+            value: function() {
+                return "SecureDOMEvent: " + event + "{ key: " + JSON.stringify(key) + " }";
+            }
+        }
+    });
+
+    // re-exposing externals
+    // TODO: we might need to include non-enumerables
+    for (var name in event) {
+        if (!(name in o)) {
+            // every DOM event has a different shape, we apply filters when possible,
+            // and bypass when no secure filter is found.
+            Object.defineProperty(o, name, DOMEventSecureDescriptors[name] || SecureThing.createFilteredProperty(event, name));
+        }
+    }
+
+    setLockerSecret(o, "key", key);
+    setLockerSecret(o, "ref", event);
+    return Object.seal(o);
+}
+
+SecureDOMEvent.filterTouchesDescriptor = function (event, propName) {
+    "use strict";
+
     // descriptor to produce a new collection of touches where the target of each
     // touch is a secure element
     return {
-      get: function() {
-        // perf hard-wired in case there is not a touches to wrap
-        var event = getLockerSecret(this, "event");
-        var touches = event[propName];
-        if (!touches) {
-          return touches;
-        }
-        return touches.map(function (touch) {
-          // touches is normally a big big collection of touch objects,
-          // we do not want to pre-process them all, just create a the getters
-          // and process the accessor on the spot. e.g.:
-          // https://developer.mozilla.org/en-US/docs/Web/Events/touchstart
-          return Object.keys(touch).reduce(function (o, p) {
-            Object.defineProperty(o, p, {
-              // all props in a touch object are readonly by spec:
-              // https://developer.mozilla.org/en-US/docs/Web/API/Touch
-              get: function () {
-                if (isDOMElementOrNode(touch[p])) {
-                  $A.lockerService.util.verifyAccess(event, touch[p]);
-                  return new SecureElement(touch[p], getLockerSecret(event, "key"));
-                }
-                return touch[p];
-              }
+        get: function() {
+            // perf hard-wired in case there is not a touches to wrap
+            var touches = event[propName];
+            if (!touches) {
+                return touches;
+            }
+            var se = this;
+            return touches.map(function(touch) {
+                // touches is normally a big big collection of touch objects,
+                // we do not want to pre-process them all, just create a the getters
+                // and process the accessor on the spot. e.g.:
+                // https://developer.mozilla.org/en-US/docs/Web/Events/touchstart
+                return Object.keys(touch).reduce(function(o, p) {
+                    Object.defineProperty(o, p, {
+                        // all props in a touch object are readonly by spec:
+                        // https://developer.mozilla.org/en-US/docs/Web/API/Touch
+                        get: function() {
+                            return SecureThing.filterEverything(se, touch[p]);
+                        }
+                    });
+                }, {});
             });
-          }, {});
-        });
-      }
+        }
     };
-  }
-
-  function throwAccessViolation(propName) {
-    return {
-      get: function() {
-        throw Error("Access denied for insecure " + propName);
-      }
-    };
-  }
-
-  var DOMEventSecureDescriptors = {
-    // Events properties that are DOM Elements were compiled from
-    // https://developer.mozilla.org/en-US/docs/Web/Events
-    target: SecureThing.createFilteredProperty("target"),
-    currentTarget: SecureThing.createFilteredProperty("currentTarget"),
-    relatedTarget: SecureThing.createFilteredProperty("relatedTarget"),
-
-    // Touch Events are special on their own:
-    // https://developer.mozilla.org/en-US/docs/Web/API/Touch
-    touches: filterTouchesDescriptor("touch"),
-    targetTouches: filterTouchesDescriptor("targetTouches"),
-    changedTouches: filterTouchesDescriptor("changedTouches"),
-
-    // WindowProxy for events like compositionupdate
-    // disabling this capability seems to be the right thing to do for now.
-    view: throwAccessViolation("view"),
-
-    // non-standard properties and aliases
-    srcElement: SecureThing.createFilteredProperty("srcElement"),
-    explicitOriginalTarget: SecureThing.createFilteredProperty("explicitOriginalTarget"),
-    originalTarget: SecureThing.createFilteredProperty("originalTarget")
-  };
-
-  function SecureDOMEvent(event, key) {
-    setLockerSecret(this, "key", key);
-    setLockerSecret(this, "ref", event);
-    
-    // re-exposing externals
-    for (var name in event) {
-      if (name in SecureDOMEvent.prototype) {
-        // ignoring anything that SecureDOMEvent already implements
-        return;
-      }
-      
-      // every DOM event has a different shape, we apply filters when possible,
-      // and bypass when no secure filter is found.
-      Object.defineProperty(this, name, DOMEventSecureDescriptors[name] || SecureThing.createFilteredProperty(name));
-    }
-    
-    Object.freeze(this);
-  }
-
-  SecureDOMEvent.prototype = Object.create(null, {
-    toString: {
-      value: function() {
-        return "SecureDOMEvent: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
-      }
-    }
-  });
-
-  SecureDOMEvent.prototype.constructor = SecureDOMEvent;
-
-  return SecureDOMEvent;
-})();
+};

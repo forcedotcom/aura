@@ -16,68 +16,57 @@
 
 /*jslint sub: true */
 
-//#include aura.locker.SecureDocument
-//#include aura.locker.SecureAura
-
-var SecureWindow = (function() {
+/**
+ * Construct a SecureWindow.
+ *
+ * @public
+ * @class
+ * @constructor
+ *
+ * @param {Object}
+ *            win - the DOM window
+ * @param {Object}
+ *            key - the key to apply to the secure window
+ */
+function SecureWindow(win, key) {
 	"use strict";
 
-	/**
-	 * Construct a new SecureWindow.
-	 *
-	 * @public
-	 * @class
-	 * @constructor
-	 *
-	 * @param {Object}
-	 *            win - the DOM window
-	 * @param {Object}
-	 *            key - the key to apply to the secure window
-	 */
-	function SecureWindow(win, key) {
-		setLockerSecret(this, "key", key);
-		setLockerSecret(this, "ref", win);
-		Object.defineProperties(this, {
-			document: {
-				enumerable: true,
-				value: new SecureDocument(win.document, key)
-			},
-			"$A": {
-				enumerable: true,
-				value: new SecureAura(win['$A'], key)
-			},
-			window: {
-				enumerable: true,
-				get: function () {
-					// circular window references to match DOM API
-					return this;
-				}
-			},
-			setTimeout: {
-				enumerable: true,
-				value: function (callback) {
-					setTimeout.apply(win, [callback.bind(this)].concat(Array.prototype.slice.call(arguments, 1)));
-				}
-			},
-			setInterval: {
-				enumerable: true,
-				value: function (callback) {
-					setInterval.apply(win, [callback.bind(this)].concat(Array.prototype.slice.call(arguments, 1)));
-				}
+	var o = Object.create(null, {
+		document: {
+			enumerable: true,
+			value: SecureDocument(win.document, key)
+		},
+		"$A": {
+			enumerable: true,
+			value: SecureAura(win['$A'], key)
+		},
+		window: {
+			enumerable: true,
+			get: function () {
+				// circular window references to match DOM API
+				return o;
 			}
-		});
-		Object.freeze(this);
-	}
-
-	SecureWindow.prototype = Object.create(null, {
+		},
+		setTimeout: {
+			enumerable: true,
+			value: function (callback) {
+				setTimeout.apply(win, [SecureThing.FunctionPrototypeBind.call(callback, o)].concat(SecureThing.ArrayPrototypeSlice.call(arguments, 1)));
+			}
+		},
+		setInterval: {
+			enumerable: true,
+			value: function (callback) {
+				setInterval.apply(win, [SecureThing.FunctionPrototypeBind.call(callback, o)].concat(SecureThing.ArrayPrototypeSlice.call(arguments, 1)));
+			}
+		},
 		toString: {
 			value: function() {
-				return "SecureWindow: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
+				return "SecureWindow: " + win + "{ key: " + JSON.stringify(key) + " }";
 			}
 		}
 	});
 
-	SecureWindow.prototype.constructor = SecureWindow;
-
-	return SecureWindow;
-})();
+	setLockerSecret(o, "key", key);
+	setLockerSecret(o, "ref", win);
+	return Object.seal(o);
+}

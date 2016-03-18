@@ -171,6 +171,18 @@ window['$A'] = {};
 // #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}
 
 //-- LockerService -----------------------------------------------------------
+//#include aura.locker.SecureThing
+//#include aura.locker.SecureDOMEvent
+//#include aura.locker.SecureIFrameElement
+//#include aura.locker.SecureElement
+//#include aura.locker.SecureScriptElement
+//#include aura.locker.SecureDocument
+//#include aura.locker.SecureAura
+//#include aura.locker.SecureWindow
+//#include aura.locker.SecureAuraEvent
+//#include aura.locker.SecureAction
+//#include aura.locker.SecureComponent
+//#include aura.locker.SecureComponentRef
 //#include aura.locker.LockerService
 
 /**
@@ -214,14 +226,14 @@ function AuraInstance () {
 
     /**
      * Error severity for categorizing errors
-     * 
-     * ALERT [default error severity level if error thrower doesn’t explicitly specify a severity level] - 
+     *
+     * ALERT [default error severity level if error thrower doesn’t explicitly specify a severity level] -
      * the current page has issues and we need to alert the user that an error has occurred.  The error(s) could potentially be corrected by a page reload
      *
-     * FATAL - the user’s session is now completely broken and cannot continue being used. 
+     * FATAL - the user’s session is now completely broken and cannot continue being used.
      * The user should logout and contact Salesforce support or their administrator.
      *
-     * QUIET - An error has occurred but it won’t affect the user/page. 
+     * QUIET - An error has occurred but it won’t affect the user/page.
      * This is likely something unexpected that a lower level component can just quietly log for later diagnostics by Salesforce (e.g. a perf issue or something else).
      *
      * @public

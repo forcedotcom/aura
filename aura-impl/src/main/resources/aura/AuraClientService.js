@@ -2752,7 +2752,7 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                     }
                 }
 
-                var effectiveAccess=definition.access||isInternal?'I':'P';
+                var effectiveAccess=definition.access||(isInternal?'I':'P');
                 if(effectiveAccess==='P') {
                     // PUBLIC means "same namespace only"
                     var targetNamespace = definition.getDescriptor().getNamespace();

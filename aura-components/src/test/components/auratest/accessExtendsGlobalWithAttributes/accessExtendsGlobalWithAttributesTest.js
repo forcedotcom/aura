@@ -6,10 +6,12 @@
         }
     },
 
-    testCanAccessPublicAttributeOnBaseComponent: {
+    testCanNotAccessPublicAttributeOnBaseComponentFromDifferentNamespace: {
         test: function(cmp) {
+            $A.test.expectAuraError("Access Check Failed!");
+
             cmp.testAttributeAccess("Public");
-            $A.test.assertEquals("PUBLIC", cmp.get("v.output"));
+            $A.test.assertEquals(undefined, cmp.get("v.output"));
         }
     },
 

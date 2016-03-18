@@ -8,7 +8,8 @@
   <aura:token name="uiModal.container" value=""/>
   <aura:token name="uiModal.header" value=""/>
   <aura:token name="uiModal.title" value=""/>
-  <aura:token name="uiModal.content" value=""/>
+  <aura:token name="uiModal.body" value=""/>
+  <aura:token name="uiModal.bodySpacing" value=""/>
   <aura:token name="uiModal.footer" value=""/>
   <aura:token name="uiModal.backdrop" value=""/>
   <aura:token name="uiModal.backdropOpen" value=""/>

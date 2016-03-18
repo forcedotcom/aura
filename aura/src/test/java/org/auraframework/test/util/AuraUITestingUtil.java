@@ -47,20 +47,21 @@ import com.google.common.collect.Lists;
  */
 
 public class AuraUITestingUtil {
-    private static final Logger LOG = Logger.getLogger("AuraUITestingUtil");
-
     private final WebDriver driver;
+    private final String logPrefix;
+    private final Logger logger;
     private int timeoutInSecs;
     private int rerunCount = 0;
     protected static final Random RAND = new Random(System.currentTimeMillis());
 
     public AuraUITestingUtil(WebDriver driver) {
-        this(driver, 30);
+        this(driver, null, null);
     }
 
-    public AuraUITestingUtil(WebDriver driver, int timeoutInSecs) {
+    public AuraUITestingUtil(WebDriver driver, Logger logger, String logPrefix) {
         this.driver = driver;
-        setTimeoutInSecs(timeoutInSecs);
+        this.logPrefix = logPrefix == null ? "" : logPrefix;
+        this.logger = logger != null ? logger : Logger.getLogger(AuraUITestingUtil.class.getSimpleName());
     }
 
     public enum ActionDuringTransit {
@@ -719,7 +720,7 @@ public class AuraUITestingUtil {
 
     public void waitForAppCacheReady() {
         final long start = System.currentTimeMillis();
-        LOG.info("---->AuraUITestingUtil.waitForAppCacheReady starting");
+        logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAppCacheReady starting");
         waitUntilWithCallback(
                 new ExpectedCondition<Boolean>() {
                     @Override
@@ -728,7 +729,7 @@ public class AuraUITestingUtil {
                                 + "return $A.util.isUndefinedOrNull(cache) || (cache.status===cache.UNCACHED)"
                                 + "||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
                         if (res) {
-                            LOG.info("---->AuraUITestingUtil.waitForAppCacheReady finished " + (System.currentTimeMillis() - start));
+                            logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAppCacheReady finished " + (System.currentTimeMillis() - start));
                         }
                         return res;
                     }
@@ -737,7 +738,7 @@ public class AuraUITestingUtil {
                     @Override
                     public String apply(WebDriver d) {
                         Object ret = getRawEval("return window.applicationCache.status");
-                        LOG.info("---->AuraUITestingUtil.waitForAppCacheReady timed_out " + (System.currentTimeMillis() - start));
+                        logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAppCacheReady timed_out " + (System.currentTimeMillis() - start));
                         return "Current AppCache status is " + appCacheStatusIntToString(((Long) ret).intValue());
                     }
                 },
@@ -750,14 +751,14 @@ public class AuraUITestingUtil {
      */
     public void waitForAuraTestComplete(int timeoutSecs) {
         final long start = System.currentTimeMillis();
-        LOG.info("---->AuraUITestingUtil.waitForAuraTestComplete starting");
+        logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAuraTestComplete starting");
         waitUntilWithCallback(
                 new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
                         boolean res = getBooleanEval("return (window.$A && window.$A.test && window.$A.test.isComplete()) || false;");
                         if (res) {
-                            LOG.info("---->AuraUITestingUtil.waitForAuraTestComplete finished "
+                            logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAuraTestComplete finished "
                                     + (System.currentTimeMillis() - start));
                         }
                         return res;
@@ -770,7 +771,7 @@ public class AuraUITestingUtil {
                         if (dump.isEmpty()) {
                             dump = "no extra test information to display.";
                         }
-                        LOG.info("---->AuraUITestingUtil.waitForAuraTestComplete timed_out "
+                        logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAuraTestComplete timed_out "
                                 + (System.currentTimeMillis() - start));
                         return "Test timed out on server.\n" + dump;
                     }
@@ -802,14 +803,14 @@ public class AuraUITestingUtil {
      */
     public void waitForAuraInit(final Set<String> expectedErrors) {
         final long start = System.currentTimeMillis();
-        LOG.info("---->AuraUITestingUtil.waitForAuraInit starting");
+        logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAuraInit starting");
         try {
             waitForDocumentReady();
             waitForAuraFrameworkReady(expectedErrors);
             waitForAppCacheReady();
-            LOG.info("---->AuraUITestingUtil.waitForAuraInit finished " + (System.currentTimeMillis() - start));
+            logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAuraInit finished " + (System.currentTimeMillis() - start));
         } catch (Throwable t) {
-            LOG.info("---->AuraUITestingUtil.waitForAuraInit failed " + (System.currentTimeMillis() - start));
+            logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAuraInit failed " + (System.currentTimeMillis() - start));
             throw t;
         }
     }
@@ -819,14 +820,14 @@ public class AuraUITestingUtil {
      */
     public void waitForDocumentReady() {
         final long start = System.currentTimeMillis();
-        LOG.info("---->AuraUITestingUtil.waitForDocumentReady starting");
+        logger.info(logPrefix + " ---->AuraUITestingUtil.waitForDocumentReady starting");
         waitUntilWithCallback(
                 new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
                         boolean res = getBooleanEval("return document.readyState === 'complete'");
                         if (res) {
-                            LOG.info("---->AuraUITestingUtil.waitForDocumentReady finished "
+                            logger.info(logPrefix + " ---->AuraUITestingUtil.waitForDocumentReady finished "
                                     + (System.currentTimeMillis() - start));
                         }
                         return res;
@@ -836,7 +837,7 @@ public class AuraUITestingUtil {
                     @Override
                     public String apply(WebDriver d) {
                         String ret = (String) getRawEval("return document.readyState");
-                        LOG.info("---->AuraUITestingUtil.waitForDocumentReady timed_out "
+                        logger.info(logPrefix + " ---->AuraUITestingUtil.waitForDocumentReady timed_out "
                                 + (System.currentTimeMillis() - start));
                         return "Current document.readyState is <" + ret + ">";
                     }
@@ -852,7 +853,7 @@ public class AuraUITestingUtil {
      */
     public void waitForAuraFrameworkReady(final Set<String> expectedErrors) {
         final long start = System.currentTimeMillis();
-        LOG.info("---->AuraUITestingUtil.waitForAuraFrameworkReady starting");
+        logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAuraFrameworkReady starting");
         String doNotAssign = "\nThis message means, you aren't even on Aura application at this point. " +
                 "Please do not assign this test failure to Aura team/s unless, Aura team/s is the owner of this test. ";
         WebDriverWait waitAuraPresent = new WebDriverWait(driver, timeoutInSecs);
@@ -863,7 +864,7 @@ public class AuraUITestingUtil {
                             public Boolean apply(WebDriver input) {
                                 Boolean res = (Boolean) getRawEval("return !!window.$A");
                                 if (res) {
-                                    LOG.info("---->AuraUITestingUtil.waitForAuraFrameworkReady framework_loaded "
+                                    logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAuraFrameworkReady framework_loaded "
                                             + (System.currentTimeMillis() - start));
                                 }
                                 return res;
@@ -880,7 +881,7 @@ public class AuraUITestingUtil {
                                 assertNoAuraErrorMessage(expectedErrors);
                                 boolean res = isAuraFrameworkReady();
                                 if (res) {
-                                    LOG.info("---->AuraUITestingUtil.waitForAuraFrameworkReady finished "
+                                    logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAuraFrameworkReady finished "
                                             + (System.currentTimeMillis() - start));
                                 }
                                 return res;
@@ -1045,5 +1046,4 @@ public class AuraUITestingUtil {
         boolean hasScroll = this.getBooleanEval(js);
         return hasScroll;
     }
-
 }

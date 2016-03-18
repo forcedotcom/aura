@@ -26,7 +26,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.integration.Integration;
-import org.auraframework.integration.UnsupportedUserAgentException;
 import org.auraframework.service.IntegrationService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -115,20 +114,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
             fail("Not specifying a localId to injected component should be tolerated.");
         }
     }
-    /**
-     * Integration Service throws exception when used with an unsupported client. 
-     * @throws Exception
-     */
-    public void testThrowsOnUnsupportedBrowsers() throws Exception{
-        String ie6UserAgent = "Mozilla/4.0 (compatible; MSIE 6.1; Windows XP; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
-        Integration integration = service.createIntegration("", Mode.DEV, true, ie6UserAgent, null, null);
-        try{
-            injectSimpleComponent(integration);
-            fail("Integration service should throw exception when used with unsupported browsers.");
-        }catch(UnsupportedUserAgentException e){
-            //expected
-        }
-    }
+
     /**
      * Sanity check for IntegrationService.
      * 

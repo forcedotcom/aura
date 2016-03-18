@@ -4,21 +4,33 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 	var queuedData = [];
 	var transactions = {};
 
+	var labels = {
+		"clear" : chrome.i18n.getMessage("menu_clear"),
+		"id" : chrome.i18n.getMessage("transactions_id"),
+		"starttime" : chrome.i18n.getMessage("transactions_starttime"),
+		"starttime_info" : chrome.i18n.getMessage("transactions_starttime_info"),
+		"duration" : chrome.i18n.getMessage("transactions_duration"),
+		"duration_info" : chrome.i18n.getMessage("transactions_duration_info"),
+		"context" : chrome.i18n.getMessage("transactions_context"),
+		"actions" : chrome.i18n.getMessage("transactions_actions"),
+		"XHRs" : chrome.i18n.getMessage("transactions_xhrs")
+	};
+
 	var markup = `
 		<div class="aura-panel panel-status-bar">
-			<button class="clear-status-bar-item status-bar-item" title="Clear">
+			<button class="clear-status-bar-item status-bar-item" title="${labels.clear}">
 				<div class="glyph"></div><div class="glyph shadow"></div>
 			</button>
 		</div>
 		<div class="transactions" id="trs">
 			<table>
 				<thead>
-					<th>Id</th>
-					<th>Start Time<br /><span class="th-description">(second since page loaded)</span></th>
-					<th>Duration<br /><span class="th-description">(milliseconds)</span></th>
-					<th>Context</th>
-					<th>Actions</th>
-					<th>XHRs</th>
+					<th>${labels.id}</th>
+					<th>${labels.starttime}<br /><span class="th-description">${labels.starttime_info}</span></th>
+					<th>${labels.duration}<br /><span class="th-description">${labels.duration_info}</span></th>
+					<th>${labels.context}</th>
+					<th>${labels.actions}</th>
+					<th>${labels.XHRs}</th>
 				</thead>
 				<tbody>
 				</tbody>
@@ -62,7 +74,7 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 			'<td class="id"><a href="javascript:void(0)" data-id="'+ tid +'">' + t.id + '</a></td>',
 			'<td class="ts">' + this.contextualizeTime(t) +'</td>',
 			'<td class="dur">' + Math.floor(t.duration * 1000) / 1000 +'</td>',
-			'<td class="ctx">' + JSON.stringify(t.context, null, '\t') + '</td>',
+			'<td class="ctx"><aurainspector-json>' + JSON.stringify(t.context, null, '\t') + '</aurainspector-json></td>',
 			'<td class="actions">' + this.summarizeActions(t) + '</td>',
 			'<td class="xhr">' + this.summarizeXHR(t) + '</td>',
 		].join('');

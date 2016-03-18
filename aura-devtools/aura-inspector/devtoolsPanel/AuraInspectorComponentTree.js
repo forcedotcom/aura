@@ -14,7 +14,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
     var labels = {
         refresh: chrome.i18n.getMessage("menu_refresh"),
         expandall: chrome.i18n.getMessage("componenttree_menu_expandall"),
-        showids: chrome.i18n.getMessage("menu_refresh")
+        showids: chrome.i18n.getMessage("componenttree_menu_showids")
     };
 
     var markup = `
@@ -32,7 +32,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
                 </button>
               </li>
               <li class="divider"></li>
-              <li><input type="checkbox" id="showglobalids-checkbox"><label for="showglobalids-checkbox">Show Global IDs</label></li>
+              <li><input type="checkbox" id="showglobalids-checkbox"><label for="showglobalids-checkbox">${labels.showids}</label></li>
           </menu>
           <div class="flex scroll">
             <div class="component-tree source-code" id="tree"></div>
@@ -229,10 +229,10 @@ function AuraInspectorComponentTree(devtoolsPanel) {
                 getBodyFromIds(currentBody, function(bodyNodes){
                     callback(flattenArray(bodyNodes))
                 });
-            } else if(isExpression(component) && isFacetArray(component.attributes.value)) {
-
+            } else if(isExpression(component) && isFacets(component.attributes.value)) {
+                var facets = Array.isArray(component.attributes.value) ? component.attributes.value : [component.attributes.value];
                 // Is an expression and a facet.
-                getBodyFromIds(component.attributes.value, function(bodyNodes){
+                getBodyFromIds(facets, function(bodyNodes){
                     callback(flattenArray(bodyNodes));
                 });
 
@@ -261,10 +261,12 @@ function AuraInspectorComponentTree(devtoolsPanel) {
 
         }
 
-        function isFacetArray(array) {
-            if(!Array.isArray(array)) { return false; }
-            for(var c=0;c<array.length;c++) {
-                if(!devtoolsPanel.isComponentId(array[c])) { return false; }
+        function isFacets(value) {
+            if(!Array.isArray(value)) { 
+                return devtoolsPanel.isComponentId(value);
+            }
+            for(var c=0;c<value.length;c++) {
+                if(!devtoolsPanel.isComponentId(value[c])) { return false; }
             }
             return true;
         }

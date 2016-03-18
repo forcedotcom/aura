@@ -129,7 +129,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                             "'self' chrome-extension: 'unsafe-inline' 'nonce-LockerServiceTemporaryNonce'",
                             csp.get("script-src"));
                     assertEquals("style-src is wrong",
-                            "'self' chrome-extension: 'unsafe-inline' 'nonce-LockerServiceTemporaryNonce'",
+                            "'self' chrome-extension: 'unsafe-inline'",
                             csp.get("style-src"));
                 }
 

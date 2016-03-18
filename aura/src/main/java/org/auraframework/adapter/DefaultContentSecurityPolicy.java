@@ -104,14 +104,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         List<String> list = new ArrayList<>(3);
         list.add(null); // Same origin allowed
         list.add("chrome-extension:");
-        // always enable UNSAFE_INLINE to support CSP 1.x, but if the nonce is
-        // also added, browsers with CSP 2.x will automatically disable UNSAFE_INLINE
-        // in favor of a nonce.
         list.add(CSP.UNSAFE_INLINE);
-        if (!inlineStyle) {
-            list.add("'nonce-LockerServiceTemporaryNonce'");
-        }
-
         return list;
     }
 

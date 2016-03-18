@@ -74,13 +74,13 @@
 
             <!-- ====== Styles ====== -->
             {!v.auraResetTags}
-            <style nonce="LockerServiceTemporaryNonce">
+            <style>
                 {!v.inlineStyle}
                 {!v.appcacheProgressBarStyle}
             </style>
             {!v.auraStyleTags}
             {!v.extraStyleTags}
-            <style nonce="LockerServiceTemporaryNonce">{!v.auraInlineStyle}</style>
+            <style>{!v.auraInlineStyle}</style>
         <!-- ==================== -->
         </head>
 

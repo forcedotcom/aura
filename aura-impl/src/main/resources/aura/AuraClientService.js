@@ -298,6 +298,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
         ret["message"] = "Communication error, please retry or reload the page";
         // #end
         ret["status"] = "ERROR";
+        return ret;
     }
 
     //

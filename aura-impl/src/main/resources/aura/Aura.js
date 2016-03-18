@@ -917,7 +917,7 @@ AuraInstance.prototype.getCallback = function(callback) {
             // customers who throw AFE would want to handle it with their own custom experience.
             if (e instanceof $A.auraFriendlyError || e instanceof $A.auraError) {
                 if (context && context.getDef) {
-                    e.component = context.getDef().getDescriptor().toString();
+                    e.component = e.component || context.getDef().getDescriptor().toString();
                 }
 
                 throw e;

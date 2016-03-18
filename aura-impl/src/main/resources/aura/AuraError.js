@@ -94,7 +94,7 @@ function AuraError() {
         error.name = this.name;
         this.lineNumber = error.lineNumber;
         this.number = error.number;
-        this.message = error.message || message;
+        this.message = message + (innerError ? " [" + innerError.message + "]" : "");
         this.stackTrace = getStackTrace(error);
         this.severity = severity;
     }

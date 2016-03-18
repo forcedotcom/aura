@@ -99,7 +99,7 @@
 
       <!-- PanelSlider should have 1 error-->
      <aura:if isTrue="{!v.caseToRender == 'testActiveSliderAriaHiddenIncorrect'}">
-             <div class="forcePanelSlider active">
+             <div class="forcePanelSlider slideIn">
                 <a title="blah">test</a>
                 <div class="body" aria-hidden="true">test</div>
              </div>
@@ -107,7 +107,7 @@
 
       <!-- PanelSlider should have no errors-->
      <aura:if isTrue="{!v.caseToRender == 'testActivePanelSliderAriaHiddenCorrect'}">
-            <div class="forcePanelSlider active">
+            <div class="forcePanelSlider slideIn">
                 <a title="blah">test</a>
                 <div class="body" aria-hidden="false">test</div>
              </div>

@@ -78,15 +78,12 @@
 
                 cmp.find("testRemoteAttributes").getElement().click();
             },
-            function canUsePublicAttribute(cmp){
+            function canNotUsePublicAttribute(cmp){
                 var expected="PUBLIC";
                 cmp.set("v.testType","Public");
+                $A.test.expectAuraError("Access Check Failed!");
 
                 cmp.find("testRemoteAttributes").getElement().click();
-
-                $A.test.addWaitFor(expected,function(){
-                    return $A.test.getTextByComponent(cmp.find("local"));
-                });
             },
             function canUseInternalAttribute(cmp){
                 var expected="INTERNAL";

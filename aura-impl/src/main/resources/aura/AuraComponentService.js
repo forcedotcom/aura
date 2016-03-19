@@ -1354,23 +1354,55 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
             throw new $A.auraError("Component class not found: " + descriptor, null, $A.severity.QUIET);
         }
 
-        callback(new classConstructor(config, forceClientCreation), 'SUCCESS');
-        return action;
+        if($A.clientService.allowAccess(def)) {
+            callback(new classConstructor(config, forceClientCreation), 'SUCCESS');
+        }else{
+            var context=$A.getContext();
+            var message="Access Check Failed! AuraComponentService.createComponent(): '" + descriptor + "' is not visible to '" + context.getCurrentAccess() + "'.";
+            if(context.enableAccessChecks) {
+                if(context.logAccessFailures){
+                    $A.error(message);
+                }
+                callback(null, "ERROR", "Unknown component '" + descriptor + "'.");
+            }else{
+                if(context.logAccessFailures){
+                    $A.warning(message);
+                }
+                callback(new classConstructor(config, forceClientCreation), 'SUCCESS');
+            }
+        }
+        return;
     }
 
     action = this.requestComponent(this, callback, config);
     action.setAbortable();
     $A.enqueueAction(action);
-    return action;
 };
 
 AuraComponentService.prototype.createComponentPriv = function (config) {
     var descriptor = this.getDescriptorFromConfig(config["componentDef"]);
     var def = this.getComponentDef({ "descriptor" : descriptor });
-    $A.assert(def, 'Definition does not exist on the client for descriptor:'+descriptor);
 
-    var classConstructor = this.getComponentClass(descriptor);
-    return new classConstructor(config);
+    if($A.clientService.allowAccess(def)) {
+        var classConstructor = this.getComponentClass(descriptor);
+        return new classConstructor(config);
+    }else{
+        var context=$A.getContext();
+        var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + context.getCurrentAccess() + "'.";
+        if(context.enableAccessChecks) {
+            if(context.logAccessFailures){
+                $A.error(message);
+            }
+        }else{
+            if(context.logAccessFailures){
+                $A.warning(message);
+            }
+            if(def) {
+                return new (this.getComponentClass(descriptor))(config);
+            }
+        }
+    }
+    throw new Error('Definition does not exist on the client for descriptor:'+descriptor);
 };
 
 /*

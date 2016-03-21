@@ -20,12 +20,12 @@
     <aura:import library="ui:inputNumberLibrary" property="inputNumberLibrary"/>
 
     <!-- Public attributes -->
-    <aura:attribute name="id"        type="String"                                    description="DOM id of the input element." />
-    <aura:attribute name="required"  type="Boolean"  default="false"  access="GLOBAL" description="Specifies whether the input is required. Default value is &quot;false&quot;."/>
-    <aura:attribute name="value"     type="String"                    access="GLOBAL" description="The value currently in the input field."/>
-    <aura:attribute name="disabled"  type="Boolean"  default="false"  access="GLOBAL" description="Specifies whether the component should be displayed in a disabled state. Default value is &quot;false&quot;."/>
-    <aura:attribute name="style"     type="String"   default="number" access="GLOBAL" description="Specifies which number style should be used by default if format attributes is not passed. ['number','currency','percent']" />
-    <aura:attribute name="updateOn"  type="String"   default="change" access="GLOBAL" description="Specifies when do you want to change value attr. By default is on input 'change' event. ['change','input']" />
+    <aura:attribute name="id"        type="String"                     description="DOM id of the input element." />
+    <aura:attribute name="required"  type="Boolean"  default="false"   description="Specifies whether the input is required. Default value is &quot;false&quot;."/>
+    <aura:attribute name="value"     type="Decimal"                    description="The value currently in the input field."/>
+    <aura:attribute name="disabled"  type="Boolean"  default="false"   description="Specifies whether the component should be displayed in a disabled state. Default value is &quot;false&quot;."/>
+    <aura:attribute name="style"     type="String"   default="number"  description="Specifies which number style should be used by default if format attributes is not passed. ['number','currency','percent']" />
+    <aura:attribute name="updateOn"  type="String"   default="change"  description="Specifies when do you want to change value attr. By default is on input 'change' event. ['change','input']" />
 
     <!-- Private attributes -->
     <aura:attribute name="inputValue"           type="string"  access="private" default="" />
@@ -34,7 +34,6 @@
     <!-- Event handlers -->
     <aura:handler name="init"   value="{! this }"    action="{! c.initialize }" />
     <aura:handler name="change" value="{! v.value }" action="{! c.handleChangeEvent }" />
-
 
     <input type="text"
            aura:id="input"

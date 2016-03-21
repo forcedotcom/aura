@@ -39,7 +39,6 @@
     },
 
     rerender: function(component) {
-
         // Allow override of helper methods.
         var concreteCmp = component.getConcreteComponent();
         var concreteHelper = concreteCmp.getDef().getHelper();

@@ -143,6 +143,8 @@ function lib() { //eslint-disable-line no-unused-vars
 	        }
 
 	        var component = htmlCmp.getComponentValueProvider().getConcreteComponent();
+			// patch for input number(inputNumber, inputCurrency, inputPercent)
+			component = component.meta.name ===  'ui$inputSmartNumber' ?  component.getComponentValueProvider().getConcreteComponent() : component;
 	        var helper = component.getDef().getHelper();
 
 	        if (component._recentlyClicked) {

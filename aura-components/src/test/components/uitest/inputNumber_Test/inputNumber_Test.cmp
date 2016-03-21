@@ -16,11 +16,22 @@
 
 -->
 <aura:component model="java://org.auraframework.components.test.java.model.TestJavaModel">
-    <aura:attribute name="testCmpName" type="string" default="Number"/>
 
-    <ui:inputNumber aura:id="Number" value="{!m.number}" updateOn="keyup"/> <br/> <!-- updateOn=keyup necessary for ipad automation. Webdriver does not handle updateOn=change well. -->
-    <ui:inputNumber aura:id="UnsetNumber" updateOn="keyup"/> <br/> <!-- updateOn=keyup necessary for ipad automation. Webdriver does not handle updateOn=change well. -->
+    <aura:attribute name="testCmpName" type="string" default="Number"/>
+    <aura:attribute name="eventFired"  type="Object" />
+    <aura:attribute name="eventList"   type="Object[]" default="[]" />
+
+
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+
+    <ui:inputNumber aura:id="Number" value="{!m.number}" updateOn="keyup" label="Number" labelPosition="top" />
 
     <auratest:baseInputTest cmpType="{!v.testCmpName}" ref="{!m.number}"/>
+    <h1>List of fired events</h1>
+    <ul aura:id="eventList">
+        <aura:iteration items="{! v.eventList }" var="event">
+            <li>{! event.type }</li>
+        </aura:iteration>
+    </ul>
 
 </aura:component>

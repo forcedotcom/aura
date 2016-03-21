@@ -67,7 +67,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             writeHtmlStyles(Aura.getServletUtilAdapter().getStyles(context), sb);
             attributes.put("auraStyleTags", sb.toString());
             sb.setLength(0);
-            writeHtmlScripts(Aura.getServletUtilAdapter().getScripts(context), sb);
+            writeHtmlScripts(Aura.getServletUtilAdapter().getScripts(context, true, componentAttributes), sb);
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
                 attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
@@ -117,5 +117,4 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             throw new AuraRuntimeException(e);
         }
     }
-
 }

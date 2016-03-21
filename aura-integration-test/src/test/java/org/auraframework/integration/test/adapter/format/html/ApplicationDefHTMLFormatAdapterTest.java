@@ -115,7 +115,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         String expectedSubPath = AuraTextUtil.urlencode(String.format(
                 "{\"mode\":\"UTEST\",\"app\":\"%s\",\"test\":\"org.auraframework.integration.test.adapter.format.html.ApplicationDefHTMLFormatAdapterTest.testWriteManifest\"}",
                 desc.getDescriptorName(), desc.getQualifiedName(), uid, getQualifiedName()));
-        String expectedAttribute = " manifest=\"/l/" + expectedSubPath + "/app.manifest\"";
+        String expectedAttribute = " manifest=\"/l/" + expectedSubPath + "/app.manifest";
         if (!tag.contains(expectedAttribute)) {
             fail("Did not find expected manifest attribute <" + expectedAttribute + "> in:" + tag);
         }
@@ -171,6 +171,6 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         assertFalse("Comments were not stripped out from template CSS", body.contains("Multi line comment"));
         assertFalse("Inline comments were not stripped our from template CSS", body.contains("Inline comment"));
         assertTrue("Expected template css not found in serialized response.",
-                body.contains("<style nonce=\"LockerServiceTemporaryNonce\">body {background-color:#ededed; font-size:13px; line-height:1.3}</style>"));
+                body.contains("<style>body {background-color:#ededed; font-size:13px; line-height:1.3}</style>"));
     }
 }

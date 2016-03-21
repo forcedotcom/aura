@@ -338,13 +338,14 @@
      * internal v.value should be undefined
      * displayed value should be empty
      */
+    EMPTY_STRING : '',
     testSetInvalidValue: {
         attributes: {value: 12},
         test: [function (cmp) {
             cmp.set('v.value', 'abc');
         }, function(cmp){
             var inputValue = cmp.getElement().value;
-            $A.test.assertEquals('', inputValue, "Cmp: input value should be empty string");
+            $A.test.assertEquals(this.EMPTY_STRING, inputValue, "Cmp: input value should be empty string");
             $A.test.assertEquals(undefined, cmp.get("v.value"), "Cmp: value should be undefined.");
         }]
     }

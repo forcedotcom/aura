@@ -1,111 +1,391 @@
 {
 	"manifest_name": {
 		"message": "Aura Inspector",
-		"desccription": "Public title that shows up in the list of extensions the user has installed."
+		"description": "Public title that shows up in the list of extensions the user has installed."
 	},
 	"manifest_description": {
 		"message": "For inspecting Aura apps",
-		"desccription": "Description that shows up in the list of extensions the user has installed."
+		"description": "Description that shows up in the list of extensions the user has installed."
 	},
 	"devtools_tabname": {
 		"message": "Aura",
 		"description": "The tab that shows up in the chrome devtools"
 	},
-	"tabs_componentree": {
+	"tabs_componenttree": {
 		"message": "Component Tree",
-		"desccription": ""
+		"description": ""
 	},
 	"tabs_performance": {
 		"message": "Performance",
-		"desccription": ""
+		"description": ""
 	},
 	"tabs_transactions": {
 		"message": "Transactions",
-		"desccription": ""
+		"description": ""
 	},
 	"tabs_eventlog": {
 		"message": "Event Log",
-		"desccription": ""
+		"description": ""
 	},
 	"tabs_actions": {
 		"message": "Actions",
-		"desccription": ""
+		"description": ""
 	},
 	"tabs_storage": {
 		"message": "Storage",
-		"desccription": ""
+		"description": ""
+	},
+	"tabs_help": {
+		"message": "Help",
+		"description": ""
 	},
 	"menu_refresh": {
 		"message": "Refresh",
-		"desccription": ""
+		"description": ""
 	},
 	"menu_record": {
 		"message": "Toggle Recording",
-		"desccription": ""
+		"description": ""
 	},
 	"menu_clear": {
 		"message": "Clear",
-		"desccription": ""
+		"description": ""
 	},
 	"menu_filter": {
 		"message": "Filter",
-		"desccription": ""
+		"description": ""
+	},
+	"kb": {
+		"message": "KB",
+		"description": "Abbreviation for Kilobytes."
+	},
+	"ms": {
+		"message": "ms",
+		"description": "Abbreviation for milliseconds."
 	},
 	"componenttree_menu_expandall": {
 		"message": "Expand All",
-		"desccription": ""
+		"description": ""
 	},
 	"componenttree_menu_showids": {
 		"message": "Show Global IDs",
-		"desccription": ""
+		"description": ""
 	},
 	"performance_menu_showcollected": {
 		"message": "Show Current Collected",
-		"desccription": ""
+		"description": ""
 	},
 	"eventlog_menu_appevents": {
 		"message": "App Events",
-		"desccription": ""
+		"description": ""
 	},
 	"eventlog_menu_cmpevents": {
 		"message": "Cmp Events",
-		"desccription": ""
+		"description": ""
 	},
 	"eventlog_menu_unhandled": {
 		"message": "Unhandled",
-		"desccription": ""
+		"description": ""
+	},
+	"eventlog_menu_appevents_tooltip": {
+		"message": "Show application events",
+		"description": ""
+	},
+	"eventlog_menu_cmpevents_tooltip": {
+		"message": "Show component events",
+		"description": ""
+	},
+	"eventlog_menu_unhandled_tooltip": {
+		"message": "Show unhandled events",
+		"description": ""
 	},
 	"actions_menu_storable": {
 		"message": "Storable",
-		"desccription": ""
+		"description": ""
 	},
 	"actions_menu_cached": {
 		"message": "Cached",
-		"desccription": ""
+		"description": ""
 	},
 	"actions_menu_background": {
 		"message": "Background",
-		"desccription": ""
+		"description": ""
 	},
 	"actions_menu_success": {
 		"message": "Success",
-		"desccription": ""
+		"description": ""
 	},
 	"actions_menu_incomplete": {
 		"message": "Incomplete",
-		"desccription": ""
+		"description": ""
 	},
 	"actions_menu_error": {
 		"message": "Error",
-		"desccription": ""
+		"description": ""
 	},
 	"actions_menu_aborted": {
 		"message": "Aborted",
-		"desccription": ""
+		"description": ""
+	},
+	"actions_menu_record_tooltip": {
+		"message": "Toggle recording",
+		"description": ""
+	},
+	"actions_menu_storable_tooltip": {
+		"message": "Show storable actions",
+		"description": ""
+	},
+	"actions_menu_cached_tooltip": {
+		"message": "Show storable actions served from cache",
+		"description": ""
+	},
+	"actions_menu_background_tooltip": {
+		"message": "Show background actions",
+		"description": ""
+	},
+	"actions_menu_success_tooltip": {
+		"message": "Show actions that succeeded",
+		"description": ""
+	},
+	"actions_menu_incomplete_tooltip": {
+		"message": "Show actions in incomplete state",
+		"description": ""
+	},
+	"actions_menu_error_tooltip": {
+		"message": "Show actions that errored",
+		"description": ""
+	},
+	"actions_menu_aborted_tooltip": {
+		"message": "Show aborted actions",
+		"description": ""
+	},
+	"actions_section_pendingoverrides": {
+		"message": "Pending Overrides",
+		"description": ""
+	},
+	"actions_section_pendingoverrides_description": {
+		"message": "Drag actions here. Next time we see action with same name, we will either drop it, send back modified response, or error response.",
+		"description": ""
+	},
+	"actions_section_processedoverrides": {
+		"message": "Processed Overrides",
+		"description": ""
+	},
+	"actions_section_pending": {
+		"message": "Pending",
+		"description": ""
+	},
+	"actions_section_running": {
+		"message": "Running",
+		"description": ""
+	},
+	"actions_section_completed": {
+		"message": "Completed",
+		"description": ""
+	},
+	"transactions_id": {
+		"message": "Id",
+		"description": ""
+	},
+	"transactions_starttime": {
+		"message": "Start Time",
+		"description": ""
+	},
+	"transactions_duration": {
+		"message": "Duration",
+		"description": ""
+	},
+	"transactions_context": {
+		"message": "Context",
+		"description": ""
+	},
+	"transactions_actions": {
+		"message": "Actions",
+		"description": ""
+	},
+	"transactions_xhrs": {
+		"message": "XHRs",
+		"description": ""
+	},
+	"transactions_starttime_info": {
+		"message": "(second since page loaded)",
+		"description": ""
+	},
+	"transactions_duration_info": {
+		"message": "(milliseconds)",
+		"description": ""
+	},
+	"eventcard_parameters": {
+		"message": "Parameters",
+		"description": ""
+	},
+	"eventcard_caller": {
+		"message": "Caller!",
+		"description": ""
+	},
+	"eventcard_source": {
+		"message": "Source",
+		"description": ""
+	},
+	"eventcard_duration": {
+		"message": "Duration",
+		"description": ""
+	},
+	"eventcard_handledby": {
+		"message": "Handled By",
+		"description": ""
+	},
+	"eventcard_togglegrid": {
+		"message": "Toggle Grid",
+		"description": ""
+	},
+	"actioncard_id": {
+		"message": "Id",
+		"description": ""
+	},
+	"actioncard_state": {
+		"message": "State",
+		"description": ""
+	},
+	"actioncard_abortable": {
+		"message": "Abortable",
+		"description": ""
+	},
+	"actioncard_background": {
+		"message": "Background",
+		"description": ""
+	},
+	"actioncard_created": {
+		"message": "Created Components",
+		"description": ""
+	},
+	"actioncard_storable": {
+		"message": "Storable",
+		"description": ""
+	},
+	"actioncard_storablesize": {
+		"message": "Storable Size Est.",
+		"description": ""
+	},
+	"actioncard_storablerefresh": {
+		"message": "Storable Refresh",
+		"description": ""
+	},
+	"actioncard_storablecachehit": {
+		"message": "Storable Cache Hit",
+		"description": ""
+	},
+	"actioncard_storablekey": {
+		"message": "Storage Key",
+		"description": ""
+	},
+	"actioncard_removeaction": {
+		"message": "Remove Action",
+		"description": ""
+	},
+	"actioncard_parameters": {
+		"message": "Parameters",
+		"description": ""
+	},
+	"actioncard_result": {
+		"message": "Result",
+		"description": ""
+	},
+	"actioncard_error": {
+		"message": "Error",
+		"description": ""
+	},
+	"actioncard_dropaction": {
+		"message": "Drop the Action",
+		"description": ""
+	},
+	"actioncard_overrideresult": {
+		"message": "Override the Result",
+		"description": ""
+	},
+	"actioncard_errorresponse": {
+		"message": "Error Response Next Time",
+		"description": ""
+	},
+	"actioncard_key": {
+		"message": "Key",
+		"description": ""
+	},
+	"actioncard_newvalue": {
+		"message": "New Value",
+		"description": ""
+	},
+	"actioncard_save": {
+		"message": "Save",
+		"description": ""
+	},
+	"actioncard_cancel": {
+		"message": "Cancel",
+		"description": ""
+	},
+	"actioncard_edit": {
+		"message": "Edit",
+		"description": ""
+	},
+	"actioncard_errormessage": {
+		"message": "Error Message",
+		"description": ""
+	},
+	"actioncard_errorstack": {
+		"message": "Error Stack",
+		"description": ""
+	},
+	"componentview_globalid": {
+		"message": "Global ID",
+		"description": ""
+	},
+	"componentview_isrendered": {
+		"message": "Is Rendered",
+		"description": ""
+	},
+	"componentview_isvalid": {
+		"message": "Is Valid",
+		"description": ""
+	},
+	"componentview_descriptor": {
+		"message": "Descriptor",
+		"description": ""
+	},
+	"componentview_elements": {
+		"message": "HTML Elements",
+		"description": ""
+	},
+	"componentview_rerendered": {
+		"message": "Rerendered Count",
+		"description": ""
+	},
+	"componentview_avpfvp": {
+		"message": "Attribute & Facet Value Provider",
+		"description": ""
+	},
+	"componentview_avp": {
+		"message": "Attribute Value Provider",
+		"description": ""
+	},
+	"componentview_fvp": {
+		"message": "Facet Value Provider",
+		"description": ""
+	},
+	"componentview_attributes": {
+		"message": "Attributes",
+		"description": ""
+	},
+	"componentview_model": {
+		"message": "Model",
+		"description": ""
+	},
+	"componentview_super": {
+		"message": "Super",
+		"description": ""
 	}
 	/*,
 	"": {
 		"message": "",
-		"desccription": ""
+		"description": ""
 	}*/
 }

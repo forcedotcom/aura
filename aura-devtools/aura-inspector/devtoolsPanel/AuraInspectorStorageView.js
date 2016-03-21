@@ -13,11 +13,16 @@ function AuraInspectorStorageView(devtoolsPanel) {
     /** Id for this view, must be unique among all views. */
     this.panelId = "storage";
 
+    var labels = {
+        "refresh": chrome.i18n.getMessage("menu_refresh"),
+        "kb": chrome.i18n.getMessage("kb") // Kilobytes not knowledgebase
+    };
+
     /** Markup of panel */
     var markup = `
         <menu type="toolbar">
         <li>
-          <button id="refresh-button" class="refresh-status-bar-item status-bar-item" title="Refresh">
+          <button id="refresh-button" class="refresh-status-bar-item status-bar-item" title="${labels.refresh}">
             <div class="glyph toolbar-button-theme"></div>
             <div class="glyph shadow"></div>
           </button>
@@ -213,7 +218,7 @@ function AuraInspectorStorageView(devtoolsPanel) {
      * @return {String} label in KB.
      */
     function toKb(value, decimals) {
-        return (value / 1024).toFixed(decimals) + " KB";
+        return (value / 1024).toFixed(decimals) + " " + labels.kb;
     }
 
     /**

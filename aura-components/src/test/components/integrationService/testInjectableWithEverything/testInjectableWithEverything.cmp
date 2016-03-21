@@ -15,6 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <ui:button aura:id="button" buttonTitle="Click to throw an exception" label="Click to throw an exception" press="{!c.handleButtonClick}"/>
+<aura:component render="SERVER">
+    <integrationService:simpleStub
+        placeholder='placeholder'
+        localId='localId'
+        desc='markup://integrationService:injectableWithEverything' />
 </aura:component>
+

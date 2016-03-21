@@ -1,0 +1,12 @@
+
+.THIS.buttons {
+     background: #ccc;
+     padding: 10px;
+     cursor: pointer;
+}
+
+.THIS.log {
+    font-weight: bold;
+    font-size: -2;
+    color: #888;
+}

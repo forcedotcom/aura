@@ -14,33 +14,25 @@
  * limitations under the License.
  */
 
-//#include aura.locker.SecureThing
+function SecureAuraEvent(event, key) {
+    "use strict";
 
-var SecureAuraEvent = (function() {
-  "use strict";
+    var o = Object.create(null, {
+        toString: {
+            value: function() {
+                return "SecureAuraEvent: " + event + "{ key: " + JSON.stringify(key) + " }";
+            }
+        },
+        "fire": SecureThing.createPassThroughMethod(event, "fire"),
+        "getName": SecureThing.createPassThroughMethod(event, "getName"),
+        "getParam": SecureThing.createFilteredMethod(event, "getParam"),
+        "getParams": SecureThing.createFilteredMethod(event, "getParams"),
+        "getSource": SecureThing.createFilteredMethod(event, "getSource"),
+        "setParam": SecureThing.createPassThroughMethod(event, "setParam"),
+        "setParams": SecureThing.createPassThroughMethod(event, "setParams")
+    });
 
-  function SecureAuraEvent(event, key) {
-    setLockerSecret(this, "key", key);
-    setLockerSecret(this, "ref", event);
-    Object.freeze(this);
-  }
-
-  SecureAuraEvent.prototype = Object.create(null, {
-    toString: {
-      value: function() {
-        return "SecureAuraEvent: " + getLockerSecret(this, "ref") + "{ key: " + JSON.stringify(getLockerSecret(this, "key")) + " }";
-      }
-    },
-    "fire": SecureThing.createPassThroughMethod("fire"),
-    "getName": SecureThing.createPassThroughMethod("getName"),
-    "getParam": SecureThing.createFilteredMethod("getParam"),
-    "getParams": SecureThing.createFilteredMethod("getParams"),
-    "getSource": SecureThing.createFilteredMethod('getSource'),
-    "setParam": SecureThing.createPassThroughMethod("setParam"),
-    "setParams": SecureThing.createPassThroughMethod("setParams")
-  });
-
-  SecureAuraEvent.prototype.constructor = SecureAuraEvent;
-
-  return SecureAuraEvent;
-})();
+    setLockerSecret(o, "key", key);
+    setLockerSecret(o, "ref", event);
+    return Object.seal(o);
+}

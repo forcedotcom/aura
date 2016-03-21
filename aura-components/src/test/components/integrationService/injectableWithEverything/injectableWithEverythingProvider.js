@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 ({
-    handleButtonClick : function(cmp, evt) {
-        throw new Error("testing from handleButtonClick");
-        /* expect log line: 
-         * Unhandled Exception 'Error: testing from handleButtonClick': Error cause descriptor: reportErrorTest$eventCallbackThrowTest$controller$handleButtonClick
-         */
+    provide : function AisToInjectProvider(component) {
+        var valueFromHelper = component.getDef().getHelper().returnAString();
+        var returnvalue = 'ValueFromJsProvider['+valueFromHelper+']';
+        return {
+            attributes: {
+                'valueFromJSProvider': returnvalue
+            }
+        };
     }
 })

@@ -29,7 +29,7 @@
     testZero: {
         attributes: {value: 0},
         test: function (component) {
-            this.assertValue(component, 0, "");
+            this.assertValue(component, 0, "0");
         }
     },
 
@@ -39,7 +39,7 @@
     testNumber: {
         attributes: {value: 12345.67},
         test: function (component) {
-            this.assertValue(component, "12345.67", "12,345.67");
+            this.assertValue(component, 12345.67, "12,345.67");
         }
     },
 
@@ -49,7 +49,7 @@
     testNegativeNumber: {
         attributes: {value: -12345.67},
         test: function (component) {
-            this.assertValue(component, "-12345.67", "-12,345.67");
+            this.assertValue(component, -12345.67, "-12,345.67");
         }
     },
 
@@ -58,12 +58,15 @@
      */
     testUpdateFormat: {
         attributes: {value: 1234, format: "#,###.0000"},
-        test: [function (component) {
-            this.assertValue(component, "1234", "1,234.0000");
-            component.set("v.format", '#,##.00');
-        }, function (component) {
-            this.assertValue(component, "1234", "1,234.0000");
-        }]
+        test: [
+            function (component) {
+                this.assertValue(component, 1234, "1,234.0000");
+                component.set("v.format", '#,##.00');
+            },
+            function (component) {
+                this.assertValue(component, 1234, "1,234.0000");
+            }
+        ]
     },
 
     // check component's internval v.value and displayed value on the input box
@@ -72,5 +75,25 @@
                 "Cmp value does not equal expected");
         $A.test.assertEquals(expectedElementValue, component.getElement().value,
                 "Element value does not equal expected");
+    },
+    testCheckValueTypePassingAttr :  {
+        attributes : { value : 12345 },
+        test : [
+            function (cmp) {
+                var value = cmp.get('v.value');
+                $A.test.assertEquals('number',typeof value,'The type of value should be and Number');
+            }
+        ]
+    },
+    testCheckValueTypeSettingAttr : {
+        test : [
+            function (cmp) {
+                cmp.set('v.value',12345);
+            },
+            function (cmp) {
+                var value = cmp.get('v.value');
+                $A.test.assertEquals('number',typeof value,'The type of value should be and Number');
+            }
+        ]
     }
 })// eslint-disable-line semi

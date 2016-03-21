@@ -19,7 +19,7 @@
 <aura:documentation>
     <aura:description>
         <p><code>ui:​panelManager2</code>​ handles panels created by the <code>ui:panel</code> component. 
-          You only need one instance of <code>ui:​panelManager2</code> in an app. 
+           You only need one instance of <code>ui:​panelManager2</code> in an app. 
         </p>
 <pre>&lt;aura:component>    
     &lt;ui:panelManager2 aura:id="pm">

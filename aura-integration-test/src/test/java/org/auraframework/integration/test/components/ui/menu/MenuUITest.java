@@ -137,6 +137,14 @@ public class MenuUITest extends WebDriverTestCase {
         testActionMenuViaKeyboardInteractionForApp(MENUTEST_ATTACHTOBODY_APP, "");
     }
 
+    public void testOpenMenuViaKeyboardDownKey() throws Exception {
+    	openMenuViaKeyboardAndTestActionMenu(MENUTEST_APP, Keys.DOWN, "actionItem1", "actionItem3");
+    }
+    
+    public void testOpenMenuViaKeyboardReturn() throws Exception {
+    	openMenuViaKeyboardAndTestActionMenu(MENUTEST_APP, Keys.RETURN, "trigger", "actionItem2");
+    }
+    
     // TODO: W-2406307: remaining Halo test failure
     public void _testActionMenuGeneratedFromMetaDataViaKeyboardInteraction() throws Exception {
         testActionMenuViaKeyboardInteractionForApp(MENUTEST_METADATA_APP, "");
@@ -205,6 +213,36 @@ public class MenuUITest extends WebDriverTestCase {
         waitForFocusOnMenuActionItem(actionItem1Element);
         actionItem1Element.sendKeys(Keys.ESCAPE);
         waitForMenuClose(actionMenu);
+    }
+    
+    private void openMenuViaKeyboardAndTestActionMenu(String appName, Keys openKey, String focusAfterOpen, String itemExpected) throws Exception{
+	     
+    	open(appName);
+    	
+    	WebDriver driver = this.getDriver();
+        WebElement menuLabel = driver.findElement(By.className("trigger"));
+        WebElement actionMenu = driver.findElement(By.className("actionMenu"));
+        WebElement focusAfterOpenItem = driver.findElement(By.className(focusAfterOpen));
+        WebElement focusAfterOpenElement = null;
+        WebElement expectedItem = driver.findElement(By.className(itemExpected));
+        WebElement expectedItemElement = getAnchor(expectedItem);
+          
+        // opening menu using keyboard return or space - focus would remain on the trigger
+        if(focusAfterOpen == "trigger") {
+        	focusAfterOpenElement = menuLabel;
+        	openMenu(menuLabel, actionMenu, openKey);
+        	assertEquals("Focus should be on the trigger", menuLabel.getText(), getAuraUITestingUtil().getActiveElementText());
+        }
+        
+        // opening menu using keyboard interaction down button - focus should be on 1st element
+        else {
+        	focusAfterOpenElement = getAnchor(focusAfterOpenItem);
+            openMenu(menuLabel, actionMenu, openKey);
+            waitForFocusOnMenuActionItem(focusAfterOpenElement);
+        }
+          
+        focusAfterOpenElement.sendKeys(Keys.DOWN, Keys.DOWN);
+        waitForFocusOnMenuActionItem(expectedItemElement);
     }
 
     @PerfTest
@@ -583,6 +621,19 @@ public class MenuUITest extends WebDriverTestCase {
      */
     private void openMenu(WebElement menuLabel, WebElement actionMenu) {
         menuLabel.click();
+        waitForMenuOpen(actionMenu);
+    }
+    
+    /**
+     * Open the menu through a keyboard interaction and wait for it to have the visible class.
+     *
+     * @param menuLabel  The WebElement to click on that opens the menu
+     * @param actionMenu The WebElement on which to wait for the visible class to be present
+     * @param openKey    The WebDriver key to use that opens the menu
+     */
+    private void openMenu(WebElement menuLabel, WebElement actionMenu, Keys openKey) {    	
+    	menuLabel.sendKeys("");
+        menuLabel.sendKeys(openKey); 	
         waitForMenuOpen(actionMenu);
     }
 

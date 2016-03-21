@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.Renderer;
+import org.auraframework.impl.system.RenderContextImpl;
 import org.auraframework.integration.Integration;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
@@ -37,7 +38,7 @@ public abstract class AbstractRendererForTestingIntegrationService implements Re
 
         Integration integration = Aura.getIntegrationService().createIntegration(
                 "", Mode.DEV, true, null, applicationTag, null);
-        integration.injectComponent(tag, attributes, localId, locatorDomId, out, useAsync);
+        integration.injectComponentHtml(tag, attributes, localId, locatorDomId, out, useAsync);
 
         // The only not-so-ideal part of this approach to testing
         // IntegrationService is that we have to start the

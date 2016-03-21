@@ -19,7 +19,6 @@ import org.auraframework.Aura;
 import org.auraframework.css.TokenCache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext;
 
 import com.google.common.base.Optional;
@@ -47,7 +46,7 @@ public final class Tokens {
      * <p>
      * The application's overrides are not implicitly included in this result by default. However, note that the
      * application's overrides are explicitly added to the context at one point during the request (See
-     * {@link AuraBaseServlet#getStyles()}). Effectively this means that these <em>will</em> be included during the
+     * {@link AuraServletUtilAdapter#getStyles(AuraContext)}). Effectively this means that these <em>will</em> be included during the
      * actual CSS request itself. See {@link #addAppTokensDescriptors()}.
      */
     public static Optional<TokenCache> getTokenOverrides(AuraContext context) {

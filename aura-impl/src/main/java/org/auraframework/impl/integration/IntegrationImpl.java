@@ -19,27 +19,37 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.http.AuraBaseServlet;
+import org.auraframework.impl.system.RenderContextHTMLImpl;
+import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.instance.Action;
+import org.auraframework.instance.Application;
+import org.auraframework.instance.Component;
 import org.auraframework.integration.Integration;
 import org.auraframework.integration.UnsupportedUserAgentException;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
-import org.auraframework.system.Client.Type;
 import org.auraframework.system.Message;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.collect.Lists;
@@ -49,6 +59,8 @@ public class IntegrationImpl implements Integration {
 
     private static final String COMPONENT_DEF_TEMPLATE =
         "{'componentDef': 'markup://%s', 'attributes': { 'values' : %s }, 'localId': '%s'}";
+
+    private TemplateUtil templateUtil = new TemplateUtil();
 
     public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent,
                            String application) throws QuickFixException {
@@ -60,24 +72,32 @@ public class IntegrationImpl implements Integration {
     }
 
     @Override
-    public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
-                                Appendable out) throws UnsupportedUserAgentException, IOException, QuickFixException {
-        this.injectComponent(tag, attributes, localId, locatorDomId, out, false);
+    public void injectComponentHtml(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+            Appendable out, boolean useAsync) throws UnsupportedUserAgentException, IOException, QuickFixException {
+        this.injectComponent(tag, attributes, localId, locatorDomId, new RenderContextHTMLImpl(out), useAsync);
+    }
+
+    @Override
+    public void injectComponentHtml(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+            Appendable out) throws UnsupportedUserAgentException, IOException, QuickFixException {
+        this.injectComponentHtml(tag, attributes, localId, locatorDomId, out, false);
     }
 
     @Override
     public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
-                                Appendable out, boolean useAsync)
-            throws UnsupportedUserAgentException, IOException, QuickFixException {
+            RenderContext rc) throws UnsupportedUserAgentException, IOException, QuickFixException {
+        this.injectComponent(tag, attributes, localId, locatorDomId, rc, false);
+    }
 
-        if (!isSupportedClient(client)) {
-            throw new UnsupportedUserAgentException(client.getUserAgent());
-        }
+    @Override
+    public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+                                RenderContext rc, boolean useAsync)
+            throws UnsupportedUserAgentException, IOException, QuickFixException {
 
         if (initializeAura && !hasApplicationBeenWritten) {
             // load aura resources
             // specifies async so component configs are not printed to HTML
-            writeApplication(out);
+            writeApplication(rc);
             hasApplicationBeenWritten = true;
         }
 
@@ -185,13 +205,16 @@ public class IntegrationImpl implements Integration {
                     init.append(String.format("$A.getRoot()._aisScopedCallback(function() { $A.clientService.injectComponent(config, \"%s\", \"%s\"); });", locatorDomId, localId));
                 }
 
-                out.append("<script>").append(init).append("</script>");
+                rc.pushScript();
+                rc.getCurrent().append(init);
+                rc.popScript();
 
             } catch (Throwable t) {
                 // DCHASMAN TODO W-1498425 Refine this approach - we currently have 2 conflicting exception handling mechanisms kicking in that need to be
                 // reconciled
-                out.append("<script>").append("$A.log(\"failed to create component: " + t.toString() + "\")")
-                        .append("</script>");
+                rc.pushScript();
+                rc.getCurrent().append("$A.log(\"failed to create component: " + t.toString() + "\")");
+                rc.popScript();
             }
         } finally {
             releaseContext();
@@ -248,25 +271,52 @@ public class IntegrationImpl implements Integration {
         return context;
     }
 
-    private void writeApplication(Appendable out) throws IOException, AuraRuntimeException, QuickFixException {
-        if (isSupportedClient(client)) {
-            // ensure that we have a context.
-            getContext(null);
-            try {
-                ApplicationDef appDef = getApplicationDescriptor(application).getDef();
+    private void writeApplication(RenderContext rc) throws IOException, AuraRuntimeException, QuickFixException {
+        // ensure that we have a context.
+        AuraContext context = getContext(null);
+        try {
+            ApplicationDef appDef = getApplicationDescriptor(application).getDef();
 
-                Aura.getSerializationService().write(appDef, null,
-                        ApplicationDef.class, out, "EMBEDDED_HTML");
-            } catch (QuickFixException e) {
-                throw new AuraRuntimeException(e);
-            } finally {
-                releaseContext();
+            InstanceService instanceService = Aura.getInstanceService();
+            RenderingService renderingService = Aura.getRenderingService();
+            ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
+            ComponentDef templateDef = appDef.getTemplateDef();
+
+            Map<String, Object> attributes = Maps.newHashMap();
+
+            StringBuilder sb = new StringBuilder();
+            templateUtil.writeHtmlStyles(servletUtilAdapter.getStyles(context), sb);
+            attributes.put("auraStyleTags", sb.toString());
+            sb.setLength(0);
+            templateUtil.writeHtmlScripts(servletUtilAdapter.getScripts(context, false, null), sb);
+            DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
+            if (styleDefDesc != null) {
+                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
             }
-        }
-    }
 
-    private static boolean isSupportedClient(Client client) {
-        return client == null || (client.getType() != Type.IE6 && client.getType() != Type.OTHER);
+            attributes.put("auraScriptTags", sb.toString());
+            Map<String, Object> auraInit = Maps.newHashMap();
+
+            Application instance = instanceService.getInstance(appDef, null);
+
+            auraInit.put("instance", instance);
+            auraInit.put("token", AuraBaseServlet.getToken());
+            auraInit.put("host", context.getContextPath());
+
+            StringBuilder contextWriter = new StringBuilder();
+
+            Aura.getSerializationService().write(context, null, AuraContext.class, contextWriter, "JSON");
+
+            auraInit.put("context", new Literal(contextWriter.toString()));
+
+            attributes.put("auraInit", JsonEncoder.serialize(auraInit, context.getJsonSerializationContext()));
+            Component template = instanceService.getInstance(templateDef.getDescriptor(), attributes);
+            renderingService.render(template, rc);
+        } catch (QuickFixException e) {
+            throw new AuraRuntimeException(e);
+        } finally {
+            releaseContext();
+        }
     }
 
     private DefDescriptor<ApplicationDef> getApplicationDescriptor(String application) {

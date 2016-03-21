@@ -35,6 +35,17 @@ public abstract class AbstractLoggingUITest extends WebDriverTestCase {
 
     public AbstractLoggingUITest(String name) {
         super(name);
+        logger = Logger.getRootLogger();
+    }
+
+    public AbstractLoggingUITest(String name, Class<?> loggerClass) {
+        super(name);
+        logger = Logger.getLogger(loggerClass);
+    }
+
+    public AbstractLoggingUITest(String name, String loggerName) {
+        super(name);
+        logger = Logger.getLogger(loggerName);
     }
 
     @Override
@@ -42,7 +53,6 @@ public abstract class AbstractLoggingUITest extends WebDriverTestCase {
         super.setUp();
         appender = new LoggingTestAppender();
 
-        logger = Logger.getLogger("LoggingContextImpl");
         // When we run integration tests, the logging level of logger LoggingContextImpl
         // is WARN, setting it into INFO here so that we can get the log as we run the app.
         originalLevel = logger.getLevel();

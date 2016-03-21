@@ -4,23 +4,32 @@
 		body {
 			font-family: 'Lucida Grande', 'Consolas', 'sans-serif';
 		}
-		header { display: inline-block; }
+		header { 
+			display: inline-block; 
+		}
 		h1 {
 			font-weight: 300;
-	    font-size: 1.125rem;
-	    line-height: 1.25;
-		  padding: 0 0 3px 0;
+	    	font-size: 1.125rem;
+	    	line-height: 1.25;
+		  	padding: 0 0 3px 0;
 			margin: 0;
 		}
 		h6 { color: #bbb; display: inline; font-size: .75em; margin: 0; padding: 0; }
 		dl, dt, dd { margin: 0; padding: 0; display: inline-block; }
 		dd { padding: 0 10px; display: block; }
-		.parameters { display: block; }
-		.parameters:before {
-			content: 'Parameters';
+		section > p {
+			display: flex;
+			flex: 100%;
+		}
+		.parameters, .caller { 
+			display: flex; 
+			flex:100%;
+		}
+
+		aurainspector-label {
 			display: inline-block;
 			font-family: 'Lucida Grande', 'Consolas', 'sans-serif';
-			flex: 0 0 auto;
+			flex: none;
 			width: 80px;
 			vertical-align: top;
 			display: inline-block;
@@ -28,75 +37,22 @@
 			font-size: 0.75rem;
 			line-height: 1.5;
 		}
-	.caller { display: block; }
-	.caller:before {
-		content: 'Caller';
-		display: inline-block;
-		font-family:  'Lucida Grande', 'Consolas', 'sans-serif';
-		flex: 0 0 auto;
-		width: 80px;
-		vertical-align: top;
-		display: inline-block;
-		color: #54698d;
-		font-size: 0.75rem;
-		line-height: 1.5;
-	}
-	.eventSource::before {
-		content: 'Source';
-		display:inline-block;
-		font-family: 'Lucida Grande', 'Consolas', 'sans-serif';
-		flex: 0 0 auto;
-		width: 80px;
-		vertical-align: top;
-		display: inline-block;
-		color: #54698d;
-		font-size: 0.75rem;
-		line-height: 1.5;
-		-webkit-font-smoothing: subpixel-antialiased;
-	}
-	.eventDuration::before {
-		content: 'Duration';
-		display: inline-block;
-		font-family: 'Lucida Grande', 'Consolas', 'sans-serif';
-		flex: 0 0 auto;
-		width: 80px;
-		vertical-align: top;
-		display: inline-block;
-		color: #54698d;
-		font-size: 0.75rem;
-		line-height: 1.5;
-	}
-	.eventHandledBy::before {
-		content: 'Handled By';
-		display: inline-block;
-		flex: 0 0 auto;
-		font-family: 'Lucida Grande', 'Consolas', 'sans-serif';
-		width: 80px;
-		vertical-align: top;
-		display: inline-block;
-		color: #54698d;
-		font-size: 0.75rem;
-		line-height: 1.5;
-	}
-	.eventHandledBy dl, .eventSource{
-	  font-family: Menlo, monospace;
-	  font-size: 11px;
-	  -webkit-font-smoothing: antialiased;
-	}
-	.eventHandledBy, .eventSource, .caller, .parameters, .eventDuration{
-		display: flex;
-		margin-top: .5rem;
-	}
+
+		.eventHandledBy dl, .eventSource{
+		  font-family: Menlo, monospace;
+		  font-size: 11px;
+		  -webkit-font-smoothing: antialiased;
+		}
+
 		#eventHandledByGrid {
 			width: 700px;
 			height: 400px;
 			background: #f4f6f9;
-			/*border-radius: 10px; */
-			/*margin-left: 80px; */
 			margin-top: .5rem;
-			}
-		/*#gridToggle { border: 1px solid #ddd; border-radius: 5px; background: #eee; float: left; }*/
+		}
+
 		.hidden { display: none; }
+
 		.slds-m-top--x-small {
 		  margin-top: 0.5rem; }
 			a:active {
@@ -200,12 +156,22 @@
 		<h6><!-- Event Type --></h6>
     </header>
     <section>
-	    <aurainspector-json class="parameters" expandTo="0"><!-- Parameters --></aurainspector-json>
-	    <aurainspector-outputFunction class="caller"><!-- Caller --></aurainspector-outputFunction>
-	    <div id="eventSource" class="eventSource"></div>
-	    <div id="eventDuration" class="eventDuration"></div>
-	    <div id="eventHandledBy" class="eventHandledBy"></div>
-	    <button id="gridToggle" class="hidden slds-button slds-button--neutral slds-button--x-small slds-m-top--x-small">Toggle Grid</button>
+    	<p>
+	    	<aurainspector-label key="eventcard_parameters"></aurainspector-label><aurainspector-json class="parameters" expandTo="0"><!-- Parameters --></aurainspector-json>
+	    </p>
+	    <p>
+	    	<aurainspector-label key="eventcard_caller"></aurainspector-label><aurainspector-outputFunction class="caller"><!-- Caller --></aurainspector-outputFunction>
+	    </p>
+	    <p>
+	    	<aurainspector-label key="eventcard_source"></aurainspector-label><span id="eventSource" class="eventSource"></span>
+	    </p>
+	    <p>
+	    	<aurainspector-label key="eventcard_duration"></aurainspector-label><span id="eventDuration" class="eventDuration"></span>
+	    </p>
+	    <p>
+	    	<aurainspector-label key="eventcard_handledby"></aurainspector-label><span id="eventHandledBy" class="eventHandledBy"></span>
+	    </p>
+	    <button id="gridToggle" class="hidden slds-button slds-button--neutral slds-button--x-small slds-m-top--x-small"><aurainspector-label key="eventcard_togglegrid"></aurainspector-label></button>
 	    <div id="eventHandledByGrid" class="hidden">
 	    </div>
     </section>

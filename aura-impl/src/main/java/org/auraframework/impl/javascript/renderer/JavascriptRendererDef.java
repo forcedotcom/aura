@@ -33,6 +33,7 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
@@ -113,7 +114,7 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
     }
 
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable out) {
+    public void render(BaseComponent<?, ?> component, RenderContext rc) {
         throw new UnsupportedOperationException();
     }
 

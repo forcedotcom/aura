@@ -17,16 +17,23 @@
 package org.auraframework.http.resource;
 
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraResource;
+import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.JsonReader;
+
+import com.google.common.collect.Maps;
 
 public abstract class AuraResourceImpl implements AuraResource {
     private final String name;
@@ -34,7 +41,7 @@ public abstract class AuraResourceImpl implements AuraResource {
 
     protected DefinitionService definitionService = Aura.getDefinitionService();
     protected ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
-
+    
     public AuraResourceImpl(String name, Format format) {
         this(name, format, false);
     }
@@ -63,6 +70,12 @@ public abstract class AuraResourceImpl implements AuraResource {
         return format;
     }
 
+    @Deprecated
+    @Override
+    public boolean isCSRFProtect() {
+        return false;
+    }
+
     /**
      * Injection override.
      *
@@ -81,10 +94,39 @@ public abstract class AuraResourceImpl implements AuraResource {
         this.servletUtilAdapter = servletUtilAdapter;
     }
 
-    @Deprecated
-	@Override
-	public boolean isCSRFProtect() {
-		return false;
+    private final StringParam attributesParam = new StringParam("aura.attributes", 0, false);
+
+    protected Map<String, Object> getComponentAttributes(HttpServletRequest request) {
+        if (request == null) {
+            return null;
+        }
+        String attributesString = attributesParam.get(request);
+        if (attributesString != null) {
+            try {
+                if (attributesString.startsWith(AuraTextUtil.urlencode("{"))) {
+                    // Decode encoded context json. Serialized AuraContext json always starts with "{"
+                    attributesString = AuraTextUtil.urldecode(attributesString);
+                }
+                @SuppressWarnings("unchecked")
+                Map<String,Object> result = (Map<String, Object>) new JsonReader().read(attributesString);
+                return result;
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            Enumeration<String> attributeNames = request.getParameterNames();
+            Map<String, Object> attributes = Maps.newHashMap();
+
+            while (attributeNames.hasMoreElements()) {
+                String name = attributeNames.nextElement();
+                if (!name.startsWith("aura.")) {
+                    Object value = new StringParam(name, 0, false).get(request);
+
+                    attributes.put(name, value);
+                }
+            }
+            return attributes;
+        }
 	}
 };
 

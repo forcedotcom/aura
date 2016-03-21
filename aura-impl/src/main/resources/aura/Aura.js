@@ -171,6 +171,18 @@ window['$A'] = {};
 // #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}
 
 //-- LockerService -----------------------------------------------------------
+//#include aura.locker.SecureThing
+//#include aura.locker.SecureDOMEvent
+//#include aura.locker.SecureIFrameElement
+//#include aura.locker.SecureElement
+//#include aura.locker.SecureScriptElement
+//#include aura.locker.SecureDocument
+//#include aura.locker.SecureAura
+//#include aura.locker.SecureWindow
+//#include aura.locker.SecureAuraEvent
+//#include aura.locker.SecureAction
+//#include aura.locker.SecureComponent
+//#include aura.locker.SecureComponentRef
 //#include aura.locker.LockerService
 
 /**
@@ -214,14 +226,14 @@ function AuraInstance () {
 
     /**
      * Error severity for categorizing errors
-     * 
-     * ALERT [default error severity level if error thrower doesn’t explicitly specify a severity level] - 
+     *
+     * ALERT [default error severity level if error thrower doesn’t explicitly specify a severity level] -
      * the current page has issues and we need to alert the user that an error has occurred.  The error(s) could potentially be corrected by a page reload
      *
-     * FATAL - the user’s session is now completely broken and cannot continue being used. 
+     * FATAL - the user’s session is now completely broken and cannot continue being used.
      * The user should logout and contact Salesforce support or their administrator.
      *
-     * QUIET - An error has occurred but it won’t affect the user/page. 
+     * QUIET - An error has occurred but it won’t affect the user/page.
      * This is likely something unexpected that a lower level component can just quietly log for later diagnostics by Salesforce (e.g. a perf issue or something else).
      *
      * @public
@@ -392,6 +404,7 @@ function AuraInstance () {
     this.enqueueAction             = this.clientService.enqueueAction.bind(this.clientService);
     this.deferAction               = this.clientService.deferAction.bind(this.clientService);
     this.deferPendingActions       = this.clientService.deferPendingActions.bind(this.clientService);
+    this.runAfterInit               = this.clientService.runAfterInitDefs.bind(this.clientService);
 
     this.render                    = this.renderingService.render.bind(this.renderingService);
     this.rerender                  = this.renderingService.rerender.bind(this.renderingService);
@@ -416,15 +429,15 @@ function AuraInstance () {
      * @public
      */
     this.pushCreationPath = function(creationPath) {
-    	var ctx = this.getContext();
-    	if (!ctx) {
+        var ctx = this.getContext();
+        if (!ctx) {
             return;
-    	}
-    	var act = ctx.getCurrentAction();
-    	if (!act) {
+        }
+        var act = ctx.getCurrentAction();
+        if (!act) {
             return;
-    	}
-    	act.pushCreationPath(creationPath);
+        }
+        act.pushCreationPath(creationPath);
     };
 
 
@@ -435,15 +448,15 @@ function AuraInstance () {
      * @public
      */
     this.popCreationPath = function(creationPath) {
-    	var ctx = this.getContext();
-    	if (!ctx) {
+        var ctx = this.getContext();
+        if (!ctx) {
             return;
-    	}
-    	var act = ctx.getCurrentAction();
-    	if (!act) {
+        }
+        var act = ctx.getCurrentAction();
+        if (!act) {
             return;
-    	}
-    	act.popCreationPath(creationPath);
+        }
+        act.popCreationPath(creationPath);
     };
 
     /**
@@ -453,18 +466,19 @@ function AuraInstance () {
      * @public
      */
     this.setCreationPathIndex = function(idx) {
-    	var ctx = this.getContext();
-    	if (!ctx) {
+        var ctx = this.getContext();
+        if (!ctx) {
             return;
-    	}
-    	var act = ctx.getCurrentAction();
-    	if (!act) {
+        }
+        var act = ctx.getCurrentAction();
+        if (!act) {
             return;
-    	}
-    	act.setCreationPathIndex(idx);
+        }
+        act.setCreationPathIndex(idx);
     };
 
-    //	Google Closure Compiler Symbol Exports
+    //  Google Closure Compiler Symbol Exports
+    this["runAfterInit"] = this.runAfterInit;
     this["clientService"] = this.clientService;
     this["componentService"] = this.componentService;
     this["renderingService"] = this.renderingService;
@@ -551,10 +565,10 @@ function AuraInstance () {
         event : 'aura:clientRedirect',
         "globalId" : "Aura",
         "handler" : function(evt) {
-        	var url = evt.getParam('url');
-        	if (url != null) {
-        		window.location = url;
-        	}
+            var url = evt.getParam('url');
+            if (url != null) {
+                window.location = url;
+            }
         }
     });
 
@@ -591,6 +605,16 @@ AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; 
  */
 AuraInstance.prototype.initAsync = function(config) {
     Aura.bootstrapMark("initAsync");
+
+    //
+    // This hook is to allow for reloading after aura is initialized, including
+    // any storage setup, as we may well have to clear persistent storage.
+    //
+    this.clientService.reloadPointPassed = true;
+    if (this.clientService.reloadFunction) {
+        this.clientService.reloadFunction();
+        return;
+    }
 
     var regexpDetectURLProcotolSegment = /^(.*?:)?\/\//;
 
@@ -655,10 +679,15 @@ AuraInstance.prototype.setLanguage = function() {
 /**
  * Initializes Aura with context info but without retrieving component from server. Used for synchronous initialization.
  *
+ * Whoever named this function should be shot, but I won't rename for now. Eventually we want to use
+ * startApplication, and make it either auto-require app.js or have the caller load app.js and then invoke
+ * startApplication with the data.
+ *
  * @param {Object} config The configuration attributes
  * @param {Boolean} useExisting
  * @param {Boolean} doNotInitializeServices Set to true if the History service should not be initialized, or false if
- * 	 it should. Defaults to true for Aura Integration Service.
+ *   it should. Defaults to true for Aura Integration Service.
+ * @public
  */
 AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
     config = $A.util.json.resolveRefsObject(config);
@@ -673,7 +702,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
         $A.context.setCurrentAction(null);
     } else {
         // Use the existing context and just join the new context into it
-        // FIXME: is this used? it won't do the right thing if there are components.
+        // FIXME: This is used by integration service, and will not work correctly with components.
         $A.getContext()['merge'](config["context"]);
     }
 };
@@ -806,7 +835,7 @@ AuraInstance.prototype.handleError = function(message, e) {
             e.severity = e.severity || this.severity["ALERT"];
 
             //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-            displayMessage += "\n" + e.stackTrace;
+            displayMessage += "\n" + (e.component ? "Failing descriptor: {" + e.component + "}\n" : "") + e.stackTrace;
             //#end
             dispMsg = $A.util.format(format, displayMessage);
         }
@@ -897,7 +926,7 @@ AuraInstance.prototype.getCallback = function(callback) {
     var context=$A.getContext().getCurrentAccess();
     return function(){
         $A.getContext().setCurrentAccess(context);
-        $A.clientService.pushStack(name);
+        $A.clientService.pushStack("$A.getCallback()");
         try {
             return callback.apply(this,Array.prototype.slice.call(arguments));
         } catch (e) {
@@ -905,12 +934,12 @@ AuraInstance.prototype.getCallback = function(callback) {
             // customers who throw AFE would want to handle it with their own custom experience.
             if (e instanceof $A.auraFriendlyError || e instanceof $A.auraError) {
                 if (context && context.getDef) {
-                    e.component = context.getDef().getDescriptor().toString();
+                    e.component = e.component || context.getDef().getDescriptor().toString();
                 }
 
                 throw e;
             } else {
-                var errorWrapper = new $A.auraError("Uncaught error in "+name, e);
+                var errorWrapper = new $A.auraError("Uncaught error in $A.getCallback()", e);
                 if (context && context.getDef) {
                     errorWrapper.component = context.getDef().getDescriptor().toString();
                 }
@@ -918,7 +947,7 @@ AuraInstance.prototype.getCallback = function(callback) {
                 throw errorWrapper;
             }
         } finally {
-            $A.clientService.popStack(name);
+            $A.clientService.popStack("$A.getCallback()");
             $A.getContext().releaseCurrentAccess();
         }
     };

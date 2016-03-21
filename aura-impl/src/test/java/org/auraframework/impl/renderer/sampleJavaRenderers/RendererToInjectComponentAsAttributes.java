@@ -23,6 +23,7 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.Renderer;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -32,7 +33,7 @@ public class RendererToInjectComponentAsAttributes extends AbstractRendererForTe
         Renderer {
 
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
         String desc = (String) component.getAttributes().getValue("desc");
         Boolean useAsync = (Boolean) component.getAttributes().getValue("useAsync");
         Map<String, Object> auratextAttr = Maps.newHashMap();
@@ -48,6 +49,7 @@ public class RendererToInjectComponentAsAttributes extends AbstractRendererForTe
 
         List<ComponentDefRef> cmps = Lists.newArrayList(grapeFruit, waterMelon);
 
+        Appendable out = rc.getCurrent();
         out.append("<div id='placeholder' class='placeholder' style='border: 1px solid black'/>");
 
         Map<String, Object> attr = Maps.newHashMap();

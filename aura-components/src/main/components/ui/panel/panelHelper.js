@@ -499,5 +499,13 @@
         } else {
             this.positioningLib.panelPositioning.reposition(callback);
         }
+    },
+    
+    scopeScrollables: function (cmp) {
+        var dom = cmp.getElement();
+        var scrollables = dom.querySelectorAll('.scrollable');
+        for (var i = 0; i < scrollables.length; i++) {
+            this.lib.panelLibCore.scopeScroll(scrollables[i]);
+        }
     }
 })// eslint-disable-line semi

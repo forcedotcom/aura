@@ -48,16 +48,15 @@ public class AccessChecksUITest extends WebDriverTestCase {
      * Note that since auratest:accessPublicComponent IS included as a dependency on accessExternalNamespace, this
      * will try to the component on the client and fail.
      */
-    public void testPublicComponentInaccessibleFromExternalNamespace() throws Exception {
-        getMockConfigAdapter().setNonInternalNamespace("componentTest");
+    public void _testPublicComponentInaccessibleFromExternalNamespace() throws Exception {
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessPublicComponent");
         clickCreateComponentButton();
 
         // Component create will fail on the client due to access checks so wait for error dialog to be displayed
         // and then assert no new component on page.
         waitForElementTextContains(
-                getDriver().findElement(By.id("auraErrorMessage")), "componentDef is required");
-        assertEquals("No new component should be present", "", getDriver().findElement(By.className("output"))
+                getDriver().findElement(By.id("auraErrorMessage")), "Access Check Failed");
+        assertEquals("No new component should be present", "null", getDriver().findElement(By.className("output"))
                 .getText());
     }
 

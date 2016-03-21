@@ -15,6 +15,9 @@
  */
 package org.auraframework.integration.test.error;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
+
 import org.auraframework.system.AuraContext.Mode;
 
 public class ServerModelErrorUITest extends AbstractErrorUITestCase {
@@ -23,11 +26,14 @@ public class ServerModelErrorUITest extends AbstractErrorUITestCase {
         super(name);
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError when an exception is thrown from model.
      */
     public void testDefaultHandleErrorInModelWhenSerialize() throws Exception {
         open("/auratest/errorHandlingErrorModelApp.app", Mode.PROD, false);
-        assertDisplayedErrorMessage("Failed to initialize application");
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Failed to initialize application";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 }

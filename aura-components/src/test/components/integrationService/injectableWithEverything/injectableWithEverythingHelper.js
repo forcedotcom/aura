@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- .THIS.container {
-	position: relative;
-	z-index: 1;
-}
+({
+    returnAString: function() {
+        return 'ValueFromHelper';
+    }
+})

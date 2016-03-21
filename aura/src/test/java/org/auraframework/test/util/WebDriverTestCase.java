@@ -831,16 +831,17 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
             logger.info(driverInfo);
 
-            auraUITestingUtil = null;
-            perfWebDriverUtil = new PerfWebDriverUtil(currentDriver, getAuraUITestingUtil());
+            auraUITestingUtil = new AuraUITestingUtil(currentDriver);
+            auraUITestingUtil.setTimeoutInSecs(Integer.parseInt(System.getProperty("webdriver.timeout", "30")));
+            perfWebDriverUtil = new PerfWebDriverUtil(currentDriver, auraUITestingUtil);
         }
         return currentDriver;
     }
 
     public AuraUITestingUtil getAuraUITestingUtil() {
         if(auraUITestingUtil == null){
-            auraUITestingUtil = new AuraUITestingUtil(getDriver(), Integer.parseInt(System.getProperty(
-                    "webdriver.timeout", "30")));
+            auraUITestingUtil = new AuraUITestingUtil(getDriver());
+            auraUITestingUtil.setTimeoutInSecs(Integer.parseInt(System.getProperty("webdriver.timeout", "30")));
         }
         return auraUITestingUtil;
     }

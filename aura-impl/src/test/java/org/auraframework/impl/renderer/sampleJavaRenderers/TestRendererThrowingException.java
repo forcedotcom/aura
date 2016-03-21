@@ -19,12 +19,13 @@ import java.io.IOException;
 
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class TestRendererThrowingException implements Renderer {
 
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, RenderContext renderContext) throws IOException, QuickFixException {
         throw new ArithmeticException("From TestRendererThrowingException");
     }
 

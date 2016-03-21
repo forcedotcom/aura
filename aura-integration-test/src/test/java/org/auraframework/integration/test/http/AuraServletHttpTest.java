@@ -293,8 +293,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("markup://aura:clientOutOfSync", eventJson.get("descriptor"));
         Object f = json.get("defaultHandler");
         assertEquals(JsFunction.class, f.getClass());
-        assertEquals("try{$A.clientService.setOutdated()}catch(e){$L.clientService.setOutdated()}",
-                ((JsFunction) f).getBody());
+        assertEquals("$A.clientService.setOutdated()", ((JsFunction) f).getBody());
     }
 
     private void assertNoCacheRequest(String inputUrl, String expectedRedirect) throws Exception {

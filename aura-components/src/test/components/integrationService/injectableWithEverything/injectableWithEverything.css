@@ -13,14 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-({
-    init: function(cmp) {
-        setTimeout($A.getCallback(function() {
-            throw new Error("testing from $A.getCallback");
-        }, 1000));
-        /* expect log line:
-         * Unhandled Exception 'AuraError: testing from $A.getCallback': Error cause descriptor: markup://reportErrorTest:getCallbackThrowTest
-         */
-    }
-})
+.THIS .dataFromAttribute { color: #fff; }

@@ -33,6 +33,7 @@ import org.auraframework.integration.test.logging.AbstractLoggingUITest;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.FreshBrowserInstance;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -88,37 +89,43 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         UNCACHED, IDLE, CHECKING, DOWNLOADING, UPDATEREADY, OBSOLETE;
     }
 
-    private String appName;
-    private String namespace;
-    private String cmpName;
-    private DefDescriptor<ComponentDef> cmpDesc;
-    private DefDescriptor<ControllerDef> controllerDesc;
-
     public AppCacheResourcesLoggingUITest(String name) {
-        super(name);
+        super(name, "LoggingContextImpl");
     }
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
         getAuraUITestingUtil().setTimeoutInSecs(60);
-        namespace = "appCacheResourcesUITest" + getAuraTestingUtil().getNonce();
-        appName = "cacheapplication";
-        cmpName = "cachecomponent";
-
-        cmpDesc = createDef(ComponentDef.class,
-                String.format("%s:%s", namespace, cmpName), SRC_COMPONENT);
-
-        controllerDesc = createDef(ControllerDef.class, String.format("%s://%s.%s",
-                DefDescriptor.JAVASCRIPT_PREFIX, namespace, cmpName),
-                SRC_CONTROLLER);
-
-        createDef(
-                ApplicationDef.class,
-                String.format("%s:%s", namespace, appName),
-                String.format("<aura:application useAppcache='true' render='client'>"
-                        + "<%s:%s/>" + "</aura:application>", namespace, cmpDesc.getName()));
     }
+
+    private class AppDescription {
+        public String appName;
+        public String namespace;
+        public String cmpName;
+        public DefDescriptor<ComponentDef> cmpDesc;
+        public DefDescriptor<ControllerDef> controllerDesc;
+
+        public AppDescription() {
+        namespace = "appCacheResourcesUITest" + getAuraTestingUtil().getNonce();
+            appName = "cacheapplication";
+            cmpName = "cachecomponent";
+
+            cmpDesc = createDef(ComponentDef.class,
+                    String.format("%s:%s", namespace, cmpName), SRC_COMPONENT);
+
+            controllerDesc = createDef(ControllerDef.class, String.format("%s://%s.%s",
+                    DefDescriptor.JAVASCRIPT_PREFIX, namespace, cmpName),
+                    SRC_CONTROLLER);
+
+            createDef(
+                    ApplicationDef.class,
+                    String.format("%s:%s", namespace, appName),
+                    String.format("<aura:application useAppcache='true' render='client'>"
+                            + "<%s:%s/>" + "</aura:application>", namespace, cmpDesc.getName()));
+        }
+    }
+
 
     /**
      * Opening cached app will only query server for the manifest and the component load.
@@ -129,12 +136,13 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     @Test
     // TODO(W-2944620): Adding safeEval.html to manifest causing unnecessary manifest requests
     public void _testNoChanges() throws Exception {
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
-        assertRequests(getExpectedInitialRequests(), logs);
+        AppDescription app = new AppDescription();
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        assertRequests(getExpectedInitialRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
 
         // only expect a fetch for the manifest and the initAsync component load
-        logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
+        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
         List<Request> expected = Lists.newArrayList(new Request("/auraResource", "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -150,27 +158,31 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     @Flapper
     @Test
     public void testCacheError() throws Exception {
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
-        assertRequests(getExpectedInitialRequests(), logs);
+        AppDescription app = new AppDescription();
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        assertRequests(getExpectedInitialRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
 
         Date expiry = new Date(System.currentTimeMillis() + 60000);
-        String cookieName = getManifestCookieName();
+        String cookieName = getManifestCookieName(app);
         updateCookie(cookieName, "error", expiry, "/");
 
-        logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
+        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
-        expectedChange.add(new Request(getUrl(), null, 302)); // hard refresh
+        expectedChange.add(new Request(getUrl(app), null, 302)); // hard refresh
         switch (getBrowserType()) {
         case GOOGLECHROME:
             expectedChange.add(new Request(3, "/auraResource", "manifest", 200));
-            expectedChange.add(new Request(2, getUrl(), null, 200));
+            expectedChange.add(new Request(2, getUrl(app), null, 200));
             break;
         default:
             expectedChange.add(new Request("/auraResource", "manifest", 200));
-            expectedChange.add(new Request(getUrl(), null, 200));
+            expectedChange.add(new Request(getUrl(app), null, 200));
             expectedChange.add(new Request("/auraResource", "css", 200));
+            //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+            //there should be an app.js and an inline.js here.
+            //expectedChange.add(new Request("/auraResource", "js", 200));
             expectedChange.add(new Request("/auraResource", "js", 200));
         }
         assertRequests(expectedChange, logs);
@@ -188,23 +200,27 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testCacheErrorWithEmptyCache() throws Exception {
+        AppDescription app = new AppDescription();
         openNoAura("/aura/application.app"); // just need a domain page to set cookie from
 
         Date expiry = new Date(System.currentTimeMillis() + 60000);
-        String cookieName = getManifestCookieName();
+        String cookieName = getManifestCookieName(app);
         updateCookie(cookieName, "error", expiry, "/");
 
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
         expectedChange.add(new Request("/auraResource", "css", 200));
-        expectedChange.add(new Request("/auraResource", "js", 200));
+        //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+        //there should be an app.js and an inline.js here.
+        //expectedChange.add(new Request("/auraResource", "js", 200));
+        expectedChange.add(new Request(2, "/auraResource", "js", 200));
         switch (getBrowserType()) {
         case GOOGLECHROME:
-            expectedChange.add(new Request(1, getUrl(), null, 200));
+            expectedChange.add(new Request(1, getUrl(app), null, 200));
             break;
         default:
-            expectedChange.add(new Request(getUrl(), null, 200));
+            expectedChange.add(new Request(getUrl(app), null, 200));
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.UNCACHED);
@@ -220,33 +236,36 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
-    @Flapper
     @Test
     public void testManifestRequestLimitExceeded() throws Exception {
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
-        assertRequests(getExpectedInitialRequests(), logs);
+        AppDescription app = new AppDescription();
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        assertRequests(getExpectedInitialRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
 
         Date expiry = new Date(System.currentTimeMillis() + 60000);
-        String cookieName = getManifestCookieName();
+        String cookieName = getManifestCookieName(app);
         Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
         String timeVal = cookie.getValue().split(":")[1];
         updateCookie(cookieName, "8:" + timeVal, expiry, "/");
-        logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
+        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
 
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
-        expectedChange.add(new Request(getUrl(), null, 302)); // hard refresh
+        expectedChange.add(new Request(getUrl(app), null, 302)); // hard refresh
         switch (getBrowserType()) {
         case GOOGLECHROME:
             expectedChange.add(new Request(3, "/auraResource", "manifest", 200));
-            expectedChange.add(new Request(2, getUrl(), null, 200));
+            expectedChange.add(new Request(2, getUrl(app), null, 200));
             break;
         default:
             expectedChange.add(new Request("/auraResource", "manifest", 200));
-            expectedChange.add(new Request(getUrl(), null, 200));
+            expectedChange.add(new Request(getUrl(app), null, 200));
             expectedChange.add(new Request("/auraResource", "css", 200));
-            expectedChange.add(new Request("/auraResource", "js", 200));
+            //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+            //expectedChange.add(new Request("/auraResource", "js", 200), there should be an app.js and an
+            //inline.js here.
+            expectedChange.add(new Request(2, "/auraResource", "js", 200));
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -257,30 +276,32 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      * TODO(W-2955424) : un-comment the last 4 lines, and update what we should be expecting.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @Flapper
     @Test
     public void testComponentCssChange() throws Exception {
+        AppDescription app = new AppDescription();
         String src_style = ".THIS {background-image: url('/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@');}";
-        DefDescriptor<StyleDef> styleDesc = createDef(StyleDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, namespace, cmpName),src_style);
+        DefDescriptor<StyleDef> styleDesc = createDef(StyleDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, app.namespace, app.cmpName),src_style);
 
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, TOKEN, TOKEN);
         
         Request sGif = new Request("/auraFW/resources/qa/images/s.gif", null, 200);
-        List<Request> expectedInitialRequests = Lists.newArrayList(getExpectedInitialRequests());
+        List<Request> expectedInitialRequests = Lists.newArrayList(getExpectedInitialRequests(app));
 		expectedInitialRequests.add(sGif);
 		assertRequests(expectedInitialRequests, logs);
-		
+
         assertAppCacheStatus(Status.IDLE);
 
         // update a component's css file
         String replacement = getName() + System.currentTimeMillis();
         updateStringSource(styleDesc, src_style.replace(TOKEN, replacement));
 
-        logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
+        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, replacement, TOKEN);
         
-        List<Request> expectedChangeRequests = Lists.newArrayList(getExpectedChangeRequests());
+        List<Request> expectedChangeRequests = Lists.newArrayList(getExpectedChangeRequests(app));
         expectedChangeRequests.add(sGif);
 		assertRequests(expectedChangeRequests, logs);
-        
+
         assertAppCacheStatus(Status.IDLE);
     }
 
@@ -291,14 +312,15 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testComponentJsChange() throws Exception {
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
-        assertRequests(getExpectedInitialRequests(), logs);
+        AppDescription app = new AppDescription();
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        assertRequests(getExpectedInitialRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
         // update a component's js controller file
         String replacement = getName() + System.currentTimeMillis();
-        updateStringSource(controllerDesc, SRC_CONTROLLER.replace(TOKEN, replacement));
-        logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
-        assertRequests(getExpectedChangeRequests(), logs);
+        updateStringSource(app.controllerDesc, SRC_CONTROLLER.replace(TOKEN, replacement));
+        logs = loadMonitorAndValidateApp(app, TOKEN, replacement, "", TOKEN);
+        assertRequests(getExpectedChangeRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
 
 //        logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
@@ -313,15 +335,17 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
+    @ThreadHostileTest("depends on cache state")
     public void testComponentMarkupChange() throws Exception {
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
-        assertRequests(getExpectedInitialRequests(), logs);
+        AppDescription app = new AppDescription();
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        assertRequests(getExpectedInitialRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
         // update markup of namespaced component used by app
         String replacement = getName() + System.currentTimeMillis();
-        updateStringSource(cmpDesc, SRC_COMPONENT.replace(TOKEN, replacement));
-        logs = loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);
-        assertRequests(getExpectedChangeRequests(), logs);
+        updateStringSource(app.cmpDesc, SRC_COMPONENT.replace(TOKEN, replacement));
+        logs = loadMonitorAndValidateApp(app, replacement, TOKEN, "", TOKEN);
+        assertRequests(getExpectedChangeRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
  /*       logs = loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);
         List<Request> expected = Lists.newArrayList(new Request("/auraResource", "manifest", 200));
@@ -337,25 +361,25 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME })
     @Test
+    @ThreadHostileTest("depends on cache state")
     public void testStoragesClearedOnAppcacheUpdate() throws Exception {
+        AppDescription app = new AppDescription();
         // Override app we load in the test with a custom one that uses a template to setup persistent storage and an
         // inner component to interact with storages.
-        appName = "cacheapplicationStorage";
+        app.appName = "cacheapplicationStorage";
         String storageCmpName = "cachecomponentStorage";
         String templateName = "templatecomponentStorage";
 
-        DefDescriptor<ComponentDef> templateDesc = createDef(
-                ComponentDef.class,
-                String.format("%s:%s", namespace, templateName),
+        DefDescriptor<ComponentDef> templateDesc = createDef(ComponentDef.class,
+                String.format("%s:%s", app.namespace, templateName),
                 "<aura:component isTemplate='true' extends='aura:template'>"
                         + "<aura:set attribute='auraPreInitBlock'>"
                         + "<auraStorage:init name='actions' persistent='true' secure='false' clearStorageOnInit='false' debugLoggingEnabled='true' defaultExpiration='60' defaultAutoRefreshInterval='60'/>"
                         + "</aura:set>"
                         + "</aura:component>");
 
-        DefDescriptor<ComponentDef> storageCmpDesc = createDef(
-                ComponentDef.class,
-                String.format("%s:%s", namespace, storageCmpName),
+        DefDescriptor<ComponentDef> storageCmpDesc = createDef(ComponentDef.class,
+                String.format("%s:%s", app.namespace, storageCmpName),
                 "<aura:component>"
                         + "<aura:attribute name='storageOutput' type='String' default='Waiting'/>"
                         + "<ui:button label='Add to storage' class='addToStorage' press='{!c.addToStorage}'/>"
@@ -365,12 +389,11 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
 
         createDef(
                 ControllerDef.class,
-                String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX,
-                        namespace, storageCmpName),
+                String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, app.namespace, storageCmpName),
                 "{ addToStorage: function(cmp) { "
                         + "$A.storageService.getStorage('actions').put('testkey','testvalue')"
                         + ".then(function(){"
-                        + "return $A.storageService.getStorage('ComponentDefStorage').put('testkey','testvalue');"
+                        + "return $A.storageService.getStorage('ComponentDefStorage').put('testkey','{2:1}');"
                         + "}).then(function() {"
                         + "cmp.set('v.storageOutput','Storage Done')"
                         + "})"
@@ -396,14 +419,14 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
                         + "['catch'](function(err){ cmp.set('v.storageOutput', err); });"
                         + "}}");
 
-        createDef(ApplicationDef.class, String.format("%s:%s", namespace, appName), String.format(
+        createDef(ApplicationDef.class, String.format("%s:%s", app.namespace, app.appName), String.format(
                 "<aura:application useAppcache='true' render='client' template='%s:%s'>"
                         + "<%s:%s/> <%s:%s/>"
                         + "</aura:application>",
-                namespace, templateDesc.getName(), namespace, cmpName, namespace,
+                app.namespace, templateDesc.getName(), app.namespace, app.cmpName, app.namespace,
                 storageCmpDesc.getName()));
 
-        loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
+        loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
 
         // Add stuff to storage
         findDomElement(By.cssSelector(".addToStorage")).click();
@@ -415,8 +438,8 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
 
         // Update markup of component used by app and reload
         String replacement = getName() + System.currentTimeMillis();
-        updateStringSource(cmpDesc, SRC_COMPONENT.replace(TOKEN, replacement));
-        loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);
+        updateStringSource(app.cmpDesc, SRC_COMPONENT.replace(TOKEN, replacement));
+        loadMonitorAndValidateApp(app, replacement, TOKEN, "", TOKEN);
 
         // Verify caches cleared
         findDomElement(By.cssSelector(".checkStorage")).click();
@@ -447,8 +470,8 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         return desc;
     }
 
-    private String getManifestCookieName() {
-        return String.format(COOKIE_NAME, getAuraModeForCurrentBrowser().toString(), namespace, appName);
+    private String getManifestCookieName(AppDescription app) {
+        return String.format(COOKIE_NAME, getAuraModeForCurrentBrowser().toString(), app.namespace, app.appName);
     }
 
     private void assertAppCacheStatus(final Status status) {
@@ -541,12 +564,12 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      * @param cssToken The text to be found from css.
      * @param fwToken The text to be found from the framework.
      */
-    private List<Request> loadMonitorAndValidateApp(final String markupToken, String jsToken, String cssToken,
-            String fwToken) throws Exception {
+    private List<Request> loadMonitorAndValidateApp(final AppDescription app, 
+            final String markupToken, String jsToken, String cssToken, String fwToken) throws Exception {
         appender.clearLogs();
         // Opening a page through WebDriverTestCase adds a nonce to ensure fresh resources. In this case we want to see
         // what's cached, so build our URL and call WebDriver.get() directly.
-        String url = getUrl();
+        String url = getUrl(app);
         Map<String, String> params = new HashMap<>();
         params.put("aura.mode", getAuraModeForCurrentBrowser().toString());
         url = addUrlParams(url, params);
@@ -582,8 +605,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
                             @Override
                             public WebElement apply(WebDriver input) {
                                 try {
-                                    WebElement find = findDomElement(By
-                                            .cssSelector(".clickableme"));
+                                    WebElement find = findDomElement(By.cssSelector(".clickableme"));
                                     if (markupToken.equals(find.getText())) {
                                         return find;
                                     }
@@ -626,8 +648,8 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      * @return url of test app, looks like this "/appCacheResourcesUITest1456791509755/cacheapplication.app",
      * where 1456791509755 is a nonce
      */
-    private String getUrl() {
-        return String.format("/%s/%s.app", namespace, appName);
+    private String getUrl(AppDescription app) {
+        return String.format("/%s/%s.app", app.namespace, app.appName);
     }
 
     /**
@@ -692,7 +714,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      *
      * @return the list of request objects, not necessarily in order.
      */
-    private List<Request> getExpectedChangeRequests() {
+    private List<Request> getExpectedChangeRequests(AppDescription app) {
         switch (getBrowserType()) {
         case GOOGLECHROME:
             /*
@@ -707,10 +729,13 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
                     // The manifest change causes the correct fetch, eliminating our 302 and 404
                     // new Request(getUrl(), null, 302), // hard refresh
                     // new Request("/auraResource", "manifest", 404), // manifest out of date
-                    new Request(4, "/auraResource", "manifest", 200),
-                    new Request(2, getUrl(), null, 200), // rest are cache updates
+                    new Request(5, "/auraResource", "manifest", 200),
+                    new Request(2, getUrl(app), null, 200), // rest are cache updates
                     new Request(2, "/auraResource", "css", 200),
-                    new Request(2, "/auraResource", "js", 200));
+                    //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+                    //there should be an app.js and an inline.js here.
+                    //new Request(2, "/auraResource", "js", 200),
+                    new Request(4, "/auraResource", "js", 200));
         default:
             /*
              * For iOS Get the set of expected requests on change. These are the requests that we expect for filling the
@@ -724,9 +749,12 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
                     // new Request(getUrl(), null, 302), // hard refresh
                     // new Request("/auraResource", "manifest", 404), // manifest out of date
                     new Request("/auraResource", "manifest", 200),
-                    new Request(2, getUrl(), null, 200), // rest are cache updates
+                    new Request(2, getUrl(app), null, 200), // rest are cache updates
                     new Request(2, "/auraResource", "css", 200),
-                    new Request(2, "/auraResource", "js", 200));
+                    //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+                    //there should be an app.js and an inline.js here.
+                    //new Request(2, "/auraResource", "js", 200),
+                    new Request(4, "/auraResource", "js", 200));
         }
     }
 
@@ -735,7 +763,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      *
      * @return the list of request objects, not necessarily in order.
      */
-    private List<Request> getExpectedInitialRequests() {
+    private List<Request> getExpectedInitialRequests(AppDescription app) {
         switch (getBrowserType()) {
         case GOOGLECHROME:
             /*
@@ -746,10 +774,13 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
              * are two requests for the initial page, one as the first request, and one to fill the app cache (odd, but
              * true). There are also two manifest requests.
              */
-            return ImmutableList.of(new Request(2, getUrl(), null, 200),
+            return ImmutableList.of(new Request(2, getUrl(app), null, 200),
                     new Request(2, "/auraResource", "manifest", 200),
                     new Request(2, "/auraResource", "css", 200),
-                    new Request(2, "/auraResource", "js", 200));
+                    //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+                    //there should be an app.js and an inline.js here.
+                    //new Request(2, "/auraResource", "js", 200),
+                    new Request(4, "/auraResource", "js", 200));
         default:
             /*
              * For iOS Get the set of expected requests on change. These are the requests that we expect for filling the
@@ -757,10 +788,13 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
              * all three components, initial, css, and js</li> <li>Finally, the browser re-fetches the manifest to check
              * contents</li> <ul> Note that there are also two css and js request.
              */
-            return ImmutableList.of(new Request(1, getUrl(), null, 200),
+            return ImmutableList.of(new Request(1, getUrl(app), null, 200),
                     new Request(1, "/auraResource", "manifest", 200),
                     new Request(2, "/auraResource", "css", 200),
-                    new Request(2, "/auraResource", "js", 200));
+                    //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+                    //there should be an app.js and an inline.js here.
+                    //new Request(2, "/auraResource", "js", 200),
+                    new Request(4, "/auraResource", "js", 200));
         }
     }
 

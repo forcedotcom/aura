@@ -15,11 +15,6 @@
  */
 /*jslint sub: true */
 
-//#include aura.locker.SecureWindow
-//#include aura.locker.SecureComponent
-//#include aura.locker.SecureComponentRef
-//#include aura.locker.SecureAuraEvent
-
 var getLockerSecret, setLockerSecret;
 
 function LockerService() {
@@ -80,6 +75,7 @@ function LockerService() {
 		});
 	};
 
+	// defining LockerService as a service
 	var service = {
 		createForDef : function(code, def) {
 			var namespace = def.getDescriptor().getNamespace();
@@ -95,7 +91,7 @@ function LockerService() {
 			var psuedoKeySymbol = JSON.stringify(key);
 			var env = keyToEnvironmentMap[psuedoKeySymbol];
 			if (!env) {
-				env = keyToEnvironmentMap[psuedoKeySymbol] = new SecureWindow(window, key);
+				env = keyToEnvironmentMap[psuedoKeySymbol] = SecureWindow(window, key);
 			}
 			return env;
 		},
@@ -112,6 +108,7 @@ function LockerService() {
 				lockerShadows = {};
 				Object.getOwnPropertyNames(window).forEach(function (name) {
 					// apply whitelisting to the lockerShadows
+					// TODO: recursive to cover WindowPrototype properties as well
 					if (whitelist.indexOf(name) === -1) {
 						lockerShadows[name] = undefined;
 					}
@@ -157,7 +154,7 @@ function LockerService() {
 				return component;
 			}
 
-			return new SecureComponent(component, key);
+			return SecureComponent(component, key);
 		},
 
 		wrapComponentEvent : function(component, event) {
@@ -165,7 +162,7 @@ function LockerService() {
 				return event;
 			}
 			// if the component is secure, the event have to be secure.
-			return new SecureAuraEvent(event, getLockerSecret(component, "key"));
+			return SecureAuraEvent(event, getLockerSecret(component, "key"));
 		},
 
 		unwrap : function(st) {

@@ -372,8 +372,9 @@ var AuraDevToolService = function() {
                         }
                     }
                     //Panel is the top element
+                    //Class 'slideIn' is to accommodate panelSliders which no longer have an 'active' class attached to the top element
                     else{
-                        if($A.util.hasClass(activePanel, "active")){
+                        if($A.util.hasClass(activePanel, "active") || $A.util.hasClass(activePanel, "slideIn")){
                             if(!$A.util.isUndefinedOrNull(hiddenValue) && (hiddenValue.toLowerCase().indexOf("true") > -1)){
                                 errorArray.push(activePanel);
                             }

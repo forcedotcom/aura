@@ -40,8 +40,8 @@
     <aura:dependency resource="ui:checkboxMenuItem" />
 
     <aura:if isTrue="{!v.useMenu}">
-        <ui:menu>
-            <ui:menuTriggerLink class="{!v.class}" disabled="{!v.disabled}" ariaDescribedBy="{!v.ariaDescribedBy}"
+        <ui:menu class="{!v.class}">
+            <ui:menuTriggerLink disabled="{!v.disabled}" ariaDescribedBy="{!v.ariaDescribedBy}"
                                 label="{!v.selectedLabel}"/>
             <ui:menuList aura:id="options" autoPosition="false" aura:flavor="default,left"
                          menuExpand="{!c.menuOpened}"

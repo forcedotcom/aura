@@ -65,19 +65,12 @@
      */
     testClientActionJavascriptError : {
         test : function(cmp) {
-            var message;
-            $A.test.addFunctionHandler($A, "warning", function(msg, err) {
-                message = msg;
-            });
-
             try {
                 cmp.throwsAnError();
                 $A.test.fail("Expected error when running client-side action");
             } catch (e) {
-                $A.test.assertEquals("intentional error", e.message);
+                $A.test.assertEquals("Action failed: actionsTest$clientActionWithServerController$controller$throwsAnError [intentional error]", e.message);
             }
-
-            $A.test.assertEquals("Action failed: actionsTest$clientActionWithServerController$controller$throwsAnError", message);
         }
     },
 

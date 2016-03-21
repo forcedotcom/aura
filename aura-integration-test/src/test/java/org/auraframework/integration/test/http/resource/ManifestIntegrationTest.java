@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,6 +43,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.resource.Manifest;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.AuraContext;
+import org.mockito.Mockito;
 
 public class ManifestIntegrationTest extends AuraImplTestCase {
 
@@ -73,13 +75,14 @@ public class ManifestIntegrationTest extends AuraImplTestCase {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(response.getWriter()).thenReturn(new PrintWriter(stringWriter));
+        when(request.getParameterNames()).thenReturn(new Vector<String>().elements());
 
         ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
         ServletUtilAdapter spyServletUtilAdapter = spy(servletUtilAdapter);
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
         ConfigAdapter spyConfigAdapter = spy(configAdapter);
         doReturn(new ArrayList<String>()).when(spyServletUtilAdapter).getStyles(context);
-        doReturn(new ArrayList<String>()).when(spyServletUtilAdapter).getScripts(context);
+        doReturn(new ArrayList<String>()).when(spyServletUtilAdapter).getScripts(Mockito.any(), Mockito.anyBoolean(), Mockito.anyMap());
 
         Manifest manifest = new Manifest();
         manifest.setServletUtilAdapter(spyServletUtilAdapter);

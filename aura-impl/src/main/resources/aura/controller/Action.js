@@ -1159,13 +1159,13 @@ Action.prototype.toJSON = function() {
 Action.prototype.markException = function(e) {
     // if the error doesn't have id, we wrap it with auraError so that when displaying UI, it will have an id
     if (!e.id) {
-        e = new $A.auraError(null, e);
+        var descriptor = this.def ? this.def.toString() : "";
+        e = new $A.auraError(descriptor ? "Action failed: " + descriptor : "", e);
+        e.component = descriptor;
     }
 
     this.state = "ERROR";
     this.error = e;
-    $A.warning("Action failed: " + (this.def?this.def.toString():"") , e);
-    $A.logger.reportError(e, this.getDef().getDescriptor());
     if ($A.clientService.inAuraLoop()) {
         throw e;
     }

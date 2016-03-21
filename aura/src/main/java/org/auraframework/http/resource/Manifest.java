@@ -75,6 +75,7 @@ public class Manifest extends AuraResourceImpl {
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
         servletUtilAdapter.setNoCache(response);
         try {
+            Map<String,Object> attributes = getComponentAttributes(request);
             //
             // First, we make sure that the manifest is enabled.
             //
@@ -153,7 +154,7 @@ public class Manifest extends AuraResourceImpl {
                 sw.write('\n');
             }
 
-            for (String s : servletUtilAdapter.getScripts(context)) {
+            for (String s : servletUtilAdapter.getScripts(context, true, attributes)) {
                 sw.write(s);
                 sw.write('\n');
             }

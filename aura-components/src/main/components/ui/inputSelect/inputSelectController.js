@@ -17,7 +17,13 @@
     doInit: function (cmp, evt, helper) {
         var concreteCmp = cmp.getConcreteComponent();
         var concreteHelper = concreteCmp.getDef().getHelper() || helper;
+
         concreteHelper.init(concreteCmp);
+
+        if (cmp.get("v.useMenu")) {
+            helper.updateMenuLabel(concreteCmp);
+            cmp._createMenuItems = true;
+        }
     },
 
     valueChange: function (cmp, evt, helper) {

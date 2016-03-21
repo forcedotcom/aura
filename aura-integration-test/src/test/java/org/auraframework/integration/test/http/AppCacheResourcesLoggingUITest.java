@@ -90,7 +90,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     }
 
     public AppCacheResourcesLoggingUITest(String name) {
-        super(name);
+        super(name, "LoggingContextImpl");
     }
 
     @Override
@@ -289,7 +289,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         List<Request> expectedInitialRequests = Lists.newArrayList(getExpectedInitialRequests(app));
 		expectedInitialRequests.add(sGif);
 		assertRequests(expectedInitialRequests, logs);
-		
+
         assertAppCacheStatus(Status.IDLE);
 
         // update a component's css file
@@ -301,7 +301,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         List<Request> expectedChangeRequests = Lists.newArrayList(getExpectedChangeRequests(app));
         expectedChangeRequests.add(sGif);
 		assertRequests(expectedChangeRequests, logs);
-        
+
         assertAppCacheStatus(Status.IDLE);
     }
 

@@ -15,10 +15,13 @@
     limitations under the License.
 
 -->
-<aura:application access="unauthenticated" controller="java://org.auraframework.components.test.java.controller.TestController">
+<aura:application access="unauthenticated"
+        controller="java://org.auraframework.components.test.java.controller.TestController">
     <aura:attribute name="message" type="String"/>
-    <aura:attribute name="error" type="String"/>
+    <aura:attribute name="severity" type="String"/>
+    <aura:attribute name="errorId" type="String"/>
     <aura:attribute name="eventHandled" type="Boolean" default="false"/>
+    <aura:attribute name="actionDone" type="Boolean" default="false"/>
 
     <!-- The following attributes can be passed in with url to perform tests -->
     <!-- set false when testing defult handler-->
@@ -118,7 +121,12 @@
     </table>
 
     systemError Event is handled on App: <div id="eventHandledOnApp">{!v.eventHandled}</div>
-    <div id="appErrorOutput"> {!v.message} </div>
+    <aura:if isTrue="{!v.eventHandled}">
+    <h2>Error details:</h2><br/>
+        Message: <div id="appErrorOutput"> {!v.message} </div><br/>
+        Severity: <div id="appSeverityOutput"> {!v.severity} </div><br/>
+        Id: <div id="appIdOutput"> {!v.errorId} </div><br/>
+    </aura:if>
 
     <br/><br/>
     <aura:if isTrue="{!v.addInvalidComponent}">
@@ -132,5 +140,10 @@
             </auratest:errorHandling>
         </aura:set>
     </aura:if>
+
+    <br/>
+    Client error is sent via Caboose Actions, force a foreground action to sent error to server:
+    <ui:button label="Server Action" press="{!c.doServerAction}" class="serverActionButton"/>
+    <div id="actionDone"> {!v.actionDone} </div>
 
 </aura:application>

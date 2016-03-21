@@ -95,7 +95,7 @@
     </tr>
     </table>
 
-    systemError Event is handled on App: <div id="eventHandledOnCmp">{!v.eventHandled}</div>
+    systemError Event is handled on component: <div id="eventHandledOnCmp">{!v.eventHandled}</div>
     <div id="cmpErrorOutput"> {!v.message} </div>
 
 </aura:component>

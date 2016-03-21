@@ -19,15 +19,11 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
 
-// The tests with click are failing on autobuild Firefox. Manually verified error can be handled correctly.
-// The failures can be reproduced in Saucelab. Seems the buttons were not actually clicked when executing click().
-// In Saucelab, during executing the tests, if manually click the button, the tests pass.
-// Disable for now (W-2796537)
-@ExcludeBrowsers({ BrowserType.FIREFOX })
 public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
     public ErrorHandlingUITest(String name) {
@@ -42,10 +38,10 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         assertErrorMaskIsNotVisible();
 
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
         assertDisplayedErrorMessage("Error from app client controller");
 
-        findDomElement(ERROR_CLOSE_LOCATOR).click();
+        findAndClickElement(ERROR_CLOSE_LOCATOR);
         assertErrorMaskIsNotVisible();
     }
 
@@ -58,7 +54,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         assertDisplayedErrorMessage("Error from app render");
 
-        findDomElement(ERROR_CLOSE_LOCATOR).click();
+        findAndClickElement(ERROR_CLOSE_LOCATOR);
         assertErrorMaskIsNotVisible();
     }
 
@@ -69,14 +65,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
    @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI, BrowserType.FIREFOX })
     public void testErrorMessageFromErrorContainsStacktraceInDevMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.DEV);
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
         assertDisplayedErrorMessage("Error from app client controller");
         assertStacktracePresent();
     }
 
     public void testErrorMessageFromErrorNotContainsStacktraceInProdMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
         assertDisplayedErrorMessage("Error from app client controller");
 
         // TODO: W-2979891, should not use error message string length to verify whether there's a callstack.
@@ -90,14 +86,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI, BrowserType.FIREFOX })
     public void testErrorMessageFromAuraAssertContainsStacktraceInDevMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.DEV);
-        findDomElement(By.cssSelector(".errorFromAppTable .failAssertInClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .failAssertInClientControllerButton"));
         assertDisplayedErrorMessage("Assert failed in app client controller");
         assertStacktracePresent();
     }
 
     public void testErrorMessageFromAuraAssertNotContainsStacktraceInProdMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
-        findDomElement(By.cssSelector(".errorFromAppTable .failAssertInClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .failAssertInClientControllerButton"));
         assertDisplayedErrorMessage("Assert failed in app client controller");
         assertNoStacktracePresent();
     }
@@ -109,21 +105,21 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI, BrowserType.FIREFOX })
     public void testErrorMessageFromAuraErrorContainsStacktraceDevMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.DEV);
-        findDomElement(By.cssSelector(".errorFromAppTable .auraErrorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .auraErrorFromClientControllerButton"));
         assertDisplayedErrorMessage("AuraError from app client controller");
         assertStacktracePresent();
     }
 
     public void testErrorMessageFromAuraErrorNotContainsStacktraceInProdMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
-        findDomElement(By.cssSelector(".errorFromAppTable .auraErrorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .auraErrorFromClientControllerButton"));
         assertDisplayedErrorMessage("AuraError from app client controller");
         assertNoStacktracePresent();
     }
 
     public void testErrorMessageFromAuraFriendlyErrorNotContainsStacktraceInPRODMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
-        findDomElement(By.cssSelector(".errorFromAppTable .auraFriendlyErrorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .auraFriendlyErrorFromClientControllerButton"));
         assertDisplayedErrorMessage("AuraFriendlyError from app client controller");
         assertNoStacktracePresent();
     }
@@ -133,13 +129,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      *
      * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
      * or show anything in error object in the handler.
+     * Firefox is in lower version in autobuild, which has this issue too.
      */
     @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI, BrowserType.FIREFOX })
     public void testAuraFriendlyErrorMessageFromData() throws Exception {
         String expectedContainedMessage = "Friendly Error Message from data";
         open("/auratest/errorHandlingApp.app?useFriendlyErrorMessageFromData=true&handleSystemError=true", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromAppTable .auraFriendlyErrorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .auraFriendlyErrorFromClientControllerButton"));
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
@@ -151,7 +148,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedContainedMessage = "Assert failed in app client controller";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromAppTable .failAssertInClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .failAssertInClientControllerButton"));
         // wait for custom handler on App handled the event.
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
@@ -168,7 +165,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedContainedMessage = "Error from app client controller";
         open("/auratest/errorHandlingApp.app", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
 
         assertDisplayedErrorMessage(expectedContainedMessage);
     }
@@ -181,7 +178,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedContainedMessage = "Error from app client controller";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
@@ -196,7 +193,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     public void testDefaultHandleErrorThrownFromContainedCmpClientController() throws Exception {
         String expected = "Error from component client controller";
         open("/auratest/errorHandlingApp.app", Mode.PROD);
-        findDomElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
         assertDisplayedErrorMessage(expected);
     }
 
@@ -208,7 +205,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedContainedMessage = "Error from component client controller";
         open("/auratest/errorHandlingApp.app?handleSystemErrorInContainedCmp=true", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
         // wait for custom handler on App handled the event.
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnCmp']")), "true");
 
@@ -225,7 +222,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedContainedMessage = "Error from component client controller";
         open("/auratest/errorHandlingApp.app?handleSystemErrorInContainedCmp=true", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
         // wait for custom handler on App handled the event.
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnCmp']")), "true");
 
@@ -242,7 +239,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedContainedMessage = "Error from app client controller";
         open("/auratest/errorHandlingApp.app?handleSystemErrorInContainedCmp=true", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
         // wait for custom handler on App handled the event.
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnCmp']")), "true");
 
@@ -257,7 +254,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      */
     public void testDefaultHandleErrorThrownFromServerActionCallback() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromServerActionCallbackButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromServerActionCallbackButton"));
         assertDisplayedErrorMessage("Error from server action callback in app");
     }
 
@@ -269,7 +266,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedContainedMessage = "Error from server action callback in app";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromServerActionCallbackButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromServerActionCallbackButton"));
         // wait for custom handler on App handled the event.
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
@@ -284,7 +281,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      */
     public void testDefaultHandleErrorThrownFromCreateComponentCallback() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromCreateComponentCallbackButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromCreateComponentCallbackButton"));
         assertDisplayedErrorMessage("Error from createComponent callback in app");
     }
 
@@ -296,7 +293,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedContainedMessage = "Error from createComponent callback in app";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromCreateComponentCallbackButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromCreateComponentCallbackButton"));
         // wait for custom handler on App handled the event.
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
@@ -311,7 +308,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      */
     public void testDefaultHandleErrorThrownFromFunctionWrappedInGetCallback() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromFunctionWrappedInGetCallbackButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromFunctionWrappedInGetCallbackButton"));
         assertDisplayedErrorMessage("Error from function wrapped in getCallback in app");
     }
 
@@ -323,7 +320,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedContainedMessage = "Error from function wrapped in getCallback in app";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromFunctionWrappedInGetCallbackButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromFunctionWrappedInGetCallbackButton"));
         // wait for custom handler on App handled the event.
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
@@ -338,7 +335,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      */
     public void testDefaultHandleErrorFromLibraryCode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
-        findDomElement(By.cssSelector(".errorFromCmpTable .errorFromLibraryCodeButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromLibraryCodeButton"));
         assertDisplayedErrorMessage("Error from library Code");
     }
 
@@ -350,7 +347,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedContainedMessage = "Error from library Code";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromCmpTable .errorFromLibraryCodeButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromLibraryCodeButton"));
         // wait for custom handler on App handled the event.
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
@@ -400,7 +397,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      */
     public void testDefaultHandleErrorThrownFromRerender() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromRerenderButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromRerenderButton"));
         assertDisplayedErrorMessage("Error from app rerender");
     }
 
@@ -412,7 +409,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
 
         // click throw Error in rerender() on Component and handle it in app.
-        findDomElement(By.cssSelector(".errorFromCmpTable .errorFromRerenderButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromRerenderButton"));
         // wait for custom handler on App handled the event.
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
@@ -426,7 +423,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      */
     public void testDefaultHandleErrorThrownFromUnrender() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
-        findDomElement(By.cssSelector(".errorFromCmpTable .errorFromUnrenderButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromUnrenderButton"));
         assertDisplayedErrorMessage("Error from component unrender");
     }
 
@@ -437,7 +434,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedContainedMessage = "Error from component unrender";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromCmpTable .errorFromUnrenderButton")).click();
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromUnrenderButton"));
         // wait for custom handler on App handled the event.
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
@@ -489,4 +486,15 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertTrue("Stacktrace should not be present on displayed error.", actualMessage.length() < 150);
     }
 
+    /**
+     * This is a workaround for Webdriver tests run on Firefox.
+     */
+    private void findAndClickElement(By locator) {
+        waitForElementAppear(locator);
+        // Workaround for Webdriver tests run on Firefox. Calling WebElement.click() fails to click the button in some
+        // situations but executing a javascript click like so seems to work.
+        WebElement webElement = getDriver().findElement(locator);
+        JavascriptExecutor executor = (JavascriptExecutor) getDriver();
+        executor.executeScript("arguments[0].click();", webElement);
+    }
 }

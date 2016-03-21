@@ -14,6 +14,8 @@
         }
 
         cmp.set("v.message", message);
+        cmp.set("v.errorId", auraError.id);
+        cmp.set("v.severity", auraError.severity);
         cmp.set("v.eventHandled", true);
 
         event["handled"] = true;
@@ -73,5 +75,14 @@
     throwErrorFromUnrender: function(cmp) {
         cmp.set("v.throwErrorFromUnrender", true);
         cmp.destroy(false);
+    },
+
+
+    doServerAction: function(cmp) {
+        var action = cmp.get("c.doSomething");
+        action.setCallback(this, function() {
+                cmp.set("v.actionDone", true);
+            });
+        $A.enqueueAction(action);
     }
 })

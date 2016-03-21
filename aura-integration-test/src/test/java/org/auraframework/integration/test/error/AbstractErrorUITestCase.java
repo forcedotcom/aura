@@ -16,8 +16,8 @@
 
 package org.auraframework.integration.test.error;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
+import java.util.Arrays;
+import java.util.List;
 
 import org.auraframework.test.util.WebDriverTestCase;
 import org.openqa.selenium.By;
@@ -33,25 +33,57 @@ public class AbstractErrorUITestCase extends WebDriverTestCase {
         super(name);
     }
 
-    protected boolean isErrorMaskVisible() {
-        WebElement errorMask = findDomElement(ERROR_MASK_LOCATOR);
-        if(errorMask != null) {
-            return errorMask.isDisplayed();
-        }
-        return false;
-    }
-
+    /**
+     * Find error message on error modal when the error model is displayed.
+     * This method fails test if error mask doesn't show up.
+     *
+     * @return a string of displayed error message
+     */
     protected String findErrorMessage() {
-        waitForElement("Error mask should be visible when error is handled by default handler.", findDomElement(ERROR_MASK_LOCATOR), true);
+        waitForElement("Error mask is not visible.", findDomElement(ERROR_MASK_LOCATOR), true);
         return getText(ERROR_MSG_LOCATOR);
     }
 
-    protected void assertDisplayedErrorMessage(String message) {
-        String actualMessage = findErrorMessage();
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(message));
+    /**
+     * Asserts that there is no visible error mask on current page.
+     * This method does not wait for any element. Make sure all actions are done before calling it.
+     */
+    protected void assertErrorMaskIsNotVisible() {
+        WebElement errorMask = findDomElement(ERROR_MASK_LOCATOR);
+        if(errorMask != null && errorMask.isDisplayed() ) {
+           fail("Unexpected error mask shows up.");
+        }
     }
 
-    protected void assertErrorMaskIsNotVisible() {
-        assertFalse("Error mask should not be visible.", isErrorMaskVisible());
+    /**
+     * Asserts that error message contains stacktrace.
+     *
+     * Stacktraces vary greatly across browsers. We assume that if error message contains more lines
+     * than the expected message lines, then the message contains stacktrace.
+     *
+     * @param message - the actual message to check if containing stacktrace.
+     * @param numOfMsgLines - the expected number of plain error message lines.
+     */
+    protected void assertClientErrorContainsStacktrace(String message, int numOfMsgLines) {
+        List<String> lines = Arrays.asList(message.split("\\n"));
+        if(lines.size() <= numOfMsgLines) {
+            fail("Error message does not contain stacktrace: " + message);
+        }
+    }
+
+    /**
+     * Asserts that error message does not contains stacktrace.
+     *
+     * Stacktraces vary greatly across browsers. We assume that if error message contains more lines
+     * than the expected message lines, then the message contains stacktrace.
+     *
+     * @param message - the actual message to check if containing stacktrace.
+     * @param numOfMsgLines - the expected number of plain error message lines.
+     */
+    protected void assertClientErrorNotContainsStacktrace(String message, int numOfMsgLines) {
+        List<String> lines = Arrays.asList(message.split("\\n"));
+        if(lines.size() > numOfMsgLines) {
+            fail("Error message contains stacktrace: " + message);
+        }
     }
 }

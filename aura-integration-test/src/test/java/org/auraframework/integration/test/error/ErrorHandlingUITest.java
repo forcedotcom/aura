@@ -30,7 +30,22 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         super(name);
     }
 
-    /*
+    /**
+     * In prod mode, the error message has two lines:
+     *   Something has gone wrong. [MESSAGES]
+     *   Please try again.
+     */
+    private static int NUM_OF_MSG_LINES_PROD_MODE = 2;
+    /**
+     * In non-prod mode, the error message has three lines, excluding stack trace:
+     *   Something has gone wrong. [MESSAGES]
+     *   Failing descriptor: [DESCRIPTOR]
+     *   [STACKTRACE]
+     *   Please try again.
+     */
+    private static int NUM_OF_MSG_LINES_NON_PROD_MODE = 3;
+
+    /**
      * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button.
      * Automation for W-1091838.
      */
@@ -39,92 +54,121 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
 
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
-        assertDisplayedErrorMessage("Error from app client controller");
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app client controller";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
 
         findAndClickElement(ERROR_CLOSE_LOCATOR);
         assertErrorMaskIsNotVisible();
     }
 
-    /*
+    /**
      * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button
      * when $A has not been initialized yet.
      */
     public void testErrorMessageDisplayAndCloseWhenAuraIsNotInitialized() throws Exception {
         open("/auratest/errorHandlingApp.app?throwErrorFromRender=true", Mode.PROD, false);
 
-        assertDisplayedErrorMessage("Error from app render");
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app render";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
 
         findAndClickElement(ERROR_CLOSE_LOCATOR);
         assertErrorMaskIsNotVisible();
     }
 
-   /*
+   /**
     * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
     * or show anything in error object in the handler.
     */
    @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI, BrowserType.FIREFOX })
-    public void testErrorMessageFromErrorContainsStacktraceInDevMode() throws Exception {
+    public void testMessageFromErrorContainsStacktraceInDevMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.DEV);
+
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
-        assertDisplayedErrorMessage("Error from app client controller");
-        assertStacktracePresent();
-    }
+        String actualMsg = findErrorMessage();
+
+        String expectedMsg = "Error from app client controller";
+        assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
+        assertClientErrorContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_NON_PROD_MODE);
+   }
 
     public void testErrorMessageFromErrorNotContainsStacktraceInProdMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
-        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
-        assertDisplayedErrorMessage("Error from app client controller");
 
-        // TODO: W-2979891, should not use error message string length to verify whether there's a callstack.
-        //assertNoStacktracePresent();
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
+        String actualMsg = findErrorMessage();
+
+        String expectedMsg = "Error from app client controller";
+        assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
+        assertClientErrorNotContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_PROD_MODE);
     }
 
-    /*
+    /**
      * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
      * or show anything in error object in the handler.
      */
     @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI, BrowserType.FIREFOX })
     public void testErrorMessageFromAuraAssertContainsStacktraceInDevMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.DEV);
+
         findAndClickElement(By.cssSelector(".errorFromAppTable .failAssertInClientControllerButton"));
-        assertDisplayedErrorMessage("Assert failed in app client controller");
-        assertStacktracePresent();
+
+        String actualMsg = findErrorMessage();
+        String expectedMsg = "Assert failed in app client controller";
+        assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
+        assertClientErrorContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_NON_PROD_MODE);
     }
 
     public void testErrorMessageFromAuraAssertNotContainsStacktraceInProdMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
+
         findAndClickElement(By.cssSelector(".errorFromAppTable .failAssertInClientControllerButton"));
-        assertDisplayedErrorMessage("Assert failed in app client controller");
-        assertNoStacktracePresent();
+
+        String actualMsg = findErrorMessage();
+        String expectedMsg = "Assert failed in app client controller";
+        assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
+        assertClientErrorNotContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_PROD_MODE);
     }
 
-    /*
+    /**
      * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
      * or show anything in error object in the handler.
      */
     @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI, BrowserType.FIREFOX })
     public void testErrorMessageFromAuraErrorContainsStacktraceDevMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.DEV);
+
         findAndClickElement(By.cssSelector(".errorFromAppTable .auraErrorFromClientControllerButton"));
-        assertDisplayedErrorMessage("AuraError from app client controller");
-        assertStacktracePresent();
+
+        String actualMsg = findErrorMessage();
+        String expectedMsg = "AuraError from app client controller";
+        assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
+        assertClientErrorContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_NON_PROD_MODE);
     }
 
     public void testErrorMessageFromAuraErrorNotContainsStacktraceInProdMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
+
         findAndClickElement(By.cssSelector(".errorFromAppTable .auraErrorFromClientControllerButton"));
-        assertDisplayedErrorMessage("AuraError from app client controller");
-        assertNoStacktracePresent();
+
+        String actualMsg = findErrorMessage();
+        String expectedMsg = "AuraError from app client controller";
+        assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
+        assertClientErrorNotContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_PROD_MODE);
     }
 
     public void testErrorMessageFromAuraFriendlyErrorNotContainsStacktraceInPRODMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromAppTable .auraFriendlyErrorFromClientControllerButton"));
-        assertDisplayedErrorMessage("AuraFriendlyError from app client controller");
-        assertNoStacktracePresent();
+
+        String actualMsg = findErrorMessage();
+        String expectedMsg = "AuraFriendlyError from app client controller";
+        assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
+        assertClientErrorNotContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_PROD_MODE);
     }
 
-    /*
+    /**
      * Verify new error message can be retrieved in Aura Friendly Error data
      *
      * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
@@ -157,20 +201,21 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError event when an error is thrown from
      * an App's client side controller.
      */
     public void testDefaultHandleErrorThrownFromClientController() throws Exception {
-        String expectedContainedMessage = "Error from app client controller";
         open("/auratest/errorHandlingApp.app", Mode.PROD);
 
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
 
-        assertDisplayedErrorMessage(expectedContainedMessage);
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app client controller";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify custom error handler can handle systemError event when an error is thrown from
      * an App's client side controller.
      */
@@ -186,18 +231,20 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError event when an error is thrown from
      * a component's client side controller.
      */
     public void testDefaultHandleErrorThrownFromContainedCmpClientController() throws Exception {
-        String expected = "Error from component client controller";
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
-        assertDisplayedErrorMessage(expected);
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from component client controller";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify custom error handler can handle systemError event when an error is thrown from
      * a component's client side controller.
      */
@@ -214,7 +261,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
-    /*
+    /**
      * Verify custom error handler in a component can handle systemError event when an error is thrown from
      * a component's client side controller.
      */
@@ -231,7 +278,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
-    /*
+    /**
      * Verify custom error handler in a component can handle systemError event when an error is thrown from
      * its containing app's client side controller.
      */
@@ -248,17 +295,20 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError event when an error is thrown from
      * a server action's callback.
      */
     public void testDefaultHandleErrorThrownFromServerActionCallback() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromServerActionCallbackButton"));
-        assertDisplayedErrorMessage("Error from server action callback in app");
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from server action callback in app";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify custom error handler can handle systemError event when an error is thrown from
      * a server action's callback.
      */
@@ -275,17 +325,20 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError event when an error is thrown from
      * creatComponent's callback.
      */
     public void testDefaultHandleErrorThrownFromCreateComponentCallback() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromCreateComponentCallbackButton"));
-        assertDisplayedErrorMessage("Error from createComponent callback in app");
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from createComponent callback in app";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify custom error handler can handle systemError event when an error is thrown from
      * creatComponent's callback.
      */
@@ -302,17 +355,21 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError event when an error is thrown from
      * a function which is wrapped in $A.getCallback().
      */
     public void testDefaultHandleErrorThrownFromFunctionWrappedInGetCallback() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
+
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromFunctionWrappedInGetCallbackButton"));
-        assertDisplayedErrorMessage("Error from function wrapped in getCallback in app");
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from function wrapped in getCallback in app";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify custom error handler can handle systemError event when an error is thrown from
      * a function which is wrapped in $A.getCallback().
      */
@@ -329,17 +386,19 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError event when an error is thrown from
      * a function that is imported from library.
      */
     public void testDefaultHandleErrorFromLibraryCode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromLibraryCodeButton"));
-        assertDisplayedErrorMessage("Error from library Code");
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from library Code";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify custom error handler can handle systemError event when an error is thrown from
      * a function that is imported from library.
      */
@@ -356,52 +415,66 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError event when an error is thrown from render().
      */
     public void testDefaultHandleErrorFromRenderWhenNoCustomHandler() throws Exception {
         open("/auratest/errorHandlingApp.app?throwErrorFromRender=true", Mode.PROD, false);
-        assertDisplayedErrorMessage("Error from app render");
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app render";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify systemError event can be handled by Aura default error handler event when an error is thrown from render()
      * if a cmp/app contains custom error handler.
      * When error is thrown from render(), $A is not initialized, so the event has to be handled by default handler.
      */
     public void testDefaultHandleErrorFromRenderWhenMarkEventHandled() throws Exception {
         open("/auratest/errorHandlingApp.app?throwErrorFromRender=true&handleSystemError=true", Mode.PROD, false);
-        assertDisplayedErrorMessage("Error from app render");
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app render";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError event when an error is thrown from afterRender().
      */
     public void testDefaultHandleErrorFromAfterRenderWhenNoCustomHandler() throws Exception {
         open("/auratest/errorHandlingApp.app?throwErrorFromAfterRender=true", Mode.PROD, false);
-        assertDisplayedErrorMessage("Error from app afterrender");
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app afterrender";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify systemError event can be handled by Aura default error handler event when an error is thrown from afterRender()
      * if a cmp/app contains custom error handler.
      * When error is thrown from afterRender(), $A is not initialized, so the event has to be handled by default handler.
      */
     public void testDefaultHandleErrorFromAfterRenderWhenMarkEventHandled() throws Exception {
         open("/auratest/errorHandlingApp.app?throwErrorFromAfterRender=true&handleSystemError=true", Mode.PROD, false);
-        assertDisplayedErrorMessage("Error from app afterrender");
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app afterrender";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError event when an error is thrown from rerender().
      */
     public void testDefaultHandleErrorThrownFromRerender() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
+
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromRerenderButton"));
-        assertDisplayedErrorMessage("Error from app rerender");
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app rerender";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify custom handle on App can hanle systemError event when an error is thrown from rerender() of its contained component.
      */
     public void testHandleErrorThrownFromRerenderWhenMarkEventHandled() throws Exception {
@@ -418,16 +491,20 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError event when an error is thrown from unrender().
      */
     public void testDefaultHandleErrorThrownFromUnrender() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
+
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromUnrenderButton"));
-        assertDisplayedErrorMessage("Error from component unrender");
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from component unrender";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify custom error handler can handle systemError event when an error is thrown from render().
      */
     public void testCustomHandleErrorThrownFromUnrender() throws Exception {
@@ -443,47 +520,39 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError event when an error is thrown during init phase.
      */
     public void testDefaultHandleErrorFromInitWhenNoCustomHandler() throws Exception {
         open("/auratest/errorHandlingApp.app?throwErrorFromInit=true", Mode.PROD, false);
-        assertDisplayedErrorMessage("Error from app init");
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app init";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify systemError event can be handled by Aura default error handler event when an error is thrown during init phase
      * if a cmp/app contains custom error handler.
      * When error is thrown during init phase, $A is not initialized, so the event has to be handled by default handler.
      */
     public void testDefaultHandleErrorFromInitWhenMarkEventHandled() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorFromInit=true", Mode.PROD, false);
-        assertDisplayedErrorMessage("Error from app init");
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app init";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
-    /*
+    /**
      * Verify Aura default error handler can handle systemError event when there is an invalid component.
      */
     public void testDefaultHandleInvalidComponentErrorWhenMarkEventHandled() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true&addInvalidComponent=true", Mode.PROD, false);
-        assertDisplayedErrorMessage("Failed to initialize application");
-    }
 
-    /**
-     * Stacktraces vary greatly across browsers so just verify there's more characters than the normal error message and
-     * assume it's the stacktrace.
-     */
-    private void assertStacktracePresent() {
         String actualMessage = findErrorMessage();
-        assertTrue("Stacktrace not present on displayed error.", actualMessage.length() > 150);
-    }
-
-    /**
-     * Only the standard error message plus message on Error should be displayed.
-     */
-    private void assertNoStacktracePresent() {
-        String actualMessage = findErrorMessage();
-        assertTrue("Stacktrace should not be present on displayed error.", actualMessage.length() < 150);
+        String expectedMsg = "Failed to initialize application";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 
     /**

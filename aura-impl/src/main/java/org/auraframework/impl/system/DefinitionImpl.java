@@ -359,6 +359,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders().get(LABEL.getPrefix());
         for (PropertyReference e : props) {
             if (e.getRoot().equals(LABEL.getPrefix())) {
+                labelProvider.validate(e.getStem());
                 labelProvider.getValue(e.getStem());
             }
         }

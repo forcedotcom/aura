@@ -255,7 +255,7 @@
      */
     updateError: function (cmp, errors) {
         if (this._thereIsErrorComponent(cmp)) {
-            this._updateErrorComponent(cmp);
+            this._updateErrorComponent(cmp,errors);
 
         } else {
             // Do nothing if no error component AND no error.

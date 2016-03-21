@@ -19,12 +19,13 @@ import java.io.IOException;
 
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.RenderContext;
 
 public class TestSimpleRenderer implements Renderer {
     public static String htmlOutput = "<div>salesforce.com, inc, All rights reserved <a href=\"http://www.salesforce.com\" target=\"_blank\">Home</a></div>";
 
     @Override
-    public void render(BaseComponent<?, ?> cmp, Appendable out) throws IOException {
-        out.append(htmlOutput);
+    public void render(BaseComponent<?, ?> cmp, RenderContext rc) throws IOException {
+        rc.getCurrent().append(htmlOutput);
     }
 }

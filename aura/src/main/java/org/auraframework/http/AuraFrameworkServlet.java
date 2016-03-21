@@ -26,14 +26,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
 
 public class AuraFrameworkServlet extends AuraBaseServlet {
 
     private static final long serialVersionUID = 6034969764380397480L;
-    private static final ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
     private static final String MINIFIED_FILE_SUFFIX = ".min";
+    private ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
+    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
+    private ResourceLoader resourceLoader = configAdapter.getResourceLoader();
 
     // RESOURCES_PATTERN format:
     // /required_root/optional_nonce/required_rest_of_path
@@ -54,7 +58,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             return;
         }
         long ifModifiedSince = request.getDateHeader(HttpHeaders.IF_MODIFIED_SINCE);
-        setBasicHeaders(null, request,  response);
+        servletUtilAdapter.setCSPHeaders(null, request,  response);
         InputStream in = null;
         try {
 
@@ -172,7 +176,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 return;
             }
             response.reset();
-            setBasicHeaders(null, request, response);
+            servletUtilAdapter.setCSPHeaders(null, request, response);
 
             // handle any MIME content type, using only file name (not contents)
             String mimeType = mimeTypesMap.getContentType(path);
@@ -193,7 +197,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 // If we had a mismatched UID or we had none, and are requesting js (legacy) we set a short
                 // cache response.
                 //
-                setNoCache(response);
+                servletUtilAdapter.setNoCache(response);
             } else if (matchedUid || js) {
                 //
                 // If we have a known good state, we send a long expire. Warning, this means that resources other
@@ -202,12 +206,12 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 // TODO: if we want to have things not included in the fw uid use the fw-uid nonce,
                 // we need to adjust to drop the matchedUid.
                 //
-                setLongCache(response);
+                servletUtilAdapter.setLongCache(response);
             } else {
                 //
                 // By default we use short expire. (1 day)
                 //
-                setShortCache(response);
+                servletUtilAdapter.setShortCache(response);
             }
 
             IOUtil.copyStream(in, response.getOutputStream());

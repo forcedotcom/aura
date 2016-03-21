@@ -20,19 +20,21 @@ import java.util.Map;
 
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class RendererToInjectCmpWithNullLocalId extends AbstractRendererForTestingIntegrationService implements
         Renderer {
 
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
         String desc = (String) component.getAttributes().getValue("desc");
         @SuppressWarnings("unchecked")
         Map<String, Object> attr = (Map<String, Object>) component.getAttributes().getValue("attrMap");
         String placeholder = (String) component.getAttributes().getValue("placeholder");
         Boolean useAsync = (Boolean) component.getAttributes().getValue("useAsync");
 
+        Appendable out = rc.getCurrent();
         out.append(String.format("<div id='%s' style='border: 1px solid black'/>", placeholder));
 
         injectComponent(desc, attr, null, "placeholder", out, useAsync);

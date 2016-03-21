@@ -93,6 +93,8 @@ public class AuraServlet extends AuraBaseServlet {
 
     private ManifestUtil manifestUtil = new ManifestUtil();
 
+    private ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -152,7 +154,7 @@ public class AuraServlet extends AuraBaseServlet {
             Aura.getExceptionAdapter().handleException(e);
         }
 
-        setNoCache(response);
+        servletUtilAdapter.setNoCache(response);
         response.setHeader(HttpHeaders.LOCATION, newLocation);
     }
 
@@ -185,7 +187,7 @@ public class AuraServlet extends AuraBaseServlet {
         try {
             response.setCharacterEncoding(UTF_ENCODING);
             context = Aura.getContextService().getCurrentContext();
-            response.setContentType(getContentType(context.getFormat()));
+            response.setContentType(servletUtilAdapter.getContentType(context.getFormat()));
             definitionService = Aura.getDefinitionService();
         } catch (RuntimeException re) {
             //
@@ -263,8 +265,7 @@ public class AuraServlet extends AuraBaseServlet {
             throws ServletException, IOException {
         // Knowing the app, we can do the HTTP headers, so of which depend on
         // the app in play, so we couldn't do this earlier.
-        ServletUtilAdapter servletUtil = Aura.getServletUtilAdapter();
-        setBasicHeaders(defDescriptor, request, response);
+        servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
         T def;
 
         try {
@@ -278,7 +279,7 @@ public class AuraServlet extends AuraBaseServlet {
                 assertAccess(def);
             }
         } catch (Throwable t) {
-            servletUtil.handleServletException(t, false, context, request, response, false);
+            servletUtilAdapter.handleServletException(t, false, context, request, response, false);
             return;
         }
 
@@ -287,9 +288,9 @@ public class AuraServlet extends AuraBaseServlet {
 
         try {
             if (shouldCacheHTMLTemplate(request)) {
-                setLongCache(response);
+                servletUtilAdapter.setLongCache(response);
             } else {
-                setNoCache(response);
+                servletUtilAdapter.setNoCache(response);
             }
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION);
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION_AURA);
@@ -301,7 +302,7 @@ public class AuraServlet extends AuraBaseServlet {
             String formatAdapter = formatAdapterParam.get(request);
             serializationService.write(def, getComponentAttributes(request), clazz, out, formatAdapter);
         } catch (Throwable e) {
-            servletUtil.handleServletException(e, false, context, request, response, true);
+            servletUtilAdapter.handleServletException(e, false, context, request, response, true);
         } finally {
             loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);
             loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION);
@@ -381,22 +382,21 @@ public class AuraServlet extends AuraBaseServlet {
         ContextService contextService = Aura.getContextService();
         ServerService serverService = Aura.getServerService();
         AuraContext context = contextService.getCurrentContext();
-        ServletUtilAdapter servletUtil = Aura.getServletUtilAdapter();
         response.setCharacterEncoding(UTF_ENCODING);
         boolean written = false;
-        setNoCache(response);
+        servletUtilAdapter.setNoCache(response);
 
         //
         // Pre-hook
         //
-        if (servletUtil.actionServletPostPre(request, response)) {
+        if (servletUtilAdapter.actionServletPostPre(request, response)) {
             return;
         }
         try {
             if (context.getFormat() != Format.JSON) {
                 throw new AuraRuntimeException("Invalid request, post must use JSON");
             }
-            response.setContentType(getContentType(Format.JSON));
+            response.setContentType(servletUtilAdapter.getContentType(Format.JSON));
             String msg = messageParam.get(request);
             if (msg == null) {
                 throw new AuraRuntimeException("Invalid request, no message");
@@ -418,7 +418,7 @@ public class AuraServlet extends AuraBaseServlet {
             }
 
             // The bootstrap action cannot not have a CSRF token so we let it through
-            boolean isBootstrapAction = isBootstrapAction(message, isProductionMode(context.getMode()));
+            boolean isBootstrapAction = isBootstrapAction(message, servletUtilAdapter.isProductionMode(context.getMode()));
 
             if (!isBootstrapAction) {
                 validateCSRF(csrfToken.get(request));
@@ -428,7 +428,7 @@ public class AuraServlet extends AuraBaseServlet {
 
             // Knowing the app, we can do the HTTP headers, so of which depend on
             // the app in play, so we couldn't do this
-            setBasicHeaders(applicationDescriptor, request, response);
+            servletUtilAdapter.setCSPHeaders(applicationDescriptor, request, response);
             if (applicationDescriptor != null) {
                 // ClientOutOfSync will drop down.
                 try {
@@ -456,15 +456,15 @@ public class AuraServlet extends AuraBaseServlet {
             out.write(CSRF_PROTECT);
             serverService.run(message, context, out, attributes);
         } catch (RequestParam.InvalidParamException ipe) {
-            servletUtil.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
+            servletUtilAdapter.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
             return;
         } catch (RequestParam.MissingParamException mpe) {
-            servletUtil.handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
+            servletUtilAdapter.handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
             return;
         } catch (JsonParseException jpe) {
-            servletUtil.handleServletException(new SystemErrorException(jpe), false, context, request, response, false);
+            servletUtilAdapter.handleServletException(new SystemErrorException(jpe), false, context, request, response, false);
         } catch (Exception e) {
-            servletUtil.handleServletException(e, false, context, request, response, written);
+            servletUtilAdapter.handleServletException(e, false, context, request, response, written);
         }
     }
 

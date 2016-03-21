@@ -84,15 +84,15 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 attributes.put("autoInitialize", "false");
             } else {
                 if (manifestUtil.isManifestEnabled()) {
-                    attributes.put("manifest", manifestUtil.getManifestUrl());
+                    attributes.put("manifest", Aura.getServletUtilAdapter().getManifestUrl(context, componentAttributes));
                 }
 
                 sb.setLength(0);
-                writeHtmlScripts(Aura.getServletUtilAdapter().getBaseScripts(context), sb);
+                writeHtmlScripts(Aura.getServletUtilAdapter().getBaseScripts(context, componentAttributes), sb);
                 attributes.put("auraBaseScriptTags", sb.toString());
 
                 sb.setLength(0);
-                writeHtmlScripts(Aura.getServletUtilAdapter().getNamespacesScripts(context), true, sb);
+                writeHtmlScripts(Aura.getServletUtilAdapter().getFrameworkScripts(context, true, componentAttributes), true, sb);
                 attributes.put("auraNamespacesScriptTags", sb.toString());
 
                 if(mode != Mode.PROD && mode != Mode.PRODDEBUG &&
@@ -115,7 +115,7 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 attributes.put("auraInit", JsonEncoder.serialize(auraInit));
             }
             Component template = instanceService.getInstance(templateDef.getDescriptor(), attributes);
-            renderingService.render(template, out);
+            renderingService.render(template, out, null);
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         }

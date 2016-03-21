@@ -17,6 +17,7 @@ package org.auraframework.adapter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -27,9 +28,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.AuraResource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -94,23 +96,44 @@ public interface ServletUtilAdapter extends AuraAdapter {
 
     /**
      * Get the full set of scripts for the current context.
+     *
+     * @param context the aura context to use.
+     * @param safeInlineJs should we include 'inline.js' to allow for CSP protection?
+     * @return the list of scripts.
      */
-    List<String> getScripts(AuraContext context) throws QuickFixException;
+    List<String> getScripts(AuraContext context, boolean safeInlineJs, Map<String,Object> attributes)
+        throws QuickFixException;
+
+    /**
+     * Get the manifest url.
+     */
+    String getManifestUrl(AuraContext context, Map<String,Object> attributes);
 
     /**
      * Get the full set of styles for the current context.
+     *
+     * @param context the aura context to use.
+     * @return the list of css includes
      */
     List<String> getStyles(AuraContext context) throws QuickFixException;
 
     /**
      * Get the base set of scripts for the current context.
+     *
+     * @param context the aura context to use.
+     * @return the list of scripts.
      */
-    List<String> getBaseScripts(AuraContext context) throws QuickFixException;
+    List<String> getBaseScripts(AuraContext context, Map<String,Object> attributes) throws QuickFixException;
 
     /**
-     * Get the base set of scripts for the top level namespace of the current context.
+     * Get the framework scripts for the current application.
+     *
+     * @param context the aura context to use.
+     * @param safeInlineJs should we include 'inline.js' to allow for CSP protection?
+     * @return the list of scripts.
      */
-    List<String> getNamespacesScripts(AuraContext context) throws QuickFixException;
+    List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, Map<String,Object> attributes)
+        throws QuickFixException;
 
     /**
      * Force a page to not be cached.

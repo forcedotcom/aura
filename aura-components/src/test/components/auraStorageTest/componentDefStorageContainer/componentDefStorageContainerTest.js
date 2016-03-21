@@ -44,7 +44,8 @@
         ]
     },
 
-    testComponentDefStorageEviction: {
+    // This test will _not_ work in general... too many assumptions
+    _testComponentDefStorageEviction: {
         labels : ["flapper"],
         test: [
             function loadIframe(cmp) {
@@ -71,6 +72,10 @@
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:block");
             },
             function fetchCmpFromServerToEvictFirstCmp(cmp) {
+                // Why in the world would we believe that fetching this will knock out the first
+                // entry. The storage size is 400K, which means we are assuming that somehow the
+                // combined sizes are magically going to overflow that. If anyone changes the markup
+                // that assumption will fail.
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:menu");
             },
             function verifyOriginalFetchedCmpEvicted(cmp) {

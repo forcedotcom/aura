@@ -21,6 +21,7 @@ import java.util.List;
 import org.auraframework.Aura;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -29,12 +30,12 @@ public class ComponentRenderer implements Renderer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
         Object bodyAttribute = component.getAttributes().getValue("body");
         if(bodyAttribute !=null && bodyAttribute instanceof List) {
             List<BaseComponent<?, ?>> body = (List<BaseComponent<?, ?>>) bodyAttribute;
             for (BaseComponent<?, ?> c : body) {
-                Aura.getRenderingService().render(c, out);
+                Aura.getRenderingService().render(c, rc);
             }
         }
     }

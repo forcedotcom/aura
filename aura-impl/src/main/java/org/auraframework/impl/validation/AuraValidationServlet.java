@@ -77,7 +77,7 @@ public class AuraValidationServlet extends AuraBaseServlet {
         String charset = Charsets.UTF_8.toString();
         response.setStatus(HttpServletResponse.SC_OK);
         response.setCharacterEncoding(charset);
-        setBasicHeaders(Aura.getContextService().getCurrentContext().getApplicationDescriptor(),
+        Aura.getServletUtilAdapter().setCSPHeaders(Aura.getContextService().getCurrentContext().getApplicationDescriptor(),
                 request, response);
 
         if (report != null) {

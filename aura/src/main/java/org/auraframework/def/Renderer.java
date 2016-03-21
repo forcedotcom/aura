@@ -18,6 +18,7 @@ package org.auraframework.def;
 import java.io.IOException;
 
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -34,9 +35,9 @@ public interface Renderer {
      * Render a component.
      * 
      * @param component The instance to render.
-     * @param appendable the output buffer
+     * @param renderContext the output buffer
      * @throws IOException if the appendable does.
      * @throws QuickFixException if there is a quick fix.
      */
-    public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException;
+    public void render(BaseComponent<?, ?> component, RenderContext renderContext) throws IOException, QuickFixException;
 }

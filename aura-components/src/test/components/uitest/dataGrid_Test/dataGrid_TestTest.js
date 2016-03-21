@@ -33,7 +33,7 @@
      * Start at last possible page, then verify that last paging elements acknowledge the change.
      * Ignore FF because row creation and rendering takes too long for FF
      */
-    testWithLargeData : {
+    _testWithLargeData : {
     	browsers : ["-IE8", "-IE7", "-Firefox"],
         attributes : {"pageSize" : 3000, "currentPage" : 1},
         test : function(cmp){

@@ -109,7 +109,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
 
         // No local ID should be fine
         try {
-            integration.injectComponent(simpleComponentTag, attributes, "", "", out);
+            integration.injectComponentHtml(simpleComponentTag, attributes, "", "", out);
         } catch (Exception unexpected) {
             fail("Not specifying a localId to injected component should be tolerated.");
         }
@@ -153,8 +153,8 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
         try {
-            integration.injectComponent(cmp1.getDescriptorName(), attributes, "", "", out);
-            integration.injectComponent(cmp2.getDescriptorName(), attributes, "", "", out);
+            integration.injectComponentHtml(cmp1.getDescriptorName(), attributes, "", "", out);
+            integration.injectComponentHtml(cmp2.getDescriptorName(), attributes, "", "", out);
         } catch (Exception unexpected) {
             fail("Failed to inject multiple component. Exception:" + unexpected.getMessage());
         }
@@ -195,7 +195,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
         try {
-            integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out, async);
+            integration.injectComponentHtml(cmp.getDescriptorName(), attributes, "", "", out, async);
         } catch (Exception unexpected) {
             fail("Exception occured when injecting component with attribute values. Exception:"
                     + unexpected.getMessage());
@@ -244,7 +244,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
         try {
-            integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out);
+            integration.injectComponentHtml(cmp.getDescriptorName(), attributes, "", "", out);
         } catch (Exception unexpected) {
             fail("Exception occured when injecting component with attribute and event handlers. Exception:"
                     + unexpected.getMessage());
@@ -261,7 +261,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
         try {
-            integration.injectComponent(simpleComponentTag, attributes, "", "", out);
+            integration.injectComponentHtml(simpleComponentTag, attributes, "", "", out);
             fail("Using nonexisting attribute names should have failed.");
         } catch (AuraRuntimeException expected) {
             // TODO rework after ccollab: Earlier error message was like
@@ -281,7 +281,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
         try {
-            integration.injectComponent(arraysComponentTag, attributes, "", "", out);
+            integration.injectComponentHtml(arraysComponentTag, attributes, "", "", out);
             fail("Passing attribute with wrong type should have failed.");
         } catch (AuraRuntimeException expected) {
             // TODO rework after ccollab: Earlier error message was like
@@ -303,7 +303,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         attributes.put("label", "Click Me");
         attributes.put("press", new Integer(10));
         try {
-            integration.injectComponent(simpleComponentTag, attributes, "", "", out);
+            integration.injectComponentHtml(simpleComponentTag, attributes, "", "", out);
             fail("Should have failed to accept a non String value for event handler.");
         } catch (AuraRuntimeException expected) {
             // Expected
@@ -323,7 +323,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
         try {
-            integration.injectComponent("foo:bared", attributes, "", "", out);
+            integration.injectComponentHtml("foo:bared", attributes, "", "", out);
             fail("Instantiating component through integration service should have failed because of missing component def.");
         } catch (DefinitionNotFoundException expected) {
             // Expected exception
@@ -340,7 +340,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
         try {
-            integration.injectComponent(validApp, attributes, "", "", out);
+            integration.injectComponentHtml(validApp, attributes, "", "", out);
             fail("Injecting an application through integration service should have failed.");
         } catch (DefinitionNotFoundException expected) {
             // TODO: Maybe a better error message?
@@ -362,7 +362,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
         try {
-            integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out);
+            integration.injectComponentHtml(cmp.getDescriptorName(), attributes, "", "", out);
         } catch (Exception unexpected) {
             fail("Exceptions during component instantiation should be funneled to the client.");
         }
@@ -395,7 +395,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Appendable out = new StringBuffer();
         Integration integration = service.createIntegration("", Mode.UTEST, true, null, appDesc.getQualifiedName(), null);
         try {
-            integration.injectComponent(simpleComponentTag, attributes, "", "", out);
+            integration.injectComponentHtml(simpleComponentTag, attributes, "", "", out);
             fail("App used for integration should extend aura:integrationServiceApp");
         } catch (AuraRuntimeException expected) {
             assertEquals("Application must extend aura:integrationServiceApp.", expected.getMessage());
@@ -405,7 +405,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     private void assertException(Integration obj, String tag, Map<String, Object> attributes, String localId,
             String locatorDomId, Appendable out) throws Exception {
         try {
-            obj.injectComponent(tag, attributes, localId, locatorDomId, out);
+            obj.injectComponentHtml(tag, attributes, localId, locatorDomId, out);
             fail("Expected IntegrationService to throw an AuraRuntimeException.");
         } catch (NullPointerException e) {
             fail("IntegrationService threw a NullPointerException, expected AuraRuntimeException.");
@@ -429,7 +429,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("label", "Click Me");
         Appendable out = new StringBuffer();
-        obj.injectComponent(simpleComponentTag, attributes, "", "", out);
+        obj.injectComponentHtml(simpleComponentTag, attributes, "", "", out);
         return out;
     }
     

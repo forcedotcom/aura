@@ -16,7 +16,7 @@
 function lib() { //eslint-disable-line no-unused-vars
       var transformFunctions = {
         center: function(inp, targetBox) {
-            return inp + 0.5 * targetBox.width; 
+            return Math.floor(inp + 0.5 * targetBox.width); 
         },
         right: function(inp, targetBox) {
             return inp + targetBox.width;
@@ -90,7 +90,7 @@ function lib() { //eslint-disable-line no-unused-vars
             case 'middle' :
                 this._exp = function(targetBox, elementBox) {
                     return {
-                        top: 0.5 * (2 * targetBox.top + targetBox.height - elementBox.height)
+                        top: Math.floor(0.5 * (2 * targetBox.top + targetBox.height - elementBox.height))
                     };
                 };
                 break;

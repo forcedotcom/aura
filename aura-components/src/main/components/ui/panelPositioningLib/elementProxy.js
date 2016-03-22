@@ -132,13 +132,12 @@ function lib(w) { //eslint-disable-line no-unused-vars
      * @method refresh
      */
     ElementProxy.prototype.refresh = function() {
-
         if(!this.isDirty()) {
 
-            if(!this.checkNodeIsInDom) {
+            if(!this.checkNodeIsInDom()) {
                 return this.release();
             }
-
+            
             var box, x, scrollTop, scrollLeft;
 
             if(typeof w.pageYOffset !== 'undefined') {

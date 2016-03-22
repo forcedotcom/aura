@@ -44,13 +44,12 @@
 
 	buildTooltip: function(component, cb) {
 		var cmLib = this.cmLib;
-		var compDef ={};
+		var compDef = {};
 		if(component._tooltip) {
 			setTimeout($A.getCallback(function () {
 				cb(component._tooltip);
 			}, 0));
 		} else {
-
 			['tooltipBody', 
 				'isVisible', 
 				'tooltipBody', 
@@ -149,6 +148,7 @@
 	cleanup: function(component) {
 		if(component._tooltip ) {
 			this.cmLib.containerManager.getSharedInstance().destroyContainer(component._tooltip);
+			component._tooltip = null;
 		}
 	},
 

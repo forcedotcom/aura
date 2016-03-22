@@ -864,6 +864,8 @@ AuraInstance.prototype.handleError = function(message, e) {
  * Note that the method should only be used if try-catch mechanism
  * of error handling is not desired or not functional (ex: in nested promises)
  * @public
+ * @param {String} message The message to display.
+ * @param {Error} error An error object to be included in handling and reporting.
  * @platform
  */
 AuraInstance.prototype.reportError = function(message, error) {
@@ -1392,6 +1394,7 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
      * @borrows AuraComponentService#newComponentAsync as $A.newCmpAsync
      * @borrows AuraInstance#localizationService as localizationService
      * @borrows AuraInstance#util as util
+     * @borrows AuraInstance#reportError as $A.reportError
      */
     window['$A'] = new AuraInstance();
     Aura.bootstrapMark("frameworkReady");

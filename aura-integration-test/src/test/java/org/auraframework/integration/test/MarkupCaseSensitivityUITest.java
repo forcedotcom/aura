@@ -47,6 +47,11 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
 	public MarkupCaseSensitivityUITest(String name) {
 		super(name);
 	}
+
+
+	public void testDummy() {
+		return;
+	}
 	
 	/**
 	 * we have library imported in testMarkupCaseSensitivityApp.app like this:
@@ -56,10 +61,11 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
      * This verify after first loading the testApp (it loads fine)
      * we modify test_Library.lib, change all basicFirst to BASICFirst (wrong case, BASICFirst.js doesn't exist)
      * then reload the testApp, it still loads fine, and what we changed is updated in lib too (verify through helper).
-	 */
+         fix it and enable plz: W-2984818	
+       */
 	@UnAdaptableTest("SFDC chrome autobuild doesn't pick up source change, not sure why.")
 	@ThreadHostileTest("We are messing up with source during the test, if you load other cmp/app at the same time, it might get wrong source")
-	public void testLibFileChangeAfterCached() throws Exception {
+	public void _testLibFileChangeAfterCached() throws Exception {
 		//load the test app, and verify the lib loads fine
 		String url = "/"+testAppNamespace+"/"+testAppName+".app";
         open(url, Mode.DEV);

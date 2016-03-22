@@ -520,6 +520,7 @@ button.toggle:focus {
   border-left: 1px solid #e0e5ee;
   bottom: 0;
   overflow: auto;
+  padding: 0 0 30px 0;
   position: absolute;
   right: 0;
   width: 25%;

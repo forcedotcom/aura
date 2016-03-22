@@ -1157,16 +1157,23 @@ Action.prototype.toJSON = function() {
  * @param e the exception with which we want to mark the action.
  */
 Action.prototype.markException = function(e) {
+    var descriptor = this.def ? this.def.toString() : "";
+
     // if the error doesn't have id, we wrap it with auraError so that when displaying UI, it will have an id
     if (!e.id) {
-        var descriptor = this.def ? this.def.toString() : "";
         e = new $A.auraError(descriptor ? "Action failed: " + descriptor : "", e);
         e.component = descriptor;
+    }
+
+    // keep the root cause failing descriptor for AE and AFE
+    if (e instanceof $A.auraError) {
+        e.component = e.component || descriptor;
     }
 
     this.state = "ERROR";
     this.error = e;
     if ($A.clientService.inAuraLoop()) {
+        $A.lastKnownError = e;
         throw e;
     }
 };

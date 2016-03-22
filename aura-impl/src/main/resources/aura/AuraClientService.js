@@ -601,15 +601,6 @@ AuraClientService.prototype.countAvailableXHRs = function(/*isBackground*/) {
 };
 
 /**
- * release the current thread from 'in aura collections'
- *
- * @export
- */
-AuraClientService.prototype.inFlightXHRs = function(/*isBackground*/) {
-    return this.allXHRs.length - this.availableXHRs.length;
-};
-
-/**
  * Get an available XHR.
  *
  * Used for instrumentation
@@ -1021,6 +1012,23 @@ AuraClientService.prototype.init = function(config, token, container) {
         throw new $A.auraError("Error during init", e, $A.severity.QUIET);
     }
     //#end
+};
+
+/**
+ * Return the number of inFlightXHRs
+ *
+ * @export
+ */
+AuraClientService.prototype.inFlightXHRs = function(excludeBackground) {
+    if (excludeBackground) {
+        var inFlight = $A.util.filter(this.allXHRs, function (xhr) {
+            return this.availableXHRs.indexOf(xhr) === -1 && !xhr.background;
+        }, this);
+
+        return inFlight.length;
+    }
+
+    return this.allXHRs.length - this.availableXHRs.length;
 };
 
 /**
@@ -1875,6 +1883,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         }
         actionsToSend.push(action.prepareToSend());
     }
+
     if (actionsToSend.length === 0) {
         return false;
     }
@@ -1908,6 +1917,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         url = url + "?" + qs;
     }
 
+    auraXHR.background = options && options.background;
     auraXHR.length = qs.length;
     auraXHR.request = this.createXHR();
     auraXHR.marker = Aura.Services.AuraClientServiceMarker++;

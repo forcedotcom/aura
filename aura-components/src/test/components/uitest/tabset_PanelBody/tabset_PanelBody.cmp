@@ -1,0 +1,125 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+	<ui:tabset aura:id="tabset" class="tabset">
+		<ui:tab aura:id="tab1" class="tab1" title="Long content" scroll="true">
+			<div class="tabContent" >
+				In the spring of 1936 an exploration party penetrates thick jungle on the South American continent. When the group's leader stops to examine map fragments, another of the group pulls a gun. The leader, hearing the click as the turncoat chambers a round, pulls out a bullwhip and disarms the man, sending him fleeing back through the jungle. The man who expertly wields the bullwhip is Dr. Henry "Indiana" Jones, Jr. (Harrison Ford), an archaeologist with a reputation for heavy-handed field work that takes him around the globe in search of ancient treasures.<br/>
+				<br/>
+				Indy and his remaining companion, Sapito (Alfred Molina), enter a dank and oppressively vast cave, where a competitor of his, Forrestal, disappeared. Inside the cave are several traps rigged by the ancient people who hid a small, valuable statue there -- and one of the traps is found to have snared Forrestal. Jones finds the antechamber where the statue sits atop a pedestal and is protected by an elaborate system of pressure-sensitive stones that release deadly darts from the surrounding walls. Jones avoids the booby-trapped stones and makes it to the idol. He very deftly replaces the idol with a bag of sand, judging the weight of the treasure by sight. However, the weight is not precise, the pedestal sinks and the chamber begins to disintegrate. Jones runs, narrowly avoiding the darts. When he arrives at a bottomless pit he and Sapito had crossed earlier using Jones' bullwhip, Sapito crosses safely but refuses to give Jones his whip unless he gives him the idol. Sapito drops the whip and runs off. Jones manages to jump across and pull himself up and escape under the stone door that closes. He finds Sapito dead, killed by the same trap that killed Forrestal. Jones retrieves the idol and must once again flee while a large boulder rushes toward him.<br/>
+				<br/>
+				Seemingly safe, Indy is cornered by the Hovitos, the local tribe, who are led by Dr. Rene Belloq (Paul Freeman), an arrogant French archaeologist who is a longtime rival and enemy of Indy's. Indy flees and is rescued by Jock (Fred Sorenson), flying a seaplane, though Indy isn't pleased to find Jock's pet snake Reggie inside.<br/>
+				<br/>
+				Back stateside, Indy teaches an archeology class and is still upset over the loss of the statue, which he surmises Belloq is taking to Marrakesh; he has found pieces he feels will pay for a trip to Marrakesh to find Belloq, but Indy's friend Marcus Brody (Denholm Elliott) dashes that hope by informing him that two Army Intelligence officers want to talk to him about Abner Ravenwood, his former teacher, who was his friend until Indy broke up with his daughter, Marion (Karen Allen).<br/>
+				<br/>
+				The Army officers are concerned because they've intercepted a German cable concerning a mammoth archaeological dig in the Egyptian desert. When they read the cable, Indy and Marcus realize the Nazis have discovered Tanis, an ancient city buried in a gigantic sandstorm in 980 B.C. and the possible burial site of the Ark of the Covenant. The Ark was built by ancient Hebrews to hold the stone tablets on which Moses inscribed the Ten Commandments. It holds immense mystical power -- enough to allow the Nazis to level mountains and lay waste to entire regions.<br/>
+				<br/>
+				Indy flies to Nepal (followed by a Nazi agent, Toht (Ronald Lacey)) to confront Marion Ravenwood, who runs a restaurant and bar (and who can outdrink anyone) because he needs the headpiece to the Staff of Ra, whose crystals will allow him to determine the exact location of the Ark. Marion, still bitter over their breakup, nonetheless accepts when Indy offers her $3,000 and the promise of more when they return stateside. She is cryptic about the headpiece, and after Indy leaves she ponders it as she wears it around her neck.<br/>
+				<br/>
+				Toht and several Sherpa heavies enter the bar and hold Marion hostage, with Toht ready to torture her for the headpiece. Indy returns and a firefight erupts during which the fireplace is dislodged and the building begins burning down. Toht finds the headpiece but when he grabs it he's badly burned -- leaving an image of one side of the headpiece branded on his hand. He escapes while Indy and Marion do likewise and fly to Egypt to see Indy's pal, Sallah (John Rhys-Davies), who is working on the Nazi site and who reveals that the Nazis are aided by a French archaeologist (Belloq).<br/>
+				<br/>
+				Later, while shopping at a Cairo bazaar, Indy and Marion are attacked by sword-wielding Arabs working for Nazi agents. Indy fights them off but in the confusion Marion is trapped in a large basket and taken by two of the terrorists. The effort to track her down is held up by a man brandishing a sword in intimidating fashion. The swordsman is shot down in short order by a thoroughly unimpressed Indy.<br/>
+				<br/>
+				Soon Indy spots a basket carried to a truck filled with explosives and is fired on by a submachine-gun-wielding assailant. His Nazi commander orders the Arabs to take off, but Indy shoots them and the truck crashes, exploding and destroying the basket.<br/>
+				<br/>
+				Disconsolate over losing Marion, Indy drowns his sorrows in drink but is met by more Nazi agents who escort him to a table at which is seated Belloq, who gleefully talks about finding the Ark. Indy, no longer caring whether he lives or dies, reaches for his sidearm as Arabs inside pull rifles -- only to see Sallah's large brood of children rush in and the "Arabs" to turn out to be US Marines, much to the embarassment of Belloq.<br/>
+				<br/>
+				Sallah takes Indy to see a shaman who is reading the Ra headpiece after both men have learned that Belloq and his Wehrmacht aide, Colonel Dietrich (Wolf Kahler), have obtained a copy of the headpiece. (Neither man is aware that it is a duplicate traced from Toht's burned hand.) The shaman reveals two critical facts: first, that the headpiece gives the precise height of the Staff of Ra, and second, that the staff the Nazis used was too long -- so their excavation is over a mile away from the Ark's actual burial site, which is known as the Well of Souls.<br/>
+				<br/>
+				Infiltrating the mammoth site, Indy is lowered into an underground maproom containing a precisely detailed miniature of the city. Using the Ra headpiece, he identifies the precise location of the Well of Souls. Sneaking further around the gigantic camp, Indy is shocked to find Marion, alive but bound and gagged. Indy starts to free her, but when she reveals that the Nazis keep asking about him and what he knows, he realizes he can't cut her loose without revealing his presence to the Nazis.<br/>
+				<br/>
+				Late that afternoon Indy and Sallah sneak a digging party of their own to the actual location of the Well of Souls. Late into the night they dig open the chamber, and to Indy's horror it is filled with dangerous snakes. Indy clears an area of snakes with burning torches, then lowers himself into the chamber and burns many of the snakes alive with flaming gasoline. Sallah follows and the two eventually find the gigantic chest that is the Ark.<br/>
+				<br/>
+				By now it is dawn, and only now does Belloq notice the commotion a mile away. The Nazis surround the site and Indy is left trapped inside, but Dietrich leaves him with something else -- Marion, who is thrown into the chamber and the area closed off.<br/>
+				<br/>
+				Indy notices a wall where snakes are entering. He climbs a mammoth statue and with all his might breaks it from its foundation and it crashes through the wall. The two find an opening to the surface, and discover the airfield at the excavation camp, where there is a bizarre Nazi transport plane. The two sneak up to the plane, but Indy is attacked by a mechanic and a prolonged fight ensues that is joined by a burly Nazi who pummels Indy before being punched backward and shredded to bits by the plane's propellers. Marion seizes one of the plane's machine guns and opens fire on Nazi soldiers, in the process setting a fuel dump aflame. The fire destroys the area and the plane explodes, but Indy and Marion escape.<br/>
+				<br/>
+				Dietrich orders his men to transport the Ark by truck to Cairo. When Sallah finds Indy and Marion, he is overjoyed they're alive and tells them of Dietrich's plan. Indy takes a horse and pursues the convoy, seizing the truck containing the Ark and surviving a brutal chase and fight with Nazi soldiers to drive the Ark to safety.<br/>
+				<br/>
+				He and Marion board a ship taking the Ark back to the US, but a Nazi submarine captures the ship. The Ark is taken aboard the sub and Marion taken prisoner for Belloq. Indy, however, escapes Nazi pursuit and rides the submarine as it sails on the ocean surface to an island where Belloq and the Nazis trek to the top of a mountain.<br/>
+				<br/>
+				Indy has grabbed a rocket launcher and intercepts Belloq, vowing to blow up the Ark unless Marion is freed. But Belloq calls Indy's bluff, knowing Indy wants to know what the Ark contains as much as anyone. Indy finds he can't carry out his threat, and is seized.<br/>
+				<br/>
+				At an elaborate ceremony atop the mountain Indy and Marion, tied to a pole, can only watch as the Ark is opened, but it contains nothing but sand, the remains of the stone tablets. No sooner is it opened, however, than its spirits suddenly appear. Indy and Marion, remembering an ancient code that requires people to close their eyes and not look at the now-freed spirits, withstand the mayhem that ensues as the energy of the Ark surges forth and its spirits attack the now-terrified Nazis, killing the entire contingent and destroying Belloq in gruesome fashion. The energy mass surges high into the sky before returning to the Ark and resealing it, leaving Indy and Marion drained but freed.<br/>
+				<br/>
+				Weeks later Indy and Marcus feud with the Army officers over the whereabouts of the Ark, Indy angry that the Army has no idea what it has in the Ark -- though it appears they in fact do understand what they have, as the Ark is sealed in a large crate and stored anonymously in a gigantic government warehouse, never to be seen again.
+			</div>
+	    </ui:tab>
+	    <ui:tab aura:id="tab2" class="tab2" title="Short" closable="true">
+	        tab 2
+	    </ui:tab>
+	    <ui:tab aura:id="tab3" class="tab3"  title="Tab With Nested Tabs">
+	    	<ui:tabset aura:id="tabsetNested">
+	            <ui:tab aura:id="nestedTab1" class="nestedTab1" title="nested tab 1" closable="true">
+	                nested tab 1
+	            </ui:tab>
+	            <ui:tab aura:id="nestedTab2" class="nestedTab2" title="nested tab 2 - long content">
+		            <div class="tabContentNested scrollable">
+		                Now, this is a story all about how<br/>
+						My life got flipped-turned upside down<br/>
+						And I'd like to take a minute<br/>
+						Just sit right there<br/>
+						I'll tell you how I became the prince of a town called Bel-Air<br/>
+						<br/>
+						In west Philadelphia born and raised<br/>
+						On the playground was where I spent most of my days<br/>
+						Chillin' out maxin' relaxin' all cool<br/>
+						And all shooting some b-ball outside of the school<br/>
+						When a couple of guys who were up to no good<br/>
+						Started making trouble in my neighborhood<br/>
+						I got in one little fight and my mom got scared<br/>
+						She said 'You're movin' with your auntie and uncle in Bel-Air'<br/>
+						<br/>
+						I begged and pleaded with her day after day<br/>
+						But she packed my suitcase and sent me on my way<br/>
+						She gave me a kiss and then she gave me my ticket.<br/>
+						I put my Walkman on and said, 'I might as well kick it'.<br/>
+						<br/>
+						First class, yo this is bad<br/>
+						Drinking orange juice out of a champagne glass.<br/>
+						Is this what the people of Bel-Air living like?<br/>
+						Hmm this might be alright.<br/>
+						<br/>
+						But wait I hear they're prissy, bourgeois, all that<br/>
+						Is this the type of place that they just send this cool cat?<br/>
+						I don't think so<br/>
+						I'll see when I get there<br/>
+						I hope they're prepared for the prince of Bel-Air<br/>
+						<br/>
+						Well, the plane landed and when I came out<br/>
+						There was a dude who looked like a cop standing there with my name out<br/>
+						I ain't trying to get arrested yet<br/>
+						I just got here<br/>
+						I sprang with the quickness like lightning, disappeared<br/>
+						<br/>
+						I whistled for a cab and when it came near<br/>
+						The license plate said fresh and it had dice in the mirror<br/>
+						If anything I could say that this cab was rare<br/>
+						But I thought 'Nah, forget it' - 'Yo, home to Bel-Air'<br/>
+						<br/>
+						I pulled up to the house about 7 or 8<br/>
+						And I yelled to the cabbie 'Yo home smell ya later'<br/>
+						I looked at my kingdom<br/>
+						I was finally there<br/>
+						To sit on my throne as the Prince of Bel-Air
+					</div>
+	            </ui:tab>
+	        </ui:tabset>
+	    </ui:tab>
+	</ui:tabset>
+</aura:component>

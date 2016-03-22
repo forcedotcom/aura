@@ -871,6 +871,12 @@ AuraInstance.prototype.reportError = function(message, error) {
     $A.handleError(message, error);
     if ($A.initialized) {
         $A.getCallback(function() {
+            if (error && message) {
+                // if there's extra info in the message that's not in error.message, include it for report.
+                if (message !== error.message && message.indexOf(error.message) > -1) {
+                    error.message = message;
+                }
+            }
             $A.logger.reportError(error);
         })();
         $A.services.client.postProcess();

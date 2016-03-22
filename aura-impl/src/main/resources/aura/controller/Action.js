@@ -1173,6 +1173,7 @@ Action.prototype.markException = function(e) {
     this.state = "ERROR";
     this.error = e;
     if ($A.clientService.inAuraLoop()) {
+        $A.lastKnownError = e;
         throw e;
     }
 };

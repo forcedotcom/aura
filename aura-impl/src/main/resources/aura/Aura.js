@@ -244,6 +244,8 @@ function AuraInstance () {
         QUIET: "QUIET"
     };
 
+    this.lastKnownError = null;
+
     /**
      * Instance of the AuraLocalizationService which provides utility methods for localizing data or getting formatters for numbers, currencies, dates, etc.<br/>
      * See the documentation for <a href="#reference?topic=api:AuraLocalizationService">AuraLocalizationService</a> for the members.
@@ -265,7 +267,6 @@ function AuraInstance () {
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     this.devToolService = new AuraDevToolService();
-    this.errors = [];
     //#end
 
 
@@ -814,15 +815,6 @@ AuraInstance.prototype.handleError = function(message, e) {
     var dispMsg = message;
     var evtArgs = {"message":dispMsg,"error":null,"auraError":null};
     if (e) {
-        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        // only keep the most recent 1000 errors
-        var len = this.errors.length;
-        if (len === 1000) {
-            this.errors = this.errors.slice(1, len);
-        }
-
-        this.errors.push(e);
-        //#end
         if (e["handled"]) {
             return;
         } else {
@@ -869,8 +861,12 @@ AuraInstance.prototype.handleError = function(message, e) {
  * @platform
  */
 AuraInstance.prototype.reportError = function(message, error) {
-    // when the method is called w/o error object, we create a dummy to have client error id.
-    error = error || new $A.auraError("[NoErrorObjectAvailable] " + message);
+    // for browsers that doesn't have 5th argument (error object) passed in the onerror handler,
+    // we use our bookkeeping object this.lastKnownError
+    // when there is still no error object, we create a dummy to have client error id.
+    error = error ||
+        ((this.lastKnownError && message && message.indexOf(this.lastKnownError.message) > -1) ? this.lastKnownError : null) ||
+        new $A.auraError("[NoErrorObjectAvailable] " + message);
 
     $A.handleError(message, error);
     if ($A.initialized) {
@@ -879,6 +875,7 @@ AuraInstance.prototype.reportError = function(message, error) {
         })();
         $A.services.client.postProcess();
     }
+    this.lastKnownError = null;
 };
 
 /**
@@ -934,11 +931,12 @@ AuraInstance.prototype.getCallback = function(callback) {
         } catch (e) {
             // no need to wrap AFE with auraError as
             // customers who throw AFE would want to handle it with their own custom experience.
-            if (e instanceof $A.auraFriendlyError || e instanceof $A.auraError) {
+            if (e instanceof $A.auraError) {
                 if (context && context.getDef) {
                     e.component = e.component || context.getDef().getDescriptor().toString();
                 }
 
+                $A.lastKnownError = e;
                 throw e;
             } else {
                 var errorWrapper = new $A.auraError("Uncaught error in $A.getCallback()", e);
@@ -946,6 +944,7 @@ AuraInstance.prototype.getCallback = function(callback) {
                     errorWrapper.component = context.getDef().getDescriptor().toString();
                 }
 
+                $A.lastKnownError = errorWrapper;
                 throw errorWrapper;
             }
         } finally {

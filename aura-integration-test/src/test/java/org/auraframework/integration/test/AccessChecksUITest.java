@@ -21,7 +21,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
-@ThreadHostileTest("Tests modify what namespaces are Internal or not")
+@ThreadHostileTest("Tests modify what namespaces are Internal or not and locker service enabled")
 public class AccessChecksUITest extends WebDriverTestCase {
 
     public AccessChecksUITest(String name) {
@@ -31,6 +31,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        
         // TODO: remove when $A.createComponent is exposed in the locker
         getMockConfigAdapter().setLockerServiceEnabled(false);
     }

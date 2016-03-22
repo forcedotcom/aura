@@ -20,7 +20,7 @@ import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 
-@ThreadHostileTest("Tests modify what namespaces are internal or not")
+@ThreadHostileTest("Tests modify what namespaces are Internal or not and locker service enabled")
 public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
 
     public GetDefinitionAccessCheckUITest(String name) {
@@ -30,6 +30,7 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        
         // TODO: remove when $A.createComponent is exposed in the locker
         getMockConfigAdapter().setLockerServiceEnabled(false);
     }

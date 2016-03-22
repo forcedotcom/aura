@@ -43,7 +43,6 @@ import com.google.common.collect.Sets;
  * ConfigAdapter for Aura tests.
  */
 public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConfigAdapter {
-
     /**
      * An extension of a ContentSecurityPolicy that adds "odd" test requirements.
      */
@@ -160,7 +159,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private String csrfToken = null;
     private final Set<String> nonInternalNamespaces = new HashSet<>();
     private final Set<String> unprivilegedNamespaces = new HashSet<>();
-    private Boolean lockerServiceEnabled = null;
+    private Boolean isLockerServiceEnabledGlobally;
 
     public MockConfigAdapterImpl() {
         super();
@@ -179,7 +178,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         csrfToken = null;
         unprivilegedNamespaces.clear();
         nonInternalNamespaces.clear();
-        lockerServiceEnabled = null;
+        isLockerServiceEnabledGlobally = null;
     }
 
     @Override
@@ -327,15 +326,12 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     }
 
     @Override
-    public void setLockerServiceEnabled(boolean isLockerServiceEnabled) {
-        this.lockerServiceEnabled = isLockerServiceEnabled;
+    public void setLockerServiceEnabled(boolean enabled) {
+		isLockerServiceEnabledGlobally = enabled;
     }
 
     @Override
     public boolean isLockerServiceEnabled() {
-        if (lockerServiceEnabled == null) {
-            return super.isLockerServiceEnabled();
-        }
-        return this.lockerServiceEnabled;
+        return (isLockerServiceEnabledGlobally == null) ? super.isLockerServiceEnabled() : isLockerServiceEnabledGlobally;
     }
 }

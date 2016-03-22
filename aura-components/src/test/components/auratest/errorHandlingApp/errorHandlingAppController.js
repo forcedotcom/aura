@@ -6,13 +6,15 @@
         }
 
         var message = event.getParam("message");
-        var error = event.getParam("error");
+        var errorName = event.getParam("error");
         var auraError = event.getParam("auraError");
 
         if(cmp.get("v.useFriendlyErrorMessageFromData") && auraError.data) {
             message = auraError.data["friendlyMessage"];
         }
 
+        cmp._errorName = errorName;
+        cmp._auraError = auraError;
         cmp.set("v.message", message);
         cmp.set("v.errorId", auraError.id);
         cmp.set("v.severity", auraError.severity);
@@ -36,7 +38,9 @@
     },
 
     throwAuraErrorFromClientController: function(cmp) {
-        throw new AuraError("AuraError from app client controller");
+        // severity is undefined by default
+        var severity = cmp.get("v.severity");
+        throw new AuraError("AuraError from app client controller", undefined, severity);
     },
 
     throwAuraFriendlyErrorFromClientController: function(cmp) {
@@ -76,7 +80,6 @@
         cmp.set("v.throwErrorFromUnrender", true);
         cmp.destroy(false);
     },
-
 
     doServerAction: function(cmp) {
         var action = cmp.get("c.doSomething");

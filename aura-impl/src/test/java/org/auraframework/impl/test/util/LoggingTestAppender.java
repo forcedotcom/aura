@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.integration.test.logging;
+package org.auraframework.impl.test.util;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 
 public class LoggingTestAppender extends AppenderSkeleton {
-    private final List<LoggingEvent> log = Collections.synchronizedList(new ArrayList<>());
+    private final List<LoggingEvent> log = new CopyOnWriteArrayList<>();
     public static final String NAME = "LoggingTestAppender";
 
     public LoggingTestAppender() {

@@ -23,8 +23,8 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 import org.auraframework.impl.ExceptionAdapterImpl;
+import org.auraframework.impl.test.util.LoggingTestAppender;
 import org.auraframework.integration.test.logging.AbstractLoggingUITest;
-import org.auraframework.integration.test.logging.LoggingTestAppender;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.hamcrest.CoreMatchers;
@@ -42,6 +42,26 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
 
     public ErrorHandlingLoggingUITest(String name) {
         super(name, ExceptionAdapterImpl.class);
+    }
+
+    public void testClientErrorIdMatchesLoggedErrorId() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+        // generate an error on the client side
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+        String clientErrorId = getText(By.cssSelector("div[id='appErrorIdOutput']"));
+
+        // Client error is sent via Caboose Actions, force a foreground action to sent error to server
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        String errorIdHeader = "Client error id: ";
+        int errorIdStart = log.indexOf(errorIdHeader) + errorIdHeader.length();
+        // error id's length is 36
+        String loggedErrorId = log.substring(errorIdStart, errorIdStart + 36);
+        assertEquals(clientErrorId, loggedErrorId);
     }
 
     public void testClientErrorFromClientController() throws Exception {
@@ -98,6 +118,40 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
+    public void testClientErrorFromRerender() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+        // generate a client error in rerender()
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromRerenderButton"));
+        // Client error is sent via Caboose Actions, force a foreground action to sent error to server
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String failingDescriptor = "markup://auratest:errorHandlingApp";
+        String expectedMessage = String.format("AuraError: rerender threw an error in '%s' [Error from app rerender]", failingDescriptor);
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    public void testClientErrorFromUnrerender() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+        // generate a client error in rerender()
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromUnrenderButton"));
+        // Client error is sent via Caboose Actions, force a foreground action to sent error to server
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String failingDescriptor = "markup://auratest:errorHandlingApp";
+        String expectedMessage = String.format("AuraError: unrender threw an error in '%s' [Error from app unrender]", failingDescriptor);
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
     private void assertClientErrorLogContains(String log, String expectedMessage, boolean requireErrorId, String failingDescriptor) {
         assertThat("Missing expected message in the log.", log, CoreMatchers.containsString(expectedMessage));
         assertThat("Missing failing descriptpr in the log." + log, log, CoreMatchers.containsString("Failing descriptor: " + failingDescriptor));
@@ -117,18 +171,16 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
             @Override
             public Boolean apply(WebDriver d) {
                 List<LoggingEvent> logs = appender.getLog();
-                synchronized(logs) {
-                    while (!logs.isEmpty()) {
-                        LoggingEvent log = logs.remove(0);
-                        Level level = log.getLevel();
-                        // client error is logged as ERROR
-                        if (level.equals(Level.ERROR)) {
-                            cspRecords.add(log.getMessage().toString());
-                            return cspRecords.size() == expectedLogsSize;
-                        }
+                while (!logs.isEmpty()) {
+                    LoggingEvent log = logs.remove(0);
+                    Level level = log.getLevel();
+                    // client error is logged as ERROR
+                    if (level.equals(Level.ERROR)) {
+                        cspRecords.add(log.getMessage().toString());
+                        return cspRecords.size() == expectedLogsSize;
                     }
-                    return false;
                 }
+                return false;
             }
         },
         10,

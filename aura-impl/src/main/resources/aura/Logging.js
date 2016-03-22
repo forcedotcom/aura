@@ -54,6 +54,10 @@
                 return true;
             }
 
+            if (url && line && col) {
+                message = message + "\nthrows at " + url + ":" + line + ":" + col;
+            }
+
             $A.reportError(message, err);
             return true;
         };

@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2016 salesforce.com, inc.
+    Copyright (C) 2013 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,16 +21,9 @@
     <aura:attribute name="value" type="Decimal" default=""/>
 
     <!--Layout -->
-    <div style="padding:15px;">
-        <ui:inputCurrency aura:id="input" value="{! v.value }" label="Input"/>
-        <br/>
-        v.value:
-        <ui:outputText aura:id="output" value="{! v.value }"/>
-        <hr/>
-        <ui:button label="Set number - 1234" press="{! c.setNewValueAsNumber }"></ui:button>
-        <ui:button label="Set string number - '5678'" press="{! c.setNewValueAsString }"></ui:button>
-        <ui:button label="Set a well formatted string number '$5,678.00'" press="{! c.setNewValueAsWellFormatted }"></ui:button>
-        <ui:button label="Set incorrent  '35Aai#i'" press="{! c.setNewValueIncorrect }"></ui:button>
-    </div>
+    <ui:inputPercent aura:id="input" value="{! v.value }" label="Input"/>
+    <br/>
+    v.value:
+    <ui:outputText aura:id="output" value="{! v.value }"/>
 
 </aura:component>

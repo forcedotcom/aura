@@ -14,15 +14,32 @@
  * limitations under the License.
  */
 ({
+    /*
+     * Pass nothing to component
+     */
+    testUnassigned: {
+        test: function (component) {
+            this.assertCmpElemValues(component, undefined, "");
+        }
+    },
+
+    /*
+     * Test 0 to catch if(number) bug
+     */
+    testZero: {
+        attributes: {value: 0},
+        test: function (component) {
+            this.assertCmpElemValues(component, 0, "0%");
+        }
+    },
+
 	/**
-	 * Test percent formated correctly.
+	 * Test percent formated correctly with default format
 	 */
-	testPercentDisplayed: {
+	testDefaultFormat: {
     	attributes : {value : .12},
     	test : function(component){
-    		var value = component.getElement().value;
-    		$A.test.assertEquals(0.12, component.get("v.value"), "Cmp value does not equal expected");
-    		$A.test.assertEquals("12%", value, "Element value does not equal expected");
+            this.assertCmpElemValues(component, 0.12, '12%');
     	}
     },
 
@@ -32,21 +49,18 @@
     testValueScale: {
     	attributes : {value : .12, valueScale : "5" },
     	test : function(component){
-    		var value = component.getElement().value;
-    		$A.test.assertEquals(0.12, component.get("v.value"), "Cmp value does not equal expected");
-    		$A.test.assertEquals("1,200,000%", value, "Element value does not equal expected");
+            this.assertCmpElemValues(component, 0.12, '1,200,000%');
     	}
     },
 
     /**
-	 * Test percent formated correctly when value scale is a negative value
+	 * Test percent formatted correctly when value scale is a negative value
+     * displayed value = value * 100. so value 12000 -> display 1200000 -> -5 scale (divide 10^5) -> 12
 	 */
-    _testValueScaleNegative: {
-    	attributes : {value : .12, valueScale : "-5"},
+    testValueScaleNegative: {
+    	attributes : {value : 12000, valueScale : "-5"},
     	test : function(component){
-    		var value = component.getElement().value;
-    		$A.test.assertEquals(0.12, component.get("v.value"), "Cmp value does not equal expected");
-    		$A.test.assertEquals("0.00012%", value, "Element value does not equal expected");
+            this.assertCmpElemValues(component, 12000, '12%');
     	}
     },
 
@@ -56,54 +70,67 @@
     testValueScaleWithFormat: {
     	attributes : {value : .12,  valueScale : "5", format : "#,###.00%"},
     	test : function(component){
-    		var value = component.getElement().value;
-    		$A.test.assertEquals(0.12, component.get("v.value"), "Cmp value does not equal expected");
-    		$A.test.assertEquals("1,200,000.00%", value, "Element value does not equal expected");
+            this.assertCmpElemValues(component, 0.12, '1,200,000.00%');
     	}
     },
 
+    /**
+     * Test to make sure positive value works when changing the format
+     */
     testPositiveValueWithFormat: {
         attributes : {value : 1.145, format : '0000.0%'},
         test: function(component){
-        	var value = component.getElement().value;
-        	$A.test.assertEquals(1.145, component.get("v.value"), "Cmp: Percentage not correct");
-            $A.test.assertEquals('0114.5%', value, "Element: Percentage not correct");
+            this.assertCmpElemValues(component, 1.145, '0114.5%');
         }
     },
 
+    /**
+     * Test to make sure negative value works when changing the format
+     */
     testNegativeValueWithFormat: {
         attributes : {value : -0.14, format : '.000%'},
         test: function(component){
-        	var value = component.getElement().value;
-        	$A.test.assertEquals(-0.14, component.get("v.value"), "Cmp: Percentage not correct");
-            $A.test.assertEquals('-14.000%', value, "Element: Percentage not correct");
+            this.assertCmpElemValues(component, -0.14, '-14.000%');
         }
     },
 
+    /**
+     * Test passing invalid format. Expect to use default format.
+     */
     testInvalidFormat: {
         attributes : { value : 30, format: ',,'},
         test: function(component){
-        	var value = component.getElement().value;
-        	$A.test.assertEquals(30, component.get("v.value"), "Cmp: Expected value to use default format");
-            $A.test.assertEquals('3,000%', value, "Element: Expected value to use default format");
+            this.assertCmpElemValues(component, 30, '3,000%');
         }
     },
 
-    testRounding: {
-        attributes : {value : 0.14566, format: '0.00%'},
+    /**
+     * Test rounding up
+     */
+    testRoundingUp: {
+        attributes : {value : 0.14565, format: '0.00%'},
         test: function(component){
-        	var value = component.getElement().value;
-        	$A.test.assertEquals(0.14566, component.get("v.value"), "Cmp: Rounding not correct");
-            $A.test.assertEquals('14.57%', value, "Element: Rounding not correct");
+            this.assertCmpElemValues(component, 0.14565, '14.57%');
         }
     },
 
+    /**
+     * Test rounding down
+     */
+    testRoundingDown: {
+        attributes : {value : 0.14564, format: '0.00%'},
+        test: function(component){
+            this.assertCmpElemValues(component, 0.14564, '14.56%');
+        }
+    },
+
+    /**
+     * Test precision with format
+     */
     testPrecision: {
         attributes : {value : .05, format : '.0%'},
         test: function(component){
-        	var value = component.getElement().value;
-        	$A.test.assertEquals(.05, component.get("v.value"), "Cmp: Percentage not correct");
-            $A.test.assertEquals('5.0%', value, "Element: Percentage not correct");
+            this.assertCmpElemValues(component, .05, '5.0%');
         }
     },
 
@@ -111,16 +138,12 @@
      * Verify that when the value changes it is rerendered with the unformated new value
      */
     testUpdateValue: {
-        attributes : {value : .227},
+        attributes : {value : .23},
         test: [function(component){
-        	var value = component.getElement().value;
-        	$A.test.assertEquals(.227, component.get("v.value"), "Cmp: Value not formatted correctly");
-            $A.test.assertEquals('23%', value, "Element: Value not formatted correctly");
+            this.assertCmpElemValues(component, .23, '23%');
             component.set("v.value", 965.21);
         }, function(component){
-            var value = component.getElement().value;
-        	$A.test.assertEquals(965.21, component.get("v.value"), "Cmp: Value not formatted correctly");
-            $A.test.assertEquals('96,521%', value, "Element: Value not formatted correctly");
+            this.assertCmpElemValues(component, 965.21, '96,521%');
         }]
     },
 
@@ -129,15 +152,21 @@
      */
     testUpdateFormat: {
         attributes : {value : .227, format : '#0.#%'},
-        test: function(component){
-        	var value = component.getElement().value;
-        	$A.test.assertEquals(.227, component.get("v.value"), "Cmp: Value not formatted correctly");
-            $A.test.assertEquals('22.7%', value, "Element: Value not formatted correctly");
+        test: [function(component){
+            this.assertCmpElemValues(component, .227, '22.7%');
             component.set("v.format", "000.00 %");
-            $A.rerender(component);
-            value = component.getElement().value;
-        	$A.test.assertEquals(.227, component.get("v.value"), "Cmp: Value not formatted correctly");
-            $A.test.assertEquals('22.7%', value, "Element: Value not formatted correctly");
-        }
+        }, function(component){
+            this.assertCmpElemValues(component, .227, '22.7%');
+        }]
+    },
+
+    /*****************
+     * Helpers
+     *****************/
+    // check component's internval v.value and displayed value on the input box
+    assertCmpElemValues: function (component, expectedCmpVal, expectedElemVal) {
+        $A.test.assertEquals(expectedCmpVal, component.get("v.value"));
+        $A.test.assertEquals(expectedElemVal, component.getElement().value,
+                "Element value is not displayed/formatted correctly.");
     }
 })// eslint-disable-line semi

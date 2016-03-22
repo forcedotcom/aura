@@ -19,18 +19,16 @@
 
     <!-- Attributes -->
     <aura:attribute name="value" type="Decimal" default=""/>
+    <aura:attribute name="max" type="Decimal" default="99999999999999"/>
+    <aura:attribute name="min" type="Decimal" default="-99999999999999"/>
+    <aura:attribute name="disabled" type="Boolean" default="false"/>
 
     <!--Layout -->
-    <div style="padding:15px;">
-        <ui:inputCurrency aura:id="input" value="{! v.value }" label="Input"/>
-        <br/>
-        v.value:
-        <ui:outputText aura:id="output" value="{! v.value }"/>
-        <hr/>
-        <ui:button label="Set number - 1234" press="{! c.setNewValueAsNumber }"></ui:button>
-        <ui:button label="Set string number - '5678'" press="{! c.setNewValueAsString }"></ui:button>
-        <ui:button label="Set a well formatted string number '$5,678.00'" press="{! c.setNewValueAsWellFormatted }"></ui:button>
-        <ui:button label="Set incorrent  '35Aai#i'" press="{! c.setNewValueIncorrect }"></ui:button>
-    </div>
+    Input:
+    <ui:inputSmartNumber aura:id="input" value="{! v.value }"
+            max="{! v.max }" min="{! v.min }" disabled="{! v.disabled }"/>
+    <br/>
+    v.value:
+    <ui:outputText aura:id="output" value="{! v.value }"/>
 
 </aura:component>

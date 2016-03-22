@@ -19,7 +19,7 @@
      */
     testUnassigned: {
         test: function (component) {
-            this.assertValue(component, undefined, "");
+            this.assertCmpElemValues(component, undefined, "");
         }
     },
 
@@ -29,17 +29,17 @@
     testZero: {
         attributes: {value: 0},
         test: function (component) {
-            this.assertValue(component, 0, "0");
+            this.assertCmpElemValues(component, 0, "0");
         }
     },
 
     /*
-     * Test general number
+     * Test decimal number
      */
-    testNumber: {
+    testDecimalNumber: {
         attributes: {value: 12345.67},
         test: function (component) {
-            this.assertValue(component, 12345.67, "12,345.67");
+            this.assertCmpElemValues(component, 12345.67, "12,345.67");
         }
     },
 
@@ -49,7 +49,53 @@
     testNegativeNumber: {
         attributes: {value: -12345.67},
         test: function (component) {
-            this.assertValue(component, -12345.67, "-12,345.67");
+            this.assertCmpElemValues(component, -12345.67, "-12,345.67");
+        }
+    },
+
+    /*
+     * Test integer number
+     */
+    testIntegerNumber: {
+        attributes: {value: 12345},
+        test: function (component) {
+            this.assertCmpElemValues(component, 12345, "12,345");
+        }
+    },
+
+    /*
+     * Verify that when value is set to an invalid value,
+     * internal v.value should be undefined
+     * displayed value should be empty
+     */
+    testSetInvalidValue: {
+        test: [function (component) {
+            component.set('v.value', 'abc');
+        }, function(component){
+            this.assertCmpElemValues(component, undefined, "");
+        }]
+    },
+
+    /**
+     * Verify that when the value changes it is rerendered with the unformated new value
+     */
+    testUpdateValue: {
+        attributes : {value : 22.7, format : '##,#0,00.00#####'},
+        test: [function(component){
+            this.assertCmpElemValues(component, 22.7, "0,22.70");
+            component.set("v.value", 49322);
+        }, function(component){
+           this.assertCmpElemValues(component, 49322, "4,93,22.00");
+        }]
+    },
+
+    /**
+     * Test value is formatted correctly
+     */
+    testFormatValue: {
+        attributes: {value: 12345.67, format: "$#,##.0000:)"},
+        test: function (component) {
+            this.assertCmpElemValues(component, 12345.67, "$1,23,45.6700:)");
         }
     },
 
@@ -58,42 +104,38 @@
      */
     testUpdateFormat: {
         attributes: {value: 1234, format: "#,###.0000"},
-        test: [
-            function (component) {
-                this.assertValue(component, 1234, "1,234.0000");
-                component.set("v.format", '#,##.00');
-            },
-            function (component) {
-                this.assertValue(component, 1234, "1,234.0000");
-            }
-        ]
+        test: [function (component) {
+            this.assertCmpElemValues(component, 1234, "1,234.0000");
+            component.set("v.format", '#,##.00');
+        }, function (component) {
+            this.assertCmpElemValues(component, 1234, "1,234.0000");
+        }]
     },
 
+    testCheckValueTypePassingAttr:  {
+        attributes: {value: 12345},
+        test: [function (cmp) {
+            var value = cmp.get('v.value');
+            $A.test.assertEquals('number', typeof value, 'The type of value should be and Number');
+        }]
+    },
+
+    testCheckValueTypeSettingAttr: {
+        test: [function (cmp) {
+            cmp.set('v.value', 12345);
+        }, function (cmp) {
+            var value = cmp.get('v.value');
+            $A.test.assertEquals('number', typeof value, 'The type of value should be and Number');
+        }]
+    },
+
+    /*****************
+     * Helpers
+     *****************/
     // check component's internval v.value and displayed value on the input box
-    assertValue: function (component, expectedComponentValue, expectedElementValue) {
-        $A.test.assertEquals(expectedComponentValue, component.get("v.value"),
-                "Cmp value does not equal expected");
-        $A.test.assertEquals(expectedElementValue, component.getElement().value,
-                "Element value does not equal expected");
-    },
-    testCheckValueTypePassingAttr :  {
-        attributes : { value : 12345 },
-        test : [
-            function (cmp) {
-                var value = cmp.get('v.value');
-                $A.test.assertEquals('number',typeof value,'The type of value should be and Number');
-            }
-        ]
-    },
-    testCheckValueTypeSettingAttr : {
-        test : [
-            function (cmp) {
-                cmp.set('v.value',12345);
-            },
-            function (cmp) {
-                var value = cmp.get('v.value');
-                $A.test.assertEquals('number',typeof value,'The type of value should be and Number');
-            }
-        ]
+    assertCmpElemValues: function (component, expectedCmpVal, expectedElemVal) {
+        $A.test.assertEquals(expectedCmpVal, component.get("v.value"));
+        $A.test.assertEquals(expectedElemVal, component.getElement().value,
+                "Element value is not displayed/formatted correctly.");
     }
 })// eslint-disable-line semi

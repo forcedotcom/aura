@@ -13,16 +13,63 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
+({  
+    /*
+     * Pass nothing to component
+     */
+    testUnassigned: {
+        test: function (component) {
+            this.assertCmpElemValues(component, undefined, "");
+        }
+    },
+
+    /*
+     * Test 0 to catch if(number) bug
+     */
+    testZero: {
+        attributes: {value: 0},
+        test: function (component) {
+            this.assertCmpElemValues(component, 0, "$0.00");
+        }
+    },
+
+    /*
+     * Test integer value
+     */
+    testIntegerCurrency: {
+        attributes: {value: 12345},
+        test: function (component) {
+            this.assertCmpElemValues(component, 12345, "$12,345.00");
+        }
+    },
+
+    /*
+     * Test decimal value
+     */
+    testDecimalCurrency: {
+        attributes: {value: 12345.67},
+        test: function (component) {
+            this.assertCmpElemValues(component, 12345.67, "$12,345.67");
+        }
+    },
+    
+    /*
+     * Test negative value
+     */
+    testNegativeCurrency: {
+        attributes: {value: -123},
+        test: function (component) {
+            this.assertCmpElemValues(component, -123, "-$123.00");
+        }
+    },
+
     /**
      * Test currency formatted correctly.
      */
-    testCurrency: {
-        attributes: {value: 1234 },
+    testDefaultFormat: {
+        attributes: {value: 1234},
         test: function (component) {
-            var value = component.getElement().value;
-            $A.test.assertEquals(1234, component.get("v.value"), "Cmp value does not equal expected");
-            $A.test.assertEquals("$1,234.00", value, "Element value does not equal expected");
+            this.assertCmpElemValues(component, 1234, "$1,234.00");
         }
     },
     
@@ -38,52 +85,71 @@
     },
 
     /**
-     * Test currency formatted correctly with custom format.
+     * Test passing invalid format. Expect to use default format.
      */
-    testCurrencyWithFormat: {
-        attributes: {value: 1234, format: "$#,###.0000"},
+    testInvalidFormat: {
+        attributes: {value: 1234, format: ',,'},
         test: function (component) {
-            var value = component.getElement().value;
-            $A.test.assertEquals(1234, component.get("v.value"), "Cmp value does not equal expected");
-            $A.test.assertEquals("$1,234.0000", value, "Element value does not equal expected");
+            this.assertCmpElemValues(component, 1234, "$1,234.00");
         }
     },
 
     /**
-     * Verify that when the value changes it is re-rendered with the non-formatted new value
+     * Test currency formatted correctly with custom format.
+     */
+    testWithFormat: {
+        attributes: {value: 1234.56, format: "$#,###.0000"},
+        test: function (component) {
+            this.assertCmpElemValues(component, 1234.56, "$1,234.5600");
+        }
+    },
+
+    /*
+     * Verify that when value is set to an invalid value,
+     * internal v.value should be undefined
+     * displayed value should be empty
+     */
+    testSetInvalidValue: {
+        test: [function (component) {
+            component.set('v.value', 'abc');
+        }, function(component){
+            this.assertCmpElemValues(component, undefined, "");
+        }]
+    },
+
+    /*
+     * Verify that when the value changes it is re-rendered with the new format
      */
     testUpdateValue: {
         attributes: {value: 1234, format: "$#,###.0000"},
-        test: [
-            function (cmp) {
-                var value = cmp.getElement().value;
-                $A.test.assertEquals(1234, cmp.get("v.value"), "Cmp value does not equal expected");
-                $A.test.assertEquals("$1,234.0000", value, "Element value does not equal expected");
-            },
-            function (cmp) {
-                cmp.set("v.value", 5678);
-                $A.test.assertEquals(5678, cmp.get("v.value"), "Cmp value does not equal expected");
-
-                $A.test.addWaitFor("$5,678.0000", function () {
-                    return cmp.helper.getInputElement(cmp).value;
-                });
-            }]
+        test: [function (component) {
+            this.assertCmpElemValues(component, 1234, "$1,234.0000");
+            component.set("v.value", 5678);
+        }, function (component) {
+            this.assertCmpElemValues(component, 5678, "$5,678.0000");
+        }]
     },
 
     /**
      * Verify that when the format changes it is not re-rendered with the new format
      */
     testUpdateFormat: {
-        attributes: {value: 1234, format: "$#,###.0000"},
-        test: function (component) {
-            var value = component.getElement().value;
-            $A.test.assertEquals(1234, component.get("v.value"), "Cmp value does not equal expected");
-            $A.test.assertEquals("$1,234.0000", value, "Element value does not equal expected");
-            component.set("v.format", '£#,###.00');
-            $A.rerender(component);
-            value = component.getElement().value;
-            $A.test.assertEquals(1234, component.get("v.value"), "Cmp value does not equal expected");
-            $A.test.assertEquals("$1,234.0000", value, "Element value does not equal expected");
-        }
+        attributes: {value: 1234, format: "@#,###.0000"},
+        test: [function (component) {
+            this.assertCmpElemValues(component, 1234, "@1,234.0000");
+            component.set("v.format", '$#,###.00');
+        }, function (component) {
+            this.assertCmpElemValues(component, 1234, "@1,234.0000");
+        }]
+    },
+
+    /*****************
+     * Helpers
+     *****************/
+    // check component's internval v.value and displayed value on the input box
+    assertCmpElemValues: function (component, expectedCmpVal, expectedElemVal) {
+        $A.test.assertEquals(expectedCmpVal, component.get("v.value"));
+        $A.test.assertEquals(expectedElemVal, component.getElement().value,
+                "Element value is not displayed/formatted correctly.");
     }
 })// eslint-disable-line semi

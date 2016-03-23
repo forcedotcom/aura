@@ -25,7 +25,7 @@
 
     <!--Layout -->
     Input:
-    <ui:inputSmartNumber aura:id="input" value="{! v.value }"
+    <ui:inputSmartNumber aura:id="input" value="{! v.value }" updateOn="keyup"
             max="{! v.max }" min="{! v.min }" disabled="{! v.disabled }"/>
     <br/>
     v.value:

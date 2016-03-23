@@ -23,7 +23,7 @@
             this.assertLinksPresent(cmp, "href=\"http://www.salesforce.com\"");
         }
     },
-    
+
     testNoWWWLink:{
         attributes : {textValue: 'visit salesforce.com for more details'},
         test: function(cmp){
@@ -93,28 +93,28 @@
             this.assertLinksPresent(cmp, "href=\"mailto:dude@aura.com\"");
         }
     },
-    
+
     testIPAddressLink:{
         attributes : {textValue: 'visit http://152.1.1.255 for more details'},
         test: function(cmp){
             this.assertLinksPresent(cmp, "href=\"http://152.1.1.255\"");
         }
     },
-    
+
     testDomainAndPortLink:{
         attributes : {textValue: 'visit http://user.salesforce.com:8080 for more details'},
         test: function(cmp){
             this.assertLinksPresent(cmp, "href=\"http://user.salesforce.com:8080\"");
         }
     },
-    
+
     testIPAddressAndPortLink:{
         attributes : {textValue: 'visit http://127.0.0.1:9090 for more details'},
         test: function(cmp){
             this.assertLinksPresent(cmp, "href=\"http://127.0.0.1:9090\"");
         }
     },
-    
+
     testAnchorLink:{
         attributes : {textValue: 'visit https://en.wikipedia.org/wiki/Salesforce.com#Lightning for more details'},
         test: function(cmp){
@@ -132,17 +132,48 @@
         }
     },
 
-    assertLinksPresent: function(cmp, hrefText) {
+    testAnchorInText:{
+        attributes : {textValue: 'visit <a href="http://www.bbc.co.uk" target="_blank">BBC</a> or www.salesforce.com for more details'},
+        test: function(cmp){
+            this.assertLinksPresent(cmp, "href=\"http://www.bbc.co.uk\"", false);
+            this.assertLinksPresent(cmp, "href=\"http://www.salesforce.com\"", false);
+            // make sure the href in the link isn't linkified
+            this.assertTextNotPresent(cmp, "href=\"&lt;a href=\"");
+        }
+    },
+
+    testImgInText:{
+        attributes : {textValue: 'visit <img src="http://www2.sfdcstatic.com/common/assets/img/logo-tag-company.png"/> or www.salesforce.com for more details'},
+        test: function(cmp){
+            this.assertLinksPresent(cmp, "src=\"http://www2.sfdcstatic.com/common/assets/img/logo-tag-company.png\"", false);
+            this.assertLinksPresent(cmp, "href=\"http://www.salesforce.com\"", false);
+            // make sure the href in the link isn't linkified
+            this.assertTextNotPresent(cmp, "src=\"&lt;a href=\"");
+        }
+    },
+
+    assertLinksPresent: function(cmp, hrefText, checkValue) {
         $A.test.addWaitForWithFailureMessage(true,
             function() {
                 var htmlValue = cmp.find("richTextComp").getElement().innerHTML;
                 return $A.test.contains(htmlValue, hrefText);
             }, "couldn't find " + hrefText + " in: "  + cmp.find("richTextComp").getElement().innerHTML,
             function() {
-                var textValue = $A.test.getText(cmp.find("richTextComp").getElement());
-                $A.test.assertEquals(textValue, cmp.get("v.textValue"));
+                // The following assertion wouldn't work if the text contains html elements
+                if (checkValue) {
+                    var textValue = $A.test.getText(cmp.find("richTextComp").getElement());
+                    $A.test.assertEquals(textValue, cmp.get("v.textValue"));
+                }
             }
         )
+    },
+
+    assertTextNotPresent: function(cmp, text) {
+        $A.test.addWaitForWithFailureMessage(true,
+            function() {
+                var htmlValue = cmp.find("richTextComp").getElement().innerHTML;
+                return !$A.test.contains(htmlValue, text);
+            }, "Found " + text + " in: "  + cmp.find("richTextComp").getElement().innerHTML)
     }
 
 })// eslint-disable-line semi

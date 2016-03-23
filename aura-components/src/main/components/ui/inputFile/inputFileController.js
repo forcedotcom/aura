@@ -14,9 +14,41 @@
  * limitations under the License.
  */
 ({
+    init : function (cmp, event, helper) {
+        var body = cmp.get('v.body')
+          , customBodyList
+          , helperCmpList;
+
+        // find cmps that inherit from ui:inputFileInnerContent,
+        // store refs and set context
+        customBodyList = helper.findAllCustomBody(body);
+        helper.storeCustomBodyRefs(cmp, customBodyList);
+
+        customBodyList.forEach(function (customBody) {
+            helper.setCmpContext(cmp, customBody);
+            helper.registerActions(cmp);
+        });
+        //debugger;
+        helperCmpList = helper.findAllHelperCmps(body);
+        helperCmpList.forEach(function (helperCmp) {
+            helperCmp.setAttributeValueProvider(cmp);
+            helper.setCmpContext(cmp, helperCmp);
+        })
+
+    },
     handleChange : function (cmp, event, helper) {
         var files = event.getParam('files');
         helper.updateInputFile(cmp,files);
         helper.updateFilesAttr(cmp,files);
+        helper.attachFormElement(cmp,event);
+
+        if (helper.thereIsCustoms(cmp)) {
+            helper.updateBodyCmpContext(cmp);
+        }
+    },
+    reset : function (cmp, event, helper) {
+        var EMPTY_OBJ = {};
+        helper.fireChangeEvent(cmp, EMPTY_OBJ)
     }
+
 });

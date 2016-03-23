@@ -1,0 +1,15 @@
+<aura:component extensible="true" abstract="true" implements="ui:inputFileInterface">
+    <!--Attributes -->
+    <aura:attribute name="filesArr"    type="Object[]" default="[]" />
+    <aura:attribute name="map"         type="Object"    />
+
+    <!--Methods -->
+    <aura:method name="register" action="{! c.register }" access="PUBLIC">
+        <aura:attribute name="callback" type="Object" />
+    </aura:method>
+
+    <!--Handlers -->
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+
+    {! v.body }
+</aura:component>

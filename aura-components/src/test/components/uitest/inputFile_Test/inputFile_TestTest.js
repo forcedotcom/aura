@@ -78,11 +78,14 @@
             get : function () { return Object.keys(this).length; }
         });
     },
+    getDroppableZone : function (cmp) {
+        return cmp.find('inputFile').getElement().querySelector('.droppable-zone');
+    },
     testFireEvent : {
         attributes : { multiple : false, accept : 'image/jpg' },
         test : [
             function (cmp) {
-                var elem = cmp.find('inputFile').getElement();
+                var elem = this.getDroppableZone(cmp);
                 this.fireDomEvent(elem,this.DROP_EVENT_1())
             },
             function (cmp) {
@@ -92,11 +95,27 @@
 
         ]
     },
+    testFireEventIncludeFormRef : {
+        attributes : { multiple : false, accept : 'image/jpg', includeFormInside : true },
+        test : [
+            function (cmp) {
+                var elem = this.getDroppableZone(cmp);
+                this.fireDomEvent(elem,this.DROP_EVENT_1())
+            },
+            function (cmp) {
+               var event = cmp.get('v.lastChangeEvent');
+               var params = event.getParams();
+               $A.test.assertNotUndefinedOrNull(params.form,'form element should be include in the event fired.');
+               $A.test.assertTrue(params.form instanceof HTMLFormElement,'form attributes should a real form element.');
+            }
+
+        ]
+    },
     testDropMultipleAllowed :  {
         attributes : { multiple : true, accept : 'image/jpg,image/png' },
         test : [
             function (cmp) {
-                var elem = cmp.find('inputFile').getElement();
+                var elem = this.getDroppableZone(cmp);
                 this.fireDomEvent(elem,this.DROP_EVENT_2());
             },
             function (cmp) {
@@ -110,7 +129,7 @@
         test : [
             // Drop multiples
             function (cmp) {
-                var elem = cmp.find('inputFile').getElement();
+                var elem = this.getDroppableZone(cmp);
                 this.fireDomEvent(elem,this.DROP_EVENT_2());
             },
             // Should be null or undefined 'cause is not allowed
@@ -120,7 +139,7 @@
             },
             // Drop single file
             function (cmp) {
-                var elem = cmp.find('inputFile').getElement();
+                var elem = this.getDroppableZone(cmp);
                 this.fireDomEvent(elem,this.DROP_EVENT_1())
             },
             // Allowed
@@ -130,7 +149,7 @@
             },
             // Drop Multiple again
             function (cmp) {
-                var elem = cmp.find('inputFile').getElement();
+                var elem = this.getDroppableZone(cmp);
                 this.fireDomEvent(elem,this.DROP_EVENT_2());
             },
             // Value still the last accept drop
@@ -144,7 +163,7 @@
         attributes : { multiple : false, accept : 'image/jpg,image/png' },
         test : [
             function (cmp) {
-                var elem = cmp.find('inputFile').getElement();
+                var elem = this.getDroppableZone(cmp);
                 this.fireDomEvent(elem,this.DROP_EVENT_3());
             },
             function (cmp) {
@@ -153,7 +172,7 @@
             },
             // Drop single file
             function (cmp) {
-                var elem = cmp.find('inputFile').getElement();
+                var elem = this.getDroppableZone(cmp);
                 this.fireDomEvent(elem,this.DROP_EVENT_1())
             },
             // Allowed
@@ -168,7 +187,7 @@
         attributes : { multiple : true , accept : 'image/jpg,image/png', maxSizeAllowed :  5242880 },
         test : [
             function (cmp) {
-                var elem = cmp.find('inputFile').getElement();
+                var elem = this.getDroppableZone(cmp);
                 this.fireDomEvent(elem,this.DROP_BIG_FILE());
             },
             function (cmp) {
@@ -176,7 +195,7 @@
                 $A.test.assertEquals(0, count,'File drop was too big. Event count should still zero.');
             },
             function (cmp) {
-                var elem = cmp.find('inputFile').getElement();
+                var elem = this.getDroppableZone(cmp);
                 this.fireDomEvent(elem,this.DROP_EVENT_1());
             },
             function (cmp) {

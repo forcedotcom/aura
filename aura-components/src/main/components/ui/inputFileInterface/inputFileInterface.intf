@@ -25,4 +25,6 @@
     <aura:attribute name="disabled"       type="Boolean" default="false" />
     <!--Events -->
     <aura:registerEvent name="change" type="ui:inputFileChangeEvent" />
+    <!--Methods -->
+    <aura:method name="reset" action="{! c.reset }" />
 </aura:interface>

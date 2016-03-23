@@ -19,7 +19,9 @@
 
     <aura:attribute name="inputFileHtmlElement" type="Object" access="private"/>
 
-    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+    <aura:handler name="init"   value="{! this }"        action="{! c.init }" />
+    <aura:handler name="change" value="{! v.accept }"    action="{! c.init }" />
+    <aura:handler name="change" value="{! v.multiple }"  action="{! c.init }" />
 
     <span class="open-browse-container" onclick="{! c.handleOpenClick }">
         {! v.body }

@@ -23,16 +23,17 @@ function SecureComponentRef(component, key) {
             value: function() {
                 return "SecureComponentRef: " + component + "{ key: " + JSON.stringify(key) + " }";
             }
-        },
-
-        "isValid": SecureThing.createFilteredMethod(component, "isValid"),
-        "isInstanceOf": SecureThing.createFilteredMethod(component, "isInstanceOf"),
-        "isRendered": SecureThing.createFilteredMethod(component, "isRendered"),
-        "getGlobalId": SecureThing.createFilteredMethod(component, "getGlobalId"),
-        "getLocalId": SecureThing.createFilteredMethod(component, "getLocalId"),
-        "addValueProvider": SecureThing.createFilteredMethod(component, "addValueProvider"),
-        "set": SecureThing.createFilteredMethod(component, "set"),
-        "get": SecureThing.createFilteredMethod(component, "get")
+        }
+    });
+    Object.defineProperties(o, {
+        "isValid": SecureThing.createFilteredMethod(o, component, "isValid"),
+        "isInstanceOf": SecureThing.createFilteredMethod(o, component, "isInstanceOf"),
+        "isRendered": SecureThing.createFilteredMethod(o, component, "isRendered"),
+        "getGlobalId": SecureThing.createFilteredMethod(o, component, "getGlobalId"),
+        "getLocalId": SecureThing.createFilteredMethod(o, component, "getLocalId"),
+        "addValueProvider": SecureThing.createFilteredMethod(o, component, "addValueProvider"),
+        "set": SecureThing.createFilteredMethod(o, component, "set"),
+        "get": SecureThing.createFilteredMethod(o, component, "get")
 
     });
 

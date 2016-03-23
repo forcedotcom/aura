@@ -22,20 +22,22 @@ function SecureAction(action, key) {
             value: function() {
                 return "SecureAction: " + action + "{ key: " + JSON.stringify(key) + " }";
             }
-        },
-        "setCallback": SecureThing.createFilteredMethod(action, "setCallback"),
-        "setParams": SecureThing.createFilteredMethod(action, "addHandler"),
-        "setParam": SecureThing.createFilteredMethod(action, "addHandler"),
-        "getParams": SecureThing.createFilteredMethod(action, "getParams"),
-        "getParam": SecureThing.createFilteredMethod(action, "getParam"),
-        "getCallback": SecureThing.createFilteredMethod(action, "getCallback"),
-        "getState": SecureThing.createFilteredMethod(action, "getState"),
-        "getReturnValue": SecureThing.createFilteredMethod(action, "getReturnValue"),
-        "getError": SecureThing.createFilteredMethod(action, "getError"),
-        "isBackground": SecureThing.createFilteredMethod(action, "isBackground"),
-        "setBackground": SecureThing.createFilteredMethod(action, "setBackground"),
-        "setAbortable": SecureThing.createFilteredMethod(action, "setAbortable"),
-        "setStorable": SecureThing.createFilteredMethod(action, "setStorable")
+        }
+    });
+    Object.defineProperties(o, {
+        "setCallback": SecureThing.createFilteredMethod(o, action, "setCallback"),
+        "setParams": SecureThing.createFilteredMethod(o, action, "addHandler"),
+        "setParam": SecureThing.createFilteredMethod(o, action, "addHandler"),
+        "getParams": SecureThing.createFilteredMethod(o, action, "getParams"),
+        "getParam": SecureThing.createFilteredMethod(o, action, "getParam"),
+        "getCallback": SecureThing.createFilteredMethod(o, action, "getCallback"),
+        "getState": SecureThing.createFilteredMethod(o, action, "getState"),
+        "getReturnValue": SecureThing.createFilteredMethod(o, action, "getReturnValue"),
+        "getError": SecureThing.createFilteredMethod(o, action, "getError"),
+        "isBackground": SecureThing.createFilteredMethod(o, action, "isBackground"),
+        "setBackground": SecureThing.createFilteredMethod(o, action, "setBackground"),
+        "setAbortable": SecureThing.createFilteredMethod(o, action, "setAbortable"),
+        "setStorable": SecureThing.createFilteredMethod(o, action, "setStorable")
     });
 
     setLockerSecret(o, "key", key);

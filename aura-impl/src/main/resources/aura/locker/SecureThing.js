@@ -59,7 +59,7 @@ SecureThing.filterEverything = function (st, raw) {
 		mutated = true;
 		setLockerSecret(swallowed, "ref", raw);
 	} else if (t === "object") {
-		var isNodeList = raw && (raw instanceof NodeList);
+		var isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
 		if (Array.isArray(raw) || isNodeList) {
 			swallowed = [];
 			for (var n = 0; n < raw.length; n++) {
@@ -147,29 +147,29 @@ SecureThing.unfilterEverything = function(st, value) {
 	return value;
 };
 
-SecureThing.createFilteredMethod = function(raw, methodName) {
+SecureThing.createFilteredMethod = function(st, raw, methodName) {
 	"use strict";
 
 	return {
 		enumerable: true,
 		value : function() {
-			var fnReturnedValue = raw[methodName].apply(raw, SecureThing.unfilterEverything(this, SecureThing.ArrayPrototypeSlice.call(arguments)));
-			return SecureThing.filterEverything(this, fnReturnedValue);
+			var fnReturnedValue = raw[methodName].apply(raw, SecureThing.unfilterEverything(st, SecureThing.ArrayPrototypeSlice.call(arguments)));
+			return SecureThing.filterEverything(st, fnReturnedValue);
 		}
 	};
 };
 
-SecureThing.createFilteredProperty = function(raw, propertyName) {
+SecureThing.createFilteredProperty = function(st, raw, propertyName) {
 	"use strict";
 
 	return {
 		enumerable: true,
 		get : function() {
 			var value = raw[propertyName];
-			return SecureThing.filterEverything(this, value);
+			return SecureThing.filterEverything(st, value);
 		},
 		set : function(value) {
-			raw[propertyName] = SecureThing.unfilterEverything(this, value);
+			raw[propertyName] = SecureThing.unfilterEverything(st, value);
 		}
 	};
 };

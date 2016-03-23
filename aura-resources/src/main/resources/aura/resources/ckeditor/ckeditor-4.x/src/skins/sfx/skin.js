@@ -87,7 +87,7 @@ CKEDITOR.skin.ua_dialog = '';
 // Registers the icons that we override
  (function() {
 		var icons = ( 'bold,bulletedlist,image,indent,italic,justifyblock,justifycenter,justifyleft,justifyright,' +
-			'link,numberedlist,outdent,redo,removeformat,strike,textcolor,underline,undo' ).split( ',' );
+			'link,numberedlist,outdent,redo,removeformat,strike,textcolor,underline,undo,codesnippet' ).split( ',' );
 
 		var iconsFolder = CKEDITOR.getUrl( CKEDITOR.skin.path() + 'icons/' + ( CKEDITOR.env.hidpi ? 'hidpi/' : '' ) );
 

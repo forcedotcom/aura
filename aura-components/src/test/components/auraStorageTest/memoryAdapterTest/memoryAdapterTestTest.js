@@ -525,5 +525,45 @@
 
             $A.test.addWaitFor(true, function(){ return completed; });
         }
+    },
+
+    /**
+     * Verifies an expired item is evicted after sweep is run.
+     */
+    testAgeBasedEviction: {
+        test: function(cmp) {
+            // set min sweep interval to 1ms
+            AuraStorage.SWEEP_INTERVAL.MIN = 1;
+
+            var name = "ageBasedEviction";
+            var storage = $A.storageService.initStorage(name, false, true, 4096, 0.1 /* sec */);
+
+            var completed = false;
+            var key = "key1";
+            storage.put(key, { "value" : { "alpha" : "beta", "gamma" : "delta" } })
+                .then(function() {
+                    // get() triggers an async sweep so loop until get()
+                    // returns undefined indicating sweep has run
+
+                    var checkIfItemEvicted = function() {
+                        storage.get(key).then(function(item) {
+                            if (item === undefined) {
+                                completed = true;
+                                return; // so we don't loop
+                            }
+
+                            // not yet expired so loop
+                            checkIfItemEvicted();
+                        })
+                        ["catch"](function(error) { $A.test.fail(error.toString()); });
+                    }
+
+                    // start looping...
+                    checkIfItemEvicted();
+                })
+                ["catch"](function(error) { $A.test.fail(error.toString()); });
+
+            $A.test.addWaitFor(true, function() { return completed; });
+        }
     }
 })

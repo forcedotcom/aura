@@ -59,23 +59,23 @@ function SecureElement(el, key) {
 			}
 		},
 
-		removeEventListener : SecureThing.createPassThroughMethod(el, "removeEventListener"),
-		dispatchEvent : SecureThing.createPassThroughMethod(el, "dispatchEvent"),
+		removeEventListener : SecureThing.createFilteredMethod(el, "removeEventListener"),
+		dispatchEvent : SecureThing.createFilteredMethod(el, "dispatchEvent"),
 
 		childNodes : SecureThing.createFilteredProperty(el, "childNodes"),
 		children : SecureThing.createFilteredProperty(el, "children"),
 
-		getAttribute: SecureThing.createPassThroughMethod(el, "getAttribute"),
-		setAttribute: SecureThing.createPassThroughMethod(el, "setAttribute"),
+		getAttribute: SecureThing.createFilteredMethod(el, "getAttribute"),
+		setAttribute: SecureThing.createFilteredMethod(el, "setAttribute"),
 
 		ownerDocument : SecureThing.createFilteredProperty(el, "ownerDocument"),
 		parentNode : SecureThing.createFilteredProperty(el, "parentNode"),
 
 		// Standard HTMLElement methods
 		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
-		blur: SecureThing.createPassThroughMethod(el, "blur"),
-		click: SecureThing.createPassThroughMethod(el, "click"),
-		focus: SecureThing.createPassThroughMethod(el, "focus")
+		blur: SecureThing.createFilteredMethod(el, "blur"),
+		click: SecureThing.createFilteredMethod(el, "click"),
+		focus: SecureThing.createFilteredMethod(el, "focus")
 	});
 	// applying standard secure element properties
 	SecureElement.addSecureProperties(o, el);
@@ -100,6 +100,6 @@ SecureElement.addSecureProperties = function (se, raw) {
 		'style', 'tabIndex', 'title'
 		// Note: ignoring 'offsetParent' from the list above.
 	].forEach(function (name) {
-		Object.defineProperty(se, name, SecureThing.createPassThroughProperty(raw, name));
+		Object.defineProperty(se, name, SecureThing.createFilteredProperty(raw, name));
 	});
 };

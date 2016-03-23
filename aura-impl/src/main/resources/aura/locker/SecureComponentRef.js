@@ -25,12 +25,12 @@ function SecureComponentRef(component, key) {
             }
         },
 
-        "isValid": SecureThing.createPassThroughMethod(component, "isValid"),
-        "isInstanceOf": SecureThing.createPassThroughMethod(component, "isInstanceOf"),
-        "isRendered": SecureThing.createPassThroughMethod(component, "isRendered"),
-        "getGlobalId": SecureThing.createPassThroughMethod(component, "getGlobalId"),
-        "getLocalId": SecureThing.createPassThroughMethod(component, "getLocalId"),
-        "addValueProvider": SecureThing.createPassThroughMethod(component, "addValueProvider"),
+        "isValid": SecureThing.createFilteredMethod(component, "isValid"),
+        "isInstanceOf": SecureThing.createFilteredMethod(component, "isInstanceOf"),
+        "isRendered": SecureThing.createFilteredMethod(component, "isRendered"),
+        "getGlobalId": SecureThing.createFilteredMethod(component, "getGlobalId"),
+        "getLocalId": SecureThing.createFilteredMethod(component, "getLocalId"),
+        "addValueProvider": SecureThing.createFilteredMethod(component, "addValueProvider"),
         "set": SecureThing.createFilteredMethod(component, "set"),
         "get": SecureThing.createFilteredMethod(component, "get")
 

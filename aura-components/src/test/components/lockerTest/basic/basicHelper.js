@@ -2,7 +2,7 @@
 	helperMethod : function() {
 		alert("{ document: " + document.toString() + " }");
 	},
-	
+
 	log : function(component, message, blockedExploit) {
 		var content = component.find("content");
 		var messageDiv = document.createElement("div");
@@ -11,14 +11,14 @@
             messageDiv.style.backgroundColor = "green";
             messageDiv.style.opacity = "0.4";
         }
-        
+
 		messageDiv.appendChild(document.createTextNode(message));
 		content.getElement().appendChild(messageDiv);
 	},
 
 	testSymbol : function(testCase) {
 		var symbol = testCase.toString();
-		
+
 		// Test out eval, self, and Function tricks
 		try {
 			var result = testCase();
@@ -31,7 +31,7 @@
 					&& error.indexOf("SecurityError") < 0) {
 				throw new Error("Unexpected exception: " + x.toString());
 			}
-			
+
 			this.helper.log(this.component, "Blocked: " + symbol, true);
 		}
 	},
@@ -39,7 +39,7 @@
 	verifyElementCount: function(className, expected) {
 		var els = document.getElementsByClassName(className);
 		if (els.length !== expected) {
-			throw new Error("Wrong number of <" + tagName + "> returned from SecureDocument.getElementsByClassName('" + className + "'): " + els.length);
+			throw new Error("Wrong number of elements returned from SecureDocument.getElementsByClassName('" + className + "'): " + els.length);
 		}
 	}
 })

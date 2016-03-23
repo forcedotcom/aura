@@ -23,13 +23,13 @@ function SecureAuraEvent(event, key) {
                 return "SecureAuraEvent: " + event + "{ key: " + JSON.stringify(key) + " }";
             }
         },
-        "fire": SecureThing.createPassThroughMethod(event, "fire"),
-        "getName": SecureThing.createPassThroughMethod(event, "getName"),
+        "fire": SecureThing.createFilteredMethod(event, "fire"),
+        "getName": SecureThing.createFilteredMethod(event, "getName"),
         "getParam": SecureThing.createFilteredMethod(event, "getParam"),
         "getParams": SecureThing.createFilteredMethod(event, "getParams"),
         "getSource": SecureThing.createFilteredMethod(event, "getSource"),
-        "setParam": SecureThing.createPassThroughMethod(event, "setParam"),
-        "setParams": SecureThing.createPassThroughMethod(event, "setParams")
+        "setParam": SecureThing.createFilteredMethod(event, "setParam"),
+        "setParams": SecureThing.createFilteredMethod(event, "setParams")
     });
 
     setLockerSecret(o, "key", key);

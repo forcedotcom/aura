@@ -74,10 +74,10 @@ function SecureDocument(doc, key) {
         querySelector: SecureThing.createFilteredMethod(doc, "querySelector"),
         querySelectorAll: SecureThing.createFilteredMethod(doc, "querySelectorAll"),
 
-        title: SecureThing.createPassThroughProperty(doc, "title"),
+        title: SecureThing.createFilteredProperty(doc, "title"),
 
         // DCHASMAN TODO W-2839646 Figure out how much we want to filter cookie access???
-        cookie: SecureThing.createPassThroughProperty(doc, "cookie")
+        cookie: SecureThing.createFilteredProperty(doc, "cookie")
     });
 
     setLockerSecret(o, "key", key);

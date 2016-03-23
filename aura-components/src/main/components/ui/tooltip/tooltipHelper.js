@@ -117,7 +117,8 @@
 	hide: function(component) {
 
 		this.buildTooltip(component, $A.getCallback(function(tt){
-			if(tt.isValid()) {
+			//Race condition causes tt to be null
+			if(tt && tt.isValid()) {
 				tt.set('v.isVisible', false);
 			}
 			if(component.isValid()) {

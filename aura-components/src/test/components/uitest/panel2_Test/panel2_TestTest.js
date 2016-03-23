@@ -643,6 +643,48 @@
         }]
     },
     
+    testClosePanelUsingNotify: {
+    	attributes : {"testPanelType" : "panel"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		var panel = cmp._panel;
+    		if (panel == null) {
+    			panel = this.getPanelFromDomElement(cmp, "panel");
+    		}
+    		
+    		panel.getEvent('notify').setParams({
+                action: 'closePanel',
+                typeOf: 'ui:closePanel'
+            }).fire();
+    	}, function(cmp) {
+    		this.waitForPanelDialogClose();
+    	}]
+    },
+    
+    testCloseModalUsingNotify: {
+    	attributes : {"testPanelType" : "modal"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForModalOpen();
+    	}, function(cmp) {
+    		var panel = cmp._panel;
+    		if (panel == null) {
+    			panel = this.getPanelFromDomElement(cmp, "modal");
+    		}
+    		
+    		panel.getEvent('notify').setParams({
+                action: 'closePanel',
+                typeOf: 'ui:closePanel'
+            }).fire();
+    	}, function(cmp) {
+    		this.waitForModalClose();
+    	}]
+    },
+    
     /**************************************************PANEL POSITION TEST**************************************************/
     
     /**
@@ -1028,6 +1070,14 @@
     	var panelBodyElem = panelRef.find("body").getElement();
     	var testerHtmlCmp = $A.componentService.getRenderingComponentForElement(panelBodyElem.lastChild);
     	return testerHtmlCmp.getAttributeValueProvider();
+    },
+    
+    getPanelFromDomElement : function(cmp, panelType, index) {
+    	panelType = panelType == "panel" ? "uiPanel" : "uiModal";
+    	index = index ? index : 0;
+    	var panelElm = $A.test.getElementByClass(panelType);
+		var htmlCmp = $A.componentService.getRenderingComponentForElement(panelElm[index]);
+    	return htmlCmp.getAttributeValueProvider();
     },
     
     createPanel : function(cmp) {

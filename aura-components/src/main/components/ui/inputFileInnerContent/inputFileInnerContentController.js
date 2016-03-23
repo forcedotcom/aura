@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    init : function (cmp, event, helper) {
+({ /* eslint-disable */
+    init : function (cmp) {
         // Setting default value to map of callbacks
         var EMPTY_OBJECT = {};
         cmp.set('v.map',EMPTY_OBJECT);
     },
-    register : function (cmp, event, helper) {
+    register : function (cmp, event) {
         var callback = event.getParam('callback');
         var action   = event.getParam('action');
         var map      = cmp.get('v.map');
@@ -28,4 +28,4 @@
             map[action] = callback;
         }
     }
-})
+}) /* eslint-enable */

@@ -27,12 +27,11 @@
         return cmp.find('hidden-input').getElement().form;
     },
     customBody : function (cmp) {
-        var body = cmp.get('v.body');
-        if (body.length === 0) return false
+        return cmp.get('v.body').length > 0;
     },
     findAllCustomBody : function (body) {
         return body.reduce(function (prev, cmp) {
-            if (cmp.meta.name === 'aura$text') return prev;
+            if (cmp.meta.name === 'aura$text') { return prev; }
             if (cmp.meta.name === 'aura$html') {
                 return prev.concat(this.findAllCustomBody(cmp.get('v.body')));
             }
@@ -45,7 +44,7 @@
     },
     findAllHelperCmps : function (body) {
         return body.reduce(function (prev, cmp) {
-            if (cmp.meta.name === 'aura$text') return prev;
+            if (cmp.meta.name === 'aura$text') { return prev; }
             if (cmp.meta.name === 'aura$html') {
                 return prev.concat(this.findAllHelperCmps(cmp.get('v.body')));
             }
@@ -86,7 +85,6 @@
         });
     },
     getMappedFiles : function (cmp) {
-        var customList = cmp.get('v.customBodyList');
         var files  = cmp.get('v.files');
         return Object.keys(files).map(function (index) {
             return files[index];

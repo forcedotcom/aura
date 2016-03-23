@@ -33,7 +33,7 @@
         helperCmpList.forEach(function (helperCmp) {
             helperCmp.setAttributeValueProvider(cmp);
             helper.setCmpContext(cmp, helperCmp);
-        })
+        });
 
     },
     handleChange : function (cmp, event, helper) {
@@ -48,7 +48,7 @@
     },
     reset : function (cmp, event, helper) {
         var EMPTY_OBJ = {};
-        helper.fireChangeEvent(cmp, EMPTY_OBJ)
+        helper.fireChangeEvent(cmp, EMPTY_OBJ);
     }
 
 });

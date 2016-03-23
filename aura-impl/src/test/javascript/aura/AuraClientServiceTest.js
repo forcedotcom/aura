@@ -1065,7 +1065,11 @@ Test.Aura.AuraClientServiceTest = function() {
                         orderedEncode : function(obj) {
                             return obj;
                         },
-                        decode : function() {
+                        decode : function(json) {
+                            // if it's html, do JSON parsing to fail the test
+                            if(/^\s*</.test(json)) {
+                                return JSON.parse(json)
+                            }
                             return mockData.decodedResponse;
                         },
                         resolveRefsArray : function(input) {
@@ -1092,6 +1096,23 @@ Test.Aura.AuraClientServiceTest = function() {
             document : document,
             Aura : Aura
         });
+
+        [Fact]
+        function ErrorStatusWhenResponseTextIsHtml() {
+            var response = {
+                status : 200,
+                responseText: "<!DOCTYPE html>"
+            };
+            var target;
+            var ret;
+
+            mocksForDecode(function() {
+                target = new Aura.Services.AuraClientService();
+                ret = target.decode(response);
+            });
+
+            Assert.Equal("ERROR", ret["status"]);
+        }
 
         [Fact]
         function GvpWithRefSupportIsResolved() {

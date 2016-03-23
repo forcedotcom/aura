@@ -316,14 +316,13 @@
 
         this.getComponent = function(componentId, options) {
             var component = $A.getComponent(componentId);
-            // var configuration = {
-            //     "body" : true // Should we serialize the body?
-            // };
             var configuration = Object.assign({
                 "attributes": true, // True to serialize the attributes, if you just want the body you can set this to false and body to true. (Good for serializing supers)
                 "body": true, // Serialize the Body? This can be expensive so you can turn it off.
                 "elementCount": false, // Count all child elements of all the elements associated to a component.
-                "model": false // Serialize the model data as well
+                "model": false, // Serialize the model data as well
+                "valueProviders": false, // Should we serialize the attribute and facet value providers to the output? Could be a little slow now since we serialize passthrough value keys which could be big objects.
+                "handlers": false // Do we serialize the event handlers this component is subscribed to?
             }, options);
             if(component){
                 if(!component.isValid()) {
@@ -341,8 +340,6 @@
                         "valid": true,
                         "expressions": {},
                         "attributes": {},
-                        "attributeValueProvider": getValueProvider(component.getAttributeValueProvider()),
-                        "facetValueProvider": getValueProvider(component.getComponentValueProvider()),
                         "__proto__": null, // no inherited properties
                         "elementCount": 0,
                         "rerender_count": this.getCount(component._$getSelfGlobalId$() + "_rerendered")
@@ -352,6 +349,13 @@
                         //,"model": null
                     };
 
+                    // VALUE PROVIDERS
+                    if(configuration.valueProviders) {
+                        output["attributeValueProvider"] = getValueProvider(component.getAttributeValueProvider());
+                        output["facetValueProvider"] = getValueProvider(component.getComponentValueProvider());
+                    }
+
+                    // ATTRIBUTES
                     if(configuration.attributes) {
                         var auraError=$A.error;                       
                         var attributes = component.getDef().getAttributeDefs();
@@ -376,6 +380,7 @@
                                 var rawValue;
                                 accessCheckFailed = false;
 
+                                // BODY
                                 // If we don't want the body serialized, skip it.
                                 // We would only want the body if we are going to show
                                 // the components children.
@@ -399,7 +404,9 @@
                         } finally {
                             $A.error = auraError;
                         }
-                    } else if(configuration.body) {
+                    } 
+                    // BODY
+                    else if(configuration.body) {
                         var rawValue;
                         var value;
                         try {
@@ -426,6 +433,7 @@
                         output["supers"] = supers;
                     }
 
+                    // ELEMENT COUNT
                     // Concrete is the only one with elements really, so doing it at the super
                     // level is duplicate work.
                     if(component.isConcrete() && configuration.elementCount) {
@@ -440,6 +448,7 @@
                         output.elementCount = elementCount;
                     }
 
+                    // MODEL
                     if(configuration.model) {
                         var model = component.getModel();
                         if(model) {
@@ -447,6 +456,34 @@
                         }
                     }
 
+                    // HANDLERS
+                    if(configuration.handlers){ 
+                        var handlers = {};
+                        var events = component.getEventDispatcher();
+                        var current;
+                        var apiSupported = true; // 204+ only. Don't want to error in 202. Should remove this little conditional in 204 after R2.
+                        for(var eventName in events) {
+                            current = events[eventName];
+                            if(Array.isArray(current) && current.length && apiSupported) {
+                                handlers[eventName] = [];
+                                for(var c=0;c<current.length;c++){
+                                    if(!current[c].hasOwnProperty("actionExpression")) {
+                                        apiSupported = false;
+                                        break;
+                                    }
+                                    handlers[eventName][c] = {
+                                        "expression": current[c]["actionExpression"],
+                                        "valueProvider": getValueProvider(current[c]["valueProvider"])
+                                    };
+                                }
+                            }
+                        }
+                        if(apiSupported) {
+                            output["handlers"] = handlers; 
+                        }
+                    }
+
+                    // Output to the dev tools
                     return this.safeStringify(output);
                 }
             }
@@ -609,13 +646,40 @@
                 //"providers": safeStringify()
                 $type$: "passthrough"
             };
-
-            while(!("_$getSelfGlobalId$" in valueProvider)) {
-                valueProvider = valueProvider.getComponent();
+            
+            if('getPrimaryProviderKeys' in valueProvider) {
+                var values = {};
+                var value;
+                var keys;
+                var provider = valueProvider;
+                while(provider && !("_$getSelfGlobalId$" in provider)) {
+                    keys = provider.getPrimaryProviderKeys();
+                    for(var c = 0; c<keys.length;c++) {
+                        key = keys[c];
+                        if(!values.hasOwnProperty(key)) {
+                            value = provider.get(key);
+                            if($A.util.isComponent(value)) {
+                                values[key] = {
+                                    "id": value
+                                };
+                            } else {
+                                values[key] = value;
+                            }
+                        }
+                    }
+                    provider = provider.getComponent();
+                }
+                if(provider && "_$getSelfGlobalId$" in provider) {
+                    output["globalId"] = provider._$getSelfGlobalId$();                    
+                }
+                output["values"] = values;
+            } else {
+                while(!("_$getSelfGlobalId$" in valueProvider)) {
+                    valueProvider = valueProvider.getComponent();
+                }
+                output["globalId"] = valueProvider._$getSelfGlobalId$();
             }
-
-            output["globalId"] = valueProvider._$getSelfGlobalId$();
-
+        
             return output;
         }
 

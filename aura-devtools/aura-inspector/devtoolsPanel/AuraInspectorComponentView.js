@@ -48,8 +48,11 @@ function AuraInspectorComponentView(devtoolsPanel) {
                     treeComponent.render();              
                 });
             }, {
+                body: true,
                 elementCount: true,
-                model: true
+                model: true,
+                valueProviders: true,
+                handlers: true
             });
         }
     };
@@ -64,24 +67,34 @@ function AuraInspectorComponentView(devtoolsPanel) {
         // Should probably use a FacetFormatter, but how do I easily specify that info to TreeNode.create()
         // that is compatible with every other TreeNode.create() call.
         if(current.attributeValueProvider == current.facetValueProvider) {
-            var attributeValueProvider = TreeNode.create(chrome.i18n.getMessage("componentview_avpfvp"), "attributeValueProvider");
+            var attributeValueProvider = TreeNode.create(chrome.i18n.getMessage("componentview_avpfvp"), "attributeValueProvider", "property");
             treeComponent.addChild(attributeValueProvider);
 
             componentId = devtoolsPanel.cleanId(typeof current.attributeValueProvider == "string" ? current.attributeValueProvider : current.attributeValueProvider.globalId);
             
             attributeValueProvider.addChild(TreeNode.create(componentId, "attributeValueProvider_" + current.globalId, "globalId"));
         } else {
-            var attributeValueProvider = TreeNode.create(chrome.i18n.getMessage("componentview_avp"), "attributeValueProvider");
+            var attributeValueProvider = TreeNode.create(chrome.i18n.getMessage("componentview_avp"), "attributeValueProvider", "property");
             treeComponent.addChild(attributeValueProvider);
 
             componentId = devtoolsPanel.cleanId(typeof current.attributeValueProvider == "string" ? current.attributeValueProvider : current.attributeValueProvider.globalId);
-            attributeValueProvider.addChild(TreeNode.create(componentId, "attributeValueProvider_" + current.globalId, "globalId"));
+            attributeValueProvider.addChild(TreeNode.create(componentId, "attributeValueProvider_" + current.globalId, "globalId", "property"));
 
-            var facetValueProvider = TreeNode.create(chrome.i18n.getMessage("componentview_fvp"), "facetValueProvider");
+            // Show passthroughs keys and values
+            if(current.attributeValueProvider.$type$ === "passthrough" && current.attributeValueProvider.values) {
+                generateNodes(current.attributeValueProvider.values, attributeValueProvider);
+            }
+
+            var facetValueProvider = TreeNode.create(chrome.i18n.getMessage("componentview_fvp"), "facetValueProvider", "property");
             treeComponent.addChild(facetValueProvider);
 
             componentId = devtoolsPanel.cleanId(typeof current.facetValueProvider == "string" ? current.facetValueProvider : current.facetValueProvider.globalId);
-            facetValueProvider.addChild(TreeNode.create(componentId, "facetValueProvider_" + current.globalId, "globalId"));
+            facetValueProvider.addChild(TreeNode.create(componentId, "facetValueProvider_" + current.globalId, "globalId", "property"));
+
+            // Show passthroughs keys and values
+            if(current.facetValueProvider.$type$ === "passthrough" && current.facetValueProvider.values) {
+                generateNodes(current.facetValueProvider.values, facetValueProvider);
+            }
         }
 
         var bodies = current.attributes.body || {};
@@ -109,6 +122,27 @@ function AuraInspectorComponentView(devtoolsPanel) {
             generateNodes(current.model, parentNode);
             treeComponent.addChildren(parentNode.getChildren());
         }
+
+        if(current.handlers && Object.keys(current.handlers).length) {
+            treeComponent.addChild(TreeNode.create(chrome.i18n.getMessage("componentview_handlers"), "Handlers", "header"));
+            var handlers = current.handlers;
+            var handlerNode;
+            var current;
+            var controllerRef;
+            for(var eventName in handlers) {
+                current = handlers[eventName];
+                handlerNode = TreeNode.create({ "key": eventName, "value": current }, "", "keyvalue");
+                for(var c=0;c<current.length;c++) {
+                    controllerRef = {
+                        "expression": current[c].expression,
+                        "component": devtoolsPanel.cleanId(current[c].valueProvider)
+                    };
+                    handlerNode.addChild(TreeNode.create(controllerRef, "", "controllerref"));
+                }
+                treeComponent.addChild(handlerNode);
+            }
+
+        }
     }
 
     function renderForComponentSuper(component, callback) {
@@ -125,7 +159,9 @@ function AuraInspectorComponentView(devtoolsPanel) {
                 attributes: false,
                 body: true,
                 elementCount: false,
-                model: true
+                model: true,
+                valueProviders: true,
+                handlers: true
             });
         } else if(callback) { 
             callback();
@@ -147,6 +183,8 @@ function AuraInspectorComponentView(devtoolsPanel) {
                     node.addChild(TreeNode.create(devtoolsPanel.cleanId(value), parentNode.getId() + "_" + prop, "globalId"));
                 } else if(devtoolsPanel.isActionId(value)) {
                     node.addChild(TreeNode.create(devtoolsPanel.cleanId(value), parentNode.getId() + "_" + prop, "controllerref"));                    
+                } else if(typeof value === "string" && value.trim().length === 0) {
+                    node.addChild(TreeNode.create('""', parentNode.getId() + "_" + prop));
                 } else {
                     node.addChild(TreeNode.create(value, parentNode.getId() + "_" + prop));
                 }

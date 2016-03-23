@@ -44,6 +44,13 @@
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler event="aura:systemError" action="{!c.handleSystemError}"/>
 
+    <aura:method name="throwErrorFromClientController"
+                 action="{!c.throwErrorFromClientController}"/>
+    <aura:method name="throwAuraErrorFromClientController"
+                 action="{!c.throwAuraErrorFromClientController}"/>
+    <aura:method name="throwAuraFriendlyErrorFromClientController"
+                 action="{!c.throwAuraFriendlyErrorFromClientController}"/>
+
     <table class="errorFromAppTable">
     <caption> Errors from Application: </caption>
     <tr>
@@ -51,7 +58,8 @@
         <td>
           <ui:button label="Throw"
                      press="{!c.throwErrorFromClientController}"
-                     class="errorFromClientControllerButton"/>
+                     class="errorFromClientControllerButton"
+                     aura:id="errorFromClientControllerButton"/>
         </td>
     </tr>
     <tr>
@@ -107,7 +115,8 @@
         <td>
           <ui:button label="Throw"
                      press="{!c.throwAuraErrorFromClientController}"
-                     class="auraErrorFromClientControllerButton"/>
+                     class="auraErrorFromClientControllerButton"
+                     aura:id="auraErrorFromClientControllerButton"/>
         </td>
     </tr>
     <tr>
@@ -115,17 +124,19 @@
         <td>
           <ui:button label="Throw"
                      press="{!c.throwAuraFriendlyErrorFromClientController}"
-                     class="auraFriendlyErrorFromClientControllerButton"/>
+                     class="auraFriendlyErrorFromClientControllerButton"
+                     aura:id="auraFriendlyErrorFromClientControllerButton"/>
         </td>
     </tr>
     </table>
 
     systemError Event is handled on App: <div id="eventHandledOnApp">{!v.eventHandled}</div>
+    <br/>
     <aura:if isTrue="{!v.eventHandled}">
     <h2>Error details:</h2><br/>
         Message: <div id="appErrorOutput"> {!v.message} </div><br/>
-        Severity: <div id="appSeverityOutput"> {!v.severity} </div><br/>
-        Id: <div id="appIdOutput"> {!v.errorId} </div><br/>
+        Severity: <div id="appErrorSeverityOutput"> {!v.severity} </div><br/>
+        Id: <div id="appErrorIdOutput"> {!v.errorId} </div><br/>
     </aura:if>
 
     <br/><br/>

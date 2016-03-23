@@ -255,7 +255,7 @@ AuraRenderingService.prototype.unrender = function(components) {
                         cmp["unrender"]();
                         context.releaseCurrentAccess(cmp);
                     } catch (e) {
-                        var ae = new $A.auraError("Unrender threw an error in "+cmp.getDef().getDescriptor().toString(), e);
+                        var ae = new $A.auraError("unrender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
                         ae.component = cmp.getDef().getDescriptor().toString();
                         $A.lastKnownError = ae;
                         throw ae;

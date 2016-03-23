@@ -56,6 +56,17 @@ Test.Aura.AuraFriendlyErrorTest = function() {
        }
 
         [Fact]
+        function IsInstanceAuraError() {
+            var actual;
+
+            mockFramework(function(){
+                actual = new Aura.Errors.AuraFriendlyError();
+            });
+
+            Assert.True(actual instanceof Aura.Errors.AuraError);
+        }
+
+        [Fact]
         function MessageIsEmptyWhenConstructorHasNoArgument() {
             var actual;
 

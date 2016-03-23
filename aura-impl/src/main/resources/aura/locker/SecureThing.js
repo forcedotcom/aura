@@ -60,7 +60,11 @@ SecureThing.filterEverything = function (st, raw) {
 		setLockerSecret(swallowed, "ref", raw);
 	} else if (t === "object") {
 		var isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
-		if (Array.isArray(raw) || isNodeList) {
+		if (raw === window) {
+			return $A.lockerService.getEnv(getLockerSecret(st, "key"));
+		} else if (raw === document) {
+			return $A.lockerService.getEnv(getLockerSecret(st, "key")).document;
+		} else if (Array.isArray(raw) || isNodeList) {
 			swallowed = [];
 			for (var n = 0; n < raw.length; n++) {
 				var newValue = SecureThing.filterEverything(st, raw[n]);

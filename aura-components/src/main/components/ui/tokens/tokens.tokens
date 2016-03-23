@@ -13,4 +13,6 @@
   <aura:token name="uiModal.footer" value=""/>
   <aura:token name="uiModal.backdrop" value=""/>
   <aura:token name="uiModal.backdropOpen" value=""/>
+  
+  <aura:token name="uiPanel.truncate" value=""/>
 </aura:tokens>

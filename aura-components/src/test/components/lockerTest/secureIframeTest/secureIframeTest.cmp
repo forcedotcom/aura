@@ -16,11 +16,16 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-    <aura:method name="getIframe" action="{!c.getIframe}"/>
+    <aura:method name="testIframeAttributes" action="{!c.testIframeAttributes}">
+        <aura:attribute name="attributesWhitelist" type="List"/>
+        <aura:attribute name="attributesBlacklist" type="List"/>
+    </aura:method>
+    <aura:method name="testIframeMethods" action="{!c.testIframeMethods}">
+        <aura:attribute name="methodsWhitelist" type="List"/>
+    </aura:method>
 
     <div aura:id="title">SecureIFrameElement test</div>
-    
     <iframe aura:id="iframe"/>
 </aura:component>

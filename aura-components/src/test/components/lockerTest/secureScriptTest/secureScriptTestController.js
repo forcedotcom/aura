@@ -1,7 +1,8 @@
 ({
-    getScript: function(cmp) {
+    testScriptSrcExposed: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
         var script =  document.createElement("script");
         script.src = "foo.js";
-        cmp.set("v.log", script);
+        testUtils.assertEquals("foo.js", script.src, "Unexpected script source");
     }
 })

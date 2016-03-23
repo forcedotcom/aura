@@ -16,18 +16,19 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+    <aura:attribute name="testRenderer" type="Boolean" default="false" description="Set to true to check Locker wrappers in renderer"/>
+
+    <aura:method name="testAuraLockerInController" action="{!c.testAuraLockerInController}"/>
+    <aura:method name="testAlertExposed" action="{!c.testAlertExposed}"/>
+    <aura:method name="testComponentLockerInController" action="{!c.testComponentLockerInController}"/>
+    <aura:method name="testDocumentLockerInController" action="{!c.testDocumentLockerInController}"/>
+    <aura:method name="testWindowLockerInController" action="{!c.testWindowLockerInController}"/>
+    <aura:method name="testSecureElementFrozenAfterCreation_FromMarkup" action="{!c.testSecureElementFrozenAfterCreation_FromMarkup}"/>
+    <aura:method name="testSecureElementFrozenAfterCreation_DynamicallyCreated" action="{!c.testSecureElementFrozenAfterCreation_DynamicallyCreated}"/>
+    <aura:method name="testAppendDynamicallyCreatedDivToMarkup" action="{!c.testAppendDynamicallyCreatedDivToMarkup}"/>
+    <aura:method name="testEvalBlocking" action="{!c.testEvalBlocking}"/>
 
     <div>LockerService test</div>
-    <ui:button label="Test Wrappers" press="{!c.testWrappers}" aura:id="testWrappers"/>
-    <aura:method name="getWrappersFromController" action="{!c.getWrappersFromController}"/>
-    <aura:method name="getSecureElementFromMarkup" action="{!c.getSecureElementFromMarkup}"/>
-    <aura:method name="appendDiv" action="{!c.appendDiv}"/>
-    <aura:method name="createScriptTags" action="{!c.createScriptTags}"/>
-    <aura:method name="getAlert" action="{!c.getAlert}"/>
-    <aura:method name="testEvalBlocking" action="{!c.testEvalBlocking}">
-	    <aura:attribute name="testUtils" type="Object"/>
-    </aura:method>
-    
     <div aura:id="content"/>
 </aura:component>

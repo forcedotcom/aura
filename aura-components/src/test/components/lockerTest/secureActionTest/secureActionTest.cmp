@@ -16,9 +16,9 @@
 
 -->
 <aura:component implements="aura:requireLocker" controller="java://org.auraframework.components.test.java.controller.TestController">
-    <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-    <aura:method name="getSecureAction" action="{!c.getSecureAction}"/>
+    <aura:method name="testSecureAction" action="{!c.testSecureAction}"/>
 
     <div>SecureAction test</div>
 </aura:component>

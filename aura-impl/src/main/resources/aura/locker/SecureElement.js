@@ -57,25 +57,26 @@ function SecureElement(el, key) {
 				};
 				el.addEventListener(event, sCallback, useCapture);
 			}
-		},
+		}
+	});
+	Object.defineProperties(o, {
+		removeEventListener : SecureThing.createFilteredMethod(o, el, "removeEventListener"),
+		dispatchEvent : SecureThing.createFilteredMethod(o, el, "dispatchEvent"),
 
-		removeEventListener : SecureThing.createPassThroughMethod(el, "removeEventListener"),
-		dispatchEvent : SecureThing.createPassThroughMethod(el, "dispatchEvent"),
+		childNodes : SecureThing.createFilteredProperty(o, el, "childNodes"),
+		children : SecureThing.createFilteredProperty(o, el, "children"),
 
-		childNodes : SecureThing.createFilteredProperty(el, "childNodes"),
-		children : SecureThing.createFilteredProperty(el, "children"),
+		getAttribute: SecureThing.createFilteredMethod(o, el, "getAttribute"),
+		setAttribute: SecureThing.createFilteredMethod(o, el, "setAttribute"),
 
-		getAttribute: SecureThing.createPassThroughMethod(el, "getAttribute"),
-		setAttribute: SecureThing.createPassThroughMethod(el, "setAttribute"),
-
-		ownerDocument : SecureThing.createFilteredProperty(el, "ownerDocument"),
-		parentNode : SecureThing.createFilteredProperty(el, "parentNode"),
+		ownerDocument : SecureThing.createFilteredProperty(o, el, "ownerDocument"),
+		parentNode : SecureThing.createFilteredProperty(o, el, "parentNode"),
 
 		// Standard HTMLElement methods
 		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
-		blur: SecureThing.createPassThroughMethod(el, "blur"),
-		click: SecureThing.createPassThroughMethod(el, "click"),
-		focus: SecureThing.createPassThroughMethod(el, "focus")
+		blur: SecureThing.createFilteredMethod(o, el, "blur"),
+		click: SecureThing.createFilteredMethod(o, el, "click"),
+		focus: SecureThing.createFilteredMethod(o, el, "focus")
 	});
 	// applying standard secure element properties
 	SecureElement.addSecureProperties(o, el);
@@ -100,6 +101,6 @@ SecureElement.addSecureProperties = function (se, raw) {
 		'style', 'tabIndex', 'title'
 		// Note: ignoring 'offsetParent' from the list above.
 	].forEach(function (name) {
-		Object.defineProperty(se, name, SecureThing.createPassThroughProperty(raw, name));
+		Object.defineProperty(se, name, SecureThing.createFilteredProperty(se, raw, name));
 	});
 };

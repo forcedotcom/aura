@@ -1,15 +1,16 @@
 ({
     /**
-     * Note that the test is not in the locker so many of the test cases must delegate to the controller or helper
-     * to get objects and then return them to the test for verification.
+     * Note that this test file operates in system mode (objects are not Lockerized) so the tests delegate logic and
+     * verification to the controller and helper files, which operate in user mode.
      */
+
+    setUp: function(cmp) {
+        cmp.set("v.testUtils", $A.test);
+    },
 
     testSecureAction: {
         test: function(cmp) {
-            cmp.getSecureAction();
-            var secureAction = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureAction", secureAction.toString(), "Expected server-side action in the locker" +
-                    " to be a SecureAction");
+            cmp.testSecureAction();
         }
     }
 })

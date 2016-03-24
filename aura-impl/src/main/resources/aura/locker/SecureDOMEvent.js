@@ -17,18 +17,26 @@
 function SecureDOMEvent(event, key) {
     "use strict";
 
+    var o = Object.create(null, {
+        toString: {
+            value: function() {
+                return "SecureDOMEvent: " + event + "{ key: " + JSON.stringify(key) + " }";
+            }
+        }
+    });
+
     var DOMEventSecureDescriptors = {
         // Events properties that are DOM Elements were compiled from
         // https://developer.mozilla.org/en-US/docs/Web/Events
-        target: SecureThing.createFilteredProperty(event, "target"),
-        currentTarget: SecureThing.createFilteredProperty(event, "currentTarget"),
-        relatedTarget: SecureThing.createFilteredProperty(event, "relatedTarget"),
+        target: SecureThing.createFilteredProperty(o, event, "target"),
+        currentTarget: SecureThing.createFilteredProperty(o, event, "currentTarget"),
+        relatedTarget: SecureThing.createFilteredProperty(o, event, "relatedTarget"),
 
         // Touch Events are special on their own:
         // https://developer.mozilla.org/en-US/docs/Web/API/Touch
-        touches: SecureDOMEvent.filterTouchesDescriptor(event, "touch"),
-        targetTouches: SecureDOMEvent.filterTouchesDescriptor(event, "targetTouches"),
-        changedTouches: SecureDOMEvent.filterTouchesDescriptor(event, "changedTouches"),
+        touches: SecureDOMEvent.filterTouchesDescriptor(o, event, "touch"),
+        targetTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, "targetTouches"),
+        changedTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, "changedTouches"),
 
         // WindowProxy for events like compositionupdate
         // disabling this capability seems to be the right thing to do for now.
@@ -39,18 +47,10 @@ function SecureDOMEvent(event, key) {
         },
 
         // non-standard properties and aliases
-        srcElement: SecureThing.createFilteredProperty(event, "srcElement"),
-        explicitOriginalTarget: SecureThing.createFilteredProperty(event, "explicitOriginalTarget"),
-        originalTarget: SecureThing.createFilteredProperty(event, "originalTarget")
+        srcElement: SecureThing.createFilteredProperty(o, event, "srcElement"),
+        explicitOriginalTarget: SecureThing.createFilteredProperty(o, event, "explicitOriginalTarget"),
+        originalTarget: SecureThing.createFilteredProperty(o, event, "originalTarget")
     };
-
-    var o = Object.create(null, {
-        toString: {
-            value: function() {
-                return "SecureDOMEvent: " + event + "{ key: " + JSON.stringify(key) + " }";
-            }
-        }
-    });
 
     // re-exposing externals
     // TODO: we might need to include non-enumerables
@@ -58,7 +58,7 @@ function SecureDOMEvent(event, key) {
         if (!(name in o)) {
             // every DOM event has a different shape, we apply filters when possible,
             // and bypass when no secure filter is found.
-            Object.defineProperty(o, name, DOMEventSecureDescriptors[name] || SecureThing.createFilteredProperty(event, name));
+            Object.defineProperty(o, name, DOMEventSecureDescriptors[name] || SecureThing.createFilteredProperty(o, event, name));
         }
     }
 
@@ -67,7 +67,7 @@ function SecureDOMEvent(event, key) {
     return Object.seal(o);
 }
 
-SecureDOMEvent.filterTouchesDescriptor = function (event, propName) {
+SecureDOMEvent.filterTouchesDescriptor = function (se, event, propName) {
     "use strict";
 
     // descriptor to produce a new collection of touches where the target of each
@@ -79,7 +79,6 @@ SecureDOMEvent.filterTouchesDescriptor = function (event, propName) {
             if (!touches) {
                 return touches;
             }
-            var se = this;
             return touches.map(function(touch) {
                 // touches is normally a big big collection of touch objects,
                 // we do not want to pre-process them all, just create a the getters

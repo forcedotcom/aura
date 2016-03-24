@@ -61,23 +61,24 @@ function SecureDocument(doc, key) {
                 $A.lockerService.trust(o, node);
                 return SecureElement(node, key);
             }
-        },
+        }
+    });
+    Object.defineProperties(o, {
+        body: SecureThing.createFilteredProperty(o, doc, "body"),
+        head: SecureThing.createFilteredProperty(o, doc, "head"),
 
-        body: SecureThing.createFilteredProperty(doc, "body"),
-        head: SecureThing.createFilteredProperty(doc, "head"),
+        getElementById: SecureThing.createFilteredMethod(o, doc, "getElementById"),
+        getElementsByClassName: SecureThing.createFilteredMethod(o, doc, "getElementsByClassName"),
+        getElementsByName: SecureThing.createFilteredMethod(o, doc, "getElementsByName"),
+        getElementsByTagName: SecureThing.createFilteredMethod(o, doc, "getElementsByTagName"),
 
-        getElementById: SecureThing.createFilteredMethod(doc, "getElementById"),
-        getElementsByClassName: SecureThing.createFilteredMethod(doc, "getElementsByClassName"),
-        getElementsByName: SecureThing.createFilteredMethod(doc, "getElementsByName"),
-        getElementsByTagName: SecureThing.createFilteredMethod(doc, "getElementsByTagName"),
+        querySelector: SecureThing.createFilteredMethod(o, doc, "querySelector"),
+        querySelectorAll: SecureThing.createFilteredMethod(o, doc, "querySelectorAll"),
 
-        querySelector: SecureThing.createFilteredMethod(doc, "querySelector"),
-        querySelectorAll: SecureThing.createFilteredMethod(doc, "querySelectorAll"),
-
-        title: SecureThing.createPassThroughProperty(doc, "title"),
+        title: SecureThing.createFilteredProperty(o, doc, "title"),
 
         // DCHASMAN TODO W-2839646 Figure out how much we want to filter cookie access???
-        cookie: SecureThing.createPassThroughProperty(doc, "cookie")
+        cookie: SecureThing.createFilteredProperty(o, doc, "cookie")
     });
 
     setLockerSecret(o, "key", key);

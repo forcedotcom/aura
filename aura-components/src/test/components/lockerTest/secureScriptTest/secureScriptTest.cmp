@@ -16,9 +16,9 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-    <aura:method name="getScript" action="{!c.getScript}"/>
+    <aura:method name="testScriptSrcExposed" action="{!c.testScriptSrcExposed}"/>
 
     <div aura:id="title">SecureScriptElement test</div>
 </aura:component>

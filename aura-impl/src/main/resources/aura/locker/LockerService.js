@@ -45,8 +45,8 @@ function LockerService() {
 	function masterKey() {/*lexical master key*/}
 
 	getLockerSecret = function (st, type) {
-		if (typeof st !== "object") {
-			throw new TypeError("Secrets can only be stored in Objects.");
+		if (typeof st !== "object" && typeof st !== "function") {
+			throw new TypeError("Secrets can only be stored in Objects and Functions.");
 		}
 		var lock = st["$ls" + type];
 		if (lock && validLockSet["has"](lock)) {
@@ -63,8 +63,8 @@ function LockerService() {
 			}
 			return secret;
 		}
-		if (typeof st !== "object") {
-			throw new TypeError("Secrets can only be retrieved from Objects.");
+		if (typeof st !== "object" && typeof st !== "function") {
+			throw new TypeError("Secrets can only be retrieved from Objects and Functions.");
 		}
 		if (typeof st["$ls" + type] === 'function') {
 			throw new Error("Re-setting of " + type + " is prohibited");

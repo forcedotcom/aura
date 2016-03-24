@@ -52,7 +52,7 @@
     },
     isNumberInRange: function (cmp) {
         var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || 9007199254740991
-          , MIN_SAFE_INTEGER = Number.MIN_SAFE_INTEGER || 9007199254740991
+          , MIN_SAFE_INTEGER = Number.MIN_SAFE_INTEGER || -9007199254740991
           , lib              = this.inputNumberLibrary.number
           , formatter        = cmp.get('v.format')
           , number           = cmp.get('v.inputValue');
@@ -155,7 +155,13 @@
             // 'cause .5 is 50% => scale 0 == -2 in back operation.
             newValue = this.isPercentStyle(cmp) ? Number(newValue + 'e' + (-valueScale - 2)) : newValue;
 
-        cmp.set('v.value',newValue);
+        if (cmp.get('v.value') !== newValue) {
+            cmp.set('v.value', newValue);
+            this.fireChangeEvent(cmp);
+        }
+    },
+    fireChangeEvent : function (cmp) {
+        cmp.getEvent('change').fire();
     },
     hasChangedValue : function (cmp) {
         var lib = this.inputNumberLibrary.number;

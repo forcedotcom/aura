@@ -139,7 +139,7 @@
             } else {
                 panel.set('v.referenceElement', component.find('input').getElement().querySelector('input'));
             }
-            $A.get('e.ui:stackPanel').setParams({
+            $A.getEvt("markup://ui:stackPanel").setParams({
                 callback: function(zIndex) {
                     panel.set('v.zIndex', zIndex);
                 }

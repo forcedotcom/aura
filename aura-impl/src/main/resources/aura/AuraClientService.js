@@ -279,7 +279,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
     // now that we have a response from a server.
     //
     if (this._isDisconnected) {
-        e = $A.get("e.aura:connectionResumed");
+        e = $A.getEvt("markup://aura:connectionResumed");
         if (e) {
             this._isDisconnected = false;
             e.fire();
@@ -464,7 +464,7 @@ AuraClientService.prototype.throwExceptionEvent = function(resp) {
 };
 
 AuraClientService.prototype.fireDoneWaiting = function() {
-    $A.get("e.aura:doneWaiting").fire();
+    $A.getEvt("markup://aura:doneWaiting").fire();
 };
 
 /**
@@ -1978,7 +1978,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 
     // legacy code, spinner actually relies on the waiting event, need a proper fix
     setTimeout(function() {
-        $A.get("e.aura:waiting").fire();
+        $A.getEvt("markup://aura:waiting").fire();
     }, 1);
 
     this.lastSendTime = Date.now();

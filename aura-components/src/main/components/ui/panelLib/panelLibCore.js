@@ -195,7 +195,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 payload: { panelInstance: cmp.getGlobalId() }
             }).fire();
 
-            $A.get('e.ui:panelTransitionBegin').setParams(
+            $A.getEvt("markup://ui:panelTransitionBegin").setParams(
                 { 
                     panel: cmp, 
                     isOpening: true
@@ -230,7 +230,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     }
                 }
 
-                $A.get('e.ui:panelTransitionEnd').setParams({
+                $A.getEvt("markup://ui:panelTransitionEnd").setParams({
                     action: 'show', 
                     panelId: cmp.getGlobalId()
                 }).fire();
@@ -273,7 +273,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
             }
             
             cmp.set('v.visible', false);
-            $A.get('e.ui:panelTransitionBegin').setParams({ panel: cmp, isOpening: false }).fire();
+            $A.getEvt("markup://ui:panelTransitionBegin").setParams({ panel: cmp, isOpening: false }).fire();
 
 
             //endAnimationHandler: cleanup all classes and events
@@ -289,7 +289,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     }
 
 
-                    $A.get('e.ui:panelTransitionEnd').setParams({
+                    $A.getEvt("markup://ui:panelTransitionEnd").setParams({
                         action: 'hide', 
                         panelId: panelId
                     }).fire();

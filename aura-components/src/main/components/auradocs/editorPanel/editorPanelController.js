@@ -15,7 +15,7 @@
  */
 ({
 	open : function(cmp, descriptor){
-		var evt = $A.get("e.auradocs:openDef");
+		var evt = $A.getEvt("markup://auradocs:openDef");
 		evt.setParams({
 			descriptor : descriptor,
 			defType : "Component"

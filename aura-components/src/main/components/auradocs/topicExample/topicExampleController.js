@@ -15,7 +15,7 @@
  */
 ({
     show : function(cmp){
-        var evt = $A.get("e.auradocs:focusDef");
+        var evt = $A.getEvt("markup://auradocs:focusDef");
         evt.setParams({
             descriptor : cmp.get("v.descriptor"),
             defType : cmp.get("v.defType")

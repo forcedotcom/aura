@@ -17,7 +17,7 @@
     open : function(cmp, event) {
 
         event.preventDefault();
-        var evt = $A.get("e.auradocs:openDef");
+        var evt = $A.getEvt("markup://auradocs:openDef");
         evt.setParams({
             descriptor : cmp.get("v.descriptor"),
             defType : cmp.get("v.defType")

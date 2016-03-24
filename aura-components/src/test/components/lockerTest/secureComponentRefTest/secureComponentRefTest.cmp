@@ -16,9 +16,12 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-    <aura:method name="getFacet" action="{!c.getFacet}"/>
+    <aura:method name="testFacetFromAnotherNamespaceIsSecureComponentRef" action="{!c.testFacetFromAnotherNamespaceIsSecureComponentRef}"/>
+    <aura:method name="testUnexposedPlatformAPIs" action="{!c.testUnexposedPlatformAPIs}">
+            <aura:attribute name="unexposedPlatformApis" type="List"/>
+    </aura:method>
 
     <div>SecureComponentRef test</div>
     <aura:text value="aura:text component" aura:id="facet"/>

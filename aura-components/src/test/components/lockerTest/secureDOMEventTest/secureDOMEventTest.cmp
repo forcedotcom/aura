@@ -16,9 +16,10 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-	<aura:method name="getClickDOMEvent" action="{!c.getClickDOMEvent}"/>
+    <aura:method name="testClickEvent" action="{!c.testClickEvent}"/>
+    <aura:method name="testEventViewThrowsError" action="{!c.testEventViewThrowsError}"/>
 
     <div aura:id="title">SecureDOMEvent test</div>
 </aura:component>

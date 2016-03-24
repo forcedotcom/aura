@@ -1,55 +1,37 @@
 ({
     /**
-     * Note that the test is not in the locker so many of the test cases must delegate to the controller or helper
-     * to get objects and then return them to the test for verification.
+     * Note that this test file operates in system mode (objects are not Lockerized) so the tests delegate logic and
+     * verification to the controller and helper files, which operate in user mode.
      */
+
+    setUp: function(cmp) {
+        cmp.set("v.testUtils", $A.test);
+    },
 
     test$AExposedOnWindow: {
         test: function(cmp) {
-            cmp.getWindow();
-            var wrapped = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureAura", wrapped["$A"].toString(), "Expected window.$A to return SecureAura");
+            cmp.test$AExposedOnWindow();
         }
     },
 
     testDocumentExposedOnWindow: {
         test: function(cmp) {
-            cmp.getWindow();
-            var wrapped = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureDocument", wrapped["document"].toString(), "Expected window.document to"
-                    + " return SecureDocument");
+            cmp.testDocumentExposedOnWindow();
         }
     },
 
     testCircularReferenceIsSecureWindow: {
         test: function(cmp) {
-            cmp.getWindow();
-            var wrapped = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureWindow", wrapped["window"].toString(), "Expected window.window to"
-                    + " return SecureWindow");
+            cmp.testCircularReferenceIsSecureWindow();
         }
     },
 
     testNoAccessToWindowViaSetTimeout: {
         test: function(cmp) {
-            var actual;
-            var completed = false;
-            cmp.getWindow();
-            var wrapped = cmp.get("v.log");
-
-            wrapped.setTimeout(function() {
-                actual = this;
-                completed = true;
-            }, 0);
-
-            $A.test.addWaitFor(
-                    true,
-                    function() { return completed },
-                    function() {
-                        $A.test.assertStartsWith("SecureWindow", wrapped["window"].toString(), "Expected 'this' inside" +
-                                " setTimeout callback to be SecureWidow");
-                    }
-            );
+            cmp.testNoAccessToWindowViaSetTimeout();
+            $A.test.addWaitFor(true, function() {
+                return !!cmp.get("v.testComplete");
+            });
         }
     }
 })

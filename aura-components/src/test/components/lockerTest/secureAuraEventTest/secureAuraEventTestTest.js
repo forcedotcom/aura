@@ -1,26 +1,22 @@
 ({
     /**
-     * Note that the test is not in the locker so many of the test cases must delegate to the controller or helper
-     * to get objects and then return them to the test for verification.
+     * Note that this test file operates in system mode (objects are not Lockerized) so the tests delegate logic and
+     * verification to the controller and helper files, which operate in user mode.
      */
+
+    setUp: function(cmp) {
+        cmp.set("v.testUtils", $A.test);
+    },
 
     testGetEventSourceReturnsSecureComponent: {
         test: function(cmp) {
-            cmp.getEventTest();
-            var event = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureComponent", event.getSource().toString());
+            cmp.testGetEventSourceReturnsSecureComponent();
         }
     },
 
     testExerciseEventAPIs: {
         test: function(cmp) {
-            cmp.getEventTest();
-            var event = cmp.get("v.log");
-            var params = { "type": "event", "message": "testMessage" };
-            event.setParams(params);
-            $A.test.assertEquals("debugLog", event.getName());
-            $A.test.assertEquals(params.message, event.getParams().message);
-            $A.test.assertDefined(event.fire);
+            cmp.testExerciseEventAPIs();
         }
     }
 })

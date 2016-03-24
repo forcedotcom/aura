@@ -1,7 +1,7 @@
 ({
     /**
-     * Note that the test is not in the locker so many of the test cases must delegate to the controller or helper
-     * to get objects and then return them to the test for verification.
+     * Note that this test file operates in system mode (objects are not Lockerized) so the tests delegate logic and
+     * verification to the controller and helper files, which operate in user mode.
      */
 
     // TODO(tbliss): make these lists on SecureIFrameElement accessible here for maintainablility
@@ -9,26 +9,19 @@
     AttributesBlacklist: ['contentDocument', 'contentWindow', 'sandbox', 'srcdoc'],
     MethodsWhitelist: ['blur', 'focus'],
 
+    setUp: function(cmp) {
+        cmp.set("v.testUtils", $A.test);
+    },
+
     testIframeAttributes: {
         test: function(cmp) {
-            cmp.getIframe();
-            var iframe = cmp.get("v.log");
-            this.AttributesWhitelist.forEach(function(name) {
-                $A.test.assertTrue(name in iframe);
-            });
-            this.AttributesBlacklist.forEach(function(name) {
-                $A.test.assertFalse(name in iframe);
-            });
+            cmp.testIframeAttributes(this.AttributesWhitelist, this.AttributesBlacklist);
         }
     },
 
     testIframeMethods: {
         test: function(cmp) {
-            cmp.getIframe();
-            var iframe = cmp.get("v.log");
-            this.MethodsWhitelist.forEach(function(name) {
-                $A.test.assertDefined(iframe[name]);
-            });
+            cmp.testIframeMethods(this.MethodsWhitelist);
         }
     }
 })

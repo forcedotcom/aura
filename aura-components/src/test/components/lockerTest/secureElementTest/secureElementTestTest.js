@@ -1,12 +1,12 @@
 ({
     /**
-     * Note that the test is not in the locker so many of the test cases must delegate to the controller or helper
-     * to get objects and then return them to the test for verification.
+     * Note that this test file operates in system mode (objects are not Lockerized) so the tests delegate logic and
+     * verification to the controller and helper files, which operate in user mode.
      */
 
     // TODO(tbliss): make these lists on SecureElement accessible here for maintainablility
     ElementPropertiesWhitelist: ['childElementCount', 'classList', 'className', 'id', 'tagName'],
-    ElementProperitesBlacklast: ['attributes', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
+    ElementProperitesBlacklist: ['attributes', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
                                  'nextElementSibling', 'previousElementSibling'],
 
     HTMLPropertiesWhitelist: ['accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable',
@@ -14,34 +14,24 @@
                               'style', 'tabIndex', 'title'],
     HTMLPropertiesBlacklist: ['offsetParent'],
 
-    OtherPropertiesWhitelist: ["childNodes", "children", "innerText", "ownerDocument", "parentNode"],
+    OtherPropertiesWhitelist: ["childNodes", "children", "ownerDocument", "parentNode"],
 
     MethodsWhitelist: ["appendChild", "addEventListener", "removeEventListener", "dispatchEvent",
                        "getAttribute", "setAttribute", "blur", "click", "focus"],
 
+    setUp: function(cmp) {
+        cmp.set("v.testUtils", $A.test);
+    },
+
     testElementProperties: {
         test: function(cmp) {
-            cmp.getDiv();
-            var element = cmp.get("v.log");
-            this.ElementPropertiesWhitelist.forEach(function(name) {
-                $A.test.assertTrue(name in element, "Expected property '" + name + "' to be a property on SecureElement");
-            });
-            this.ElementProperitesBlacklast.forEach(function(name) {
-                $A.test.assertFalse(name in element, "Expected property '" + name + "' to not be exposed on SecureElement");
-            });
+            cmp.testElementProperties(this.ElementPropertiesWhitelist, this.ElementProperitesBlacklist);
         }
     },
 
     testHtmlProperties: {
         test: function(cmp) {
-            cmp.getDiv();
-            var element = cmp.get("v.log");
-            this.HTMLPropertiesWhitelist.forEach(function(name) {
-                $A.test.assertTrue(name in element, "Expected property '" + name + "' to be a property on SecureElement");
-            });
-            this.HTMLPropertiesBlacklist.forEach(function(name) {
-                $A.test.assertFalse(name in element, "Expected property '" + name + "' to not be exposed on SecureElement");
-            });
+            cmp.testHtmlProperties(this.HTMLPropertiesWhitelist, this.HTMLPropertiesBlacklist);
         }
     },
 
@@ -58,11 +48,7 @@
 
     testExposedMethods: {
         test: function(cmp) {
-            cmp.getDiv();
-            var element = cmp.get("v.log");
-            this.MethodsWhitelist.forEach(function(name) {
-                $A.test.assertDefined(element[name]);
-            });
+            cmp.testExposedMethods(this.MethodsWhitelist);
         }
     },
 })

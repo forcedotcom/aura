@@ -16,7 +16,19 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+
+    <aura:method name="testElementProperties" action="{!c.testElementProperties}">
+        <aura:attribute name="elementPropertiesWhitelist" type="List"/>
+        <aura:attribute name="elementPropertiesBlacklist" type="List"/>
+    </aura:method>
+    <aura:method name="testHtmlProperties" action="{!c.testHtmlProperties}">
+        <aura:attribute name="htmlPropertiesWhitelist" type="List"/>
+        <aura:attribute name="htmlPropertiesBlacklist" type="List"/>
+    </aura:method>
+    <aura:method name="testExposedMethods" action="{!c.testExposedMethods}">
+        <aura:attribute name="methodsWhitelist" type="List"/>
+    </aura:method>
 
     <aura:method name="getDiv" action="{!c.getDiv}"/>
 

@@ -37,6 +37,7 @@ import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.source.StringSourceLoader;
 
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Sets;
 
 /**
  * ConfigAdapter for Aura tests.
@@ -242,7 +243,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
     @Override
     public Set<String> getPrivilegedNamespaces() {
-        Set<String> namespaces = super.getPrivilegedNamespaces();
+        Set<String> namespaces = Sets.newTreeSet(super.getPrivilegedNamespaces());
         namespaces.removeAll(unprivilegedNamespaces);
         return namespaces;
     }
@@ -266,7 +267,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
     @Override
     public Set<String> getInternalNamespaces() {
-        Set<String> namespaces = super.getInternalNamespaces();
+        Set<String> namespaces = Sets.newTreeSet(super.getInternalNamespaces());
         namespaces.removeAll(nonInternalNamespaces);
         return namespaces;
     }

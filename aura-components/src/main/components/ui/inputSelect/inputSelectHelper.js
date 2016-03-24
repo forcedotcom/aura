@@ -102,7 +102,6 @@
             menuItems.push(menuItem);
             if (menuItems.length === options.length) {
                 cmp.find("options").set("v.body", menuItems);
-                cmp.find("options").get("e.refresh").fire();
             }
         };
         var multiSelect = cmp.get("v.multiple");

@@ -36,6 +36,7 @@
     <aura:handler name="keydown" action="{!c.onKeyboardEvent}"/>
 
     <aura:handler name="refresh" action="{!c.update}"/>
+    <aura:handler name="change" value="{!v.body}" action="{!c.update}"/>
 
     <div class="{!v.class}" aura:id="menu" role="menu">
         <aura:if isTrue="{!v.headerText != null}">

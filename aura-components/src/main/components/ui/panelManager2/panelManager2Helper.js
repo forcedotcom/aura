@@ -234,7 +234,7 @@
         
         if(!panelObj.panel._transitionEndFired) {
             // listeners still need to know the panel is gone
-            $A.get('e.ui:panelTransitionEnd').setParams({
+            $A.getEvt("markup://ui:panelTransitionEnd").setParams({
                 action: 'hide', 
                 panelId: panelId
             }).fire();

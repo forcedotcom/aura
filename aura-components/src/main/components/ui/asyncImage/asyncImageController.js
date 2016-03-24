@@ -20,7 +20,7 @@
         imageElement.src = cmp.get("v.actualImageSrc");
         var callback = $A.getCallback(function () {
             if (cmp && cmp.isValid()) {
-                $A.get("e.ui:asyncComponentLoaded").fire({"asyncComponent": cmp});
+                $A.getEvt("markup://ui:asyncComponentLoaded").fire({"asyncComponent": cmp});
             }
         });
         // notify asyncComponentManager when image is loaded (or there was an error)

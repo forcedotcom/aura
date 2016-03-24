@@ -25,7 +25,7 @@
         if (afe) {
             var output = cmp.find('errorText');
             var dialog = cmp.find('errorOverlay');
-            var open = $A.get("e.ui:openDialog");
+            var open = $A.getEvt("markup://ui:openDialog");
 
             output.set("v.value", afe.data["friendlyMessage"]);
 
@@ -41,7 +41,7 @@
 
     hideErrorDialog: function(cmp){
         var dialog= cmp.find('errorOverlay');
-        var close = $A.get("e.ui:closeDialog");
+        var close = $A.getEvt("markup://ui:closeDialog");
         close.setParams({
             dialog : dialog
         });

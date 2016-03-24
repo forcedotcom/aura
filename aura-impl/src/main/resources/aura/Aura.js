@@ -763,7 +763,7 @@ AuraInstance.prototype.finishInit = function(doNotInitializeServices) {
         $A.util.removeClass(document.body, "loading");
         delete $A.globalValueProviders;
         this["finishedInit"] = true;
-        $A.get("e.aura:initialized").fire();
+        $A.getEvt("markup://aura:initialized").fire();
         $A.metricsService.applicationReady();
     }
 
@@ -843,7 +843,7 @@ AuraInstance.prototype.handleError = function(message, e) {
     }
 
     if ($A.initialized) {
-        $A.getEvt("aura:systemError").fire(evtArgs);
+        $A.getEvt('markup://aura:systemError').fire(evtArgs);
     } else {
         if ($A.showErrors()) {
             $A.message(dispMsg);

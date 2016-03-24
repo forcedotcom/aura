@@ -145,7 +145,7 @@
         var closeButton  = dialog.find("closeButton").getElement(),
             shiftPressed = event.shiftKey,
             currentFocus = document.activeElement,
-            closeEvent   = $A.get("e.ui:closeDialog");
+            closeEvent = $A.getEvt("markup://ui:closeDialog");
 
         closeEvent.setParams({ dialog : dialog, confirmClicked : false });
 
@@ -198,7 +198,7 @@
             return;
         } else {
             if (clickOutToClose) {
-                closeEvent = $A.get("e.ui:closeDialog");
+                closeEvent = $A.getEvt("markup://ui:closeDialog");
                 closeEvent.setParams({
                     dialog : dialog,
                     confirmClicked : false

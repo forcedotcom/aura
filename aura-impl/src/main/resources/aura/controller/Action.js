@@ -1163,10 +1163,8 @@ Action.prototype.markException = function(e) {
     if (!e.id) {
         e = new $A.auraError(descriptor ? "Action failed: " + descriptor : "", e);
         e.component = descriptor;
-    }
-
-    // keep the root cause failing descriptor for AE and AFE
-    if (e instanceof $A.auraError) {
+    } else if (e instanceof $A.auraError) {
+        // keep the root cause failing descriptor
         e.component = e.component || descriptor;
     }
 

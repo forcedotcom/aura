@@ -238,9 +238,10 @@ Logger.prototype.getStackTrace = function(e, remove) {
             remove += 2;
         }
     }
-    if (e && e.stack) {
-        stack = e.stack;
+    if (e) {
+        stack = e.stackTrace || e.stack;
     }
+
     // Chrome adds the error message to the beginning of the stacktrace. Strip that we only want the the actual stack.
     var chromeStart = "Error: " + e.message;
     if (stack && stack.indexOf(chromeStart) === 0) {
@@ -378,7 +379,6 @@ Logger.prototype.hasSubscriptions = function(level) {
  */
 Logger.prototype.devDebugConsoleLog = function(level, message, error) {
     var stringVersion = null;
-    var showTrace = true;
     var trace;
     var logMsg = level + ": " + (message || "");
 
@@ -404,9 +404,8 @@ Logger.prototype.devDebugConsoleLog = function(level, message, error) {
                     console[filter]("%s", "Failing component: " + error.component);
                 }
                 console[filter]("%o", error);
-                showTrace = !(error.stack || error.stackTrace);
             }
-            if (showTrace && trace) {
+            if ((filter === "error" || filter === "warn") && trace) {
                 for ( var j = 0; j < trace.length; j++) {
                     console[filter]("%s", trace[j]);
                 }
@@ -416,9 +415,8 @@ Logger.prototype.devDebugConsoleLog = function(level, message, error) {
             console["debug"](message);
             if (error) {
                 console["debug"](error);
-                showTrace = !(error.stack || error.stackTrace);
             }
-            if (showTrace && trace) {
+            if (trace) {
                 console["group"]("stack");
                 for ( var i = 0; i < trace.length; i++) {
                     console["debug"](trace[i]);

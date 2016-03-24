@@ -52,7 +52,7 @@
     },
     isNumberInRange: function (cmp) {
         var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || 9007199254740991
-          , MIN_SAFE_INTEGER = Number.MIN_SAFE_INTEGER || 9007199254740991
+          , MIN_SAFE_INTEGER = Number.MIN_SAFE_INTEGER || -9007199254740991
           , lib              = this.inputNumberLibrary.number
           , formatter        = cmp.get('v.format')
           , number           = cmp.get('v.inputValue');

@@ -152,6 +152,81 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
+    public void testClientErrorFromContainedCmpClientController() throws Exception {
+        open("/auratest/errorHandlingApp.app", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String failingDescriptor = "auratest$errorHandling$controller$throwErrorFromClientController";
+        String expectedMessage = String.format("AuraError: Action failed: %s [Error from component client controller]", failingDescriptor);
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    public void testClientErrorFromContainedCmpActionCallback() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromServerActionCallbackButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String expectedMessage = "AuraError: Uncaught error in $A.getCallback() [Error from component server action callback]";
+        String failingDescriptor = "markup://auratest:errorHandling";
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    public void testClientErrorFromGetcallbackWrappedFunctionInContainCmp() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromFunctionWrappedInGetCallbackButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String expectedMessage = "AuraError: Uncaught error in $A.getCallback() [Error from function wrapped in getCallback in component]";
+        String failingDescriptor = "markup://auratest:errorHandling";
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    public void testClientErrorFromContainedCmpRerender() throws Exception {
+        open("/auratest/errorHandlingApp.app", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromRerenderButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String failingDescriptor = "markup://auratest:errorHandling";
+        String expectedMessage = String.format("AuraError: rerender threw an error in '%s' [Error from component rerender]", failingDescriptor);
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    public void testClientErrorFromContainedCmpUnrerender() throws Exception {
+        open("/auratest/errorHandlingApp.app", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromUnrenderButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String failingDescriptor = "markup://auratest:errorHandling";
+        String expectedMessage = String.format("AuraError: unrender threw an error in '%s' [Error from component unrender]", failingDescriptor);
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
     private void assertClientErrorLogContains(String log, String expectedMessage, boolean requireErrorId, String failingDescriptor) {
         assertThat("Missing expected message in the log.", log, CoreMatchers.containsString(expectedMessage));
         assertThat("Missing failing descriptpr in the log." + log, log, CoreMatchers.containsString("Failing descriptor: " + failingDescriptor));

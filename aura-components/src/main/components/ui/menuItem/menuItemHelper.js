@@ -45,6 +45,8 @@
                 event.preventDefault();
                 concreteComponent.select();
             }
+        } else if (event.type === "click") {
+            event.preventDefault();
         }
 
         return false;

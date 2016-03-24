@@ -613,67 +613,9 @@
                 });
             } ]
     },
-    /**
-     * Verify cache sweeping(expiration check). defaultExpiration settings
-     * trumps defaultAutoRefreshInterval setting
-     */
-    testCacheExpiration : {
-        attributes : {
-            defaultExpiration : 1, // I am king
-            defaultAutoRefreshInterval : 60 // Very high but doesn't matter
-        },
-        test : [ function(cmp) {
-            $A.test.setTestTimeout(30000);
-            this.resetCounter(cmp, "testCacheExpiration");
-        }, function(cmp) {
-            //Run the action and mark it as storable.
-            var a = cmp.get("c.fetchDataRecord");
-            a.setParams({testName : "testCacheExpiration"});
-            a.setStorable();
-            $A.test.enqueueAction(a);
-            $A.test.addWaitFor(
-                false,
-                $A.test.isActionPending,
-                function(){
-                    $A.test.assertFalse(a.isFromStorage(), "Failed to execute action at server");
-                    $A.test.assertEquals(0, a.getReturnValue().Counter, "Wrong counter value seen in response");
-                }
-            );
-            var key = a.getStorageKey();
-            var expired = false;
-            // Twisted asynchronicity, but it should do the right thing.
-            $A.test.addWaitFor(true, function(){
-                    if (a.getState() == "SUCCESS") {
-                        // don't start looking until our action has finished.
-                        $A.storageService.getStorage("actions").get(key).then(function(item) {
-                            if (item === undefined) {
-                                expired = true;
-                            }
-                        });
-                    }
-                    return expired;
-                });
-        }, function(cmp) {
-            var aSecond = cmp.get("c.fetchDataRecord");
-            aSecond.setParams({testName: "testCacheExpiration"});
-            aSecond.setStorable();
-            $A.test.enqueueAction(aSecond);
-            $A.test.addWaitFor(
-                "SUCCESS",
-                function () {
-                    return aSecond.getState();
-                },
-                function () {
-                    $A.test.assertEquals(1, aSecond.getReturnValue().Counter, "aSecond response invalid.");
-                    $A.test.assertFalse(aSecond.isFromStorage(), "expected cache expiration");
-                }
-            );
-        } ]
-    },
 
     /**
      * When offline, should not purge cached data.
-     *
      */
     testCacheDataNotPurgedWhenOffline : {
         attributes : {
@@ -727,10 +669,10 @@
                     });
             } ]
     },
+
     /**
      * Go offline (should not purge cached data), then go back online, should
      * use cached data.
-     *
      */
     testCacheDataUsedWhenConnectionResumed : {
         attributes : {

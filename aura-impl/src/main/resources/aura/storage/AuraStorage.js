@@ -32,7 +32,12 @@ var AuraStorage = function AuraStorage(config) {
     this.setVersion(config["version"]);
     this.updateKeyPrefix();
 
-    this.lastSweep = new Date().getTime();
+    // frequency guard for sweeping
+    this.sweepInterval = Math.min(Math.max(this.defaultExpiration*0.5, AuraStorage["SWEEP_INTERVAL"]["MIN"]), AuraStorage["SWEEP_INTERVAL"]["MAX"]);
+
+    this.lastSweepTime = new Date().getTime();
+
+    this._sweepingSuspended = false;
 
     var clearStorageOnInit = config["clearStorageOnInit"];
 
@@ -247,20 +252,59 @@ AuraStorage.prototype.remove = function(key, doNotFireModified) {
  * @private
  */
 AuraStorage.prototype.sweep = function() {
-    // Do not sweep if we have lost our connection, we'll ignore expiration until sweeping resumes
-    // OR if we've recently swept
-    if (this._sweepingSuspended || ((new Date().getTime() - this.lastSweep) < (this.defaultExpiration / 60))) {
+    // sweeping guards:
+    // 1. sweeping is in progress
+    if (this._sweepingInProgress) {
+        return;
+    }
+    // 2. sweeping has been suspended. often set when the client goes offline or the store's size is being manually managed.
+    if (this._sweepingSuspended) {
+        return;
+    }
+    // 3. framework hasn't finished init'ing
+    if (!$A["finishedInit"]) {
+        return;
+    }
+    // 4. frequency
+    var sweepInterval = new Date().getTime() - this.lastSweepTime;
+    if (sweepInterval < this.sweepInterval) {
         return;
     }
 
+    // prevent concurrent sweeps
+    this._sweepingInProgress = true;
+
     var that = this;
+    function doneSweeping() {
+        that.log("sweep() - complete");
+        that._sweepingInProgress = false;
+        that.lastSweepTime = new Date().getTime();
+        $A.storageService.fireModified();
+    }
+
+    // if adapter can do its own sweeping
     if (this.adapter.sweep) {
-        this.adapter.sweep().then(function() {
-            that.lastSweep = new Date().getTime();
-            $A.storageService.fireModified();
-        });
-    } else {
-        this.adapter.getExpired().then(function (expired) {
+        this.adapter.sweep()
+            .then(
+                undefined, // noop
+                function() {
+                    // swallow the error
+                }
+            )
+            .then(doneSweeping);
+        return;
+    }
+
+    // fallback: get expired items and remove them
+    this.adapter.getExpired()
+        .then(
+            undefined, // noop
+            function() {
+                // swallow the error, return empty set
+                return [];
+            }
+        )
+        .then(function (expired) {
             // note: expired includes any key prefix. and it may
             // include items with different key prefixes which
             // we want to expire first. thus remove directly from the
@@ -270,27 +314,23 @@ AuraStorage.prototype.sweep = function() {
                 return;
             }
 
+            function noop() {}
             var promiseSet = [];
-            var key;
+            var key, promise;
+
             for (var n = 0; n < expired.length; n++) {
                 key = expired[n];
                 that.log("sweep() - expiring item with key: " + key);
-                promiseSet.push(that.adapter.removeItem(key));
+                // ensure all promises succeed
+                promise = that.adapter.removeItem(key).then(
+                    undefined, // noop
+                    noop // return promise to success state
+                );
+                promiseSet.push(promise);
             }
 
-            // When all of the remove promises have completed...
-            Promise.all(promiseSet).then(
-                function () {
-                    that.log("sweep() - complete");
-                    that.lastSweep = new Date().getTime();
-                    $A.storageService.fireModified();
-                },
-                function (err) {
-                    that.log("Error while sweep() was removing items: " + err);
-                }
-            );
+            return Promise.all(promiseSet).then(doneSweeping, doneSweeping); // eslint-disable-line consistent-return
         });
-    }
 };
 
 /**
@@ -411,3 +451,14 @@ AuraStorage.prototype.updateKeyPrefix = function() {
  * @private
  */
 AuraStorage.KEY_DELIMITER = ":";
+
+/**
+ * Sweep intervals (milliseconds).
+ */
+AuraStorage["SWEEP_INTERVAL"] = {
+        "MIN": 60000, // 1 min
+        "MAX": 300000 // 5 min
+};
+
+
+Aura.Storage.AuraStorage = AuraStorage;

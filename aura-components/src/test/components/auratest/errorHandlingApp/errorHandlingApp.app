@@ -30,6 +30,7 @@
     <aura:attribute name="throwErrorFromInit" type="Boolean" default="false"/>
     <aura:attribute name="throwErrorFromRender" type="boolean" default="false"/>
     <aura:attribute name="throwErrorFromAfterRender" type="Boolean" default="false"/>
+    <aura:attribute name="throwErrorInHandler" type="Boolean" default="false"/>
 
     <!-- The following attributes can be passed in with url and need to click button to perform tests -->
     <aura:attribute name="throwErrorFromRerender" type="Boolean" default="false" />
@@ -46,10 +47,8 @@
 
     <aura:method name="throwErrorFromClientController"
                  action="{!c.throwErrorFromClientController}"/>
-    <aura:method name="throwAuraErrorFromClientController"
-                 action="{!c.throwAuraErrorFromClientController}"/>
-    <aura:method name="throwAuraFriendlyErrorFromClientController"
-                 action="{!c.throwAuraFriendlyErrorFromClientController}"/>
+    <aura:method name="throwErrorFromServerActionCallback"
+                 action="{!c.throwErrorFromServerActionCallback}"/>
 
     <table class="errorFromAppTable">
     <caption> Errors from Application: </caption>
@@ -75,7 +74,8 @@
         <td>
           <ui:button label="Throw"
                      press="{!c.throwErrorFromCreateComponentCallback}"
-                     class="errorFromCreateComponentCallbackButton"/>
+                     class="errorFromCreateComponentCallbackButton"
+                     aura:id="errorFromCreateComponentCallbackButton"/>
         </td>
     </tr>
     <tr>
@@ -126,6 +126,24 @@
                      press="{!c.throwAuraFriendlyErrorFromClientController}"
                      class="auraFriendlyErrorFromClientControllerButton"
                      aura:id="auraFriendlyErrorFromClientControllerButton"/>
+        </td>
+    </tr>
+    <tr>
+        <td>Error from aura:method handler: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromAuraMethodHandler}"
+                     class="errorFromAuraMethodHandlerButton"
+                     aura:id="errorFromAuraMethodHandlerButton"/>
+        </td>
+    </tr>
+    <tr>
+        <td>Error from contained component client controller: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromContainedCmpController}"
+                     class="errorFromContainedCmpControllerButton"
+                     aura:id="errorFromContainedCmpControllerButton"/>
         </td>
     </tr>
     </table>

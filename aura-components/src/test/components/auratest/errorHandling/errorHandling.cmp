@@ -35,6 +35,11 @@
 
     <aura:import library="auratest:errorHandlingLib" property="ErrorHandlingLib"/>
 
+    <aura:method name="throwErrorFromClientController"
+                 action="{!c.throwErrorFromClientController}"/>
+    <aura:method name="throwErrorFromFunctionWrappedInGetCallback"
+                 action="{!c.throwErrorFromFunctionWrappedInGetCallback}"/>
+
     <table class="errorFromCmpTable">
     <caption> Errors from Component:</caption>
     <tr>

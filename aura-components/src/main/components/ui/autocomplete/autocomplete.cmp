@@ -64,9 +64,6 @@
     <aura:if isTrue="{!v.inputType == 'inputTextArea'}">
         <ui:inputTextAreaForAutocomplete aura:id="input" 
                                          class="{!v.inputClass+' '+v.theme}"
-                                         label="{!v.label}"
-                                         labelClass="{!v.labelClass}"
-                                         labelPosition="{!v.labelPosition}"
                                          placeholder="{!v.placeholder}"
                                          updateOn="{!v.updateOn}"
                                          ariaDescribedBy="{!v.ariaDescribedBy}"
@@ -76,9 +73,6 @@
         <aura:set attribute="else">
             <ui:inputTextForAutocomplete aura:id="input" 
                                          class="{!v.inputClass+' '+v.theme}"
-                                         label="{!v.label}"
-                                         labelClass="{!v.labelClass}"
-                                         labelPosition="{!v.labelPosition}"
                                          placeholder="{!v.placeholder}"
                                          updateOn="{!v.updateOn}"
                                          ariaDescribedBy="{!v.ariaDescribedBy}"

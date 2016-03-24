@@ -29,12 +29,12 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -54,6 +54,8 @@ import org.auraframework.impl.source.file.AuraFileMonitor;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
@@ -83,40 +85,65 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final String VERSION_PROPERTY = "aura.build.version";
     private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
 
-    private static final Set<String> SYSTEM_NAMESPACES = Sets.newHashSet();
-    private static final Set<String> CANONICAL_NAMESPACES = Sets.newTreeSet();
-    private static final Set<String> PRIVILEGED_NAMESPACES = Sets.newTreeSet();
+    private final Map<String, Boolean> SYSTEM_NAMESPACES = new ConcurrentHashMap<String,Boolean>();
+    private final Map<String, Boolean> CANONICAL_NAMESPACES = new ConcurrentHashMap<String,Boolean>();
+    private final Map<String, Boolean> PRIVILEGED_NAMESPACES = new ConcurrentHashMap<String,Boolean>();
 
-    private static final Set<String> UNSECURED_PREFIXES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("aura", "layout").build();
+    private volatile Set<String> CANONICAL_IMMUTABLE = Sets.newTreeSet();
+    private volatile Set<String> PRIVILEGED_IMMUTABLE = Sets.newTreeSet();
 
-    private static final Set<String> UNDOCUMENTED_NAMESPACES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("auradocs").build();
+    private final Set<String> UNSECURED_PREFIXES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("aura", "layout").build();
 
-    private static final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java");
+    private final Set<String> UNDOCUMENTED_NAMESPACES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("auradocs").build();
+
+    private final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java");
 
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
-    private final JavascriptGroup jsGroup;
-    private final FileGroup resourcesGroup;
+    private JavascriptGroup jsGroup;
+    private FileGroup resourcesGroup;
     private String jsUid = "";
     private String resourcesUid = "";
     private String fwUid = "";
-    private final ResourceLoader resourceLoader;
-    private final Long buildTimestamp;
+    private ResourceLoader resourceLoader;
+    private Long buildTimestamp;
     private String auraVersionString;
     private boolean lastGenerationHadCompilationErrors = false;
-    private final boolean validateCss;
-    private final Map<String, String> effectiveTimezones;
+    private boolean validateCss;
+    private Map<String, String> effectiveTimezones;
 
-    private LocalizationAdapter localizationAdapter = Aura.getLocalizationAdapter();
+    private LocalizationAdapter localizationAdapter;
+
+    private InstanceService instanceService;
+
+    private ContextService contextService;
+
+    private String resourceCacheDir;
 
     public ConfigAdapterImpl() {
-        this(getDefaultCacheDir());
+        this(IOUtil.newTempDir("auracache"));
     }
 
-    private static String getDefaultCacheDir() {
-        return IOUtil.newTempDir("auracache");
+    /**
+     * For extension only, if you use this to create an instance, your services won't be setup.
+     * @param resourceCacheDir
+     */
+    public ConfigAdapterImpl(final String resourceCacheDir) {
+        this.resourceCacheDir = resourceCacheDir;
+        this.localizationAdapter = Aura.getLocalizationAdapter();
+        this.instanceService = Aura.getInstanceService();
+        this.contextService = Aura.getContextService();
+        initialize();
     }
 
-    protected ConfigAdapterImpl(String resourceCacheDir) {
+    public ConfigAdapterImpl(String resourceCacheDir, LocalizationAdapter localizationAdapter, InstanceService instanceService, ContextService contextService) {
+        this.resourceCacheDir = resourceCacheDir;
+        this.localizationAdapter = localizationAdapter;
+        this.instanceService = instanceService;
+        this.contextService = contextService;
+        initialize();
+    }
+
+    public void initialize() {
         // can this initialization move to some sort of common initialization dealy?
         try {
             this.resourceLoader = new ResourceLoader(resourceCacheDir, true);
@@ -183,8 +210,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             AuraFileMonitor.start();
         }
 
-        Aura.getContextService().registerGlobal("isVoiceOver", true, false);
-        Aura.getContextService().registerGlobal("dynamicTypeSize", true, "");
+        contextService.registerGlobal("isVoiceOver", true, false);
+        contextService.registerGlobal("dynamicTypeSize", true, "");
     }
 
     protected FileGroup newAuraResourcesHashingGroup() throws IOException {
@@ -208,22 +235,26 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public boolean isInternalNamespace(String namespace) {
-        return namespace != null && SYSTEM_NAMESPACES.contains(namespace.toLowerCase());
+        return namespace != null && SYSTEM_NAMESPACES.containsKey(namespace.toLowerCase());
     }
 
     @Override
     public Set<String> getInternalNamespaces(){
-        return CANONICAL_NAMESPACES;
+        synchronized (CANONICAL_NAMESPACES) {
+            return CANONICAL_IMMUTABLE;
+        }
     }
 
     @Override
     public boolean isPrivilegedNamespace(String namespace) {
-        return namespace != null && PRIVILEGED_NAMESPACES.contains(namespace);
+        return namespace != null && PRIVILEGED_NAMESPACES.containsKey(namespace);
     }
 
     @Override
     public Set<String> getPrivilegedNamespaces(){
-        return PRIVILEGED_NAMESPACES;
+        synchronized (PRIVILEGED_NAMESPACES) {
+            return PRIVILEGED_IMMUTABLE;
+        }
     }
 
     @Override
@@ -275,7 +306,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             } catch (Exception x) {
                 lastGenerationHadCompilationErrors = true;
                 throw new AuraRuntimeException("Unable to regenerate aura javascript", x);
-
             }
         }
     }
@@ -287,7 +317,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      */
     @Override
     public String getResetCssURL() {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         String contextPath = context.getContextPath();
         String uid = context.getFrameworkUID();
         String resetCss = "resetCSS.css";
@@ -296,7 +326,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             if (appDesc != null) {
                 BaseComponentDef templateDef = ((BaseComponentDef) appDesc.getDef()).getTemplateDef();
                 if (templateDef.isTemplate()) {
-                    BaseComponent<?, ?> template = (BaseComponent<?, ?>) Aura.getInstanceService().getInstance(templateDef);
+                    BaseComponent<?, ?> template = (BaseComponent<?, ?>) instanceService.getInstance(templateDef);
                     String auraResetStyle=getTemplateValue(template,"auraResetStyle");
                     switch(auraResetStyle){
                         case "reset":
@@ -355,7 +385,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         String tz = al.getTimeZone().getID();
         tz = getAvailableTimezone(tz);
         tz = tz.replace("/", "-");
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         String contextPath = context.getContextPath();
         String nonce = context.getFrameworkUID();
         return String.format("%s/auraFW/resources/%s/libs_%s.js", contextPath, nonce, tz);
@@ -400,7 +430,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public String getHTML5ShivURL() {
         String ret = null;
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         String ua = context != null ? context.getClient().getUserAgent() : null;
         BrowserInfo b = new BrowserInfo(ua);
         if (b.isIE7() || b.isIE8()) {
@@ -414,7 +444,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public String getAuraJSURL() {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         String contextPath = context.getContextPath();
         String suffix = context.getMode().getJavascriptMode().getSuffix();
         String nonce = context.getFrameworkUID();
@@ -423,7 +453,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public String getLockerWorkerURL() {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         String contextPath = context.getContextPath();
         String nonce = context.getFrameworkUID();
         return String.format("%s/auraFW/resources/%s/lockerservice/safeEval.html", contextPath, nonce);
@@ -434,7 +464,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      */
     @Override
     public String getEncryptionKeyURL() {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         String contextPath = context.getContextPath();
         return String.format("%s/l/{}/app.encryptionkey", contextPath);
     }
@@ -489,7 +519,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public Mode getDefaultMode() {
-        return Aura.getConfigAdapter().isProduction() ? Mode.PROD : Mode.DEV;
+        return this.isProduction() ? Mode.PROD : Mode.DEV;
     }
 
     private Properties loadProperties() {
@@ -622,8 +652,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public void addInternalNamespace(String namespace) {
         if(namespace != null && !namespace.isEmpty()){
-            SYSTEM_NAMESPACES.add(namespace.toLowerCase());
-            CANONICAL_NAMESPACES.add(namespace);
+            SYSTEM_NAMESPACES.put(namespace.toLowerCase(), Boolean.TRUE);
+            CANONICAL_NAMESPACES.put(namespace, Boolean.TRUE);
+            synchronized (CANONICAL_NAMESPACES) {
+                CANONICAL_IMMUTABLE = ImmutableSortedSet.copyOf(CANONICAL_NAMESPACES.keySet());
+            }
         }
     }
 
@@ -631,19 +664,29 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public void removeInternalNamespace(String namespace) {
         SYSTEM_NAMESPACES.remove(namespace.toLowerCase());
         CANONICAL_NAMESPACES.remove(namespace);
+        synchronized (CANONICAL_NAMESPACES) {
+            CANONICAL_IMMUTABLE = ImmutableSortedSet.copyOf(CANONICAL_NAMESPACES.keySet());
+        }
     }
 
     @Override
     public void addPrivilegedNamespace(String namespace) {
         if(namespace != null && !namespace.isEmpty()){
-            PRIVILEGED_NAMESPACES.add(namespace);
+            PRIVILEGED_NAMESPACES.put(namespace, Boolean.TRUE);
+            synchronized (PRIVILEGED_NAMESPACES) {
+                PRIVILEGED_IMMUTABLE = ImmutableSortedSet.copyOf(PRIVILEGED_NAMESPACES.keySet());
+            }
         }
     }
 
     @Override
     public void removePrivilegedNamespace(String namespace) {
         PRIVILEGED_NAMESPACES.remove(namespace);
+        synchronized (PRIVILEGED_NAMESPACES) {
+            PRIVILEGED_IMMUTABLE = ImmutableSortedSet.copyOf(PRIVILEGED_NAMESPACES.keySet());
+        }
     }
+
     @Override
     public boolean isDocumentedNamespace(String namespace) {
         return !UNDOCUMENTED_NAMESPACES.contains(namespace) && !namespace.toLowerCase().endsWith("test");
@@ -676,19 +719,20 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return new DefaultContentSecurityPolicy(inlineStyle);
     }
 
-    /**
-     * Injection override.
-     */
     public void setLocalizationAdapter(LocalizationAdapter adapter) {
         this.localizationAdapter = adapter;
     }
 
-	@Override
-	public boolean isLockerServiceEnabled() {
-		return true;
-	}
+    public void setContextService(ContextService service) {
+        this.contextService = service;
+    }
 
-	protected boolean isSafeEvalWorkerURI(String uri) {
+    @Override
+    public boolean isLockerServiceEnabled() {
+        return true;
+    }
+
+    protected boolean isSafeEvalWorkerURI(String uri) {
         return uri.endsWith("/lockerservice/safeEval.html");
-	}
+    }
 }

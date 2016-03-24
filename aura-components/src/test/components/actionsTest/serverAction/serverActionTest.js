@@ -375,20 +375,17 @@
             $A.enqueueAction(a);
             $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
         }, function(cmp) {
-            var errorMsg = "Action callback error from test",
-                warningMsg = "Finishing cached action failed. Trying to refetch from server",
+            var warningMsg = "Finishing cached action failed. Trying to refetch from server",
                 errorThrown = false,
                 that = this;
 
             // Actions from storage will log a warning instead of displaying error box
             $A.test.expectAuraWarning(warningMsg);
-            $A.test.expectAuraError(errorMsg);
             var a = $A.test.getAction(cmp, "c.executeInForeground", undefined, function(a) {
                 if (!errorThrown) {
                     // First callback is action from storage
                     $A.test.assertTrue(a.isFromStorage(), "First action callback should be from storage");
                     errorThrown = true;
-                    $A.error(errorMsg);
                     throw new Error("Thrown by test");
                 } else {
                     // Second callback is retry action from server. Error from stored action should not be present.

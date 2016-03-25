@@ -25,7 +25,6 @@
 
     <aura:attribute name="menuItems" type="Object[]" description="List of objects that represent the menu items to be generated. Should be of the form {id: String, label: String}"/>
     <aura:attribute name="menuItemCache" type="Object" access="PRIVATE" />
-    <aura:attribute name="focusedItemName" type="String" access="PRIVATE" />
 
     <aura:registerevent name="onTabHover" type="ui:onTabHover" description="The event is fired when the mouse moves over a tab or when a tab is put into focus." />
     <aura:registerevent name="onTabUnhover" type="ui:onTabHover" description="The event is fired when the mouse moves off of a tab or when focus is moved away from a tab." />
@@ -33,27 +32,14 @@
 
     <aura:dependency resource="markup://ui:actionMenuItem" />
 
-    <aura:method name="setActive" action="{!c.activateMenu}" access="PUBLIC" description="Set the tab item to active or inactive">
-        <aura:attribute name="active" type="Boolean" description="Indicates the tab is active or not."/>
-        <aura:attribute name="index" type="Integer" description="which menu item to focuse."/>
-    </aura:method>
+    <aura:method name="focus"/>
 
     <aura:handler name="change" value="{!v.menuItems}" action="{!c.updateMenuItems}"/>
 
     <li aura:id="li" class="{!v.class + ' tabs__item'}" role="presentation">
         <ui:menu aura:id="menu">
-            <ui:menuTrigger aura:id="trigger">
-                <a class="tabHeader" aura:id="tabItem"
-                   onmouseover="{!c.onTabHover}" onmouseout="{!c.onTabUnhover}" onblur="{!c.onTabUnhover}"
-                   aria-controls="{!v.ariaControlId}" aria-selected="{!v.active ? 'true' : 'false'}" tabindex="-1" role="tab">
-                    <span class="title">{!v.title}</span>
-                    <span class="{!v.iconClass}">{!v.icon}</span>
-                </a>
-            </ui:menuTrigger>
-            <ui:tabOverflowMenuList aura:id="menuList" menuFocusChange="{!c.focusChange}" menuCollapse="{!c.onCollapse}"
-                                    forwardWrap="{!c.handleForwardWrap}" reverseWrap="{!c.handleReverseWrap}">
-
-            </ui:tabOverflowMenuList>
+            <ui:menuTriggerLink aura:id="overflowTrigger">{!v.title}</ui:menuTriggerLink>
+            <ui:menuList aura:id="menuList" aura:flavor="right, default" autoPosition="false" menuSelect="{!c.tabSelected}"/>
         </ui:menu>
     </li>
 

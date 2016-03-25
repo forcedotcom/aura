@@ -33,8 +33,16 @@ function SecureComponentRef(component, key) {
         "getLocalId": SecureThing.createFilteredMethod(o, component, "getLocalId"),
         "addValueProvider": SecureThing.createFilteredMethod(o, component, "addValueProvider"),
         "set": SecureThing.createFilteredMethod(o, component, "set"),
-        "get": SecureThing.createFilteredMethod(o, component, "get")
-
+        "get": {
+            enumerable: true,
+            value: function(name) {
+                // protection against anything other then `cmp.get('v.something')`
+                if (typeof name !== "string" || name.length < 3 || name.indexOf("v.") !== 0) {
+                    throw new SyntaxError('Invalid key '+ name);
+                }
+                return SecureThing.filterEverything(o, component["get"](name));
+            }
+        }
     });
 
     setLockerSecret(o, "key", key);

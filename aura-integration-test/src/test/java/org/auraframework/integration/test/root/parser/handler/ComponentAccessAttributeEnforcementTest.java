@@ -36,9 +36,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     /**
      * Template tests start
      */
-    /**
-     * Verify Creating a Component works with isTemplate='true'
-     */
     @Test
     public void testApplicationWithSystemNamespaceImplementsTemplateWithSameSystemNamespaceGlobal() throws QuickFixException {
         //create component with system namespace
@@ -88,9 +85,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Creating a Component works with isTemplate='true'
-     */
     @Test
     public void testApplicationWithSystemNamespaceImplementsTemplateWithOtherSystemNamespace() throws QuickFixException {
         //create component with system namespace
@@ -140,9 +134,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Creating a Component works with isTemplate='true'
-     */
     @Test
     public void testApplicationWithSystemNamespaceImplementsTemplateWithCustomNamespace() throws QuickFixException {
         //create component with custom namespace
@@ -181,9 +172,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
     
     
-    /**
-     * Verify Creating a Component works with isTemplate='true'
-     */
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithSystemNamespace() throws QuickFixException {
         //create component with system namespace
@@ -197,10 +185,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Creating a Component works with isTemplate='true'
-     * verifyAttributeTestCase Custom Custom
-     */
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithSameCustomNamespace() throws QuickFixException {
         //create component with custom namespace
@@ -214,10 +198,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Creating a Component works with isTemplate='true'
-     * verifyAttributeTestCase Custom CustomOther
-     */
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithOtherCustomNamespace() throws QuickFixException {
         //create component with custom namespace
@@ -235,10 +215,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     /**
      * Abstract tests start
      */
-    /**
-     * Verify Creating a Component works with abstract='true'
-     * verifyAttributeTestCase System System
-     */
     @Test
     public void testComponentWithSystemNamespaceHasAbstractComponentWithSameSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
@@ -252,10 +228,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Creating a Component works with abstract='true'
-     * verifyAttributeTestCase System SystemOther
-     */
     @Test
     public void testComponentWithSystemNamespaceHasAbstractComponentWithOtherSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
@@ -269,10 +241,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Creating a Component works with abstract='true'
-     * verifyAttributeTestCase System Custom
-     */
     @Test
     public void testComponentWithCustomNamespaceHasAbstractComponentWithSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
@@ -286,10 +254,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Creating a Component works with abstract='true'
-     * verifyAttributeTestCase Custom Custom
-     */
     @Test
     public void testComponentWithCustomNamespaceHasAbstractComponentWithSameCustomNamespaceInMarkup() throws QuickFixException {
         //create component with custom namespace
@@ -303,10 +267,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Creating a Component works with abstract='true'
-     * verifyAttributeTestCase Custom CustomOther
-     */
     @Test
     public void testComponentWithCustomNamespaceHasAbstractComponentWithAnotherCustomNamespaceInMarkup() throws QuickFixException {
         //create component with custom namespace
@@ -320,10 +280,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Creating a Component works with abstract='true'
-     * verifyAttributeTestCase Custom System
-     */
     @Test
     public void testComponentWithSystemNamespaceHasAbstractComponentWithCustomNamespaceInMarkup() throws QuickFixException {
         //create component with custom namespace
@@ -343,10 +299,136 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
      * Default access tests start
      */
     /**
-     * Verify Default access enforcement
-     * verifyAccess for Application,System,System
-     * verifyAccess for Application,SystemOther,SystemOther
+     * tests around including another component in your markup start
      */
+    /**
+     * tests around privileged namespace starts
+     */
+    @Test
+    public void testApplicationWithSystemNamespaceIncludeComponentWithPrivilegedNamespaceInMarkup() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithCustomNamespaceIncludeComponentWithPrivilegedNamespaceInMarkup() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+        try {
+        	descriptor.getDef();
+         	fail("component of custom namespace shouldn't be able to include component of privileged namespace");
+        } catch(Exception e) {
+        	assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to component 'privilegedNS:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSamePrivilegedNamespaceInMarkup() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithOtherPrivilegedNamespaceInMarkup() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+         	fail("component of privileged namespace shouldn't be able to include component of another privileged namespace");
+        } catch(Exception e) {
+        	assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        	//expect 
+    		//System.out.println(e.getMessage());
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSystemNamespaceInMarkup() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+         	fail("component of privileged namespace shouldn't be able to include component of system namespace");
+        } catch(Exception e) {
+        	assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to component 'string:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSystemNamespaceInMarkupAccessInternal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Internal'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+        	fail("component of privileged namespace shouldn't be able to include component of system namespace");
+        } catch(Exception e) {
+        	assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to component 'string:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithCustomNamespaceInMarkup() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+        	fail("component of privileged namespace shouldn't be able to include component of custom namespace");
+        } catch(Exception e) {
+        	assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to component 'cstring:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    
+    
     @Test
     public void testApplicationWithSystemNamespaceIncludeComponentWithSameSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
@@ -360,11 +442,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Default access enforcement
-     * verifyAccess for Application,System,SystemOther
-     * verifyAccess for Application,SystemOther,System
-     */
     @Test
     public void testApplicationWithSystemNamespaceIncludeComponentWithOtherSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
@@ -378,13 +455,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Default access enforcement
-     * verifyAccess for Application,System,Custom
-     * verifyAccess for Application,System,CustomOther
-     * verifyAccess for Application,SystemOther,Custom
-     * verifyAccess for Application,SystemOther,CustomOther
-     */
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
@@ -405,13 +475,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         }
     }
     
-    /**
-     * Verify Default access enforcement
-     * verifyAccess for Application,Custom,System
-     * verifyAccess for Application,Custom,SystemOther
-     * verifyAccess for Application,CustomOther,System
-     * verifyAccess for Application,CustomOther,SystemOther
-     */
     @Test
     public void testApplicationWithSystemNamespaceIncludeComponentWithCustomNamespaceInMarkup() throws QuickFixException {
         //create component with custom namespace
@@ -425,11 +488,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Default access enforcement
-     * verifyAccess for Application,Custom,Custom
-     * verifyAccess for Application,CustomOther,CustomOther
-     */
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithSameCustomNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
@@ -443,11 +501,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Default access enforcement
-     * verifyAccess for Application,Custom,CustomOther
-     * verifyAccess for Application,CustomOther,Custom
-     */
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithAnotherCustomNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
@@ -468,13 +521,8 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         }
     }
     
-    
-    
-    
     /**
-     * Verify Default access enforcement
-     * verifyAccess for Application,System,System
-     * verifyAccess for Application,SystemOther,SystemOther
+     * tests around extends start
      */
     @Test
     public void testComponnetWithSystemNamespaceExtendsComponentWithSameSystemNamespace() throws QuickFixException {
@@ -489,11 +537,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Default access enforcement
-     * verifyAccess for Application,System,SystemOther
-     * verifyAccess for Application,SystemOther,System
-     */
     @Test
     public void testComponentWithSystemNamespaceExtendsComponentWithOtherSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
@@ -507,13 +550,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Default access enforcement
-     * verifyAccess for Application,System,Custom
-     * verifyAccess for Application,System,CustomOther
-     * verifyAccess for Application,SystemOther,Custom
-     * verifyAccess for Application,SystemOther,CustomOther
-     */
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
@@ -534,13 +570,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         }
     }
     
-    /**
-     * Verify Default access enforcement
-     * verifyAccess for Application,Custom,System
-     * verifyAccess for Application,Custom,SystemOther
-     * verifyAccess for Application,CustomOther,System
-     * verifyAccess for Application,CustomOther,SystemOther
-     */
     @Test
     public void testComponentWithSystemNamespaceExtendsComponentWithCustomNamespaceInMarkup() throws QuickFixException {
         //create component with custom namespace
@@ -554,11 +583,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Default access enforcement
-     * verifyAccess for Application,Custom,Custom
-     * verifyAccess for Application,CustomOther,CustomOther
-     */
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithSameCustomNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
@@ -572,11 +596,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Default access enforcement
-     * verifyAccess for Application,Custom,CustomOther
-     * verifyAccess for Application,CustomOther,Custom
-     */
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithAnotherCustomNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
@@ -603,12 +622,114 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
      * Verify Public access enforcement
      */
     /**
-     * Public access tests start
+     * tests around privileged namespace starts
      */
+    @Test
+    public void testApplicationWithSystemNamespaceIncludeComponentWithPrivilegedNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithCustomNamespaceIncludeComponentWithPrivilegedNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+        try {
+        	descriptor.getDef();
+         	fail("component of custom namespace shouldn't be able to include component of privileged namespace");
+        } catch(Exception e) {
+        	assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to component 'privilegedNS:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSamePrivilegedNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithOtherPrivilegedNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+         	fail("component of privileged namespace shouldn't be able to include component of another privileged namespace");
+        } catch(Exception e) {
+        	assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        	//expect 
+    		//System.out.println(e.getMessage());
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSystemNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+         	fail("component of privileged namespace shouldn't be able to include component of system namespace");
+        } catch(Exception e) {
+        	assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to component 'string:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+        	fail("component of privileged namespace shouldn't be able to include component of custom namespace");
+        } catch(Exception e) {
+        	assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to component 'cstring:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
+    
     /**
      * Verify Public access enforcement
-     * verifyAccess for Application,System,System
-     * verifyAccess for Application,SystemOther,SystemOther
      */
     @Test
     public void testApplicationWithSystemNamespaceIncludeComponentWithSameSystemNamespaceInMarkupAccessPublic() throws QuickFixException {
@@ -623,11 +744,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Public access enforcement
-     * verifyAccess for Application,System,SystemOther
-     * verifyAccess for Application,SystemOther,System
-     */
     @Test
     public void testApplicationWithSystemNamespaceIncludeComponentWithOtherSystemNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
@@ -641,13 +757,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Public access enforcement
-     * verifyAccess for Application,System,Custom
-     * verifyAccess for Application,System,CustomOther
-     * verifyAccess for Application,SystemOther,Custom
-     * verifyAccess for Application,SystemOther,CustomOther
-     */
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithSystemNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
@@ -668,13 +777,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         }
     }
     
-    /**
-     * Verify Public access enforcement
-     * verifyAccess for Application,Custom,System
-     * verifyAccess for Application,Custom,SystemOther
-     * verifyAccess for Application,CustomOther,System
-     * verifyAccess for Application,CustomOther,SystemOther
-     */
     @Test
     public void testApplicationWithSystemNamespaceIncludeComponentWithCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with custom namespace
@@ -688,11 +790,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Public access enforcement
-     * verifyAccess for Application,Custom,Custom
-     * verifyAccess for Application,CustomOther,CustomOther
-     */
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithSameCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
@@ -706,11 +803,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Public access enforcement
-     * verifyAccess for Application,Custom,CustomOther
-     * verifyAccess for Application,CustomOther,Custom
-     */
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithAnotherCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
@@ -735,7 +827,7 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     
     /**
-     * Verify Public access enforcement
+     * tests around extends start
      */
     @Test
     public void testComponnetWithSystemNamespaceExtendsComponentWithSameSystemNamespaceAccessPublic() throws QuickFixException {
@@ -750,11 +842,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Public access enforcement
-     * verifyAccess for Application,System,SystemOther
-     * verifyAccess for Application,SystemOther,System
-     */
     @Test
     public void testComponentWithSystemNamespaceExtendsComponentWithOtherSystemNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
@@ -768,9 +855,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Public access enforcement
-     */
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithSystemNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
@@ -791,13 +875,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         }
     }
     
-    /**
-     * Verify Public access enforcement
-     * verifyAccess for Application,Custom,System
-     * verifyAccess for Application,Custom,SystemOther
-     * verifyAccess for Application,CustomOther,System
-     * verifyAccess for Application,CustomOther,SystemOther
-     */
     @Test
     public void testComponentWithSystemNamespaceExtendsComponentWithCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with custom namespace
@@ -811,11 +888,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Public access enforcement
-     * verifyAccess for Application,Custom,Custom
-     * verifyAccess for Application,CustomOther,CustomOther
-     */
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithSameCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
@@ -829,11 +901,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         descriptor.getDef();
     }
     
-    /**
-     * Verify Public access enforcement
-     * verifyAccess for Application,Custom,CustomOther
-     * verifyAccess for Application,CustomOther,Custom
-     */
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithAnotherCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
@@ -860,9 +927,82 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
      * Global access tests start
      */
     /**
+     * tests around privileged namespace starts
+     */
+    @Test
+    public void testApplicationWithSystemNamespaceIncludeComponentWithPrivilegedNamespaceInMarkupAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithCustomNamespaceIncludeComponentWithPrivilegedNamespaceInMarkupAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Global'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+        	descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSamePrivilegedNamespaceInMarkupAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Global'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithOtherPrivilegedNamespaceInMarkupAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Global'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        	descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSystemNamespaceInMarkupAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Global'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        	descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceIncludeComponentWithCustomNamespaceInMarkupAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component extensible='true' access='Global'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        	descriptor.getDef();
+    }
+    /**
      * Verify Global access enforcement
-     * verifyAccess for Application,System,System
-     * verifyAccess for Application,SystemOther,SystemOther
      */
     @Test
     public void testApplicationWithSystemNamespaceIncludeComponentWithSameSystemNamespaceInMarkupAccessGlobal() throws QuickFixException {
@@ -879,8 +1019,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Application,System,SystemOther
-     * verifyAccess for Application,SystemOther,System
      */
     @Test
     public void testApplicationWithSystemNamespaceIncludeComponentWithOtherSystemNamespaceInMarkupAccessGlobal() throws QuickFixException {
@@ -897,10 +1035,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Application,System,Custom
-     * verifyAccess for Application,System,CustomOther
-     * verifyAccess for Application,SystemOther,Custom
-     * verifyAccess for Application,SystemOther,CustomOther
      */
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithSystemNamespaceInMarkupAccessGlobal() throws QuickFixException {
@@ -917,10 +1051,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Application,Custom,System
-     * verifyAccess for Application,Custom,SystemOther
-     * verifyAccess for Application,CustomOther,System
-     * verifyAccess for Application,CustomOther,SystemOther
      */
     @Test
     public void testApplicationWithSystemNamespaceIncludeComponentWithCustomNamespaceInMarkupAccessGlobal() throws QuickFixException {
@@ -937,8 +1067,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Application,Custom,Custom
-     * verifyAccess for Application,CustomOther,CustomOther
      */
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithSameCustomNamespaceInMarkupAccessGlobal() throws QuickFixException {
@@ -955,8 +1083,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Application,Custom,CustomOther
-     * verifyAccess for Application,CustomOther,Custom
      */
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithAnotherCustomNamespaceInMarkupAccessGlobal() throws QuickFixException {
@@ -976,8 +1102,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Application,System,System
-     * verifyAccess for Application,SystemOther,SystemOther
      */
     @Test
     public void testComponnetWithSystemNamespaceExtendsComponentWithSameSystemNamespaceAccessGlobal() throws QuickFixException {
@@ -994,8 +1118,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Application,System,SystemOther
-     * verifyAccess for Application,SystemOther,System
      */
     @Test
     public void testComponentWithSystemNamespaceExtendsComponentWithOtherSystemNamespaceInMarkupAccessGlobal() throws QuickFixException {
@@ -1012,10 +1134,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Application,System,Custom
-     * verifyAccess for Application,System,CustomOther
-     * verifyAccess for Application,SystemOther,Custom
-     * verifyAccess for Application,SystemOther,CustomOther
      */
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithSystemNamespaceInMarkupAccessGlobal() throws QuickFixException {
@@ -1032,10 +1150,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Application,Custom,System
-     * verifyAccess for Application,Custom,SystemOther
-     * verifyAccess for Application,CustomOther,System
-     * verifyAccess for Application,CustomOther,SystemOther
      */
     @Test
     public void testComponentWithSystemNamespaceExtendsComponentWithCustomNamespaceInMarkupAccessGlobal() throws QuickFixException {
@@ -1052,8 +1166,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Application,Custom,Custom
-     * verifyAccess for Application,CustomOther,CustomOther
      */
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithSameCustomNamespaceInMarkupAccessGlobal() throws QuickFixException {
@@ -1070,8 +1182,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Application,Custom,CustomOther
-     * verifyAccess for Application,CustomOther,Custom
      */
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithAnotherCustomNamespaceInMarkupAccessGlobal() throws QuickFixException {

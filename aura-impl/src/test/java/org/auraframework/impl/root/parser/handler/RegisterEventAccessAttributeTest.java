@@ -27,7 +27,9 @@ import org.auraframework.system.Source;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
+@UnAdaptableTest("when run in core, we throw error with different type.")
 public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
 
 	public RegisterEventAccessAttributeTest(String name) {

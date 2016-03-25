@@ -168,13 +168,28 @@ public class AuraTestingUtil {
      * @param defClass interface of the definition represented by this source
      * @param contents source contents
      * @param namePrefix package name prefix
-     * @param isInternalNamespace if true, namespace is internal
+     * @param isInternalNamespace if true, namespace is internal, if false, it will be customer
      * @return the {@link DefDescriptor} for the created definition
      */
     public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
             String namePrefix, boolean isInternalNamespace) {
+    	return addSourceAutoCleanup(defClass, contents, namePrefix, isInternalNamespace, false);
+    }
+    
+    /**
+     * Convenience method to create a description and load a source in one shot.
+     *
+     * @param defClass interface of the definition represented by this source
+     * @param contents source contents
+     * @param namePrefix package name prefix
+     * @param isInternalNamespace if true, namespace is internal
+     * @param isPrivilegedNamespace if true, namespace is privileged. if both false, it will be customer
+     * @return the {@link DefDescriptor} for the created definition
+     */
+    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
+            String namePrefix, boolean isInternalNamespace, boolean isPrivilegedNamespace) {
         StringSourceLoader loader = StringSourceLoader.getInstance();
-        DefDescriptor<T> descriptor = loader.addSource(defClass, contents, namePrefix, isInternalNamespace)
+        DefDescriptor<T> descriptor = loader.addSource(defClass, contents, namePrefix, isInternalNamespace, isPrivilegedNamespace)
                 .getDescriptor();
         markForCleanup(descriptor);
         return descriptor;
@@ -200,8 +215,22 @@ public class AuraTestingUtil {
      */
     public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
             boolean isInternalNamespace) {
+    	return addSourceAutoCleanup(descriptor, contents, isInternalNamespace, false);
+    }
+    
+    /**
+     * Convenience method to create a description and load a source in one shot.
+     *
+     * @param descriptor descriptor for the source to be created
+     * @param contents source contents
+     * @param isInternalNamespace if true, will add to internal namespace
+     * @param isPrivilegedNamespace if true, will add to privileged namespace. if both false, will add to customer namespace
+     * @return the {@link DefDescriptor} for the created definition
+     */
+    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
+            boolean isInternalNamespace, boolean isPrivilegedNamespace) {
         StringSourceLoader loader = StringSourceLoader.getInstance();
-        loader.putSource(descriptor, contents, false, isInternalNamespace);
+        loader.putSource(descriptor, contents, false, isInternalNamespace, isPrivilegedNamespace);
         markForCleanup(descriptor);
         return descriptor;
     }

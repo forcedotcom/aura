@@ -52,6 +52,8 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
     public static final String DEFAULT_CUSTOM_NAMESPACE = "cstring";
     public static final String OTHER_CUSTOM_NAMESPACE = "cstring1";
     public static final String ANOTHER_CUSTOM_NAMESPACE = "cstring2";
+    public static final String DEFAULT_PRIVILEGED_NAMESPACE = "privilegedNS";
+    public static final String OTHER_PRIVILEGED_NAMESPACE = "privilegedNS1";
 
     private static final String DEFAULT_NAME_PREFIX = "thing";
     private static final Set<String> PREFIXES = ImmutableSet.of(
@@ -86,6 +88,9 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
     private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> namespaces = new ConcurrentHashMap<>();
 
     private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> customNamespaces = new ConcurrentHashMap<>();
+    
+    private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> privilegedNamespaces = new ConcurrentHashMap<>();
+
 
     private StringSourceLoader() {
         namespaces.put(DEFAULT_NAMESPACE,
@@ -99,6 +104,11 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
                 new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
         customNamespaces.put(ANOTHER_CUSTOM_NAMESPACE,
                 new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
+        
+        privilegedNamespaces.put(DEFAULT_PRIVILEGED_NAMESPACE,
+        		new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
+        privilegedNamespaces.put(OTHER_PRIVILEGED_NAMESPACE,
+        		new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
     }
 
     /**
@@ -148,8 +158,8 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
      * @throws IllegalStateException when loading a definition that already exists with the same descriptor.
      */
     public final <D extends Definition> StringSource<D> addSource(Class<D> defClass, String contents,
-            @Nullable String namePrefix, boolean isInternalNamespace) {
-        return putSource(defClass, contents, namePrefix, false, isInternalNamespace);
+            @Nullable String namePrefix, boolean isInternalNamespace, boolean isPrivilegedNamespace) {
+        return putSource(defClass, contents, namePrefix, false, isInternalNamespace, isPrivilegedNamespace);
     }
 
     /**
@@ -163,8 +173,8 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
      * @return the created {@link StringSource}
      */
     public final <D extends Definition> StringSource<D> putSource(Class<D> defClass, String contents,
-            @Nullable String namePrefix, boolean overwrite, boolean isInternalNamespace) {
-        return putSource(defClass, contents, namePrefix, overwrite, isInternalNamespace, null);
+            @Nullable String namePrefix, boolean overwrite, boolean isInternalNamespace, boolean isPrivilegedNamespace) {
+        return putSource(defClass, contents, namePrefix, overwrite, isInternalNamespace, isPrivilegedNamespace, null);
     }
 
     /**
@@ -178,9 +188,9 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
      * @return the created {@link StringSource}
      */
     public final <D extends Definition, B extends Definition> StringSource<D> putSource(Class<D> defClass, String contents,
-            @Nullable String namePrefix, boolean overwrite, boolean isInternalNamespace, @Nullable DefDescriptor<B> bundle) {
+            @Nullable String namePrefix, boolean overwrite, boolean isInternalNamespace, boolean isPrivilegedNamespace, @Nullable DefDescriptor<B> bundle) {
         DefDescriptor<D> descriptor = createStringSourceDescriptor(namePrefix, defClass, bundle);
-        return putSource(descriptor, contents, overwrite, isInternalNamespace);
+        return putSource(descriptor, contents, overwrite, isInternalNamespace, isPrivilegedNamespace);
     }
 
     /**
@@ -193,7 +203,7 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
      */
     public final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor, String contents,
             boolean overwrite) {
-        return putSource(descriptor, contents, overwrite, true);
+        return putSource(descriptor, contents, overwrite, true, false);
     }
 
     /**
@@ -206,14 +216,14 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
      * @return the created {@link StringSource}
      */
     public final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor, String contents,
-            boolean overwrite, boolean isInternalNamespace) {
+            boolean overwrite, boolean isInternalNamespace, boolean isPrivilegedNamespace) {
         Format format = DescriptorInfo.get(descriptor.getDefType().getPrimaryInterface()).getFormat();
         StringSource<D> source = new StringSource<>(descriptor, contents, descriptor.getQualifiedName(), format);
-        return putSource(descriptor, source, overwrite, isInternalNamespace);
+        return putSource(descriptor, source, overwrite, isInternalNamespace, isPrivilegedNamespace);
     }
 
     private final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor,
-            StringSource<D> source, boolean overwrite, boolean isInternalNamespace) {
+            StringSource<D> source, boolean overwrite, boolean isInternalNamespace, boolean isPrivilegedNamespace) {
         SourceMonitorEvent event = SourceMonitorEvent.CREATED;
 
         nsLock.lock();
@@ -224,6 +234,9 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
             if (isInternalNamespace) {
                 sourceMap = namespaces.get(namespace);
             }
+            else if(isPrivilegedNamespace) {
+            	sourceMap = privilegedNamespaces.get(namespace);
+            }
             else {
                 sourceMap = customNamespaces.get(namespace);
             }
@@ -232,6 +245,9 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
                 sourceMap = Maps.newHashMap();
                 if (isInternalNamespace) {
                     namespaces.put(namespace, sourceMap);
+                }
+                else if(isPrivilegedNamespace) {
+                	privilegedNamespaces.put(namespace, sourceMap);
                 }
                 else {
                     customNamespaces.put(namespace, sourceMap);
@@ -282,6 +298,15 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
                     customNamespaces.remove(namespace);
                 }
             }
+            else if (privilegedNamespaces.containsKey(namespace)) {
+            	sourceMap = privilegedNamespaces.get(namespace);
+                Preconditions.checkState(sourceMap != null);
+                Preconditions.checkState(sourceMap.remove(descriptor) != null);
+                if (!DEFAULT_PRIVILEGED_NAMESPACE.equals(namespace) && !OTHER_PRIVILEGED_NAMESPACE.equals(namespace) &&
+                		sourceMap.isEmpty()) {
+                	privilegedNamespaces.remove(namespace);
+                }
+            }
         } finally {
             nsLock.unlock();
         }
@@ -319,6 +344,15 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
                 }
             }
         }
+        for (String namespace : privilegedNamespaces.keySet()) {
+            if (matcher.matchNamespace(namespace)) {
+                for (DefDescriptor<?> desc : privilegedNamespaces.get(namespace).keySet()) {
+                    if (matcher.matchDescriptorNoNS(desc)) {
+                        ret.add(desc);
+                    }
+                }
+            }
+        }
         return ret;
     }
 
@@ -335,6 +369,8 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
         }
         else if (customNamespaces.containsKey(namespace)) {
             sourceMap = customNamespaces.get(namespace);
+        } else if (privilegedNamespaces.containsKey(namespace)) {
+            sourceMap = privilegedNamespaces.get(namespace);
         }
 
         if (sourceMap != null) {
@@ -356,7 +392,9 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
     public Set<String> getNamespaces() {
         Set<String> allNamespaces = new HashSet<>(namespaces.keySet());
         Set<String> cNamespaces = new HashSet<>(customNamespaces.keySet());
+        Set<String> pNamespaces = new HashSet<>(privilegedNamespaces.keySet());
         allNamespaces.addAll(cNamespaces);
+        allNamespaces.addAll(pNamespaces);
         return ImmutableSet.copyOf(allNamespaces);
     }
 
@@ -375,6 +413,9 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
         }
         else if (customNamespaces.containsKey(descriptor.getNamespace())) {
             sourceMap = customNamespaces.get(descriptor.getNamespace());
+        }
+        else if (privilegedNamespaces.containsKey(descriptor.getNamespace())) {
+        	sourceMap = privilegedNamespaces.get(descriptor.getNamespace());
         }
 
         if (sourceMap != null) {

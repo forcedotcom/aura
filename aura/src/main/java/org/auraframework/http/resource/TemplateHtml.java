@@ -39,6 +39,7 @@ public class TemplateHtml extends TemplateResource {
         renderingService.render(template, out, null);
     }
 
+    @Override
     protected boolean shouldCacheHTMLTemplate(DefDescriptor<? extends BaseComponentDef> appDefDesc,
             HttpServletRequest request, AuraContext context) throws QuickFixException {
         if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {

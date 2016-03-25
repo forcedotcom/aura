@@ -35,30 +35,30 @@
 				    		newResponse["responseText"] = responseText;
 				    		//change recordObjCounter to 10
 				    		var idx = response.indexOf("Counter");
-				    		var idxNumberStart = idx;// Counter":1 
+				    		var idxNumberStart = idx;// Counter":1
 				    		var idxNumberEnd = response.indexOf(",", idx);
 				    		var numberStr = response.substring(idxNumberStart, idxNumberEnd);
 			    			newResponse["response"] = newResponse["response"].replace(numberStr, "Counter\": 10");
 			    			newResponse["responseText"] = newResponse["responseText"].replace(numberStr, "Counter\": 10");
 			    			decode_done = true;
 			    			$A.test.removePreDecodeCallback(cb_handle);
-			    			
+
 			    			//new feed decode with the new response
 				    		return newResponse;
 			    		} else {
 			    			return oldResponse;
 			    		}
-			    		
+
 			    	};
-			    	
+
 			    	cb_handle = $A.test.addPreDecodeCallback(modifyResponse);
-		            
+
 		            $A.test.addWaitFor(true, function() { return decode_done; });
-		    	   
+
 		    	   //now enqueue the Action
 		    	   var action = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:1});
 				   $A.enqueueAction(action);
-				   $A.test.addWaitForWithFailureMessage(true, 
+				   $A.test.addWaitForWithFailureMessage(true,
 						   function(){ return $A.test.areActionsComplete([action])},
 						   "fail waiting for server action to finish",
 						   function() {
@@ -67,7 +67,7 @@
 		       }
 		]
 	},
-	
+
 	testServerActionWithStoredResponseGetStorageFirst : {
 		test: [
 		function primeActionStorage(cmp) {
@@ -375,9 +375,9 @@
             $A.enqueueAction(a);
             $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
         }, function(cmp) {
-            var warningMsg = "Finishing cached action failed. Trying to refetch from server",
-                errorThrown = false,
-                that = this;
+            var warningMsg = "Finishing cached action failed. Trying to refetch from server";
+            var errorThrown = false;
+            var that = this;
 
             // Actions from storage will log a warning instead of displaying error box
             $A.test.expectAuraWarning(warningMsg);
@@ -386,11 +386,11 @@
                     // First callback is action from storage
                     $A.test.assertTrue(a.isFromStorage(), "First action callback should be from storage");
                     errorThrown = true;
-                    throw new Error("Thrown by test");
+                    throw new Error("Action callback error from test");
                 } else {
                     // Second callback is retry action from server. Error from stored action should not be present.
                     $A.test.assertFalse(a.isFromStorage(), "Second action callback should be from server");
-                    $A.test.assertFalse(that.isAuraErrorDivVisible());
+                    $A.test.assertFalse(that.isAuraErrorDivVisible(), "Unexpected error showed up");
                 }
             });
             a.setStorable();

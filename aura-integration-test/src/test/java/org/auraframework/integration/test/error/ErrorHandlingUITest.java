@@ -535,6 +535,26 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
+     * Verify that client error is handled by default handler when custom handler has error.
+     */
+    public void testErrorIsHandledByDefaultHandlerWhenCustomHandlerHasError() throws Exception {
+        // the error is handled by custom error but an error is thrown from custom handler
+        open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorInHandler=true", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app client controller";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
+
+        // at this point, the custom handler should be removed from systemError event subscribers.
+        // generate error again to see the error still can be handled by default handler.
+        findAndClickElement(ERROR_CLOSE_LOCATOR);
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
+        actualMessage = findErrorMessage();
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
+    }
+
+    /**
      * This is a workaround for Webdriver tests run on Firefox.
      */
     private void findAndClickElement(By locator) {

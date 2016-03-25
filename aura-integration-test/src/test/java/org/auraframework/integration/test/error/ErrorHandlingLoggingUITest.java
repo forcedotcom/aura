@@ -227,6 +227,60 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
+    /**
+     * Verify that the client error in error handler gets logged on the server side.
+     * On the server side, there should be two error logs, the original error's log and the error handler error's log.
+     */
+    public void testClientErrorFromCustomErrorHandler() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorInHandler=true", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        // expecting two error logs
+        List<String> logs = getClientErrorLogs(appender, 2);
+
+        String handlerErrorLog = null;
+        // the order of the logs may not be guaranteed, using message to identify
+        if(logs.get(0).contains("Error from error handler")) {
+            handlerErrorLog = logs.get(0);
+        } else {
+            handlerErrorLog = logs.get(1);
+        }
+
+        boolean requireErrorId = true;
+        // the failing descriptor is the failing error handler, so that we can find out it's handler's error
+        String failingDescriptor = "auratest$errorHandlingApp$controller$handleSystemError";
+        String expectedMessage = String.format("AuraError: Action failed: %s [Error from error handler]", failingDescriptor);
+        assertClientErrorLogContains(handlerErrorLog, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    /**
+     * Verify that client side error gets logged even if custom error handler has error.
+     */
+    public void testClientErrorGetsLoggedWhenCustomErrorHandlerHasError() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorInHandler=true", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        // expecting two error logs, one for the original error and one for the handler's error
+        List<String> logs = getClientErrorLogs(appender, 2);
+
+        String originalErrorLog = null;
+        // the order of the logs may not be guaranteed, using message to identify
+        if(logs.get(0).contains("Error from component client controller")) {
+            originalErrorLog = logs.get(0);
+        } else {
+            originalErrorLog = logs.get(1);
+        }
+
+        boolean requireErrorId = true;
+        String failingDescriptor = "auratest$errorHandling$controller$throwErrorFromClientController";
+        String expectedMessage = String.format("AuraError: Action failed: %s [Error from component client controller]", failingDescriptor);
+        assertClientErrorLogContains(originalErrorLog, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
     private void assertClientErrorLogContains(String log, String expectedMessage, boolean requireErrorId, String failingDescriptor) {
         assertThat("Missing expected message in the log.", log, CoreMatchers.containsString(expectedMessage));
         assertThat("Missing failing descriptpr in the log." + log, log, CoreMatchers.containsString("Failing descriptor: " + failingDescriptor));

@@ -1,6 +1,6 @@
 {
 	"help" : [
-		{ "text": "Open Source Documentation", "href":"http://www.auraframework.org/auradocs/docs.app" }
+		{ "text": "Reference App", "href":"/auradocs/reference.app" }
 	]
 }
 

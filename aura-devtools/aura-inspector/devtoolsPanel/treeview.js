@@ -4,7 +4,11 @@ function TreeNode(text, id) {
 
     // ?
     this.addChild = function(node) {
-        _children.push(node);
+        if(Array.isArray(node)) {
+            _children = _children.concat(node);
+        } else {
+            _children.push(node);
+        }
     };
 
     this.getId = function() {
@@ -43,7 +47,7 @@ function TreeNode(text, id) {
     };
 
     this.toString = function() {
-        return this.getLabel()+"";
+        return JSON.stringify(text) + " [" + this.getLabel() + "]";
     }
 }
 
@@ -119,6 +123,8 @@ function TreeNode(text, id) {
 
                         } else if(current && typeof current === "object") {
                             fragment.appendChild(document.createTextNode(Object.keys(current).length ? "{...}" : "{}"));
+                        } else if(isFCV(current)) {
+                            fragment.appendChild(document.createTextNode(formatFCV(current)));
                         } else {
                             fragment.appendChild(document.createTextNode(current+""));
                         }
@@ -147,7 +153,11 @@ function TreeNode(text, id) {
             if(value.attributes["aura:id"]) {
                 pattern.push(' <span class="component-attribute">aura:id</span>="' + value.attributes["aura:id"] + '"');
                 for(var attr in value.attributes.HTMLAttributes) {
-                    pattern.push(' <span class="component-attribute">' + attr + '</span>="' + String$escape(value.attributes.HTMLAttributes[attr]) + '"');
+                    if(isFCV(value.attributes.HTMLAttributes[attr])) {
+                        pattern.push(' <span class="component-attribute">' + attr + '</span>="' + String$escape(formatFCV(value.attributes.HTMLAttributes[attr])) + '"');
+                    } else {
+                        pattern.push(' <span class="component-attribute">' + attr + '</span>="' + String$escape(value.attributes.HTMLAttributes[attr]) + '"');
+                    }
                 }   
             }
 
@@ -166,8 +176,20 @@ function TreeNode(text, id) {
             return text;
         },
         ExpressionComponentFormatter: function(value) {
-            //return ByReference || ByValue;
-            return value.attributes.expression || value.attributes.value;
+            var expression = value.attributes.expression;
+
+            // ByReference {!...}
+            if(expression) { 
+                if(isFCV(expression)) {
+                    return formatFCV(expression);
+                }
+                return expression;
+            }
+
+            var attributeValue = value.attributes.value;
+
+            // ByValue {#...}
+            return attributeValue;
         },
         KeyValueFormatter: function(config){
             var value = config.value;
@@ -226,6 +248,7 @@ function TreeNode(text, id) {
         FunctionFormatter: function(value){
             var span = document.createElement("span");
             span.appendChild(document.createTextNode("function(){...}"));
+            span.setAttribute("title", value+"");
             return span;
         },
         FacetFormatter: function(value){
@@ -384,6 +407,45 @@ function TreeNode(text, id) {
     function String$escape(string) {
         if(typeof string != "string") { return string; }
         return string.replace("<", "&lt;").replace(">", "&gt;");
+    }
+
+    function isFCV(compiledFcv) {
+        var devFcvPrefix = "function (cmp, fn) { return ";
+        var prodFcvPrefix = "function (a,b){return";
+
+        return typeof compiledFcv === "string" && (compiledFcv.startsWith(devFcvPrefix) || compiledFcv.startsWith(prodFcvPrefix));
+    }
+
+    function formatFCV(compiledFcv) {
+        var devFcvPrefix = "function (cmp, fn) { return ";
+        var prodFcvPrefix = "function (a,b){return";
+
+        // FCV in Dev Mode, code will be different in Prod Mode so we'll do a separate block for that.
+        if(compiledFcv.startsWith(devFcvPrefix)) {
+            // Lets try to clean up the Function a bit to make it easier to read.
+            compiledFcv = "{! " + 
+                // remove the initial function() { portion and the ending }
+                compiledFcv.substr(devFcvPrefix.length, compiledFcv.length - devFcvPrefix.length - 1)
+                // change fn.method, to just method
+                .replace(/fn\.([a-zA-Z]+)\(/g, "$1(")
+                // Change cmp.get("v.val") to just v.val
+                .replace(/cmp\.get\(\"([a-zA-Z\._]+)\"\)/g, "$1")
+                // ensure consistent ending
+                .trim() + " }";
+
+        } else if(compiledFcv.startsWith(prodFcvPrefix)) {
+            compiledFcv = "{! " + 
+                // Strip beginning function() { and ending }
+                compiledFcv.substr(prodFcvPrefix.length, compiledFcv.length - prodFcvPrefix.length - 1)
+                // In prod, it's not fn.method its b.method, so change it to just method
+                .replace(/b\.([a-zA-Z]+)\(/g, "$1(")
+                // Again in Prod, it's a.get, not cmp.get, so remove a.get and end up with just v.property
+                .replace(/a\.get\(\"([a-zA-Z\._]+)\"\)/g, "$1")
+                // consistent ending
+                .trim() + " }";
+        }
+
+        return compiledFcv;
     }
 
 })();
@@ -590,10 +652,10 @@ function AuraInspectorTreeView(treeContainer) {
         var label = node.getLabel();
 
         if(node.hasFormatter()) {
-            if(typeof label === "string") {
-                span.innerHTML = label;
+            if(label && typeof label === "object" && "nodeType" in label) {
+                span.appendChild(label);
             } else {
-                span.appendChild(label)
+                span.innerHTML = label;
             }
         } else {
             span.appendChild(document.createTextNode(label));

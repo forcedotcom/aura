@@ -171,7 +171,7 @@ AuraStorageService.prototype.createAdapter = function(adapter, name, maxSize, de
 };
 
 AuraStorageService.prototype.fireModified = function() {
-    var e = $A.getEvt("markup://auraStorage:modified");
+    var e = $A.eventService.getNewEvent("markup://auraStorage:modified");
     if (e) {
         e.fire();
     }

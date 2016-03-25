@@ -1211,7 +1211,7 @@ Component.prototype.fireChangeEvent=function(key,oldValue,newValue,index){
             }
         }
         if (observers.length) {
-            var eventDef = $A.get("e").getEventDef("aura:valueChange");
+            var eventDef = $A.eventService.getEventDef("aura:valueChange");
             var dispatcher = {};
             dispatcher[eventDef.getDescriptor().getQualifiedName()] = observers;
             var changeEvent = new Aura.Event.Event({
@@ -2114,7 +2114,7 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
 Component.prototype.getMethodHandler = function(valueProvider,name,action,attributes){
     var observer=this.getActionCaller(valueProvider,action||("c."+name));
     return function(/*param1,param2,paramN*/){
-        var eventDef = $A.get("e").getEventDef("aura:methodCall");
+        var eventDef = $A.eventService.getEventDef("aura:methodCall");
         var dispatcher = {};
         dispatcher[eventDef.getDescriptor().getQualifiedName()] = [observer];
         var methodEvent = new Aura.Event.Event({

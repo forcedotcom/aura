@@ -204,7 +204,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
 
 
             //endAnimationHandler: cleanup all classes and events
-            var finishHandler = function () {
+            var finishHandler = $A.getCallback(function () {
                 if(!cmp.isValid()) {
                     return;
                 }
@@ -236,7 +236,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 }).fire();
 
                 config.onFinish && config.onFinish();
-            };
+            });
 
             panel.setAttribute("aria-hidden", 'false');
             if (useTransition) {
@@ -277,7 +277,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
 
 
             //endAnimationHandler: cleanup all classes and events
-            var finishHandler = function () {
+            var finishHandler = $A.getCallback(function () {
 
                 // make sure the compoment is valid befdore  
                 // doining anything with it, because
@@ -309,7 +309,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 }
 
                 
-            };
+            });
 
             panel.setAttribute("aria-hidden", 'true');
             if (useTransition) {

@@ -455,7 +455,7 @@ ComponentDef.prototype.getEventDef = function(name, includeValueEvents) {
         if (ComponentDef.valueEvents.hasOwnProperty(name)) {
             name = ComponentDef.valueEvents[name];
         }
-        ret=$A.get("e").getEventDef(name);
+        ret=$A.get("e").getDef(name);
     }
     return ret;
 };

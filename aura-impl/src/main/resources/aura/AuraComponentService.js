@@ -889,6 +889,7 @@ AuraComponentService.prototype.hasDefinition = function(descriptor) {
 
 /**
  * Gets the component definition from the registry.
+ * Does not go to the server if the definition is not available.
  *
  * @param {String|Object} descriptor The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
  * @returns {ComponentDef} The metadata of the component

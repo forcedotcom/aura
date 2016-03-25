@@ -53,7 +53,16 @@ AuraEventService.prototype.qualifyEventName = function(event) {
  */
 AuraEventService.prototype.newEvent = function(eventDef, eventName, sourceCmp) {
     $A.assert(eventDef, "EventDef is required");
-    eventDef = this.getEventDef(eventDef);
+    eventDef = this.getDef(eventDef);
+
+    return this.getNewEvent(eventDef, eventName, sourceCmp);
+};
+
+AuraEventService.prototype.getNewEvent = function(eventDefinition, eventName, sourceCmp) {
+    var eventDef = eventDefinition;
+    if(typeof eventDefinition === "string") {
+        eventDef = this.getEventDef(eventDefinition);
+    }
 
     if (eventDef) {
         var config = {};
@@ -229,11 +238,12 @@ AuraEventService.prototype.removeHandler = function(config) {
 
 /**
  * Returns the event definition.
+ * Internal method to the framework. To get an event def from the API, use $A.get("e.prefix:name", function(def){});
+ * 
  * @param {String} descriptor name of EventDef
  * @return {EventDef} The event definition.
  * @memberOf AuraEventService
- * @public
- * @export
+ * @private
  */
 AuraEventService.prototype.getEventDef = function(config) {
     var descConfig = this.createDescriptorConfig(config);
@@ -247,6 +257,36 @@ AuraEventService.prototype.getEventDef = function(config) {
     return definition;
 };
 
+/**
+ * Get the event definition. 
+ * Does access checks.
+ * You cannot fire this though, use newEvent() for that.
+ * 
+ * @param  {String}  descriptor Event descriptor in the pattern prefix:name or markup://prefix:name.
+ */
+AuraEventService.prototype.getDef = function(descriptor) {
+    $A.assert(descriptor, "No EventDefinition was descriptor specified.");
+    var definition = this.getEventDef(descriptor);
+
+    if(definition && !$A.clientService.allowAccess(definition)) {
+        var context=$A.getContext();
+        var message="Access Check Failed! EventService.getEventDef():'" + definition.getDescriptor().toString() + "' is not visible to '" + (context&&context.getCurrentAccess()) + "'.";
+        // if(context.enableAccessChecks) {
+        //     if(context.logAccessFailures){
+        //         $A.error(message);
+        //    }
+        //     return null;
+        // } else {
+        //     if(context.logAccessFailures){
+                $A.warning(message);
+            //}
+            //Intentional fallthrough
+        //}
+    }
+    
+    return definition;
+};
+
 
 /**
  * Checks to see if the definition for the event currently reside on the client.
@@ -257,7 +297,23 @@ AuraEventService.prototype.getEventDef = function(config) {
  * @return {Boolean}            True if the definition is present on the client.
  */
 AuraEventService.prototype.hasDefinition = function(descriptor) {
-    return !!this.getEventDef(descriptor);
+    var definition = this.getEventDef(descriptor);
+    if(definition && !$A.clientService.allowAccess(definition)) {
+        var context=$A.getContext();
+        var message="Access Check Failed! EventService.hasDefinition():'" + definition.getDescriptor().toString() + "' is not visible to '" + (context&&context.getCurrentAccess()) + "'.";
+        if(context.enableAccessChecks) {
+           if(context.logAccessFailures){
+               $A.error(message);
+           }
+           return false;
+        }else{
+            if(context.logAccessFailures){
+                $A.warning(message);
+            }
+            //Intentional fallthrough
+        }
+    }
+    return !!definition;
 };
 
 /**
@@ -286,9 +342,10 @@ AuraEventService.prototype.createDescriptorConfig = function(descriptor) {
  */
 AuraEventService.prototype.getDefinition = function(descriptor, callback) {
     var descriptorName = descriptor.replace('e.', '');
-    var def = this.getEventDef(descriptorName);
+    var def = this.getDef(descriptorName);
 
-    if (def) {
+    // if def failed the access check, or the event was returned.
+    if (def === null || def) {
         callback(def);
         return;
     }
@@ -300,7 +357,7 @@ AuraEventService.prototype.getDefinition = function(descriptor, callback) {
     action.setCallback(this, function (actionReponse) {
         var definition = null;
         if(actionReponse.getState() === "SUCCESS") {
-            definition = this.getEventDef(descriptorName);
+            definition = this.getDef(descriptorName);
         }
         callback(definition);
     });
@@ -346,8 +403,7 @@ AuraEventService.prototype.createFromSavedConfigs = function(config) {
  * @param {Object} config The parameters for the event
  * @return {EventDef} The event definition.
  * @memberOf AuraEventService
- * @public
- * @export
+ * @private
  */
 AuraEventService.prototype.createEventDef = function(config) {
     var descConfig = this.createDescriptorConfig(config);
@@ -391,7 +447,6 @@ AuraEventService.prototype.hasHandlers = function(name) {
 
 /**
  * Returns the qualified name of all events known to the registry.
- * Available in DEV mode only.
  * @export
  */
 AuraEventService.prototype.getRegisteredEvents = function() {

@@ -13,13 +13,13 @@
             cmp.testServerActionIsSecureAction();
         }
     },
-    
+
     testClientActionIsSecureAction: {
         test: function(cmp) {
             cmp.testClientActionIsSecureAction();
         }
     },
-    
+
     testActionThatErrors: {
         test: function(cmp) {
             cmp.testActionThatErrors();
@@ -30,7 +30,7 @@
     },
 
     // TODO(W-2988718): Action passed from system mode is raw Action object instead of SecureAction
-    _testDifferentNamespacedActionPassedFromSystemMode: {
+    testDifferentNamespacedActionPassedFromSystemMode: {
         test: function(cmp) {
             var facet = cmp.find("facet");
             var facetAction = facet.get("c.cExecuteInForegroundWithReturn");

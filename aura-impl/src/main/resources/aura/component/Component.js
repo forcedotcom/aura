@@ -1785,9 +1785,9 @@ Component.prototype.setupComponentDef = function(config) {
     }
 
     var key = getLockerSecret(this.componentDef, "key");
-	if (key) {
-    	$A.lockerService.util.applyKey(this, key);
-	}
+    if (key) {
+        setLockerSecret(this, key);
+    }
 };
 
 Component.prototype.createComponentStack = function(facets, valueProvider){

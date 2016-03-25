@@ -30,6 +30,12 @@ Aura.Event.Event = function(config) {
     this.fired = false;
     this.eventStopPropagation = false;
     this.componentEvent = false;
+
+    // propagating locker key when possible
+    var key = this.source && getLockerSecret(this.source, "key");
+    if (key) {
+        setLockerSecret(this, "key", key);
+    }
 };
 
 /**

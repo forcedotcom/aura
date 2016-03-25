@@ -843,7 +843,10 @@ AuraInstance.prototype.handleError = function(message, e) {
     }
 
     if ($A.initialized) {
-        $A.getEvt('markup://aura:systemError').fire(evtArgs);
+        // fire the event later so the current handleError could return even if an error occurs in the event handler.
+        window.setTimeout($A.getCallback(function() {
+            $A.getEvt('markup://aura:systemError').fire(evtArgs);
+        }), 0);
     } else {
         if ($A.showErrors()) {
             $A.message(dispMsg);

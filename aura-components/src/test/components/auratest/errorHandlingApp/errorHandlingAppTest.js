@@ -4,18 +4,25 @@
      */
     testAuraErrorDefaultSeverity : {
         attributes: {"handleSystemError": true},
-        test: function(cmp) {
-            $A.test.expectAuraError("AuraError from app client controller");
-            $A.test.clickOrTouch(cmp.find("auraErrorFromClientControllerButton").getElement());
-            //cmp.throwAuraErrorFromClientController();
+        test: [
+            function(cmp) {
+                $A.test.expectAuraError("AuraError from app client controller");
+                $A.test.clickOrTouch(cmp.find("auraErrorFromClientControllerButton").getElement());
 
-            var expected = $A.severity.ALERT;
-            var actual = cmp.get("v.severity");
+                // since the error handler is executed asyncly, must wait here.
+                $A.test.addWaitForWithFailureMessage(true, function(){
+                        return cmp.get("v.eventHandled");
+                    },
+                    "The expected error didn't get handled.");
+            }, function(cmp) {
+                var expected = $A.severity.ALERT;
+                var actual = cmp.get("v.severity");
 
-            // set handler back to default, so that error model can show up
-            cmp.set("v.handleSystemError", false);
-            $A.test.assertEquals(expected, actual);
-        }
+                // set handler back to default, so that error model can show up
+                cmp.set("v.handleSystemError", false);
+                $A.test.assertEquals(expected, actual);
+            }
+        ]
     },
 
     /**
@@ -23,17 +30,24 @@
      */
     testAuraFriendlyErrorDefaultSeverity : {
         attributes: {"handleSystemError": true},
-        test: function(cmp) {
-            $A.test.expectAuraError("AuraFriendlyError from app client controller");
-            $A.test.clickOrTouch(cmp.find("auraFriendlyErrorFromClientControllerButton").getElement());
+        test: [
+            function(cmp) {
+                $A.test.expectAuraError("AuraFriendlyError from app client controller");
+                $A.test.clickOrTouch(cmp.find("auraFriendlyErrorFromClientControllerButton").getElement());
 
-            var expected = $A.severity.QUIET;
-            var actual = cmp.get("v.severity");
+                $A.test.addWaitForWithFailureMessage(true, function(){
+                        return cmp.get("v.eventHandled");
+                    },
+                    "The expected error didn't get handled.");
+            }, function(cmp) {
+                var expected = $A.severity.QUIET;
+                var actual = cmp.get("v.severity");
 
-            // set handler back to default, so that error model can show up
-            cmp.set("v.handleSystemError", false);
-            $A.test.assertEquals(expected, actual);
-        }
+                // set handler back to default, so that error model can show up
+                cmp.set("v.handleSystemError", false);
+                $A.test.assertEquals(expected, actual);
+            }
+        ]
     },
 
     /**
@@ -44,17 +58,24 @@
             "handleSystemError": true,
             "severity": "FATAL"
         },
-        test: function(cmp) {
-            $A.test.expectAuraError("AuraError from app client controller");
-            $A.test.clickOrTouch(cmp.find("auraErrorFromClientControllerButton").getElement());
+        test: [
+            function(cmp) {
+                $A.test.expectAuraError("AuraError from app client controller");
+                $A.test.clickOrTouch(cmp.find("auraErrorFromClientControllerButton").getElement());
+                $A.test.addWaitForWithFailureMessage(true, function(){
+                        return cmp.get("v.eventHandled");
+                    },
+                    "The expected error didn't get handled.");
+            },
+            function(cmp) {
+                var expected = $A.severity.FATAL;
+                var actual = cmp.get("v.severity");
 
-            var expected = $A.severity.FATAL;
-            var actual = cmp.get("v.severity");
-
-            // set handler back to default, so that error model can show up
-            cmp.set("v.handleSystemError", false);
-            $A.test.assertEquals(expected, actual);
-        }
+               // set handler back to default, so that error model can show up
+                cmp.set("v.handleSystemError", false);
+                $A.test.assertEquals(expected, actual);
+            }
+        ]
     },
 
     /**
@@ -62,36 +83,47 @@
      */
      testNonAuraErrorIsWrappedAsAuraErrorInHandler: {
         attributes: {"handleSystemError": true},
-        test: function(cmp) {
-            var expectedMessage = "Error from app client controller";
-            $A.test.expectAuraError(expectedMessage);
-            $A.test.clickOrTouch(cmp.find("errorFromClientControllerButton").getElement());
+        test: [
+            function(cmp) {
 
-            // cmp._auraError gets assigned in error handler
-            var targetError = cmp._auraError;
-            cmp.set("v.handleSystemError", false);
-            $A.test.assertTrue(targetError instanceof AuraError);
-            $A.test.assertTrue($A.test.contains(targetError.message, expectedMessage),
-                    "Error in handler doesn't contain the original error message.");
-        }
+                $A.test.expectAuraError("Error from app client controller");
+                $A.test.clickOrTouch(cmp.find("errorFromClientControllerButton").getElement());
+                $A.test.addWaitForWithFailureMessage(true, function(){
+                        return cmp.get("v.eventHandled");
+                    },
+                    "The expected error didn't get handled.");
+            },
+            function(cmp) {
+                var expectedMessage = "Error from app client controller";
+                // cmp._auraError gets assigned in error handler
+                var targetError = cmp._auraError;
+                cmp.set("v.handleSystemError", false);
+                $A.test.assertTrue(targetError instanceof AuraError);
+                $A.test.assertTrue($A.test.contains(targetError.message, expectedMessage),
+                        "Error in handler doesn't contain the original error message.");
+            }
+        ]
      },
 
     /**
      * Verify that failing descriptor is correct when an AuraError gets thrown
      */
     testFailingDescriptorWhenAuraErrorIsThrown : {
-        test: function(cmp) {
-            $A.test.expectAuraError("AuraError from app client controller");
-            $A.test.clickOrTouch(cmp.find("auraErrorFromClientControllerButton").getElement());
+        test: [
+            function(cmp) {
+                $A.test.expectAuraError("AuraError from app client controller");
+                $A.test.clickOrTouch(cmp.find("auraErrorFromClientControllerButton").getElement());
+                this.waitForErrorModal();
+            },
+            function(cmp) {
+                var actual = this.findFailingDescriptorFromErrorModal();
+                //auratest$errorHandlingApp$controller$throwAuraErrorFromClientController
+                var action = cmp.get("c.throwAuraErrorFromClientController");
+                var expected = action.getDef().toString();
 
-
-            var actual = this.findFailingDescriptorFromErrorModal();
-            //auratest$errorHandlingApp$controller$throwAuraErrorFromClientController
-            var action = cmp.get("c.throwAuraErrorFromClientController");
-            var expected = action.getDef().toString();
-
-            $A.test.assertEquals(expected, actual);
-        }
+                $A.test.assertEquals(expected, actual);
+            }
+        ]
     },
 
     testFailingDescriptorForErrorFromCreateComponentCallback: {
@@ -99,7 +131,6 @@
             function(cmp) {
                 $A.test.expectAuraError("Error from createComponent callback in app");
                 $A.test.clickOrTouch(cmp.find("errorFromCreateComponentCallbackButton").getElement());
-
                 this.waitForErrorModal();
             },
             function(cmp) {
@@ -117,17 +148,21 @@
      * The test approach is to click a button to call aura:method in controller.
      */
     testFailingDescriptorForErrorFromAuraMethodHandler: {
-        test: function(cmp) {
-            $A.test.expectAuraError("Error from app client controller");
-            $A.test.clickOrTouch(cmp.find("errorFromAuraMethodHandlerButton").getElement());
+        test: [
+            function(cmp) {
+                $A.test.expectAuraError("Error from app client controller");
+                $A.test.clickOrTouch(cmp.find("errorFromAuraMethodHandlerButton").getElement());
+                this.waitForErrorModal();
+            },
+            function(cmp) {
+                var actual = this.findFailingDescriptorFromErrorModal();
+                // expects the descriptor is where the error happens
+                var action = cmp.get("c.throwErrorFromClientController");
+                var expected = action.getDef().toString();
 
-            var actual = this.findFailingDescriptorFromErrorModal();
-            // expects the descriptor is where the error happens
-            var action = cmp.get("c.throwErrorFromClientController");
-            var expected = action.getDef().toString();
-
-            $A.test.assertEquals(expected, actual);
-        }
+                $A.test.assertEquals(expected, actual);
+            }
+        ]
     },
 
     testFailingDescriptorForErrorFromAuraMethodWithCallback: {
@@ -148,16 +183,20 @@
     },
 
     testFailingDescriptorForErrorFromContainedCmpController: {
-        test: function(cmp) {
-            $A.test.expectAuraError("Error from component client controller");
-            $A.test.clickOrTouch(cmp.find("errorFromContainedCmpControllerButton").getElement());
+        test: [
+            function(cmp) {
+                $A.test.expectAuraError("Error from component client controller");
+                $A.test.clickOrTouch(cmp.find("errorFromContainedCmpControllerButton").getElement());
+                this.waitForErrorModal();
+            },
+            function(cmp) {
+                var actual = this.findFailingDescriptorFromErrorModal();
+                var action = cmp.find("containedCmp").get("c.throwErrorFromClientController");
+                var expected = action.getDef().toString();
 
-            var actual = this.findFailingDescriptorFromErrorModal();
-            var action = cmp.find("containedCmp").get("c.throwErrorFromClientController");
-            var expected = action.getDef().toString();
-
-            $A.test.assertEquals(expected, actual);
-        }
+                $A.test.assertEquals(expected, actual);
+            }
+        ]
     },
 
     testFailingDescriptorForErrorFromContainedCmpCallback: {
@@ -199,7 +238,6 @@
 
                 $A.test.assertEquals(expected, actual);
             }
-
         ]
     },
 

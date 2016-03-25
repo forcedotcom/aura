@@ -18,6 +18,7 @@
 <aura:component access="GLOBAL" support="GA" extensible="true" extends="ui:popupTrigger" description="A link that triggers a dropdown menu.">
     
     <aura:attribute access="GLOBAL" name="label" type="String" description="The text displayed on the component."/>
+    <aura:attribute name="ariaLabel" type="String"/>
 
     <aura:registerEvent access="GLOBAL" name="menuTriggerPress" type="ui:menuTriggerPress" description="The event that is fired when the trigger is clicked."/>
 
@@ -26,10 +27,12 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
+    <aura:method name="setFocus" action="{!c.focus}"/>
+
     <aura:set attribute="trigger">
         <div aura:id="menuTrigger">
             <!-- programatic dispatch of onblur="{!c.onblur}" onfocus="{!c.onfocus}" -->
-            <a aura:id="link" aria-haspopup="true" aria-disabled="{!v.disabled}"
+            <a aura:id="link" aria-label="{!v.ariaLabel}" aria-haspopup="true" aria-disabled="{!v.disabled}"
                tabindex="{!v.disabled ? -1: 0}" class="{!v.class}" title="{!v.title}" onclick="{!c.onClick}">
 
                 <aura:if isTrue="{!v.body.length == 0}">

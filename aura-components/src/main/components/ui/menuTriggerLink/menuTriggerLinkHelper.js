@@ -28,7 +28,7 @@
         }
 
         if (dispatcher.blur && dispatcher.blur.length) {
-            htmlAttr.blur = cmp.getReference('c.onblur');
+            htmlAttr.onblur = cmp.getReference('c.onblur');
         }
     },
     focus: function(component) {

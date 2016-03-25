@@ -50,7 +50,7 @@ public class AuraUITestingUtil {
     private final WebDriver driver;
     private final String logPrefix;
     private final Logger logger;
-    private int timeoutInSecs;
+    private int timeoutInSecs = 30;
     private int rerunCount = 0;
     protected static final Random RAND = new Random(System.currentTimeMillis());
 

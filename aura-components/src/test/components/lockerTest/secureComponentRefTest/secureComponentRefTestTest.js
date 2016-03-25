@@ -21,5 +21,17 @@
                                          "addValueProvider", "getEvent", "find", "getElements"];
             cmp.testUnexposedPlatformAPIs(unexposedPlatformApis);
         }
+    },
+
+    testGetCThrowsError: {
+        test: function(cmp) {
+            cmp.testGetCThrowsError();
+        }
+    },
+
+    testGetFacetActionThrowsError: {
+        test: function(cmp) {
+            cmp.testGetFacetActionThrowsError();
+        }
     }
 })

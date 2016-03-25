@@ -7,9 +7,10 @@
             event = e;
         });
         element.click(); 
-        testUtils.assertStartsWith("SecureDOMEvent", event.toString());;
+        testUtils.assertStartsWith("SecureDOMEvent", event.toString());
         testUtils.assertStartsWith("SecureElement", event.target.toString(), "Expected event.target to return SecureElement");
         testUtils.assertStartsWith("SecureElement", event.srcElement.toString(), "Expected event.srcElement to return SecureElement");
+        testUtils.assertDefined(event.path, "Unable to access event.path");
         // Verify non-wrapped method is still accessible
         testUtils.assertEquals("number", typeof event.timeStamp);
     },

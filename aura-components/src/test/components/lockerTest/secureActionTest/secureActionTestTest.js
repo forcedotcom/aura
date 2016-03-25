@@ -8,9 +8,35 @@
         cmp.set("v.testUtils", $A.test);
     },
 
-    testSecureAction: {
+    testServerActionIsSecureAction: {
         test: function(cmp) {
-            cmp.testSecureAction();
+            cmp.testServerActionIsSecureAction();
+        }
+    },
+    
+    testClientActionIsSecureAction: {
+        test: function(cmp) {
+            cmp.testClientActionIsSecureAction();
+        }
+    },
+    
+    testActionThatErrors: {
+        test: function(cmp) {
+            cmp.testActionThatErrors();
+            $A.test.addWaitFor(true, function() {
+                return !!cmp.get("v.testComplete");
+            });
+        }
+    },
+
+    testDifferentNamespacedActionPassedFromSystemMode: {
+        test: function(cmp) {
+            var facet = cmp.find("facet");
+            var facetAction = facet.get("c.cExecuteInForegroundWithReturn");
+            cmp.testDifferentNamespacedActionPassedFromSystemMode(facetAction);
+            $A.test.addWaitFor(true, function() {
+                return !!cmp.get("v.testComplete");
+            });
         }
     }
 })

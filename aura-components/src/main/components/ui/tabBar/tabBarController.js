@@ -70,7 +70,6 @@
 			var visibleTabs = overflowData.visibleTabs;
 			index = visibleTabs[visibleTabs.length - 1].index;
 		}
-
 		e.setParams({"index": index, "oldTab": oldTab, "focus": evt.getParam("focus")}).fire();
 	},
 
@@ -107,15 +106,6 @@
 	},
 
 	onResize: function(cmp, evt, helper) {
-		var overflowData = cmp.get("v.overflowData");
-		var barWidth = helper.getBarWidth(cmp);
-		if (barWidth > 0 && overflowData.barWidth !== barWidth) {
-			requestAnimationFrame($A.getCallback(function () {
-					if (cmp.isValid()) {
-						helper.adjustOverflow(cmp);
-					}
-				})
-			);
-		}
+		helper.onResize(cmp);
 	}
 })// eslint-disable-line semi

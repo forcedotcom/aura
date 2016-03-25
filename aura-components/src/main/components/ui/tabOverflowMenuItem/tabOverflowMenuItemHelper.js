@@ -15,16 +15,6 @@
  */
 
 ({
-	handleHoverEvent: function(cmp, eventName) {
-		var event = cmp.getEvent(eventName);
-		// Set this tabItem component as a param in the event
-		var params = {
-			tabComponent : cmp
-		};
-		event.setParams(params);
-		event.fire();
-	},
-
 	// TODO: possible to separate this out while still using similar scoping?
 	updateMenuItems : function(cmp) {
 		var self = this,
@@ -34,6 +24,9 @@
 			menuItemCache = this.getMenuItemCache(cmp);
 
 		var callback = function(newMenuItem) {
+			if (!cmp.isValid()) {
+				return;
+			}
 			count--;
 			newMenuItem.autoDestroy(false);
 			newMenuItem.addHandler("click", cmp, "c.onMenuSelection");
@@ -96,10 +89,6 @@
 			index : index,
 			focus : focus
 		};
-
-		if (focus) {
-			cmp.set("v.focusedItemName", null, true);
-		}
 
 		cmp.get("e.onTabSelection").setParams(params).fire();
 	}

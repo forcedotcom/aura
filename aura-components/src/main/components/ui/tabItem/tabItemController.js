@@ -43,11 +43,19 @@
         $A.util.squash(evt, true);
     },
 
-    onTabHover: function(cmp, evt, helper) {
+    onfocus: function(cmp, evt, helper) {
         helper.handleHoverEvent(cmp, 'onTabHover');
     },
 
-    onTabUnhover: function(cmp, evt, helper) {
+    onmouseover: function(cmp, evt, helper) {
+        helper.handleHoverEvent(cmp, 'onTabHover');
+    },
+
+    onblur: function(cmp, evt, helper) {
+        helper.handleHoverEvent(cmp, 'onTabUnhover');
+    },
+
+    onmouseout: function(cmp, evt, helper) {
         helper.handleHoverEvent(cmp, 'onTabUnhover');
     }
 })// eslint-disable-line semi

@@ -37,14 +37,6 @@
         <div>
             <br/>for ScriptSources, we allow same origin, eval(..)  <br/>
             <script src="/auraFW/resources/codemirror/js/codemirror.js"></script>
-          <!--  /aura-resources/src/main/resources/aura/resources/codemirror/js/codemirror.js -->
-            <script>
-                var eval_res = "test result from eval: "+eval("window.location.pathname");
-                document._eval_res = eval_res;
-                <!-- 
-                    alert("Hi from application:"+eval_res);
-                -->
-            </script>
         </div>
         <div>
             <br/>component below will load, but it's custom script is gone<br/> 

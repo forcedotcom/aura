@@ -68,7 +68,7 @@
     <html manifest="{!v.manifest}">
         <head>
             <title>{!v.title}</title>
-            <script nonce="LockerServiceTemporaryNonce">
+            <script>
             var pageStartTime = (new Date()).getTime();</script>
             {!v.extraMetaTags}
 
@@ -113,7 +113,7 @@
 
             {!v.auraPreInitBlock}
 
-            <script nonce="LockerServiceTemporaryNonce">
+            <script>
                 if ({!v.autoInitialize}) {
                     $A.initAsync({!v.auraInit});
                 } else if ({!v.autoInitializeSync}){

@@ -36,5 +36,5 @@
         test: function(cmp) {
             cmp.testGetCThrowsError();
         }
-    },
+    }
 })

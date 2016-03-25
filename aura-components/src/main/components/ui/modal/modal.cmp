@@ -55,7 +55,7 @@
             <div aura:id="content" class="{!join(' ', 'modal-container', token('uiModal.container'))}">
                 <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
-                <div class="{!join(' ', 'modal-header', and(empty(v.header), empty(v.title)) ? 'empty' : '', token('uiModal.header'), v.headerClass)}">
+                <div class="{!join(' ', 'modal-header', token('uiModal.header'), v.headerClass, and(empty(v.header), empty(v.title)) ? 'empty ' + token('uiModal.headerEmpty') : '')}">
                     {!v.icon}
                     <aura:if isTrue="{!!empty(v.title)}">
                         <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title ' + token('uiModal.title') : 'assistiveText'}">{!v.title}</h2>

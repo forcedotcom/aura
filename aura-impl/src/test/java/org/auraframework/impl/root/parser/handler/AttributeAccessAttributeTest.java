@@ -23,8 +23,8 @@ import org.auraframework.def.Definition;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.system.Parser;
-import org.auraframework.system.Source;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
@@ -46,9 +46,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithDefaultAccessCustomNamespace() throws Exception {
     	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String'  /></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -59,9 +59,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithEmptyAccessCustomNamespace() throws Exception {
     	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access=''/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -78,9 +78,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithInvalidAccessCustomNamespace() throws Exception {
     	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='BLAH'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -98,9 +98,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>";
     	
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -118,9 +118,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithInvalidAndValidAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, BLAH, GLOBAL'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -138,9 +138,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithStaticAccessAndAccessMethodCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -158,9 +158,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticationAndAccessMethodCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -182,9 +182,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithGlobalAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -194,9 +194,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPublicAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -206,9 +206,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPrivateAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVATE'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -218,9 +218,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithInternalAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='INTERNAL'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -237,9 +237,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPrivilegedAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVILEGED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -260,9 +260,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithGlobalAccessMethodCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -278,9 +278,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPublicAccessMethodCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -296,9 +296,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPrivateAccessMethodCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -314,9 +314,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPrivilegedAccessMethodCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -332,9 +332,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithInternalAccessMethodCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -354,9 +354,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithGlobalAndPrivateAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, PRIVATE'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -375,9 +375,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPublicAndPublicAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC, PUBLIC'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -391,9 +391,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testComponentWithAuthenticationCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -410,9 +410,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testComponentWithUnAuthenticationCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='UNAUTHENTICATED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -432,9 +432,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithUnAuthenticationMethodCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -454,9 +454,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndUnAuthenticationAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -476,9 +476,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndAuthenticationAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -498,9 +498,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndGlobalAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,GLOBAL'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -516,9 +516,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndPrivateAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVATE'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -534,9 +534,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndPublicAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PUBLIC'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -552,9 +552,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndPrivilegedAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVILEGED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -570,9 +570,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndInternalAccessCustomNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,INTERNAL'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -592,9 +592,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithDefaultAccessPrivilegedNamespace() throws Exception {
     	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String'  /></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -605,9 +605,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithEmptyAccessPrivilegedNamespace() throws Exception {
     	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access=''/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -624,9 +624,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithInvalidAccessPrivilegedNamespace() throws Exception {
     	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='BLAH'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -644,9 +644,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>";
     	
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -664,9 +664,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithInvalidAndValidAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, BLAH, GLOBAL'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -684,9 +684,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithStaticAccessAndAccessMethodPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -704,9 +704,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticationAndAccessMethodPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -728,9 +728,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithGlobalAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -740,9 +740,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPublicAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -752,9 +752,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPrivateAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVATE'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -764,9 +764,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithInternalAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='INTERNAL'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -783,9 +783,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPrivilegedAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVILEGED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -799,9 +799,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithGlobalAccessMethodPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponnet",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponnet",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -817,9 +817,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPublicAccessMethodPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponnet",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponnet",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -835,9 +835,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPrivateAccessMethodPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponnet",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponnet",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -853,9 +853,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPrivilegedAccessMethodPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponnet",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponnet",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -871,9 +871,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithInternalAccessMethodPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponnet",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponnet",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -893,9 +893,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithGlobalAndPrivateAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, PRIVATE'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -914,9 +914,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithPublicAndPublicAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC, PUBLIC'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -930,9 +930,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testComponentWithAuthenticationPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -949,9 +949,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testComponentWithUnAuthenticationPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='UNAUTHENTICATED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -971,9 +971,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithUnAuthenticationMethodPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -993,9 +993,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndUnAuthenticationAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1015,9 +1015,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndAuthenticationAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1037,9 +1037,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndGlobalAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,GLOBAL'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1055,9 +1055,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndPrivateAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVATE'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1073,9 +1073,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndPublicAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PUBLIC'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1091,9 +1091,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndPrivilegedAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVILEGED'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1109,9 +1109,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	public void testAttributeWithAuthenticatedAndInternalAccessPrivilegedNamespace() throws Exception {
 		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,INTERNAL'/></aura:component>";
     	DefDescriptor<ComponentDef> descriptor = 
-    			(DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-    					cmpSource, "privilegedNS:testcomponent",
-                false);
+    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+        		cmpSource, "privilegedNS:testcomponent",
+        false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1131,9 +1131,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithDefaultAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String'  /></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1144,9 +1144,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithEmptyAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access=''/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1163,9 +1163,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithInvalidAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='BLAH'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1183,9 +1183,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>";
         
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1203,9 +1203,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithInvalidAndValidAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, BLAH, GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1223,9 +1223,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithStaticAccessAndAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1243,9 +1243,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithAuthenticationAndAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1267,9 +1267,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithGlobalAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1279,9 +1279,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithPublicAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1291,9 +1291,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithPrivateAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1303,9 +1303,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithInternalAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='INTERNAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1315,9 +1315,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithPrivilegedAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVILEGED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1332,9 +1332,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithGlobalAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1344,9 +1344,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithPublicAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1356,9 +1356,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithPrivateAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1368,9 +1368,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithPrivilegedAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1380,9 +1380,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithInternalAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1396,9 +1396,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithGlobalAndPrivateAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1417,9 +1417,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithPublicAndPublicAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC, PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1433,9 +1433,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testComponentWithAuthenticationInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1452,9 +1452,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testComponentWithUnAuthenticationInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='UNAUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1474,9 +1474,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithUnAuthenticationMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1496,9 +1496,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithAuthenticatedAndUnAuthenticationAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1518,9 +1518,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithAuthenticatedAndAuthenticationAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1540,9 +1540,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithAuthenticatedAndGlobalAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1558,9 +1558,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithAuthenticatedAndPrivateAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1576,9 +1576,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithAuthenticatedAndPublicAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1594,9 +1594,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithAuthenticatedAndPrivilegedAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVILEGED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1612,9 +1612,9 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     public void testAttributeWithAuthenticatedAndInternalAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,INTERNAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
-                (DefDescriptor<ComponentDef>)getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                        cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                true);
+                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
+                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
+        true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);

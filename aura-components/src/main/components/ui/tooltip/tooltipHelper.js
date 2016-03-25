@@ -58,6 +58,7 @@
 				'direction', 
 				'fadeOut', 
 				'fadeIn',
+				'domId',
 				'fadeOutDuration',
 				'fadeInDuration',
 				'delay'].forEach(function(attr) {

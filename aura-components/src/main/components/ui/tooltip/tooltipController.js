@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 ({
+    init: function(component) {
+
+        var domId = component.get('v.domId');
+        if(!domId) {
+            domId = 'tt-for-' + component.getGlobalId();
+            component.set('v.domId', domId);
+        }
+    },
+
     show: function(component, event, helper) {
         if(component.isValid() && $A.util.getBooleanValue(component.get('v.advanced'))) {
             helper.show(component);

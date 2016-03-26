@@ -139,7 +139,6 @@ public class ClientComponentClass {
     }
 
     final private void writeLockerExporter(Appendable out) throws IOException, QuickFixException {
-
     	StringBuilder sb = new StringBuilder();
         sb.append("var ").append(className).append(" = ");
     	writeObjects(sb);
@@ -177,11 +176,15 @@ public class ClientComponentClass {
 
     	ConfigAdapter configAdapter = Aura.getConfigAdapter();
     	if (configAdapter.isLockerServiceEnabled()) {
-			requireLocker = !configAdapter.isInternalNamespace(descriptor.getNamespace());
-        	if (!requireLocker) {
-	            DefDescriptor<InterfaceDef> requireLockerDescr = Aura.getDefinitionService().getDefDescriptor(REQUIRE_LOCKER, InterfaceDef.class);
-	        	requireLocker = componentDef.isInstanceOf(requireLockerDescr);
-        	}
+    		// We always run layout:// in system mode
+    		String prefix = descriptor.getPrefix();
+			if (prefix == null || !prefix.toLowerCase().equals("layout")) {
+				requireLocker = !configAdapter.isInternalNamespace(descriptor.getNamespace());
+	        	if (!requireLocker) {
+		            DefDescriptor<InterfaceDef> requireLockerDescr = Aura.getDefinitionService().getDefDescriptor(REQUIRE_LOCKER, InterfaceDef.class);
+		        	requireLocker = componentDef.isInstanceOf(requireLockerDescr);
+	        	}
+    		}
 		}
 
     	return requireLocker;

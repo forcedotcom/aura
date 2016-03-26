@@ -51,7 +51,6 @@ import org.auraframework.util.adapter.SourceControlAdapter;
  */
 @ServiceComponent
 public class Aura {
-
     private static ClientLibraryService clientLibraryService;
 
     @Inject

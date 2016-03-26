@@ -51,6 +51,7 @@ import org.auraframework.util.adapter.SourceControlAdapter;
  */
 @ServiceComponent
 public class Aura {
+
     private static ClientLibraryService clientLibraryService;
 
     @Inject
@@ -86,7 +87,7 @@ public class Aura {
     public static LoggingService getLoggingService() {
         return Aura.get(LoggingService.class);
     }
-    
+
     /**
      * Get the Logging Service: Provides Aura with a top-level Logging handler from the host environments
      */
@@ -191,7 +192,7 @@ public class Aura {
     public static ClientLibraryService getClientLibraryService() {
         return clientLibraryService;
     }
-    
+
     /**
      * Gets the caching service: a general service for setting and getting arbitrary blobs based on a key
      * Encapsulates the access to aura's known caches.

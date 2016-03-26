@@ -239,8 +239,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     @Override
     public void regenerate(File destRoot) throws IOException {
         reset();
-        // 202: Disable JS validation since we precompile definitions
-        generate(destRoot, false);
+        generate(destRoot, true);
         postProcess();
     }
 

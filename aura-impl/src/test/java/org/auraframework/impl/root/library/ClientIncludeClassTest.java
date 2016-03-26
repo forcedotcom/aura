@@ -22,85 +22,108 @@ import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.def.DefinitionTest;
+import org.auraframework.impl.root.library.IncludeDefRefImpl;
+import org.auraframework.impl.root.library.IncludeDefRefImpl.Builder;
+import org.mockito.Answers;
+import org.mockito.Mock;
 
-public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
+public class ClientIncludeClassTest extends DefinitionTest<IncludeDef> {
 
-	IncludeDefRefImpl.Builder builder = new IncludeDefRefImpl.Builder();
+    Builder builder = new IncludeDefRefImpl.Builder();
 
-    public JavascriptIncludeClassTest(String name) {
+    @Mock(answer = Answers.RETURNS_MOCKS)
+    DefDescriptor<IncludeDef> descriptor;
+
+    public ClientIncludeClassTest(String name) {
         super(name);
     }
 
     public void testSerializeMinimal() throws Exception {
-		String code = "function(){}";
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+		String source = "function(){}";
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, 
         		LibraryDef.class, null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("minimal",
                 IncludeDef.class, libDesc);
-        addSourceAutoCleanup(includeDesc, code);
+        addSourceAutoCleanup(includeDesc, source);
 
         builder.setDescriptor(includeDesc.getDef().getDescriptor());
         IncludeDefRef def = builder.build();
 
+        ClientIncludeClass clientIncludeClass = new ClientIncludeClass(def);
+        StringBuffer buffer = new StringBuffer();
+        clientIncludeClass.writeClass(buffer);
+
         assertEquals(
                 String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s);\n",
-                		JavascriptIncludeClass.getClientDescriptor(includeDesc), code), def.getCode(false));
+                		ClientIncludeClass.getClientDescriptor(def.getReferenceDescriptor()), source), buffer.toString());
     }
 
     public void testSerializeWithSingleComments() throws Exception {
-        String code = "//this doc should be helpful\nfunction(){\n//fix later\nreturn this;}//last word";
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+        String source = "//this doc should be helpful\nfunction(){\n//fix later\nreturn this;}//last word";
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, 
         		LibraryDef.class, null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("singleComments",
                 IncludeDef.class, libDesc);
-        addSourceAutoCleanup(includeDesc, code);
+        addSourceAutoCleanup(includeDesc, source);
 
         builder.setDescriptor(includeDesc.getDef().getDescriptor());
         IncludeDefRef def = builder.build();
 
+        ClientIncludeClass clientIncludeClass = new ClientIncludeClass(def);
+        StringBuffer buffer = new StringBuffer();
+        clientIncludeClass.writeClass(buffer);
+
         assertEquals(
                 String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s);\n",
-                		JavascriptIncludeClass.getClientDescriptor(includeDesc), code), def.getCode(false));
+                		ClientIncludeClass.getClientDescriptor(def.getReferenceDescriptor()), source), buffer.toString());
     }
 
     public void testSerializeWithMultiComments() throws Exception {
-        String code = "/*this doc should be helpful*/function(){/*fix later*/return this;}/*last word*/";
+        String source = "/*this doc should be helpful*/function(){/*fix later*/return this;}/*last word*/";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("multiComments",
                 IncludeDef.class, libDesc);
-        addSourceAutoCleanup(includeDesc, code);
+        addSourceAutoCleanup(includeDesc, source);
 
         builder.setDescriptor(includeDesc.getDef().getDescriptor());
         IncludeDefRef def = builder.build();
 
+        ClientIncludeClass clientIncludeClass = new ClientIncludeClass(def);
+        StringBuffer buffer = new StringBuffer();
+        clientIncludeClass.writeClass(buffer);
+
         assertEquals(
                 String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s);\n",
-                		JavascriptIncludeClass.getClientDescriptor(includeDesc), code), def.getCode(false));
+                		ClientIncludeClass.getClientDescriptor(def.getReferenceDescriptor()), source), buffer.toString());
     }
 
     public void testSerializeWithImport() throws Exception {
-    	String code = "function(){}";
+    	String source = "function(){}";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("hasImport",
                 IncludeDef.class, libDesc);
         DefDescriptor<IncludeDef> importDesc = getAuraTestingUtil().createStringSourceDescriptor("firstimport",
                 IncludeDef.class, libDesc);
-        addSourceAutoCleanup(includeDesc, code);
+        addSourceAutoCleanup(includeDesc, source);
 
         builder.setDescriptor(includeDesc.getDef().getDescriptor());
         builder.setImports(Arrays.asList(importDesc));
         IncludeDefRef def = builder.build();
 
+        ClientIncludeClass clientIncludeClass = new ClientIncludeClass(def);
+        StringBuffer buffer = new StringBuffer();
+        clientIncludeClass.writeClass(buffer);
+
         assertEquals(
                 String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\"],%s);\n",
-                		JavascriptIncludeClass.getClientDescriptor(includeDesc),
-                		JavascriptIncludeClass.getClientDescriptor(importDesc), code), def.getCode(false));
+                		ClientIncludeClass.getClientDescriptor(def.getReferenceDescriptor()), 
+                		ClientIncludeClass.getClientDescriptor(importDesc), source), buffer.toString());
     }
 
     public void testSerializeWithExternalImport() throws Exception {
-    	String code = "function(){}";
+    	String source = "function(){}";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("hasImport",
@@ -111,21 +134,25 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         DefDescriptor<IncludeDef> extIncludeDesc = getAuraTestingUtil().createStringSourceDescriptor("firstimport",
                 IncludeDef.class, extLibDesc);
 
-        addSourceAutoCleanup(includeDesc, code);
+        addSourceAutoCleanup(includeDesc, source);
 
         builder.setDescriptor(includeDesc.getDef().getDescriptor());
         builder.setImports(Arrays.asList(extIncludeDesc));
         IncludeDefRef def = builder.build();
 
+        ClientIncludeClass clientIncludeClass = new ClientIncludeClass(def);
+        StringBuffer buffer = new StringBuffer();
+        clientIncludeClass.writeClass(buffer);
+
         assertEquals(
                 String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\"],%s);\n",
-                		JavascriptIncludeClass.getClientDescriptor(includeDesc),
-                		JavascriptIncludeClass.getClientDescriptor(extIncludeDesc), code), def.getCode(false));
+                		ClientIncludeClass.getClientDescriptor(def.getReferenceDescriptor()), 
+                		ClientIncludeClass.getClientDescriptor(extIncludeDesc), source), buffer.toString());
     }
 
     public void testSerializeWithMultipleImports() throws Exception {
-    	String code = "function(){}";
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+    	String source = "function(){}";
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, 
         		LibraryDef.class, null);
         DefDescriptor<IncludeDef> import1Desc = getAuraTestingUtil().createStringSourceDescriptor("firstimport",
                 IncludeDef.class, libDesc);
@@ -136,35 +163,43 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
                 LibraryDef.class, null);
         DefDescriptor<IncludeDef> extImportDesc = getAuraTestingUtil().createStringSourceDescriptor("thirdimport",
                 IncludeDef.class, extLibDesc);
-
-        addSourceAutoCleanup(import1Desc, code);
+        
+        addSourceAutoCleanup(import1Desc, source);
 
         builder.setDescriptor(import1Desc.getDef().getDescriptor());
         builder.setImports(Arrays.asList(import2Desc, extImportDesc));
         IncludeDefRef def = builder.build();
 
+        ClientIncludeClass clientIncludeClass = new ClientIncludeClass(def);
+        StringBuffer buffer = new StringBuffer();
+        clientIncludeClass.writeClass(buffer);
+
         assertEquals(
-                String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\", \"%s\"],%s);\n",
-                		JavascriptIncludeClass.getClientDescriptor(import1Desc),
-                		JavascriptIncludeClass.getClientDescriptor(import2Desc),
-				JavascriptIncludeClass.getClientDescriptor(extImportDesc), code), def.getCode(false));
+                String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\",\"%s\"],%s);\n",
+                		ClientIncludeClass.getClientDescriptor(def.getReferenceDescriptor()), 
+                		ClientIncludeClass.getClientDescriptor(import2Desc),
+                		ClientIncludeClass.getClientDescriptor(extImportDesc), source), buffer.toString());
     }
 
     public void testSerializeWithExports() throws Exception {
-    	String code = "var myexpt=function(){return 'something'}";
+    	String source = "var myexpt=function(){return 'something'}";
         String export = "myexpt";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("hasExports",
                 IncludeDef.class, libDesc);
-        addSourceAutoCleanup(includeDesc, code);
+        addSourceAutoCleanup(includeDesc, source);
 
         builder.setDescriptor(includeDesc.getDef().getDescriptor());
 		builder.setExport(export);
         IncludeDefRef def = builder.build();
 
+        ClientIncludeClass clientIncludeClass = new ClientIncludeClass(def);
+        StringBuffer buffer = new StringBuffer();
+        clientIncludeClass.writeClass(buffer);
+
         assertEquals(
                 String.format("$A.componentService.addLibraryInclude(\"%s\",[],function lib(){\n%s;\nreturn %s;\n});\n",
-                		JavascriptIncludeClass.getClientDescriptor(includeDesc), code, export), def.getCode(false));
+                		ClientIncludeClass.getClientDescriptor(def.getReferenceDescriptor()), source, export), buffer.toString());
     }
 }

@@ -49,7 +49,6 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
 
     public AttributeDefImplUnitTest(String name) {
         super(name);
-        this.descriptorName = "testAttribute";
         this.qualifiedDescriptorName = "testAttribute";
     }
 
@@ -138,7 +137,6 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
     }
 
     public void testValidateDefinitionInvalidName() throws Exception {
-        this.descriptorName = "i'm invalid";
         this.qualifiedDescriptorName = "i'm invalid";
         try {
             buildDefinition().validateDefinition();

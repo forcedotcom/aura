@@ -1,4 +1,4 @@
-$A.componentService.addComponentClass("markup://test:testComponent",function() {
+$A.componentService.addComponentClass("markup://test:testComponent",function () {
 var test$testComponent = {
   "meta":{
     "name":"test$testComponent",

@@ -1,8 +1,0 @@
-{
-    "function1":function(args) {
-       var str = 'do Nothing';
-    },
-    "function2":function(args1, args2) {
-        var str = 'Still do Nothing';
-    }
-  }

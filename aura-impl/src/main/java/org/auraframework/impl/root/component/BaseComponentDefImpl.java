@@ -16,6 +16,8 @@
 
 package org.auraframework.impl.root.component;
 
+import static org.auraframework.instance.AuraValueProviderType.LABEL;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.builder.BaseComponentDefBuilder;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ActionDef.ActionType;
@@ -46,9 +47,8 @@ import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.HelperDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.JavascriptCodeBuilder;
 import org.auraframework.def.LibraryDefRef;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.MethodDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
@@ -78,8 +78,6 @@ import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.json.Json;
 
 import com.google.common.base.Splitter;
@@ -118,10 +116,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     private final Map<DefDescriptor<MethodDef>,MethodDef> methodDefs;
     private final List<LibraryDefRef> imports;
     private final List<AttributeDefRef> facets;
-    private final String code;
-    private final String minifiedCode;
     private final Set<PropertyReference> expressionRefs;
-    private final List<JavascriptProcessingError> codeErrors;
 
     private final RenderType render;
     private final WhitespaceBehavior whitespaceBehavior;
@@ -135,6 +130,8 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     private final boolean hasFlavorableChild;
     private final boolean dynamicallyFlavorable;
 
+    private String clientComponentClass;
+
     private final int hashCode;
 
     private transient Boolean localDeps = null;
@@ -145,7 +142,17 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         this.controllerDescriptors = AuraUtil.immutableList(builder.controllerDescriptors);
         this.interfaces = AuraUtil.immutableSet(builder.interfaces);
         this.methodDefs = AuraUtil.immutableMap(builder.methodDefs);
-        this.extendsDescriptor = builder.extendsDescriptor;
+
+        if (builder.extendsDescriptor != null) {
+            this.extendsDescriptor = builder.extendsDescriptor;
+        } else {
+            if (this.interfaces.contains(ROOT_MARKER)) {
+                this.extendsDescriptor = null;
+            } else {
+                this.extendsDescriptor = getDefaultExtendsDescriptor();
+            }
+        }
+
         this.templateDefDescriptor = builder.templateDefDescriptor;
         this.events = AuraUtil.immutableMap(builder.events);
         this.eventHandlers = AuraUtil.immutableList(builder.eventHandlers);
@@ -171,11 +178,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         this.hasFlavorableChild = builder.hasFlavorableChild;
         this.dynamicallyFlavorable = builder.dynamicallyFlavorable;
 
-        this.code = builder.code;
-        this.minifiedCode = builder.minifiedCode;
-        this.codeErrors = AuraUtil.immutableList(builder.codeErrors);
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
-
         if (getDescriptor() != null) {
             this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(),
                     ControllerDef.class, DefDescriptor.COMPOUND_PREFIX);
@@ -183,7 +186,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             this.compoundControllerDescriptor = null;
         }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
-                extendsDescriptor, interfaces, methodDefs, providerDescriptors, rendererDescriptors, helperDescriptors, resourceDescriptors,
+                extendsDescriptor, interfaces, methodDefs, rendererDescriptors, helperDescriptors, resourceDescriptors,
                 imports);
     }
 
@@ -533,7 +536,14 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
     @Override
     public void retrieveLabels() throws QuickFixException {
-        retrieveLabels(expressionRefs);
+        // only get our direct labels, all others are handled by dependencies.
+        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
+                .get(LABEL.getPrefix());
+        for (PropertyReference e : expressionRefs) {
+            if (e.getRoot().equals(LABEL.getPrefix())) {
+                labelProvider.getValue(e.getStem());
+            }
+        }
     }
 
     @Override
@@ -811,6 +821,17 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     @Override
+    public ControllerDef getRemoteControllerDef() throws QuickFixException {
+        for (DefDescriptor<ControllerDef> desc : controllerDescriptors) {
+        	ControllerDef def = desc.getDef();
+            if (!def.isLocal()) {
+                return def;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public StyleDef getStyleDef() throws QuickFixException {
         return styleDescriptor == null ? null : styleDescriptor.getDef();
     }
@@ -929,6 +950,26 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         return hashCode;
     }
 
+    /**
+     * Gets the component class for this component definition and all its parents, except for aura:component.
+     */
+    @Override
+    public String getComponentClass() throws QuickFixException, IOException {
+
+        if(clientComponentClass == null) {
+            final StringBuilder sb = new StringBuilder();
+
+            sb.append("function(){");
+        	ClientComponentClass clientClass = new ClientComponentClass(this);
+            clientClass.writeClass(sb);
+            sb.append('}');
+
+            clientComponentClass = sb.toString();
+        }
+
+        return clientComponentClass;
+    }
+
     public boolean hasServerAction(ControllerDef controllerDef) {
     	Map<String, ? extends ActionDef> actionDefs = controllerDef.getActionDefs();
         for (ActionDef actionDef : actionDefs.values()) {
@@ -1045,11 +1086,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                 }
 
                 if(!context.getDefRegistry().getClientClassLoaded(descriptor)) {
-	                boolean minify = context.getMode().minify();
-	                String code = getCode(minify);
-	                if (!AuraTextUtil.isNullEmptyOrWhitespace(code)) {
-						json.writeMapEntry("componentClass", "function(){" + code + "}");
-                	}
+                    json.writeMapEntry("componentClass", getComponentClass());
                 }
 
                 serializeFields(json);
@@ -1062,38 +1099,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
 	protected abstract void serializeFields(Json json) throws IOException,
     QuickFixException;
-
-    @Override
-    public String getCode(boolean minify) throws QuickFixException {
-    	String js = minify && !AuraTextUtil.isNullEmptyOrWhitespace(minifiedCode) ? minifiedCode : code;
-    	if (isLockerRequired()) {
-    		js = JavascriptComponentClass.convertToLocker(js);
-    	}
-    	return js;
-    }
-
-    /**
-     * Return true if the definition is a component that needs to be locked.
-     */
-	private boolean isLockerRequired() throws QuickFixException {
-    	boolean requireLocker = false;
-
-    	ConfigAdapter configAdapter = Aura.getConfigAdapter();
-    	if (configAdapter.isLockerServiceEnabled()) {
-			requireLocker = !configAdapter.isInternalNamespace(descriptor.getNamespace());
-        	if (!requireLocker) {
-	            DefDescriptor<InterfaceDef> requireLockerDescr = Aura.getDefinitionService().getDefDescriptor("aura:requireLocker", InterfaceDef.class);
-	        	requireLocker = isInstanceOf(requireLockerDescr);
-        	}
-    	}
-
-    	return requireLocker;
-    }
-
-    @Override
-	public List<JavascriptProcessingError> getCodeErrors() {
-        return codeErrors;
-    }
 
     /**
      * @see ComponentDef#getRendererDescriptor()
@@ -1275,7 +1280,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     public static abstract class Builder<T extends BaseComponentDef> extends
-    RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T>, JavascriptCodeBuilder {
+    RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
 
         public Builder(Class<T> defClass) {
             super(defClass);
@@ -1304,15 +1309,10 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         public Map<String, RegisterEventDef> events;
         public List<EventHandlerDef> eventHandlers;
         public List<LibraryDefRef> imports;
-
-		public String code;
-		public String minifiedCode;
-		public List<JavascriptProcessingError> codeErrors;
-		public Set<PropertyReference> expressionRefs;
-
-		public String render;
+        public Set<PropertyReference> expressionRefs;
+        public String render;
         public WhitespaceBehavior whitespaceBehavior;
-        public List<DependencyDef> dependencies;
+        List<DependencyDef> dependencies;
         public List<ClientLibraryDef> clientLibraries;
         private RenderType renderType;
         private List<DefDescriptor<TokensDef>> tokenOverrides;
@@ -1436,29 +1436,13 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             return this;
         }
 
-        @Override
-        public void addDependency(DependencyDef dependency) {
+        public Builder<T> addDependency(DependencyDef dependency) {
             if (this.dependencies == null) {
-                this.dependencies = new ArrayList<>();
+                this.dependencies = Lists.newArrayList();
             }
             this.dependencies.add(dependency);
-        }
-
-        public Builder<T> addAllExpressionRefs(Collection<PropertyReference> refs) {
-            if (expressionRefs == null) {
-            	this.expressionRefs = new HashSet<>();
-            }
-            expressionRefs.addAll(refs);
             return this;
         }
-
-		@Override
-		public void addExpressionRef(PropertyReference propRef) {
-            if (this.expressionRefs == null) {
-            	this.expressionRefs = new HashSet<>();
-            }
-            this.expressionRefs.add(propRef);
-		}
 
         @Override
         public Builder<T> setStyleDef(StyleDef styleDef) {
@@ -1519,29 +1503,15 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             return this;
         }
 
-        @Override
-        public void setCode(String code) {
-        	this.code = code;
-        }
-
-        @Override
-        public void setMinifiedCode(String minifiedCode) {
-        	this.minifiedCode = minifiedCode;
-        }
-
-        @Override
-        public void setCodeErrors(List<JavascriptProcessingError> codeErrors) {
-        	this.codeErrors = codeErrors;
-        }
-
         /**
          * Gets the methodDefs for this instance.
          *
          * @return The methodDefs.
          */
         public Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() {
-             return this.methodDefs;
+            return this.methodDefs;
         }
+
 
         protected void finish() {
             if (render == null) {
@@ -1553,17 +1523,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                     setParseError(e);
                 }
             }
-
-            if (extendsDescriptor == null) {
-            	if (interfaces == null || !interfaces.contains(ROOT_MARKER)) {
-            		extendsDescriptor = getDefaultExtendsDescriptor();
-            	}
-            }
-
-            new JavascriptComponentClass(this).construct(this);
         }
-
-        public abstract DefDescriptor<T> getDefaultExtendsDescriptor();
     }
 
     /**
@@ -1691,7 +1651,10 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
         // If we've gotten this far, let's check for controllers.
         if (ret) {
-        	ret = ret && getControllerDefDescriptors().isEmpty();
+            ret = ret && getLocalControllerDef() == null;
+        }
+        if (ret) {
+            ret = ret && getRemoteControllerDef() == null;
         }
 
         // If we've gotten this far, let's check for Styles (server rendering
@@ -1736,4 +1699,8 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     public WhitespaceBehavior getWhitespaceBehavior() {
         return whitespaceBehavior;
     }
+
+    @Override
+    public abstract DefDescriptor<T> getDefaultExtendsDescriptor();
+
 }

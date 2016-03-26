@@ -36,7 +36,7 @@ public class MockProviderDef extends MockDefinition<ProviderDef> implements Prov
 
     /**
      * Simpler point to mock. Called by provide methods.
-     *
+     * 
      * @return the ComponentConfig provided by this Provider.
      */
     public ComponentConfig provide() {
@@ -56,11 +56,6 @@ public class MockProviderDef extends MockDefinition<ProviderDef> implements Prov
     @Override
     public boolean isLocal() {
         return true;
-    }
-
-    @Override
-    public String getCode() {
-        return null;
     }
 
     @Override

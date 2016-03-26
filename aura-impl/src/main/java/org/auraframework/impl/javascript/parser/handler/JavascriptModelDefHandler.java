@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.javascript.parser.handler;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.auraframework.def.DefDescriptor;
@@ -33,8 +34,9 @@ public class JavascriptModelDefHandler extends JavascriptHandler<ModelDef, Model
     }
 
     @Override
-    protected JavascriptModelDef createDefinition(Map<String, Object> map) throws QuickFixException {
+    protected JavascriptModelDef createDefinition(String code) throws QuickFixException, IOException {
         setDefBuilderFields(builder);
+        Map<String, Object> map = codeToMap(code);
         for (Map.Entry<String, Object> e : map.entrySet()) {
             builder.addProperty(e.getKey(), e.getValue(), getLocation());
         }

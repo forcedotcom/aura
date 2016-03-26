@@ -47,6 +47,7 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
     public void setUp() throws Exception {
         super.setUp();
 
+        this.descriptorName = "valid";
         this.qualifiedDescriptorName = "valid";
 
         this.builder = new Builder();
@@ -80,6 +81,7 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
     }
 
     public void testInvalidName() throws Exception {
+        this.descriptorName = "1";
         this.qualifiedDescriptorName = "1";
         try {
             buildDefinition().validateDefinition();

@@ -30,7 +30,6 @@ import org.auraframework.impl.javascript.parser.JavascriptControllerParser;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.util.json.JsonEncoder;
 
 public class JavascriptControllerParserTest extends AuraImplTestCase {
 
@@ -105,9 +104,9 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
         Map<String, ? extends ActionDef> actionDefMap = controllerDef.getActionDefs();
         assertEquals("There should be one actionDef in ActionDefs", 1, actionDefMap.size());
         assertTrue(actionDefMap.containsKey("function1"));
-        ActionDef actionDef = actionDefMap.get("function1");
-        String jsonStr = JsonEncoder.serialize(actionDef);
-        assertEquals("The latest function should survive.", "function(cmp) {var v = 2;}", jsonStr);
+
+        String code = controllerDef.getCode();
+        assertEquals("The latest function should survive.", "{\n    \"function1\":function(cmp) {var v = 2;}\n  }", code);
     }
 
     /**

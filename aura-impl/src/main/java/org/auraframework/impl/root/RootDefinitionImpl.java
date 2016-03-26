@@ -119,7 +119,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
         public Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
         public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs;
-        private List<DefDescriptor<ProviderDef>> providerDescriptors;
+        public List<DefDescriptor<ProviderDef>> providerDescriptors;
         private SupportLevel support;
         private DefDescriptor<DocumentationDef> documentationDescriptor;
 

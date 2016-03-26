@@ -51,7 +51,7 @@ public class JavaProviderDefImpl extends DefinitionImpl<JavaProviderDef> impleme
 
     /**
      * Validate our definition.
-     * 
+     *
      * This validation ensures that we have a provider method to get either a descriptor (simple case) or a config
      * (complex case). It also refuses to allow a method by the name of provideAttributes.
      */
@@ -120,6 +120,11 @@ public class JavaProviderDefImpl extends DefinitionImpl<JavaProviderDef> impleme
     @Override
     public boolean isLocal() {
         return true;
+    }
+
+    @Override
+    public String getCode() {
+        return null;
     }
 
     public static final class Builder extends AbstractJavaProviderDef.Builder<JavaProviderDef> {

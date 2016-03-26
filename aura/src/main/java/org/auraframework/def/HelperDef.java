@@ -17,10 +17,7 @@ package org.auraframework.def;
 
 /**
  */
-public interface HelperDef extends Definition {
+public interface HelperDef extends CodeDefinition {
     @Override
     DefDescriptor<HelperDef> getDescriptor();
-
-    boolean isLocal();
-
 }

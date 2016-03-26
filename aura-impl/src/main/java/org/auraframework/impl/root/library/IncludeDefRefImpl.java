@@ -16,51 +16,33 @@
 package org.auraframework.impl.root.library;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DependencyDef;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
-import org.auraframework.def.JavascriptCodeBuilder;
-import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.json.Json;
 
 public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements IncludeDefRef {
-	private static final long serialVersionUID = 610875326950592992L;
-	private final int hashCode;
+    private static final long serialVersionUID = 610875326950592992L;
 
     private final List<DefDescriptor<IncludeDef>> imports;
     private final List<String> aliases;
     private final String export;
-
-    private final String code;
-    private final String minifiedCode;
-	private final List<JavascriptProcessingError> codeErrors;
-    private final Set<PropertyReference> expressionRefs;
+    private final int hashCode;
 
     protected IncludeDefRefImpl(Builder builder) {
         super(builder);
         this.imports = builder.imports;
-        this.aliases = AuraUtil.immutableList(builder.aliases);
+        this.aliases = builder.aliases;
         this.export = builder.export;
-        this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
-
-        this.code = builder.code;
-        this.minifiedCode = builder.minifiedCode;
-        this.codeErrors = AuraUtil.immutableList(builder.codeErrors);
-
-        this.hashCode = AuraUtil.hashCode(imports, aliases, export, code);
+        this.hashCode = AuraUtil.hashCode(imports, aliases, export);
     }
 
     @Override
@@ -86,21 +68,6 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
     @Override
     public String getExport() {
         return export;
-    }
-
-    @Override
-    public String getCode(boolean minify) {
-        return minify ? minifiedCode : code;
-    }
-
-    @Override
-    public List<JavascriptProcessingError> getCodeErrors() {
-        return codeErrors;
-    }
-
-    @Override
-    public void retrieveLabels() throws QuickFixException {
-    	retrieveLabels(expressionRefs);
     }
 
     @Override
@@ -132,21 +99,6 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
             throw new InvalidDefinitionException(String.format(
                     "%s 'export' attribute must be a valid javascript identifier", IncludeDefRefHandler.TAG),
                     getLocation());
-        }
-        if (!codeErrors.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            boolean first = true;
-            for (JavascriptProcessingError error : codeErrors) {
-            	if (first) {
-            		first = false;
-            	} else {
-            		sb.append("\n");
-            	}
-            	sb.append(error.toString());
-            }
-            if (sb.length() > 0) {
-            	throw new InvalidDefinitionException(sb.toString(), getLocation());
-            }
         }
     }
 
@@ -188,74 +140,31 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
         return hashCode;
     }
 
-    public static class Builder extends DefinitionImpl.RefBuilderImpl<IncludeDef, IncludeDefRef> implements JavascriptCodeBuilder {
+    public static class Builder extends DefinitionImpl.RefBuilderImpl<IncludeDef, IncludeDefRef> {
 
-    	public List<DefDescriptor<IncludeDef>> imports;
-		public List<String> aliases;
-        public String export;
-
-        public String code;
-        public String minifiedCode;
-        public List<JavascriptProcessingError> codeErrors;
-
-        public Set<PropertyReference> expressionRefs;
-        public List<DependencyDef> dependencies;
+		private List<DefDescriptor<IncludeDef>> imports;
+        private List<String> aliases;
+        private String export;
 
         public Builder() {
 			super(IncludeDef.class);
 		}
 
-        public Builder setImports(List<DefDescriptor<IncludeDef>> imports) {
-            this.imports = AuraUtil.immutableList(imports);
-            return this;
-        }
-
-        public Builder setAliases(List<String> aliases) {
-            this.aliases = aliases;
-            return this;
-        }
-
-        public Builder setExport(String export) {
-            this.export = export;
-            return this;
-        }
-
-        @Override
-        public void setCode(String code) {
-        	this.code = code;
-        }
-
-        @Override
-        public void setMinifiedCode(String minifiedCode) {
-        	this.minifiedCode = minifiedCode;
-        }
-
-        @Override
-        public void setCodeErrors(List<JavascriptProcessingError> codeErrors) {
-        	this.codeErrors = codeErrors;
-        }
-
-        @Override
-        public void addDependency(DependencyDef dependency) {
-            if (this.dependencies == null) {
-                this.dependencies = new ArrayList<>();
-            }
-            this.dependencies.add(dependency);
-        }
-
-		@Override
-		public void addExpressionRef(PropertyReference propRef) {
-            if (this.expressionRefs == null) {
-            	this.expressionRefs = new HashSet<>();
-            }
-            this.expressionRefs.add(propRef);
-		}
-
-
         @Override
         public IncludeDefRefImpl build() {
-            new JavascriptIncludeClass(this).construct(this);
             return new IncludeDefRefImpl(this);
+        }
+
+        public void setImports(List<DefDescriptor<IncludeDef>> imports) {
+            this.imports = AuraUtil.immutableList(imports);
+        }
+
+        public void setAliases(List<String> aliases) {
+            this.aliases = aliases;
+        }
+
+        public void setExport(String exports) {
+            this.export = exports;
         }
     }
 }

@@ -16,19 +16,28 @@
 package org.auraframework.impl.javascript.parser.handler;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.builder.DefBuilder;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.root.parser.handler.ExpressionContainerHandler;
+import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json.IndentType;
+import org.auraframework.util.javascript.JavascriptProcessingError;
+import org.auraframework.util.javascript.JavascriptWriter;
 import org.auraframework.util.json.JsonConstant;
-import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonHandlerProvider;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
@@ -36,11 +45,14 @@ import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 /**
  * base class for javascripty source handling gnomes.
  */
-public abstract class JavascriptHandler<D extends Definition, T extends Definition> {
-
-	protected final Source<?> source;
+public abstract class JavascriptHandler<D extends Definition, T extends Definition> implements ExpressionContainerHandler {
+    protected final Source<?> source;
     protected final DefDescriptor<D> descriptor;
 
+    private static final String JS_PREFIX = "A="; // let first unnamed function satisfy Closure
+    private static final String JS_ANONYMOUS_FUNCTION = "(?s)^function\\s*\\(.*";
+    private static final String JS_LEADING_COMMENTS = "(?s)^(?:[\\s\n]|/\\*.*?\\*/|//.*?\n)+";
+    
     protected JavascriptHandler(DefDescriptor<D> descriptor, Source<?> source) {
         this.source = source;
         this.descriptor = descriptor;
@@ -48,12 +60,6 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
 
     protected Location getLocation() {
         return new Location(source.getSystemId(), source.getLastModified());
-    }
-
-    @SuppressWarnings("unchecked")
-	DefDescriptor<? extends RootDefinition> getParentDescriptor() {
-    	DefDescriptor<? extends Definition> bundle = descriptor.getBundle();
-    	return (DefDescriptor<? extends RootDefinition>)bundle;
     }
 
     public DefDescriptor<D> getDescriptor() {
@@ -75,12 +81,17 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
         builder.setLocation(getLocation());
     }
 
-
     public T getDefinition() {
 
         try {
-            String code = source.getContents();
-            return createDefinition(code);
+            String contents = source.getContents();
+            Map<String, Object> map = getJsonSource(contents);
+
+            TextTokenizer tt = TextTokenizer.tokenize(contents, getLocation());
+            tt.addExpressionRefs(this);
+
+            return createDefinition(map);
+
         } catch (QuickFixException qfe) {
             return createDefinition(qfe);
         } catch (JsonParseException pe) {
@@ -91,12 +102,11 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
     }
 
     /**
-     * create the definition from the source source
+     * create the definition from the parsed source
      *
-     * @param code the source that was read in
-     * @throws IOException
+     * @param map the source that was read in
      */
-    protected abstract T createDefinition(String code) throws QuickFixException, IOException;
+    protected abstract T createDefinition(Map<String, Object> map) throws QuickFixException;
 
     /**
      * create the definition from a parse error.
@@ -105,15 +115,10 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
      */
     protected abstract T createDefinition(Throwable error);
 
-    /**
-     * Parse the source into JSON to preserve the same syntax checking. Component
-     * bundles only allow JS Object Literals, not plain JS source code, and we
-     * use JSON to validate the structure of the file.
-     */
-    protected Map<String, Object> codeToMap(String code) throws IOException {
+    protected Map<String, Object> getJsonSource(String contents) throws IOException {
         Map<String, Object> map = null;
 
-        JsonStreamReader in = new JsonStreamReader(code, getHandlerProvider());
+        JsonStreamReader in = new JsonStreamReader(new StringReader(contents), getHandlerProvider());
         try {
             JsonConstant token = in.next();
             if (token == JsonConstant.FUNCTION_ARGS_START) {
@@ -134,17 +139,42 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
         return map;
     }
 
-    /**
-     * Allow us to convert JSON back to JS source code. We want to do this
-     * here in the handler because we don't want to expose JsFunction to any
-     * class further down.
-     */
-    protected String mapToCode(Map<String, Object> map) throws IOException {
-        StringBuilder sb = new StringBuilder(map.size() * 32);
-        JsonEncoder json = new JsonEncoder(sb, true, false);
-        // Indent to ease debugging.
-		json.pushIndent(IndentType.BRACE);
-        json.writeValue(map);
-        return sb.toString();
+    protected String getCompressedSource(String contents, String filename) throws InvalidDefinitionException, IOException {
+        Writer w = new StringWriter();
+
+        // Remove leading whitespace and comments to get to code
+        String code = contents.replaceFirst(JS_LEADING_COMMENTS, "");
+        
+        // Prevent Closure error with unnamed functions
+        final boolean isAnonymousFunction = code.matches(JS_ANONYMOUS_FUNCTION);
+        if (isAnonymousFunction) {
+        	code = JS_PREFIX + code;
+        }
+        
+        List<JavascriptProcessingError> errors = JavascriptWriter.CLOSURE_WHITESPACE.compress(code, w, filename);
+
+        if (!errors.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (JavascriptProcessingError error : errors) {
+                if (isAnonymousFunction && error.getLine() == 1) {
+                    // adjust for prefix
+                    error.setStartColumn(error.getStartColumn() - JS_PREFIX.length());
+                }
+            	sb.append('\n').append(error.toString());
+            }
+        	
+            if (sb.length() > 0) {
+            	throw new InvalidDefinitionException(sb.toString(), getLocation());
+            }
+        }
+
+        return w.toString();
+    }
+
+    @Override
+    public void addExpressionReferences(Set<PropertyReference> propRefs) {
+        // TODO: this should be a typed exception
+        throw new AuraRuntimeException("Expressions are not allowed inside a " + descriptor.getDefType()
+                + " definition", propRefs.iterator().next().getLocation());
     }
 }

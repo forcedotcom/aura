@@ -56,7 +56,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
     }
 
     public void testGetActionDefs() throws Exception {
-        String controllerJs =
+        String controllerJs = 
                 "({ " +
                 "    function1: function(arg) {}," +
                 "    function2: function(arg) {}" +
@@ -104,7 +104,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
         ControllerDef controllerDef = definitionService.getDefinition(controllerDesc);
 
         assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
-        goldFileText(controllerDef.getCode());
+        serializeAndGoldFile(controllerDef, "_JSControllerDef");
     }
 
     /**

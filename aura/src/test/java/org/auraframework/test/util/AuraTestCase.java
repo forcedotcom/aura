@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.service.ContextService;
@@ -38,7 +40,7 @@ import junit.framework.AssertionFailedError;
 
 /**
  * Base class for unit tests referencing the Aura framework.
- *
+ * 
  * @since 0.0.178
  */
 public abstract class AuraTestCase extends UnitTestCase {
@@ -144,7 +146,7 @@ public abstract class AuraTestCase extends UnitTestCase {
 
     /**
      * Check to ensure that an exception exactly matches both message and location.
-     *
+     * 
      * @param e the exception to check.
      * @param clazz a class to match if it is not null.
      * @param message The message to match (must be exact match).
@@ -157,7 +159,7 @@ public abstract class AuraTestCase extends UnitTestCase {
 
     /**
      * Check to ensure that an exception matches both message regex and location.
-     *
+     * 
      * @param e the exception to check.
      * @param clazz a class to match if it is not null.
      * @param regex The regex string to match (must be exact match).
@@ -172,7 +174,7 @@ public abstract class AuraTestCase extends UnitTestCase {
      * Check the exception exactly matches the message and check the location of an Exception using the Source of the
      * file in error. Use this method when the location is a full filesystem path to the file (instead of just a
      * qualified name).
-     *
+     * 
      * Depending on whether we are reading form jars or source, the location in the exception is different. When reading
      * from source we need to strip the "file:" prefix. When reading from jars we leave the "jar:file:" prefix.
      */
@@ -214,7 +216,7 @@ public abstract class AuraTestCase extends UnitTestCase {
 
     /**
      * Check to ensure that an exception message starts with a given message and matches a location.
-     *
+     * 
      * @param e the exception to check.
      * @param clazz a class to match if it is not null.
      * @param message The message to match (must be exact match).
@@ -229,7 +231,7 @@ public abstract class AuraTestCase extends UnitTestCase {
      * Check the exception message starts with a given message and check the location of an Exception using the Source
      * of the file in error. Use this method when the location is a full filesystem path to the file (instead of just a
      * qualified name).
-     *
+     * 
      * Depending on whether we are reading form jars or source, the location in the exception is different. When reading
      * from source we need to strip the "file:" prefix. When reading from jars we leave the "jar:file:" prefix.
      */
@@ -251,7 +253,7 @@ public abstract class AuraTestCase extends UnitTestCase {
 
     /**
      * Check to ensure that an exception message contains a string and has the correct location.
-     *
+     * 
      * @param e the exception to check.
      * @param clazz a class to match if it is not null.
      * @param message The String which is contained in the Exception message.
@@ -266,7 +268,7 @@ public abstract class AuraTestCase extends UnitTestCase {
      * Check the exception exactly message contains a string and check the location of an Exception using the Source of
      * the file in error. Use this method when the location is a full filesystem path to the file (instead of just a
      * qualified name).
-     *
+     * 
      * Depending on whether we are reading form jars or source, the location in the exception is different. When reading
      * from source we need to strip the "file:" prefix. When reading from jars we leave the "jar:file:" prefix.
      */
@@ -298,6 +300,10 @@ public abstract class AuraTestCase extends UnitTestCase {
             auraTesingMarkupUtil = new AuraTestingMarkupUtil();
         }
         return auraTesingMarkupUtil;
+    }
+
+    protected DefDescriptor<ControllerDef> getClientController(BaseComponentDef def) throws Exception {
+        return def.getRemoteControllerDef().getDescriptor();
     }
 
     /**

@@ -123,6 +123,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
         builder.imports = Lists.newArrayList();
         builder.controllerDescriptors = Lists.newArrayList();
         builder.facets = Lists.newArrayList();
+        builder.expressionRefs = Sets.newHashSet();
     }
 
     @Override
@@ -540,6 +541,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
 
     @Override
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
-        builder.addAllExpressionRefs(propRefs);
+        builder.expressionRefs.addAll(propRefs);
     }
 }

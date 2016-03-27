@@ -1426,20 +1426,20 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         DefDescriptor<RendererDef> otherNamespaceDef = getAuraTestingUtil()
                 .addSourceAutoCleanup(
                         RendererDef.class,
-                        "({render: function(cmp) {"
-                                + "cmp.getValue('v.simplevalue1').setValue($A.get('$Label' + '.Related_Lists' + '.task_mode_today', cmp));"
-                                + "cmp.getValue('v.simplevalue2').setValue($A.get('$Label.DOESNT.EXIST', cmp));"
-                                + "cmp.getValue('v.simplevalue3').setValue($A.get('$Label.Related_Lists.DOESNTEXIST', cmp));"
-                                + "// Both section and name are required. This request will return undefined and no action is requested."
-                                + "cmp.getValue('v.simplevalue4').setValue($A.get('$Label.DOESNTEXIST', cmp));"
-                                + "// These requests are here to test that there are no multiple action requests for the same $Label"
-                                + "// See LabelValueProviderUITest.java"
-                                + "var tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
-                                + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
-                                + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
-                                + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
-                                + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
-                                + "return this.superRender();"
+                        "({render: function(cmp) {\n"
+                                + "cmp.getValue('v.simplevalue1').setValue($A.get('$Label' + '.Related_Lists' + '.task_mode_today', cmp));\n"
+                                + "cmp.getValue('v.simplevalue2').setValue($A.get('$Label.DOESNT.EXIST', cmp));\n"
+                                + "cmp.getValue('v.simplevalue3').setValue($A.get('$Label.Related_Lists.DOESNTEXIST', cmp));\n"
+                                + "// Both section and name are required. This request will return undefined and no action is requested.\n"
+                                + "cmp.getValue('v.simplevalue4').setValue($A.get('$Label.DOESNTEXIST', cmp));\n"
+                                + "// These requests are here to test that there are no multiple action requests for the same $Label\n"
+                                + "// See LabelValueProviderUITest.java\n"
+                                + "var tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);\n"
+                                + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);\n"
+                                + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);\n"
+                                + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);\n"
+                                + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);\n"
+                                + "return this.superRender();\n"
                                 + "}})",
                         "cstring1.labelProvider", false);
         DefDescriptor<ApplicationDef> app = getAuraTestingUtil().addSourceAutoCleanup(

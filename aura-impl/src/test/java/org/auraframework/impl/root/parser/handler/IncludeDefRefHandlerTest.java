@@ -139,6 +139,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
     }
 
     public void testGetElementWithInvalidImportFormat() throws Exception {
+    	
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
                 "<%s name='name' imports='invalid:library'/>", IncludeDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
@@ -172,19 +173,21 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
 
     public void testGetElementWithEmptyTag() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
-        StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
+        
+        StringSource<IncludeDefRef> includeSource = new StringSource<>(descriptor, String.format(
                 "<%s name='%s'></%s>", IncludeDefRefHandler.TAG, expectedName, IncludeDefRefHandler.TAG), "myID",
                 Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(includeSource), includeSource);
 
         IncludeDefRef actualDef = handler.getElement();
         assertEquals(expectedName, actualDef.getName());
     }
 
     public void testGetElementWithNonEmptyTag() throws Exception {
-        String expectedName = getAuraTestingUtil().getNonce("irrelevant");
+        String expectedName = getAuraTestingUtil().getNonce("irrelevant");        
+        
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
                 "<%s name='%s'>text</%s>", IncludeDefRefHandler.TAG, expectedName, IncludeDefRefHandler.TAG), "myID",
                 Format.XML);
@@ -193,7 +196,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
 
         try {
-            handler.getElement();
+        	handler.getElement();
             fail("Include tag may not contain any children");
         } catch (AuraRuntimeException t) {
             assertExceptionMessageEndsWith(t, AuraRuntimeException.class,

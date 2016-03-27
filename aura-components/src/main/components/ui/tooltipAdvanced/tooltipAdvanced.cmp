@@ -43,7 +43,7 @@
     <div class="{!v.classList}" aura:flavorable="true" aura:id="tooltip" style="{!v.tooltipStyle}" aria-hidden="{!!v.isVisible}">
         <div aura:id="tooltipwrapper">
             <div class="pointer pointer-advanced"></div>
-            <div aura:id="tooltipbody" class="tooltip-advanced tooltip-body">{!v.tooltipBody}</div>
+            <div aura:id="tooltipbody" id="{!v.domId}" class="tooltip-advanced tooltip-body">{!v.tooltipBody}</div>
         </div>
     </div>
 </aura:component>

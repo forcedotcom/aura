@@ -58,7 +58,6 @@
     <aura:handler name="matchText" action="{!c.matchText}"/>
     
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-    <aura:set attribute="labelPosition" value="hidden"/>
     <aura:handler name="listExpand" event="ui:autocompleteListExpand" action="{!c.handleListExpand}"/>
 
     <aura:if isTrue="{!v.inputType == 'inputTextArea'}">

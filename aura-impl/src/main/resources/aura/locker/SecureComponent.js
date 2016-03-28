@@ -77,6 +77,7 @@ function SecureComponent(component, key) {
         "getLocalId": SecureThing.createFilteredMethod(o, component, "getLocalId"),
         "getSuper": SecureThing.createFilteredMethod(o, component, "getSuper"),
         "getReference": SecureThing.createFilteredMethod(o, component, "getReference"),
+        "getVersion": SecureThing.createFilteredMethod(o, component, "getVersion"),
         "clearReference": SecureThing.createFilteredMethod(o, component, "clearReference"),
         "autoDestroy": SecureThing.createFilteredMethod(o, component, "autoDestroy"),
         "isConcrete": SecureThing.createFilteredMethod(o, component, "isConcrete"),

@@ -34,9 +34,6 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
 
 	public InterfaceAccessAttributeTest(String name) {
 		super(name);
-		
-		ConfigAdapter adapter = Aura.getConfigAdapter();
-        adapter.addPrivilegedNamespace("privilegedNS");
 	}
 	
 	/***********************************************************************************

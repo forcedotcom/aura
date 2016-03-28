@@ -32,9 +32,6 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
 
 	public EventAccessAttributeTest(String name) {
 		super(name);
-		
-		ConfigAdapter adapter = Aura.getConfigAdapter();
-        adapter.addPrivilegedNamespace("privilegedNS");
 	}
 	
 	/***********************************************************************************

@@ -26,8 +26,7 @@
         $A.enqueueAction(secureAction);
     },
 
-    // TODO(W-2988718): Action passed from system mode is raw Action object instead of SecureAction
-    _testDifferentNamespacedActionPassedFromSystemMode: function(cmp, event, helper) {
+    testDifferentNamespacedActionPassedFromSystemMode: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
         var facetAction = event.getParam("arguments").facetAction;
         facetAction.setCallback(this, function(a) {

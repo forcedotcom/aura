@@ -29,7 +29,8 @@
         }
     },
 
-    testDifferentNamespacedActionPassedFromSystemMode: {
+    // TODO(W-2988718): Action passed from system mode is raw Action object instead of SecureAction
+    _testDifferentNamespacedActionPassedFromSystemMode: {
         test: function(cmp) {
             var facet = cmp.find("facet");
             var facetAction = facet.get("c.cExecuteInForegroundWithReturn");

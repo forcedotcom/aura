@@ -25,7 +25,6 @@ public class ComponentDefImplUnitTest extends
 
     public ComponentDefImplUnitTest(String name) {
         super(name);
-        descriptorName = "component";
         qualifiedDescriptorName = "test:component";
     }
 

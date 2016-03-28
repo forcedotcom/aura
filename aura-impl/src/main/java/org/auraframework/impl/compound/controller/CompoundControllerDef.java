@@ -104,9 +104,4 @@ public class CompoundControllerDef extends DefinitionImpl<ControllerDef> impleme
     public boolean isLocal() {
         throw new UnsupportedOperationException("Can't access isLocal() on a compound controller");
     }
-
-    @Override
-    public String getCode() {
-        return null;
-    }
 }

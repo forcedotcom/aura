@@ -68,7 +68,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraPrivateAccessor.invoke(servlet, "doGet", request, response);
     }
 
-
+    
     /**
      * verify we response SC_NOT_FOUND when getting app.manifest where manifest is not enabled
      * @throws Exception
@@ -171,7 +171,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         context.setClient(clientWEBKIT);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
-        boolean minify = context.getMode().minify();
+        Mode mode = context.getMode();
+        final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
         DummyHttpServletRequest request = new DummyHttpServletRequest("app.css") {
@@ -214,7 +215,8 @@ public class AuraResourceServletTest extends AuraTestCase {
                 .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
-        boolean minify = context.getMode().minify();
+        Mode mode = context.getMode();
+        final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
         DummyHttpServletRequest request = new DummyHttpServletRequest("app.css") {
@@ -254,7 +256,8 @@ public class AuraResourceServletTest extends AuraTestCase {
                 .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
-        boolean minify = context.getMode().minify();
+        Mode mode = context.getMode();
+        final boolean minify = !(mode.isTestMode() || mode.isDevMode());
         final String mKey = minify ? "MIN:" : "DEV:";
 
         DummyHttpServletRequest request = new DummyHttpServletRequest("app.js") {
@@ -538,8 +541,8 @@ public class AuraResourceServletTest extends AuraTestCase {
             }
         }
     }
-
-
+    
+    
 
     private static class MyDummyHttpServletResponse extends DummyHttpServletResponse {
         StringWriter stringWriter = new StringWriter();

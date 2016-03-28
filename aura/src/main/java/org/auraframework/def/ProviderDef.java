@@ -21,13 +21,15 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
-public interface ProviderDef extends CodeDefinition {
+public interface ProviderDef extends Definition {
     @Override
     DefDescriptor<? extends ProviderDef> getDescriptor();
 
     ComponentConfig provide(DefDescriptor<? extends RootDefinition> intfDescriptor) throws QuickFixException;
 
     ComponentConfig provide(ComponentDefRefBuilder ref) throws QuickFixException;
+
+    boolean isLocal();
 
     boolean supportsRefProvide();
 }

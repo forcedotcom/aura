@@ -16,8 +16,8 @@
 package org.auraframework.impl;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +37,8 @@ import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.impl.root.component.ClientComponentClass;
+import org.auraframework.impl.root.library.ClientIncludeClass;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.service.LoggingService;
@@ -51,6 +53,7 @@ import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.JavascriptProcessingError;
+import org.auraframework.util.javascript.JavascriptWriter;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
@@ -172,9 +175,8 @@ public class ServerServiceImpl implements ServerService {
 
     @Override
     public void writeAppCss(final Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException {
-
-    	AuraContext context = Aura.getContextService().getCurrentContext();
-        boolean minify = context.getMode().minify();
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        Mode mode = context.getMode();
 
         StyleContext styleContext = context.getStyleContext();
 
@@ -208,8 +210,8 @@ public class ServerServiceImpl implements ServerService {
         keyBuilder.append("$");
 
         // minified or not
-        final String mKey = minify ? "MIN:" : "DEV:";
-        keyBuilder.append(mKey);
+        final boolean minify = !(mode.isTestMode() || mode.isDevMode());
+        keyBuilder.append(minify ? "MIN:" : "DEV:");
 
         // app uid
         DefDescriptor<?> appDesc = context.getLoadingApplicationDescriptor();
@@ -249,8 +251,7 @@ public class ServerServiceImpl implements ServerService {
     @Override
     public void writeAppSvg(DefDescriptor<SVGDef> svg, Writer out)
             throws IOException, QuickFixException {
-
-    	AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = Aura.getContextService().getCurrentContext();
 
         // build cache key
         final StringBuilder keyBuilder = new StringBuilder(64);
@@ -291,26 +292,25 @@ public class ServerServiceImpl implements ServerService {
         Aura.getSerializationService().write(svgDef, null, SVGDef.class, sb, Format.SVG.name());
         return sb.toString();
     }
-
+    
     @Override
     public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out)
             throws IOException, QuickFixException {
-
-    	AuraContext context = Aura.getContextService().getCurrentContext();
-        final boolean minify = context.getMode().minify();
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        Mode mode = context.getMode();
+        final boolean minify = !mode.prettyPrint();
+        final String mKey = minify ? "MIN:" : "DEV:";
 
         context.setPreloading(true);
         DefDescriptor<?> appDesc = context.getLoadingApplicationDescriptor();
-
-        final String mKey = minify ? "MIN:" : "DEV:";
         final String uid = context.getUid(appDesc);
         final String key = "JS:" + mKey + uid;
 
-        String cached = context.getDefRegistry().getCachedString(uid, appDesc, key,
+        String cached = context.getDefRegistry().getCachedString(uid, appDesc, key, 
         		new Callable<String>() {
 		    		@Override
 					public String call() throws Exception {
-		    			String res = getDefinitionsString(dependencies, key);
+		    			String res = getDefinitionsString(dependencies, key, minify);
 		    			//log the cache miss here
 		    			Aura.getCachingService().getStringsCache().logCacheStatus("StringsCache", "cache miss for key: "+key+";");
 		    			return res;
@@ -322,36 +322,43 @@ public class ServerServiceImpl implements ServerService {
         }
     }
 
-    private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key)
+    private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key, boolean minify)
     		throws QuickFixException, IOException {
 
         AuraContext context = Aura.getContextService().getCurrentContext();
-        boolean minify = context.getMode().minify();
         MasterDefRegistry masterDefRegistry = context.getDefRegistry();
-
         StringBuilder sb = new StringBuilder();
-        List<JavascriptProcessingError> errors = new ArrayList<>();
+        List<JavascriptProcessingError> errors = null;
 
-
-        // Append component classes.
+        // append component classes
         Collection<BaseComponentDef> componentDefs = filterAndLoad(BaseComponentDef.class, dependencies, null);
         for (BaseComponentDef def : componentDefs) {
-        	sb.append(def.getCode(minify));
-        	errors.addAll(def.getCodeErrors());
+        	ClientComponentClass clientComponentClass = new ClientComponentClass(def);
+            clientComponentClass.writeClass(sb);
             masterDefRegistry.setClientClassLoaded(def.getDescriptor(), true);
         }
 
-        // Process Libraries with a lower granularity level, to prevent duplication of external includes.
+        // append library include classes
         Collection<LibraryDef> libraryDefs = filterAndLoad(LibraryDef.class, dependencies, null);
         for (LibraryDef libraryDef : libraryDefs) {
         	List<IncludeDefRef> includeDefs = libraryDef.getIncludes();
 	        for (IncludeDefRef defRef : includeDefs) {
-                sb.append(defRef.getCode(minify));
-                errors.addAll(defRef.getCodeErrors());
-                masterDefRegistry.setClientClassLoaded(defRef.getDescriptor(), true);
+	            ClientIncludeClass clientIncludeClass = new ClientIncludeClass(defRef);
+	            clientIncludeClass.writeClass(sb);
+	        }
+            masterDefRegistry.setClientClassLoaded(libraryDef.getDescriptor(), true);
+        }
+        
+        // If requested, compile the classes.
+        if (minify) {
+            StringWriter sw = new StringWriter();
+            errors = JavascriptWriter.CLOSURE_SIMPLE.compress(sb.toString(), sw, key);
+            if (errors == null || errors.isEmpty()) {
+                sb.setLength(0);
+                sb.append(sw);
             }
         }
-
+        
         sb.append("$A.clientService.initDefs({");
 
         // append component definitions
@@ -393,15 +400,18 @@ public class ServerServiceImpl implements ServerService {
 
         sb.append("});\n\n");
 
-        // if not production instance, add all errors found during compilation,
-        // even in DEV mode, so developers are informed of errors encountered in JS.
-        if (!Aura.getConfigAdapter().isProduction()) {
-    		if (errors != null && !errors.isEmpty()) {
-    			appendCommentedCodeErrors(errors, sb);
+        // if unable to compress, add error comments to the end.
+        // ONLY if not production instance
+        if (minify) {
+            if (errors != null && !errors.isEmpty()) {
+                if (!Aura.getConfigAdapter().isProduction()) {
+                    sb.append(commentedJavascriptErrors(errors));
+                }
             }
         }
-
-        return sb.toString();
+        
+        String output = sb.toString();
+        return output;
     }
 
     @Override
@@ -452,7 +462,7 @@ public class ServerServiceImpl implements ServerService {
 	                }
             	}
             }
-
+            	
         } catch (QuickFixException qfe) {
             // This should never happen here, by the time we are filtering our set, all dependencies
             // MUST be loaded. If not, we have a serious bug that must be addressed.
@@ -467,14 +477,21 @@ public class ServerServiceImpl implements ServerService {
      * @param errors list of javascript syntax errors
      * @return commented errors
      */
-    private void appendCommentedCodeErrors(List<JavascriptProcessingError> errors, StringBuilder out) {
-        out
-        .append("/**")
-        .append(System.lineSeparator())
-        .append("Errors are preventing some components from being minimized")
-        .append(System.lineSeparator())
-        .append(errors)
-        .append("**/");
+    private StringBuilder commentedJavascriptErrors(List<JavascriptProcessingError> errors) {
+        StringBuilder errorMsgs = new StringBuilder();
+        if (errors != null && !errors.isEmpty()) {
+            errorMsgs
+            .append("/**")
+            .append(System.lineSeparator())
+            .append("There are errors preventing this file from being minimized! ")
+            .append("Start from the first error as they cascade and produce additional errors.")
+            .append(System.lineSeparator());
+            for (JavascriptProcessingError err : errors) {
+                errorMsgs.append(err);
+            }
+            errorMsgs.append("**/");
+        }
+        return errorMsgs;
     }
 
 }

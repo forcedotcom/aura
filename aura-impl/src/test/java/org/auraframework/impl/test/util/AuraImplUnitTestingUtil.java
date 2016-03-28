@@ -109,6 +109,11 @@ public class AuraImplUnitTestingUtil {
         return defaultAttributeValue;
     }
 
+    public DefDescriptor<ControllerDef> getClientControllerDescriptor() {
+        return DefDescriptorImpl.getInstance("javascript://client.controller",
+                ControllerDef.class);
+    }
+
     public DefDescriptor<RendererDef> getRendererDescriptor() {
         return DefDescriptorImpl.getInstance("js://test.renderer",
                 RendererDef.class);
@@ -429,14 +434,14 @@ public class AuraImplUnitTestingUtil {
                 ComponentDef.class), null);
     }
 
-    public ComponentDef makeComponentDef() throws QuickFixException {
+    public ComponentDef makeComponentDef() {
         return makeComponentDef(null, null, null, null, null, null, null, null,
                 null, null, null, null, false, false);
     }
 
     public ComponentDef makeComponentDef(
             DefDescriptor<ComponentDef> descriptor,
-            DefDescriptor<ComponentDef> extendsDescriptor) throws QuickFixException {
+            DefDescriptor<ComponentDef> extendsDescriptor) {
         return makeComponentDef(descriptor, null, null, null, null, null, null,
                 extendsDescriptor, null, null, false, false);
     }
@@ -448,7 +453,7 @@ public class AuraImplUnitTestingUtil {
             List<ComponentDefRef> children, Location location,
             DefDescriptor<ControllerDef> controllerDescriptor,
             DefDescriptor<ModelDef> modelDescriptor,
-            DefDescriptor<ComponentDef> extendsDescriptor) throws QuickFixException {
+            DefDescriptor<ComponentDef> extendsDescriptor) {
 
         if (attributeDefs == null) {
             attributeDefs = new HashMap<>();
@@ -505,7 +510,6 @@ public class AuraImplUnitTestingUtil {
      * A null parameter indicates you don't care what the value is, and thus it
      * replaces the parameter with a default object. If you want null values for
      * the parameter, you have to call the objects constructor directly.
-     * @throws QuickFixException
      */
     public ComponentDef makeComponentDef(
             DefDescriptor<ComponentDef> descriptor,
@@ -517,7 +521,7 @@ public class AuraImplUnitTestingUtil {
             DefDescriptor<ComponentDef> extendsDescriptor,
             Set<DefDescriptor<InterfaceDef>> interfaces,
             List<EventHandlerDef> eventHandlers, boolean isAbstract,
-            boolean isExtensible) throws QuickFixException {
+            boolean isExtensible) {
 
         ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
 
@@ -601,7 +605,6 @@ public class AuraImplUnitTestingUtil {
      * A null parameter indicates you don't care what the value is, and thus it
      * replaces the parameter with a default object. If you want null values for
      * the parameter, you have to call the objects constructor directly.
-     * @throws QuickFixException
      */
     public ComponentDef makeComponentDef(
             DefDescriptor<ComponentDef> descriptor,
@@ -615,7 +618,7 @@ public class AuraImplUnitTestingUtil {
             List<EventHandlerDef> eventHandlers,
             DefDescriptor<StyleDef> styleDescriptor,
             DefDescriptor<RendererDef> rendererDescriptor, boolean isAbstract,
-            boolean isExtensible) throws QuickFixException {
+            boolean isExtensible) {
         ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
 
         if (attributeDefs == null) {
@@ -677,7 +680,7 @@ public class AuraImplUnitTestingUtil {
             DefDescriptor<ComponentDef> extendsDescriptor,
             Set<DefDescriptor<InterfaceDef>> interfaces,
             List<EventHandlerDef> eventHandlers, boolean isAbstract,
-            boolean isExtensible) throws QuickFixException {
+            boolean isExtensible) {
         List<DefDescriptor<ControllerDef>> cd = new ArrayList<>();
         if (controllerDescriptor != null) {
             cd.add(controllerDescriptor);

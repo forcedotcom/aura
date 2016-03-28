@@ -20,9 +20,11 @@
 
     <aura:method name="testFacetFromAnotherNamespaceIsSecureComponentRef" action="{!c.testFacetFromAnotherNamespaceIsSecureComponentRef}"/>
     <aura:method name="testUnexposedPlatformAPIs" action="{!c.testUnexposedPlatformAPIs}">
-            <aura:attribute name="unexposedPlatformApis" type="List"/>
+        <aura:attribute name="unexposedPlatformApis" type="List"/>
     </aura:method>
+    <aura:method name="testGetCThrowsError" action="{!c.testGetCThrowsError}"/>
+    <aura:method name="testGetFacetActionThrowsError" action="{!c.testGetFacetActionThrowsError}"/>
 
     <div>SecureComponentRef test</div>
-    <aura:text value="aura:text component" aura:id="facet"/>
+    <ui:button label="ui:button component" aura:id="facet"/>
 </aura:component>

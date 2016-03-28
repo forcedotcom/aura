@@ -820,7 +820,10 @@ AuraInstance.prototype.handleError = function(message, e) {
             e["handled"] = true;
         }
 
-        if (e["name"] === "AuraError") {
+        if (e instanceof $A.auraFriendlyError) {
+            e.severity = e.severity || this.severity.QUIET;
+            evtArgs = {"message":e["message"],"error":e["name"],"auraError":e};
+        } else if (e instanceof $A.auraError) {
             var format = "Something has gone wrong. {0}.\nPlease try again.\n";
             var displayMessage = e.message || e.name;
             e.severity = e.severity || this.severity["ALERT"];
@@ -829,13 +832,6 @@ AuraInstance.prototype.handleError = function(message, e) {
             displayMessage += "\n" + (e.component ? "Failing descriptor: {" + e.component + "}\n" : "") + e.stackTrace;
             //#end
             dispMsg = $A.util.format(format, displayMessage);
-        }
-
-        if (e["name"] === "AuraFriendlyError") {
-            e.severity = e.severity || this.severity.QUIET;
-            evtArgs = {"message":e["message"],"error":e["name"],"auraError":e};
-        }
-        else {
             // use null error string to specify non auraFriendlyError type.
             evtArgs = {"message":dispMsg,"error":null,"auraError":e};
         }

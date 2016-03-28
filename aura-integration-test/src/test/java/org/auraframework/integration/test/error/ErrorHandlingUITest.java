@@ -30,16 +30,17 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * In prod mode, the error message has two lines:
-     *   Something has gone wrong. [MESSAGES]
+     * In prod mode, the error message has three lines:<br>
+     *   Something has gone wrong. [MESSAGES]<br>
+     *   Failing descriptor: [DESCRIPTOR]<br>
      *   Please try again.
      */
-    private static int NUM_OF_MSG_LINES_PROD_MODE = 2;
+    private static int NUM_OF_MSG_LINES_PROD_MODE = 3;
     /**
-     * In non-prod mode, the error message has three lines, excluding stack trace:
-     *   Something has gone wrong. [MESSAGES]
-     *   Failing descriptor: [DESCRIPTOR]
-     *   [STACKTRACE]
+     * In non-prod mode, the error message has three lines, excluding stack trace:<br>
+     *   Something has gone wrong. [MESSAGES]<br>
+     *   Failing descriptor: [DESCRIPTOR]<br>
+     *   [STACKTRACE]<br>
      *   Please try again.
      */
     private static int NUM_OF_MSG_LINES_NON_PROD_MODE = 3;

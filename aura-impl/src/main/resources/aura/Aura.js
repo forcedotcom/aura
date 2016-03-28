@@ -827,9 +827,9 @@ AuraInstance.prototype.handleError = function(message, e) {
             var format = "Something has gone wrong. {0}.\nPlease try again.\n";
             var displayMessage = e.message || e.name;
             e.severity = e.severity || this.severity["ALERT"];
-            displayMessage += "\n" + (e.component ? "Failing descriptor: {" + e.component + "}\n" : "");
+            displayMessage += "\n" + (e.component ? "Failing descriptor: {" + e.component + "}" : "");
             //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-            displayMessage += e.stackTrace;
+            displayMessage += "\n" + e.stackTrace;
             //#end
             dispMsg = $A.util.format(format, displayMessage);
             // use null error string to specify non auraFriendlyError type.

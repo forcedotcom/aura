@@ -150,6 +150,11 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
                             "renderingTest", "setAttributesTest", "test", "tokenSanityTest", "uitest", "utilTest",
                             "updateTest", "whitespaceBehaviorTest", "appCache")
                     .build();
+    
+    private static final Set<String> SYSTEM_TEST_PRIVILEGED_NAMESPACES = new ImmutableSortedSet.Builder<>(
+            String.CASE_INSENSITIVE_ORDER)
+                    .add("testPrivilegedNS1", "testPrivilegedNS2")
+                    .build();
 
     private Boolean isClientAppcacheEnabled = null;
     private Boolean isProduction = null;
@@ -252,6 +257,10 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         if (unprivilegedNamespaces.contains(namespace)) {
             return false;
         }
+        
+        if(SYSTEM_TEST_PRIVILEGED_NAMESPACES.contains(namespace)) {
+        	return true;
+        }
 
         if (super.isPrivilegedNamespace(namespace)) {
             return true;
@@ -305,7 +314,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
         return false;
     }
-
+    
     @Override
     public boolean isUnsecuredNamespace(String namespace) {
         return super.isUnsecuredNamespace(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace);

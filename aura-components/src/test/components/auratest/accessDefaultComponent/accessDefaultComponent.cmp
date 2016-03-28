@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="Global">
+<aura:component>
     <aura:attribute name="privateAttribute" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
     <aura:attribute name="publicAttribute" type="String" access="PUBLIC" description="public" default="PUBLIC"/>
     <aura:attribute name="globalAttribute" type="String" access="GLOBAL" description="global" default="GLOBAL"/>
@@ -23,7 +23,4 @@
      <div aura:id="attributeDiv">
     	privateAttribute:{!v.privateAttribute}; publicAttribute:{!v.publicAttribute}; globalAttribute:{!v.globalAttribute};
     </div>
-    
-    <div class="accessGlobalComponent">auratest:accessGlobalComponent</div>
-    
 </aura:component>

@@ -943,7 +943,7 @@ AuraInstance.prototype.getCallback = function(callback) {
                 $A.lastKnownError = e;
                 throw e;
             } else {
-                var errorWrapper = new $A.auraError("Uncaught error in $A.getCallback()", e);
+                var errorWrapper = new $A.auraError("Error in $A.getCallback()", e);
                 if (context && context.getDef) {
                     errorWrapper.component = context.getDef().getDescriptor().toString();
                 }

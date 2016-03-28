@@ -2,5 +2,6 @@
   "mode":"UTEST",
   "app":"test:laxSecurity",
   "test":"org.auraframework.integration.test.context.AuraContextImplTest.testSerializeWithDroppedLoaded",
-  "fwuid":"#FAKEUID#"
+  "fwuid":"#FAKEUID#",
+  "enableAccessChecks":true
 }

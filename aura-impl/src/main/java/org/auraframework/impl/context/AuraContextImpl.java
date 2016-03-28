@@ -228,7 +228,11 @@ public class AuraContextImpl implements AuraContext {
             if (started) {
                 json.writeArrayEnd();
             }
+
+            json.writeMapEntry("enableAccessChecks",enableAccessChecks);
+
             json.writeMapEnd();
+
         }
     }
 

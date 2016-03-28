@@ -102,6 +102,9 @@ public interface AuraContext {
 
     boolean isDebugToolEnabled = false;
 
+    // JBUCH: TEMPORARY FLAG FOR 202 CRUC. REMOVE IN 204.
+    boolean enableAccessChecks = true;
+
     enum Format {
         MANIFEST, CSS, JS, JSON, HTML, SVG, ENCRYPTIONKEY
     }

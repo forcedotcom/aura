@@ -83,6 +83,14 @@
         </td>
     </tr>
     <tr>
+        <td>Throw Error from Callback Function in Library Code in Component: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromCallbackFunctionInLibrary}"
+                     class="errorFromCallbackFunctionInLibraryButton"/>
+        </td>
+    </tr>
+    <tr>
         <td>Throw Error From Component Rerender: </td>
         <td>
           <ui:button label="Throw"

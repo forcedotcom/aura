@@ -79,7 +79,7 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
         RendererDef rendererDef = definitionService.getDefinition(rendererDesc);
 
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
-        goldFileText(rendererDef.getCode());
+        serializeAndGoldFile(rendererDef, "_JSRendererDef");
     }
 
     public void testSerializeJavascriptRendererDefHasNoFunction() throws Exception {
@@ -88,6 +88,6 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
         RendererDef rendererDef = definitionService.getDefinition(rendererDesc);
 
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
-        goldFileText(rendererDef.getCode());
+        serializeAndGoldFile(rendererDef, "_JSRendererDef");
     }
 }

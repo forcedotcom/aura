@@ -56,7 +56,7 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
     }
 
     @Override
-    protected LibraryDefImpl createDefinition() throws QuickFixException {
+    protected LibraryDefImpl createDefinition() {
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(startLocation);
         builder.setOwnHash(source.getHash());

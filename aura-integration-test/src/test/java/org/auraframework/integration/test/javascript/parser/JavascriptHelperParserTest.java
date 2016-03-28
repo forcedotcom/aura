@@ -27,6 +27,7 @@ import org.auraframework.impl.javascript.parser.JavascriptHelperParser;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.util.json.JsonEncoder;
 
 public class JavascriptHelperParserTest extends AuraImplTestCase {
 
@@ -98,8 +99,8 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
         assertThat(helperDef, instanceOf(JavascriptHelperDef.class));
         helperDef.validateDefinition();
 
-        String code = helperDef.getCode();
-        assertEquals("The latest function should survive.", "{\n    \"function1\":function(cmp) {var v = 2;}\n  }", code);
+        String jsonStr = JsonEncoder.serialize(helperDef);
+        assertEquals("The latest function should survive.", "{\"function1\":function(cmp) {var v = 2;}}", jsonStr);
     }
 
     public void testParseHelperWithNonFunctionElements() throws Exception {
@@ -115,8 +116,8 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
         assertThat(helperDef, instanceOf(JavascriptHelperDef.class));
         helperDef.validateDefinition();
 
-        String code = helperDef.getCode();
-        assertEquals("The latest function should survive.", "{\n    \"foo\":\"do NOthing\"\n  }", code);
+        String jsonStr = JsonEncoder.serialize(helperDef);
+        assertEquals("The latest function should survive.", "{\"foo\":\"do NOthing\"}", jsonStr);
     }
 
     /**

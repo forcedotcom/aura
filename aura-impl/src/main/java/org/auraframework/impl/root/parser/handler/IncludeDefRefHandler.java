@@ -31,6 +31,7 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.library.IncludeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -58,9 +59,9 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
     }
 
     public IncludeDefRefHandler(RootTagHandler<? extends RootDefinition> parentHandler, XMLStreamReader xmlReader,
-        Source<?> source) {
-    	super(xmlReader, source);
-    	this.parentHandler = parentHandler;
+            Source<?> source) {
+        super(xmlReader, source);
+        this.parentHandler = parentHandler;
     }
 
     @Override
@@ -79,11 +80,10 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
         if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
             throw new InvalidDefinitionException(("aura:include must specify a valid JavaScript file name."), getLocation());
         }
-        DefDescriptor<IncludeDef> descriptor = DefDescriptorImpl.getInstance(
+        builder.setDescriptor(DefDescriptorImpl.getInstance(
         		String.format("%s.%s", parentDescriptor.getNamespace(), name), 
-        		IncludeDef.class, parentDescriptor);
-        builder.setDescriptor(descriptor);
-        
+        		IncludeDef.class, parentDescriptor));
+
         String importNames = getAttributeValue(ATTRIBUTE_IMPORTS);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(importNames)) {
             List<DefDescriptor<IncludeDef>> imports = new LinkedList<>();
@@ -108,8 +108,7 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
 
         String aliases = getAttributeValue(ATTRIBUTE_ALIASES);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(aliases)) {
-        	List<String> aliasList = Arrays.asList(aliases.trim().split("\\s*\\,\\s*"));
-            builder.setAliases(aliasList);
+            builder.setAliases(AuraUtil.immutableList(Arrays.asList(aliases.trim().split("\\s*\\,\\s*"))));
         }
 
         String export = getAttributeValue(ATTRIBUTE_EXPORT);
@@ -125,8 +124,9 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
         }
 
         builder.setOwnHash(source.getHash());
-	   	return builder.build();
-    }   
+
+        return builder.build();
+    }
 
     @Override
     public Set<String> getAllowedAttributes() {

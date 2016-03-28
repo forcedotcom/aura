@@ -15,8 +15,14 @@
  */
 package org.auraframework.def;
 
-public interface IncludeDef extends CodeDefinition {
+public interface IncludeDef extends Definition {
 
 	@Override
     DefDescriptor<IncludeDef> getDescriptor();
+
+    /**
+     * Gets the JavaScript source code in the included file.
+     * @return the source code.
+     */
+    String getCode();
 }

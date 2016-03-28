@@ -24,7 +24,6 @@ import java.io.Writer;
 import java.util.EnumSet;
 
 import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Ignore;
 
 import com.google.common.collect.ImmutableList;
 
@@ -151,8 +150,6 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     /**
      * Make sure the processor regeneration stops when there are errors in the source file
      */
-    // 202: Disable JS validation since we precompile definitions
-    @Ignore
     public void testJavascriptReGenerationFails() throws Exception {
         File file = getResourceFile("/testdata/javascript/testJavascriptReGenerationFails.js");
         DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("regenerationFail", file.getParentFile(),

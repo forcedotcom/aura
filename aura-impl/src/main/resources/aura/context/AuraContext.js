@@ -44,7 +44,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.contextPath = config["contextPath"] || "";
     this.allowedGlobals = config["allowedGlobals"];
     this.globals = config["globals"];
-    this.enableAccessChecks=true;
+    this.enableAccessChecks=false;
     // JBUCH: TOGGLE LOGGING OFF BY DEFAULT IN PROD MODE
     this.logAccessFailures= true
                             // #if {"modes" : ["PRODUCTION"]}
@@ -385,6 +385,8 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     if (otherContext["fwuid"] !== this.fwuid) {
         throw new $A.auraError("framework mismatch", null, $A.severity.QUIET);
     }
+    this.enableAccessChecks=otherContext["enableAccessChecks"];
+
     this.globalValueProviders.merge(otherContext["globalValueProviders"]);
     $A.localizationService.init();
 

@@ -40,7 +40,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessGlobalComponent");
         clickCreateComponentButton();
-        verifyComponentCreated("auratest:accessGlobalComponent");
+        verifyComponentCreated("auratest:accessGlobalComponent", false);
     }
 
     /**
@@ -225,6 +225,15 @@ public class AccessChecksUITest extends WebDriverTestCase {
 
     private void verifyComponentCreated(String expected) {
         waitForElementTextPresent(getDriver().findElement(By.className("output")), expected);
+    }
+    
+    private void verifyComponentCreated(String expected, boolean exactMatch) {
+    	if(exactMatch == true) {
+    		waitForElementTextPresent(getDriver().findElement(By.className("output")), expected);
+    	} else {
+    		this.waitForElementTextContains(getDriver().findElement(By.className("output")), expected);
+    	}
+        
     }
 
     private void verifyComponentNotCreated() {

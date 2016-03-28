@@ -318,6 +318,94 @@
            }
        ]
    },
+   
+   /**************************************************************************************************
+	    Test for creating component belong to Privileged namespace starts
+	***************************************************************************************************/
+	
+	testCreateComponentWithDefaultAccessOfPrivilegedNS:{
+        test:[
+        function canCreateComponentWithDefaultAccess(cmp){
+        	var completed = false;
+        	var that = this;
+            $A.createComponent(
+            	"markup://testPrivilegedNS1:componentWithDefaultAccess", 
+            	{}, 
+            	function(newCmp){
+            		$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS1$componentWithDefaultAccess");
+            		that.componentCreated = newCmp;
+            		completed = true;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+        function cannotAccessPrivateAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.privateAttribute");
+        },
+        function cannotAccessPublicAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.publicAttribute");
+        },
+        function canAccessGlobalAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.globalAttribute");
+        	$A.test.assertEquals(actual, "GLOBAL");
+        }
+        ]
+    },
+    
+    testCreateComponentWithPublicAccessOfPrivilegedNS:{
+        test:[
+        function cannotCreateComponentWithPublicAccess(cmp){//Different
+        	var completed = false;
+        	$A.test.expectAuraError("Access Check Failed!");
+            $A.createComponent(
+            	"markup://testPrivilegedNS1:componentWithPublicAccess", 
+            	{}, 
+            	function(newCmp){//newCmp will be null
+            		completed = true;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        }
+        ]
+    },
+    
+    testCreateComponentWithGlobalAccessOfPrivilegedNS:{
+        test:[
+        function canCreateComponentWithGlobalAccess(cmp){
+        	var completed = false;
+        	var that = this;
+            $A.createComponent(
+            	"markup://testPrivilegedNS1:componentWithGlobalAccess", 
+            	{}, 
+            	function(newCmp){
+            		$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS1$componentWithGlobalAccess");
+            		that.componentCreated = newCmp;
+            		completed = true;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+        function cannotAccessPrivateAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.privateAttribute");
+        },
+        function cannotAccessPublicAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.publicAttribute");
+        },
+        function canAccessGlobalAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.globalAttribute");
+        	$A.test.assertEquals(actual, "GLOBAL");
+        }
+        ]
+    },
+    
+    
+    
+	
+	
 
    testSetNonExistentAttribute: {
        test: function(cmp) {

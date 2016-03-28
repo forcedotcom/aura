@@ -939,17 +939,14 @@ Test.Aura.AuraClientServiceTest = function() {
             location: mockLocation
         });
 
-        var targetService;
-        mockDeps(function() {
-            targetService = new Aura.Services.AuraClientService();
-        });
-
         [Fact]
         function doesNotCallLocalStorageClearWhenUpdateReady() {
             storageClearCalled = false;
             componentDefsClearCalled = false;
 
             mockDeps(function() {
+                var targetService = new Aura.Services.AuraClientService();
+                targetService.reloadPointPassed = true;
                 evtCallbacks["updateready"]();
             });
 
@@ -962,24 +959,26 @@ Test.Aura.AuraClientServiceTest = function() {
             componentDefsClearCalled = false;
 
             mockDeps(function() {
+                var targetService = new Aura.Services.AuraClientService();
+                targetService.reloadPointPassed = true;
                 evtCallbacks["updateready"]();
             });
 
             Assert.False(storageClearCalled);
         }
 
-// This test does not work correctly now
-//        [Fact]
-//        function callsComponentRegistryClearWhenUpdateReady() {
-//            storageClearCalled = false;
-//            componentDefsClearCalled = false;
-//
-//            mockDeps(function() {
-//                evtCallbacks["updateready"]();
-//            });
-//
-//            Assert.True(componentDefsClearCalled);
-//        }
+       [Fact]
+       function callsComponentRegistryClearWhenUpdateReady() {
+           storageClearCalled = false;
+           componentDefsClearCalled = false;
+           mockDeps(function() {
+                var targetService = new Aura.Services.AuraClientService();
+                targetService.reloadPointPassed = true;
+                evtCallbacks["updateready"]();
+           });
+
+           Assert.True(componentDefsClearCalled);
+       }
     }
 
     [Fixture]

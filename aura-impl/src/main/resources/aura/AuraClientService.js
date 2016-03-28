@@ -702,31 +702,31 @@ AuraClientService.prototype.dumpCachesAndReload = function() {
         return;
     }
     this.reloadFunction = function() {
-    // reload even if storage clear fails
-    var actionStorage = Action.getStorage();
-    var actionClear = actionStorage && actionStorage.isPersistent() ? actionStorage.clear() : Promise["resolve"]([]);
+        // reload even if storage clear fails
+        var actionStorage = Action.getStorage();
+        var actionClear = actionStorage && actionStorage.isPersistent() ? actionStorage.clear() : Promise["resolve"]([]);
 
-    actionClear.then(
-        undefined, // noop on success
-        function(e) {
-            $A.log("Failed to clear persistent actions cache", e);
-            // do not rethrow to return to resolve state
-        }
-    ).then(
-        function() {
-            return $A.componentService.clearDefsFromStorage();
-        }
-    ).then(
-        undefined, // noop on success
-        function(e) {
-            $A.log("Failed to clear persistent component def storage", e);
-            // do not rethrow to return to resolve state
-        }
-    ).then(
-        function() {
-            window.location.reload(true);
-        }
-    );
+        actionClear.then(
+            undefined, // noop on success
+            function(e) {
+                $A.log("Failed to clear persistent actions cache", e);
+                // do not rethrow to return to resolve state
+            }
+        ).then(
+            function() {
+                return $A.componentService.clearDefsFromStorage();
+            }
+        ).then(
+            undefined, // noop on success
+            function(e) {
+                $A.log("Failed to clear persistent component def storage", e);
+                // do not rethrow to return to resolve state
+            }
+        ).then(
+            function() {
+                window.location.reload(true);
+            }
+        );
     };
     if (this.reloadPointPassed) {
         this.reloadFunction();
@@ -1681,7 +1681,7 @@ AuraClientService.prototype.sendActionXHRs = function() {
     if (background.length) {
         this.sendAsSingle(background, background.length);
     }
-    
+
     if (deferred.length) {
         if (this.idle()) {
             this.sendAsSingle(deferred, 1);

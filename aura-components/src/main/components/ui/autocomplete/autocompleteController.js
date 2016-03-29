@@ -137,7 +137,7 @@
             if (!$A.util.isEmpty(listReferenceComponent) && !$A.util.isUndefinedOrNull(listReferenceComponent[0])) {
                 panel.set('v.referenceElement', listReferenceComponent[0].getElement());
             } else {
-                panel.set('v.referenceElement', component.find('input').getElement().querySelector('input'));
+                panel.set('v.referenceElement', component.find('input').getElement());
             }
             $A.getEvt("markup://ui:stackPanel").setParams({
                 callback: function(zIndex) {

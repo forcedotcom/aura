@@ -814,6 +814,14 @@ AuraComponentService.prototype.hasDefinition = function(descriptor) {
 
 
 /**
+ * Return the definition of the components that were not used yet (we have the def config but we haven't build the def instance)
+ * @export
+ */
+AuraComponentService.prototype.getUnusedDefinitions = function () {
+    return Object.keys(this.savedComponentConfigs);
+};
+
+/**
  * Get the component definition. If it is not available will go to the server to retrieve it.
  *
  * This method is private, to utilize it, you should use $A.getDefinition("prefix:markup");

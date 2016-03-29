@@ -69,7 +69,7 @@
                 cmp.throwsAnError();
                 $A.test.fail("Expected error when running client-side action");
             } catch (e) {
-                $A.test.assertEquals("Action failed: actionsTest$clientActionWithServerController$controller$throwsAnError [intentional error]", e.message);
+                $A.test.assertEquals("Action failed: actionsTest$clientActionWithServerController$controller$throwsAnError [Error: intentional error]", e.message);
             }
         }
     },

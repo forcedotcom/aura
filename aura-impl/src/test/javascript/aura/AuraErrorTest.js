@@ -100,4 +100,30 @@ Test.Aura.AuraErrorTest = function() {
             Assert.Equal(36, actual.length);
         }
     }
+
+    [Fixture]
+    function ToString() {
+        [Fact]
+        function ContainsMessage() {
+            var expected = "test message";
+            var target;
+
+            windowMock(function(){
+                target = new Aura.Errors.AuraError(expected);
+            });
+
+            Assert.Equal(expected, target.toString());
+        }
+
+        [Fact]
+        function ReturnsEmptyStringWhenMessageIsUndefined() {
+            var target;
+
+            windowMock(function(){
+                target = new Aura.Errors.AuraError();
+            });
+
+            Assert.Equal('', target.toString());
+        }
+    }
 }

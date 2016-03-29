@@ -90,10 +90,10 @@ function AuraError() {
         }
 
         var error = innerError || new Error(message);
-        error.name = this.name;
+        this.name = innerError ? innerError.name : this.name;
         this.lineNumber = error.lineNumber;
         this.number = error.number;
-        this.message = message + (innerError ? " [" + innerError.message + "]" : "");
+        this.message = message + (innerError ? " [" + innerError.toString() + "]" : "");
         this.stackTrace = getStackTrace(error);
         this.severity = severity;
     }
@@ -112,5 +112,8 @@ function AuraError() {
 
 AuraError.prototype = new Error();
 AuraError.prototype.constructor = AuraError;
+AuraError.prototype.toString = function() {
+    return this.message || Error.prototype.toString();
+};
 
 Aura.Errors.AuraError = AuraError;

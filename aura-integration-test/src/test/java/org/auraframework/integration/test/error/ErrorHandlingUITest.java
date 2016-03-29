@@ -30,16 +30,17 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * In prod mode, the error message has two lines:
-     *   Something has gone wrong. [MESSAGES]
+     * In prod mode, the error message has three lines:<br>
+     *   Something has gone wrong. [MESSAGES]<br>
+     *   Failing descriptor: [DESCRIPTOR]<br>
      *   Please try again.
      */
-    private static int NUM_OF_MSG_LINES_PROD_MODE = 2;
+    private static int NUM_OF_MSG_LINES_PROD_MODE = 3;
     /**
-     * In non-prod mode, the error message has three lines, excluding stack trace:
-     *   Something has gone wrong. [MESSAGES]
-     *   Failing descriptor: [DESCRIPTOR]
-     *   [STACKTRACE]
+     * In non-prod mode, the error message has three lines, excluding stack trace:<br>
+     *   Something has gone wrong. [MESSAGES]<br>
+     *   Failing descriptor: [DESCRIPTOR]<br>
+     *   [STACKTRACE]<br>
      *   Please try again.
      */
     private static int NUM_OF_MSG_LINES_NON_PROD_MODE = 3;
@@ -531,6 +532,26 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         String actualMessage = findErrorMessage();
         String expectedMsg = "Failed to initialize application";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
+    }
+
+    /**
+     * Verify that client error is handled by default handler when custom handler has error.
+     */
+    public void testErrorIsHandledByDefaultHandlerWhenCustomHandlerHasError() throws Exception {
+        // the error is handled by custom error but an error is thrown from custom handler
+        open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorInHandler=true", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app client controller";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
+
+        // at this point, the custom handler should be removed from systemError event subscribers.
+        // generate error again to see the error still can be handled by default handler.
+        findAndClickElement(ERROR_CLOSE_LOCATOR);
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
+        actualMessage = findErrorMessage();
         assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 

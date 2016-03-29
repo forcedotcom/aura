@@ -98,7 +98,7 @@ function AuraInspectorDefinitionsList(devtoolsPanel) {
                 if(isComponentDef(descriptor)) {
                     command = "$auraTemp = $A.componentService.getDef('" + descriptor + "'); console.log('$auraTemp = ', $auraTemp);";
                 } else {
-                    command = "$auraTemp = $A.eventService.getEventDef('" + descriptor + "'); console.log('$auraTemp = ', $auraTemp);";
+                    command = "$auraTemp = $A.eventService.getDef('" + descriptor + "'); console.log('$auraTemp = ', $auraTemp);";
                 }
                 chrome.devtools.inspectedWindow.eval(command);
             }
@@ -122,7 +122,7 @@ function AuraInspectorDefinitionsList(devtoolsPanel) {
         if(isComponentDef(descriptor)) {
             command = "$A.util.json.encode($A.componentService.getDef('" + descriptor + "'));";
         } else if(isEventDef(descriptor)) {
-            command = "$A.util.json.encode($A.eventService.getEventDef('" + descriptor + "'));";
+            command = "$A.util.json.encode($A.eventService.getDef('" + descriptor + "'));";
         }
 
         chrome.devtools.inspectedWindow.eval(command, function(data, exceptionInfo){

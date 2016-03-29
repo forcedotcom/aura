@@ -103,13 +103,13 @@
                 if(referenceEl) {
                     panelEl.style.visibility = 'hidden';
                     
-                    requestAnimationFrame(function() {
+                    requestAnimationFrame($A.getCallback(function() {
                         panelEl.style.visibility = 'visible';
                         //need to set focus after animation frame
                         if (autoFocus) {
                             self.lib.panelLibCore.setFocus(cmp);
                         }
-                    });
+                    }));
                 } else {
                     panelEl.style.visibility = 'visible';
                     if (autoFocus) {
@@ -128,10 +128,10 @@
             this.position(cmp, referenceEl, function() {
                 self.positioningLib.panelPositioning.reposition();
                 cmp.positioned = true;
-                requestAnimationFrame(function() {
+                requestAnimationFrame($A.getCallback(function() {
                     panelEl.style.opacity = '1';
                     self.lib.panelLibCore.show(cmp, conf);
-                });
+                }));
                 
             });
         } else {

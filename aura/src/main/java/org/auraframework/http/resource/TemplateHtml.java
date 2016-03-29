@@ -43,7 +43,7 @@ public class TemplateHtml extends TemplateResource {
     protected boolean shouldCacheHTMLTemplate(DefDescriptor<? extends BaseComponentDef> appDefDesc,
             HttpServletRequest request, AuraContext context) throws QuickFixException {
         if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
-            Boolean isOnePageApp = ((ApplicationDef) appDefDesc.getDef()).isOnePageApp();
+            Boolean isOnePageApp = ((ApplicationDef)appDefDesc.getDef()).isOnePageApp();
             if (isOnePageApp != null) {
                 return isOnePageApp.booleanValue();
             }

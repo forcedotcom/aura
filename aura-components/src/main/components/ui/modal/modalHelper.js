@@ -88,10 +88,10 @@
         };
 
         if(useTransition) {
-            setTimeout(function() {
+            setTimeout($A.getCallback(function() {
                 panel.style.opacity = 1;
                 self.lib.panelLibCore.show(cmp, config);
-            }, 50);
+            }), 50);
         } else {
             self.lib.panelLibCore.show(cmp, config);
         }

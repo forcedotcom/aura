@@ -464,7 +464,7 @@ AuraClientService.prototype.throwExceptionEvent = function(resp) {
 };
 
 AuraClientService.prototype.fireDoneWaiting = function() {
-    $A.getEvt("markup://aura:doneWaiting").fire();
+    $A.eventService.getNewEvent("markup://aura:doneWaiting").fire();
 };
 
 /**
@@ -1978,7 +1978,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 
     // legacy code, spinner actually relies on the waiting event, need a proper fix
     setTimeout(function() {
-        $A.getEvt("markup://aura:waiting").fire();
+        $A.eventService.getNewEvent("markup://aura:waiting").fire();
     }, 1);
 
     this.lastSendTime = Date.now();

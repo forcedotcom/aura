@@ -725,7 +725,6 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
         var app = $A.clientService["init"](config, token, $A.util.getElement(container));
         $A.setRoot(app);
         Aura.bootstrapMark("createAndRenderAppReady");
-
         if (!$A.initialized) {
             $A.initialized = true;
             $A.addDefaultErrorHandler(app);
@@ -763,7 +762,7 @@ AuraInstance.prototype.finishInit = function(doNotInitializeServices) {
         $A.util.removeClass(document.body, "loading");
         delete $A.globalValueProviders;
         this["finishedInit"] = true;
-        $A.getEvt("markup://aura:initialized").fire();
+        $A.eventService.getNewEvent("markup://aura:initialized").fire();
         $A.metricsService.applicationReady();
     }
 
@@ -844,9 +843,9 @@ AuraInstance.prototype.handleError = function(message, e) {
 
     if ($A.initialized) {
         // fire the event later so the current handleError could return even if an error occurs in the event handler.
-        window.setTimeout($A.getCallback(function() {
-            $A.getEvt('markup://aura:systemError').fire(evtArgs);
-        }), 0);
+        window.setTimeout(function() {
+            $A.eventService.getNewEvent('markup://aura:systemError').fire(evtArgs);
+        }, 0);
     } else {
         if ($A.showErrors()) {
             $A.message(dispMsg);
@@ -1301,7 +1300,7 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
         if(descriptor && descriptor.indexOf("e.") !== -1) {
             descriptor = descriptor.replace("e.", "");
             isEvent = true;
-            def =this.eventService.getEventDef(descriptor);
+            def =this.eventService.getDef(descriptor);
         } else {
             def = this.componentService.getDef(descriptor);
             isEvent = false;
@@ -1310,7 +1309,7 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
             returnDefinitions[c] = def;
         } else {
             // detect without access checks
-            if((isEvent && !this.eventService.hasDefinition(descriptor)) ||
+            if((isEvent && !this.eventService.getEventDef(descriptor)) ||
                     (!isEvent && !this.componentService.getComponentDef(this.componentService.createDescriptorConfig(descriptor)))) {
 
                 requestDefinitions.push(descriptors[c]);
@@ -1341,7 +1340,7 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
                 if(pendingMap.hasOwnProperty(requestedDescriptor)) {
                     pendingInfo = pendingMap[requestedDescriptor];
                     if(pendingInfo["isEvent"]) {
-                        returnDefinitions[pendingInfo["position"]] = this.eventService.getEventDef(requestedDescriptor) || null;
+                        returnDefinitions[pendingInfo["position"]] = this.eventService.getDef(requestedDescriptor) || null;
                     } else {
                         returnDefinitions[pendingInfo["position"]] = this.componentService.getDef(requestedDescriptor) || null;
                     }

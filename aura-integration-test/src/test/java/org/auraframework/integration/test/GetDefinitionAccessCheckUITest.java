@@ -35,9 +35,6 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
         getMockConfigAdapter().setLockerServiceEnabled(false);
     }
 
-    /*
-     * TODO: (W-2799335) Disabled this test since $A.getDeifinition() doesn't do access check for Event
-     */
     public void _testGetEventDefinitionWithoutAccess() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("clientApiTest");
         open("/clientApiTest/getDefinition.cmp");
@@ -58,9 +55,6 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
         assertEquals("null", actual);
     }
 
-    /*
-     * TODO: (W-2799335) Disabled this test since $A.getDeifinitions() doesn't do access check for Event
-     */
     public void _testGetMutilpleDefinitionsWithoutAccess() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("clientApiTest");
         open("/clientApiTest/getDefinition.cmp");

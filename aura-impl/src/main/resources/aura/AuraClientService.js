@@ -902,7 +902,7 @@ AuraClientService.prototype.setConnected = function(isConnected) {
         return;
     }
 
-    var e = $A.get(isDisconnected ? "e.aura:connectionLost" : "e.aura:connectionResumed");
+    var e = $A.eventService.getNewEvent(isDisconnected ? "aura:connectionLost" : "aura:connectionResumed");
     if (e) {
         this._isDisconnected = isDisconnected;
         e.fire();

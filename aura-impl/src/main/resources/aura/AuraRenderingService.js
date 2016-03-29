@@ -825,7 +825,7 @@ AuraRenderingService.prototype.addAuraClass = function(cmp, element){
 
         $A.util.addClass(element, className);
         if (element["tagName"]) {
-            element["auraClass"] = $A.util.buildClass(element["auraClass"],className);
+            element.setAttribute("data-aura-class",$A.util.buildClass(element.getAttribute("data-aura-class"),className));
         }
     } else if (concrete.isInstanceOf("aura:html")) { // only check html cmps (presuming this is faster) TODONM find a better way to short-circuit here
         // this is for nested flavorable elements (not at top level of cmp).
@@ -833,7 +833,7 @@ AuraRenderingService.prototype.addAuraClass = function(cmp, element){
         if (flavorClassName) {
             $A.util.addClass(element, flavorClassName);
             if (element["tagName"]) {
-                element["auraClass"] = $A.util.buildClass(element["auraClass"],flavorClassName);
+                element.setAttribute("data-aura-class",$A.util.buildClass(element.getAttribute("data-aura-class"),flavorClassName));
             }
         }
     }

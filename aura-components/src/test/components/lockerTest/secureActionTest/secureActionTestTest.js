@@ -35,5 +35,11 @@
             var facetAction = facet.get("c.cExecuteInForegroundWithReturn");
             cmp.testDifferentNamespacedActionPassedFromSystemMode(facetAction);
         }
-    }
+    },
+    
+    testGlobalControllerBlocked: {
+        test: function(cmp) {
+            cmp.testGlobalControllerBlocked();
+        }
+    },
 })

@@ -31,7 +31,14 @@
         var facetAction = event.getParam("arguments").facetAction;
         testUtils.assertStartsWith("SecureThing", facetAction.toString(), "Action from another component passed from " +
                 "system mode should be SecureThing");
-        testUtils.assertUndefined(facetAction.setCallback, "Action.js APIs should not be defined action we don't have access to");
+        testUtils.assertUndefined(facetAction.setCallback, "Action.js APIs should not be defined on action we don't have access to");
+    },
+
+    testGlobalControllerBlocked: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var action = $A.get("c.aura://ComponentController.getComponent");
+        testUtils.assertStartsWith("SecureThing", action.toString(), "Action from global controller should be SecureThing");
+        testUtils.assertUndefined(action.setCallback, "Action.js APIs should not be defined on action we don't have access to");
     },
 
     clientActionForTest: function(cmp) {

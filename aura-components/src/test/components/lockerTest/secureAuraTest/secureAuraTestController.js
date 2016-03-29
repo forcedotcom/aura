@@ -53,20 +53,7 @@
         testUtils.assertStartsWith("SecureComponent", secureComponent.toString(), "Expected $A.getComponent on a component"
                 + " from the same namespace to be a SecureComponent");
     },
-    
-    testEnqueueAction: function(cmp) {
-        var testUtils = cmp.get("v.testUtils");
-        var action = $A.get("c.aura://ComponentController.getComponent");
-        action.setParams({name: "markup://aura:text"});
-        action.setCallback(this, function (a) {
-            //testUtils.assertStartsWith("SecureAction", a.toString());
-            testUtils.assertEquals("SUCCESS", a.getState(), "Action did not return in a SUCCESS state");
-            testUtils.assertEquals("markup://aura:text", a.getReturnValue().componentDef.descriptor, "Unexpected action return value");
-            cmp.set("v.testComplete", true);
-        });
-        $A.enqueueAction(action);
-    },
-    
+
     testUtilExposedOnSecureAura: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         // Verify 1 exposed API and 1 API not exposed in Locker

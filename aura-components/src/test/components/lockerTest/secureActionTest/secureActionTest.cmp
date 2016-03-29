@@ -25,6 +25,7 @@
     <aura:method name="testDifferentNamespacedActionPassedFromSystemMode" action="{!c.testDifferentNamespacedActionPassedFromSystemMode}">
         <aura:attribute name="facetAction" type="Object"/>
     </aura:method>
+    <aura:method name="testGlobalControllerBlocked" action="{!c.testGlobalControllerBlocked}"/>
 
     <div>SecureAction test</div>
     <actionsTest:serverAction aura:id="facet"/>

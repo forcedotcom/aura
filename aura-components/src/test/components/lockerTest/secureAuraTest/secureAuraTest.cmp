@@ -29,7 +29,6 @@
     <aura:method name="testGetGVP" action="{!c.testGetGVP}"/>
     <aura:method name="testGetDifferentNamespaceComponentReturnsSecureComponentRef" action="{!c.testGetDifferentNamespaceComponentReturnsSecureComponentRef}"/>
     <aura:method name="testGetSameNamespaceComponentReturnsSecureComponent" action="{!c.testGetSameNamespaceComponentReturnsSecureComponent}"/>
-    <aura:method name="testEnqueueAction" action="{!c.testEnqueueAction}"/>
     <aura:method name="testUtilExposedOnSecureAura" action="{!c.testUtilExposedOnSecureAura}"/>
     <aura:method name="testUtilHasClassAPI" action="{!c.testUtilHasClassAPI}"/>
     <aura:method name="testDynamicallyCreatedComponentDifferentNamespaceIsSecureComponentRef" action="{!c.testDynamicallyCreatedComponentDifferentNamespaceIsSecureComponentRef}"/>

@@ -45,14 +45,16 @@
      * Start at last possible page, then verify that last paging elements acknowledge the change.
      * Row creation and rendering takes too long for FF need to reduce size of page.
      */
-    testWithLargeDataFF : {
-    	labels : ["extended"],
-    	browsers : ["Firefox"],
-        attributes : {"pageSize" : 1500, "currentPage" : 1},
-        test : function(cmp){
-            this.verifyDataGridUsingPager(cmp,[true, true, false, false], 1500, "1 - 1500 of 7500");
-        }
-    },
+//    TODO : commenting out because test takes too long to run. Need to increase performance of
+//    component creation/re-rendering in dataGrid for FF 
+//    testWithLargeDataFF : {
+//    	labels : ["extended"],
+//    	browsers : ["Firefox"],
+//        attributes : {"pageSize" : 1500, "currentPage" : 1},
+//        test : function(cmp){
+//            this.verifyDataGridUsingPager(cmp,[true, true, false, false], 1500, "1 - 1500 of 7500");
+//        }
+//    },
     
     /**
      * Verifying that dataGrid is accessible

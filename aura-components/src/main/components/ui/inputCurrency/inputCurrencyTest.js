@@ -25,6 +25,17 @@
             $A.test.assertEquals("$1,234.00", value, "Element value does not equal expected");
         }
     },
+    
+    /**
+     * Test that the format is set by default
+     */
+    testDefaultFormat : {
+    	test : function(component) {
+    		var expectedFormat = "¤#,##0.00";
+    		var format = component.get('v.format');
+    		$A.test.assertEquals(expectedFormat, format, "The actual format did not match the expected format");
+    	} 	
+    },
 
     /**
      * Test currency formatted correctly with custom format.

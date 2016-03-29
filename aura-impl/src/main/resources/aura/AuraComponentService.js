@@ -189,7 +189,8 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
         "componentDef" : this.createDescriptorConfig(type),
         "attributes"   : { "values" : attributes },
         "localId"      : attributes && attributes["aura:id"],
-        "flavor"       : (attributes && attributes["aura:flavor"])
+        "flavor"       : (attributes && attributes["aura:flavor"]),
+        "skipCreationPath": true
     };
 
     this.createComponentPrivAsync(config, callback);

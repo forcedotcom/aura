@@ -323,6 +323,30 @@
     },
 
     /**
+     * When requesting a component via an action, the returned config should be consumed on the client in the Action
+     * callback. If it is not, a warning should be logged.
+     */
+    testCreateComponentAfterGetComponent : {
+        test : function(cmp) {
+            var actual = null;
+            var action = $A.get("c.aura://ComponentController.getComponent");
+            action.setParams({
+                "name" : "markup://loadLevelTest:serverComponent"
+            });
+            action.setCallback(this, function(a) {
+                // Should be fine.
+                $A.createComponent("aura:html", {}, function(auraHtml) {
+                    actual = auraHtml;
+                });
+            });
+
+            $A.enqueueAction(action);
+            
+            $A.test.addWaitFor(true, function() { return !!actual; }, function(){});
+        }
+    },
+
+    /**
      * Storable actions without a callback are a special case and should have their unused component configs cleared
      * automatically without an error or warning.
      */

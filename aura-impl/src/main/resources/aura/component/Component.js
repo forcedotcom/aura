@@ -1676,6 +1676,7 @@ Component.prototype.unrender = function() {
  * Get the expected version number of a component based on its caller's requiredVersionDefs
  * Note that for various rendering methods, we cannot rely on access stack.
  * We use creation version instead.
+ * @platform
  * @export
  */
 Component.prototype.getVersion = function() {

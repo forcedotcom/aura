@@ -119,6 +119,18 @@
         	$A.test.assertEquals('rtl', component.find('span').getElement().dir, "Label not rendered with specified text direction.");
         }
     },
+    testLabelNotRequired:{
+        attributes:{iconImgSrc:'/auraFW/resources/aura/images/bug.png'},
+        test:function(component){
+            var button = component.find('button');
+            var img = button.getElement().children[0];
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(img), "Button not rendered with img tag");
+            var span = component.find("span");
+            $A.test.assertUndefinedOrNull(span, "No visible label span should appear when label is null");
+            var hidden = component.find("hidden");
+            $A.test.assertUndefinedOrNull(hidden, "No hidden label span should appear when label is null");
+        }
+    },
     //TODO W-1014086
     _testRerender:{
         attributes:{label:"Like", disabled:false, hasIcon:true, iconImgSrc:'/auraFW/resources/aura/images/bug.png'},

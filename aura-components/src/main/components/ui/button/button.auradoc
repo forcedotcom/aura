@@ -21,7 +21,7 @@
 			A <code>ui:button</code> component represents a button element that executes an action defined by a controller. Clicking the button triggers the client-side controller method set for the <code>press</code> event.
 			The button can be created in several ways.
 		</p>
-		<p>A text-only button has only the required <code>label</code> attribute set on it.</p>
+		<p>A text-only button has only the <code>label</code> attribute set on it.</p>
 		<pre>&lt;ui:button label="Find"/></pre>
 		<p>An image-only button uses both the <code>label</code> and <code>labelClass</code> attributes with CSS.</p>
 		<pre>&lt;!-- Component markup -->

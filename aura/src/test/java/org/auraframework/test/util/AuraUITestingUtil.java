@@ -767,13 +767,13 @@ public class AuraUITestingUtil {
                 new ExpectedCondition<String>() {
                     @Override
                     public String apply(WebDriver d) {
-                        String dump = (String) getRawEval("return (window.$A && window.$A.test) ? window.$A.test.getDump() : 'window.$A.test not present in browser';");
-                        if (dump.isEmpty()) {
+                        Object dump = getRawEval("return (window.$A && window.$A.test) ? window.$A.test.getDump() : 'window.$A.test not present in browser';");
+                        if (dump == null || dump.toString().isEmpty()) {
                             dump = "no extra test information to display.";
                         }
                         logger.info(logPrefix + " ---->AuraUITestingUtil.waitForAuraTestComplete timed_out "
                                 + (System.currentTimeMillis() - start));
-                        return "Test timed out on server.\n" + dump;
+                        return "Test timed out on server.\n" + dump.toString();
                     }
                 },
                 timeoutSecs,

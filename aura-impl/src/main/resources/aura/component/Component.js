@@ -1786,7 +1786,7 @@ Component.prototype.setupComponentDef = function(config) {
 
     var key = getLockerSecret(this.componentDef, "key");
     if (key) {
-        setLockerSecret(this, key);
+        setLockerSecret(this, "key", key);
     }
 };
 

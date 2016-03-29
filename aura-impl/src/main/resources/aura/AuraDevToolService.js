@@ -1107,7 +1107,8 @@ var AuraDevToolService = function() {
                      errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, inputTextTags));
                      errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, textAreaTags));
                      errorArray = errorArray.concat(accessAideFuncs.inputLabelAide(lbls, selectTags));
-                     errorArray = errorArray.concat(accessAideFuncs.matchLabelToInput(lbls));
+                     // Disabling in 202 - re-enable this test in 204
+                     // errorArray = errorArray.concat(accessAideFuncs.matchLabelToInput(lbls));
 
                      return accessAideFuncs.formatOutput(inputLabelMsg, errorArray);
                  }

@@ -15,6 +15,8 @@
  */
 package org.auraframework.integration.test.root.parser.handler;
 
+import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -367,6 +369,7 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     		//System.out.println(e.getMessage());
         }
     }
+    
     @Test
     public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace

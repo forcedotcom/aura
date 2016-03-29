@@ -31,9 +31,6 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
 
     public ApplicationAccessAttributeEnforcementTest(String name) throws Exception {
         super(name);
-        
-        ConfigAdapter adapter = Aura.getConfigAdapter();
-        adapter.addPrivilegedNamespace("privilegedNS");
     }
     
     /**

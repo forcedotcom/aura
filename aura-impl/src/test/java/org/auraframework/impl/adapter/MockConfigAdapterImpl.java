@@ -153,7 +153,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     
     private static final Set<String> SYSTEM_TEST_PRIVILEGED_NAMESPACES = new ImmutableSortedSet.Builder<>(
             String.CASE_INSENSITIVE_ORDER)
-                    .add("testPrivilegedNS1", "testPrivilegedNS2")
+                    .add("privilegedNS", "testPrivilegedNS1", "testPrivilegedNS2")
                     .build();
 
     private Boolean isClientAppcacheEnabled = null;

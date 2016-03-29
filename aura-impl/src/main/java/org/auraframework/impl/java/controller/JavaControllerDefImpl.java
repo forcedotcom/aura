@@ -146,4 +146,9 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
     public boolean isLocal() {
     	return true;
     }
+
+    @Override
+    public String getCode() {
+        return null;
+    }
 }

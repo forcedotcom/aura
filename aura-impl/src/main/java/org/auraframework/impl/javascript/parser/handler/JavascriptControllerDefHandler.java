@@ -15,20 +15,21 @@
  */
 package org.auraframework.impl.javascript.parser.handler;
 
+import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.javascript.controller.JavascriptActionDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef.Builder;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
-import org.auraframework.system.Location;
+import org.auraframework.impl.util.JavascriptTokenizer;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.JsonHandlerProvider;
 
@@ -49,31 +50,37 @@ public class JavascriptControllerDefHandler extends JavascriptHandler<Controller
     }
 
     @Override
-    protected JavascriptControllerDef createDefinition(Map<String, Object> map) {
+    protected JavascriptControllerDef createDefinition(String code) throws IOException, QuickFixException {
         setDefBuilderFields(builder);
-        for (Entry<String, Object> entry : map.entrySet()) {
-            Object value = entry.getValue();
-            if (value != null && value instanceof JsFunction) {
-                String name = entry.getKey();
-                ((JsFunction) value).setName(name);
-                JavascriptActionDef action = createActionDef(name, (JsFunction) value);
-                builder.addAction(name, action);
-            }
-        }
+        new JavascriptTokenizer(getParentDescriptor(), code, getLocation()).process(builder);
+
+        Map<String, Object> map = codeToMap(code);
+        Map<String, JavascriptActionDef> actions = createActionMap(map);
+        builder.addActions(actions);
+
+        String recode = mapToCode(map);
+        builder.setCode(recode);
+
         return builder.build();
     }
 
-    private JavascriptActionDef createActionDef(String name, JsFunction f) {
+    private Map<String, JavascriptActionDef> createActionMap(Map<String, Object> map) {
+		Map<String, JavascriptActionDef> actions = new TreeMap<>();
+	    for (Entry<String, Object> entry : map.entrySet()) {
+	        Object value = entry.getValue();
+	        if (value != null && value instanceof JsFunction) {
+	            String name = entry.getKey();
+	            JavascriptActionDef action = createActionDef(name);
+	            actions.put(name, action);
+	        }
+	    }
+	    return actions;
+    }
+
+    private JavascriptActionDef createActionDef(String name) {
         JavascriptActionDef.Builder builder = new JavascriptActionDef.Builder();
         builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getDescriptor(), ActionDef.class));
-        builder.function = f;
-        builder.setLocation(new Location(source.getSystemId(), f.getLine(), f.getCol(), source.getLastModified()));
         return builder.build();
-    }
-
-    @Override
-    public void addExpressionReferences(Set<PropertyReference> propRefs) {
-        builder.expressionRefs.addAll(propRefs);
     }
 
     @Override

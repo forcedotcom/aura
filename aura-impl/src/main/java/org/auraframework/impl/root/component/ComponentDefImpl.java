@@ -29,38 +29,38 @@ import org.auraframework.util.json.Json;
  * Once they are created, they can only be replaced, never changed.
  */
 public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> implements ComponentDef {
-    private static final long serialVersionUID = 6449560899515044182L;
+	private static final long serialVersionUID = 6449560899515044182L;
 
-    protected ComponentDefImpl(Builder builder) {
-        super(builder);
-    }
+	protected ComponentDefImpl(Builder builder) {
+		super(builder);
+	}
 
-    /**
-     * The Descriptor for the component that all non-root components eventually
-     * must extend. Similar to java.lang.Object in java.
-     */
-    public static final DefDescriptor<ComponentDef> PROTOTYPE_COMPONENT = DefDescriptorImpl.getInstance(
-            "markup://aura:component", ComponentDef.class);
+	/**
+	 * The Descriptor for the component that all non-root components eventually
+	 * must extend. Similar to java.lang.Object in java.
+	 */
+	public static final DefDescriptor<ComponentDef> PROTOTYPE_COMPONENT = DefDescriptorImpl
+			.getInstance("markup://aura:component", ComponentDef.class);
 
-    public static class Builder extends BaseComponentDefImpl.Builder<ComponentDef> implements ComponentDefBuilder {
+	public static class Builder extends BaseComponentDefImpl.Builder<ComponentDef> implements ComponentDefBuilder {
 
-        public Builder() {
-            super(ComponentDef.class);
-        }
+		public Builder() {
+			super(ComponentDef.class);
+		}
+
+		@Override
+		public ComponentDef build() {
+			finish();
+			return new ComponentDefImpl(this);
+		}
 
         @Override
-        public ComponentDef build() {
-            finish();
-            return new ComponentDefImpl(this);
+        public DefDescriptor<ComponentDef> getDefaultExtendsDescriptor() {
+            return ComponentDefImpl.PROTOTYPE_COMPONENT;
         }
-    }
+	}
 
-    @Override
-    public DefDescriptor<ComponentDef> getDefaultExtendsDescriptor() {
-        return ComponentDefImpl.PROTOTYPE_COMPONENT;
-    }
-
-    @Override
-    protected void serializeFields(Json json) throws IOException {
-    }
+	@Override
+	protected void serializeFields(Json json) throws IOException {
+	}
 }

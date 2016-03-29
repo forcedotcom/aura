@@ -57,7 +57,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
         TestSuiteDef testSuite = new JavascriptTestSuiteParser().parse(descriptor, source);
         assertTrue(testSuite instanceof JavascriptTestSuiteDef);
         // Step 2: Gold file the Json output of the test suite object
-        serializeAndGoldFile(testSuite, "_JSTestSuite");
+        goldFileText(testSuite.getCode());
     }
 
     /**
@@ -120,7 +120,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
         assertTrue(testSuite instanceof JavascriptTestSuiteDef);
 
         // Step 2: Gold file the Json output of the test suite object
-        serializeAndGoldFile(testSuite, "_JSTestSuite");
+        goldFileText(testSuite.getCode());
 
         // Step 3: Verify the properties of the JavascriptTestSuiteDef object
         // OBject that is to be verified, Qualified name,

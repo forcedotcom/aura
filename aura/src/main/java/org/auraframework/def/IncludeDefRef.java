@@ -17,27 +17,27 @@ package org.auraframework.def;
 
 import java.util.List;
 
-public interface IncludeDefRef extends Definition {
+public interface IncludeDefRef extends Definition, MinifiedCodeDefinition {
 
 	DefDescriptor<IncludeDef> getReferenceDescriptor();
 
 	/**
      * Gets the list of imports.
-     * 
+     *
      * @return the client descriptor.
      */
 	List<DefDescriptor<IncludeDef>> getImports();
 
 	/**
      * Gets the list of JavaScript identifiers to alias the imports inside the module.
-     * 
+     *
      * @return the list of aliases identifiers.
      */
 	List<String> getAliases();
 
 	/**
      * Gets the JavaScript identifier return from the module.
-     * 
+     *
      * @return the export identifier.
      */
 	String getExport();

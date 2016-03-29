@@ -67,6 +67,11 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
     }
 
     @Override
+    public String getCode() {
+        return null;
+    }
+
+    @Override
     public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
         LoggingService loggingService = Aura.getLoggingService();
         loggingService.stopTimer(LoggingService.TIMER_AURA);

@@ -24,8 +24,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
 import org.auraframework.impl.system.DefinitionImpl;
-import org.auraframework.system.SubDefDescriptor;
-import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 
 /**
@@ -33,14 +31,9 @@ import org.auraframework.util.json.Json;
  */
 public class JavascriptActionDef extends DefinitionImpl<ActionDef> implements ActionDef {
     private static final long serialVersionUID = 2121724820799466774L;
-    private final JsFunction function;
 
     protected JavascriptActionDef(Builder builder) {
         super(builder);
-        this.function = builder.function;
-        SubDefDescriptor<?, ?> desc = (SubDefDescriptor<?, ?>) descriptor;
-        function.setName(String.format("%s$%s_%s", desc.getParentDescriptor().getNamespace(), desc
-                .getParentDescriptor().getName(), desc.getName()));
     }
 
     @Override
@@ -63,7 +56,7 @@ public class JavascriptActionDef extends DefinitionImpl<ActionDef> implements Ac
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeValue(function);
+        throw new UnsupportedOperationException("client-side Javascript actions do not serialize back from the server");
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<ActionDef> {
@@ -71,8 +64,6 @@ public class JavascriptActionDef extends DefinitionImpl<ActionDef> implements Ac
         public Builder() {
             super(ActionDef.class);
         }
-
-        public JsFunction function;
 
         @Override
         public JavascriptActionDef build() {

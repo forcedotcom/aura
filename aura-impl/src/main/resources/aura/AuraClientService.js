@@ -144,6 +144,9 @@ AuraClientService = function AuraClientService () {
     this.namespaces={internal:{},privileged:{}};
     this.lastSendTime = Date.now();
 
+    // This will be only changed after the unload event
+    this._appNotTearingDown = true;
+
     // XHR timeout (milliseconds)
     this.xhrTimeout = undefined;
 
@@ -466,6 +469,16 @@ AuraClientService.prototype.throwExceptionEvent = function(resp) {
 AuraClientService.prototype.fireDoneWaiting = function() {
     $A.eventService.getNewEvent("markup://aura:doneWaiting").fire();
 };
+
+/**
+ * This will be called by the unload event
+ *
+ * @private
+ */
+AuraClientService.prototype.tearDown = function() {
+    this._appNotTearingDown = false;
+};
+
 
 /**
  * make the current thread be 'in aura collections'
@@ -1921,10 +1934,12 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     auraXHR.length = qs.length;
     auraXHR.request = this.createXHR();
     auraXHR.marker = Aura.Services.AuraClientServiceMarker++;
-    auraXHR.request["open"](method, url, true);
-    if ("withCredentials" in auraXHR.request) {
+    auraXHR.request["open"](method, url, this._appNotTearingDown);
+
+    if (this._appNotTearingDown && "withCredentials" in auraXHR.request) {
         auraXHR.request["withCredentials"] = true;
     }
+
     //
     // Careful! On some browsers "onreadystatechange" is a write only property, so make
     // sure that we only write it. And for safety's sake, just write it once.

@@ -722,6 +722,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
 AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
     if (!$A["hasErrors"]) {
         Aura.bootstrapMark("createAndRenderAppInit");
+        $A.addTearDownHandler();
         var app = $A.clientService["init"](config, token, $A.util.getElement(container));
         $A.setRoot(app);
         Aura.bootstrapMark("createAndRenderAppReady");
@@ -735,6 +736,14 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
             });
         }
     }
+};
+
+/**
+ * Add default handler to aura:systemError event
+ * @private
+ */
+AuraInstance.prototype.addTearDownHandler = function () {
+    window.addEventListener('unload', $A.getCallback($A.clientService.tearDown.bind($A.clientService)));
 };
 
 /**

@@ -15,6 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component render="client">
-    {!v.body}
+<aura:component
+    extensible="true"
+    provider="java://org.auraframework.components.dependency.dependencyProvider">
+    <aura:attribute name="qualifiedName" type="String"/>
 </aura:component>

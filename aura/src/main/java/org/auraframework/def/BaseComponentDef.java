@@ -50,6 +50,15 @@ public interface BaseComponentDef extends RootDefinition, MinifiedCodeDefinition
     List<DependencyDef> getDependencies();
 
     /**
+     * Get the set of dependencies tracked by the server.
+     * 
+     * These only dependencies that the client should indicates has having or not, using the 'loaded"
+     * context attribute during communications.
+     *
+     */
+    List<DefDescriptor<ComponentDef>> getTrackedDependencies();
+
+    /**
      * Get the event handlers for the component.
      *
      * @return all the handlers on this component, including those inherited

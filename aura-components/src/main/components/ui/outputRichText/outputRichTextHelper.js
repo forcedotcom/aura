@@ -46,6 +46,7 @@
 
     sanitize: function(component, value) {
         if ($A.util.isEmpty(value)) {
+        	component.set("v.displayValue", '');
             return;
         }
 

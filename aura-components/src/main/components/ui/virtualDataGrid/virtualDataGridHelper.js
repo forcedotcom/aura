@@ -323,10 +323,11 @@
     appendVirtualRows: function (cmp, items) {
         $A.metricsService.markStart(this.NS, this.NAME + ".appendVirtualRows", {auraid : cmp.getGlobalId()});
         var fragment  = document.createDocumentFragment(),
-            container = this.getGridBody(cmp);
+            container = this.getGridBody(cmp),
+            offset = cmp.get("v.items").length;
 
         for (var i = 0; i < items.length; i++) {
-            var virtualItem = this._generateVirtualRow(cmp, items[i], i);
+            var virtualItem = this._generateVirtualRow(cmp, items[i], offset + i);
             cmp._virtualItems.push(virtualItem);
             fragment.appendChild(virtualItem);
         }

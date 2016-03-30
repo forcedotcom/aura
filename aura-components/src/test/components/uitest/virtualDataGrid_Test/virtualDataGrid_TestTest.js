@@ -135,6 +135,8 @@
             $A.test.assertEquals("Peter Parker 1", $A.test.getText(elements[this.DOM][100].children[0]), "Insert failed (dom check): Element at index 0 incorrect");
             // check items
             $A.test.assertEquals("Peter Parker 1", elements[this.ITEMS][100].name, "Insert failed (items check): Element at index 0 incorrect");
+            // check cached index
+            $A.test.assertEquals(100, elements[this.DOM][100]._index, "Insert failed (index check): Cached index incorrect");
         }]
     },
     

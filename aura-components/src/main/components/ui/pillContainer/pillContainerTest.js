@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	owner:"sle",
+	owner:"ctatlah",
 
 
     //make sure show more has invisible class on load

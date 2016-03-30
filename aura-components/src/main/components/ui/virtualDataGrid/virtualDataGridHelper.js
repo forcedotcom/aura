@@ -17,10 +17,8 @@
     NS: "UIPERF",
     NAME: "ui:virtualDataGrid",
     
-    DELEGATED_EVENTS: [
-        'click',
-        'keydown'
-    ],
+    DELEGATED_EVENTS : [],
+    
     DEFAULT_TEMPLATES : {
         row    : 'tr',
         column : 'td',
@@ -157,13 +155,16 @@
     */
     createEventDelegates: function (cmp, container) {
         var self     = this,
-            events   = this.DELEGATED_EVENTS,
+            events   = cmp.get("v.delegatedEvents"),
             delegate = function (e) {
                 self._eventDelegator(cmp, e);
             };
         
-        for (var i = 0; i < events.length; i++) {
-            container.addEventListener(events[i], delegate, false);
+        if (!$A.util.isEmpty(events)) {
+        	events = events.split(',');
+        	for (var i = 0; i < events.length; i++) {
+                container.addEventListener(events[i], delegate, false);
+            }
         }
     },
     _getRenderingComponentForElement: function (domElement) {

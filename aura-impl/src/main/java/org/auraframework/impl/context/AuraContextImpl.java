@@ -68,6 +68,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class AuraContextImpl implements AuraContext {
+    // JBUCH: TEMPORARY FLAG FOR 202 CRUC. REMOVE IN 204.
+    protected boolean enableAccessChecks = true;
+
     private static final Logger logger = Logger.getLogger(AuraContextImpl.class);
 
     private static class DefSorter implements Comparator<Definition> {
@@ -229,7 +232,8 @@ public class AuraContextImpl implements AuraContext {
                 json.writeArrayEnd();
             }
 
-            json.writeMapEntry("enableAccessChecks",enableAccessChecks);
+            // JBUCH: TEMPORARY CRUC FIX FOR 202. REMOVE IN 204
+            json.writeMapEntry("enableAccessChecks",((AuraContextImpl)ctx).enableAccessChecks);
 
             json.writeMapEnd();
 

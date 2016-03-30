@@ -95,8 +95,8 @@
  				className='';
             }
 
-			if (!$A.util.isUndefinedOrNull(element.auraClass)) {
-				className += (" " + element.auraClass);
+			if (!$A.util.isUndefinedOrNull(element.getAttribute("data-aura-class"))) {
+				className += (" " + element.getAttribute("data-aura-class"));
 			}
 
 			if (element["className"] !== className) {

@@ -61,9 +61,9 @@
      */
     testCssClassNames : {
         test : function(cmp) {
-            var inputTextClasses = cmp.find('inputText').getElement().auraClass;
-            var outputTextClasses = cmp.find('outputText').getElement().auraClass;
-            var pClasses = cmp.find('p').getElement().auraClass;
+            var inputTextClasses = cmp.find('inputText').getElement().getAttribute("data-aura-class");
+            var outputTextClasses = cmp.find('outputText').getElement().getAttribute("data-aura-class");
+            var pClasses = cmp.find('p').getElement().getAttribute("data-aura-class");
 
             $A.test.assertEquals("uiInput uiInputText uiInput--default uiInput--input clientApiTestCssStyleTest", $A.util.trim(inputTextClasses),
                     "Incorrect class names present on inputText.");

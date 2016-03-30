@@ -288,7 +288,9 @@
     },
 
     _isEqual: function(object1, object2) {
-        //todo: comparing on id makes more sense
+        if (object1.id) {
+            return object1.id === object2.id;
+        }
         return (object1.label.toLowerCase() === object2.label.toLowerCase());
     },
 

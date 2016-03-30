@@ -19,49 +19,12 @@
 	setUp: function(cmp){
 		this.componentCreated = undefined; 
     },
-    
-
+	
 	
 	/*****************************************************************************************
 	    Test for creating component belong to a DIFFERENT privileged namespace starts
 	******************************************************************************************/
 	
-    testCreateComponentWithPrivilegedAccessOfAnotherPrivilegedNS:{
-        test:[
-        function canCreateComponentWithDefaultAccess(cmp){ //Different
-        	//so the default access level for privileged namespace is Global?
-        	var completed = false;
-        	var that = this;
-            $A.createComponent(
-            	"markup://testPrivilegedNS2:componentWithPrivilegedAccess", 
-            	{}, 
-            	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS2$componentWithPrivilegedAccess");
-            		that.componentCreated = newCmp;
-            		completed = true;
-            	}
-            );
-            $A.test.addWaitFor(true, function(){ return completed; });
-        }, 
-        function cannotAccessPrivateAttribute(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
-        	var actual = this.componentCreated.get("v.privateAttribute");
-        },
-        function cannotAccessPublicAttribute(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
-        	var actual = this.componentCreated.get("v.publicAttribute");
-        },
-        function canAccessGlobalAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.globalAttribute");
-        	$A.test.assertEquals(actual, "GLOBAL");
-        }, 
-        function canAccessPrivilegedAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.privilegedAttribute");
-        	$A.test.assertEquals(actual, "PRIVILEGED");
-        }
-        ]
-    },
-    
     testCreateComponentWithDefaultAccessOfAnotherPrivilegedNS:{
         test:[
         function canCreateComponentWithDefaultAccess(cmp){ //Different
@@ -90,10 +53,6 @@
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
-        },
-        function canAccessPrivilegedAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.privilegedAttribute");
-        	$A.test.assertEquals(actual, "PRIVILEGED");
         }
         ]
     },
@@ -143,10 +102,6 @@
         function cannotAccessGlobalAttribute(cmp) { 
         	var actual = this.componentCreated.get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
-        },
-        function canAccessPrivilegedAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.privilegedAttribute");
-        	$A.test.assertEquals(actual, "PRIVILEGED");
         }
         ]
     },
@@ -183,10 +138,6 @@
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
-        },
-        function canAccessPrivilegedAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.privilegedAttribute");
-        	$A.test.assertEquals(actual, "PRIVILEGED");
         }
         ]
     },
@@ -219,10 +170,6 @@
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
-        },
-        function canAccessPrivilegedAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.privilegedAttribute");
-        	$A.test.assertEquals(actual, "PRIVILEGED");
         }
         ]
     },
@@ -255,10 +202,6 @@
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
-        },
-        function canAccessPrivilegedAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.privilegedAttribute");
-        	$A.test.assertEquals(actual, "PRIVILEGED");
         }
         ]
     },
@@ -268,42 +211,6 @@
 	/**************************************************************************************************
 	    Test for creating component belong to Internal/System namespace starts
 	***************************************************************************************************/
-    
-    testCreateComponentWithPrivilegedAccessOfSystemNS:{
-        test:[
-        function canCreateComponentWithDefaultAccess(cmp){//Different
-        	var completed = false;
-        	var that = this;
-            $A.createComponent(
-            	"markup://auratest:accessPrivilegedComponent", 
-            	{}, 
-            	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"auratest$accessPrivilegedComponent");
-            		that.componentCreated = newCmp;
-            		completed = true;
-            	}
-            );
-            $A.test.addWaitFor(true, function(){ return completed; });
-        },
-        function cannotAccessPrivateAttribute(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
-        	var actual = this.componentCreated.get("v.privateAttribute");
-        },
-        function cannotAccessPublicAttribute(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
-        	var actual = this.componentCreated.get("v.publicAttribute");
-        },
-        function canAccessGlobalAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.globalAttribute");
-        	$A.test.assertEquals(actual, "GLOBAL");
-        },
-        function canAccessPrivilegedAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.privilegedAttribute");
-        	$A.test.assertEquals(actual, "PRIVILEGED");
-        }
-        ]
-    },
-    
 	testCreateComponentWithDefaultAccessOfSystemNS:{
         test:[
         function canCreateComponentWithDefaultAccess(cmp){//Different
@@ -331,10 +238,6 @@
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
-        },
-        function canAccessPrivilegedAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.privilegedAttribute");
-        	$A.test.assertEquals(actual, "PRIVILEGED");
         }
         ]
     },
@@ -383,10 +286,6 @@
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
-        },
-        function canAccessPrivilegedAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.privilegedAttribute");
-        	$A.test.assertEquals(actual, "PRIVILEGED");
         }
         ]
     }

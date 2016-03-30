@@ -20,7 +20,6 @@ import java.io.ObjectInputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
-import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
@@ -165,18 +164,6 @@ public class DefinitionAccessImpl implements DefinitionAccess {
             throw new InvalidAccessValueException("Invalid access attribute value \"" + access.name() + "\"");
         }
         if (access == Access.PRIVILEGED && !(isInternalNamespace || isPrivilegedNamespace)) {
-        	System.out.println("namespace:"+namespace.toString()+" is not internal nor privileged. error out.");
-        	System.out.println("++++++++++++++++++++++++++++++++++++++ ");
-        	Set<String> pns = config.getPrivilegedNamespaces();
-        	for(String str : pns) {
-        		System.out.print(str+";");
-        	}
-        	System.out.println("\n++++++++++++++++++++++++++++++++++++++\nInternal Namespace \n");
-        	Set<String> ins = config.getInternalNamespaces();
-        	for(String str : ins) {
-        		System.out.print(str+";");
-        	}
-        	System.out.println("\n++++++++++++++++++++++++++++++++++++++ ");
             throw new InvalidAccessValueException("Invalid access attribute value \"" + access.name() + "\"");
         }
         if (access != null && accessMethod != null) {

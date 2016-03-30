@@ -3,7 +3,7 @@
         var testUtils = cmp.get("v.testUtils");
         var documentFragment = document.createDocumentFragment();
         testUtils.assertStartsWith("SecureElement", documentFragment.toString(), "Expected document.createDocumentFragment()"
-                + " to return a SecureElement");
+                + " to return a SecureElement"); 
     },
     
     testCreateScriptElementReturnsSecureScript: function(cmp) {
@@ -76,5 +76,10 @@
         //testUtils.assertTrue($A.util.isArray(result), "Expected document.querySelectorAll('*') to return an Array");
         testUtils.assertStartsWith("SecureThing", result[0].toString(), "Expected document.querySelectorAll('*') to" +
                 " return SecureThing elements");
+    },
+    
+    testDocumentBodyConstructorNotExposed: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertUndefined(document.body.constructor, "document.body.constructor should not be defined in Locker");
     }
 })

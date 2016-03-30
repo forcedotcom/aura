@@ -36,5 +36,11 @@
         test: function(cmp) {
             cmp.testGetCThrowsError();
         }
+    },
+    
+    testAddValueProviderExploit: {
+        test: function(cmp) {
+            cmp.testAddValueProviderExploit();
+        }
     }
 })

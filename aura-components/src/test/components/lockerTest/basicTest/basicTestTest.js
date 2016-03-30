@@ -89,6 +89,18 @@
         }
     },
 
+    testContextOfController: {
+        test: function(cmp) {
+            cmp.testContextOfController();
+        }
+    },
+
+    testDefineGetterExploit: {
+        test: function(cmp) {
+            cmp.testDefineGetterExploit();
+        }
+    },
+
     testAttemptToEvalToWindow: {
         test: function(cmp) {
         	cmp.testEvalBlocking();

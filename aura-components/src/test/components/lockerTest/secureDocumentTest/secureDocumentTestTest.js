@@ -68,5 +68,11 @@
         test: function(cmp) {
             cmp.testQuerySelectorAllReturnsSecureNodeList();
         }
+    },
+    
+    testDocumentBodyConstructorNotExposed: {
+        test: function(cmp) {
+            cmp.testDocumentBodyConstructorNotExposed();
+        }
     }
 })

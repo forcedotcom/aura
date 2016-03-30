@@ -15,12 +15,25 @@
 
     testActionThatErrors: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        var secureAction = cmp.get("c.throwException");
+        var secureAction = cmp.get("c.throwExceptionNoLineNums");
         secureAction.setCallback(this, function(a) {
             var error = a.getError();
             testUtils.assertTrue(error && error.length > 0, "Expected Action error not present in callback");
-            testUtils.assertTrue(error[0].message.indexOf("intentionally generated") >= 0, "Unexpected Action error");
+            testUtils.assertTrue(error[0].message.indexOf("throwExceptionNoLineNums") >= 0, "Unexpected Action error");
             testUtils.assertEquals("ERROR", a.getState());
+            cmp.set("v.testComplete", true);
+        });
+        $A.enqueueAction(secureAction);
+    },
+
+    testSetParams: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var secureAction = cmp.get("c.getString");
+        secureAction.setParams({
+            "param": "foo"
+        });
+        secureAction.setCallback(this, function(a) {
+            testUtils.assertEquals("foo", a.getReturnValue());
             cmp.set("v.testComplete", true);
         });
         $A.enqueueAction(secureAction);

@@ -56,15 +56,6 @@
         }
     },
 
-    testEnqueueAction: {
-        test: function(cmp) {
-            cmp.testEnqueueAction();
-            $A.test.addWaitFor(true, function() {
-                return !!cmp.get("v.testComplete");
-            });
-        }
-    },
-
     testGetCallback: {
         test: function(cmp) {
             cmp.testGetCallback();

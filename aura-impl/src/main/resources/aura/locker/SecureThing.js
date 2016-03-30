@@ -85,7 +85,11 @@ SecureThing.filterEverything = function (st, raw) {
 			var key = getLockerSecret(st, "key");
 			var hasAccess = $A.lockerService.util.hasAccess(st, raw);
 			$A.assert(key, "A secure object should always have a key.");
-			if ($A.util.isComponent(raw)) {
+			if ($A.util.isAction(raw)) {
+				swallowed = hasAccess ?
+						SecureAction(raw, key) : SecureThing(raw, key);
+				mutated = raw !== swallowed;
+			} else if ($A.util.isComponent(raw)) {
 				swallowed = hasAccess ?
 						SecureComponent(raw, key) : SecureComponentRef(raw, key);
 				mutated = raw !== swallowed;

@@ -78,6 +78,12 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
 
     var ctx = $A.getContext();
     this.callingCmp = ctx ? ctx.getCurrentAccess() : null;
+
+    // propagating locker key when possible
+    var key = cmp && getLockerSecret(cmp, "key");
+    if (key) {
+        setLockerSecret(this, "key", key);
+    }
 }
 
 // Static methods:
@@ -964,7 +970,7 @@ Action.prototype.setAbortable = function() {
 };
 
 /**
- * [Deprecated] [Returns undefined] 
+ * [Deprecated] [Returns undefined]
  *
  * @public
  * @returns {string} undefined

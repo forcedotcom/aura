@@ -294,6 +294,22 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
 
+    /**
+     * Privileged access tests start
+     * I won't add more tests to this, because our access='privileged' only works on client side, see W-2996170. 
+     */
+    @Test
+    public void _testApplicationWithPrivilegedNamespaceIncludeComponentWithSystemNamespaceInMarkupAccessPrivileged() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component access='Privileged'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        descriptor.getDef();
+    }
     
     /**
      * Default access tests start

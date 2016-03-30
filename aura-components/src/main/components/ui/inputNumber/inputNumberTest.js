@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 ({
+    EMPTY_STRING : '',
     /**
      * Test when value is not assigned.
      */
@@ -338,7 +339,6 @@
      * internal v.value should be undefined
      * displayed value should be empty
      */
-    EMPTY_STRING : '',
     testSetInvalidValue: {
         attributes: {value: 12},
         test: [function (cmp) {
@@ -346,7 +346,7 @@
         }, function(cmp){
             var inputValue = cmp.getElement().value;
             $A.test.assertEquals(this.EMPTY_STRING, inputValue, "Cmp: input value should be empty string");
-            $A.test.assertEquals(undefined, cmp.get("v.value"), "Cmp: value should be undefined.");
+            $A.test.assertEquals(null, cmp.get("v.value"), "Cmp: value should be undefined.");
         }]
     }
 })// eslint-disable-line semi

@@ -86,13 +86,10 @@
         }
     },
     
-    handleKeyAction: function(component, event, helper) {
-
+    handleKeyAction: function(component, event) {
         var concrete = component.getConcreteComponent();
         var concreteHelper = concrete.getDef().getHelper();
         concreteHelper.handleKeyAction(component, event);
-        var domEvent = event.getParam("domEvent");
-        helper.fireEvent(component, domEvent, helper);
     },
     
     handleMatchDone: function(component, event) {

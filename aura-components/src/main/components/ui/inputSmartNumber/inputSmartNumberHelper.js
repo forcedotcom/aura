@@ -117,7 +117,10 @@
         }
     },
     setValueEmpty : function (cmp) {
-        cmp.set('v.value',undefined);
+        if (cmp.get('v.value') !== null) {
+            cmp.set('v.value', null);
+            this.fireChangeEvent(cmp);
+        }
     },
     formatInputValue : function (cmp) {
         var lib = this.inputNumberLibrary.number;

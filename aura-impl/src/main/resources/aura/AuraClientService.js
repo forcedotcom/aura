@@ -226,7 +226,7 @@ AuraClientService.prototype.setQueueSize = function(queueSize) {
 /**
  * Mark all currently queued (but not sent) actions as 'deferred'.
  *
- * This is intended for use when componenes are kept 'alive' after they are no longer on the screen for better
+ * This is intended for use when components are kept 'alive' after they are no longer on the screen for better
  * performance going back and forth between various displays.
  */
 AuraClientService.prototype.deferPendingActions = function() {

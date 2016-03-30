@@ -24,8 +24,10 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.impl.controller.ComponentController.AuraClientException;
 import org.auraframework.impl.test.util.LoggingTestAppender;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
+@UnAdaptableTest("SFDCExceptionAdapter is used on SFDC side. No need to run this in autobuild.")
 public class ExceptionAdapterImplTest extends AuraImplTestCase {
 
     private Logger logger;
@@ -60,6 +62,7 @@ public class ExceptionAdapterImplTest extends AuraImplTestCase {
 
         exceptionAdapter.handleException(clientException, null);
         List<LoggingEvent> logs = appender.getLog();
+        assertEquals("Expecting a log line.", 1, logs.size());
         String logString = logs.get(0).getMessage().toString();
 
         String[] actual = logString.split("\\n");

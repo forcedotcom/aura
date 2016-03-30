@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 package org.auraframework.integration.test.http;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +34,7 @@ import org.auraframework.http.AuraResourceRewriteFilter;
 import org.auraframework.http.AuraResourceServlet;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
@@ -47,7 +46,9 @@ import org.auraframework.test.util.DummyHttpServletRequest;
 import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
-
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockHttpSession;
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
  * conditions. I would like this test to be in the "aura" module (vice "aura-impl"), but the configuration there isn't
@@ -55,6 +56,8 @@ import org.auraframework.util.test.util.AuraPrivateAccessor;
  * for now.
  */
 public class AuraResourceServletTest extends AuraTestCase {
+
+    ContextService contextService = Aura.getContextService();
 
     public static class SimulatedErrorException extends RuntimeException {
         private static final long serialVersionUID = 411181168049748986L;
@@ -322,106 +325,67 @@ public class AuraResourceServletTest extends AuraTestCase {
      * Verify SVG requests return a correct etag.
      */
     public void testSvgCacheUsesEtag() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload",
-                ApplicationDef.class);
-        AuraContext context = Aura.getContextService()
-                .startContext(Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
+        DefDescriptor<ApplicationDef> appDesc =
+                definitionService.getDefDescriptor("markup://appCache:withpreload", ApplicationDef.class);
+        AuraContext context = contextService.startContext(
+                Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
         DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
         String etag = definitionService.getDefinition(svgDesc).getOwnHash();
-
-        final String uid = context.getDefRegistry().getUid(null, svgDesc);
+        String uid = context.getDefRegistry().getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
 
-        DummyHttpServletRequest request = new DummyHttpServletRequest("resources.svg") {
-            @Override
-            public long getDateHeader(String name) {
-                return -1;
-            }
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest(null, "resources.svg");
+        mockRequest.setAttribute(AuraResourceServlet.ORIG_REQUEST_URI, "resources.svg");
+        mockRequest.addParameter(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
+        //If referer is empty we assume the image is not viewed from within a webpage
+        mockRequest.addHeader("referer", "ANotNullString");
+        mockRequest.setSession(new MockHttpSession());
 
-            @Override
-            public String getHeader(String name) {
-                if (name.equalsIgnoreCase("referer")) {
-                    //If referer is empty we assume the image is not viewed from within a webpage
-                    return "ANotNullString";
-                }
-                return super.getHeader(name);
-            }
-        };
-        request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
-        HttpServletResponse response = new DummyHttpServletResponse() {
-            Map<String, String> headers = new HashMap<>();
-            @Override
-            public void setHeader(String name, String value) {
-                headers.put(name.toLowerCase(), value);
-            }
-
-            @Override
-            public String getHeader(String name) {
-                return headers.get(name.toLowerCase());
-            }
-        };
+        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
         AuraResourceServlet servlet = new AuraResourceServlet();
-        doGet(servlet, request, response);
+        doGet(servlet, mockRequest, mockResponse);
 
-        String etagResponce = response.getHeader("etag");
-        assertEquals(etag, etagResponce);
-        //For etag to work properly, we need to "disable" the browser from caching it permanently.
-        assertEquals("no-cache", response.getHeader("cache-control"));
-        //If referer is not null, the image should be sent as a embedded image.
+        List<String> headers = mockResponse.getHeaders("etag");
+        assertTrue("Failed to find expected value in header.", headers.contains(etag));
+
+        // For etag to work properly, we need to "disable" the browser from caching it permanently.
+        headers = mockResponse.getHeaders("cache-control");
+        assertEquals("no-cache", mockResponse.getHeader("cache-control"));
+
+        // If referer is not null, the image should be sent as a embedded image.
         // IE not an attachment.
-        assertNull(response.getHeader("Content-Disposition"));
+        headers = mockResponse.getHeaders("Content-Disposition");
+        assertTrue(headers.isEmpty());
     }
 
     /**
      * Verify SVG servlet returns 304 if etag's match.
      */
     public void testSvgReturns304() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload",
-                ApplicationDef.class);
-        AuraContext context = Aura.getContextService()
-                .startContext(Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
+        DefDescriptor<ApplicationDef> appDesc =
+                definitionService.getDefDescriptor("markup://appCache:withpreload", ApplicationDef.class);
+        AuraContext context = contextService.startContext(
+                Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
         DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
-        final String etag = definitionService.getDefinition(svgDesc).getOwnHash();
-
-        final String uid = context.getDefRegistry().getUid(null, svgDesc);
+        String etag = definitionService.getDefinition(svgDesc).getOwnHash();
+        String uid = context.getDefRegistry().getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
 
-        DummyHttpServletRequest request = new DummyHttpServletRequest("resources.svg") {
-            @Override
-            public long getDateHeader(String name) {
-                return -1;
-            }
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest(null, "resources.svg");
+        mockRequest.setSession(new MockHttpSession());
+        mockRequest.setAttribute(AuraResourceServlet.ORIG_REQUEST_URI, "resources.svg");
+        mockRequest.addHeader("if-none-match", etag);
+        //If referer is empty we assume the image is not viewed from within a webpage
+        mockRequest.addHeader("referer", "ANotNullString");
+        mockRequest.addParameter(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
 
-            @Override
-            public String getHeader(String name) {
-                if (name.equalsIgnoreCase("if-none-match")) {
-                    return etag;
-                } else if (name.equalsIgnoreCase("referer")) {
-                    //If referer is empty we assume the image is not viewed from within a webpage
-                    return "ANotNullString";
-                }
-                return super.getHeader(name);
-            }
-        };
-        request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
-        HttpServletResponse response = new DummyHttpServletResponse() {
-            int status;
-            @Override
-            public int getStatus() {
-                return status;
-            }
-
-            @Override
-            public void setStatus(int sc) {
-                status = sc;
-            }
-        };
+        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
         AuraResourceServlet servlet = new AuraResourceServlet();
-        doGet(servlet, request, response);
+        doGet(servlet, mockRequest, mockResponse);
 
-        assertEquals(304, response.getStatus());
+        assertEquals(304, mockResponse.getStatus());
     }
 
     /**
@@ -429,40 +393,27 @@ public class AuraResourceServletTest extends AuraTestCase {
      * This is to prevent any scripts hidden in the SVG from running on the local domain
      */
     public void testSvgNoReferer() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload",
-                ApplicationDef.class);
-        AuraContext context = Aura.getContextService()
-                .startContext(Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
+        DefDescriptor<ApplicationDef> appDesc =
+                definitionService.getDefDescriptor("markup://appCache:withpreload", ApplicationDef.class);
+        AuraContext context = contextService.startContext(
+                Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
         DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
-
-        final String uid = context.getDefRegistry().getUid(null, svgDesc);
+        String uid = context.getDefRegistry().getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
 
-        DummyHttpServletRequest request = new DummyHttpServletRequest("resources.svg") {
-            @Override
-            public long getDateHeader(String name) {
-                return -1;
-            }
-        };
-        request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
-        HttpServletResponse response = new DummyHttpServletResponse() {
-            Map<String, String> headers = new HashMap<>();
-            @Override
-            public void setHeader(String name, String value) {
-                headers.put(name.toLowerCase(), value);
-            }
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest(null, "resources.svg");
+        mockRequest.setAttribute(AuraResourceServlet.ORIG_REQUEST_URI, "resources.svg");
+        mockRequest.addParameter(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
+        mockRequest.setSession(new MockHttpSession());
 
-            @Override
-            public String getHeader(String name) {
-                return headers.get(name.toLowerCase());
-            }
-        };
+        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
         AuraResourceServlet servlet = new AuraResourceServlet();
-        doGet(servlet, request, response);
+        doGet(servlet, mockRequest, mockResponse);
 
-        assertNotNull("Expected content disposition", response.getHeader("Content-Disposition"));
-        assertTrue(response.getHeader("Content-Disposition").contains("attachment; filename"));
+        List<String> headers = mockResponse.getHeaders("Content-Disposition");
+        assertFalse("Failed to find any header for Content-Disposition", headers.isEmpty());
+        assertTrue(headers.contains("attachment; filename=resources.svg"));
     }
 
     /**

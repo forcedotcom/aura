@@ -18,9 +18,7 @@ package org.auraframework.integration.test.components.ui.button;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.PerfTest;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 
 @PerfTest
 public class ButtonUITest extends WebDriverTestCase {
@@ -29,16 +27,9 @@ public class ButtonUITest extends WebDriverTestCase {
         super(name);
     }
 
-    public void testButtonLabelRequired() throws Exception {
-        final String errorMsg = "COMPONENT markup://uitest:button_LabelRequiredTest is missing required attribute 'label'";
-        openNoAura("/uitest/button_LabelRequiredTest.cmp");
-
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return getAuraUITestingUtil().getAuraErrorMessage().contains(errorMsg);
-            }
-        }, "Required label error not displayed");
+    public void testButtonLabelNotRequired() throws Exception {
+        open("/uitest/button_LabelRequiredTest.cmp");
+        getAuraUITestingUtil().assertNoAuraErrorMessage(null);
     }
 
     public void testDomEventAttributeOnPressEvent() throws Exception {

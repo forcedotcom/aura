@@ -22,7 +22,7 @@
     <aura:attribute name="buttonType" type="String" default="button" access="GLOBAL" />
     <aura:attribute name="class" type="String" default="" access="GLOBAL" description="A CSS style to be attached to the button. This style is added in addition to base styles output by the component."/>
     <aura:attribute name="variant" type="String" default="" description="Replacement CSS class(es) to output in place of injected classes"/>
-    <aura:attribute name="label" type="String" required="true" access="GLOBAL" description="The text displayed on the button. Corresponds to the value attribute of the rendered HTML input element."/>
+    <aura:attribute name="label" type="String" access="GLOBAL" description="The text displayed on the button. Corresponds to the value attribute of the rendered HTML input element."/>
     <aura:attribute name="labelClass" type="String" default="" access="GLOBAL" description="A CSS style to be attached to the label. This style is added in addition to base styles output by the component."/>
     <aura:attribute name="labelDisplay" type="Boolean" default="true" description="Specifies whether the label is displayed. If not, we add a hidden text for accessibility purpose."/>
     <aura:attribute name="iconImgSrc" type="String" default="" description="The absolute or relative URL of the icon to display on the button. The image's alt attribute is set to the value of the button’s label attribute."/>
@@ -55,7 +55,7 @@
 
     <!--
         NOTE: This events will be added programatically to avoid extra DOM handlers
-        This won't be neccesary once we apply delegation events at the framework level
+        This won't be necessary once we apply delegation events at the framework level
 
         onclick="{!c.press}"
         onkeydown="{!c.handleKeydown}"
@@ -78,14 +78,16 @@
             <img src="{! v.iconImgSrc != '' ? v.iconImgSrc : '/auraFW/resources/aura/s.gif'}" class="{! v.iconClass + ' icon bLeft' }" alt=""/>
         </aura:if>
 
-        <aura:if isTrue="{!v.labelDisplay}">
+        <aura:if isTrue="{!v.labelDisplay &amp;&amp; !empty(v.label)}">
             <span aura:id="span" class="{! v.labelClass + ' label bBody truncate' }" dir="{!v.labelDir}">
                 {!v.label}
             </span>
             <aura:set attribute="else">
-                <span aura:id="hidden" class="assistiveText">
-                    {!v.label}
-                </span>
+                <aura:if isTrue="{!!empty(v.label)}">
+                    <span aura:id="hidden" class="assistiveText">
+                        {!v.label}
+                    </span>
+                </aura:if>
             </aura:set>
         </aura:if>
         {!v.body}

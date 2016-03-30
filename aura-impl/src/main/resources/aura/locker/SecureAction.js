@@ -26,8 +26,8 @@ function SecureAction(action, key) {
     });
     Object.defineProperties(o, {
         "setCallback": SecureThing.createFilteredMethod(o, action, "setCallback"),
-        "setParams": SecureThing.createFilteredMethod(o, action, "addHandler"),
-        "setParam": SecureThing.createFilteredMethod(o, action, "addHandler"),
+        "setParams": SecureThing.createFilteredMethod(o, action, "setParams"),
+        "setParam": SecureThing.createFilteredMethod(o, action, "setParam"),
         "getParams": SecureThing.createFilteredMethod(o, action, "getParams"),
         "getParam": SecureThing.createFilteredMethod(o, action, "getParam"),
         "getCallback": SecureThing.createFilteredMethod(o, action, "getCallback"),

@@ -73,6 +73,28 @@
         }
     },
 
+    testSetTimeoutNonFunctionParamExploit: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        try {
+            setTimeout({ bind: function() { 
+                return function() { 
+                    alert(this); 
+                };
+            }});
+            testUtils.fail("setTimeout with a non-function parameter should throw error");
+        } catch (e) {
+            testUtils.assertStartsWith("TypeError", e.toString(), "Unexpected error. Expected TypeError, got " + e);
+        }
+    },
+
+    testComponentUnfilteredFromUserToSystemMode: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var secureComponent = cmp.find("innerCmp");
+        // Make sure it's really a SecureComponent before setting
+        testUtils.assertStartsWith("SecureComponent", secureComponent.toString());
+        cmp.set("v.componentStore", secureComponent);
+    },
+
 	testEvalBlocking : function(cmp, event, helper) {
 		var testUtils = cmp.get("v.testUtils");
 		

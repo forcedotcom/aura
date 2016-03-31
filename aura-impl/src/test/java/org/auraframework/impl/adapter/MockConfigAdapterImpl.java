@@ -18,7 +18,6 @@ package org.auraframework.impl.adapter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -74,7 +73,6 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
             List<String> list = (List<String>) baseline.getScriptSources();
             AuraContext context = Aura.getContextService().getCurrentContext();
             if (context != null && context.isTestMode()) {
-                list = removeNonceCspEntry(list);
                 list.add(CSP.UNSAFE_EVAL);
             }
             return list;
@@ -83,21 +81,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         @Override
         public Collection<String> getStyleSources() {
             List<String> list = (List<String>) baseline.getStyleSources();
-            AuraContext context = Aura.getContextService().getCurrentContext();
-            if (context != null && context.isTestMode()) {
-                list = removeNonceCspEntry(list);
-            }
             return list;
-        }
-
-        private List<String> removeNonceCspEntry(List<String> csp) {
-            for (Iterator<String> iterator = csp.iterator(); iterator.hasNext();) {
-                String entry = iterator.next();
-                if (entry != null && entry.startsWith("'nonce")) {
-                    iterator.remove();
-                }
-            }
-            return csp;
         }
 
         @Override

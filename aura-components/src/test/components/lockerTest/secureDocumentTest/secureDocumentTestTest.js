@@ -74,5 +74,15 @@
         test: function(cmp) {
             cmp.testDocumentBodyConstructorNotExposed();
         }
+    },
+    
+    /**
+     * Prevent malicious users from passing in a carefully designed object to SecureDocument.createElement() that may
+     * break out of the Locker.
+     */
+    testCreateElementCoersionExploit: {
+        test: function(cmp) {
+            cmp.testCreateElementCoersionExploit();
+        }
     }
 })

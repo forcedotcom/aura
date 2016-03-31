@@ -661,6 +661,13 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
             return;
         }
 
+        // We won't be able to do an access check if the access is invalid, so
+        // just skip trying to do anything. 
+        var currentAccess = $A.getContext().getCurrentAccess();
+        if(currentAccess && !currentAccess.isValid()) {
+            return;
+        }
+
         var newComp = null;
         var status= a.getState();
         var statusMessage='';

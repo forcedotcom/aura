@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 ({
-	PANELS_OWNER    : {},  // Owner relationship who creates the panel (key) owned by -> value
-    PANELS_STACK    : [],  // The Panel Stack ordering
-    PANELS_INSTANCE : {},  // Registered instances
-    containerManager: null,  // a reference to containerManager
+	PANELS_OWNER    : {},            // Owner relationship who creates the panel (key) owned by -> value
+    PANELS_STACK    : [],            // The Panel Stack ordering
+    PANELS_INSTANCE : {},            // Registered instances
+    containerManager: null,          // a reference to containerManager
+    hasLocationChangeHandler: false, // Indicate if we already attach a locationChange handler
 
 	initialize: function(cmp) {
         var containerManager = this.cmLib.containerManager;
@@ -66,10 +67,12 @@
             panel.set('v.referenceElement', referenceElement);
         }
 
+        
         // Save instance config
         this.PANELS_INSTANCE[panel.getGlobalId()] = {
             panel           : panel,
-            destroyCallback : config.onDestroy
+            destroyCallback : config.onDestroy,
+            closeOnLocationChange: this.getLocationChangeFlag(cmp, config)
         };
 
         // Set owner
@@ -326,5 +329,37 @@
             source = provider.getAttributeValueProvider();
             provider = source !== provider ? source : null;
         }
+    },
+    /**
+     * Get a flag to indicate if we should close the panel when locationChange event is fired.
+     */
+    getLocationChangeFlag: function (cmp, config) {
+        var closeOnLocationChange = config.closeOnLocationChange;
+        if ($A.util.isEmpty(closeOnLocationChange)) { // not set, get it from panel manager
+            closeOnLocationChange = $A.util.getBooleanValue(cmp.get('v.closeOnLocationChange'));
+        } else {
+            closeOnLocationChange = $A.util.getBooleanValue(closeOnLocationChange);
+        }
+        
+        // add a handler if needed
+        if (closeOnLocationChange === true && this.hasLocationChangeHandler === false) {
+            var that = this;
+            $A.eventService.addHandler({
+                "event": "aura:locationChange",
+                "globalId": cmp.getGlobalId(),
+                "handler": function() {
+                    for (var panel, panelObj, i = that.PANELS_STACK.length - 1; i >= 0; i--) {
+                        panel = that.PANELS_STACK[i];
+                        panelObj = that.PANELS_INSTANCE[panel.getGlobalId()];
+                        if (panel && panel.isValid() && panelObj && panelObj.closeOnLocationChange === true) {
+                            panel.close();
+                        }
+                    }
+                }
+            });
+            this.hasLocationChangeHandler = true;
+        }
+        
+        return closeOnLocationChange;
     }
 })// eslint-disable-line semi

@@ -33,6 +33,7 @@
             "param": "foo"
         });
         secureAction.setCallback(this, function(a) {
+            testUtils.assertStartsWith("SecureAction", a.toString());
             testUtils.assertEquals("foo", a.getReturnValue());
             cmp.set("v.testComplete", true);
         });

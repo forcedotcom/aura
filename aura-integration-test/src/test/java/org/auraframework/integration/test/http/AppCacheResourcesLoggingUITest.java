@@ -107,7 +107,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         public DefDescriptor<ControllerDef> controllerDesc;
 
         public AppDescription() {
-        namespace = "appCacheResourcesUITest" + getAuraTestingUtil().getNonce();
+            namespace = "appCacheResourcesUITest" + getAuraTestingUtil().getNonce();
             appName = "cacheapplication";
             cmpName = "cachecomponent";
 

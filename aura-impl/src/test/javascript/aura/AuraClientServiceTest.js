@@ -21,7 +21,7 @@ Test.Aura.AuraClientServiceTest = function() {
     var Aura = {Services: {}, Controller: {}, Utils: {Util:{prototype:{on:function(){}}}}};
     var document = {
     	getElementById : function(id) {
-    		return id === "safeEvalWorker" ? {} : undefined;
+            return id === "safeEvalWorker" ? {} : undefined;
     	}
     };
 
@@ -1553,6 +1553,71 @@ Test.Aura.AuraClientServiceTest = function() {
             actual.deferred=target.actionsDeferred;
 
             Assert.Equal(expected,actual);
+        }
+    }
+
+    [Fixture]
+    function dumpCachesAndReload() {
+        [Fact]
+        function testDumpCacheSetsFunctionBeforeReady() {
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            target.reloadPointPassed = false;
+
+            target.dumpCachesAndReload();
+            Assert.NotNull(target.reloadFunction);
+        }
+
+        [Fact]
+        function testDumpCacheSavesOnlyOnce() {
+            var target;
+            var expected = "MyValue";
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            target.reloadFunction = expected;
+            target.reloadPointPassed = false;
+
+            target.dumpCachesAndReload();
+            Assert.Equal(expected, target.reloadFunction);
+        }
+
+        [Fact]
+        function testDumpCacheDoesNotRunsBeforeReady() {
+            var target;
+            var expected = "MyValue";
+            var actual = expected;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            target.actualDumpCachesAndReload = function() { actual = undefined; };
+            target.reloadFunction = expected;
+            target.reloadPointPassed = false;
+
+            target.dumpCachesAndReload();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testDumpCacheRunsAfterReady() {
+            var target;
+            var expected = "MyValue";
+            var actual = undefined;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            target.actualDumpCachesAndReload = function() { actual = expected; };
+            target.reloadFunction = undefined;
+            target.reloadPointPassed = true;
+
+            target.dumpCachesAndReload();
+            Assert.Equal(expected, actual);
         }
     }
 }

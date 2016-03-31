@@ -56,17 +56,9 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.accessStack=[];
     this.tokens={};
 
-    // storage key for the context
-    this.storageKey = "$AuraContext$";
-
     var that = this;
 
-    // load the persisted context if available. the context includes versions of dynamically loaded components whose
-    // defs are persisted on the client (see ComponentDefStorage.js). if the context is stale then the defs may be, too.
-    // the first server trip will verify the context is up-to-date; if it is not then aura:clientOutOfSync is fired
-    // which flushes the caches.
-    this.loadFromStorage(function() {
-        that.initGlobalValueProviders(config["globalValueProviders"], function(gvps) {
+    this.initGlobalValueProviders(config["globalValueProviders"], function(gvps) {
             var i, defs;
 
             // Don't ask.... You just kinda have to love this....
@@ -102,7 +94,6 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
                 initCallback(that);
             }
         });
-    });
 };
 
 /**
@@ -133,117 +124,6 @@ Aura.Context.AuraContext.prototype.initGlobalValueProviders = function(gvps, cal
     this.globalValueProviders = new Aura.Provider.GlobalValueProviders(gvps, callback);
 };
 
-/**
- * Gets storage for the context, if available.
- * @return {AuraStorage} the storage for the context; undefined if storage isn't available.
- * @private
- */
-Aura.Context.AuraContext.prototype.getStorage = function () {
-    var storage = Action.getStorage();
-    if (!storage) {
-        return undefined;
-    }
-
-    return storage.isPersistent() ? storage : undefined;
-};
-
-
-
-/**
- * Prunes the list of dynamically loaded components to reflect the actual defs
- * on the client.
- *
- * The persisted list of dynamically received defs can diverge from the available
- * defs when eviction runs on persistent component def storage and then the app is
- * reloaded. The in-memory defs are lost due to the reload; the persisted defs may
- * be a subset of the loaded list. Rather than try to maintain a loaded blacklist
- * (which may grow and shrink) we prune the list once during framework initialization.
- *
- * @private
- */
-Aura.Context.AuraContext.prototype.pruneLoaded = function() {
-    var pruneCount = 0;
-    for (var key in this.loaded) {
-        if (key.indexOf("COMPONENT@") === 0) {
-            if (!$A.componentService.getComponentDef({"descriptor":key.substr(10)})) {
-                delete this.loaded[key];
-                pruneCount++;
-            }
-        }
-    }
-
-    if (pruneCount > 0) {
-        $A.log("AuraContext.pruneLoaded(): pruned " + pruneCount + " defs");
-        // force the save in case we removed all items
-        this.saveToStorage(true);
-    }
-};
-
-/**
- * Saves the context to storage.
- * @param {Boolean} force true to force persisting to storage, otherwise persisting
- *  may be skipped if nothing to save.
- * @return {Promise} a promise that resolves when saving is complete.
- * @private
- */
-Aura.Context.AuraContext.prototype.saveToStorage = function(force) {
-    var storage = this.getStorage();
-    if (!storage) {
-        return Promise["resolve"]();
-    }
-
-    // optimization: the application is always present and provided by the config so
-    // no need to serialize it. if no other values to serialize then short-circuit
-    // unless force is specified.
-    var loadedKeys = Object.keys(this.loaded);
-    if (loadedKeys.length === 1 && force !== true) {
-        return Promise["resolve"]();
-    }
-    var filteredLoaded = {};
-    for (var key in this.loaded) {
-        if (key.indexOf("APPLICATION@") !== 0) {
-            filteredLoaded[key] = this.loaded[key];
-        }
-    }
-
-    return storage.put(this.storageKey, {"loaded": filteredLoaded}).then(
-        undefined,
-        function(err) {
-            $A.warning("AuraContext.saveToStorage(): failed to put, error: " + err);
-            throw err;
-        }
-    );
-};
-
-/**
- * Loads the context from storage.
- * @param {Function} callback the function to invoke after loading the context from storage.
- * @private
- */
-Aura.Context.AuraContext.prototype.loadFromStorage = function(callback) {
-    var storage = this.getStorage();
-    if (!storage) {
-        callback();
-        return;
-    }
-
-    //var that = this;
-    storage.get(this.storageKey).then(function (/*item*/) {
-        $A.run(function() {
-            // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
-            // if (item && item.value) {
-            //     that.joinLoaded(item.value["loaded"]);
-            // }
-            callback();
-        });
-    }, function() {
-        // error retrieving from storage
-        $A.run(function(err) {
-            $A.warning("AuraContext.loadFromStorage(): failed to load, error: " + err);
-            callback();
-        });
-    });
-};
 
 /**
  * Returns the mode for the current request. Defaults to "PROD" for production mode and "DEV" for development mode.
@@ -421,9 +301,6 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
 
     this.joinComponentConfigs(otherContext["components"], ""+this.getNum());
     this.joinLoaded(otherContext["loaded"]);
-
-    // async persist the context
-    this.saveToStorage();
 };
 
 /**
@@ -664,6 +541,37 @@ Aura.Context.AuraContext.prototype.joinLoaded = function(loaded) {
             }
         }
     }
+};
+
+/**
+ * Add back a loaded pair that was extracted using 'findLoaded'.
+ *
+ * @param {Object} pair the object returned by findLoaded.
+ * @private
+ */
+Aura.Context.AuraContext.prototype.addLoaded = function(pair) {
+    // Be safe. But should we go and scream if we get a mismatch?
+    if (pair && !this.loaded[pair["key"]]) {
+        this.loaded[pair["key"]] = pair["value"];
+    }
+};
+
+/**
+ * Find a 'loaded' pair for a descriptor.
+ *
+ * @param {String} descriptor the descriptor string.
+ * @returns {Object} an object that can be passed to addloaded.
+ * @private
+ */
+Aura.Context.AuraContext.prototype.findLoaded = function(descriptor) {
+    var cmpDescriptor = "COMPONENT@"+descriptor;
+    var appDescriptor = "APPLICATION@"+descriptor;
+    if (this.loaded[cmpDescriptor]) {
+        return { "key":cmpDescriptor, "value":this.loaded[cmpDescriptor] };
+    } else if (this.loaded[appDescriptor]) {
+        return { "key":appDescriptor, "value":this.loaded[appDescriptor] };
+    }
+    return null;
 };
 
 /**

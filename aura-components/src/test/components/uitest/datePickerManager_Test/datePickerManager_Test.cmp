@@ -20,5 +20,5 @@
       <ui:inputDateTrigger aura:id="inputWDefValue" displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/><br/>
       <ui:inputDateTrigger aura:id="inputWODefValue" class="date_input_box" displayDatePicker="true" format="MM/dd/yyyy"/><br/><br/>
       <ui:inputDate value="{!v.value}" aura:id="inputWNoDatePicker" displayDatePicker="true" loadDatePicker="true" format="yyyy-MM-dd"/>
-      <ui:datePickerManager aura:id="dpm"/>
+      <ui:datePickerManager aura:id="dpm" loadDatePicker="true"/>
 </aura:component>

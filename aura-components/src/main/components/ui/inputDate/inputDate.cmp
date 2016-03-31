@@ -15,12 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateComponent" extensible="true"
+<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateComponent, ui:handlesDateSelected" extensible="true"
                 provider="js://ui.inputDate" defaultFlavor="default, input, datetime" description="An input field for entering a date.">
     <aura:attribute name="placeholder" type="String" description="The hint for the date input format, displayed in the field if a date picker is not used. The placeholder is set during init based on the custom or locale format."/>
     <aura:attribute name="loadDatePicker" type="Boolean" default="true" description="Set to true to load the date picker. The default is true."/>
 
     <aura:dependency resource="markup://ui:inputDateHtml" type="COMPONENT"/>
+    <aura:dependency resource="markup://ui:showDatePicker" type="EVENT"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:registerEvent name="openPicker" type="ui:openPicker" description="The event fired when the date picker is opened."/>
@@ -54,7 +55,7 @@
         </form>
     </aura:if>
 
-    <aura:if isTrue="{! v.loadDatePicker }">
-        <ui:datePicker aura:id="datePicker" hideOnSelect="true" closeOnClickOut="true" selectDate="{!c.setValue}" showToday="{!$Browser.isPhone || $Browser.isTablet}"/>
+    <aura:if isTrue="{!and(v.loadDatePicker, !v.useManager) }">
+        <ui:datePicker aura:id="datePicker" hideOnSelect="true" closeOnClickOut="true" selectDate="{!c.onDateSelected}" showToday="{!$Browser.isPhone || $Browser.isTablet}"/>
    </aura:if>
 </aura:component>

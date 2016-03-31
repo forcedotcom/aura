@@ -51,10 +51,8 @@
         }
     },
 
-    setValue: function(component, event) {
-        var dateValue = event.getParam("value");
-        if (dateValue) {
-            component.set("v.value", dateValue);
-        }
+    // override ui:handlesDateSelected
+    onDateSelected: function(component, event, helper) {
+        helper.setValue(component, event);
     }
 })// eslint-disable-line semi

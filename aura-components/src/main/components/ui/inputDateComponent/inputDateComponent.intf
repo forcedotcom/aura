@@ -17,6 +17,7 @@
 -->
 <aura:interface support="GA" description="Common interface across output date components">
     <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time."/>
+    <aura:attribute name="useManager" type="Boolean" default="false" description="Indicates whether the datepicker should be managed by ui:datePickerManager."/>
     <aura:attribute name="max" type="Date" description="Specifies the maximum date allowed. Works with HTML5 only."/>
     <aura:attribute name="min" type="Date" description="Specifies the minimum date allowed. Works with HTML5 only."/>
     <aura:attribute name="step" type="Integer" description="Specifies the legal date intervals. Works with HTML5 only."/>

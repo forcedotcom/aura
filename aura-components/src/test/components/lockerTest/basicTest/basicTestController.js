@@ -57,6 +57,22 @@
         testUtils.assertEquals("fancypants", appendedDiv.className);
     },
 
+    testContextOfController: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertUndefined(this, "Expected 'this' in Locker controller to be undefined");
+    },
+
+    testDefineGetterExploit: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        try {
+            var defprop = ({}).__defineGetter__; 
+            defprop('FOO', function() { return this; }); 
+            testUtils.fail("Expected attempt to overwrite __defineGetter__ to throw an error");
+        } catch (e) {
+            testUtils.assertStartsWith("TypeError", e.toString(), "Unexpected error. Expected TypeError, got " + e);
+        }
+    },
+
 	testEvalBlocking : function(cmp, event, helper) {
 		var testUtils = cmp.get("v.testUtils");
 		

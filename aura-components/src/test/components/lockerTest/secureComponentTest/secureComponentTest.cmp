@@ -23,6 +23,7 @@
     <aura:method name="testGetElementReturnsSecureElement" action="{!c.testGetElementReturnsSecureElement}"/>
     <aura:method name="testGetEventReturnsSecureEvent" action="{!c.testGetEventReturnsSecureEvent}"/>
     <aura:method name="testGetCThrowsError" action="{!c.testGetCThrowsError}"/>
+    <aura:method name="testAddValueProviderExploit" action="{!c.testAddValueProviderExploit}"/>
 
     <aura:registerevent name="press" type="ui:press"/>
 

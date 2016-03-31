@@ -30,6 +30,7 @@
     </aura:method>
     <aura:method name="testDocumentTitle" action="{!c.testDocumentTitle}"/>
     <aura:method name="testQuerySelectorAllReturnsSecureNodeList" action="{!c.testQuerySelectorAllReturnsSecureNodeList}"/>
+    <aura:method name="testDocumentBodyConstructorNotExposed" action="{!c.testDocumentBodyConstructorNotExposed}"/>
 
     <div id="title">SecureDocument test</div>
 

@@ -29,6 +29,15 @@
         }
     },
 
+    testSetParams: {
+        test: function(cmp) {
+            cmp.testSetParams();
+            $A.test.addWaitFor(true, function() {
+                return !!cmp.get("v.testComplete");
+            });
+        }
+    },
+
     testDifferentNamespacedActionPassedFromSystemMode: {
         test: function(cmp) {
             var facet = cmp.find("facet");
@@ -36,7 +45,7 @@
             cmp.testDifferentNamespacedActionPassedFromSystemMode(facetAction);
         }
     },
-    
+
     testGlobalControllerBlocked: {
         test: function(cmp) {
             cmp.testGlobalControllerBlocked();

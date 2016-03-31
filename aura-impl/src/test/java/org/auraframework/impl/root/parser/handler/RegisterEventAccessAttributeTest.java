@@ -34,9 +34,8 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
 
 	public RegisterEventAccessAttributeTest(String name) {
 		super(name);
-		
-		ConfigAdapter adapter = Aura.getConfigAdapter();
-        adapter.addPrivilegedNamespace("privilegedNS");
+		 ConfigAdapter adapter = Aura.getConfigAdapter();
+		 adapter.addPrivilegedNamespace("privilegedNS");
 	}
 
 
@@ -197,7 +196,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, "privilegedNS:testcomponent",
+                cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
         false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
@@ -413,8 +412,8 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='UNAUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, "privilegedNS:testcomponent",
-        false);
+                cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
+                false);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -596,7 +595,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, "privilegedNS:testcomponent",
-        false);
+                false, true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -609,7 +608,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, "privilegedNS:testcomponent",
-        false);
+                false, true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -628,7 +627,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, "privilegedNS:testcomponent",
-        false);
+                false, true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -648,7 +647,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, "privilegedNS:testcomponent",
-        false);
+                false, true);
         Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, descriptor);

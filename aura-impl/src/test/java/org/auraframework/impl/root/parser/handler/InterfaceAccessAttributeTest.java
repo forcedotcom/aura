@@ -34,9 +34,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
 
 	public InterfaceAccessAttributeTest(String name) {
 		super(name);
-		
-		ConfigAdapter adapter = Aura.getConfigAdapter();
-        adapter.addPrivilegedNamespace("privilegedNS");
+		 ConfigAdapter adapter = Aura.getConfigAdapter();
+		 adapter.addPrivilegedNamespace("privilegedNS");
 	}
 	
 	/***********************************************************************************
@@ -581,7 +580,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -595,7 +594,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -615,7 +614,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -635,7 +634,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -657,7 +656,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -678,7 +677,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
             DefDescriptor<InterfaceDef> descriptor = 
                     getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                     intfSource, "privilegedNS:testInterface",
-            false);
+            false, true);
             Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
             
             Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -699,7 +698,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -724,7 +723,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -736,7 +735,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -748,7 +747,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -767,7 +766,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -786,7 +785,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -803,7 +802,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -821,7 +820,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -839,7 +838,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -857,7 +856,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -875,7 +874,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -899,7 +898,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -921,7 +920,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -938,7 +937,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -956,7 +955,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -980,7 +979,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1003,7 +1002,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1025,7 +1024,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1048,7 +1047,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1066,7 +1065,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1084,7 +1083,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1102,7 +1101,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1120,7 +1119,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1304,7 +1303,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1529,7 +1528,7 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false);
+        false, true);
         Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);

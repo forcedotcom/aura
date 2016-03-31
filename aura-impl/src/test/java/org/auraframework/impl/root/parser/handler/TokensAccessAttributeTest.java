@@ -574,7 +574,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -588,7 +588,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -608,7 +608,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -628,7 +628,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -650,7 +650,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -671,7 +671,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
             DefDescriptor<TokensDef> descriptor = 
                     getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                     tokenSource, "privilegedNS:testTokens",
-            false);
+                    false, true);
             Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
             
             Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -692,7 +692,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -717,7 +717,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -729,7 +729,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -741,7 +741,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -753,7 +753,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -772,7 +772,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -789,7 +789,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -807,7 +807,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -825,7 +825,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -843,7 +843,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -861,7 +861,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -885,7 +885,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -907,7 +907,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -924,7 +924,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -942,7 +942,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -966,7 +966,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -989,7 +989,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1011,7 +1011,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1034,7 +1034,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1052,7 +1052,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+        false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1070,7 +1070,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1088,7 +1088,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1106,7 +1106,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(TokensDef.class,
                 tokenSource, "privilegedNS:testTokens",
-        false);
+                false, true);
         Source<TokensDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);

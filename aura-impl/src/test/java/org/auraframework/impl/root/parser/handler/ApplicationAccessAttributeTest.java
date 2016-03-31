@@ -33,10 +33,10 @@ import org.auraframework.util.test.annotation.UnAdaptableTest;
 public class ApplicationAccessAttributeTest extends AuraImplTestCase {
 
 	public ApplicationAccessAttributeTest(String name) {
-		super(name);		
-		
-		ConfigAdapter adapter = Aura.getConfigAdapter();
-        adapter.addPrivilegedNamespace("privilegedNS");
+		super(name);
+		 ConfigAdapter adapter = Aura.getConfigAdapter();
+		 adapter.addPrivilegedNamespace("privilegedNS");
+
 	}
 	
 	
@@ -534,7 +534,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -548,7 +548,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -568,7 +568,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -588,7 +588,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -610,7 +610,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -631,7 +631,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
 	    	DefDescriptor<ApplicationDef> descriptor = 
 	    			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
             		appSource, "privilegedNS:testapplication",
-            false);
+            false, true);
 	        Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
 	        
 	        Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -652,7 +652,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -677,7 +677,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -689,7 +689,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -701,7 +701,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -720,7 +720,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -739,7 +739,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -756,7 +756,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -774,7 +774,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -792,7 +792,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -810,7 +810,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -828,7 +828,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -852,7 +852,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -874,7 +874,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -891,7 +891,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -909,7 +909,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -933,7 +933,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -956,7 +956,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -978,7 +978,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1001,7 +1001,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        		false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1019,7 +1019,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        		false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1037,7 +1037,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        		false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1055,7 +1055,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        		false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1073,7 +1073,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
         		appSource, "privilegedNS:testapplication",
-        false);
+        		false, true);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
         Parser<ApplicationDef> parser = ParserFactory.getParser(Format.XML, descriptor);
@@ -1256,7 +1256,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	String appSource = "<aura:application access='PUBLIC'/>";
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
-        		appSource, "privilegedNS:testapplication",
+        		appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
         false);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         
@@ -1481,7 +1481,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
     	String appSource = "<aura:application access='UNAUTHENTICATED'/>";
     	DefDescriptor<ApplicationDef> descriptor = 
     			getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
-        		appSource, "privilegedNS:testapplication",
+        		appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
         false);
         Source<ApplicationDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         

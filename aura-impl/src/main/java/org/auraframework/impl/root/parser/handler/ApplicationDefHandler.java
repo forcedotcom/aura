@@ -21,6 +21,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.FlavorsDef;
@@ -94,6 +95,15 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             }
         }
 
+        String trackedDependecies = getAttributeValue(ATTRIBUTE_TRACK);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(trackedDependecies)) {
+            List<String> trackedList = AuraTextUtil.splitSimple(",", trackedDependecies);
+            for (String tracked : trackedList) {
+            	DefDescriptor<ComponentDef> trackedDef = DefDescriptorImpl.getInstance(tracked, ComponentDef.class);
+            	builder.addTrackedDependency(trackedDef);
+            }
+        }
+
         String isAppcacheEnabled = getAttributeValue(ATTRIBUTE_APPCACHE_ENABLED);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(isAppcacheEnabled)) {
             builder.isAppcacheEnabled = Boolean.parseBoolean(isAppcacheEnabled);
@@ -133,6 +143,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     }
 
     private static final String ATTRIBUTE_PRELOAD = "preload";
+    private static final String ATTRIBUTE_TRACK = "track";
     private static final String ATTRIBUTE_LOCATION_CHANGE_EVENT = "locationChangeEvent";
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
@@ -145,7 +156,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 
     private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-            ATTRIBUTE_PRELOAD, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_FLAVOR_OVERRIDES)
+            ATTRIBUTE_PRELOAD, ATTRIBUTE_TRACK, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_FLAVOR_OVERRIDES)
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(BaseComponentDefHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();

@@ -16,6 +16,7 @@
 package org.auraframework.impl.root.component;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.auraframework.builder.ComponentDefBuilder;
 import org.auraframework.def.ComponentDef;
@@ -60,6 +61,11 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
         }
 	}
 
+    @Override
+    public List<DefDescriptor<ComponentDef>> getTrackedDependencies() {
+    	return null;
+    }
+	
 	@Override
 	protected void serializeFields(Json json) throws IOException {
 	}

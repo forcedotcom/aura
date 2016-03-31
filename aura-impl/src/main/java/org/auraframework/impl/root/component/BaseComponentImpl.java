@@ -16,6 +16,7 @@
 package org.auraframework.impl.root.component;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.model.JavaModel;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeSetImpl;
+import org.auraframework.impl.system.RenderContextImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.AuraValueProviderType;
@@ -321,23 +323,24 @@ BaseComponent<D, I> {
             if ((attributeSet.getValueProvider() == null || hasProvidedAttributes) && !attributeSet.isEmpty()) {
                 json.writeMapEntry("attributes", attributeSet);
             }
+
             if (def.getAPIVersion() != null  &&
             		Aura.getConfigAdapter().isInternalNamespace(def.getDescriptor().getNamespace()) &&
             		context.getCurrentCallingDescriptor() == null) {
             	json.writeMapEntry("version", def.getAPIVersion());
             }
 
-//            // FIXME: This should go away.
-//            if (def.getRendererDescriptor() != null) {
-//                RendererDef rendererDef = def.getRendererDescriptor().getDef();
-//                if (rendererDef.isLocal()) {
-//                    StringWriter sw = new StringWriter();
-//                    rendererDef.render(this, sw);
-//                    // Not writing directly to json.appendable because then it wouldn't get escaped.
-//                    // ideally Json would have a FilterWriter that escapes that we could use here.
-//                    json.writeMapEntry("rendering", sw.toString());
-//                }
-//            }
+            if (def.getRendererDescriptor() != null) {
+                RendererDef rendererDef = def.getRendererDescriptor().getDef();
+                if (rendererDef.isLocal()) {
+                    StringWriter sw = new StringWriter();
+                    StringWriter garbage = new StringWriter();
+                    rendererDef.render(this, new RenderContextImpl(sw, garbage));
+                    // Not writing directly to json.appendable because then it wouldn't get escaped.
+                    // ideally Json would have a FilterWriter that escapes that we could use here.
+                    json.writeMapEntry("rendering", sw.toString());
+                }
+            }
 
             if (model != null && model.getDescriptor().getDef().hasMembers()) {
                 json.writeMapEntry("model", model);

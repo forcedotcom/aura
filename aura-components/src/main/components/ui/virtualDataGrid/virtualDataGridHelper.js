@@ -201,10 +201,10 @@
             if (targetCmp) { 
                 actionHandler = this._getActionHandler(targetCmp, type);
                 if (actionHandler) {
+                    targetCmp.getElement = getElmt.bind(targetCmp, target);
                     handlers.push({
-                        "handler"   : actionHandler,
-                        "target"    : target,
-                        "targetCmp" : targetCmp
+                        "handler" : actionHandler,
+                        "cmp"     : targetCmp
                     });
                 }
             }
@@ -241,18 +241,13 @@
             while ((actionHandlerScope = handlers.shift())) {
                 actionHandler = actionHandlerScope.handler;
                 if ($A.util.isExpression(actionHandler)) {
-                	actionHandlerScope.targetCmp.getElement = getElmt.bind(null, actionHandlerScope.target);
-                	this._dispatchAction(actionHandler.evaluate(), e, actionHandlerScope.targetCmp);
-                	delete actionHandlerScope.targetCmp.getElement;
+                    this._dispatchAction(actionHandler.evaluate(), e, actionHandlerScope.cmp);
                 }
             }
             
             if (ptv.dirty) {
                 this._rerenderDirtyElement(cmp, item, target);
             }
-            
-            delete templates[position].getElement;
-            ptv.ignoreChanges = true;
         }
     },
     _findVirtualElementPosition: function (items, elmt) {

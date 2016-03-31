@@ -18,6 +18,7 @@
     afterRender: function (cmp, helper) {
         this.superAfterRender();
         helper.scopeScrollables(cmp);
+        helper.iNoBounce(cmp.getElement());
     },
     rerender: function (cmp, helper) {
 
@@ -42,5 +43,15 @@
             });
         }
         helper.scopeScrollables(cmp);
+    },
+    unrender : function (cmp, helper) {
+        var el;
+        if (helper.iNoBounceEnabled) {
+            el = cmp.getElement();
+            el.removeEventListener('touchstart', helper.handleTouchstart, false);
+            el.removeEventListener('touchmove', helper.handleTouchmove, false);
+            helper.iNoBounceEnabled = false;
+        }
+        this.superUnrender();
     }
 })// eslint-disable-line semi

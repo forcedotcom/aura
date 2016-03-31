@@ -41,8 +41,7 @@
     },
 
     rerender: function(component, helper) {
-        var visible = component.get("v.visible"),
-            managed = component.get('v.managed');
+        var visible = component.get("v.visible");
 
         if (visible === true) {
             if (component.get("v._yearListInitialized") === false) {
@@ -59,9 +58,7 @@
 
         this.superRerender();
 
-        // If this picker is not 'managed' (consumed by ui:dataPickerManager),
-        // then positioning should be taken into account.
-        if (visible === true && !managed) {
+        if (visible === true) {
             helper.position(component);
         }
 

@@ -15,35 +15,34 @@
  */
 ({
 	handleShowDatePicker: function (cmp, evt) {
+		if (!cmp.get("v.loadDatePicker")) {
+			cmp.set("v.loadDatePicker", true);
+		}
+
 		var datePicker = cmp.find('datePicker'),
-			el = datePicker.getElement(),
-			params = evt.getParams(),
-			box = params.element.getBoundingClientRect(),
-			scrollTop = (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop,
-			scrollLeft = (document.documentElement && document.documentElement.scrollLeft) || document.body.scrollLeft;
+			params = evt.getParams();
 
-		// Position datePicker.
-		// Using scrollTop & scrollLeft for IE support; avoid window.scrollY & window.scrollX.
-		el.style.top = box.bottom + scrollTop + 'px';
-		el.style.left = box.left + scrollLeft + 'px';
-
-		// Keep reference to onselected callback.
-		cmp._onselected = params.onselected;
+		// Keep reference to the source component's globalId.
+		cmp._sourceComponentId = params.sourceComponentId;
 
 		// Set value and show datePicker.
-		datePicker.set('v.value', params.value);
+		var value = params.value;
+		if (!$A.util.isUndefinedOrNull(value)) {
+			datePicker.set('v.value', value);
+		}
+		datePicker.set("v.referenceElement", params.element);
 		datePicker.set('v.visible', true);
 	},
 
 	handleDateSelected: function (cmp, evt) {
-		var selected = cmp._onselected;
-
-		// Invoke onselected if it's a function; otherwise, assume Aura.Action.
-		if ($A.util.isFunction(selected)) {
-			selected.call({}, evt);
+		var sourceComponentId = cmp._sourceComponentId;
+		if ($A.util.isUndefinedOrNull(sourceComponentId)) {
+			return;
 		}
-		else if ($A.util.isAction(selected)) {
-			selected.runDeprecated(evt);
+
+		var sourceComponent = $A.componentService.get(cmp._sourceComponentId);
+		if (sourceComponent && sourceComponent.isInstanceOf("ui:handlesDateSelected")) {
+			sourceComponent.onDateSelected(evt.getParam("value"));
 		}
 	}
 })// eslint-disable-line semi

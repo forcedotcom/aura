@@ -15,9 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputDate" defaultFlavor="default, input"
-                description="Represents a date input component that can be used with the date picker manager, ui:datePickerManager.">
+<aura:component extends="ui:inputDate" defaultFlavor="default, input, datetime"
+                description="DEPRECATED - use inputDate with useManager=true instead. Represents a date input component that can be used with the date picker manager, ui:datePickerManager.">
     <aura:dependency resource="markup://ui:showDatePicker" type="EVENT"/>
 	<aura:set attribute="displayDatePicker" value="true"/>
 	<aura:set attribute="loadDatePicker" value="false"/>
+    <aura:set attribute="useManager" value="true"/>
 </aura:component>

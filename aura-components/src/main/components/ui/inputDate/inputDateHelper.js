@@ -43,22 +43,20 @@
     },
 
     displayDatePicker: function(component) {
-        var concCmp = component.getConcreteComponent();
-        var datePicker = concCmp.find("datePicker");
-        if (datePicker && datePicker.get("v.visible") === false) {
-            var currentDate = new Date();
-            var value = concCmp.get("v.value");
-            if (value) {
-                var langLocale = component.get("v.langLocale") || $A.get("$Locale.langLocale");
-                // since v.value is in UTC format like "2015-08-10T04:00:00.000Z", we only need the date portion
-                var dateValue = value.split("T", 1)[0] || value;
-                currentDate = $A.localizationService.parseDateTime(dateValue, "YYYY-MM-DD", langLocale, true);
+        if (component.get("v.useManager")) {
+            this.openDatepickerWithManager(component);
+        } else {
+            var concCmp = component.getConcreteComponent();
+            var datePicker = concCmp.find("datePicker");
+            if (datePicker && datePicker.get("v.visible") === false) {
+                var currentDate = this.getDateValueForDatePicker(component);
+
+                // if invalid text is entered in the inputText, currentDate will be null
+                if (!$A.util.isUndefinedOrNull(currentDate)) {
+                    datePicker.set("v.value", this.getDateString(currentDate));
+                }
+                datePicker.set("v.visible", true);
             }
-            // if invalid text is entered in the inputText, currentDate will be null
-            if (!$A.util.isUndefinedOrNull(currentDate)) {
-                datePicker.set("v.value", this.getDateString(currentDate));
-            }
-            datePicker.set("v.visible", true);
         }
     },
 
@@ -91,6 +89,18 @@
             return inputCmp.getElement();
         }
         return component.getElement();
+    },
+
+    getDateValueForDatePicker: function(component) {
+        var currentDate = new Date();
+        var value = component.get("v.value");
+        if (value) {
+            var langLocale = component.get("v.langLocale") || $A.get("$Locale.langLocale");
+            // since v.value is in UTC format like "2015-08-10T04:00:00.000Z", we only need the date portion
+            var dateValue = value.split("T", 1)[0] || value;
+            currentDate = $A.localizationService.parseDateTime(dateValue, "YYYY-MM-DD", langLocale, true);
+        }
+        return currentDate;
     },
 
     getDateString: function(date) {
@@ -140,5 +150,23 @@
                 }
     	    }
     	}
+    },
+
+    openDatepickerWithManager: function(component) {
+        var currentDate = this.getDateValueForDatePicker(component);
+
+        $A.get('e.ui:showDatePicker').setParams({
+            element  	: this.getInputElement(component),
+            value      	: currentDate ? this.getDateString(currentDate) : currentDate,
+            sourceComponentId : component.getGlobalId()
+        }).fire();
+    },
+
+    setValue: function(component, event) {
+        var dateValue = event.getParam("value") || event.getParam("arguments").value;
+        if (dateValue) {
+            component.set("v.value", dateValue);
+        }
     }
+
 })// eslint-disable-line semi

@@ -21,4 +21,5 @@
     <aura:attribute name="timeFormat" type="String" description="The java.text.SimpleDateFormat style format for the time."/>
     <aura:attribute name="dateLabel" type="String" description="The label shown above the date input field."/>
     <aura:attribute name="timeLabel" type="String" description="The label shown above the time input field."/>
+    <aura:attribute name="useManager" type="Boolean" default="false" description="Indicates whether the datepicker should be managed by ui:datePickerManager."/>
 </aura:interface>

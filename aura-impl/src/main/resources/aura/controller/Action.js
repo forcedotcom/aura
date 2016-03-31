@@ -749,8 +749,8 @@ Action.prototype.updateFromResponse = function(response) {
         // Careful now. If we get back an event from the server as part of the error,
         // we want to fire off the event. Note that this will also remove it from the
         // list of errors, and this may leave us with an empty error list. In that case
-        // we reset our state to 'EVENT' to avoid the error callback, since we have
-        // an event that should handle things.
+        // we toss in a message of 'event fired' to prevent confusion from having an
+        // error state, but no error.
         //
         // This code is perhaps a bit tenuous, as it attempts to reverse the mapping from
         // event descriptor to event name in the component, giving back the first one that
@@ -770,7 +770,9 @@ Action.prototype.updateFromResponse = function(response) {
             }
         }
         if (fired === true && newErrors.length === 0) {
-            this.state = "EVENT";
+            newErrors.push({
+                "message" : "Event fired"
+            });
         }
         this.error = newErrors;
     } else if (this.originalResponse && this.state === "SUCCESS") {

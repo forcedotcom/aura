@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 ({
-    runAfterActionCompletes: function(cmp, callback) {
-        $A.test.addWaitFor(
-            true,
-            function(){
-                // v.action is set on send.
-                var a = cmp.get("v.action");
-                return a.getState() !== "NEW" && a.getState() !== "RUNNING";
-            },
-            callback);
-    },
-
     checkResponse : function(cmp, expectedState, eventName, expectedMessage){
         cmp.find("trigger").get("e.press").fire();
         //Wait till action's call back is invoked
-        this.runAfterActionCompletes(cmp,
+        $A.test.runAfterIf(
+            function(){ return cmp.get("v.response"); }, //v.response is set only if action's call back is invoked
             function(){
-                var action = cmp.get("v.action");
+        	var action = cmp.get("v.response");
                 $A.log(action);
                 $A.log(action.error);
                 $A.test.assertEquals(expectedState, action.state, "Unexpected state: ");
@@ -42,9 +32,10 @@
 
     checkFailure : function(cmp, expectedState, expectedMessage, expectedStack) {
         cmp.find("trigger").get("e.press").fire();
-        this.runAfterActionCompletes(cmp,
+        $A.test.runAfterIf(
+            function(){ return cmp.get("v.response"); },
             function(){
-                var action = cmp.get("v.action");
+                var action = cmp.get("v.response");
                 var msg = action.error[0].message;
                 var stack = action.error[0].stack;
                 $A.log(action);
@@ -66,9 +57,8 @@
                        eventParamName:"message",
                        eventParamValue:"bah!" },
         test: function(cmp){
-            cmp.find("trigger").get("e.press").fire();
             // we have a boston accent.
-            this.checkResponse(cmp, "EVENT", "markup://aura:systemError", "bah!");
+            this.checkResponse(cmp, "ERROR", "markup://aura:systemError", "bah!");
         }
     },
 
@@ -77,35 +67,36 @@
                        eventParamName:"msg",
                        eventParamValue:"foo!" },
         test: function(cmp){
-            this.checkResponse(cmp, "EVENT", "markup://test:testActionEventEvent", "foo!");
+            this.checkResponse(cmp, "ERROR", "markup://test:testActionEventEvent", "foo!");
         }
     },
     
     
     checkResponseForEventsWithoutHandler : function(cmp, expectedState, eventName){
-        $A.test.assertUndefinedOrNull($A.getEvt(eventName),
-            "Test setup failure, eventdef known before hand.");
+    	$A.test.assertUndefinedOrNull($A.getEvt(eventName),
+			"Test setup failure, eventdef known before hand.");
         cmp.find("trigger").get("e.press").fire();
         //Wait till action's call back is invoked
-        this.runAfterActionCompletes(cmp,
+        $A.test.runAfterIf(
+            function(){ return cmp.get("v.response"); }, //v.response is set only if action's call back is invoked
             function(){
-                var action = cmp.get("v.action");
+            	var action = cmp.get("v.response");
                 $A.test.assertEquals(expectedState, action.state, "Unexpected state: ");
                 $A.test.assertDefined($A.getEvt(eventName), 
-                    "Failed to add new event def from action response.");
+                	"Failed to add new event def from action response.");
             }
         );
     },
     testApplicationEventWithNoHandler: {
-        attributes : { eventName:"test:applicationEvent"},
+    	attributes : { eventName:"test:applicationEvent"},
         test: function(cmp){
-            this.checkResponseForEventsWithoutHandler(cmp, "EVENT", "markup://test:applicationEvent");
+            this.checkResponseForEventsWithoutHandler(cmp, "ERROR", "markup://test:applicationEvent");
         }    
     },
     testComponentEventWithNoHandler: {
-        attributes : { eventName:"test:anevent"},
+    	attributes : { eventName:"test:anevent"},
         test: function(cmp){
-            this.checkResponseForEventsWithoutHandler(cmp, "EVENT", "markup://test:anevent");
+            this.checkResponseForEventsWithoutHandler(cmp, "ERROR", "markup://test:anevent");
         } 
     },
     testBadEvent: {
@@ -113,16 +104,16 @@
                        eventParamName:"msg",
                        eventParamValue:"foo!" },
         test: function(cmp){
-            //Override aura.warning() with custom verification because the error messages are different depending on ExceptionAdapter.
-            $A.test.overrideFunction($A, "warning", 
-                    function(dispMsg) {
-                        $A.test.assertTrue(
+        	//Override aura.warning() with custom verification because the error messages are different depending on ExceptionAdapter.
+        	$A.test.overrideFunction($A, "warning", 
+        			function(dispMsg) {
+        				$A.test.assertTrue(
                                 dispMsg.indexOf("An internal server error has occurred") > -1 ||
-                                dispMsg.indexOf("Unable to process your request") > -1,
-                                "display message doesn't have key words we expect, message we got:"+dispMsg);
-                        $A.message(dispMsg);
-                    });
-            cmp.find("trigger").get("e.press").fire();
+        						dispMsg.indexOf("Unable to process your request") > -1,
+        						"display message doesn't have key words we expect, message we got:"+dispMsg);
+        				$A.message(dispMsg);
+        			});
+        	cmp.find("trigger").get("e.press").fire();
             $A.test.addWaitFor(
                     false,
                     $A.test.isActionPending,

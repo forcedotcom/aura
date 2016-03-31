@@ -507,5 +507,79 @@
         for (var i = 0; i < scrollables.length; i++) {
             this.lib.panelLibCore.scopeScroll(scrollables[i]);
         }
+    },
+    startY : 0,
+    iNoBounceEnabled : false,
+    iNoBounce : function (el) {
+        this.startY = 0;
+        if (this.isScrollSupported()) {
+            this.enableINoBounce(el);
+        }
+    },
+    enableINoBounce : function (el) {
+        el.addEventListener('touchstart', this.handleTouchstart, false);
+        el.addEventListener('touchmove', this.handleTouchmove, false);
+        this.iNoBounceEnabled = true;
+    },
+    handleTouchstart : function (evt) {
+        // Store the first Y position of the touch
+        this.startY = evt.touches ? evt.touches[0].screenY : evt.screenY;
+    },
+    handleTouchmove : function (evt) {
+        // Get the element that was scrolled upon
+        var el = evt.target;
+
+        // Check all parent elements for scrollability
+        while (el !== document.body) {
+            // Get some style properties
+            var style = window.getComputedStyle(el);
+
+            if (!style) {
+                // If we've encountered an element we can't compute the style for, get out
+                break;
+            }
+
+            var scrolling = style.getPropertyValue('-webkit-overflow-scrolling');
+            var overflowY = style.getPropertyValue('overflow-y');
+            var height = parseInt(style.getPropertyValue('height'), 10);
+
+            // Determine if the element should scroll
+            var isScrollable = scrolling === 'touch' && (overflowY === 'auto' || overflowY === 'scroll');
+            var canScroll = el.scrollHeight > el.offsetHeight;
+
+            if (isScrollable && canScroll) {
+                // Get the current Y position of the touch
+                var curY = evt.touches ? evt.touches[0].screenY : evt.screenY;
+
+                // Determine if the user is trying to scroll past the top or bottom
+                // In this case, the window will bounce, so we have to prevent scrolling completely
+                var isAtTop = (this.startY <= curY && el.scrollTop === 0);
+                var isAtBottom = (this.startY >= curY && el.scrollHeight - el.scrollTop === height);
+
+                // Stop a bounce bug when at the bottom or top of the scrollable element
+                if (isAtTop || isAtBottom) {
+                    evt.preventDefault();
+                }
+
+                // No need to continue up the DOM, we've done our job
+                return;
+            }
+
+            // Test the next parent
+            el = el.parentNode;
+        }
+
+        // Stop the bouncing -- no parents are scrollable
+        evt.preventDefault();
+    },
+    isScrollSupported : function () {
+        var scrollSupport,
+            testDiv = document.createElement('div');
+
+        document.documentElement.appendChild(testDiv);
+        testDiv.style.WebkitOverflowScrolling = 'touch';
+        scrollSupport = 'getComputedStyle' in window && window.getComputedStyle(testDiv)['-webkit-overflow-scrolling'] === 'touch';
+        document.documentElement.removeChild(testDiv);
+        return scrollSupport;
     }
 })// eslint-disable-line semi

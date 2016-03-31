@@ -30,7 +30,7 @@ function LockerService() {
 	var whitelist = [
 			'undefined', 'NaN', 'Date', 'Number', 'Boolean', 'alert', 'confirm',
 			'Intl', 'Error', 'console', 'Object',
-			'clearTimeout', 'clearInterval'
+			'clearTimeout', 'clearInterval', 'String'
 		];
 
 	var nsKeys = {};

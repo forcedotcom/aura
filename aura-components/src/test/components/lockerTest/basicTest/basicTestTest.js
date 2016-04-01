@@ -101,7 +101,9 @@
         }
     },
 
+    
     testAttemptToEvalToWindow: {
+        browsers: ["-IE11"],
         test: function(cmp) {
         	cmp.testEvalBlocking();
 

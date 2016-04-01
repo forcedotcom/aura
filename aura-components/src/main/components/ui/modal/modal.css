@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+/* should be able to remove this next rule after ie11 support is dropped */
+.THIS {
+    position: fixed;
+}
+
 .THIS .hidden {
     display: none;
 }

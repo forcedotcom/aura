@@ -21,7 +21,9 @@
             paramName: cmp.get("v.eventParamName"),
             paramValue: cmp.get("v.eventParamValue")
         });
-        cmp.set("v.action", a);
+        a.setCallback(cmp, function(action){
+            cmp.set("v.response", action);
+        });
         $A.enqueueAction(a);
     },
 

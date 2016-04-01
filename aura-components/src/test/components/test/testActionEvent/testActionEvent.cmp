@@ -19,7 +19,7 @@
     <aura:attribute name="eventName" type="String" description="Name of event to associate with the exception in server action. GenericEventException will encapsulate this event"/>
     <aura:attribute name="eventParamName" type="String" description="Parameter to set on the exception"/>
     <aura:attribute name="eventParamValue" type="String"/>
-    <aura:attribute name="action" type="Aura.Action"/>
+    <aura:attribute name="response" type="Aura.Action"/>
     <aura:attribute name="data" type="String" />
     <aura:attribute name="event" type="String" />
     

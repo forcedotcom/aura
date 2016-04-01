@@ -71,6 +71,14 @@
     		this.shadowRoot.querySelector(".span_removeActionCard").style.display = "inline-block";
     		this.shadowRoot.querySelector(".dropOrModify").style.display = "block";
 			this.shadowRoot.querySelector(".card").classList.add("watch");
+			//
+    		this.shadowRoot.querySelector("#select_dropOrModify").options[0].text = chrome.i18n.getMessage("actioncard_dropaction");
+    		this.shadowRoot.querySelector("#select_dropOrModify").options[1].text = chrome.i18n.getMessage("actioncard_overrideresult");
+    		this.shadowRoot.querySelector("#select_dropOrModify").options[2].text = chrome.i18n.getMessage("actioncard_errorresponse");
+
+    		this.shadowRoot.querySelector("#select_dropOrModify").addEventListener('change', dropOrModifyChanged.bind(this));
+    	    this.shadowRoot.querySelector("#span_removeActionCard").addEventListener('click', removeActionCard.bind(this));
+    	
     		if(this.getAttribute("dropOrModify") === "modifyResponse") {//non-error response next time
     			this.shadowRoot.querySelector(".div_editActionResult").style.display = "block";
 				this.shadowRoot.querySelector(".div_errorResponse").style.display = "none";
@@ -106,11 +114,7 @@
     	var clone = document.importNode(template.content, true);
 
     	var shadowRoot = this.createShadowRoot();
-    		shadowRoot.appendChild(clone);
-
-    	shadowRoot.querySelector("#select_dropOrModify").addEventListener('change', dropOrModifyChanged.bind(this));
-    	shadowRoot.querySelector("#span_removeActionCard").addEventListener('click', removeActionCard.bind(this));
-    	
+    		shadowRoot.appendChild(clone);    	
 	};
 
 	actionCard.attributeChangedCallback = function(attrName, oldVal, newVal) {

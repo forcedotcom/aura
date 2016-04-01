@@ -984,13 +984,14 @@ AuraComponentService.prototype.getControllerDef = function(descriptor) {
  * @param {Object} relationshipMap relationship map referencing ComponentDef descriptor
  * @param {Object} registry registry that hold definition type
  * @return {*} Def definition
+ * @private
  */
 AuraComponentService.prototype.getDefFromRelationship = function(descriptor, relationshipMap, registry) {
     var def = registry[descriptor];
     if (!def && relationshipMap[descriptor]) {
         var componentDefDescriptor = relationshipMap[descriptor];
         if (this.savedComponentConfigs[componentDefDescriptor]) {
-            this.getDef(componentDefDescriptor);
+            this.getComponentDef(this.createDescriptorConfig(componentDefDescriptor));
             return registry[descriptor];
         }
     }

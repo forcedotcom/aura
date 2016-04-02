@@ -117,7 +117,7 @@
             }
         ]
     },
-    testTrackedDependencyAddedOnce:{
+    _testTrackedDependencyAddedOnce:{
         test: [
             function() {
                 this.count = 0;

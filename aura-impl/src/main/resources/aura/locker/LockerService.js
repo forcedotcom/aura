@@ -26,11 +26,12 @@ function LockerService() {
 
 	// This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
 	// which, by definition, do not provide authority or access to globals.
-	// TODO: grow this list...
 	var whitelist = [
-			'undefined', 'NaN', 'Date', 'Number', 'Boolean', 'alert', 'confirm',
+			'undefined', 'NaN', 'Infinity', 'Date', 'Number', 'Boolean', 'String', 'alert', 'confirm',
 			'Intl', 'Error', 'console', 'Object',
-			'clearTimeout', 'clearInterval', 'String'
+			'clearTimeout', 'clearInterval', 'parseInt', 'parseFloat', 
+			'decodeURI', 'decodeURIComponent', 'encodeURI', 'encodeURIComponent',
+			'isFinite', 'isNaN'
 		];
 
 	var nsKeys = {};

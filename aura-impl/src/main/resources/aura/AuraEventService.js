@@ -271,17 +271,17 @@ AuraEventService.prototype.getDef = function(descriptor) {
     if(definition && !$A.clientService.allowAccess(definition)) {
         var context=$A.getContext();
         var message="Access Check Failed! EventService.getEventDef():'" + definition.getDescriptor().toString() + "' is not visible to '" + (context&&context.getCurrentAccess()) + "'.";
-        // if(context.enableAccessChecks) {
-        //     if(context.logAccessFailures){
-        //         $A.error(message);
-        //    }
-        //     return null;
-        // } else {
-        //     if(context.logAccessFailures){
+        if(context.enableAccessChecks) {
+            if(context.logAccessFailures){
+                $A.error(message);
+           }
+            return null;
+        } else {
+            if(context.logAccessFailures){
                 $A.warning(message);
-            //}
-            //Intentional fallthrough
-        //}
+            }
+            // Intentional fallthrough
+        }
     }
     
     return definition;

@@ -83,5 +83,6 @@ function SecureDocument(doc, key) {
 
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", doc);
-    return Object.seal(o);
+        
+    return o;
 }

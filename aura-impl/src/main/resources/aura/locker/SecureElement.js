@@ -83,7 +83,8 @@ function SecureElement(el, key) {
 
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", el);
-	return Object.seal(o);
+	
+	return o;
 }
 
 SecureElement.addSecureProperties = function (se, raw) {

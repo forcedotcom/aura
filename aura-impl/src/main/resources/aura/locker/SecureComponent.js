@@ -99,5 +99,6 @@ function SecureComponent(component, key) {
     setLockerSecret(component, "secure", o); // backpointer
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", component);
-    return Object.seal(o);
+    
+    return o;
 }

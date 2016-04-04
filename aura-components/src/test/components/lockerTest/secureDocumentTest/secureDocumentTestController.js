@@ -81,5 +81,15 @@
     testDocumentBodyConstructorNotExposed: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertUndefined(document.body.constructor, "document.body.constructor should not be defined in Locker");
+    },
+    
+    testCreateElementCoersionExploit: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var el = document.createElement({ 
+            toLowerCase: function() { return 'a' }, 
+            toString: function() { return 'script' } 
+        }); 
+        testUtils.assertStartsWith("SecureScriptElement", el.toString(), "createElement string coersion exploit should be blocked" +
+                " and a SecureScriptElement should be returned, but got " + el.toString());
     }
 })

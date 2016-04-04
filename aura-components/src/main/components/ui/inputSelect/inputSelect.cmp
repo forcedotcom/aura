@@ -36,12 +36,14 @@
     <aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
     <aura:handler name="change" value="{!v.options}" action="{!c.optionsChange}"/>
 
+    <aura:method name="setFocus" action="{!c.setFocus}"/>
+
     <aura:dependency resource="ui:radioMenuItem" />
     <aura:dependency resource="ui:checkboxMenuItem" />
 
     <aura:if isTrue="{!v.useMenu}">
         <ui:menu class="{!v.class}">
-            <ui:menuTriggerLink class="select" disabled="{!v.disabled}" ariaLabel="{!v.label}"
+            <ui:menuTriggerLink aura:id="selectTrigger" class="select" disabled="{!v.disabled}" ariaLabel="{!v.label}"
                                 label="{!v.selectedLabel}"/>
             <ui:menuList aura:id="options" class="select-options" attachToBody="true" aura:flavor="default,left"
                          menuExpand="{!c.menuOpened}"

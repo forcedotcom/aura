@@ -87,6 +87,11 @@
                 }
             }
         }
+
+        if (cmp.get("v.value") === newValue) {
+            return;
+        }
+
         cmp.set("v.selectedLabel", selectedLabel);
         cmp._suspendChangeHandlers = true;
         cmp.set("v.value", newValue);

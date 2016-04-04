@@ -34,7 +34,7 @@ import com.google.common.base.Function;
  * to render it. If render = 'client', the aura servlet assumes the component
  * should be rendered clientside. In context of tests, Applications and
  * components can be used interchangeably.
- * 
+ *
  * @hierarchy Aura.Components.Renderer
  * @priority high
  * @userStory a07B0000000EWWg
@@ -86,7 +86,7 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
      * Verify that Components that have a server side renderer can still use the
      * render='client' specification.
      */
-    public void _testCmpWithJavaRendererButRenderEqualsClient() throws Exception {
+    public void testCmpWithJavaRendererButRenderEqualsClient() throws Exception {
         open("/test/test_ServerRendererOnly.cmp");
         assertTrue("Aura client engine not present on page. The component had a render='client' specification.",
                 isAuraClientEnginePresentOnPage());
@@ -111,7 +111,7 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
      * <li>The inner facet is an interface. This has both a client renderer and
      * server renderer. Only the server renderer is used.</li>
      * </ol>
-     * 
+     *
      * <pre>
      *     test_SimpleServerRenderedPage.app   render = 'server'
      *     {

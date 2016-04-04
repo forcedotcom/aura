@@ -21,6 +21,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -201,14 +202,20 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithOtherCustomNamespace() throws QuickFixException {
         //create component with custom namespace
-        String cmpSource = "<aura:component isTemplate='true' access='GLOBAL'/>";
+        String cmpSource = "<aura:component isTemplate='true' />";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
         //create application with above component in markup
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", false);
-        descriptor.getDef();
+        try {
+            descriptor.getDef();
+            fail("Template from a custom namespace cannot be used in another custom namespace because their default access is PUBLIC");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+
     }
     
 

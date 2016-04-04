@@ -15,11 +15,8 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
@@ -57,8 +54,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImpl<D>, D extends BaseComponentDef, B extends Builder<D>>
 extends RootDefinitionImplUnitTest<I, D, B> {
@@ -102,7 +101,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
             throw new AuraRuntimeException(x);
         }
         try {
-            GLOBAL_ACCESS = Aura.getDefinitionParserAdapter().parseAccess(null, "PRIVATE");
+            PRIVATE_ACCESS = Aura.getDefinitionParserAdapter().parseAccess(null, "PRIVATE");
         } catch (InvalidAccessValueException x) {
             throw new AuraRuntimeException(x);
         }
@@ -190,6 +189,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         AttributeDef attrDef = Mockito.mock(AttributeDef.class);
         Mockito.doReturn(attrDesc).when(attrDef).getDescriptor();
         Mockito.doReturn(PRIVATE_ACCESS).when(attrDef).getAccess();
+        // TODO: Fix this test as the attributeDef and expressionRefs affects the access check in no way
 
         @SuppressWarnings("unchecked")
         D parentDef = (D) Mockito.mock(getBuilder().getClass().getDeclaringClass());
@@ -198,7 +198,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         Mockito.doReturn(true).when(parentDef).isExtensible();
         Mockito.doReturn(SupportLevel.GA).when(parentDef).getSupport();
         Mockito.doReturn(parentDef).when(this.extendsDescriptor).getDef();
-        Mockito.doReturn(GLOBAL_ACCESS).when(parentDef).getAccess();
+        Mockito.doReturn(PRIVATE_ACCESS).when(parentDef).getAccess(); // this causes the access check failure
         Mockito.doReturn(DefType.COMPONENT).when(this.extendsDescriptor).getDefType();
 
         Location exprLocation = new Location("expression", 0);
@@ -240,6 +240,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         AttributeDef attrDef = Mockito.mock(AttributeDef.class);
         Mockito.doReturn(attrDesc).when(attrDef).getDescriptor();
         Mockito.doReturn(PRIVATE_ACCESS).when(attrDef).getAccess();
+        // TODO: Fix this test as the attributeDef and expressionRefs affects the access check in no way
 
         @SuppressWarnings("unchecked")
         D parentDef = (D) Mockito.mock(getBuilder().getClass().getDeclaringClass());
@@ -248,7 +249,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         Mockito.doReturn(true).when(parentDef).isExtensible();
         Mockito.doReturn(SupportLevel.GA).when(parentDef).getSupport();
         Mockito.doReturn(parentDef).when(this.extendsDescriptor).getDef();
-        Mockito.doReturn(GLOBAL_ACCESS).when(parentDef).getAccess();
+        Mockito.doReturn(PRIVATE_ACCESS).when(parentDef).getAccess(); // this causes the access check failure
         Mockito.doReturn(DefType.COMPONENT).when(this.extendsDescriptor).getDefType();
 
         this.expressionRefs = Sets.newHashSet();
@@ -301,5 +302,6 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         Mockito.doReturn(this.templateDef).when(this.templateDefDescriptor).getDef();
         Mockito.doReturn(this.templateDefDescriptor).when(this.templateDef).getDescriptor();
         Mockito.doReturn(isTemplate).when(this.templateDef).isTemplate();
+        Mockito.doReturn(GLOBAL_ACCESS).when(this.templateDef).getAccess();
     }
 }

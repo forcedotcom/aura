@@ -18,11 +18,13 @@
 <aura:component extends="ui:input" extensible="true" defaultFlavor="default, input, datetime"
                 description="HTML5 date picker, used for phone and tablet.">
 
+    <!-- update the value binding on blur, which is the event fired when the date/time picker is dismissed -->
+    <aura:set attribute="updateOn" value="blur"/>
+
     <input aura:id="inputDateHtml"
            id="{!v.domId}"
            class="{!v.class + ' input'}"
            type="date"
-           value="{!v.value}"
            aria-describedby="{!v.ariaDescribedBy}"/>
 
 </aura:component>

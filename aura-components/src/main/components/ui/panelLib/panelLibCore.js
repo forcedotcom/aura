@@ -182,6 +182,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 panel = cmp.getElement(),
                 useTransition = config.useTransition,
                 closeButton,
+                endEvent = $A.getEvt("markup://ui:panelTransitionEnd"),
                 animEl = config.animationEl || panel;
 
             //make sure animation name is valid 
@@ -204,7 +205,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
 
 
             //endAnimationHandler: cleanup all classes and events
-            var finishHandler = $A.getCallback(function () {
+            var finishHandler = function () {
                 if(!cmp.isValid()) {
                     return;
                 }
@@ -230,13 +231,13 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     }
                 }
 
-                $A.getEvt("markup://ui:panelTransitionEnd").setParams({
+                endEvent.setParams({
                     action: 'show', 
                     panelId: cmp.getGlobalId()
                 }).fire();
 
                 config.onFinish && config.onFinish();
-            });
+            };
 
             panel.setAttribute("aria-hidden", 'false');
             if (useTransition) {
@@ -265,6 +266,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 panel = cmp.getElement(),
                 panelId = cmp.getGlobalId(),
                 useTransition = config.useTransition,
+                endEvent = $A.getEvt("markup://ui:panelTransitionEnd"),
                 animEl = config.animationEl || panel;
 
             //make sure animation name is valid 
@@ -289,7 +291,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     }
 
 
-                    $A.getEvt("markup://ui:panelTransitionEnd").setParams({
+                    endEvent.setParams({
                         action: 'hide', 
                         panelId: panelId
                     }).fire();

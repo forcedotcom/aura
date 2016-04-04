@@ -19,8 +19,6 @@
     CMP_UNTRACKED: "dependencyTest:cmpUntracked",
 
     count: 0,
-    one: false,
-    two: false,
 
     testTrackedDependencyNotOnContext:{
         test: function() {
@@ -55,7 +53,6 @@
                 },
                 function () {
                     var loaded = $A.getContext().getLoaded();
-                    console.log(loaded);
                     $A.test.assertUndefinedOrNull(loaded[expected], "Untracked component should not be added to context.loaded.");
                 }
             );
@@ -79,45 +76,41 @@
                 $A.test.addCleanup(function() { override.restore(); });
             },
             function() {
-                this.one = false;
                 var that = this;
+                var completed = false;
                 $A.createComponent(this.CMP_PROVIDER,
                     {
                         qualifiedName: this.CMP_UNTRACKED
                     },
                     function () {
-                        that.one = true;
+                        completed = true;
                     }
                 );
+                $A.test.addWaitFor(true, function() {
+                    return completed;
+                });
             },
             function() {
-                this.two = false;
                 var that = this;
+                var completed = false;
                 $A.createComponent(this.CMP_PROVIDER,
                     {
                         qualifiedName: this.CMP_UNTRACKED
                     },
                     function () {
-                        that.two = true;
+                        completed = true;
                     }
                 );
+                $A.test.addWaitFor(true, function() {
+                    return completed;
+                });
             },
             function() {
-                var expected = 2;
-                var that = this;
-                $A.test.addWaitFor(true,
-                    function() {
-                        return that.one && that.two;
-                    },
-                    function() {
-                        var actual = that.count;
-                        $A.test.assertEquals(expected, actual, "Untracked components sould be retreived in every request.");
-                    }
-                );
+                $A.test.assertEquals(2, this.count, "Untracked components sould be retreived in every request.");
             }
         ]
     },
-    _testTrackedDependencyAddedOnce:{
+    testTrackedDependencyAddedOnce:{
         test: [
             function() {
                 this.count = 0;
@@ -135,41 +128,37 @@
                 $A.test.addCleanup(function() { override.restore(); });
             },
             function() {
-                this.one = false;
                 var that = this;
+                var completed = false;
                 $A.createComponent(this.CMP_PROVIDER,
                     {
                         qualifiedName: this.CMP_TRACKED
                     },
                     function () {
-                        that.one = true;
+                        completed = true;
                     }
                 );
+                $A.test.addWaitFor(true, function() {
+                    return completed;
+                });
             },
             function() {
-                this.two = false;
                 var that = this;
+                var completed = false;
                 $A.createComponent(this.CMP_PROVIDER,
                     {
                         qualifiedName: this.CMP_TRACKED
                     },
                     function () {
-                        that.two = true;
+                        completed = true;
                     }
                 );
+                $A.test.addWaitFor(true, function() {
+                    return completed;
+                });
             },
             function() {
-                var expected = 1;
-                var that = this;
-                $A.test.addWaitFor(true,
-                    function() {
-                        return that.one && that.two;
-                    },
-                    function() {
-                        var actual = that.count;
-                        $A.test.assertEquals(expected, actual, "Tracked components sould be retreived only once.");
-                    }
-                );
+                $A.test.assertEquals(1, this.count, "Tracked components sould be retreived only once.");
             }
         ]
     }

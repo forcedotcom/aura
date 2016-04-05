@@ -316,6 +316,15 @@
             // Scoping this to desktop to prevent regressions
             } else if (!$A.util.isUndefinedOrNull(referenceElem) && $A.get("$Browser.formFactor") === "DESKTOP") {
 
+                if ($A.util.isEmpty(elem.style.top)) {
+                    // this is just an approximation for the initial position of the datepicker. The positioning library
+                    // will take care of the correct position. See W-2993774
+                    elem.style.top = referenceElem.getBoundingClientRect().bottom + "px";
+                }
+
+                if ($A.util.isEmpty(elem.style.left)) {
+                    elem.style.left = referenceElem.getBoundingClientRect().left + "px";
+                }
 
                 if(!component.positionConstraint) {
                     var referenceElementAlign = 'left bottom';

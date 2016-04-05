@@ -52,6 +52,10 @@
             el.removeEventListener('touchmove', helper.handleTouchmove, false);
             helper.iNoBounceEnabled = false;
         }
+
+        if (cmp._observer) {
+            cmp._observer.disconnect();
+        }
         this.superUnrender();
     }
 })// eslint-disable-line semi

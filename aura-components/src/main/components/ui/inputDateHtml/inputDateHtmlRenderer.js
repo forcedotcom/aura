@@ -17,5 +17,10 @@
     afterRender: function(component, helper) {
         helper.formatValue(component);
         this.superAfterRender();
+    },
+
+    rerender: function(component, helper) {
+        helper.formatValue(component);
+        this.superRerender();
     }
 });

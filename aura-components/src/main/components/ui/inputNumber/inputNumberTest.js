@@ -311,6 +311,8 @@
            $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
            component.set("v.value", 49322);
        }, function(component){
+           // after dirty component is re-rendered, now input element
+           // should be displaying the new value
     	   var value = component.getElement().value;
     	   $A.test.assertEquals(49322, component.get("v.value"), "Cmp: Value not formatted correctly.");
            $A.test.assertEquals('4,93,22.00', value, "Element: Value not formatted correctly.");
@@ -328,6 +330,8 @@
            $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
            component.set("v.format", '.000');
        }, function(component){
+           // updating format dynamically is not supported
+           // value stays the same
            var value = component.getElement().value;
     	   $A.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
            $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");

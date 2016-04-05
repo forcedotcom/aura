@@ -15,24 +15,29 @@
  */
 package org.auraframework.integration.test.components.ui.inputNumber;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.components.ui.inputSmartNumber.BaseInputSmartNumber;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class InputNumberUITest extends WebDriverTestCase {
+public class InputNumberUITest extends BaseInputSmartNumber {
 
-    public InputNumberUITest(String name) {
-        super(name);
+    private final String INPUT_SEL = ".input";
+    private final String VVAL_OUTPUT_SEL = ".vvalue";
+    private final String SUBMIT_SEL = ".uiButton";
+    private final String SUBMIT_OUTUPT_SEL = ".uiButton ~ .uiOutputText";
+    
+    private final String LOCALIZATION_TEST_URL = "/uitest/inputLocalizedNumber_Test.cmp";
+    
+    public InputNumberUITest() {
+        super("/uitest/inputNumber_Test.cmp");
     }
 
     public void testInputNumber() throws Exception {
-        WebDriver d = getDriver();
-        open("/uitest/inputNumber_Test.cmp");
+        open(this.URL);
 
-        WebElement input = d.findElement(By.xpath("//input"));
-        WebElement submit = d.findElement(By.xpath("//button"));
-        WebElement output = d.findElement(By.xpath("//span[@class='uiOutputText']"));
+        WebElement input = findDomElement(By.cssSelector(INPUT_SEL));
+        WebElement submit = findDomElement(By.cssSelector(SUBMIT_SEL));
+        WebElement output = findDomElement(By.cssSelector(SUBMIT_OUTUPT_SEL));
 
         // integer
         input.clear();
@@ -49,22 +54,21 @@ public class InputNumberUITest extends WebDriverTestCase {
 
     // FIXME: bug W-1296985 - Aura numbers only handle numbers as large as JavaScript
     public void _testInputNumberDefaultValue() throws Exception {
-        WebDriver d = getDriver();
-        open("/uitest/inputNumber_Test.cmp");
+        open(this.URL);
 
-        WebElement input = d.findElement(By.xpath("//input"));
-        assertEquals("Default number from model is incorrect", "123456789123456789", input.getAttribute("value"));
+        WebElement input = findDomElement(By.cssSelector(INPUT_SEL));
+        assertEquals("Default number from model is incorrect",
+                "123456789123456789", input.getAttribute("value"));
     }
 
     // TODO: WebDriver doesn't support setting http headers for language. Need
     // to use proxy or preconfigured browser to spoof Locales other than US.
     public void testLocalizedInputNumber() throws Exception {
-        WebDriver d = getDriver();
-        open("/uitest/inputLocalizedNumber_Test.cmp");
+        open(LOCALIZATION_TEST_URL);
 
-        WebElement input = d.findElement(By.xpath("//input"));
-        WebElement submit = d.findElement(By.xpath("//button"));
-        WebElement output = d.findElement(By.xpath("//span[@class='uiOutputText']"));
+        WebElement input = findDomElement(By.cssSelector(INPUT_SEL));
+        WebElement submit = findDomElement(By.cssSelector(SUBMIT_SEL));
+        WebElement output = findDomElement(By.cssSelector(SUBMIT_OUTUPT_SEL));
 
         // integer
         input.clear();
@@ -91,28 +95,19 @@ public class InputNumberUITest extends WebDriverTestCase {
         waitForElementTextPresent(output, "-123.456");
     }
 
-    // commented for bug W-2319834
-    public void _testInputNumberWithError() throws Exception {
-        WebDriver d = getDriver();
-        open("/uitest/inputNumber_Test.cmp");
+    /**
+     * Test positive number with shortcut
+     */
+    public void testPositiveWithShortcut() throws Exception {
+        open(this.URL);
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, VVAL_OUTPUT_SEL, "1.23k", "1230", "1,230");
+    }
 
-        WebElement input = d.findElement(By.xpath("//input"));
-        WebElement submit = d.findElement(By.xpath("//button"));
-        WebElement output = d.findElement(By.xpath("//span[@class='uiOutputText']"));
-
-        // induce error
-        input.clear();
-        input.sendKeys("abcdef");
-        submit.click();
-        waitForElementTextPresent(output, "Got Error!");
-        getAuraUITestingUtil().waitForElementText(By.className("uiInputDefaultError"),
-                "Invalid value for inVar: java://long", true, "Error element never inserted into DOM");
-
-        // clear error
-        input.clear();
-        input.sendKeys("1234");
-        submit.click();
-        waitForElementTextPresent(output, "1234");
-        assertFalse("Did not expect an error message", isElementPresent(By.className("uiInputDefaultError")));
+    /**
+     * Test negative number with shortcut
+     */
+    public void testNegativeWithShortcut() throws Exception {
+        open(this.URL);
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, VVAL_OUTPUT_SEL, "-1.23k", "-1230", "-1,230");
     }
 }

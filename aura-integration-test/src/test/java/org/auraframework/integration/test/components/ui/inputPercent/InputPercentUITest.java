@@ -15,12 +15,39 @@
  */
 package org.auraframework.integration.test.components.ui.inputPercent;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.components.ui.inputSmartNumber.BaseInputSmartNumber;
 
-public class InputPercentUITest_DISABLED extends WebDriverTestCase {
+public class InputPercentUITest extends BaseInputSmartNumber {
 
-    public InputPercentUITest_DISABLED(String name) {
-        super(name);
+    private final String INPUT_SEL = ".input";
+    private final String OUTPUT_SEL = ".vvalue";
+    
+    public InputPercentUITest() {
+        super("/uitest/inputPercent_Test.cmp");
+    }
+
+    /**
+     * Test positive number with shortcut
+     */
+    public void testPositiveWithShortcut() throws Exception {
+        open(this.URL);
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "123k", "1230", "123,000%");
+    }
+
+    /**
+     * Test negative number with shortcut
+     */
+    public void testNegativeWithShortcut() throws Exception {
+        open(this.URL);
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "-123k", "-1230", "-123,000%");
+    }
+
+    /**
+     * Test decimal number
+     */
+    public void testDefaultFormatDecimalPlacesNotSupported() throws Exception {
+        open(this.URL);
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1.23", "0.01", "1%");
     }
 
     // This tests behaviour exhibited by HTML5 input type="number".

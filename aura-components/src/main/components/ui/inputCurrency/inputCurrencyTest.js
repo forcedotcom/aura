@@ -71,18 +71,9 @@
         attributes: {value: 1234},
         test: function (component) {
             this.assertCmpElemValues(component, 1234, "$1,234.00");
+            $A.test.assertEquals("¤#,##0.00", component.get('v.format'),
+                    "The actual format did not match the expected format");
         }
-    },
-    
-    /**
-     * Test that the format is set by default
-     */
-    testDefaultFormat : {
-    	test : function(component) {
-    		var expectedFormat = "¤#,##0.00";
-    		var format = component.get('v.format');
-    		$A.test.assertEquals(expectedFormat, format, "The actual format did not match the expected format");
-    	} 	
     },
 
     /**

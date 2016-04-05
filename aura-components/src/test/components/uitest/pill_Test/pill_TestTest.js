@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 ({
-	owner:"sle",
-
     //test icon background
 	testIconBackgroundColorWithIcon: {
         test: function(cmp) {

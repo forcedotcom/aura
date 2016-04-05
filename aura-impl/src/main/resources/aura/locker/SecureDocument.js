@@ -27,6 +27,11 @@
 function SecureDocument(doc, key) {
     "use strict";
 
+    function trust(st, el) {
+        $A.lockerService.trust(st, el);
+        return SecureElement(el, key);
+    }
+
     var o = Object.create(null, {
         toString: {
             value: function() {
@@ -42,30 +47,42 @@ function SecureDocument(doc, key) {
                         return SecureScriptElement(key);
 
                     default:
-                        var el = doc.createElement(tag);
-                        $A.lockerService.trust(o, el);
-                        return SecureElement(el, key);
+                        return trust(o, doc.createElement(tag));
                 }
             }
         },
         createDocumentFragment: {
             value: function() {
-                var frag = doc.createDocumentFragment();
-                $A.lockerService.trust(o, frag);
-                return SecureElement(frag, key);
+                return trust(o, doc.createDocumentFragment());
             }
         },
         createTextNode: {
             value: function(text) {
-                var node = doc.createTextNode(text);
-                $A.lockerService.trust(o, node);
-                return SecureElement(node, key);
+                return trust(o, doc.createTextNode(text));
+            }
+        },
+        createComment: {
+            value: function(data) {
+                return trust(o, doc.createComment(data));
+            }
+        },
+        documentElement: {
+        	enumerable: true,
+    		get : function() {
+                return trust(o, doc.documentElement.cloneNode());
             }
         }
     });
+
     Object.defineProperties(o, {
+        addEventListener: SecureElement.createAddEventListenerDescriptor(o, doc, key),
+
         body: SecureThing.createFilteredProperty(o, doc, "body"),
         head: SecureThing.createFilteredProperty(o, doc, "head"),
+
+        childNodes: SecureThing.createFilteredProperty(o, doc, "childNodes"),
+
+        nodeType: SecureThing.createFilteredProperty(o, doc, "nodeType"),
 
         getElementById: SecureThing.createFilteredMethod(o, doc, "getElementById"),
         getElementsByClassName: SecureThing.createFilteredMethod(o, doc, "getElementsByClassName"),
@@ -83,6 +100,6 @@ function SecureDocument(doc, key) {
 
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", doc);
-        
+
     return o;
 }

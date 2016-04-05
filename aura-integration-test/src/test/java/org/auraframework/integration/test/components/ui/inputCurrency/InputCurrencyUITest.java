@@ -20,7 +20,7 @@ import org.auraframework.integration.test.components.ui.inputSmartNumber.BaseInp
 public class InputCurrencyUITest extends BaseInputSmartNumber {
 
     private final String INPUT_SEL = ".input";
-    private final String OUTPUT_SEL = ".uiOutputText";
+    private final String OUTPUT_SEL = ".vvalue";
     
     public InputCurrencyUITest() {
         super("/uitest/inputCurrency_Test.cmp");

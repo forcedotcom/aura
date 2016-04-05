@@ -114,7 +114,7 @@
         test: [function (component) {
             component.set('v.value', 'abc');
         }, function(component){
-            this.assertCmpElemValues(component, undefined, this.EMPTY_STRING);
+            this.assertCmpElemValues(component, null, this.EMPTY_STRING);
         }]
     },
 

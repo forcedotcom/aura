@@ -19,5 +19,5 @@
     <aura:attribute name="value" type="Decimal" default=""/>
 
     <ui:inputPercent aura:id="input" value="{! v.value }" label="Input" updateOn="keyup"/>
-    <p>v.value: {!v.value}</p>
+    <p>v.value: <span class="vvalue">{!v.value}</span></p>
 </aura:component>

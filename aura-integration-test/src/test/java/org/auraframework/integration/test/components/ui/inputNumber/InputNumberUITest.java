@@ -22,7 +22,7 @@ import org.openqa.selenium.WebElement;
 public class InputNumberUITest extends BaseInputSmartNumber {
 
     private final String INPUT_SEL = ".input";
-    private final String VVAL_OUTPUT_SEL = ".uiOutputText";
+    private final String VVAL_OUTPUT_SEL = ".vvalue";
     private final String SUBMIT_SEL = ".uiButton";
     private final String SUBMIT_OUTUPT_SEL = ".uiButton ~ .uiOutputText";
     

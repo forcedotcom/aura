@@ -23,7 +23,7 @@ import org.openqa.selenium.InvalidElementStateException;
 public class InputSmartNumberUITest extends BaseInputSmartNumber {
 
     private final String INPUT_SEL = ".input";
-    private final String OUTPUT_SEL = ".uiOutputText";
+    private final String OUTPUT_SEL = ".vvalue";
     
     public InputSmartNumberUITest() {
         super("/uitest/inputSmartNumber_Test.cmp");
@@ -135,7 +135,7 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testInvalidInputs() throws Exception {
         open(this.URL);
-        inputAndVerifyElmValueWithoutFormat(INPUT_SEL, "abcde!@#$%^&*()%/", "");
+        inputAndVerifyElmValueWithoutFormat(INPUT_SEL, "acde!@#$%^&*()%/", "");
     }
 
     /**
@@ -143,7 +143,7 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testInvalidInputsBetweenNumbers() throws Exception {
         open(this.URL);
-        inputAndVerifyElmValueWithoutFormat(INPUT_SEL, "12abcde!@#$%^&*()%/345", "12345");
+        inputAndVerifyElmValueWithoutFormat(INPUT_SEL, "12acde!@#$%^&*()%/345", "12345");
     }
 
     /**

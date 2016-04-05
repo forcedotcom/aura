@@ -19,7 +19,7 @@
     <aura:attribute name="value" type="Decimal" default=""/>
 
     <ui:inputCurrency aura:id="input" value="{! v.value }" label="Input" updateOn="keyup"/>
-    <p>v.value: {!v.value}</p>
+    <p>v.value: <span class="vvalue">{!v.value}</span></p>
 
     <hr/>
     <ui:button label="Set number - 1234" press="{! c.setNewValueAsNumber }"></ui:button>

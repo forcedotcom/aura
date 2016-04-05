@@ -38,6 +38,9 @@
         <a aura:id="clear" class="clearIcon hide" onclick="{!c.clearValue}">
             <span class="assistiveText">Clear Button</span>
         </a>
+        <aura:if isTrue="{!and(v.loadDatePicker, !v.useManager) }">
+            <ui:datePicker aura:id="datePicker" hideOnSelect="true" closeOnClickOut="true" selectDate="{!c.onDateSelected}" showToday="{!$Browser.isPhone || $Browser.isTablet}"/>
+        </aura:if>
     </aura:if>
 
     <aura:if isTrue="{!$Browser.formFactor == 'DESKTOP'}">
@@ -52,10 +55,9 @@
             <a aura:id="clear" class="clearIcon hide" onclick="{!c.clearValue}">
                 <span class="assistiveText">Clear Button</span>
             </a>
+            <aura:if isTrue="{!and(v.loadDatePicker, !v.useManager) }">
+                <ui:datePicker aura:id="datePicker" hideOnSelect="true" closeOnClickOut="true" selectDate="{!c.onDateSelected}" showToday="{!$Browser.isPhone || $Browser.isTablet}"/>
+            </aura:if>
         </form>
     </aura:if>
-
-    <aura:if isTrue="{!and(v.loadDatePicker, !v.useManager) }">
-        <ui:datePicker aura:id="datePicker" hideOnSelect="true" closeOnClickOut="true" selectDate="{!c.onDateSelected}" showToday="{!$Browser.isPhone || $Browser.isTablet}"/>
-   </aura:if>
 </aura:component>

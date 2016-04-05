@@ -69,7 +69,8 @@
             class="{!(v.triggerClass ? v.triggerClass + ' ' : '') + 'tooltip-trigger'}" 
             aria-describedby="{!v.domId}" 
             tabindex="{!v.tabIndex}" >
-            {!v.body}            
+            {!v.body}
+            <span class="tooltip-invisible" id="{!v.domId}" role="tooltip">{!v.tooltipBody}</span>         
         </div>
         <aura:set attribute="else">
             <div aura:id="tooltip" aria-describedby="{!v.domId}" class="{!(v.triggerClass ? v.triggerClass + ' ' : '') + 'tooltip-trigger tooltip-basic'}" tabindex="{!v.tabIndex}">

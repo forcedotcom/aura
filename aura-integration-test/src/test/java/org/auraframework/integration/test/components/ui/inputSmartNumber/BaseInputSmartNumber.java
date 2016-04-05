@@ -30,6 +30,12 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
         this.URL = urlPath;
     }
 
+    /****************************
+     * Helper Functions
+     ****************************/
+    /**
+     * Wait for input box text to be present
+     */
     protected void waitForInputBoxTextPresent(WebElement inputBox, String expectedValue) {
         getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
@@ -45,8 +51,7 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
      * @param input - input to input box
      * @param expectedElemVal - what's displayed in the input box
      */
-    protected void inputAndWaitForElmValue(String inputSel,
-            String input, String expectedElemVal) {
+    protected void inputAndVerifyElmValueWithoutFormat(String inputSel, String input, String expectedElemVal) {
         WebElement inputElm = findDomElement(By.cssSelector(inputSel));
         inputElm.clear();
         inputElm.sendKeys(input);
@@ -61,11 +66,11 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
      * @param expectedCmpVal - component's v.value
      * @param expectedElemVal - what's displayed in the input box
      */
-    protected void inputAndWaitForCmpElmValues(String inputSel, String outputSel, 
-            String input, String expectedCmpVal, String expectedElemVal) {
+    protected void inputAndVerifyValuesAfterFormatted(String inputSel, String outputSel, String input,
+                                                      String expectedCmpVal, String expectedElemVal) {
         WebElement inputElm = findDomElement(By.cssSelector(inputSel));
         WebElement outputElm = findDomElement(By.cssSelector(outputSel));
-        
+
         // enter input
         inputElm.clear();
         inputElm.sendKeys(input);
@@ -74,7 +79,24 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
         WebElement body = findDomElement(By.tagName("body"));
         body.click();
 
+        // check v.value
         waitForElementTextPresent(outputElm, expectedCmpVal);
-        waitForInputBoxTextPresent(inputElm, expectedElemVal);
+
+        // check how the input box value is formatted
+        if (expectedElemVal != null) {
+            waitForInputBoxTextPresent(inputElm, expectedElemVal);
+        }
+    }
+
+    /**
+     * Test flow to check v.value after triggering format
+     * @param inputSel - input box selector
+     * @param outputSel - output text selector for the element that reflects v.value
+     * @param input - input to input box
+     * @param expectedCmpVal - component's v.value
+     */
+    protected void inputAndVerifyValuesAfterFormatted(String inputSel, String outputSel,
+                                                      String input, String expectedCmpVal) {
+        inputAndVerifyValuesAfterFormatted(inputSel, outputSel, input, expectedCmpVal, null);
     }
 }

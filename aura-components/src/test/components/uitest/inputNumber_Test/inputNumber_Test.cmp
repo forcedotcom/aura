@@ -21,14 +21,11 @@
     <aura:attribute name="eventFired"  type="Object" />
     <aura:attribute name="eventList"   type="Object[]" default="[]" />
 
-
     <aura:handler name="init" value="{! this }" action="{! c.init }" />
 
     <ui:inputNumber aura:id="Number" value="{!m.number}" updateOn="keyup" label="Number" labelPosition="top" />
-    <br/>
-    v.value:
-    <ui:outputText aura:id="output" value="{!m.number}"/>
-    <br/>
+    <p>v.value: {!m.number}</p>
+
     <auratest:baseInputTest cmpType="{!v.testCmpName}" ref="{!m.number}"/>
     <h1>List of fired events</h1>
     <ul aura:id="eventList">

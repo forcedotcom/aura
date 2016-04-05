@@ -16,19 +16,13 @@
 
 -->
 <aura:component>
-
-    <!-- Attributes -->
     <aura:attribute name="value" type="Decimal" default=""/>
     <aura:attribute name="max" type="Decimal" default="99999999999999"/>
     <aura:attribute name="min" type="Decimal" default="-99999999999999"/>
     <aura:attribute name="disabled" type="Boolean" default="false"/>
 
-    <!--Layout -->
     Input:
     <ui:inputSmartNumber aura:id="input" value="{! v.value }" updateOn="keyup"
             max="{! v.max }" min="{! v.min }" disabled="{! v.disabled }"/>
-    <br/>
-    v.value:
-    <ui:outputText aura:id="output" value="{! v.value }"/>
-
+    <p>v.value: {!v.value}</p>
 </aura:component>

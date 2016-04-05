@@ -16,14 +16,8 @@
 
 -->
 <aura:component>
-
-    <!-- Attributes -->
     <aura:attribute name="value" type="Decimal" default=""/>
 
-    <!--Layout -->
     <ui:inputPercent aura:id="input" value="{! v.value }" label="Input" updateOn="keyup"/>
-    <br/>
-    v.value:
-    <ui:outputText aura:id="output" value="{! v.value }"/>
-
+    <p>v.value: {!v.value}</p>
 </aura:component>

@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({  
+({
+    EMPTY_STRING : '',
     /*
      * Pass nothing to component
      */
     testUnassigned: {
         test: function (component) {
-            this.assertCmpElemValues(component, undefined, "");
+            this.assertCmpElemValues(component, undefined, this.EMPTY_STRING);
         }
     },
 
@@ -113,7 +114,7 @@
         test: [function (component) {
             component.set('v.value', 'abc');
         }, function(component){
-            this.assertCmpElemValues(component, undefined, "");
+            this.assertCmpElemValues(component, undefined, this.EMPTY_STRING);
         }]
     },
 
@@ -126,6 +127,8 @@
             this.assertCmpElemValues(component, 1234, "$1,234.0000");
             component.set("v.value", 5678);
         }, function (component) {
+            // after dirty component is re-rendered, now input element
+            // should be displaying the new value
             this.assertCmpElemValues(component, 5678, "$5,678.0000");
         }]
     },
@@ -139,6 +142,8 @@
             this.assertCmpElemValues(component, 1234, "@1,234.0000");
             component.set("v.format", '$#,###.00');
         }, function (component) {
+            // updating format dynamically is not supported
+            // value stays the same
             this.assertCmpElemValues(component, 1234, "@1,234.0000");
         }]
     },

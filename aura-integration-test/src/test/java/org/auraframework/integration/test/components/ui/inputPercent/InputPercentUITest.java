@@ -31,7 +31,7 @@ public class InputPercentUITest extends BaseInputSmartNumber {
      */
     public void testPositiveWithShortcut() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "123k", "1230", "123,000%");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "123k", "1230", "123,000%");
     }
 
     /**
@@ -39,16 +39,7 @@ public class InputPercentUITest extends BaseInputSmartNumber {
      */
     public void testNegativeWithShortcut() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "-123k", "-1230", "-123,000%");
-    }
-
-    /**
-     * Test invalid inputs are not allowed
-     * Even % is not allowed
-     */
-    public void testInvalidInputs() throws Exception {
-        open(this.URL);
-        inputAndWaitForElmValue(INPUT_SEL, "abcde!@#$%^&*()%", "");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "-123k", "-1230", "-123,000%");
     }
 
     /**
@@ -56,7 +47,7 @@ public class InputPercentUITest extends BaseInputSmartNumber {
      */
     public void testDefaultFormatDecimalPlacesNotSupported() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1.23", "0.01", "1%");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1.23", "0.01", "1%");
     }
 
     // This tests behaviour exhibited by HTML5 input type="number".

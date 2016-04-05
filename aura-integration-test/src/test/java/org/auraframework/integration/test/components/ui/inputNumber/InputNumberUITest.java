@@ -100,7 +100,7 @@ public class InputNumberUITest extends BaseInputSmartNumber {
      */
     public void testPositiveWithShortcut() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, VVAL_OUTPUT_SEL, "1.23k", "1230", "1,230");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, VVAL_OUTPUT_SEL, "1.23k", "1230", "1,230");
     }
 
     /**
@@ -108,15 +108,6 @@ public class InputNumberUITest extends BaseInputSmartNumber {
      */
     public void testNegativeWithShortcut() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, VVAL_OUTPUT_SEL, "-1.23k", "-1230", "-1,230");
-    }
-
-    /**
-     * Test invalid inputs are not allowed
-     * Event $ is not allowed
-     */
-    public void testInvalidInputs() throws Exception {
-        open(this.URL);
-        inputAndWaitForElmValue(INPUT_SEL, "abcde!@#$%^&*()%", "");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, VVAL_OUTPUT_SEL, "-1.23k", "-1230", "-1,230");
     }
 }

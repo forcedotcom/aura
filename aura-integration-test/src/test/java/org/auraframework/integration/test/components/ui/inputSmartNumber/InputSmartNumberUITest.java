@@ -34,8 +34,8 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testShortcutK() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1K", "1000", "1,000");
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1k", "1000", "1,000");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1K", "1000", "1,000");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1k", "1000", "1,000");
     }
 
     /**
@@ -43,8 +43,8 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testShortcutM() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1M", "1000000", "1,000,000");
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1m", "1000000", "1,000,000");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1M", "1000000", "1,000,000");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1m", "1000000", "1,000,000");
     }
 
     /**
@@ -52,8 +52,8 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testShortcutB() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1B", "1000000000", "1,000,000,000");
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1b", "1000000000", "1,000,000,000");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1B", "1000000000", "1,000,000,000");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1b", "1000000000", "1,000,000,000");
     }
 
     /**
@@ -61,8 +61,8 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testShortcutT() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1T", "1000000000000", "1,000,000,000,000");
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1t", "1000000000000", "1,000,000,000,000");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1T", "1000000000000", "1,000,000,000,000");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1t", "1000000000000", "1,000,000,000,000");
     }
 
     /**
@@ -70,7 +70,7 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testDecimal() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1.23", "1.23", "1.23");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1.23", "1.23", "1.23");
     }
 
     /**
@@ -78,7 +78,7 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testInvalidAlphabet() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "12j3", "123", "123");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "12j3", "123", "123");
     }
 
     /**
@@ -86,7 +86,7 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testThousandMarkBeforeDecimalMark() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1,2,3,4.56", "1234.56", "1,234.56");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1,2,3,4.56", "1234.56", "1,234.56");
     }
 
     /**
@@ -94,7 +94,7 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testThousandMarkAfterDecimalMark() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1.2,3", "1.23", "1.23");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1.2,3", "1.23", "1.23");
     }
 
     /**
@@ -102,7 +102,7 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testShortcutAfterDecimalMark() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "0.1m", "100000", "100,000");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "0.1m", "100000", "100,000");
     }
 
     /**
@@ -110,7 +110,7 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testSpaceAfterShortcut() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1k ", "1000", "1,000");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1k ", "1000", "1,000");
     }
 
     /***
@@ -119,7 +119,7 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testMinAttribute() throws Exception {
         open(this.URL + "?min=10");
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "9", "9", "9");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "9", "9", "9");
     }
 
     /**
@@ -127,7 +127,23 @@ public class InputSmartNumberUITest extends BaseInputSmartNumber {
      */
     public void testWellFormattedInput() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1,234.56", "1234.56", "1,234.56");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1,234.56", "1234.56", "1,234.56");
+    }
+
+    /**
+     * Test invalid inputs are not allowed
+     */
+    public void testInvalidInputs() throws Exception {
+        open(this.URL);
+        inputAndVerifyElmValueWithoutFormat(INPUT_SEL, "abcde!@#$%^&*()%/", "");
+    }
+
+    /**
+     * Test invalid inputs in between numbers are not allowed
+     */
+    public void testInvalidInputsBetweenNumbers() throws Exception {
+        open(this.URL);
+        inputAndVerifyElmValueWithoutFormat(INPUT_SEL, "12abcde!@#$%^&*()%/345", "12345");
     }
 
     /**

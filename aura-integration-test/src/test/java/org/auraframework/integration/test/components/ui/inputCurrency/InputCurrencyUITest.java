@@ -31,7 +31,7 @@ public class InputCurrencyUITest extends BaseInputSmartNumber {
      */
     public void testPositiveWithShortcut() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "1.23k", "1230", "$1,230.00");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1.23k", "1230", "$1,230.00");
     }
 
     /**
@@ -39,16 +39,7 @@ public class InputCurrencyUITest extends BaseInputSmartNumber {
      */
     public void testNegativeWithShortcut() throws Exception {
         open(this.URL);
-        inputAndWaitForCmpElmValues(INPUT_SEL, OUTPUT_SEL, "-1.23k", "-1230", "-$1,230.00");
-    }
-
-    /**
-     * Test invalid inputs are not allowed
-     * Even $ is not allowed
-     */
-    public void testInvalidInputs() throws Exception {
-        open(this.URL);
-        inputAndWaitForElmValue(INPUT_SEL, "abcde!@#$%^&*()%", "");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "-1.23k", "-1230", "-$1,230.00");
     }
 
     /**
@@ -56,6 +47,6 @@ public class InputCurrencyUITest extends BaseInputSmartNumber {
      */
     public void testDefaultFormatOnlyTwoDecimalPlacesAllowed() throws Exception {
         open(this.URL);
-        inputAndWaitForElmValue(INPUT_SEL, "0.12345", "0.12");
+        inputAndVerifyElmValueWithoutFormat(INPUT_SEL, "0.12345", "0.12");
     }
 }

@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 ({
+    EMPTY_STRING: '',
     /*
      * Pass nothing to component
      */
     testUnassigned: {
         test: function (component) {
-            this.assertCmpElemValues(component, undefined, "");
+            this.assertCmpElemValues(component, undefined, this.EMPTY_STRING);
         }
     },
 
@@ -71,8 +72,8 @@
     testSetInvalidValue: {
         test: [function (component) {
             component.set('v.value', 'abc');
-        }, function(component){
-            this.assertCmpElemValues(component, undefined, "");
+        }, function(component) {
+            this.assertCmpElemValues(component, undefined, this.EMPTY_STRING);
         }]
     },
 
@@ -80,11 +81,11 @@
      * Verify that when the value changes it is rerendered with the unformated new value
      */
     testUpdateValue: {
-        attributes : {value : 22.7, format : '##,#0,00.00#####'},
-        test: [function(component){
+        attributes: {value: 22.7, format: '##,#0,00.00#####'},
+        test: [function(component) {
             this.assertCmpElemValues(component, 22.7, "0,22.70");
             component.set("v.value", 49322);
-        }, function(component){
+        }, function(component) {
            this.assertCmpElemValues(component, 49322, "4,93,22.00");
         }]
     },
@@ -108,6 +109,8 @@
             this.assertCmpElemValues(component, 1234, "1,234.0000");
             component.set("v.format", '#,##.00');
         }, function (component) {
+            // updating format dynamically is not supported
+            // value stays the same
             this.assertCmpElemValues(component, 1234, "1,234.0000");
         }]
     },

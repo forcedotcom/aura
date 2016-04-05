@@ -40,6 +40,6 @@ public class InlineJs extends TemplateResource {
     @Override
     protected boolean shouldCacheHTMLTemplate(DefDescriptor<? extends BaseComponentDef> appDefDesc,
             HttpServletRequest request, AuraContext context) throws QuickFixException {
-        return true;
+        return false;
     }
 }

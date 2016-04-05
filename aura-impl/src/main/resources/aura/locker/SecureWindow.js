@@ -68,5 +68,6 @@ function SecureWindow(win, key) {
 
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", win);
-	return Object.seal(o);
+	
+	return o;
 }

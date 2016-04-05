@@ -71,18 +71,6 @@
         }
     },
 
-    testSecureElementFrozenAfterCreation_DynamicallyCreated: {
-        test: function(cmp) {
-            cmp.testSecureElementFrozenAfterCreation_DynamicallyCreated();
-        }
-    },
-
-    testSecureElementFrozenAfterCreation_FromMarkup: {
-        test: function(cmp) {
-            cmp.testSecureElementFrozenAfterCreation_FromMarkup();
-        }
-    },
-
     testAppendDynamicallyCreatedDivToMarkup: {
         test: function(cmp) {
             cmp.testAppendDynamicallyCreatedDivToMarkup();

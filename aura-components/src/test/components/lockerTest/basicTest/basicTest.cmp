@@ -25,8 +25,6 @@
     <aura:method name="testComponentLockerInController" action="{!c.testComponentLockerInController}"/>
     <aura:method name="testDocumentLockerInController" action="{!c.testDocumentLockerInController}"/>
     <aura:method name="testWindowLockerInController" action="{!c.testWindowLockerInController}"/>
-    <aura:method name="testSecureElementFrozenAfterCreation_FromMarkup" action="{!c.testSecureElementFrozenAfterCreation_FromMarkup}"/>
-    <aura:method name="testSecureElementFrozenAfterCreation_DynamicallyCreated" action="{!c.testSecureElementFrozenAfterCreation_DynamicallyCreated}"/>
     <aura:method name="testAppendDynamicallyCreatedDivToMarkup" action="{!c.testAppendDynamicallyCreatedDivToMarkup}"/>
     <aura:method name="testEvalBlocking" action="{!c.testEvalBlocking}"/>
     <aura:method name="testContextOfController" action="{!c.testContextOfController}"/>

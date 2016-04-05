@@ -30,18 +30,6 @@
                 + " to be a SecureWindow");
     },
     
-    testSecureElementFrozenAfterCreation_FromMarkup: function(cmp, event, helper) {
-        var testUtils = cmp.get("v.testUtils");
-        var div = cmp.find("content").getElement();
-        helper.doTestSecureElementFrozenAfterCreation(testUtils, div);
-    },
-    
-    testSecureElementFrozenAfterCreation_DynamicallyCreated: function(cmp, event, helper) {
-        var testUtils = cmp.get("v.testUtils");
-        var div = document.createElement("div");
-        helper.doTestSecureElementFrozenAfterCreation(testUtils, div);
-    },
-    
     testAppendDynamicallyCreatedDivToMarkup: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var div = document.createElement("div");

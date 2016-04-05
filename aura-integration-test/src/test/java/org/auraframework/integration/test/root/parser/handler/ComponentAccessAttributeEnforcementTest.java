@@ -15,6 +15,8 @@
  */
 package org.auraframework.integration.test.root.parser.handler;
 
+import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -32,108 +34,152 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
 
     public ComponentAccessAttributeEnforcementTest(String name) {
         super(name);
+        
+        ConfigAdapter adapter = Aura.getConfigAdapter();
+		 adapter.addPrivilegedNamespace("privilegedNS");
     }
 
     /**
      * Template tests start
+     * template cannot have access='Private' 
+     */
+    /**
+     * access to template in a custom namespace
+     * for template in customnamespace, we cannot have access='Privileged'
      */
     @Test
-    public void testApplicationWithSystemNamespaceImplementsTemplateWithSameSystemNamespaceGlobal() throws QuickFixException {
-        //create component with system namespace
-        String cmpSource = "<aura:component isTemplate='true' access='GLOBAL'/>";
-        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
-        //create application with above component in markup
-        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
-        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
-        descriptor.getDef();
-    }
-    @Test
-    public void testApplicationWithSystemNamespaceImplementsTemplateWithSameSystemNamespace() throws QuickFixException {
-        //create component with system namespace
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithSameCustomNamespace() throws QuickFixException {
+        //create component with custom namespace
         String cmpSource = "<aura:component isTemplate='true'/>";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
         //create application with above component in markup
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
         descriptor.getDef();
     }
     @Test
-    public void testApplicationWithSystemNamespaceImplementsTemplateWithSameSystemNamespacePublic() throws QuickFixException {
-        //create component with system namespace
-        String cmpSource = "<aura:component isTemplate='true' access='PUBLIC'/>";
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithSameCustomNamespaceAccessGlobal() throws QuickFixException {
+        //create component with custom namespace
+        String cmpSource = "<aura:component isTemplate='true' access='GLOBAL'/>";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
         //create application with above component in markup
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
         descriptor.getDef();
     }
     @Test
-    public void testApplicationWithSystemNamespaceImplementsTemplateWithSameSystemNamespaceInternal() throws QuickFixException {
-        //create component with system namespace
-        String cmpSource = "<aura:component isTemplate='true' access='INTERNAL'/>";
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithSameCustomNamespaceAccessPublic() throws QuickFixException {
+        //create component with custom namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Public'/>";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
         //create application with above component in markup
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
         descriptor.getDef();
     }
     
+     
     @Test
-    public void testApplicationWithSystemNamespaceImplementsTemplateWithOtherSystemNamespace() throws QuickFixException {
-        //create component with system namespace
-        String cmpSource = "<aura:component isTemplate='true'/>";
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithOtherCustomNamespace() throws QuickFixException {
+        //create component with custom namespace
+        String cmpSource = "<aura:component isTemplate='true' />";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
         //create application with above component in markup
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", true);
-        descriptor.getDef();
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", false);
+        try {
+            descriptor.getDef();
+            fail("Template from a custom namespace cannot be used in another custom namespace because their default access is PUBLIC");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
     }
     @Test
-    public void testApplicationWithSystemNamespaceImplementsTemplateWithOtherSystemNamespaceGlobal() throws QuickFixException {
-        //create component with system namespace
-        String cmpSource = "<aura:component isTemplate='true' access='GLOBAL'/>";
-        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
-        //create application with above component in markup
-        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
-        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", true);
-        descriptor.getDef();
-    }
-    @Test
-    public void testApplicationWithSystemNamespaceImplementsTemplateWithOtherSystemNamespacePublic() throws QuickFixException {
-        //create component with system namespace
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithOtherCustomNamespaceAccessPublic() throws QuickFixException {
+        //create component with custom namespace
         String cmpSource = "<aura:component isTemplate='true' access='PUBLIC'/>";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
         //create application with above component in markup
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", true);
-        descriptor.getDef();
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", false);
+        try {
+            descriptor.getDef();
+            fail("Template from a custom namespace cannot be used in another custom namespace because their default access is PUBLIC");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
     }
     @Test
-    public void testApplicationWithSystemNamespaceImplementsTemplateWithOtherSystemNamespaceInternal() throws QuickFixException {
-        //create component with system namespace
-        String cmpSource = "<aura:component isTemplate='true' access='INTERNAL'/>";
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithOtherCustomNamespaceAccessGlobal() throws QuickFixException {
+        //create component with custom namespace
+        String cmpSource = "<aura:component isTemplate='true' access='GLOBAL'/>";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
         //create application with above component in markup
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", false);
         descriptor.getDef();
     }
+    
+    
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithCustomNamespace() throws QuickFixException {
+        //create component with custom namespace
+        String cmpSource = "<aura:component isTemplate='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+            fail("Template from a privileged namespace cannot be used in another custom namespace with default access");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithCustomNamespaceAccessPublic() throws QuickFixException {
+        //create component with custom namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+            fail("Template from a privileged namespace cannot be used in another custom namespace with PUBLIC access");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithCustomNamespaceAccessGlobal() throws QuickFixException {
+        //create component with custom namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Global'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        descriptor.getDef();
+    }
+    
     
     @Test
     public void testApplicationWithSystemNamespaceImplementsTemplateWithCustomNamespace() throws QuickFixException {
@@ -173,8 +219,427 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
     
     
+    
+    /**
+     * access to template in a privileged namespace
+     * we cannot have access='Privileged' for tempalte in a privileged namespace
+     */
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithPrivilegedNamespace() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithPrivilegedNamespaceAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithPrivilegedNamespaceAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Global'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    
+    
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithSamePrivilegedNamespace() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithSamePrivilegedNamespaceAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithSamePrivilegedNamespaceAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        descriptor.getDef();
+    }
+    
+    
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithOtherPrivilegedNamespace() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+            fail("Template from a privileged namespace cannot be used in another privileged namespace with default access");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithOtherPrivilegedNamespaceAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+            fail("Template from a privileged namespace cannot be used in another privileged namespace with default access");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithOtherPrivilegedNamespaceAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Global'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        descriptor.getDef();
+    }
+    
+    
+    @Test
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithPrivilegedNamespace() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+        try {
+        	descriptor.getDef();
+            fail("Template from a privileged namespace cannot be used in custom namespace with default access");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+    }
+    @Test
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithPrivilegedNamespaceAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+        try {
+        	descriptor.getDef();
+            fail("Template from a privileged namespace cannot be used in custom namespace with Public access");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+    }
+    @Test
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithPrivilegedNamespaceAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Global'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+        descriptor.getDef();
+    }
+    
+    
+    
+    /**
+     * access to template in a system namespace
+     * we can have template with access='Privileged' in system namespace
+     */
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithSameSystemNamespace() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithSameSystemNamespaceAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithSameSystemNamespaceAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithSameSystemNamespaceAccessInternal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='INTERNAL'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithSameSystemNamespaceAccessPrivileged() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Privileged'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    
+    
+    
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithOtherSystemNamespace() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithOtherSystemNamespaceAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='GLOBAL'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithOtherSystemNamespaceAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithOtherSystemNamespaceInternal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='INTERNAL'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithSystemNamespaceImplementsTemplateWithOtherSystemNamespacePrivileged() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Privileged'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", true);
+        descriptor.getDef();
+    }
+    
+    
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithSystemNamespace() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+            fail("Template from a privileged namespace cannot be used in privileged namespace with default access");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithSystemNamespaceAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+            fail("Template from a privileged namespace cannot be used in privileged namespace with public access");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithSystemNamespaceAccessGlobal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Global'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithSystemNamespaceAccessInternal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Internal'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        try {
+        	descriptor.getDef();
+            fail("Template from a privileged namespace cannot be used in privileged namespace with internal access");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+    }
+    @Test
+    //W-2996170
+    public void _testApplicationWithPrivilegedNamespaceImplementsTemplateWithSystemNamespaceAccessPrivileged() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Privileged'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+        descriptor.getDef();
+    }
+    
+    
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithSystemNamespace() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+        try {
+        	descriptor.getDef();
+            fail("Template from a system namespace cannot be used in custom namespace with default access");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+    }
+    @Test
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithSystemNamespaceAccessPublic() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Public'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+        try {
+        	descriptor.getDef();
+            fail("Template from a system namespace cannot be used in custom namespace with Public access");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+    }
+    @Test
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithSystemNamespaceAccessGlobal() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component isTemplate='true' access='GLOBAL'/>";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
@@ -185,38 +650,43 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
         descriptor.getDef();
     }
-    
     @Test
-    public void testApplicationWithCustomNamespaceImplementsTemplateWithSameCustomNamespace() throws QuickFixException {
-        //create component with custom namespace
-        String cmpSource = "<aura:component isTemplate='true' access='GLOBAL'/>";
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithSystemNamespaceAccessInternal() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Internal'/>";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
         //create application with above component in markup
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
-        descriptor.getDef();
-    }
-    
-    @Test
-    public void testApplicationWithCustomNamespaceImplementsTemplateWithOtherCustomNamespace() throws QuickFixException {
-        //create component with custom namespace
-        String cmpSource = "<aura:component isTemplate='true' />";
-        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
-        //create application with above component in markup
-        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
-        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", false);
         try {
-            descriptor.getDef();
-            fail("Template from a custom namespace cannot be used in another custom namespace because their default access is PUBLIC");
+        	descriptor.getDef();
+            fail("Template from a system namespace cannot be used in custom namespace with internal access");
         } catch (NoAccessException ignored) {
             // catch NoAccessException only. Anything else fails test.
         }
-
     }
+    @Test
+    public void testApplicationWithCustomNamespaceImplementsTemplateWithSystemNamespaceAccessPrivileged() throws QuickFixException {
+        //create component with system namespace
+        String cmpSource = "<aura:component isTemplate='true' access='Privileged'/>";
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        //create application with above component in markup
+        String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+        try {
+        	descriptor.getDef();
+            fail("Template from a system namespace cannot be used in custom namespace with privileged access");
+        } catch (NoAccessException ignored) {
+            // catch NoAccessException only. Anything else fails test.
+        }
+    }
+    
+    
+   
     
 
     /**
@@ -301,23 +771,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
 
-    /**
-     * Privileged access tests start
-     * I won't add more tests to this, because our access='privileged' only works on client side, see W-2996170. 
-     */
-    @Test
-    public void _testApplicationWithPrivilegedNamespaceIncludeComponentWithSystemNamespaceInMarkupAccessPrivileged() throws QuickFixException {
-        //create component with system namespace
-        String cmpSource = "<aura:component access='Privileged'/>";
-        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.OTHER_NAMESPACE + ":testcomponent", true);
-        //create application with above component in markup
-        String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
-        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
-        descriptor.getDef();
-    }
-    
     /**
      * Default access tests start
      */

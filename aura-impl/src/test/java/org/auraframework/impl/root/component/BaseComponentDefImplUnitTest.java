@@ -182,42 +182,6 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         //buildDefinition().validateReferences();
     }
 
-    public void testValidateReferencesExpressionToSuperPrivateAttribute() throws Exception {
-        setupValidateReferences();
-
-        DefDescriptor<AttributeDef> attrDesc = DefDescriptorImpl.getInstance("privateAttribute", AttributeDef.class);
-        AttributeDef attrDef = Mockito.mock(AttributeDef.class);
-        Mockito.doReturn(attrDesc).when(attrDef).getDescriptor();
-        Mockito.doReturn(PRIVATE_ACCESS).when(attrDef).getAccess();
-        // TODO: Fix this test as the attributeDef and expressionRefs affects the access check in no way
-
-        @SuppressWarnings("unchecked")
-        D parentDef = (D) Mockito.mock(getBuilder().getClass().getDeclaringClass());
-        Mockito.doReturn(this.extendsDescriptor).when(parentDef).getDescriptor();
-        Mockito.doReturn(ImmutableMap.of(attrDesc, attrDef)).when(parentDef).getAttributeDefs();
-        Mockito.doReturn(true).when(parentDef).isExtensible();
-        Mockito.doReturn(SupportLevel.GA).when(parentDef).getSupport();
-        Mockito.doReturn(parentDef).when(this.extendsDescriptor).getDef();
-        Mockito.doReturn(PRIVATE_ACCESS).when(parentDef).getAccess(); // this causes the access check failure
-        Mockito.doReturn(DefType.COMPONENT).when(this.extendsDescriptor).getDefType();
-
-        Location exprLocation = new Location("expression", 0);
-        this.expressionRefs = Sets.newHashSet();
-        this.expressionRefs.add(new PropertyReferenceImpl("v.privateAttribute", exprLocation));
-        this.attributeDefs = ImmutableMap.of();
-        setupTemplate(true);
-        modelDefDescriptor = null;
-
-        try {
-            buildDefinition().validateReferences();
-            fail("Expected an exception when trying to refer to a private attribute in an expression");
-        } catch (Throwable t) {
-            assertExceptionMessageStartsWith(t, NoAccessException.class,
-                    "Access to COMPONENT");
-            //FIXME: we should have a better location here.
-            //assertEquals(exprLocation, ((NoAccessException) t).getLocation());
-        }
-    }
 
     public void testTemplateMustBeTemplate() throws Exception {
         setupValidateReferences();
@@ -231,40 +195,6 @@ extends RootDefinitionImplUnitTest<I, D, B> {
             assertExceptionMessageStartsWith(t, InvalidDefinitionException.class,
                     String.format("Template %s must be marked as a template", templateDefDescriptor));
         }
-    }
-
-    public void testValidateReferencesExpressionToOwnPrivateAttributeOverridingSuper() throws Exception {
-        setupValidateReferences();
-
-        DefDescriptor<AttributeDef> attrDesc = DefDescriptorImpl.getInstance("privateAttribute", AttributeDef.class);
-        AttributeDef attrDef = Mockito.mock(AttributeDef.class);
-        Mockito.doReturn(attrDesc).when(attrDef).getDescriptor();
-        Mockito.doReturn(PRIVATE_ACCESS).when(attrDef).getAccess();
-        // TODO: Fix this test as the attributeDef and expressionRefs affects the access check in no way
-
-        @SuppressWarnings("unchecked")
-        D parentDef = (D) Mockito.mock(getBuilder().getClass().getDeclaringClass());
-        Mockito.doReturn(this.extendsDescriptor).when(parentDef).getDescriptor();
-        Mockito.doReturn(ImmutableMap.of(attrDesc, attrDef)).when(parentDef).getAttributeDefs();
-        Mockito.doReturn(true).when(parentDef).isExtensible();
-        Mockito.doReturn(SupportLevel.GA).when(parentDef).getSupport();
-        Mockito.doReturn(parentDef).when(this.extendsDescriptor).getDef();
-        Mockito.doReturn(PRIVATE_ACCESS).when(parentDef).getAccess(); // this causes the access check failure
-        Mockito.doReturn(DefType.COMPONENT).when(this.extendsDescriptor).getDefType();
-
-        this.expressionRefs = Sets.newHashSet();
-        this.expressionRefs.add(new PropertyReferenceImpl("v.privateAttribute", null));
-        this.attributeDefs = ImmutableMap.of(attrDesc, attrDef);
-        this.modelDefDescriptor = null;
-
-        setupTemplate(true);
-
-        try {
-            buildDefinition().validateReferences();
-        } catch (NoAccessException expected) {
-            return;
-        }
-        fail("Should have failed with a no access exception");
     }
 
     @Override

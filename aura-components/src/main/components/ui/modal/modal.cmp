@@ -37,6 +37,7 @@
     <aura:attribute name="closeAnimation" type="String" description="Adds animation to the dialog"/>
     <aura:attribute name="autoFocus" type="Boolean" default="true" description="Sets initial focus on the first item in the panel" />
     <aura:attribute name="icon" type="Aura.Component[]" description="The icon for the modal"/>
+    <aura:attribute name="trapFocus" type="Boolean" default="true" description="Indicate if we should trap the focus inside the modal. The default is true."/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" />

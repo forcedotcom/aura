@@ -109,7 +109,7 @@
     -webkit-overflow-scrolling: touch;
 }
 
-.THIS .panel-content * {
+.THIS .panel-content > * {
     transform : translate3d(0, 0, 0);
 }
 

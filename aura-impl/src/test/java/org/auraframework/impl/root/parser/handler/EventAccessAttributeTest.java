@@ -27,7 +27,9 @@ import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
+@UnAdaptableTest("when run in core, we throw error with different type.")
 public class EventAccessAttributeTest extends AuraImplTestCase {
 
 	public EventAccessAttributeTest(String name) {
@@ -71,8 +73,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
             fail("Expect to die with InvalidAccessValueException");
         } catch (InvalidAccessValueException e) {
             //expected
-        	//W-2981494 strange error, disable this assert, see if that's the issue.
-            //assertTrue(e.getMessage().contains("Invalid access attribute value \"\""));
+            assertTrue(e.getMessage().contains("Invalid access attribute value \"\""));
         }
     }
     

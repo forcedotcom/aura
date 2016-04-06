@@ -485,5 +485,132 @@
         function getItem(cmp) {
             cmp._storageLib.testReplaceExistingWithEntryTooLarge_stage2(cmp, cmp._storage);
         }]
+    },
+
+    /**
+     * Verify that sweeping never evicts blacklisted keys.
+     *
+     * Verifies by creating a store with a minimal size and sweep timing. Stores a sentinel item (the prefix),
+     * items for the blacklist, and more sentinel items (the suffix), then triggers sweeping. Verifies that
+     * the prefix and suffix items are evicted -- and thus sweeping has run -- and the blacklisted items remain.
+     *
+     * TODO W-2481519 - when aura framework-required data moved to its own storage this test needs to be
+     * moved and refactored. it will no longer be indexeddb adapter specific.
+     */
+    testSweepNeverEvictsBlacklist: {
+        test: [
+           function setup(cmp) {
+               // force rapid sweeps so test runs quickly
+               AuraStorage.SWEEP_INTERVAL.MIN = 1;
+               AuraStorage.SWEEP_INTERVAL.MAX = 2;
+
+               // store max size
+               var maxSize = 400;
+
+               cmp._storage = $A.storageService.initStorage(
+                       "actions", // name
+                       true,      // persistent
+                       false,     // secure
+                       maxSize,   // size
+                       0.1,       // expiration
+                       1,         // auto-refresh
+                       true,      // debug logging
+                       true);     // clear on init
+
+               // blacklisted keys to never expire. copied from AuraComponentService.js
+               cmp._actionsBlacklist = ["globalValueProviders",                                /* GlobalValueProviders.js */
+                                       "aura://ComponentController/ACTION$getApplication",     /* AuraClientService.js */
+                                       "$AuraContext$"];                                       /* AuraContext.js */
+
+               // stored value for blacklisted keys. must be sufficiently small so JSON.stringify() comparison below works.
+               cmp._expected = {"foo": "bar"};
+
+               cmp._prefix = cmp._storageLib.buildEntry("prefix", maxSize/3);
+               cmp._suffix1 = cmp._storageLib.buildEntry("suffix1", maxSize/3);
+               cmp._suffix2 = cmp._storageLib.buildEntry("suffix2", maxSize/3);
+           },
+           function insertEntries(cmp) {
+               var completed = false;
+               cmp._storage.put(cmp._prefix.key, cmp._prefix.value)
+                   .then(function() {
+                       var promises = [];
+                       for (var i = 0; i < cmp._actionsBlacklist.length; i++) {
+                           promises.push(cmp._storage.put(cmp._actionsBlacklist[i], cmp._expected));
+                       }
+                       return Promise.all(promises);
+                   })
+                   .then(function() {
+                       return cmp._storage.put(cmp._suffix1.key, cmp._prefix.value);
+                   })
+                   .then(function() {
+                       return cmp._storage.put(cmp._suffix2.key, cmp._prefix.value);
+                   })
+                   .then(function() {
+                       completed = true;
+                   })
+                   ["catch"](function(e) {
+                       $A.test.fail("Storage operation failed: " + e.message);
+                   });
+
+               $A.test.addWaitForWithFailureMessage(
+                   true,
+                   function(){ return completed; },
+                   "Inserting storage entries never completed");
+           },
+           function sweepAndVerify(cmp) {
+               /**
+                * Recursive function that runs until prefix + suffix entries are evicted,
+                * and blacklist entries are not. Uses promise chaining for recursion.
+                */
+               function checkStorage() {
+                   // can't call sweep() directly so rely on get() to trigger sweep().
+                   return cmp._storage.get("anything")
+                       .then(function() {
+                           return cmp._storage.getAll();
+                       })
+                       .then(function(items) {
+                           var indexedItems = {};
+                           items.forEach(function(item) {
+                               indexedItems[item["key"]] = item["value"];
+                           });
+
+                           // if sweep() hasn't cleared the items then recurse
+                           if (indexedItems[cmp._prefix.key] || indexedItems[cmp._suffix1.key]) {
+                               return checkStorage();
+                           }
+
+                           // verify the blacklisted items remain
+                           for (var i = 0; i < cmp._actionsBlacklist.length; i++) {
+                               var item = indexedItems[cmp._actionsBlacklist[i]];
+                               if (!item) {
+                                   return Promise["reject"](new Error("Blacklisted entry '" + cmp._actionsBlacklist[i] + "' was incorrectly evicted"));
+                               }
+                               if (JSON.stringify(cmp._expected) !== JSON.stringify(item)) {
+                                   return Promise["reject"](new Error("Blacklisted entry '" + cmp._actionsBlacklist[i] + "' has wrong value"));
+                               }
+                           }
+                           // success so do not recurse
+                       });
+               }
+
+               var completed = false;
+               Promise["resolve"]()
+                   .then(function() {
+                       return checkStorage();
+                   })
+                   .then(function() {
+                       completed = true;
+                   })
+                   ["catch"](function(e) {
+                       $A.test.fail("Failure while waiting for sweep to evict items: " + e.message);
+                   });
+
+               $A.test.addWaitForWithFailureMessage(
+                       true,
+                       function(){ return completed; },
+                       "Sweeping items never completed");
+           }
+       ]
     }
+
 })

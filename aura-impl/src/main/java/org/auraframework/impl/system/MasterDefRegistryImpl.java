@@ -1307,6 +1307,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (configAdapter.isInternalNamespace(referencingNamespace)) {
                 return null;
             }
+
+            // Both access of def and referencingNamespace are privileged so we allow
+            if (access.isPrivileged() && configAdapter.isPrivilegedNamespace(referencingNamespace)) {
+                return null;
+            }
         }
 
         DefDescriptor<?> desc = def.getDescriptor();

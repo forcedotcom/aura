@@ -498,4 +498,14 @@ public class StringSourceLoader implements SourceLoader, InternalNamespaceSource
     public boolean isInternalNamespace(String namespace) {
         return namespace != null && namespaces.containsKey(namespace);
     }
+
+    /**
+     * Expose privileged namespaces added in StringSourceLoader for testing
+     *
+     * @param namespace namespace
+     * @return true if included in {@link #privilegedNamespaces}
+     */
+    public boolean isPrivilegedNamespace(String namespace) {
+        return namespace != null && privilegedNamespaces.containsKey(namespace);
+    }
 }

@@ -347,11 +347,11 @@ public class AuraResourceServletTest extends AuraTestCase {
         doGet(servlet, mockRequest, mockResponse);
 
         List<String> headers = mockResponse.getHeaders("etag");
-        assertTrue("Failed to find expected value in header.", headers.contains(etag));
+        assertTrue("Failed to find expected value in header: " + headers, headers.contains(etag));
 
         // For etag to work properly, we need to "disable" the browser from caching it permanently.
         headers = mockResponse.getHeaders("cache-control");
-        assertEquals("no-cache", mockResponse.getHeader("cache-control"));
+        assertTrue("Failed to find expected value in header: " + headers, headers.contains("no-cache"));
 
         // If referer is not null, the image should be sent as a embedded image.
         // IE not an attachment.

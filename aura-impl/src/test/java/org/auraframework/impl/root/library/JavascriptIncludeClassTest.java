@@ -41,9 +41,10 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
 
         builder.setDescriptor(includeDesc.getDef().getDescriptor());
         IncludeDefRef def = builder.build();
-
+        def.validateReferences();
+        
         assertEquals(
-                String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s);\n",
+                String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s\n);\n",
                 		JavascriptIncludeClass.getClientDescriptor(includeDesc), code), def.getCode(false));
     }
 
@@ -57,52 +58,56 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
 
         builder.setDescriptor(includeDesc.getDef().getDescriptor());
         IncludeDefRef def = builder.build();
+        def.validateReferences();
 
         assertEquals(
-                String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s);\n",
+                String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s\n);\n",
                 		JavascriptIncludeClass.getClientDescriptor(includeDesc), code), def.getCode(false));
     }
 
     public void testSerializeWithMultiComments() throws Exception {
         String code = "/*this doc should be helpful*/function(){/*fix later*/return this;}/*last word*/";
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, 
+        		LibraryDef.class, null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("multiComments",
                 IncludeDef.class, libDesc);
         addSourceAutoCleanup(includeDesc, code);
 
         builder.setDescriptor(includeDesc.getDef().getDescriptor());
         IncludeDefRef def = builder.build();
+        def.validateReferences();
 
         assertEquals(
-                String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s);\n",
+                String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s\n);\n",
                 		JavascriptIncludeClass.getClientDescriptor(includeDesc), code), def.getCode(false));
     }
 
     public void testSerializeWithImport() throws Exception {
     	String code = "function(){}";
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, 
+        		LibraryDef.class, null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("hasImport",
                 IncludeDef.class, libDesc);
         DefDescriptor<IncludeDef> importDesc = getAuraTestingUtil().createStringSourceDescriptor("firstimport",
                 IncludeDef.class, libDesc);
         addSourceAutoCleanup(includeDesc, code);
+        addSourceAutoCleanup(importDesc, code);
 
         builder.setDescriptor(includeDesc.getDef().getDescriptor());
         builder.setImports(Arrays.asList(importDesc));
         IncludeDefRef def = builder.build();
+        def.validateReferences();
 
         assertEquals(
-                String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\"],%s);\n",
+                String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\"],%s\n);\n",
                 		JavascriptIncludeClass.getClientDescriptor(includeDesc),
                 		JavascriptIncludeClass.getClientDescriptor(importDesc), code), def.getCode(false));
     }
 
     public void testSerializeWithExternalImport() throws Exception {
     	String code = "function(){}";
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, 
+        		LibraryDef.class, null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("hasImport",
                 IncludeDef.class, libDesc);
 
@@ -112,13 +117,15 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
                 IncludeDef.class, extLibDesc);
 
         addSourceAutoCleanup(includeDesc, code);
+        addSourceAutoCleanup(extIncludeDesc, code);
 
         builder.setDescriptor(includeDesc.getDef().getDescriptor());
         builder.setImports(Arrays.asList(extIncludeDesc));
         IncludeDefRef def = builder.build();
+        def.validateReferences();
 
         assertEquals(
-                String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\"],%s);\n",
+                String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\"],%s\n);\n",
                 		JavascriptIncludeClass.getClientDescriptor(includeDesc),
                 		JavascriptIncludeClass.getClientDescriptor(extIncludeDesc), code), def.getCode(false));
     }
@@ -138,13 +145,16 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
                 IncludeDef.class, extLibDesc);
 
         addSourceAutoCleanup(import1Desc, code);
+        addSourceAutoCleanup(import2Desc, code);
+        addSourceAutoCleanup(extImportDesc, code);
 
         builder.setDescriptor(import1Desc.getDef().getDescriptor());
         builder.setImports(Arrays.asList(import2Desc, extImportDesc));
         IncludeDefRef def = builder.build();
+        def.validateReferences();
 
         assertEquals(
-                String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\", \"%s\"],%s);\n",
+                String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\", \"%s\"],%s\n);\n",
                 		JavascriptIncludeClass.getClientDescriptor(import1Desc),
                 		JavascriptIncludeClass.getClientDescriptor(import2Desc),
 				JavascriptIncludeClass.getClientDescriptor(extImportDesc), code), def.getCode(false));
@@ -162,9 +172,10 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         builder.setDescriptor(includeDesc.getDef().getDescriptor());
 		builder.setExport(export);
         IncludeDefRef def = builder.build();
+        def.validateReferences();
 
         assertEquals(
-                String.format("$A.componentService.addLibraryInclude(\"%s\",[],function lib(){\n%s;\nreturn %s;\n});\n",
+                String.format("$A.componentService.addLibraryInclude(\"%s\",[],function lib(){\n%s\n;\nreturn %s;\n});\n",
                 		JavascriptIncludeClass.getClientDescriptor(includeDesc), code, export), def.getCode(false));
     }
 }

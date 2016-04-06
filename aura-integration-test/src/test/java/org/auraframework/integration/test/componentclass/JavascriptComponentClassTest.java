@@ -30,6 +30,7 @@ import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.root.component.JavascriptComponentClass;
 import org.auraframework.impl.root.component.ComponentDefImpl.Builder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -58,8 +59,9 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
     }
 
     public void testwriteClassForPlainComponent() throws Exception {
-    	builder.build();
-    	this.goldFileText(builder.code);
+        ComponentDef componentDef = builder.build();
+        JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).build();
+    	this.goldFileText(javascriptClass.getCode());
     }
 
     public void testwriteClassForComponentWithClientController() throws Exception {
@@ -72,8 +74,9 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
         DefDescriptor<ControllerDef> controllerDescriptor = addSourceAutoCleanup(ControllerDef.class, controllerCode);
 
         builder.addControllerDef(controllerDescriptor.getDef());
-        builder.build();
-    	this.goldFileText(builder.code);
+        ComponentDef componentDef = builder.build();
+        JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).build();
+    	this.goldFileText(javascriptClass.getCode());
     }
 
     public void testwriteClassForComponentWithHelper() throws Exception {
@@ -86,8 +89,9 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
         DefDescriptor<HelperDef> helperDescriptor = addSourceAutoCleanup(HelperDef.class, helperCode);
 
         builder.addHelper(helperDescriptor.getQualifiedName());
-    	builder.build();
-    	this.goldFileText(builder.code);
+        ComponentDef componentDef = builder.build();
+        JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).build();
+    	this.goldFileText(javascriptClass.getCode());
     }
 
     public void testwriteClassForComponentWithClientProvider() throws Exception {
@@ -101,8 +105,9 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
         DefDescriptor<ProviderDef> providerDescriptor = addSourceAutoCleanup(ProviderDef.class, providerCode);
         
     	builder.addProvider(providerDescriptor.getQualifiedName());
-    	builder.build();
-    	this.goldFileText(builder.code);
+        ComponentDef componentDef = builder.build();
+        JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).build();
+    	this.goldFileText(javascriptClass.getCode());
     }
 
     public void testwriteClassForComponentWithClientRenderer() throws Exception {
@@ -115,8 +120,9 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
         DefDescriptor<RendererDef> rendererDescriptor = addSourceAutoCleanup(RendererDef.class, rendererCode);
 
         builder.addRendererDef(rendererDescriptor.getDef());
-    	builder.build();
-    	this.goldFileText(builder.code);
+        ComponentDef componentDef = builder.build();
+        JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).build();
+    	this.goldFileText(javascriptClass.getCode());
     }
 
     public void testwriteClassForComponentWithClientEmptyRenderer() throws Exception {
@@ -124,8 +130,9 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
         DefDescriptor<RendererDef> rendererDescriptor = addSourceAutoCleanup(RendererDef.class, rendererCode);
 
         builder.addRendererDef(rendererDescriptor.getDef());
-    	builder.build();
-    	this.goldFileText(builder.code);
+        ComponentDef componentDef = builder.build();
+        JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).build();
+    	this.goldFileText(javascriptClass.getCode());
     }
 
     @SuppressWarnings("unchecked")
@@ -147,19 +154,21 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
         importDefs.add(mockImportDef2);
 
         builder.imports = importDefs;
-    	builder.build();
-    	this.goldFileText(builder.code);
+        ComponentDef componentDef = builder.build();
+        JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).build();
+    	this.goldFileText(javascriptClass.getCode());
     }
 
     @SuppressWarnings("unchecked")
     public void testwriteClassForComponentExtendingOtherComponent() throws Exception {
-
-        DefDescriptor<ComponentDef> mockSuperCmpDescriptor = mock(DefDescriptor.class);
+        
         // mock testing component's super component def descriptor
-        when(mockSuperCmpDescriptor.getQualifiedName()).thenReturn("markup://test:superComponent");
-
-        builder.extendsDescriptor = mockSuperCmpDescriptor;
-    	builder.build();
-    	this.goldFileText(builder.code);
+        DefDescriptor<ComponentDef> mockParentDescriptor = mock(DefDescriptor.class);
+        when(mockParentDescriptor.getQualifiedName()).thenReturn("markup://test:superComponent");
+        
+        builder.extendsDescriptor = mockParentDescriptor;
+        ComponentDef componentDef = builder.build();
+        JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).build();
+    	this.goldFileText(javascriptClass.getCode());
     }
 }

@@ -499,7 +499,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "renderer='oops'", "");
             fail("Should not be able to load component with invalid renderer");
         } catch (QuickFixException e) {
-            checkExceptionStart(e, DefinitionNotFoundException.class, "No RENDERER named js://oops found :");
+            checkExceptionStart(e, DefinitionNotFoundException.class, "No RENDERER named js://oops found");
         }
     }
 
@@ -523,7 +523,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             define(baseTag, "provider='oops'", "");
             fail("Should not be able to load component with invalid provider");
         } catch (QuickFixException e) {
-            checkExceptionStart(e, DefinitionNotFoundException.class, "No PROVIDER named java://oops found :");
+            checkExceptionStart(e, DefinitionNotFoundException.class, "No PROVIDER named java://oops found");
         }
     }
 

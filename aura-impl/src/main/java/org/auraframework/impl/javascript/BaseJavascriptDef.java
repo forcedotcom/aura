@@ -18,7 +18,6 @@ package org.auraframework.impl.javascript;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.auraframework.def.CodeDefinition;
@@ -30,7 +29,6 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.json.Json;
 
 public abstract class BaseJavascriptDef<T extends Definition> extends DefinitionImpl<T> implements CodeDefinition, Serializable {
@@ -91,16 +89,6 @@ public abstract class BaseJavascriptDef<T extends Definition> extends Definition
         public void setCode(String code) {
             this.code = code;
         }
-
-		@Override
-		public void setMinifiedCode(String minifiedCode) {
-			// We only compile once we assemble component classes.
-		}
-
-		@Override
-		public void setCodeErrors(List<JavascriptProcessingError> codeErrors) {
-			// We only compile once we assemble component classes.
-		}
 
         @Override
         public void addDependency(DependencyDef dependency) {

@@ -16,24 +16,17 @@
 package org.auraframework.impl.root.library;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DependencyDef;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
-import org.auraframework.def.JavascriptCodeBuilder;
-import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.json.Json;
 
 public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements IncludeDefRef {
@@ -44,28 +37,16 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
     private final List<String> aliases;
     private final String export;
 
-    private final String code;
-    private final String minifiedCode;
-	private final List<JavascriptProcessingError> codeErrors;
-    private final Set<PropertyReference> expressionRefs;
+    private JavascriptIncludeClass javascriptClass;
 
     protected IncludeDefRefImpl(Builder builder) {
         super(builder);
+
         this.imports = builder.imports;
         this.aliases = AuraUtil.immutableList(builder.aliases);
         this.export = builder.export;
-        this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
 
-        this.code = builder.code;
-        this.minifiedCode = builder.minifiedCode;
-        this.codeErrors = AuraUtil.immutableList(builder.codeErrors);
-
-        this.hashCode = AuraUtil.hashCode(imports, aliases, export, code);
-    }
-
-    @Override
-    public DefDescriptor<IncludeDef> getReferenceDescriptor() {
-        return descriptor;
+        this.hashCode = AuraUtil.hashCode(imports, aliases, export);
     }
 
     @Override
@@ -89,20 +70,24 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
     }
 
     @Override
-    public String getCode(boolean minify) {
-        return minify ? minifiedCode : code;
+    public String getCode(boolean minify) throws QuickFixException {
+    	String js = null;
+		initializeJavascriptClass();
+    	if (minify) {
+    		js = javascriptClass.getMinifiedCode();
+    	}
+    	if (js == null) {
+    		js = javascriptClass.getCode();
+    	}
+    	return js;
     }
 
-    @Override
-    public List<JavascriptProcessingError> getCodeErrors() {
-        return codeErrors;
+    private void initializeJavascriptClass() throws QuickFixException {
+    	if (javascriptClass == null) {
+            javascriptClass = new JavascriptIncludeClass.Builder().setDefinition(this).build();
+    	}
     }
-
-    @Override
-    public void retrieveLabels() throws QuickFixException {
-    	retrieveLabels(expressionRefs);
-    }
-
+    
     @Override
     public void serialize(Json json) throws IOException {
     	throw new UnsupportedOperationException("IncludeDefRef can't be serialized to JSON");
@@ -133,21 +118,6 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
                     "%s 'export' attribute must be a valid javascript identifier", IncludeDefRefHandler.TAG),
                     getLocation());
         }
-        if (!codeErrors.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            boolean first = true;
-            for (JavascriptProcessingError error : codeErrors) {
-            	if (first) {
-            		first = false;
-            	} else {
-            		sb.append("\n");
-            	}
-            	sb.append(error.toString());
-            }
-            if (sb.length() > 0) {
-            	throw new InvalidDefinitionException(sb.toString(), getLocation());
-            }
-        }
     }
 
     @Override
@@ -160,6 +130,7 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
                 imported.getDef().validateReferences();
             }
         }
+        initializeJavascriptClass();
     }
 
     @Override
@@ -188,18 +159,11 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
         return hashCode;
     }
 
-    public static class Builder extends DefinitionImpl.RefBuilderImpl<IncludeDef, IncludeDefRef> implements JavascriptCodeBuilder {
+    public static class Builder extends DefinitionImpl.RefBuilderImpl<IncludeDef, IncludeDefRef> {
 
     	public List<DefDescriptor<IncludeDef>> imports;
 		public List<String> aliases;
         public String export;
-
-        public String code;
-        public String minifiedCode;
-        public List<JavascriptProcessingError> codeErrors;
-
-        public Set<PropertyReference> expressionRefs;
-        public List<DependencyDef> dependencies;
 
         public Builder() {
 			super(IncludeDef.class);
@@ -221,40 +185,7 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
         }
 
         @Override
-        public void setCode(String code) {
-        	this.code = code;
-        }
-
-        @Override
-        public void setMinifiedCode(String minifiedCode) {
-        	this.minifiedCode = minifiedCode;
-        }
-
-        @Override
-        public void setCodeErrors(List<JavascriptProcessingError> codeErrors) {
-        	this.codeErrors = codeErrors;
-        }
-
-        @Override
-        public void addDependency(DependencyDef dependency) {
-            if (this.dependencies == null) {
-                this.dependencies = new ArrayList<>();
-            }
-            this.dependencies.add(dependency);
-        }
-
-		@Override
-		public void addExpressionRef(PropertyReference propRef) {
-            if (this.expressionRefs == null) {
-            	this.expressionRefs = new HashSet<>();
-            }
-            this.expressionRefs.add(propRef);
-		}
-
-
-        @Override
         public IncludeDefRefImpl build() {
-            new JavascriptIncludeClass(this).construct(this);
             return new IncludeDefRefImpl(this);
         }
     }

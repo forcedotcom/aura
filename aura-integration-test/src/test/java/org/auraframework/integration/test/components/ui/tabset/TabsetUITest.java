@@ -23,18 +23,24 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class TabsetUITest extends WebDriverTestCase {
     private final String URL = "/uitest/tabset_Test.cmp";
+    private final By OVERFLOW_LOCATOR =  By.cssSelector("li[class*='tabs__item uiTabOverflowMenuItem'] a");
+    private final By OVERFLOW_MENU_LOCATOR =  By.cssSelector("div.uiMenuList");
     private final By ACTIVE_LI_LOCATOR = By.cssSelector("li[class*='tabs__item active uiTabItem'] > a");
     private final By ACTIVE_SECTION = By.cssSelector("section[class*='tabs__content active uiTab']");
     private final String[] TITLE_ARRAY = {"Accounts", "Contacts", "Opportunities", "Leads", "Chatter", "Icon",
             "Dashboards"};
+    private final String[] OVERFLOW_TITLE_ARRAY = {"Accounts", "Contacts", "Opportunities", "Leads", "Chatter", "Icon",
+    "Dashboards", "Campaigns", "Calendars", "Events", "Tasks"};
     private final String[] BODY_ARRAY = {"tab 1 contents", "tab 2 contents", "tab 3 contents", "tab 4 contents",
             "tab 5 contents", "tab 6 contents", "tab 7 contents"};
     private int NUMBER_OF_TABS = 7;
+    private int NUMBER_OF_TABS_OVERFLOW_TABSET = 8;
 
     public TabsetUITest(String name) {
         super(name);
@@ -207,6 +213,66 @@ public class TabsetUITest extends WebDriverTestCase {
                 .getEval("return $A.test.getActiveElement().getAttribute('class')");
         assertTrue("Focus is not on ther correct element", activeElementClass.contains(itemToVerifyAgainst));
     }
+    
+    /**
+     * Function to open an overflow menu
+     * 
+     * @param overflowElement - Overflow menu trigger DOM element
+     * @param openMethod - The keyboard key with which to open the overflow menu
+     */
+    public void openOverflowMenu(WebElement overflowElement, Keys openMethod) {
+    	Actions actions = new Actions(this.getDriver());
+    	actions.moveToElement(overflowElement);
+        actions.sendKeys(openMethod);
+        actions.build().perform();
+    }
+    
+    /**
+     * Function to wait for the overflow menu in the tabset to open
+     */
+    public void waitForOverflowMenuOpen() {   	
+    	WebElement overflowMenu = findDomElement(OVERFLOW_MENU_LOCATOR);
+    	getAuraUITestingUtil().waitUntil(check -> {
+            return overflowMenu.getAttribute("class").contains("visible");
+        }, "Menu list should be visible after clicking to open");
+    }
+    
+    /**
+     * Function to navigate from a random tab to the overflow menu and open overflow menu
+     * 
+     * @param startIndex - Index or the tab from which to start navigating to overflow menu
+     * @param useTab - Use tab key to navigate to overflow menu
+     * @param openMethod - Keyboard key with which to open overflow menu
+     */
+    public void overflowKeyboardNav(int startIndex, Boolean useTabKey, Keys openMethod) {    	
+    	
+    	WebElement tab = findDomElement(By.linkText(OVERFLOW_TITLE_ARRAY[startIndex]));
+        tab.click();
+        waitForTabSelected("Did not switch over to " + OVERFLOW_TITLE_ARRAY[startIndex] + " tab", tab);
+    	
+        if(useTabKey) {
+        	getAuraUITestingUtil().pressTab(tab);
+        }
+        else {
+        	// Navigate only up to the overflow menu
+        	for(int i = startIndex; i < NUMBER_OF_TABS_OVERFLOW_TABSET; i++) {
+            	tab.sendKeys(Keys.ARROW_RIGHT);
+            	int nextIndex = i + 1;
+            	nextIndex = nextIndex == NUMBER_OF_TABS_OVERFLOW_TABSET ? nextIndex-1 : nextIndex;
+            	waitForTabSelected("Did not switch over to " + OVERFLOW_TITLE_ARRAY[nextIndex] + " tab",
+                        findDomElement(By.linkText(OVERFLOW_TITLE_ARRAY[nextIndex])));
+            	tab = findDomElement(ACTIVE_LI_LOCATOR);
+            }
+        }       
+        
+        WebElement activeElement = (WebElement) getAuraUITestingUtil().getEval("return $A.test.getActiveElement()");
+        WebElement overflowElement = findDomElement(OVERFLOW_LOCATOR);
+        assertTrue(activeElement.equals(overflowElement));
+        
+        openOverflowMenu(overflowElement, openMethod);
+                
+        waitForOverflowMenuOpen();
+    }
 
     /********************************************************************************************************************/
 
@@ -324,4 +390,33 @@ public class TabsetUITest extends WebDriverTestCase {
         // Verify inputTextArea (outside of the tab) is focused
         verifyElementFocus("inputTabContent");
     }
+    
+    /**
+     * Test to navigate from a random tab to the overflow menu using the right arrow and open the overflow
+     * menu using the ENTER key
+     * Disabled against mobile since tabbing does not make sense on mobile Tabbing with Safari acts oddly.
+     * 
+     * @throws Exception
+     */
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE,
+            BrowserType.IPAD })
+    public void testOverflowKeyboardInteraction() throws Exception { 	
+    	open("/uitest/tabset_Test.cmp?renderItem=overflow");
+    	overflowKeyboardNav(5, false, Keys.ARROW_LEFT);
+    }
+    
+    /**
+     * Test to navigate from a random tab to the overflow menu using the tab key and open the overflow menu
+     * using the UP arrow key
+     * Disabled against mobile since tabbing does not make sense on mobile Tabbing with Safari acts oddly.
+     * 
+     * @throws Exception
+     */
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE,
+        BrowserType.IPAD })
+    public void testOverflowKeyboardInteractionWithTab() throws Exception { 	
+    	open("/uitest/tabset_Test.cmp?renderItem=overflow");
+    	overflowKeyboardNav(6, true, Keys.ENTER);
+    }
+
 }

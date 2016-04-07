@@ -18,7 +18,7 @@
                          	 "del", "div", "em", "h1", "h2", "h3", "hr", "i", "img", "ins",
                          	 "kbd", "li", "ol", "p", "param", "pre", "q", "s", "samp", "small",
                          	 "span", "strong", "sub", "sup", "table", "tbody", "td", "tfoot", "th",
-                         	 "thead", "tr", "tt", "u", "ul", "var"],
+                         	 "thead", "tr", "tt", "u", "ul", "var", "strike"],
 
     SUPPORTED_ATTRS:		['accept','action','align','alt','autocomplete','background','bgcolor',
                     	     'border','cellpadding','cellspacing','checked','cite','class','clear','color',

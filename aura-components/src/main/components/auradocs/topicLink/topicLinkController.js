@@ -16,7 +16,7 @@
 ({
     open : function(cmp){
         var topicName = cmp.get("v.topic");
-        var evt = $A.get("e.auradocs:openTopic");
+        var evt = $A.getEvt("markup://auradocs:openTopic");
         evt.setParams({
             topic : topicName
         });

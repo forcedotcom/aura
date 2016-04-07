@@ -68,6 +68,7 @@
         var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
         var tabId;
 
+
         this.connect = function(){
             if(runtime) { return; }
             tabId = chrome.devtools.inspectedWindow.tabId;
@@ -240,6 +241,7 @@
                     });
                 }
             });
+
         };
 
         /**
@@ -465,7 +467,7 @@
                         console.error(e);
                     }
                 });
-            }``
+            }
         }
 
         function AuraInspector_OnShowComponentInTree() {

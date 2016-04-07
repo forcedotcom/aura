@@ -939,17 +939,14 @@ Test.Aura.AuraClientServiceTest = function() {
             location: mockLocation
         });
 
-        var targetService;
-        mockDeps(function() {
-            targetService = new Aura.Services.AuraClientService();
-        });
-
         [Fact]
         function doesNotCallLocalStorageClearWhenUpdateReady() {
             storageClearCalled = false;
             componentDefsClearCalled = false;
 
             mockDeps(function() {
+                var targetService = new Aura.Services.AuraClientService();
+                targetService.reloadPointPassed = true;
                 evtCallbacks["updateready"]();
             });
 
@@ -962,24 +959,26 @@ Test.Aura.AuraClientServiceTest = function() {
             componentDefsClearCalled = false;
 
             mockDeps(function() {
+                var targetService = new Aura.Services.AuraClientService();
+                targetService.reloadPointPassed = true;
                 evtCallbacks["updateready"]();
             });
 
             Assert.False(storageClearCalled);
         }
 
-// This test does not work correctly now
-//        [Fact]
-//        function callsComponentRegistryClearWhenUpdateReady() {
-//            storageClearCalled = false;
-//            componentDefsClearCalled = false;
-//
-//            mockDeps(function() {
-//                evtCallbacks["updateready"]();
-//            });
-//
-//            Assert.True(componentDefsClearCalled);
-//        }
+       [Fact]
+       function callsComponentRegistryClearWhenUpdateReady() {
+           storageClearCalled = false;
+           componentDefsClearCalled = false;
+           mockDeps(function() {
+                var targetService = new Aura.Services.AuraClientService();
+                targetService.reloadPointPassed = true;
+                evtCallbacks["updateready"]();
+           });
+
+           Assert.True(componentDefsClearCalled);
+       }
     }
 
     [Fixture]
@@ -1065,7 +1064,11 @@ Test.Aura.AuraClientServiceTest = function() {
                         orderedEncode : function(obj) {
                             return obj;
                         },
-                        decode : function() {
+                        decode : function(json) {
+                            // if it's html, do JSON parsing to fail the test
+                            if(/^\s*</.test(json)) {
+                                return JSON.parse(json)
+                            }
                             return mockData.decodedResponse;
                         },
                         resolveRefsArray : function(input) {
@@ -1092,6 +1095,23 @@ Test.Aura.AuraClientServiceTest = function() {
             document : document,
             Aura : Aura
         });
+
+        [Fact]
+        function ErrorStatusWhenResponseTextIsHtml() {
+            var response = {
+                status : 200,
+                responseText: "<!DOCTYPE html>"
+            };
+            var target;
+            var ret;
+
+            mocksForDecode(function() {
+                target = new Aura.Services.AuraClientService();
+                ret = target.decode(response);
+            });
+
+            Assert.Equal("ERROR", ret["status"]);
+        }
 
         [Fact]
         function GvpWithRefSupportIsResolved() {

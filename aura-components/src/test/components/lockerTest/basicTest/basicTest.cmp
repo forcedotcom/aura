@@ -16,18 +16,23 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+    <aura:attribute name="testRenderer" type="Boolean" default="false" description="Set to true to check Locker wrappers in renderer"/>
+    <aura:attribute name="componentStore" type="Object"/>
+
+    <aura:method name="testAuraLockerInController" action="{!c.testAuraLockerInController}"/>
+    <aura:method name="testAlertExposed" action="{!c.testAlertExposed}"/>
+    <aura:method name="testComponentLockerInController" action="{!c.testComponentLockerInController}"/>
+    <aura:method name="testDocumentLockerInController" action="{!c.testDocumentLockerInController}"/>
+    <aura:method name="testWindowLockerInController" action="{!c.testWindowLockerInController}"/>
+    <aura:method name="testAppendDynamicallyCreatedDivToMarkup" action="{!c.testAppendDynamicallyCreatedDivToMarkup}"/>
+    <aura:method name="testEvalBlocking" action="{!c.testEvalBlocking}"/>
+    <aura:method name="testContextOfController" action="{!c.testContextOfController}"/>
+    <aura:method name="testDefineGetterExploit" action="{!c.testDefineGetterExploit}"/>
+    <aura:method name="testSetTimeoutNonFunctionParamExploit" action="{!c.testSetTimeoutNonFunctionParamExploit}"/>
+    <aura:method name="testComponentUnfilteredFromUserToSystemMode" action="{!c.testComponentUnfilteredFromUserToSystemMode}"/>
 
     <div>LockerService test</div>
-    <ui:button label="Test Wrappers" press="{!c.testWrappers}" aura:id="testWrappers"/>
-    <aura:method name="getWrappersFromController" action="{!c.getWrappersFromController}"/>
-    <aura:method name="getSecureElementFromMarkup" action="{!c.getSecureElementFromMarkup}"/>
-    <aura:method name="appendDiv" action="{!c.appendDiv}"/>
-    <aura:method name="createScriptTags" action="{!c.createScriptTags}"/>
-    <aura:method name="getAlert" action="{!c.getAlert}"/>
-    <aura:method name="testEvalBlocking" action="{!c.testEvalBlocking}">
-	    <aura:attribute name="testUtils" type="Object"/>
-    </aura:method>
-    
     <div aura:id="content"/>
+    <lockerTest:facet aura:id="innerCmp"/>
 </aura:component>

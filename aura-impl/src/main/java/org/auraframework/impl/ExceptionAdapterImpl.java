@@ -69,7 +69,7 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
         	if(!Aura.getConfigAdapter().isProduction()){
         		StringWriter sw = new StringWriter();
                 PrintWriter p = new PrintWriter(sw);
-                th.printStackTrace(p);                
+                th.printStackTrace(p);
                 message = message + "\n\n" + sw.toString();
         	}
         	mapped = new AuraUnhandledException(message);
@@ -130,7 +130,7 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
                 logString = String.format("Unhandled Exception '%s'", th.getMessage());
             }
             if (extended.length() > 0) {
-                logString = String.format("%s: %s", logString, extended.toString());
+                logString = String.format("%s:\n%s", logString, extended.toString());
             }
             if (error) {
                 log.error(logString, th);

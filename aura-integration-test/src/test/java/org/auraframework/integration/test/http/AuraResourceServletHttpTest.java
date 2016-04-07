@@ -268,6 +268,23 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         assertTrue("SVG source should not have been returned.", response.isEmpty());
     }
 
+    public void testInlineJSNoCacheHeaders() throws Exception {
+        String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/inline.js";
+
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse httpResponse = perform(get);
+        get.releaseConnection();
+
+        Header cacheControl[] = httpResponse.getHeaders(HttpHeaders.CACHE_CONTROL);
+        assertTrue(HttpHeaders.CACHE_CONTROL + " header must exists for inline.js", cacheControl.length > 0);
+        assertTrue(HttpHeaders.CACHE_CONTROL + " header should be no-cache, no-store",
+                cacheControl[0].getValue().contains("no-cache, no-store"));
+        Header pragma[] = httpResponse.getHeaders(HttpHeaders.PRAGMA);
+        assertTrue(HttpHeaders.PRAGMA + " header must exists for inline.js", pragma.length > 0);
+        assertTrue(HttpHeaders.PRAGMA + " header should be no-cache",
+                pragma[0].getValue().contains("no-cache"));
+    }
+
     /**
      * This gets a simple context string that uses a single preload.
      */

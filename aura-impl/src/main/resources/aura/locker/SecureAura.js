@@ -26,54 +26,39 @@
 function SecureAura(AuraInstance, key) {
     "use strict";
 
-    // creating a proxy for $A.util
-    var util = Object.create(null);
-    ["isEmpty", "hasClass", "addClass", "removeClass", "toggleClass"].forEach(function(name) {
-        Object.defineProperty(util, name, {
-            enumerable: true,
-            value: AuraInstance["util"][name]
-        });
-    });
-    Object.seal(util);
+    // SecureUtil: creating a proxy for $A.util
+    var su = Object.create(null);
     var o = Object.create(null, {
         "util": {
             enumerable: true,
-            value: util
-        },
-        "createComponent": {
-            enumerable: true,
-            value: function(type, attributes, callback) {
-                $A.assert(callback && typeof callback === 'function' , 'Callback');
-                AuraInstance["createComponent"](type, attributes, function () {
-                    callback.apply(undefined, SecureThing.filterEverything(o, SecureThing.ArrayPrototypeSlice.call(arguments)));
-                });
-            }
-        },
-        "createComponents": {
-            enumerable: true,
-            value: function(components, callback) {
-                $A.assert(callback && typeof callback === 'function' , 'Callback');
-                AuraInstance["createComponents"](components, function () {
-                    callback.apply(undefined, SecureThing.filterEverything(o, SecureThing.ArrayPrototypeSlice.call(arguments)));
-                });
-            }
+            value: su
         },
         toString: {
             value: function() {
                 return "SecureAura: " + AuraInstance + "{ key: " + JSON.stringify(key) + " }";
             }
-        },
-        "enqueueAction": SecureThing.createPassThroughMethod(AuraInstance, "enqueueAction"),
-        "errorReport": SecureThing.createPassThroughMethod(AuraInstance, "errorReport"),
-        "get": SecureThing.createFilteredMethod(AuraInstance, "get"),
-        "getCallback": SecureThing.createFilteredMethod(AuraInstance, "getCallback"),
-        "getComponent": SecureThing.createFilteredMethod(AuraInstance, "getComponent"),
-        "getRoot": SecureThing.createFilteredMethod(AuraInstance, "getRoot"),
-        "log": SecureThing.createPassThroughMethod(AuraInstance, "log"),
-        "warning": SecureThing.createPassThroughMethod(AuraInstance, "warning")
+        }
+    });
+    Object.defineProperties(o, {
+        "createComponent": SecureThing.createFilteredMethod(o, AuraInstance, "createComponent"),
+        "createComponents": SecureThing.createFilteredMethod(o, AuraInstance, "createComponents"),
+        "enqueueAction": SecureThing.createFilteredMethod(o, AuraInstance, "enqueueAction"),
+        "errorReport": SecureThing.createFilteredMethod(o, AuraInstance, "errorReport"),
+        "get": SecureThing.createFilteredMethod(o, AuraInstance, "get"),
+        "getCallback": SecureThing.createFilteredMethod(o, AuraInstance, "getCallback"),
+        "getComponent": SecureThing.createFilteredMethod(o, AuraInstance, "getComponent"),
+        "getRoot": SecureThing.createFilteredMethod(o, AuraInstance, "getRoot"),
+        "log": SecureThing.createFilteredMethod(o, AuraInstance, "log"),
+        "warning": SecureThing.createFilteredMethod(o, AuraInstance, "warning")
+    });
+    ["isEmpty", "hasClass", "addClass", "removeClass", "toggleClass"].forEach(function(name) {
+        Object.defineProperty(su, name, SecureThing.createFilteredMethod(su, AuraInstance["util"], name));
     });
 
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", AuraInstance);
+    setLockerSecret(su, "key", key);
+    setLockerSecret(su, "ref", AuraInstance["util"]);
+    Object.seal(su);
     return Object.seal(o);
 }

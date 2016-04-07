@@ -189,7 +189,8 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
         "componentDef" : this.createDescriptorConfig(type),
         "attributes"   : { "values" : attributes },
         "localId"      : attributes && attributes["aura:id"],
-        "flavor"       : (attributes && attributes["aura:flavor"])
+        "flavor"       : (attributes && attributes["aura:flavor"]),
+        "skipCreationPath": true
     };
 
     this.createComponentPrivAsync(config, callback);
@@ -660,6 +661,13 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
             return;
         }
 
+        // We won't be able to do an access check if the access is invalid, so
+        // just skip trying to do anything. 
+        var currentAccess = $A.getContext().getCurrentAccess();
+        if(currentAccess && !currentAccess.isValid()) {
+            return;
+        }
+
         var newComp = null;
         var status= a.getState();
         var statusMessage='';
@@ -814,6 +822,14 @@ AuraComponentService.prototype.hasDefinition = function(descriptor) {
 
 
 /**
+ * Return the definition of the components that were not used yet (we have the def config but we haven't build the def instance)
+ * @export
+ */
+AuraComponentService.prototype.getUnusedDefinitions = function () {
+    return Object.keys(this.savedComponentConfigs);
+};
+
+/**
  * Get the component definition. If it is not available will go to the server to retrieve it.
  *
  * This method is private, to utilize it, you should use $A.getDefinition("prefix:markup");
@@ -889,6 +905,7 @@ AuraComponentService.prototype.hasDefinition = function(descriptor) {
 
 /**
  * Gets the component definition from the registry.
+ * Does not go to the server if the definition is not available.
  *
  * @param {String|Object} descriptor The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
  * @returns {ComponentDef} The metadata of the component
@@ -974,13 +991,14 @@ AuraComponentService.prototype.getControllerDef = function(descriptor) {
  * @param {Object} relationshipMap relationship map referencing ComponentDef descriptor
  * @param {Object} registry registry that hold definition type
  * @return {*} Def definition
+ * @private
  */
 AuraComponentService.prototype.getDefFromRelationship = function(descriptor, relationshipMap, registry) {
     var def = registry[descriptor];
     if (!def && relationshipMap[descriptor]) {
         var componentDefDescriptor = relationshipMap[descriptor];
         if (this.savedComponentConfigs[componentDefDescriptor]) {
-            this.getDef(componentDefDescriptor);
+            this.getComponentDef(this.createDescriptorConfig(componentDefDescriptor));
             return registry[descriptor];
         }
     }

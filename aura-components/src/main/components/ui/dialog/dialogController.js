@@ -63,7 +63,7 @@
      */
     close : function(cmp) {
 
-        var closeEvent = $A.get("e.ui:closeDialog");
+        var closeEvent = $A.getEvt("markup://ui:closeDialog");
 
         closeEvent.setParams({
             dialog : cmp,

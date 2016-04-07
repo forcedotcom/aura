@@ -1,40 +1,90 @@
 ({
-	/**
-	 * Capture the state of things here in the controller and pass back to the
-	 * test to verify
-	 */
-	getWrappersFromController : function(cmp, event, helper) {
-		var log = {
-			'cmp' : cmp,
-			'event' : event,
-			'helper' : helper,
-			'document' : document,
-			'window' : window,
-			'$A' : $A
-		};
-		cmp.set("v.log", log);
-	},
 
-	getAlert: function(cmp) {
-	    cmp.set("v.log", alert.toString());
-	},
+    testAuraLockerInController: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertStartsWith("SecureAura", $A.toString(), "Expected $A in controller to be a SecureAura");
+    },
 
-	getSecureElementFromMarkup : function(cmp) {
-		var div = cmp.find("content").getElement();
-		cmp.set("v.log", div);
-	},
+    testAlertExposed: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var alertString = alert.toString();
+        alertString = alertString.trim(); // the string starts with line break in IE
+        testUtils.assertStartsWith("function alert() {", alertString, "alert() not exposed");
+    },
 
-	appendDiv : function(cmp) {
-		var div = document.createElement("div");
-		div.id = "myId";
-		div.className = "fancypants";
-		var content = cmp.find("content");
-		var contentEl = content.getElement();
-		contentEl.appendChild(div);
-	},
-	
+    testComponentLockerInController: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertStartsWith("SecureComponent", cmp.toString(), "Expected component in controller"
+                + " to be a SecureComponent");
+    },
+    
+    testDocumentLockerInController: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertStartsWith("SecureDocument", document.toString(), "Expected document in controller"
+                + " to be a SecureDocument");
+    },
+    
+    testWindowLockerInController: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertStartsWith("SecureWindow", window.toString(), "Expected window in controller"
+                + " to be a SecureWindow");
+    },
+    
+    testAppendDynamicallyCreatedDivToMarkup: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var div = document.createElement("div");
+        div.id = "myId";
+        div.className = "fancypants";
+        var content = cmp.find("content");
+        var contentEl = content.getElement();
+        contentEl.appendChild(div);
+
+        div = cmp.find("content").getElement();
+        var appendedDiv = div.childNodes[0];
+        testUtils.assertEquals("myId", appendedDiv.id);
+        testUtils.assertEquals("fancypants", appendedDiv.className);
+    },
+
+    testContextOfController: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertUndefined(this, "Expected 'this' in Locker controller to be undefined");
+    },
+
+    testDefineGetterExploit: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        try {
+            var defprop = ({}).__defineGetter__; 
+            defprop('FOO', function() { return this; }); 
+            testUtils.fail("Expected attempt to overwrite __defineGetter__ to throw an error");
+        } catch (e) {
+            testUtils.assertStartsWith("TypeError", e.toString(), "Unexpected error. Expected TypeError, got " + e);
+        }
+    },
+
+    testSetTimeoutNonFunctionParamExploit: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        try {
+            setTimeout({ bind: function() { 
+                return function() { 
+                    alert(this); 
+                };
+            }});
+            testUtils.fail("setTimeout with a non-function parameter should throw error");
+        } catch (e) {
+            testUtils.assertStartsWith("TypeError", e.toString(), "Unexpected error. Expected TypeError, got " + e);
+        }
+    },
+
+    testComponentUnfilteredFromUserToSystemMode: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var secureComponent = cmp.find("innerCmp");
+        // Make sure it's really a SecureComponent before setting
+        testUtils.assertStartsWith("SecureComponent", secureComponent.toString());
+        cmp.set("v.componentStore", secureComponent);
+    },
+
 	testEvalBlocking : function(cmp, event, helper) {
-		var testUtils = event.getParam('arguments').testUtils;
+		var testUtils = cmp.get("v.testUtils");
 		
 		// eval attempts that return a SecureWindow object
 		helper.doTestEvalForSecureWindow(cmp, function() { return window }, testUtils);

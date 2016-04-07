@@ -1,30 +1,22 @@
 ({
     /**
-     * Note that the test is not in the locker so many of the test cases must delegate to the controller or helper
-     * to get objects and then return them to the test for verification.
+     * Note that this test file operates in system mode (objects are not Lockerized) so the tests delegate logic and
+     * verification to the controller and helper files, which operate in user mode.
      */
+
+    setUp: function(cmp) {
+        cmp.set("v.testUtils", $A.test);
+    },
 
     testClickEvent: {
         test: function(cmp) {
-            cmp.getClickDOMEvent();
-            var event = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureElement", event.target.toString(), "Expected event.target to return SecureElement");
-            $A.test.assertStartsWith("SecureElement", event.srcElement.toString(), "Expected event.srcElement to return SecureElement");
-            // Verify non-wrapped method is still accessible
-            $A.test.assertEquals("number", typeof event.timeStamp);
+            cmp.testClickEvent();
         }
     },
 
     testEventViewThrowsError: {
         test: function(cmp) {
-            cmp.getClickDOMEvent();
-            var event = cmp.get("v.log");
-            try {
-                event.view;
-                $A.test.fail("Expected event.view to throw an Error");
-            } catch (e) {
-                $A.test.assertStartsWith("Access denied for insecure", e.message, "Unexpected error accessing event.view");
-            }
+            cmp.testEventViewThrowsError();
         }
     }
 })

@@ -32,6 +32,7 @@ import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Ignore;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -45,7 +46,7 @@ import com.google.common.collect.Maps;
  * UI test for usage of Integration Service.
  *
  */
-
+@ThreadHostileTest("Tests modify if locker service is enabled")
 public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
     // defaultStubCmp : act as a container inject other components into, async is FALSE
@@ -64,11 +65,15 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        
+        getMockConfigAdapter().setLockerServiceEnabled(false);
+        
         defaultStubCmp = addSourceAutoCleanup(
             ComponentDef.class,
             getIntegrationStubMarkup(
                 "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForTestingIntegrationService",
                 true, true, true));
+        
         tmu = getAuraTestingMarkupUtil();
     }
 
@@ -783,18 +788,20 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
             throws MalformedURLException, URISyntaxException {
         String url = String.format("/%s/%s.cmp", stub.getNamespace(), stub.getName());
         url = url + "?desc=" + String.format("%s:%s", toInject.getNamespace(), toInject.getName());
+        
         if (attributeMap != null) {
             url = url + "&" + "attrMap=" + AuraTextUtil.urlencode(JsonEncoder.serialize(attributeMap));
         } else {
             url = url + "&" + "attrMap=" + AuraTextUtil.urlencode(JsonEncoder.serialize(Maps.newHashMap()));
         }
+        
         if (placeholder != null) {
             url = url + "&placeholder=" + placeholder;
         }
+        
         openNoAura(url);
-        // Wait for page to be ready
+
         getAuraUITestingUtil().waitForDocumentReady();
-        // Wait for Aura framework(injected) to be ready
         waitForAuraFrameworkReady();
     }
 

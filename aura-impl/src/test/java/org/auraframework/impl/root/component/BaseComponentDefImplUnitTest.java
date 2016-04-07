@@ -15,11 +15,8 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
@@ -33,8 +30,8 @@ import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.HelperDef;
-import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
@@ -57,8 +54,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImpl<D>, D extends BaseComponentDef, B extends Builder<D>>
 extends RootDefinitionImplUnitTest<I, D, B> {
@@ -89,7 +88,8 @@ extends RootDefinitionImplUnitTest<I, D, B> {
     protected WhitespaceBehavior whitespaceBehavior;
     protected List<DependencyDef> dependencies;
     @Mock
-    protected DefDescriptor<ControllerDef> mockControllerDef;
+    protected DefDescriptor<ControllerDef> mockControllerDesc;
+    protected ControllerDef mockControllerDef;
 
     protected static DefinitionAccess GLOBAL_ACCESS;
     protected static DefinitionAccess PRIVATE_ACCESS;
@@ -101,7 +101,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
             throw new AuraRuntimeException(x);
         }
         try {
-            GLOBAL_ACCESS = Aura.getDefinitionParserAdapter().parseAccess(null, "PRIVATE");
+            PRIVATE_ACCESS = Aura.getDefinitionParserAdapter().parseAccess(null, "PRIVATE");
         } catch (InvalidAccessValueException x) {
             throw new AuraRuntimeException(x);
         }
@@ -133,16 +133,25 @@ extends RootDefinitionImplUnitTest<I, D, B> {
     public void testValidateDefinition() throws Exception {
         //set up controllerDescriptors here to make sure we don't check it when validating definition
         this.controllerDescriptors = new ArrayList<>();
-        this.mockControllerDef = Mockito.mock(DefDescriptor.class);
-        this.controllerDescriptors.add(mockControllerDef);
+        this.mockControllerDef = Mockito.mock(ControllerDef.class);
+        Mockito.doReturn("{}").when(this.mockControllerDef).getCode();
+        this.mockControllerDesc = Mockito.mock(DefDescriptor.class);
+        Mockito.doReturn(this.mockControllerDef).when(this.mockControllerDesc).getDef();
+        this.controllerDescriptors.add(mockControllerDesc);
         this.modelDefDescriptor = Mockito.mock(DefDescriptor.class);
         testAuraContext = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         
         setupTemplate(true);
-        buildDefinition().validateDefinition();
+        D def = buildDefinition();
         
-        //verify we didn't touch controllerDef/modelDef, that's validateReference's job, not validateDefinition
-        Mockito.verify(this.mockControllerDef, Mockito.times(0)).getDef();
+        // verify that controllerDef was called while building the definition
+        Mockito.verify(this.mockControllerDesc, Mockito.times(1)).getDef();
+
+        def.validateDefinition();
+
+        //verify we didn't touch controllerDef during validateDefinition
+        Mockito.verify(this.mockControllerDesc, Mockito.times(1)).getDef();
+        //verify we didn't touch modelDef during build and validateDefinition, that's validateReference's job       
         Mockito.verify(this.modelDefDescriptor, Mockito.times(0)).getDef();
     }
     
@@ -173,41 +182,6 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         //buildDefinition().validateReferences();
     }
 
-    public void testValidateReferencesExpressionToSuperPrivateAttribute() throws Exception {
-        setupValidateReferences();
-
-        DefDescriptor<AttributeDef> attrDesc = DefDescriptorImpl.getInstance("privateAttribute", AttributeDef.class);
-        AttributeDef attrDef = Mockito.mock(AttributeDef.class);
-        Mockito.doReturn(attrDesc).when(attrDef).getDescriptor();
-        Mockito.doReturn(PRIVATE_ACCESS).when(attrDef).getAccess();
-
-        @SuppressWarnings("unchecked")
-        D parentDef = (D) Mockito.mock(getBuilder().getClass().getDeclaringClass());
-        Mockito.doReturn(this.extendsDescriptor).when(parentDef).getDescriptor();
-        Mockito.doReturn(ImmutableMap.of(attrDesc, attrDef)).when(parentDef).getAttributeDefs();
-        Mockito.doReturn(true).when(parentDef).isExtensible();
-        Mockito.doReturn(SupportLevel.GA).when(parentDef).getSupport();
-        Mockito.doReturn(parentDef).when(this.extendsDescriptor).getDef();
-        Mockito.doReturn(GLOBAL_ACCESS).when(parentDef).getAccess();
-        Mockito.doReturn(DefType.COMPONENT).when(this.extendsDescriptor).getDefType();
-
-        Location exprLocation = new Location("expression", 0);
-        this.expressionRefs = Sets.newHashSet();
-        this.expressionRefs.add(new PropertyReferenceImpl("v.privateAttribute", exprLocation));
-        this.attributeDefs = ImmutableMap.of();
-        setupTemplate(true);
-        modelDefDescriptor = null;
-
-        try {
-            buildDefinition().validateReferences();
-            fail("Expected an exception when trying to refer to a private attribute in an expression");
-        } catch (Throwable t) {
-            assertExceptionMessageStartsWith(t, NoAccessException.class,
-                    "Access to COMPONENT");
-            //FIXME: we should have a better location here.
-            //assertEquals(exprLocation, ((NoAccessException) t).getLocation());
-        }
-    }
 
     public void testTemplateMustBeTemplate() throws Exception {
         setupValidateReferences();
@@ -221,39 +195,6 @@ extends RootDefinitionImplUnitTest<I, D, B> {
             assertExceptionMessageStartsWith(t, InvalidDefinitionException.class,
                     String.format("Template %s must be marked as a template", templateDefDescriptor));
         }
-    }
-
-    public void testValidateReferencesExpressionToOwnPrivateAttributeOverridingSuper() throws Exception {
-        setupValidateReferences();
-
-        DefDescriptor<AttributeDef> attrDesc = DefDescriptorImpl.getInstance("privateAttribute", AttributeDef.class);
-        AttributeDef attrDef = Mockito.mock(AttributeDef.class);
-        Mockito.doReturn(attrDesc).when(attrDef).getDescriptor();
-        Mockito.doReturn(PRIVATE_ACCESS).when(attrDef).getAccess();
-
-        @SuppressWarnings("unchecked")
-        D parentDef = (D) Mockito.mock(getBuilder().getClass().getDeclaringClass());
-        Mockito.doReturn(this.extendsDescriptor).when(parentDef).getDescriptor();
-        Mockito.doReturn(ImmutableMap.of(attrDesc, attrDef)).when(parentDef).getAttributeDefs();
-        Mockito.doReturn(true).when(parentDef).isExtensible();
-        Mockito.doReturn(SupportLevel.GA).when(parentDef).getSupport();
-        Mockito.doReturn(parentDef).when(this.extendsDescriptor).getDef();
-        Mockito.doReturn(GLOBAL_ACCESS).when(parentDef).getAccess();
-        Mockito.doReturn(DefType.COMPONENT).when(this.extendsDescriptor).getDefType();
-
-        this.expressionRefs = Sets.newHashSet();
-        this.expressionRefs.add(new PropertyReferenceImpl("v.privateAttribute", null));
-        this.attributeDefs = ImmutableMap.of(attrDesc, attrDef);
-        this.modelDefDescriptor = null;
-
-        setupTemplate(true);
-
-        try {
-            buildDefinition().validateReferences();
-        } catch (NoAccessException expected) {
-            return;
-        }
-        fail("Should have failed with a no access exception");
     }
 
     @Override
@@ -291,5 +232,6 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         Mockito.doReturn(this.templateDef).when(this.templateDefDescriptor).getDef();
         Mockito.doReturn(this.templateDefDescriptor).when(this.templateDef).getDescriptor();
         Mockito.doReturn(isTemplate).when(this.templateDef).isTemplate();
+        Mockito.doReturn(GLOBAL_ACCESS).when(this.templateDef).getAccess();
     }
 }

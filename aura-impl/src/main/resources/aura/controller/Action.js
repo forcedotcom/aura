@@ -78,6 +78,12 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
 
     var ctx = $A.getContext();
     this.callingCmp = ctx ? ctx.getCurrentAccess() : null;
+
+    // propagating locker key when possible
+    var key = cmp && getLockerSecret(cmp, "key");
+    if (key) {
+        setLockerSecret(this, "key", key);
+    }
 }
 
 // Static methods:
@@ -966,7 +972,7 @@ Action.prototype.setAbortable = function() {
 };
 
 /**
- * [Deprecated] [Returns undefined] 
+ * [Deprecated] [Returns undefined]
  *
  * @public
  * @returns {string} undefined
@@ -1163,10 +1169,8 @@ Action.prototype.markException = function(e) {
     if (!e.id) {
         e = new $A.auraError(descriptor ? "Action failed: " + descriptor : "", e);
         e.component = descriptor;
-    }
-
-    // keep the root cause failing descriptor for AE and AFE
-    if (e instanceof $A.auraError) {
+    } else if (e instanceof $A.auraError) {
+        // keep the root cause failing descriptor
         e.component = e.component || descriptor;
     }
 

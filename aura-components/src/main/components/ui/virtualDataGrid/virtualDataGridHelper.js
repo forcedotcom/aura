@@ -17,10 +17,8 @@
     NS: "UIPERF",
     NAME: "ui:virtualDataGrid",
     
-    DELEGATED_EVENTS: [
-        'click',
-        'keydown'
-    ],
+    DELEGATED_EVENTS : [],
+    
     DEFAULT_TEMPLATES : {
         row    : 'tr',
         column : 'td',
@@ -157,13 +155,16 @@
     */
     createEventDelegates: function (cmp, container) {
         var self     = this,
-            events   = this.DELEGATED_EVENTS,
+            events   = cmp.get("v.delegatedEvents"),
             delegate = function (e) {
                 self._eventDelegator(cmp, e);
             };
         
-        for (var i = 0; i < events.length; i++) {
-            container.addEventListener(events[i], delegate, false);
+        if (!$A.util.isEmpty(events)) {
+        	events = events.split(',');
+        	for (var i = 0; i < events.length; i++) {
+                container.addEventListener(events[i], delegate, false);
+            }
         }
     },
     _getRenderingComponentForElement: function (domElement) {
@@ -200,10 +201,10 @@
             if (targetCmp) { 
                 actionHandler = this._getActionHandler(targetCmp, type);
                 if (actionHandler) {
-                    targetCmp.getElement = getElmt.bind(targetCmp, target);
                     handlers.push({
-                        "handler" : actionHandler,
-                        "cmp"     : targetCmp
+                        "handler"   : actionHandler,
+                        "target"    : target,
+                        "targetCmp" : targetCmp
                     });
                 }
             }
@@ -240,13 +241,18 @@
             while ((actionHandlerScope = handlers.shift())) {
                 actionHandler = actionHandlerScope.handler;
                 if ($A.util.isExpression(actionHandler)) {
-                    this._dispatchAction(actionHandler.evaluate(), e, actionHandlerScope.cmp);
+                	actionHandlerScope.targetCmp.getElement = getElmt.bind(null, actionHandlerScope.target);
+                	this._dispatchAction(actionHandler.evaluate(), e, actionHandlerScope.targetCmp);
+                	delete actionHandlerScope.targetCmp.getElement;
                 }
             }
             
             if (ptv.dirty) {
                 this._rerenderDirtyElement(cmp, item, target);
             }
+            
+            delete templates[position].getElement;
+            ptv.ignoreChanges = true;
         }
     },
     _findVirtualElementPosition: function (items, elmt) {
@@ -317,10 +323,11 @@
     appendVirtualRows: function (cmp, items) {
         $A.metricsService.markStart(this.NS, this.NAME + ".appendVirtualRows", {auraid : cmp.getGlobalId()});
         var fragment  = document.createDocumentFragment(),
-            container = this.getGridBody(cmp);
+            container = this.getGridBody(cmp),
+            offset = cmp.get("v.items").length;
 
         for (var i = 0; i < items.length; i++) {
-            var virtualItem = this._generateVirtualRow(cmp, items[i], i);
+            var virtualItem = this._generateVirtualRow(cmp, items[i], offset + i);
             cmp._virtualItems.push(virtualItem);
             fragment.appendChild(virtualItem);
         }

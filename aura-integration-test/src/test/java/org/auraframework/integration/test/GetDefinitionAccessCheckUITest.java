@@ -20,7 +20,7 @@ import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 
-@ThreadHostileTest("Tests modify what namespaces are internal or not")
+@ThreadHostileTest("Tests modify what namespaces are Internal or not and locker service enabled")
 public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
 
     public GetDefinitionAccessCheckUITest(String name) {
@@ -30,13 +30,11 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        
         // TODO: remove when $A.createComponent is exposed in the locker
         getMockConfigAdapter().setLockerServiceEnabled(false);
     }
 
-    /*
-     * TODO: (W-2799335) Disabled this test since $A.getDeifinition() doesn't do access check for Event
-     */
     public void _testGetEventDefinitionWithoutAccess() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("clientApiTest");
         open("/clientApiTest/getDefinition.cmp");
@@ -57,9 +55,6 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
         assertEquals("null", actual);
     }
 
-    /*
-     * TODO: (W-2799335) Disabled this test since $A.getDeifinitions() doesn't do access check for Event
-     */
     public void _testGetMutilpleDefinitionsWithoutAccess() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("clientApiTest");
         open("/clientApiTest/getDefinition.cmp");

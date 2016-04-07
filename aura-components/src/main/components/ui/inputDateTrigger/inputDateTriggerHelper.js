@@ -23,12 +23,10 @@
 			value 		= component.getConcreteComponent().get('v.value'),
 			currentDate = value ? $A.localizationService.parseDateTime(value, 'yyyy-MM-dd') : new Date();
 
-		$A.get('e.ui:showDatePicker').setParams({
+		$A.getEvt("markup://ui:showDatePicker").setParams({
 			element  	: el,
 			value      	: self.getDateString(currentDate),
-			onselected 	: function (evt) {
-				component.getConcreteComponent().set('v.value', evt.getParam('value'));
-			}
+			sourceComponentId : component.getGlobalId()
 		}).fire();
 	}
 })// eslint-disable-line semi

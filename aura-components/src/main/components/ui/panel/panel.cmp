@@ -22,6 +22,7 @@
     <aura:attribute name="title" type="String" description="The title of the dialog window" />
     <aura:attribute name="class" type="String" description="CSS class" />
     <aura:attribute name="titleDisplay" type="Boolean" default="true" description="If true, the title of the window can be shown/hidden for accessibility. The default is true." />
+    <aura:attribute name="titleTruncate" type="Boolean" default="false" description="If true, allows for truncation of long titles." />
     <aura:attribute name="startOfDialogLabel" type="String" default="Start of Dialog" description="Accessibility label that indicates the start of the dialog" />
     <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="If true, adds a listener to close the dialog when a user clicks outside the dialog. The default is false." />
     <aura:attribute name="closeAction" type="Object"
@@ -58,7 +59,7 @@
          tabindex="-1"
          class="{!v.class}"
          role="dialog"
-         aria-labeledby="{!'title_' + globalId}"
+         aria-labelledby="{!'title_' + globalId}"
          aura:flavorable="true">
 
         <div aura:id="content" class="container">
@@ -67,7 +68,7 @@
             <aura:if isTrue="{! v.header.length || !empty(v.title) }">
                 <div class="panel-header">
                     <aura:if isTrue="{!!empty(v.title)}">
-                        <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title' : 'assistiveText'}">{!v.title}</h2>
+                        <h2 id="{!'title_' + globalId}" class="{!join(' ', v.titleDisplay ? 'title' : 'assistiveText', and(v.titleTruncate, v.titleDisplay) ? token('uiPanel.truncate') : '')}">{!v.title}</h2>
                     </aura:if>
                      {!v.header}
                      {!v.closeButton}

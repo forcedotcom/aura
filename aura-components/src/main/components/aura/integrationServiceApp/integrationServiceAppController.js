@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 ({
-	init: function(application) {	
-		application.getConcreteComponent()._aisScopedCallback = $A.getCallback(function(callback) {
+	init: function() {	
+		$A.__aisScopedCallback = $A.getCallback(function(callback) {
 			callback();
 		});
 	}

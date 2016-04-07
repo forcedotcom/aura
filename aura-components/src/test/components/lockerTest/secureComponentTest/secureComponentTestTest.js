@@ -1,44 +1,46 @@
 ({
     /**
-     * Note that the test is not in the locker so many of the test cases must delegate to the controller or helper
-     * to get objects and then return them to the test for verification.
+     * Note that this test file operates in system mode (objects are not Lockerized) so the tests delegate logic and
+     * verification to the controller and helper files, which operate in user mode.
      */
 
+    setUp: function(cmp) {
+        cmp.set("v.testUtils", $A.test);
+    },
 
     testBlockedAPI: {
         test: function(cmp) {
-            cmp.getWrapperFromController();
-            var wrapped = cmp.get("v.log");
-            $A.test.assertUndefined(wrapped.removeDocumentLevelHandler, "An unexposed API (removeDocumentLevelHandler)"
-                    + " is exposed on SecureComponent");
+            cmp.testBlockedAPI();
         }
     },
 
     testFindReturnsSecureComponent: {
         test: function(cmp) {
-            cmp.getWrapperFromController();
-            var wrapped = cmp.get("v.log");
-            var cmpViaFind = wrapped.find("innerCmp");
-            $A.test.assertStartsWith("SecureComponent", cmpViaFind.toString(), "Expected component found via find()"
-                    + " to be a SecureComponent");
+            cmp.testFindReturnsSecureComponent();
         }
     },
 
     testGetElementReturnsSecureElement: {
         test: function(cmp) {
-            cmp.getElementTest();
-            var element = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureElement", element.toString(), "Expected return of cmp.getElement()"
-                    + " to be a SecureElement");
+            cmp.testGetElementReturnsSecureElement();
         }
     },
 
     testGetEventReturnsSecureEvent: {
         test: function(cmp) {
-            cmp.getEventTest();
-            var event = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureAuraEvent", event.toString(), "Expected return of cmp.event()"
-                    + " to be a SecureAuraEvent");
+            cmp.testGetEventReturnsSecureEvent();
+        }
+    },
+
+    testGetCThrowsError: {
+        test: function(cmp) {
+            cmp.testGetCThrowsError();
+        }
+    },
+    
+    testAddValueProviderExploit: {
+        test: function(cmp) {
+            cmp.testAddValueProviderExploit();
         }
     }
 })

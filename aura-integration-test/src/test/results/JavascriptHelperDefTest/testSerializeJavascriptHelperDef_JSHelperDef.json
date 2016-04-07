@@ -1,8 +1,0 @@
-{
-  "s":1,
-  "v":{
-    "getHelp":function() {
-        return 'simply';
-    }
-  }
-}

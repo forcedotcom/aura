@@ -36,6 +36,7 @@
     <aura:handler name="keydown" action="{!c.onKeyboardEvent}"/>
 
     <aura:handler name="refresh" action="{!c.update}"/>
+    <aura:handler name="change" value="{!v.body}" action="{!c.update}"/>
 
     <div class="{!v.class}" aura:id="menu" role="menu">
         <aura:if isTrue="{!v.headerText != null}">
@@ -44,7 +45,7 @@
             </div>
         </aura:if>
 
-        <ul aura:id="datalist" role="presentation">
+        <ul aura:id="datalist" class="scrollable" role="presentation">
              <aura:iteration items="{!v.menuItems}" var="item">
                 <ui:menuItem aura:id="item" class="{!item.className}" disabled="{!item.disabled}" label="{!item.label}"
                              selected="{!item.selected}" type="{!item.type}" value="{!item.value}"

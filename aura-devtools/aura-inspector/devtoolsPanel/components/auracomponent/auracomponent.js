@@ -13,7 +13,10 @@
 	auracomponent.attachedCallback = function() {
 		var _data = this.getAttribute("componentData");
 		if(!_data) {
-			getComponentData(this.getAttribute("globalId"), function(data) {
+            var summarize = this.getAttribute("summarize") || false;
+			getComponentData(this.getAttribute("globalId"), {
+                "summarize": summarize
+            }, function(data) {
 				_data = data;
 				this.setAttribute("componentData", _data);
 				render(this, _data);
@@ -72,8 +75,12 @@
         shadowRoot.appendChild(template.content);
 	}
 
-	function getComponentData(globalId, callback) {
-		var cmd = `window[Symbol.for('AuraDevTools')].Inspector.getComponent('${globalId}', {'body':false, 'elementCount': false});`;
+	function getComponentData(globalId, configuration, callback) {
+        var config = JSON.stringify({
+            "body": false,
+            "attributes": !configuration.summarize
+        });
+		var cmd = `window[Symbol.for('AuraDevTools')].Inspector.getComponent('${globalId}', ${config});`;
 
         chrome.devtools.inspectedWindow.eval(cmd, function(response, exceptionInfo) {
             if(exceptionInfo) {

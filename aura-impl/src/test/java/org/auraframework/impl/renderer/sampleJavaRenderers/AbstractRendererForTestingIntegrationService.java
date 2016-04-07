@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.Renderer;
-import org.auraframework.impl.system.RenderContextImpl;
 import org.auraframework.integration.Integration;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;

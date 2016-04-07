@@ -16,9 +16,10 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-    <aura:method name="getEventTest" action="{!c.getEventTest}"/>
+    <aura:method name="testGetEventSourceReturnsSecureComponent" action="{!c.testGetEventSourceReturnsSecureComponent}"/>
+    <aura:method name="testExerciseEventAPIs" action="{!c.testExerciseEventAPIs}"/>
 
     <aura:registerevent name="debugLog" type="aura:debugLog"/>
 

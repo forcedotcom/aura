@@ -1,18 +1,24 @@
 ({
     handleSystemError: function (cmp, event, helper) {
+        if(cmp.get("v.throwErrorInHandler")) {
+            throw Error("Error from error handler");
+        }
+
         // set handleSystemError to true when testing custom handler
         if(!cmp.get("v.handleSystemError")) {
             return;
         }
 
         var message = event.getParam("message");
-        var error = event.getParam("error");
+        var errorName = event.getParam("error");
         var auraError = event.getParam("auraError");
 
         if(cmp.get("v.useFriendlyErrorMessageFromData") && auraError.data) {
             message = auraError.data["friendlyMessage"];
         }
 
+        cmp._errorName = errorName;
+        cmp._auraError = auraError;
         cmp.set("v.message", message);
         cmp.set("v.errorId", auraError.id);
         cmp.set("v.severity", auraError.severity);
@@ -36,7 +42,9 @@
     },
 
     throwAuraErrorFromClientController: function(cmp) {
-        throw new AuraError("AuraError from app client controller");
+        // severity is undefined by default
+        var severity = cmp.get("v.severity");
+        throw new AuraError("AuraError from app client controller", undefined, severity);
     },
 
     throwAuraFriendlyErrorFromClientController: function(cmp) {
@@ -51,6 +59,14 @@
                 throw Error("Error from server action callback in app");
             });
         $A.enqueueAction(action);
+    },
+
+    throwErrorFromNestedGetCallbackFunctions: function(cmp) {
+        var callback = $A.getCallback(function() {
+                    var targetCmp = cmp.find("containedCmp");
+                    targetCmp.throwErrorFromFunctionWrappedInGetCallback();
+                });
+        setTimeout(callback, 0);
     },
 
     throwErrorFromCreateComponentCallback: function(cmp) {
@@ -77,6 +93,23 @@
         cmp.destroy(false);
     },
 
+    throwErrorFromAuraMethodHandler: function(cmp) {
+        cmp.throwErrorFromClientController();
+    },
+
+    throwErrorFromAuraMethodHandlerWithCallback: function(cmp) {
+        cmp.throwErrorFromServerActionCallback();
+    },
+
+    throwErrorFromContainedCmpController: function(cmp) {
+        var targetComponent = cmp.find("containedCmp");
+        targetComponent.throwErrorFromClientController();
+    },
+
+    throwErrorFromContainedCmpCallback: function(cmp) {
+        var targetComponent = cmp.find("containedCmp");
+        targetComponent.throwErrorFromFunctionWrappedInGetCallback();
+    },
 
     doServerAction: function(cmp) {
         var action = cmp.get("c.doSomething");

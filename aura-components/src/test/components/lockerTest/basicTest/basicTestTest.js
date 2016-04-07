@@ -1,174 +1,116 @@
 ({
     /**
-     * Note that the test is not in the locker so many of the test cases must delegate to the controller or helper
-     * to get objects and then return them to the test for verification.
+     * Note that this test file operates in system mode (objects are not Lockerized) so the tests delegate logic and
+     * verification to the controller and helper files, which operate in user mode.
      */
 
+    setUp: function(cmp) {
+        cmp.set("v.testUtils", $A.test);
+    },
 
     testCannotAccessDocumentBodyFromHelper: {
         test: function(cmp) {
-            cmp.helper.accessDocumentBody(cmp);
-            var wrapped = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureThing", wrapped.toString(), "Expected document.body passed to helper"
-                    + " to be an SecureThing");
+            cmp.helper.testCannotAccessDocumentBodyFromHelper($A.test);
         }
     },
 
     testAlertExposed: {
         test: function(cmp) {
-            cmp.getAlert();
-            var alert = cmp.get("v.log");
-            // the string starts with line break in IE
-            alert = alert.trim();
-            $A.test.assertStartsWith("function alert() {", alert, "alert() not exposed");
+            cmp.testAlertExposed();
         }
     },
 
     testAuraLockerInController: {
         test: function(cmp) {
-            cmp.getWrappersFromController();
-            var wrapped = cmp.get("v.log")["$A"];
-            $A.test.assertStartsWith("SecureAura", wrapped.toString(), "Expected $A passed to controller"
-                    + " to be a SecureAura");
+            cmp.testAuraLockerInController();
         }
     },
 
     testAuraLockerInHelper: {
         test: function(cmp) {
-            var wrapped = cmp.helper.getWrappersFromHelper()["$A"];
-            var wrapped = cmp.get("v.log")["$A"];
-            $A.test.assertStartsWith("SecureAura", wrapped.toString(), "Expected $A passed to helper"
-                    + " to be a SecureAura");
+            cmp.helper.testAuraLockerInHelper($A.test);
         }
     },
 
-    testAuraLockerInRenderer: {
+    testSecureWrappersInRenderer: {
+        attributes: {
+            testRenderer: true
+        },
         test: function(cmp) {
-            var wrapped = cmp.get("v.log")["$A"];
-            $A.test.assertStartsWith("SecureAura", wrapped.toString(), "Expected component passed to renderer"
-                    + " to be a SecureAura");
+            // Renderer will throw an error on load if anything is not Lockerized as expected, nothing to assert here.
         }
     },
 
     testComponentLockerInController: {
         test: function(cmp) {
-            cmp.getWrappersFromController();
-            var wrapped = cmp.get("v.log")["cmp"];
-            $A.test.assertStartsWith("SecureComponent", wrapped.toString(), "Expected component passed to controller"
-                    + " to be a SecureComponent");
-        }
-    },
-
-    testComponentLockerInRenderer: {
-        test: function(cmp) {
-            var wrapped = cmp.get("v.log")["cmp"];
-            $A.test.assertStartsWith("SecureComponent", wrapped.toString(), "Expected component passed to renderer"
-                    + " to be a SecureComponent");
+            cmp.testComponentLockerInController();
         }
     },
 
     testDocumentLockerInController: {
         test: function(cmp) {
-            cmp.getWrappersFromController();
-            var wrapped = cmp.get("v.log")["document"];
-            $A.test.assertStartsWith("SecureDocument", wrapped.toString(), "Expected document passed to controller"
-                    + " to be a SecureDocument");
+            cmp.testDocumentLockerInController();
         }
     },
 
     testDocumentLockerInHelper: {
         test: function(cmp) {
-            var wrapped = cmp.helper.getWrappersFromHelper()["document"];
-            $A.test.assertStartsWith("SecureDocument", wrapped.toString(), "Expected document passed to helper"
-                    + " to be a SecureDocument");
-        }
-    },
-
-    testDocumentLockerInRenderer: {
-        test: function(cmp) {
-            var wrapped = cmp.get("v.log")["document"];
-            $A.test.assertStartsWith("SecureDocument", wrapped.toString(), "Expected document accessed from renderer"
-                    + " to be a SecureDocument");
+            cmp.helper.testDocumentLockerInHelper($A.test);
         }
     },
 
     testWindowLockerInController: {
         test: function(cmp) {
-            cmp.getWrappersFromController();
-            var wrapped = cmp.get("v.log")["window"];
-            $A.test.assertStartsWith("SecureWindow", wrapped.toString(), "Expected window passed to controller"
-                    + " to be a SecureWindow");
+            cmp.testWindowLockerInController();
         }
     },
 
     testWindowLockerInHelper: {
         test: function(cmp) {
-            var wrapped = cmp.helper.getWrappersFromHelper()["window"];
-            $A.test.assertStartsWith("SecureWindow", wrapped.toString(), "Expected window passed to helper"
-                    + " to be a SecureWindow");
+            cmp.helper.testWindowLockerInHelper($A.test);
         }
-    },
-
-    testWindowLockerInRenderer: {
-        test: function(cmp) {
-            var wrapped = cmp.get("v.log")["window"];
-            $A.test.assertStartsWith("SecureWindow", wrapped.toString(), "Expected window accessed from renderer"
-                    + " to be a SecureWindow");
-        }
-    },
-
-    testSecureElementFrozenAfterCreation_DynamicallyCreated: {
-        test: function(cmp) {
-            cmp.helper.getSecureElementDynamically(cmp);
-            var div = cmp.get("v.log");
-            this.doTestSecureElementFrozenAfterCreation(div);
-        }
-    },
-
-    testSecureElementFrozenAfterCreation_FromMarkup: {
-        test: function(cmp) {
-            cmp.getSecureElementFromMarkup();
-            var div = cmp.get("v.log");
-            this.doTestSecureElementFrozenAfterCreation(div);
-        }
-    },
-
-    doTestSecureElementFrozenAfterCreation : function(div) {
-        $A.test.assertStartsWith("SecureElement", div.toString(), "Unexpected object returned from helper");
-        $A.test.assertTrue(Object.isFrozen(div), "SecureElement should be frozen");
-
-        div.onclick = function(event) {};
-        $A.test.assertUndefined(div.onclick, "Should not be able to define a property on SecureElement");
-
-        try {
-            Object.defineProperty(div, "onclick", {});
-            $A.test.fail("Should not be able to define a new property via Object.defineProperty on SecureElement");
-        } catch(e) {
-            if (e.toString().indexOf("TypeError: Cannot define property:onclick, object is not extensible") < 0) {
-                $A.test.fail("Unexpected exception: " + e.toString());
-            }
-        }
-        $A.test.assertUndefined(div.onclick, "Should not be able to define a property on SecureElement");
-
-        div.className = "fancypants";
-        delete div.className;
-        $A.test.assertEquals("fancypants", div.className, "Attemping to delete a property on the frozen SecureElement"
-                + " should be a no-op");
     },
 
     testAppendDynamicallyCreatedDivToMarkup: {
         test: function(cmp) {
-            cmp.appendDiv();
-            var div = cmp.find("content").getElement();
-            var appendedDiv = div.getElementsByTagName("div")[0];
-            $A.test.assertEquals("myId", appendedDiv.id);
-            $A.test.assertEquals("fancypants", appendedDiv.className);
+            cmp.testAppendDynamicallyCreatedDivToMarkup();
+        }
+    },
+
+    testContextOfController: {
+        test: function(cmp) {
+            cmp.testContextOfController();
+        }
+    },
+
+    testDefineGetterExploit: {
+        test: function(cmp) {
+            cmp.testDefineGetterExploit();
+        }
+    },
+
+    /**
+     * See W-2974202 for original exploit.
+     */
+    testSetTimeoutNonFunctionParamExploit: {
+        test: function(cmp) {
+            cmp.testSetTimeoutNonFunctionParamExploit();
+        }
+    },
+
+    testComponentUnfilteredFromUserToSystemMode: {
+        test: function(cmp) {
+            cmp.testComponentUnfilteredFromUserToSystemMode();
+            var component = cmp.get("v.componentStore");
+            // Component should be unfiltered when returned to system mode
+            $A.test.assertStartsWith("markup://lockerTest:facet", component.toString());
         }
     },
 
     testAttemptToEvalToWindow: {
+        browsers: ["-IE11"],
         test: function(cmp) {
-        	cmp.testEvalBlocking($A.test);
+        	cmp.testEvalBlocking();
 
         	// DCHASMAN TOOD Port these to cmp.testEvalBlocking()
 

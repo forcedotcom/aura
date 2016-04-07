@@ -71,10 +71,10 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         assertDefaultAntiClickjacking(response, expectHeaders, true);
     }
 
-    private void getOnAuraServlet(Format f, String tag) throws Exception {
+    private void getOnAuraServlet(Format f, String tag, boolean expectHeaders) throws Exception {
         String url = String.format("/aura?%s&aura.mode=FTEST&aura.format=%s", tag, f.toString());
         HttpGet get = obtainGetMethod(url);
-        requestAndAssertContentType(get, url, f, tag.length() > 0);
+        requestAndAssertContentType(get, url, f, expectHeaders);
     }
 
     private void postOnAuraServlet(Format f, Boolean causeException) throws Exception {
@@ -115,11 +115,11 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
                 break;
             case HTML:
                 // Valid component get request
-                getOnAuraServlet(format, this.componentTag);
+                getOnAuraServlet(format, this.componentTag, true);
                 // Quick fix exception
-                getOnAuraServlet(format, this.quickFixComponentTag);
+                getOnAuraServlet(format, this.quickFixComponentTag, false);
                 // Non Quick fix exception
-                getOnAuraServlet(format, "");
+                getOnAuraServlet(format, "", false);
                 break;
             case JS:// No implementation for this format
             case CSS:// No implementation for this format

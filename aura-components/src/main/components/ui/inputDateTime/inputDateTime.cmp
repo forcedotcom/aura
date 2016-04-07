@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateTimeComponent" extensible="true" defaultFlavor="default, input, datetime"
+<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateTimeComponent, ui:handlesDateSelected" extensible="true" defaultFlavor="default, input, datetime"
                 provider="js://ui.inputDateTime" controller="java://org.auraframework.impl.controller.TimeZoneInfoController"
                 description="An input field for entering a date and time.">
 
@@ -25,6 +25,7 @@
     <aura:attribute name="timePlaceholder" type="String" description="The text that is displayed for time input by default. Set during init based on the 'format' value."/>
 
     <aura:dependency resource="markup://ui:inputDateTimeHtml" type="COMPONENT"/>
+    <aura:dependency resource="markup://ui:showDatePicker" type="EVENT"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:registerEvent name="openPicker" type="ui:openPicker" description="The event fired when the date picker is opened."/>
@@ -41,7 +42,9 @@
                     </a>
                 </aura:if>
             </div>
-            <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
+            <aura:if isTrue="{!!v.useManager}">
+                <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
+            </aura:if>
             <div class="dateTime-inputTime form-element form-element__control">
                 <div class="input-has-icon input-has-icon--right">
                     <label class="form-element__label" for="{!v.domId+'-time'}">{!v.timeLabel}</label>

@@ -24,7 +24,7 @@
         tabitem_close: '.uiTabItem.active .close'
     },
 
-    owner: 'sle',
+    owner: 'ctatlah',
 
     /**
      * Test adding dynamic tabs

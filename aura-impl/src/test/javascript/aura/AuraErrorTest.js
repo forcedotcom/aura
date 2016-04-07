@@ -19,7 +19,7 @@ Function.RegisterNamespace("Test.Aura");
 Test.Aura.AuraErrorTest = function() {
     var Aura = {Errors: {}};
 
-    Mocks.GetMocks(Object.Global(), { 
+    Mocks.GetMocks(Object.Global(), {
         "Aura": Aura,
         "AuraError": function(){}
     })(function() {
@@ -96,7 +96,34 @@ Test.Aura.AuraErrorTest = function() {
                 actual = new Aura.Errors.AuraError().id;
             });
 
-            Assert.NotEmpty(actual);
+            // error id length is 36, e.g: 10fdb86c-6868-43ba-b464-347057f3b316
+            Assert.Equal(36, actual.length);
+        }
+    }
+
+    [Fixture]
+    function ToString() {
+        [Fact]
+        function ContainsMessage() {
+            var expected = "test message";
+            var target;
+
+            windowMock(function(){
+                target = new Aura.Errors.AuraError(expected);
+            });
+
+            Assert.Equal(expected, target.toString());
+        }
+
+        [Fact]
+        function ReturnsEmptyStringWhenMessageIsUndefined() {
+            var target;
+
+            windowMock(function(){
+                target = new Aura.Errors.AuraError();
+            });
+
+            Assert.Equal('', target.toString());
         }
     }
 }

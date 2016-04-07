@@ -60,18 +60,6 @@
                         },
                         "fail to load script from same origin : codemirror.js"
                 );
-            },function(cmp){
-                //test loading script , with eval() on top level application
-                /*test loading script , with eval() on child cmp --  this doesn't work
-                $A.test.assertEquals("test result from eval: /test/basicCspCmpExtendsTemplate.cmp", 
-                        document._eval_res_from_child_template, 
-                "fail to load script with eval from child cmp"); */
-                $A.test.addWaitForWithFailureMessage(true,
-                        function() { 
-                              return document._eval_res == "test result from eval: /test/basicCspTest.app";
-                        },
-                        "fail to load script with eval on top level application."
-                );
             }
         ]
     },

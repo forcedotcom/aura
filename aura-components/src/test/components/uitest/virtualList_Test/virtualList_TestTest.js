@@ -109,6 +109,7 @@
    * Verify Virtual List works with large Number of Items
    */
   testWithLargeData : {
+	  labels : ["extended"],
       attributes : {"pageSize" : 3000},
       test : function(cmp){
           var initialData = cmp.find("list").get("v.items");

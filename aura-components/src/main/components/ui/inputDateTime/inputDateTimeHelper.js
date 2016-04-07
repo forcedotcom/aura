@@ -15,9 +15,11 @@
  */
 ({
     displayDatePicker: function(component) {
-        var datePicker = component.find("datePicker");
-        if (!datePicker || datePicker.get("v.visible") === true) {
-            return;
+        if (!component.get("v.useManager")){
+            var datePicker = component.find("datePicker");
+            if (!datePicker || datePicker.get("v.visible") === true) {
+                return;
+            }
         }
 
         var langLocale = component.get("v.langLocale");
@@ -124,7 +126,7 @@
     addDomHandler : function(component, event) {
         if (!this.isDesktopMode(component)) {
             var inputElement = this.getInputElement(component);
-            this.lib.interactive.attachDomHandlerToElement(component, inputElement, event);            
+            this.lib.interactive.attachDomHandlerToElement(component, inputElement, event);
         } else {
             var inputElements = component.getElement().getElementsByTagName('input');
             for (var i = 0; i < inputElements.length; i++) {
@@ -224,16 +226,28 @@
     },
 
     popUpDatePicker: function(component, date) {
-        var datePicker = component.find("datePicker");
-        if (datePicker) {
-            datePicker.set("v.value", this.getUTCDateString(date));
-            datePicker.set("v.hours", date.getUTCHours());
-            datePicker.set("v.minutes", date.getUTCMinutes());
-            datePicker.set("v.is24HourFormat", this.is24HourFormat(component));
-            datePicker.set("v.visible", true);
-            datePicker.set("v.hideOnSelect", true);
-            datePicker.set("v.closeOnClickOut", true);
+        if (component.get("v.useManager")) {
+            this.openDatepickerWithManager(component, date);
+        } else {
+            var datePicker = component.find("datePicker");
+            if (datePicker) {
+                datePicker.set("v.value", this.getUTCDateString(date));
+                datePicker.set("v.hours", date.getUTCHours());
+                datePicker.set("v.minutes", date.getUTCMinutes());
+                datePicker.set("v.is24HourFormat", this.is24HourFormat(component));
+                datePicker.set("v.visible", true);
+                datePicker.set("v.hideOnSelect", true);
+                datePicker.set("v.closeOnClickOut", true);
+            }
         }
+    },
+
+    openDatepickerWithManager: function(component, currentDate) {
+        $A.get('e.ui:showDatePicker').setParams({
+            element  	: component.find("inputDate").getElement(),
+            value      	: currentDate ? this.getUTCDateString(currentDate) : currentDate,
+            sourceComponentId : component.getGlobalId()
+        }).fire();
     },
 
     toggleClearButton: function(component) {

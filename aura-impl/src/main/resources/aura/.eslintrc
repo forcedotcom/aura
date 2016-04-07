@@ -91,6 +91,8 @@
     "valueFactory": true,
     "ValueDef": true,
     "WallTime": true,
+    "NodeList": true,
+    "HTMLCollection": true,
     "getLockerSecret": true,
     "setLockerSecret": true,
     "SecureAura": true,

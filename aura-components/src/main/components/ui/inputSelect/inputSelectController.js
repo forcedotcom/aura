@@ -26,6 +26,18 @@
         }
     },
 
+    setFocus: function (cmp) {
+        if (cmp.get("v.useMenu")) {
+            var menuTrigger = cmp.find("selectTrigger");
+            menuTrigger.setFocus();
+        } else {
+            var selectElement = cmp.find("select").getElement();
+            if (selectElement) {
+                selectElement.focus();
+            }
+        }
+    },
+
     valueChange: function (cmp, evt, helper) {
         var concreteCmp = cmp.getConcreteComponent();
         helper.updateOptionsFromValue(concreteCmp);

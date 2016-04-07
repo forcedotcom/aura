@@ -398,7 +398,10 @@ AttributeSet.prototype.destroy = function(async) {
                 var body = v[globalId];
                 if(body) {
             		for(var j=0;j<body.length;j++) {
-            			body[j].destroy(async);
+                        var bodyCmp = body[j];
+                        if (bodyCmp && bodyCmp.destroy) {
+                            bodyCmp.destroy(async);
+                        }
             		}
                 }
         	}

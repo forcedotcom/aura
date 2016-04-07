@@ -45,14 +45,13 @@
     <aura:handler name="pressOnHighlighted" action="{!c.handlePressOnHighlighted}"/>
 
     <aura:set attribute="header">
-        <aura:if isTrue="{!!empty(v.listHeader)}"><div onclick="{!c.handleHeaderClick}" class="{!v.showListHeader?'':'hidden'}">{!v.listHeader}</div></aura:if>
+        <aura:if isTrue="{!!empty(v.listHeader)}"><div onclick="{!c.handleHeaderClick}" onmousedown="{!c.handleMouseDown}" class="{!v.showListHeader?'':'hidden'}">{!v.listHeader}</div></aura:if>
     </aura:set>
     <aura:set attribute="footer">
-        <aura:if isTrue="{!!empty(v.listFooter)}"><div onclick="{!c.handleFooterClick}" class="{!v.showListFooter?'':'hidden'}">{!v.listFooter}</div></aura:if>
+        <aura:if isTrue="{!!empty(v.listFooter)}"><div onclick="{!c.handleFooterClick}" onmousedown="{!c.handleMouseDown}" class="{!v.showListFooter?'':'hidden'}">{!v.listFooter}</div></aura:if>
     </aura:set>
 
     <ul aura:id="list" class="{!'lookup__list ' + (v.visible ? ' visible' : '')}" role="presentation" onclick="{!c.handleClick}" onmousedown="{!c.handleMouseDown}">
         <aura:iteration aura:id="iter" items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}"/>
     </ul>
-
 </aura:component>

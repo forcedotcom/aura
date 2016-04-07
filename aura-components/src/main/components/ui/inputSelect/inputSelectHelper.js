@@ -87,6 +87,11 @@
                 }
             }
         }
+
+        if (cmp.get("v.value") === newValue) {
+            return;
+        }
+
         cmp.set("v.selectedLabel", selectedLabel);
         cmp._suspendChangeHandlers = true;
         cmp.set("v.value", newValue);
@@ -102,7 +107,6 @@
             menuItems.push(menuItem);
             if (menuItems.length === options.length) {
                 cmp.find("options").set("v.body", menuItems);
-                cmp.find("options").get("e.refresh").fire();
             }
         };
         var multiSelect = cmp.get("v.multiple");
@@ -123,10 +127,13 @@
         var multiSelect = cmp.get("v.multiple");
         var options = cmp.get("v.options");
         var newLabel = "";
+        var optionSelected = false;
 
         for (var i = 0; i < options.length; i++) {
             var option = options[i];
             if (option.selected === true) {
+                optionSelected = true;
+
                 if (multiSelect && newLabel.length > 0) {
                     newLabel += this.optionSeparator;
                 }
@@ -137,6 +144,12 @@
                 }
             }
         }
+
+        // If nothing was selected, just default the label to the first item
+        if (!optionSelected && options.length > 0) {
+            newLabel = options[0].label;
+        }
+
         cmp.set("v.selectedLabel", newLabel);
     },
 

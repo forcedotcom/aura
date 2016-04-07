@@ -30,6 +30,12 @@ Aura.Event.Event = function(config) {
     this.fired = false;
     this.eventStopPropagation = false;
     this.componentEvent = false;
+
+    // propagating locker key when possible
+    var key = this.source && getLockerSecret(this.source, "key");
+    if (key) {
+        setLockerSecret(this, "key", key);
+    }
 };
 
 /**
@@ -171,7 +177,21 @@ Aura.Event.Event.prototype.dispatchNonComponentEventHandlers = function () {
                         var cmpHandlers = handlers[key];
                         for (var j = 0; j < cmpHandlers.length; j++) {
                             var handler = cmpHandlers[j];
-                            handler(this);
+                            if (handler) {
+                                try {
+                                    handler(this);
+                                } catch (e) {
+                                    if (this.eventDef.getDescriptor().toString() === "markup://aura:systemError") {
+                                        // if a systemError event handler failed, we don't want it to repeatedly failed
+                                        // because the event is fired in error handling framework.
+                                        cmpHandlers[j] = null;
+                                        $A.warning("aura:systemError event handler failed", e);
+                                        $A.logger.reportError(e);
+                                    } else {
+                                        throw e;
+                                    }
+                                }
+                            }
                         }
                     }
                 }

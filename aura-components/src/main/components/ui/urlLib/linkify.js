@@ -31,7 +31,21 @@ function lib() { //eslint-disable-line no-unused-vars
      * For more details on how this regex is constructed, refer to UrlUtil.java in core.
      */
     var linksMatchingRegex = new RegExp(
-        "((?:(?:https?|ftp)://[\\w\\-\\|=&%~#/+*@\\.,;:\\?!<>']{0,2047}(?:[\\w=/+#-]|\\([^\\s()]*\\)))|(?:\\b(?:[a-z0-9]" +
+        "(<a[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/a>|<a[\\s]+[^>]+\/>|" +
+        "<i?frame[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/i?frame>|<i?frame[\\s]+[^>]+\/>|" +
+        "<area[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/area>|<area[\\s]+[^>]+\/>|" +
+        "<link[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/link>|<link[\\s]+[^>]+\/>|" +
+        "<img[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/img>|<img[\\s]+[^>]+>|" +
+        "<form[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/form>|<form[\\s]+[^>]+\/>|" +
+        "<body[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/body>|<body[\\s]+[^>]+\/>|" +
+        "<head[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/head>|<head[\\s]+[^>]+\/>|" +
+        "<input[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/input>|<input[\\s]+[^>]+\/>|" +
+        "<button[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/button>|<button[\\s]+[^>]+\/>|" +
+        "<blockquote[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/blockquote>|<blockquote[\\s]+[^>]+\/>|" +
+        "<q[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/q>|<q[\\s]+[^>]+\/>|" +
+        "<del[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/del>|<del[\\s]+[^>]+\/>|" +
+        "<ins[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/ins>|<ins[\\s]+[^>]+\/>" + ")|" +
+        "((?:(?:https?|ftp)://[\\w\\-\\|=&%~#/+*@\\.,;:\\?!']{0,2047}(?:[\\w=/+#-]|\\([^\\s()]*\\)))|(?:\\b(?:[a-z0-9]" +
         "(?:[-a-z0-9]{0,62}[a-z0-9])?\\.)+(?:AC|AD|AE|AERO|AF|AG|AI|AL|AM|AN|AO|AQ|AR|ARPA|AS|ASIA|AT|AU|AW|AX|AZ|BA|BB|" +
         "BD|BE|BF|BG|BH|BI|BIZ|BJ|BM|BN|BO|BR|BS|BT|BV|BW|BY|BZ|CA|CAT|CC|CD|CF|CG|CH|CI|CK|CL|CM|CN|CO|COM|COOP|CR|CU|" +
         "CV|CX|CY|CZ|DE|DJ|DK|DM|DO|DZ|EC|EDU|EE|EG|ER|ES|ET|EU|FI|FJ|FK|FM|FO|FR|GA|GB|GD|GE|GF|GG|GH|GI|GL|GM|GN|GOV|" +
@@ -79,8 +93,11 @@ function lib() { //eslint-disable-line no-unused-vars
                 return text;
             }
 
-            return text.replace(linksMatchingRegex, function(match, hrefMatch, uncMatch, emailMatch) {
-                if (hrefMatch) {
+            return text.replace(linksMatchingRegex, function(match, tagMatch, hrefMatch, uncMatch, emailMatch) {
+                if (tagMatch) {
+                    // if a tag with href was found, don't linkify it.
+                    return tagMatch;
+                } else if (hrefMatch) {
                     // got href
                     return createHttpLink(hrefMatch);
                 } else if (uncMatch) {

@@ -41,6 +41,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import com.google.common.base.Function;
@@ -58,12 +59,12 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     public void setUp() throws Exception {
         super.setUp();
         // these tests trigger server recompilation which can take a bit of time
-        getAuraUITestingUtil().setTimeoutInSecs(60);
+        getAuraUITestingUtil().setTimeoutInSecs(20);
     }
 
-    private DefDescriptor<ComponentDef> setupTriggerComponent(String attrs, String body) {
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-                ComponentDef.class,
+    private void setupTriggerComponent(DefDescriptor<ComponentDef> cmpDesc, String attrs, String body) {
+    	addSourceAutoCleanup(
+    			cmpDesc,
                 String.format(
                         baseComponentTag,
                         "controller='java://org.auraframework.components.test.java.controller.JavaTestController' "
@@ -75,6 +76,11 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         addSourceAutoCleanup(
                 controllerDesc,
                 "{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);}}");
+    }
+
+    private DefDescriptor<ComponentDef> setupTriggerComponent(String attrs, String body) {
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null, ComponentDef.class, null);
+        setupTriggerComponent(cmpDesc, attrs, body);
         return cmpDesc;
     }
 
@@ -205,6 +211,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 ComponentDef.class, null);
         DefDescriptor<?> providerDesc = definitionService.getDefDescriptor(cmpDesc,
                 DefDescriptor.JAVASCRIPT_PREFIX, ProviderDef.class);
+
         addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag,
                 String.format("render='client' provider='%s'", providerDesc.getQualifiedName()),
                 "<aura:attribute name='given' type='string' default=''/>{!v.given}"));
@@ -212,16 +219,20 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         open(cmpDesc);
         assertEquals("silver spoon", getText(By.cssSelector("body")));
         updateStringSource(providerDesc, "({provide:function(){return {attributes:{'given':'golden egg'}};}})");
+
         open(cmpDesc);
         assertEquals("golden egg", getText(By.cssSelector("body")));
     }
 
     public void testGetClientRenderingAfterJsHelperChange() throws Exception {
-        DefDescriptor<?> helperDesc = addSourceAutoCleanup(HelperDef.class, "({getHelp:function(){return 'simply';}})");
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-                ComponentDef.class,
-                String.format(baseComponentTag,
-                        String.format("render='client' helper='%s'", helperDesc.getQualifiedName()), ""));
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+                ComponentDef.class, null);
+        DefDescriptor<?> helperDesc = definitionService.getDefDescriptor(cmpDesc,
+                DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class);
+
+        addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag,
+                String.format("render='client' helper='%s'", helperDesc.getQualifiedName()), ""));
+        addSourceAutoCleanup(helperDesc, "({getHelp:function(){return 'simply';}})");
         open(cmpDesc);
         assertEquals("simply", getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().getHelp();"));
         updateStringSource(helperDesc, "({getHelp:function(){return 'complicated';}})");
@@ -230,10 +241,14 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     public void testGetClientRenderingAfterJsRendererChange() throws Exception {
-        DefDescriptor<?> rendererDesc = addSourceAutoCleanup(RendererDef.class,
-                "({render:function(){return 'default';}})");
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, String.format("renderer='%s'", rendererDesc.getQualifiedName()), ""));
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
+                ComponentDef.class, null);
+        DefDescriptor<?> rendererDesc = definitionService.getDefDescriptor(cmpDesc,
+                DefDescriptor.JAVASCRIPT_PREFIX, RendererDef.class);
+
+        addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag,
+        		String.format("renderer='%s'", rendererDesc.getQualifiedName()), ""));
+    	addSourceAutoCleanup(rendererDesc, "({render:function(){return 'default';}})");
         open(cmpDesc);
         assertEquals("default", getText(By.cssSelector("body")));
         updateStringSource(rendererDesc, "({render:function(){return 'custom';}})");
@@ -465,9 +480,15 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     public void testPostAfterJsHelperChange() throws Exception {
-        DefDescriptor<?> helperDesc = addSourceAutoCleanup(HelperDef.class, "({getHelp:function(){return 'simply';}})");
-        DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent(
-                String.format("helper='%s'", helperDesc.getQualifiedName()), "");
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil()
+                .createStringSourceDescriptor(null, ComponentDef.class, null);
+        DefDescriptor<?> helperDesc = definitionService
+                .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
+                		HelperDef.class);
+
+        setupTriggerComponent(cmpDesc, String.format("helper='%s'", helperDesc.getQualifiedName()), "");
+
+        addSourceAutoCleanup(helperDesc, "({getHelp:function(){return 'simply';}})");
         open(cmpDesc);
         assertEquals("simply", getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().getHelp();"));
         updateStringSource(helperDesc, "({getHelp:function(){return 'complicated';}})");
@@ -484,11 +505,16 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     public void testPostAfterJsRendererChange() throws Exception {
-        DefDescriptor<?> rendererDesc = addSourceAutoCleanup(
-                RendererDef.class,
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil()
+                .createStringSourceDescriptor(null, ComponentDef.class, null);
+        DefDescriptor<?> rendererDesc = definitionService
+                .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
+                		RendererDef.class);
+
+        setupTriggerComponent(cmpDesc, String.format("renderer='%s'", rendererDesc.getQualifiedName()), "");
+        addSourceAutoCleanup(
+        		rendererDesc,
                 "({render:function(){var e=document.createElement('div');e.id='target';e.appendChild(document.createTextNode('default'));var r=this.superRender();r.push(e);return r;}})");
-        DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent(
-                String.format("renderer='%s'", rendererDesc.getQualifiedName()), "");
         open(cmpDesc);
         assertEquals("default", getText(By.cssSelector("#target")));
         updateStringSource(
@@ -695,6 +721,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
      *
      * See W-2909975 for additional details.
      */
+    // This tests persistent storage, exclude on Safari based browsers
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testReloadAfterMarkupChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,

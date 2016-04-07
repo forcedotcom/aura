@@ -55,19 +55,24 @@ function AuraError() {
         }
 
         function getStack() {
-            var map = {};
-            var stack = [];
-            var caller = getStack.caller && getStack.caller.caller;
-            while (caller) {
-                if (map[caller]) {
-                    stack.push(getName(caller) + " (Recursion Entry Point)");
-                    break;
+            // in strict mode accessing .caller throws an error
+            try {
+                var map = {};
+                var stack = [];
+                var caller = getStack.caller && getStack.caller.caller;
+                while (caller) {
+                    if (map[caller]) {
+                        stack.push(getName(caller) + " (Recursion Entry Point)");
+                        break;
+                    }
+                    stack.push(getName(caller));
+                    map[caller]=true;
+                    caller=caller.caller;
                 }
-                stack.push(getName(caller));
-                map[caller]=true;
-                caller=caller.caller;
+                return stack.join('\n\tat ');
+            } catch (e) {
+                return '(Unavailable)';
             }
-            return stack.join('\n\tat ');
         }
 
         function getStackTrace(err) {
@@ -90,10 +95,10 @@ function AuraError() {
         }
 
         var error = innerError || new Error(message);
-        error.name = this.name;
+        this.name = innerError ? innerError.name : this.name;
         this.lineNumber = error.lineNumber;
         this.number = error.number;
-        this.message = message + (innerError ? " [" + innerError.message + "]" : "");
+        this.message = message + (innerError ? " [" + innerError.toString() + "]" : "");
         this.stackTrace = getStackTrace(error);
         this.severity = severity;
     }
@@ -112,5 +117,8 @@ function AuraError() {
 
 AuraError.prototype = new Error();
 AuraError.prototype.constructor = AuraError;
+AuraError.prototype.toString = function() {
+    return this.message || Error.prototype.toString();
+};
 
 Aura.Errors.AuraError = AuraError;

@@ -21,13 +21,12 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.auraframework.util.IOUtil;
 
-import com.google.common.collect.Lists;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.CompilationLevel;
@@ -51,7 +50,6 @@ public enum JavascriptWriter {
         @Override
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.WHITESPACE_ONLY.setOptionsForCompilationLevel(options);
-        	options.setLanguageIn(LanguageMode.ECMASCRIPT5);
         }
     },
 
@@ -59,7 +57,6 @@ public enum JavascriptWriter {
         @Override
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
-        	options.setLanguageIn(LanguageMode.ECMASCRIPT5);
         }
     },
 
@@ -67,14 +64,12 @@ public enum JavascriptWriter {
         @Override
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.ADVANCED_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
-        	options.setLanguageIn(LanguageMode.ECMASCRIPT5);
         }
     },
 
     CLOSURE_AURA_DEBUG {
         @Override
         public void setClosureOptions(CompilerOptions options) {
-        	options.setLanguageIn(LanguageMode.ECMASCRIPT5);
             options.setPrettyPrint(true);
             options.setGeneratePseudoNames(true);
             options.setReserveRawExports(true);
@@ -92,7 +87,6 @@ public enum JavascriptWriter {
         @Override
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.ADVANCED_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
-        	options.setLanguageIn(LanguageMode.ECMASCRIPT5);
             options.setAliasAllStrings(true);
             options.setGenerateExports(true);
         }
@@ -142,12 +136,12 @@ public enum JavascriptWriter {
 
     /**
      * Compress using Closure Compiler using the options for this compression level.
-     * 
+     *
      * @param in Javascript source.
      * @param out Write the compressed source to this Writer.
      * @param filename Name used for error reporting, etc...
      * @throws IOException
-     * 
+     *
      * @TODO nmcwilliams: set externs file properly.
      */
     public List<JavascriptProcessingError> compress(String in, Writer out, String filename) throws IOException {
@@ -165,7 +159,7 @@ public enum JavascriptWriter {
 
     /**
      * Compress source file and generate associated sourcemap.
-     * 
+     *
      * @param sourceFileReader source Javascrpt file reader
      * @param compressedFileWriter Compressed Javascript file writer
      * @param sourceMapWriter Source map writer
@@ -182,7 +176,7 @@ public enum JavascriptWriter {
 
     /**
      * InputStream base compression
-     * 
+     *
      * @param in source stream
      * @param compressedFileWriter Compressed Javascript file writer
      * @param filename Source javascript file name
@@ -199,13 +193,15 @@ public enum JavascriptWriter {
      */
     private List<JavascriptProcessingError> compress(SourceFile in, Writer out, Writer sourceMapWriter,
             String filename, Map<String, String> sourceMapLocationMapping) throws IOException {
-        List<JavascriptProcessingError> msgs = new ArrayList<>();
-        // Do some actual closure variation:
-        Compiler c = new Compiler();
 
-        Compiler.setLoggingLevel(Level.WARNING);
+    	List<JavascriptProcessingError> msgs = new ArrayList<>();
+
         CompilerOptions options = new CompilerOptions();
-        if (sourceMapWriter != null) {
+        options.setCheckGlobalThisLevel(CheckLevel.OFF);
+    	options.setLanguageIn(LanguageMode.ECMASCRIPT5);
+    	options.setLanguageOut(LanguageMode.ECMASCRIPT5);
+
+    	if (sourceMapWriter != null) {
             options.sourceMapFormat = SourceMap.Format.V3;
             options.sourceMapOutputPath = filename;
         }
@@ -225,38 +221,40 @@ public enum JavascriptWriter {
         // options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
         options.addWarningsGuard(NON_STANDARD_JSDOC_GUARD);
 
-        Result result = c.compile(externs, Lists.<SourceFile> newArrayList(in), options);
+        try {
+        	Compiler compiler = new Compiler();
+	        Result result = compiler.compile(externs, Arrays.asList(in), options);
+	        String source = compiler.toSource();
 
-        if (isSelfScoping()) {
-            // Encase the compressed output in a self-executing function to
-            // scope everything.
-            // Global APIs are exported explicitly in the code.
-            out.append("(function(){");
-        }
-        out.write(c.toSource());
-        if (isSelfScoping()) {
-            // Encase the compressed output in a self-executing function to
-            // scope everything.
-            // Global APIs are exported explicitly in the code.
-            out.append("})();");
+	        if (isSelfScoping()) {
+	            // Encase the compressed output in a self-executing function to
+	            // scope everything.
+	            // Global APIs are exported explicitly in the code.
+	            out.append("(function(){").append(source).append("})();");
+	        } else {
+		        out.append(source);
+	        }
+
+	        // Write sourcemap
+	        if (result != null && sourceMapWriter != null) {
+	            StringBuilder sb = new StringBuilder();
+	            result.sourceMap.validate(true);
+	            result.sourceMap.appendTo(sb, filename);
+
+	            sourceMapWriter.write(sb.toString());
+	        }
+
+	        // errors and warnings
+	        for (JSError e : compiler.getErrors()) {
+	            JavascriptProcessingError.makeError(msgs, e.description, e.lineNumber, e.getCharno(), in.getName(), null);
+	        }
+	        for (JSError e : compiler.getWarnings()) {
+	            JavascriptProcessingError.makeWarning(msgs, e.description, e.lineNumber, e.getCharno(), in.getName(), null);
+	        }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
-        // Write sourcemap
-        if (result != null && sourceMapWriter != null) {
-            StringBuilder sb = new StringBuilder();
-            result.sourceMap.validate(true);
-            result.sourceMap.appendTo(sb, filename);
-
-            sourceMapWriter.write(sb.toString());
-        }
-
-        // errors and warnings
-        for (JSError e : c.getErrors()) {
-            JavascriptProcessingError.makeError(msgs, e.description, e.lineNumber, e.getCharno(), in.getName(), null);
-        }
-        for (JSError e : c.getWarnings()) {
-            JavascriptProcessingError.makeWarning(msgs, e.description, e.lineNumber, e.getCharno(), in.getName(), null);
-        }
         return msgs;
     }
 
@@ -272,6 +270,10 @@ public enum JavascriptWriter {
                 return CheckLevel.OFF;
             }
             if ("Parse error. illegal use of unknown JSDoc tag \"platform\"; ignoring it"
+                    .equals(error.description)) {
+                return CheckLevel.OFF;
+            }
+            if ("Parse error. illegal use of unknown JSDoc tag \"alias\"; ignoring it"
                     .equals(error.description)) {
                 return CheckLevel.OFF;
             }

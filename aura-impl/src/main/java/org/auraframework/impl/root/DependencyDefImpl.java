@@ -108,7 +108,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
 
     /**
      * Gets the dependency for this instance.
-     * 
+     *
      * @return The dependency.
      */
     @Override
@@ -146,7 +146,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
 
         /**
          * Sets the parentDescriptor for this instance.
-         * 
+         *
          * @param parentDescriptor The parentDescriptor.
          */
         @Override
@@ -157,7 +157,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
 
         /**
          * Sets the resource for this instance.
-         * 
+         *
          * @param resource The resource.
          */
         @Override
@@ -168,7 +168,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
 
         /**
          * Sets the type for this instance.
-         * 
+         *
          * @param type The type.
          */
         @Override

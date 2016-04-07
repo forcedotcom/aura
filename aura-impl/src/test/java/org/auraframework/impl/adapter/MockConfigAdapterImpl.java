@@ -18,7 +18,6 @@ package org.auraframework.impl.adapter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -37,12 +36,12 @@ import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.source.StringSourceLoader;
 
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Sets;
 
 /**
  * ConfigAdapter for Aura tests.
  */
 public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConfigAdapter {
-
     /**
      * An extension of a ContentSecurityPolicy that adds "odd" test requirements.
      */
@@ -74,7 +73,6 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
             List<String> list = (List<String>) baseline.getScriptSources();
             AuraContext context = Aura.getContextService().getCurrentContext();
             if (context != null && context.isTestMode()) {
-                list = removeNonceCspEntry(list);
                 list.add(CSP.UNSAFE_EVAL);
             }
             return list;
@@ -83,21 +81,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         @Override
         public Collection<String> getStyleSources() {
             List<String> list = (List<String>) baseline.getStyleSources();
-            AuraContext context = Aura.getContextService().getCurrentContext();
-            if (context != null && context.isTestMode()) {
-                list = removeNonceCspEntry(list);
-            }
             return list;
-        }
-
-        private List<String> removeNonceCspEntry(List<String> csp) {
-            for (Iterator<String> iterator = csp.iterator(); iterator.hasNext();) {
-                String entry = iterator.next();
-                if (entry != null && entry.startsWith("'nonce")) {
-                    iterator.remove();
-                }
-            }
-            return csp;
         }
 
         @Override
@@ -150,6 +134,11 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
                             "renderingTest", "setAttributesTest", "test", "tokenSanityTest", "uitest", "utilTest",
                             "updateTest", "whitespaceBehaviorTest", "appCache")
                     .build();
+    
+    private static final Set<String> SYSTEM_TEST_PRIVILEGED_NAMESPACES = new ImmutableSortedSet.Builder<>(
+            String.CASE_INSENSITIVE_ORDER)
+                    .add("testPrivilegedNS1", "testPrivilegedNS2")
+                    .build();
 
     private Boolean isClientAppcacheEnabled = null;
     private Boolean isProduction = null;
@@ -159,7 +148,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private String csrfToken = null;
     private final Set<String> nonInternalNamespaces = new HashSet<>();
     private final Set<String> unprivilegedNamespaces = new HashSet<>();
-    private Boolean lockerServiceEnabled = null;
+    private Boolean isLockerServiceEnabledGlobally;
 
     public MockConfigAdapterImpl() {
         super();
@@ -178,7 +167,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         csrfToken = null;
         unprivilegedNamespaces.clear();
         nonInternalNamespaces.clear();
-        lockerServiceEnabled = null;
+        isLockerServiceEnabledGlobally = null;
     }
 
     @Override
@@ -242,7 +231,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
     @Override
     public Set<String> getPrivilegedNamespaces() {
-        Set<String> namespaces = super.getPrivilegedNamespaces();
+        Set<String> namespaces = Sets.newTreeSet(super.getPrivilegedNamespaces());
         namespaces.removeAll(unprivilegedNamespaces);
         return namespaces;
     }
@@ -251,6 +240,10 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     public boolean isPrivilegedNamespace(String namespace) {
         if (unprivilegedNamespaces.contains(namespace)) {
             return false;
+        }
+        
+        if(StringSourceLoader.getInstance().isPrivilegedNamespace(namespace) || SYSTEM_TEST_PRIVILEGED_NAMESPACES.contains(namespace)) {
+        	return true;
         }
 
         if (super.isPrivilegedNamespace(namespace)) {
@@ -266,7 +259,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
     @Override
     public Set<String> getInternalNamespaces() {
-        Set<String> namespaces = super.getInternalNamespaces();
+        Set<String> namespaces = Sets.newTreeSet(super.getInternalNamespaces());
         namespaces.removeAll(nonInternalNamespaces);
         return namespaces;
     }
@@ -305,7 +298,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
         return false;
     }
-
+    
     @Override
     public boolean isUnsecuredNamespace(String namespace) {
         return super.isUnsecuredNamespace(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace);
@@ -326,15 +319,12 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     }
 
     @Override
-    public void setLockerServiceEnabled(boolean isLockerServiceEnabled) {
-        this.lockerServiceEnabled = isLockerServiceEnabled;
+    public void setLockerServiceEnabled(boolean enabled) {
+		isLockerServiceEnabledGlobally = enabled;
     }
 
     @Override
     public boolean isLockerServiceEnabled() {
-        if (lockerServiceEnabled == null) {
-            return super.isLockerServiceEnabled();
-        }
-        return this.lockerServiceEnabled;
+        return (isLockerServiceEnabledGlobally == null) ? super.isLockerServiceEnabled() : isLockerServiceEnabledGlobally;
     }
 }

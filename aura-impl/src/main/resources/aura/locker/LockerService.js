@@ -26,11 +26,12 @@ function LockerService() {
 
 	// This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
 	// which, by definition, do not provide authority or access to globals.
-	// TODO: grow this list...
 	var whitelist = [
-			'undefined', 'NaN', 'Date', 'Number', 'Boolean', 'alert', 'confirm',
+			'undefined', 'NaN', 'Infinity', 'Date', 'Number', 'Boolean', 'String', 'alert', 'confirm',
 			'Intl', 'Error', 'console', 'Object',
-			'clearTimeout', 'clearInterval'
+			'clearTimeout', 'clearInterval', 'parseInt', 'parseFloat', 
+			'decodeURI', 'decodeURIComponent', 'encodeURI', 'encodeURIComponent',
+			'isFinite', 'isNaN'
 		];
 
 	var nsKeys = {};
@@ -45,8 +46,8 @@ function LockerService() {
 	function masterKey() {/*lexical master key*/}
 
 	getLockerSecret = function (st, type) {
-		if (typeof st !== "object") {
-			throw new TypeError("Secrets can only be stored in Objects.");
+		if (typeof st !== "object" && typeof st !== "function") {
+			throw new TypeError("Secrets can only be stored in Objects and Functions.");
 		}
 		var lock = st["$ls" + type];
 		if (lock && validLockSet["has"](lock)) {
@@ -63,8 +64,8 @@ function LockerService() {
 			}
 			return secret;
 		}
-		if (typeof st !== "object") {
-			throw new TypeError("Secrets can only be retrieved from Objects.");
+		if (typeof st !== "object" && typeof st !== "function") {
+			throw new TypeError("Secrets can only be retrieved from Objects and Functions.");
 		}
 		if (typeof st["$ls" + type] === 'function') {
 			throw new Error("Re-setting of " + type + " is prohibited");

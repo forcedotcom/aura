@@ -32,6 +32,14 @@
 	display: inline-block;
 }
 
+.THIS .tooltip-invisible {
+	/* this is a secondary tooltip for screen readers */
+	clip: rect(1px, 1px, 1px, 1px);
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+}
 
 .THIS .body-basic {
 	bottom:100%;

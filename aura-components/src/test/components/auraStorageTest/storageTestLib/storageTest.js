@@ -509,11 +509,8 @@ function storageTest () {
 
         /**
          * Asserts that sizes are within an acceptable range of one another.
-         *
-         * @param {Number}
-         *            expected - the expected size (in bytes)
-         * @param {Number}
-         *            actual - the actual size (in bytes)
+         * @param {Number} expected the expected size (in bytes)
+         * @param {Number} actual the actual size (in bytes)
          */
         assertSimilarSize: function(expected, actual) {
             // range is arbitrarily picked to deal with javascript floating point calculations
@@ -523,6 +520,31 @@ function storageTest () {
             $A.test.assertTrue(acceptable, "expected (" + expected + ") and actual (" + actual + ") not within acceptable range (" + range + ")");
         },
 
-        appendLine: append
+        appendLine: append,
+
+        /**
+         * Given a size, return an object greater than the size according to $A.util.estimateSize.
+         * @param {Number} size a tight lower bound on the size (bytes) of the object that will be returned.
+         * @return {Object} an object specifying key, value, and size.
+         */
+        buildEntry: function(key, size) {
+            var CHAR_SIZE = 2; // from Aura's SizeEstimator
+
+            // remove the size of the key
+            size -= CHAR_SIZE * key.length;
+
+            var numOfCharacter = Math.ceil(size/CHAR_SIZE);
+            var value = new Array(numOfCharacter+1).join("x");
+
+            // must match logic in AuraStorage.js
+            var resultingSize = $A.util.estimateSize(key) + $A.util.estimateSize(value);
+            $A.test.assertTrue(resultingSize > size, "_buildEntry() algorithm is wrong: requested " + size + "b but generated " + resultingSize + "b");
+
+            return {
+                "key": key,
+                "value": {value:value},
+                "size": resultingSize
+            };
+        },
     };
 }

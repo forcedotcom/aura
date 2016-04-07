@@ -103,7 +103,7 @@
                 // check if a record we are about to display has been locally updated (say, by a row-level action),
                 // and thus we need to ignore any cached action.
                 else if (cmpDef.attributes && cmpDef.attributes.recordId) {
-                    var event = $A.get("e.force:localRecordChangeCheck");
+                    var event = $A.getEvt("markup://force:localRecordChangeCheck");
                     var staleRecordIds = [];
                     event.setParams({
                         name: cmpDef.descriptor,
@@ -187,12 +187,12 @@
 	},
 	afterRenderCarouselPage: function (cmp) {
 		var scroller = cmp.find('scroller').getScrollerInstance(),
-			updateEventExists = !!$A.getEvt('force:updateHighlights');
+			updateEventExists = !!$A.getEvt('markup://force:updateHighlights');
 
 			if (updateEventExists) {
 				scroller.on('scrollMove', function (action) {
 					var y = this.y;
-					var updateHighlightsEvt = $A.getEvt('force:updateHighlights');
+					var updateHighlightsEvt = $A.getEvt('markup://force:updateHighlights');
 					if (action === 'gestureMove' || action === 'scroll') {
 						if (y < 0) {
 							updateHighlightsEvt.setParams({action: 'hide', block: true}).fire();
@@ -202,7 +202,7 @@
 					}
 				});
 				scroller.on('scrollEnd', function () {
-					var updateHighlightsEvt = $A.getEvt('force:updateHighlights');
+					var updateHighlightsEvt = $A.getEvt('markup://force:updateHighlights');
 					if (scroller.y >= 0 && scroller.scrollerHeight > scroller.wrapperHeight) {
 						updateHighlightsEvt.setParams({action: 'show'}).fire();
 					}

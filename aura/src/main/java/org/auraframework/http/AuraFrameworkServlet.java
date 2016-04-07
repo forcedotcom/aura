@@ -58,7 +58,9 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             return;
         }
         long ifModifiedSince = request.getDateHeader(HttpHeaders.IF_MODIFIED_SINCE);
+        
         servletUtilAdapter.setCSPHeaders(null, request,  response);
+        
         InputStream in = null;
         try {
 
@@ -175,7 +177,9 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
+            
             response.reset();
+            
             servletUtilAdapter.setCSPHeaders(null, request, response);
 
             // handle any MIME content type, using only file name (not contents)

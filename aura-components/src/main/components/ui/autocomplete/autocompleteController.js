@@ -86,13 +86,10 @@
         }
     },
     
-    handleKeyAction: function(component, event, helper) {
-
+    handleKeyAction: function(component, event) {
         var concrete = component.getConcreteComponent();
         var concreteHelper = concrete.getDef().getHelper();
         concreteHelper.handleKeyAction(component, event);
-        var domEvent = event.getParam("domEvent");
-        helper.fireEvent(component, domEvent, helper);
     },
     
     handleMatchDone: function(component, event) {
@@ -137,9 +134,9 @@
             if (!$A.util.isEmpty(listReferenceComponent) && !$A.util.isUndefinedOrNull(listReferenceComponent[0])) {
                 panel.set('v.referenceElement', listReferenceComponent[0].getElement());
             } else {
-                panel.set('v.referenceElement', component.find('input').getElement().querySelector('input'));
+                panel.set('v.referenceElement', component.find('input').getElement());
             }
-            $A.get('e.ui:stackPanel').setParams({
+            $A.getEvt("markup://ui:stackPanel").setParams({
                 callback: function(zIndex) {
                     panel.set('v.zIndex', zIndex);
                 }

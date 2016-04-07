@@ -19,7 +19,7 @@
         event.preventDefault();
         var defModel = cmp.get("v.defModel");
 
-        var evt = $A.get("e.auraide:openDef");
+        var evt = $A.getEvt("markup://auraide:openDef");
         evt.setParams({
             descriptor : defModel["descriptor"],
             defType : defModel["defType"]

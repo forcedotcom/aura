@@ -42,8 +42,11 @@
                     component.set("v.timePlaceholder", timeFormat);
                 }
             }
-            datePicker.set("v.hasTime", false);
-            datePicker.set("v.showToday", false);
+            // datepicker can be undefined if it's managed by ui:datepickerManager
+            if (!$A.util.isUndefinedOrNull(datePicker)) {
+                datePicker.set("v.hasTime", false);
+                datePicker.set("v.showToday", false);
+            }
         } else {
             datePicker.set("v.hasTime", true);
             datePicker.set("v.showToday", true);
@@ -72,6 +75,14 @@
         var inputText = helper.getTimeString(component);
         if ($A.util.isEmpty(inputText) && !component.get("v.disabled")) {
             helper.displayTimePicker(component);
+        }
+    },
+
+    // override ui:handlesDateSelected
+    onDateSelected: function(component, event, helper) {
+        var dateValue = event.getParam("arguments").value;
+        if (dateValue) {
+            helper.setDateValue(component, dateValue);
         }
     },
 

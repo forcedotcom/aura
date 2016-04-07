@@ -316,6 +316,15 @@
             // Scoping this to desktop to prevent regressions
             } else if (!$A.util.isUndefinedOrNull(referenceElem) && $A.get("$Browser.formFactor") === "DESKTOP") {
 
+                if ($A.util.isEmpty(elem.style.top)) {
+                    // this is just an approximation for the initial position of the datepicker. The positioning library
+                    // will take care of the correct position. See W-2993774
+                    elem.style.top = referenceElem.getBoundingClientRect().bottom + "px";
+                }
+
+                if ($A.util.isEmpty(elem.style.left)) {
+                    elem.style.left = referenceElem.getBoundingClientRect().left + "px";
+                }
 
                 if(!component.positionConstraint) {
                     var referenceElementAlign = 'left bottom';
@@ -447,41 +456,6 @@
             }
         }
     },
-
-    /*
-    setGridInitialValue: function(component) {
-        var initialDateStr = component.get("v._today");
-        var initialDate = initialDateStr ? (moment(initialDateStr, "YYYY-MM-DD")).toDate() : new Date();
-        var value = component.get("v.value");
-        if (!$A.util.isUndefinedOrNull(value) && !$A.util.isEmpty(value)) {
-            var d = moment(value, "YYYY-MM-DD");
-            initialDate = d.toDate();
-        }
-        this.setGridValues(component, initialDate, initialDateStr);
-    },
-
-    setGridValues: function(component, initialDate, todayStr) {
-    	var grid = component.find("grid");
-        if (grid) {
-            grid.set("v.selectedDate", initialDate.getFullYear() + "-" + (initialDate.getMonth() + 1) + "-" + initialDate.getDate());
-            grid.set("v.date", initialDate.getDate());
-            grid.set("v.month", initialDate.getMonth());
-            grid.set("v.year", initialDate.getFullYear());
-            grid.set("v._today", todayStr);
-        }
-
-        // set initial value to time picker if hasTime is true
-        var hasTime = $A.util.getBooleanValue(component.get("v.hasTime"));
-        if (hasTime) {
-            var timePickerCmp = component.find("time");
-            if (timePickerCmp) {
-                timePickerCmp.set("v.hours", component.get("v.hours"));
-                timePickerCmp.set("v.is24HourFormat", component.get("v.is24HourFormat"));
-                timePickerCmp.set("v.minutes", component.get("v.minutes"));
-            }
-        }
-    },
-    */
 
     setTitleTag: function(component) {
     	var headingLevel = component.get("v.titleHeadingLevel");

@@ -44,13 +44,12 @@
 
 	buildTooltip: function(component, cb) {
 		var cmLib = this.cmLib;
-		var compDef ={};
+		var compDef = {};
 		if(component._tooltip) {
 			setTimeout($A.getCallback(function () {
 				cb(component._tooltip);
 			}, 0));
 		} else {
-
 			['tooltipBody', 
 				'isVisible', 
 				'tooltipBody', 
@@ -59,6 +58,7 @@
 				'direction', 
 				'fadeOut', 
 				'fadeIn',
+				'domId',
 				'fadeOutDuration',
 				'fadeInDuration',
 				'delay'].forEach(function(attr) {
@@ -118,7 +118,8 @@
 	hide: function(component) {
 
 		this.buildTooltip(component, $A.getCallback(function(tt){
-			if(tt.isValid()) {
+			//Race condition causes tt to be null
+			if(tt && tt.isValid()) {
 				tt.set('v.isVisible', false);
 			}
 			if(component.isValid()) {
@@ -149,6 +150,7 @@
 	cleanup: function(component) {
 		if(component._tooltip ) {
 			this.cmLib.containerManager.getSharedInstance().destroyContainer(component._tooltip);
+			component._tooltip = null;
 		}
 	},
 

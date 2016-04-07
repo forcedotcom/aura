@@ -16,18 +16,23 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
     <aura:attribute name="dynamicCmps" type="Object"/>
+    <aura:attribute name="testComplete" type="Boolean" default="false" description="Flag to set to signal async operations are complete and test can complete"/>
 
-	<aura:method name="getSecureAura" action="{!c.getSecureAura}"/>
-	<aura:method name="getSecureComponent" action="{!c.getSecureComponent}"/>
-	<aura:method name="dynamicallyCreateCmpsDifferentNamespace" action="{!c.dynamicallyCreateCmpsDifferentNamespace}"/>
-	<aura:method name="dynamicallyCreateCmpSameNamespace" action="{!c.dynamicallyCreateCmpSameNamespace}"/>
-	<aura:method name="callEnqueueAction" action="{!c.callEnqueueAction}"/>
-    <aura:method name="callGetCallback" action="{!c.callGetCallback}"/>
-    <aura:method name="getGVP" action="{!c.getGVP}"/>
-    <aura:method name="callGetComponentDifferentNamespace" action="{!c.callGetComponentDifferentNamespace}"/>
-    <aura:method name="callGetComponentSameNamespace" action="{!c.callGetComponentSameNamespace}"/>
+    <aura:method name="testStorageServiceNotDefined" action="{!c.testStorageServiceNotDefined}"/>
+    <aura:method name="testPlatformExposedAPIs" action="{!c.testPlatformExposedAPIs}">
+        <aura:attribute name="exposedAPIs" type="List"/>
+    </aura:method>
+    <aura:method name="testGetRootReturnsSecureComponent" action="{!c.testGetRootReturnsSecureComponent}"/>
+    <aura:method name="testGetCallback" action="{!c.testGetCallback}"/>
+    <aura:method name="testGetGVP" action="{!c.testGetGVP}"/>
+    <aura:method name="testGetDifferentNamespaceComponentReturnsSecureComponentRef" action="{!c.testGetDifferentNamespaceComponentReturnsSecureComponentRef}"/>
+    <aura:method name="testGetSameNamespaceComponentReturnsSecureComponent" action="{!c.testGetSameNamespaceComponentReturnsSecureComponent}"/>
+    <aura:method name="testUtilExposedOnSecureAura" action="{!c.testUtilExposedOnSecureAura}"/>
+    <aura:method name="testUtilHasClassAPI" action="{!c.testUtilHasClassAPI}"/>
+    <aura:method name="testDynamicallyCreatedComponentDifferentNamespaceIsSecureComponentRef" action="{!c.testDynamicallyCreatedComponentDifferentNamespaceIsSecureComponentRef}"/>
+    <aura:method name="testDynamicallyCreatedComponentSameNamespaceIsSecureComponent" action="{!c.testDynamicallyCreatedComponentSameNamespaceIsSecureComponent}"/>
 
     <div>SecureAura test</div>
     <aura:text value="Differnet namespace component" aura:id="textCmp"/>

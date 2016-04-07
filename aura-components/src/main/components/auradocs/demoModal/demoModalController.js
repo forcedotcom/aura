@@ -16,7 +16,7 @@
 ({
 	showDialog: function(cmp, event) {
 		var msg = cmp.find('modal');
-		var open = $A.get("e.ui:openDialog");
+		var open = $A.getEvt("markup://ui:openDialog");
 		open.setParams({
 			dialog : msg,
 			//triggerEvent is optional, unless when the trigger is a ui:press event

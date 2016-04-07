@@ -18,5 +18,5 @@
 <aura:event type="APPLICATION">
 	<aura:attribute name="element" type="Object" description="DOM HTMLElement for positioning."/>
 	<aura:attribute name="value" type="String" description="Initial value for ui:datePicker."/>
-	<aura:attribute name="onselected" type="Aura.Action" description="Callback"/>
+    <aura:attribute name="sourceComponentId" type="String" description="GlobalId of the inputDate or inputDateTime component firing the event"/>
 </aura:event>

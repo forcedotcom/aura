@@ -22,20 +22,21 @@ function SecureIFrameElement(el, key) {
             value: function() {
                 return "SecureIFrameElement: " + el + "{ key: " + JSON.stringify(key) + " }";
             }
-        },
-
+        }
+    });
+    Object.defineProperties(o, {
         // Standard list of iframe's properties from:
         // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
         // Note: ignoring 'contentDocument', 'contentWindow', 'sandbox' and 'srcdoc' from the list above.
-        height: SecureThing.createPassThroughProperty(el, "height"),
-        width: SecureThing.createPassThroughProperty(el, "width"),
-        name: SecureThing.createPassThroughProperty(el, "name"),
-        src: SecureThing.createPassThroughProperty(el, "src"),
+        height: SecureThing.createFilteredProperty(o, el, "height"),
+        width: SecureThing.createFilteredProperty(o, el, "width"),
+        name: SecureThing.createFilteredProperty(o, el, "name"),
+        src: SecureThing.createFilteredProperty(o, el, "src"),
 
         // Standard HTMLElement methods
         // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
-        blur: SecureThing.createPassThroughMethod(el, "blur"),
-        focus: SecureThing.createPassThroughMethod(el, "focus")
+        blur: SecureThing.createFilteredMethod(o, el, "blur"),
+        focus: SecureThing.createFilteredMethod(o, el, "focus")
     });
     // applying standard secure element properties
     SecureElement.addSecureProperties(o, el);

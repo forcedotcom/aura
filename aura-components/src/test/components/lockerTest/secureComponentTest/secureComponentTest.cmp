@@ -16,13 +16,14 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
-    <aura:attribute name="dynamicCmps" type="Aura.Component[]" />
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-    <aura:method name="getWrapperFromController" action="{!c.getWrapperFromController}"/>
-    <aura:method name="dynamicallyCreateCmps" action="{!c.dynamicallyCreateCmps}"/>
-    <aura:method name="getElementTest" action="{!c.getElementTest}"/>
-    <aura:method name="getEventTest" action="{!c.getEventTest}"/>
+    <aura:method name="testBlockedAPI" action="{!c.testBlockedAPI}"/>
+    <aura:method name="testFindReturnsSecureComponent" action="{!c.testFindReturnsSecureComponent}"/>
+    <aura:method name="testGetElementReturnsSecureElement" action="{!c.testGetElementReturnsSecureElement}"/>
+    <aura:method name="testGetEventReturnsSecureEvent" action="{!c.testGetEventReturnsSecureEvent}"/>
+    <aura:method name="testGetCThrowsError" action="{!c.testGetCThrowsError}"/>
+    <aura:method name="testAddValueProviderExploit" action="{!c.testAddValueProviderExploit}"/>
 
     <aura:registerevent name="press" type="ui:press"/>
 

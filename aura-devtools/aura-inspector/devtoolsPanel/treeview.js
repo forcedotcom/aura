@@ -4,7 +4,11 @@ function TreeNode(text, id) {
 
     // ?
     this.addChild = function(node) {
-        _children.push(node);
+        if(Array.isArray(node)) {
+            _children = _children.concat(node);
+        } else {
+            _children.push(node);
+        }
     };
 
     this.getId = function() {
@@ -43,7 +47,7 @@ function TreeNode(text, id) {
     };
 
     this.toString = function() {
-        return this.getLabel()+"";
+        return JSON.stringify(text) + " [" + this.getLabel() + "]";
     }
 }
 
@@ -53,41 +57,84 @@ function TreeNode(text, id) {
         ComponentDefFormatter: function(value){ 
             // Needs Improvement
             // Just not doing now, because component defs are messed in the head.
-            return "[[ComponentDef]]" + formatters.ComponentFormatter(value);
+            var text_node = document.createTextNode("[[ComponentDef]]");
+            var fragment = formatters.ComponentFormatter(value);
+            fragment.insertBefore(text_node, fragment.firstElementChild);
+            return fragment;
         },
         ComponentFormatter: function(value){
             value.tagName = value.tagName.split("://")[1] || value.tagName;
-            var pattern = [
-                '<span class="component-tagname">&lt;{tagName}</span>'
-            ];
+
+            var fragment = document.createDocumentFragment();
+
+            var tagname = document.createElement("span");
+            tagname.className = "component-tagname";
+            tagname.appendChild(document.createTextNode("<" + value.tagName));
+
+            fragment.appendChild(tagname);
+
+            // var pattern = [
+            //     '<span class="component-tagname">&lt;{tagName}</span>'
+            // ];
 
             // I doubt this will work once I switch over to google settings, so...
             var defaultOptions = {showGlobalIds: false};
             AuraInspectorOptions.getAll(defaultOptions, function(options){
                 if(options.showGlobalIds) {
-                    pattern.push(' <span class="component-attribute">globalId</span>="{globalId}"');
+                    //pattern.push(' <span class="component-attribute">globalId</span>="{globalId}"');
+                    var globalid = document.createElement("span");
+                    globalid.className = "component-attribute";
+                    globalid.appendChild(document.createTextNode("globalId"));
+
+                    fragment.appendChild(globalid);
+                    fragment.appendChild(document.createTextNode("="));
+                    fragment.appendChild(document.createTextNode(value.globalId));
                 }
             });
 
             if(value.attributes) {
                 var current;
+                var count_element;
+                var attribute_element;
                 for(var attr in value.attributes) {
                     if(attr != "body") {
                         current = value.attributes[attr];
 
-                        if(current && Array.isArray(current)) {
-                            current = current.length ? '[<i class="component-array-length">' + current.length + '</i>]' : "[]";
-                        } else if(current && typeof current === "object") {
-                            current = Object.keys(current).length ? "{...}" : "{}"
-                        }
+                        attribute_element =  document.createElement("span");
+                        attribute_element.className = "component-attribute";
+                        attribute_element.appendChild(document.createTextNode(attr));
 
-                        pattern.push(' <span class="component-attribute">' + attr + '</span>="' + String$escape(current) + '"');
+                        fragment.appendChild(document.createTextNode(" "));
+                        fragment.appendChild(attribute_element);
+                        fragment.appendChild(document.createTextNode('="'));
+
+                        if(current && Array.isArray(current)) {
+
+                            if(current.lenght) {
+                                fragment.appendChild(document.createTextNode("["));
+                                count_element = document.createElement("i");
+                                count_element.className = "component-array-length";
+                                count_element.appendChild(document.createTextNode(count.length));
+                                fragment.appendChild(count_element);
+                                fragment.appendChild(document.createTextNode("]"));
+                            } else {
+                                fragment.appendChild(document.createTextNode("[]"));
+                            }
+
+                        } else if(current && typeof current === "object") {
+                            fragment.appendChild(document.createTextNode(Object.keys(current).length ? "{...}" : "{}"));
+                        } else if(isFCV(current)) {
+                            fragment.appendChild(document.createTextNode(formatFCV(current)));
+                        } else {
+                            fragment.appendChild(document.createTextNode(current+""));
+                        }
+                        fragment.appendChild(document.createTextNode('"'));
                     }
                 }   
             }
 
-            pattern.push("&gt;");
-            return String$format(pattern.join(''), value);
+            fragment.appendChild(document.createTextNode(">"));
+            return fragment;
         },
         HtmlComponentFormatter: function(value) {
             value.tagName = value.attributes.tag;
@@ -106,7 +153,11 @@ function TreeNode(text, id) {
             if(value.attributes["aura:id"]) {
                 pattern.push(' <span class="component-attribute">aura:id</span>="' + value.attributes["aura:id"] + '"');
                 for(var attr in value.attributes.HTMLAttributes) {
-                    pattern.push(' <span class="component-attribute">' + attr + '</span>="' + String$escape(value.attributes.HTMLAttributes[attr]) + '"');
+                    if(isFCV(value.attributes.HTMLAttributes[attr])) {
+                        pattern.push(' <span class="component-attribute">' + attr + '</span>="' + String$escape(formatFCV(value.attributes.HTMLAttributes[attr])) + '"');
+                    } else {
+                        pattern.push(' <span class="component-attribute">' + attr + '</span>="' + String$escape(value.attributes.HTMLAttributes[attr]) + '"');
+                    }
                 }   
             }
 
@@ -125,37 +176,93 @@ function TreeNode(text, id) {
             return text;
         },
         ExpressionComponentFormatter: function(value) {
-            //return ByReference || ByValue;
-            return value.attributes.expression || value.attributes.value;
+            var expression = value.attributes.expression;
+
+            // ByReference {!...}
+            if(expression) { 
+                if(isFCV(expression)) {
+                    return formatFCV(expression);
+                }
+                return expression;
+            }
+
+            var attributeValue = value.attributes.value;
+
+            // ByValue {#...}
+            return attributeValue;
         },
         KeyValueFormatter: function(config){
             var value = config.value;
-            if(value && value.toString().indexOf("function (") === 0 || typeof value === "function"){
-                value = formatters.FunctionFormatter(value);
-            }
+            var key = config.key;
 
-            if(typeof value === "string" && value.trim().length === 0) {
-                value = "&quot;" + value + "&quot;";
-            } else if(value && Array.isArray(value)) {
-                value = value.length ? '[<i class="component-array-length">' + value.length + "</i>]" : "[]";
-            } else if(value && typeof value === "object") {
+            // Function
+            if(value && typeof value == "string" && value.toString().indexOf("function (") === 0 || typeof value === "function"){
+                value = formatters.FunctionFormatter(value);
+            } 
+            // Empty String
+            else if(typeof value === "string" && value.trim().length === 0) {
+                value = '"' + value + '"';
+            } 
+            // Array
+            else if(value && Array.isArray(value)) {
+                if(value.length) {
+                    var element = document.createElement("span");
+                    element.appendChild(document.createTextNode("["));
+
+                    var count = document.createElement("i");
+                    count.className = "component-array-length";
+                    count.appendChild(document.createTextNode(value.length));
+
+                    element.appendChild(count);
+                    element.appendChild(document.createTextNode("]"));
+                    value = element;
+                } else {
+                    value = "[]";
+                }
+            } 
+            // Non Dom object
+            else if(value && typeof value === "object" && !("nodeType" in value)) {
                 // {...} if it has content
                 // {} if it is empty
                 value = Object.keys(value).length ? "{...}" : "{}"
             }
 
-            config.value = value+"";
+            var propertyelement = document.createElement("span");
+            propertyelement.className="component-property";
+            propertyelement.appendChild(document.createTextNode(key));
 
-            return String$format('<span class="component-property">{key}</span>:<span class="component-property-value">{value}</span>', config);
+            var valueelement = document.createElement("span");
+            valueelement.className="component-property-value";
+            valueelement.appendChild(value && value.nodeType ? value : document.createTextNode(value+""));
+
+            var fragment = document.createDocumentFragment();
+            fragment.appendChild(propertyelement);
+            fragment.appendChild(document.createTextNode(":"));
+            fragment.appendChild(valueelement);
+
+            return fragment;
         },
         PropertyFormatter: function(value){ 
             return '<span class="component-property">' + value + '</span>';
         },
         FunctionFormatter: function(value){
-            return '<span>function(){...}</span>';
+            var span = document.createElement("span");
+            span.appendChild(document.createTextNode("function(){...}"));
+            span.setAttribute("title", value+"");
+            return span;
         },
         FacetFormatter: function(value){
-            return '<span class="component-property">' + value.property + '</span>:' + formatters.ComponentFormatter(value);
+            var property_element = document.element("span");
+            property_element.className = "component-property";
+            property_element.appendChild(document.createTextNode(value.property));
+
+            var fragment = formatters.ComponentFormatter(value);
+
+            fragment.insertBefore(document.createTextNode(": "), fragment.firstElementChild);
+            fragment.insertBefore(property_element, fragment.firstElementChild);
+            return fragment;
+
+            //return '<span class="component-property">' + value.property + '</span>:' + formatters.ComponentFormatter(value);
         },
         Header: function(value) {
             return '<h3>' + value + '</h3>';
@@ -164,9 +271,12 @@ function TreeNode(text, id) {
             return value.replace( /markup:\/\/(\w+):(\w+)/, '<span class="component-prefix">$1</span>:<span class="component-tagname">$2</span>');
         },
         GlobalIdFormatter: function(value) {
-            return `<aurainspector-auracomponent globalId='${value}'/>`;
+            return `<aurainspector-auracomponent globalId='${value}'></aurainspector-auracomponent>`;
         },
         ControllerReference: function(value) {
+            if(typeof value === "object") {
+                return `<aurainspector-controllerreference expression="${value.expression}" component="${value.component}"></aurainspector-controllerreference>`;
+            }
             return `<aurainspector-controllerreference>${value}</aurainspector-controllerreference>`;
         }
     };
@@ -205,6 +315,9 @@ function TreeNode(text, id) {
                 break;
             case "controllerref":
                 node.setFormatter(formatters.ControllerReference);
+                break;
+            case "property":
+                node.setFormatter(formatters.PropertyFormatter);
                 break;
         }
 
@@ -269,7 +382,7 @@ function TreeNode(text, id) {
         } else if(config.globalId) {
             attributes.tagName = config.descriptor;
             node = TreeNode.create(attributes, id, "component");
-        } else if(config.componentDef) {
+        } else if(config.componentDef && config.componentDef.descriptor) {
             // TODO: Component Defs are broken
             attributes.tagName = config.componentDef.descriptor;
             node = TreeNode.create(attributes, id, "componentdef");
@@ -294,6 +407,45 @@ function TreeNode(text, id) {
     function String$escape(string) {
         if(typeof string != "string") { return string; }
         return string.replace("<", "&lt;").replace(">", "&gt;");
+    }
+
+    function isFCV(compiledFcv) {
+        var devFcvPrefix = "function (cmp, fn) { return ";
+        var prodFcvPrefix = "function (a,b){return";
+
+        return typeof compiledFcv === "string" && (compiledFcv.startsWith(devFcvPrefix) || compiledFcv.startsWith(prodFcvPrefix));
+    }
+
+    function formatFCV(compiledFcv) {
+        var devFcvPrefix = "function (cmp, fn) { return ";
+        var prodFcvPrefix = "function (a,b){return";
+
+        // FCV in Dev Mode, code will be different in Prod Mode so we'll do a separate block for that.
+        if(compiledFcv.startsWith(devFcvPrefix)) {
+            // Lets try to clean up the Function a bit to make it easier to read.
+            compiledFcv = "{! " + 
+                // remove the initial function() { portion and the ending }
+                compiledFcv.substr(devFcvPrefix.length, compiledFcv.length - devFcvPrefix.length - 1)
+                // change fn.method, to just method
+                .replace(/fn\.([a-zA-Z]+)\(/g, "$1(")
+                // Change cmp.get("v.val") to just v.val
+                .replace(/cmp\.get\(\"([a-zA-Z\._]+)\"\)/g, "$1")
+                // ensure consistent ending
+                .trim() + " }";
+
+        } else if(compiledFcv.startsWith(prodFcvPrefix)) {
+            compiledFcv = "{! " + 
+                // Strip beginning function() { and ending }
+                compiledFcv.substr(prodFcvPrefix.length, compiledFcv.length - prodFcvPrefix.length - 1)
+                // In prod, it's not fn.method its b.method, so change it to just method
+                .replace(/b\.([a-zA-Z]+)\(/g, "$1(")
+                // Again in Prod, it's a.get, not cmp.get, so remove a.get and end up with just v.property
+                .replace(/a\.get\(\"([a-zA-Z\._]+)\"\)/g, "$1")
+                // consistent ending
+                .trim() + " }";
+        }
+
+        return compiledFcv;
     }
 
 })();
@@ -497,12 +649,18 @@ function AuraInspectorTreeView(treeContainer) {
         var li = document.createElement("li");
             li.appendChild(span);
         var isAutoExpanded = autoExpandCounter < AUTO_EXPAND_LEVEL;
+        var label = node.getLabel();
 
         if(node.hasFormatter()) {
-            span.innerHTML = node.getLabel();
+            if(label && typeof label === "object" && "nodeType" in label) {
+                span.appendChild(label);
+            } else {
+                span.innerHTML = label;
+            }
         } else {
-            span.appendChild(document.createTextNode(node.getLabel()));
+            span.appendChild(document.createTextNode(label));
         }
+
         if(autoExpandCounter === AUTO_EXPAND_LEVEL && node.getChildren().length <= AUTO_EXPAND_CHILD_COUNT) {
             autoExpandCounter--;
             isAutoExpanded = true;

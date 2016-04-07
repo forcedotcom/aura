@@ -58,11 +58,139 @@ public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
     /**
      * Default Access Tests start
      */
-    
+    /**
+     * tests around privileged namespace
+     */
+	@Test
+    public void testComponentWithSystemNamespaceImplementsInterfaceWithPrivilegedNamespace() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testinterface", false, true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        descriptor.getDef();
+    }
+	@Test
+    public void testComponentWithCustomNamespaceImplementsInterfaceWithPrivilegedNamespace() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testinterface", false, true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        try {
+        	descriptor.getDef();
+        	fail("application of custom namespace shouldn't be able to implements interface of privileged namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to interface 'privilegedNS:testinterface1' from namespace 'cstring' in 'markup://cstring:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        }
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithSamePrivilegedNamespace() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testinterface", false, true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        descriptor.getDef();
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithOtherPrivilegedNamespace() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testinterface", false, true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        try {
+        	descriptor.getDef();
+        	fail("application of privileged namespace shouldn't be able to implements interface of other privileged namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to interface 'privilegedNS:testinterface1' from namespace 'cstring' in 'markup://cstring:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        }
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithSystemNamespace() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        try {
+        	descriptor.getDef();
+        	fail("application of privileged namespace shouldn't be able to implements interface of system namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to interface 'string:testinterface1' from namespace 'privilegedNS' in 'markup://privilegedNS:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        }
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithSystemNamespaceAccessInternal() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='Internal'/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        try {
+        	descriptor.getDef();
+        	fail("application of privileged namespace shouldn't be able to implements interface of system namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to interface 'string:testinterface1' from namespace 'privilegedNS' in 'markup://privilegedNS:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        }
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithCustomNamespace() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        try {
+        	descriptor.getDef();
+        	fail("application of privileged namespace shouldn't be able to implements interface of custom namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to interface 'cstring:testinterface1' from namespace 'privilegedNS' in 'markup://privilegedNS:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        }
+    }
+	
+	
+	
+	
     /**
      * Verify Default access enforcement
-     * verifyAccess for Component,System,System
-     * verifyAccess for Component,SystemOther,SystemOther
      */
     @Test
     public void testComponentWithSystemNamespaceImplementsInterfaceWithSameSystemNamespace() throws QuickFixException {
@@ -76,11 +204,21 @@ public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
         descriptor.getDef();
     }
+    @Test
+    public void testComponentWithSystemNamespaceImplementsInterfaceWithSameSystemNamespaceAccessInternal() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='Internal'/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        descriptor.getDef();
+    }
 
     /**
      * Verify Default access enforcement
-     * verifyAccess for Component,System,SystemOther
-     * verifyAccess for Component,SystemOther,System
      */
     @Test
     public void testComponentWithSystemNamespaceImplementsInterfaceWithAnotherSystemNamespace() throws QuickFixException {
@@ -94,13 +232,21 @@ public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_NAMESPACE + ":testcomponent", true);
         descriptor.getDef();
     }
+    @Test
+    public void testComponentWithSystemNamespaceImplementsInterfaceWithAnotherSystemNamespaceAccessInternal() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='Internal'/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+        //create component implements the interface, the component is in a different system namespace
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponent", true);
+        descriptor.getDef();
+    }
 
     /**
      * Verify Default access enforcement
-     * verifyAccess for Component,System,Custom
-     * verifyAccess for Component,System,CustomOther
-     * verifyAccess for Component,SystemOther,Custom
-     * verifyAccess for Component,SystemOther,CustomOther
      */
     @Test
     public void testComponentWithCustomNamespaceImplementsInterfaceWithSystemNamespace() throws QuickFixException {
@@ -121,13 +267,28 @@ public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
             //Access to interface 'string:testinterface1' from namespace 'cstring' in 'markup://cstring:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
         }
     }
+    @Test
+    public void testComponentWithCustomNamespaceImplementsInterfaceWithSystemNamespaceInternal() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='Internal'/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+        //create component implements the interface, the component is in a custom namespace ( non-internal )
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        try {
+            descriptor.getDef();
+            fail("component with custom namespace shouldn't be able to implement interface with system namespace");
+        } catch (Exception e) {
+            //expect
+            //System.out.println(e.getMessage());
+            //Access to interface 'string:testinterface1' from namespace 'cstring' in 'markup://cstring:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+        }
+    }
 
     /**
      * Verify Default access enforcement
-     * verifyAccess for Component,Custom,System
-     * verifyAccess for Component,Custom,SystemOther
-     * verifyAccess for Component,CustomOther,System
-     * verifyAccess for Component,CustomOther,SystemOther
      */
     @Test
     public void testComponentWithSystemNamespaceImplementsInterfaceWithCustomNamespace() throws QuickFixException {
@@ -144,8 +305,6 @@ public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
 
     /**
      * Verify Default access enforcement
-     * verifyAccess for Component,Custom,Custom
-     * verifyAccess for Component,CustomOther,CustomOther
      */
     @Test
     public void testComponentWithCustomNamespaceImplementsInterfaceWithCustomNamespace() throws QuickFixException {
@@ -206,13 +365,23 @@ public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
 
     /**
      * Verify Default access enforcement
-     * verifyAccess for Interface,System,SystemOther
-     * verifyAccess for Interface,SystemOther,System
      */
     @Test
     public void testInterfaceWithSystemNamespaceExtendsInterfaceWithAnotherSystemNamespace() throws QuickFixException {
         //create interface with system namespace
         String interfaceSource = "<aura:interface/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+        //create interface extends above interface, this interface is in a different system namespace
+        String source = "<aura:interface extends='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, source,
+                StringSourceLoader.OTHER_NAMESPACE + ":testinterfaceChild", true);
+        descriptor.getDef();
+    }
+    @Test
+    public void testInterfaceWithSystemNamespaceExtendsInterfaceWithAnotherSystemNamespaceAccessInternal() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='Internal'/>";
         DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
         //create interface extends above interface, this interface is in a different system namespace
@@ -315,11 +484,116 @@ public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
     /**
      * Public Access Tests start
      */
-    
+    /**
+     * tests around privileged namespace
+     */
+	@Test
+    public void testComponentWithSystemNamespaceImplementsInterfaceWithPrivilegedNamespacePublicAccess() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='Public'/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testinterface", false, true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        descriptor.getDef();
+    }
+	@Test
+    public void testComponentWithCustomNamespaceImplementsInterfaceWithPrivilegedNamespacePublicAccess() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='Public'/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testinterface", false, true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        try {
+        	descriptor.getDef();
+        	fail("application of custom namespace shouldn't be able to implements interface of privileged namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to interface 'privilegedNS:testinterface1' from namespace 'cstring' in 'markup://cstring:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        }
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithSamePrivilegedNamespacePublicAccess() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='Public'/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testinterface", false, true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        descriptor.getDef();
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithOtherPrivilegedNamespacePublicAccess() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='Public'/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testinterface", false, true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        try {
+        	descriptor.getDef();
+        	fail("application of privileged namespace shouldn't be able to implements interface of other privileged namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to interface 'privilegedNS:testinterface1' from namespace 'cstring' in 'markup://cstring:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        }
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithSystemNamespacePublicAccess() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='Public'/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        try {
+        	descriptor.getDef();
+        	fail("application of privileged namespace shouldn't be able to implements interface of system namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to interface 'string:testinterface1' from namespace 'privilegedNS' in 'markup://privilegedNS:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        }
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithCustomNamespacePublicAccess() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='Public'/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        try {
+        	descriptor.getDef();
+        	fail("application of privileged namespace shouldn't be able to implements interface of custom namespace");
+        } catch(Exception e) {
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to interface 'cstring:testinterface1' from namespace 'privilegedNS' in 'markup://privilegedNS:testcomponent2(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+        }
+    }
+	
     /**
      * Verify Public access enforcement
-     * verifyAccess for Component,System,System
-	verifyAccess for Component,SystemOther,SystemOther
      */
     @Test
     public void testComponentWithSystemNamespaceExtendsInterfaceWithSameSystemNamespacePublicAccess() throws QuickFixException {
@@ -334,10 +608,9 @@ public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
     	descriptor.getDef();
     }
     
+    
     /**
      * Verify Public access enforcement
-     * verifyAccess for Component,System,SystemOther
-		verifyAccess for Component,SystemOther,System
      */
     @Test
     public void testComponentWithSystemNamespaceExtendsInterfaceWithAnotherSystemNamespacePublicAccess() throws QuickFixException {
@@ -354,10 +627,6 @@ public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     /**
      * Verify Public access enforcement
-     * verifyAccess for Component,System,Custom
-verifyAccess for Component,System,CustomOther
-verifyAccess for Component,SystemOther,Custom
-verifyAccess for Component,SystemOther,CustomOther
      */
     @Test
     public void testComponentWithCustomNamespaceExtendsInterfaceWithSystemNamespacePublicAccess() throws QuickFixException {
@@ -381,10 +650,6 @@ verifyAccess for Component,SystemOther,CustomOther
     
     /**
      * Verify Public access enforcement
-     * verifyAccess for Component,Custom,System
-verifyAccess for Component,Custom,SystemOther
-verifyAccess for Component,CustomOther,System
-verifyAccess for Component,CustomOther,SystemOther
      */
     @Test
     public void testComponentWithSystemNamespaceExtendsInterfaceWithCustomNamespacePublicAccess() throws QuickFixException {
@@ -401,8 +666,6 @@ verifyAccess for Component,CustomOther,SystemOther
     
     /**
      * Verify Public access enforcement
-     * verifyAccess for Component,Custom,Custom
-verifyAccess for Component,CustomOther,CustomOther
      */
     @Test
     public void testComponentWithCustomNamespaceExtendsInterfaceWithCustomNamespacePublicAccess() throws QuickFixException {
@@ -419,8 +682,6 @@ verifyAccess for Component,CustomOther,CustomOther
     
     /**
      * Verify Public access enforcement
-     * verifyAccess for Component,Custom,CustomOther
-verifyAccess for Component,CustomOther,Custom
      */
     @Test
     public void testComponentWithCustomNamespaceExtendsInterfaceWithAnotherCustomNamespacePublicAccess() throws QuickFixException {
@@ -445,8 +706,6 @@ verifyAccess for Component,CustomOther,Custom
     
     /**
      * Verify Public access enforcement
-     * verifyAccess for Interface,System,System
-verifyAccess for Interface,SystemOther,SystemOther
      */
     @Test
     public void testInterfaceWithSystemNamespaceExtendsInterfaceWithSystemNamespacePublicAccess() throws QuickFixException {
@@ -463,8 +722,6 @@ verifyAccess for Interface,SystemOther,SystemOther
     
     /**
      * Verify Public access enforcement
-     * verifyAccess for Interface,System,SystemOther
-verifyAccess for Interface,SystemOther,System
      */
     @Test
     public void testInterfaceWithSystemNamespaceExtendsInterfaceWithAnotherSystemNamespacePublicAccess() throws QuickFixException {
@@ -481,10 +738,6 @@ verifyAccess for Interface,SystemOther,System
     
     /**
      * Verify Public access enforcement
-     * verifyAccess for Interface,System,Custom
-verifyAccess for Interface,System,CustomOther
-verifyAccess for Interface,SystemOther,Custom
-verifyAccess for Interface,SystemOther,CustomOther
      */
     @Test
     public void testInterfaceWithCustomNamespaceExtendsInterfaceWithSystemNamespacePublicAccess() throws QuickFixException {
@@ -508,10 +761,6 @@ verifyAccess for Interface,SystemOther,CustomOther
     
     /**
      * Verify Public access enforcement
-     * verifyAccess for Interface,Custom,System
-verifyAccess for Interface,Custom,SystemOther
-verifyAccess for Interface,CustomOther,System
-verifyAccess for Interface,CustomOther,SystemOther
      */
     @Test
     public void testInterfaceWithSystemNamespaceExtendsInterfaceWithCustomNamespacePublicAccess() throws QuickFixException {
@@ -528,8 +777,6 @@ verifyAccess for Interface,CustomOther,SystemOther
     
     /**
      * Verify Public access enforcement
-     * verifyAccess for Interface,Custom,Custom
-verifyAccess for Interface,CustomOther,CustomOther
      */
     @Test
     public void testInterfaceWithCustomNamespaceExtendsInterfaceWithCustomNamespacePublicAccess() throws QuickFixException {
@@ -546,8 +793,6 @@ verifyAccess for Interface,CustomOther,CustomOther
 	
     /**
      * Verify Public access enforcement
-     * verifyAccess for Interface,Custom,CustomOther
-verifyAccess for Interface,CustomOther,Custom
      */
     @Test
     public void testInterfaceWithCustomNamespaceExtendsInterfaceWithAnotherCustomNamespacePublicAccess() throws QuickFixException {
@@ -574,9 +819,84 @@ verifyAccess for Interface,CustomOther,Custom
      */
     
     /**
+     * tests around privileged namespace
+     */
+	@Test
+    public void testComponentWithSystemNamespaceImplementsInterfaceWithPrivilegedNamespaceAccessGlobal() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='GLOBAL' />";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testinterface", false, true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent", true);
+        descriptor.getDef();
+    }
+	@Test
+    public void testComponentWithCustomNamespaceImplementsInterfaceWithPrivilegedNamespaceAccessGlobal() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='GLOBAL' />";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testinterface", false, true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent", false);
+        	descriptor.getDef();
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithSamePrivilegedNamespaceAccessGlobal() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='GLOBAL' />";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testinterface", false, true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        descriptor.getDef();
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithOtherPrivilegedNamespaceAccessGlobal() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='GLOBAL' />";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testinterface", false, true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        	descriptor.getDef();
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithSystemNamespaceAccessGlobal() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='GLOBAL' />";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        	descriptor.getDef();
+    }
+	@Test
+    public void testComponentWithPrivilegedNamespaceImplementsInterfaceWithCustomNamespaceAccessGlobal() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='GLOBAL' />";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+        //create component implements the interface
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent", false, true);
+        	descriptor.getDef();
+    }
+	
+    
+    /**
      * Verify Global access enforcement
-     * verifyAccess for Component,System,System
-	verifyAccess for Component,SystemOther,SystemOther
      */
     @Test
     public void testComponentWithSystemNamespaceExtendsInterfaceWithSameSystemNamespaceGlobalAccess() throws QuickFixException {
@@ -611,10 +931,6 @@ verifyAccess for Interface,CustomOther,Custom
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Component,System,Custom
-verifyAccess for Component,System,CustomOther
-verifyAccess for Component,SystemOther,Custom
-verifyAccess for Component,SystemOther,CustomOther
      */
     @Test
     public void testComponentWithCustomNamespaceExtendsInterfaceWithSystemNamespaceGlobalAccess() throws QuickFixException {
@@ -631,10 +947,6 @@ verifyAccess for Component,SystemOther,CustomOther
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Component,Custom,System
-verifyAccess for Component,Custom,SystemOther
-verifyAccess for Component,CustomOther,System
-verifyAccess for Component,CustomOther,SystemOther
      */
     @Test
     public void testComponentWithSystemNamespaceExtendsInterfaceWithCustomNamespaceGlobalAccess() throws QuickFixException {
@@ -688,8 +1000,6 @@ verifyAccess for Component,CustomOther,Custom
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Interface,System,System
-verifyAccess for Interface,SystemOther,SystemOther
      */
     @Test
     public void testInterfaceWithSystemNamespaceExtendsInterfaceWithSystemNamespaceGlobalAccess() throws QuickFixException {
@@ -706,8 +1016,6 @@ verifyAccess for Interface,SystemOther,SystemOther
     
     /**
      * Verify Global access enforcement
-     * verifyAccess for Interface,System,SystemOther
-verifyAccess for Interface,SystemOther,System
      */
     @Test
     public void testInterfaceWithSystemNamespaceExtendsInterfaceWithAnotherSystemNamespaceGlobalAccess() throws QuickFixException {

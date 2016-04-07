@@ -35,6 +35,11 @@
 
     <aura:import library="auratest:errorHandlingLib" property="ErrorHandlingLib"/>
 
+    <aura:method name="throwErrorFromClientController"
+                 action="{!c.throwErrorFromClientController}"/>
+    <aura:method name="throwErrorFromFunctionWrappedInGetCallback"
+                 action="{!c.throwErrorFromFunctionWrappedInGetCallback}"/>
+
     <table class="errorFromCmpTable">
     <caption> Errors from Component:</caption>
     <tr>
@@ -75,6 +80,14 @@
           <ui:button label="Throw"
                      press="{!c.throwErrorFromLibraryCode}"
                      class="errorFromLibraryCodeButton"/>
+        </td>
+    </tr>
+    <tr>
+        <td>Throw Error from Callback Function in Library Code in Component: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromCallbackFunctionInLibrary}"
+                     class="errorFromCallbackFunctionInLibraryButton"/>
         </td>
     </tr>
     <tr>

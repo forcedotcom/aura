@@ -510,7 +510,7 @@
     },
     
     _getInputElement: function(cmp) {
-    	return this._getInput(cmp).getElement().getElementsByTagName("input")[0];
+    	return this._getInput(cmp).getElement();
     },
 
     _fireKeydownEvent: function(cmp, keycode) {

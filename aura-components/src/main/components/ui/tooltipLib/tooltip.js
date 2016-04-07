@@ -63,10 +63,6 @@ function lib() { //eslint-disable-line no-unused-vars
 
             var domId = component.get('v.domId');
 
-
-            if(!domId) {
-                domId = component.getGlobalId();
-            }
             var fadeInDuration     = component.get('v.fadeInDuration'),
                 fadeOutDuration    = component.get('v.fadeOutDuration'),
                 delay              = component.get('v.delay');

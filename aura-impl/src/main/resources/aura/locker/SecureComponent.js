@@ -59,43 +59,46 @@ function SecureComponent(component, key) {
             value: function() {
                 return "SecureComponent: " + component + "{ key: " + JSON.stringify(key) + " }";
             }
-        },
-
+        }
+    });
+    Object.defineProperties(o, {
         // these four super* methods are exposed as a temporary solution until we figure how to re-arrange the render flow
-        "superRender": SecureThing.createFilteredMethod(component, "superRender"),
-        "superAfterRender": SecureThing.createPassThroughMethod(component, "superAfterRender"),
-        "superRerender": SecureThing.createFilteredMethod(component, "superRerender"),
-        "superUnrender": SecureThing.createFilteredMethod(component, "superUnrender"),
+        "superRender": SecureThing.createFilteredMethod(o, component, "superRender"),
+        "superAfterRender": SecureThing.createFilteredMethod(o, component, "superAfterRender"),
+        "superRerender": SecureThing.createFilteredMethod(o, component, "superRerender"),
+        "superUnrender": SecureThing.createFilteredMethod(o, component, "superUnrender"),
         // component @platform methods
-        "isValid": SecureThing.createPassThroughMethod(component, "isValid"),
-        "isInstanceOf": SecureThing.createPassThroughMethod(component, "isInstanceOf"),
-        "addHandler": SecureThing.createPassThroughMethod(component, "addHandler"),
-        "destroy": SecureThing.createPassThroughMethod(component, "destroy"),
-        "isRendered": SecureThing.createPassThroughMethod(component, "isRendered"),
-        "getGlobalId": SecureThing.createPassThroughMethod(component, "getGlobalId"),
-        "getLocalId": SecureThing.createPassThroughMethod(component, "getLocalId"),
-        "getSuper": SecureThing.createFilteredMethod(component, "getSuper"),
-        "getReference": SecureThing.createFilteredMethod(component, "getReference"),
-        "clearReference": SecureThing.createPassThroughMethod(component, "clearReference"),
-        "autoDestroy": SecureThing.createPassThroughMethod(component, "autoDestroy"),
-        "isConcrete": SecureThing.createPassThroughMethod(component, "isConcrete"),
-        "addValueProvider": SecureThing.createPassThroughMethod(component, "addValueProvider"),
-        "getConcreteComponent": SecureThing.createFilteredMethod(component, "getConcreteComponent"),
-        "find": SecureThing.createFilteredMethod(component, "find"),
-        "set": SecureThing.createFilteredMethod(component, "set"),
-        "getElement": SecureThing.createFilteredMethod(component, "getElement"),
-        "getElements": SecureThing.createFilteredMethod(component, "getElements")
+        "isValid": SecureThing.createFilteredMethod(o, component, "isValid"),
+        "isInstanceOf": SecureThing.createFilteredMethod(o, component, "isInstanceOf"),
+        "addHandler": SecureThing.createFilteredMethod(o, component, "addHandler"),
+        "destroy": SecureThing.createFilteredMethod(o, component, "destroy"),
+        "isRendered": SecureThing.createFilteredMethod(o, component, "isRendered"),
+        "getGlobalId": SecureThing.createFilteredMethod(o, component, "getGlobalId"),
+        "getLocalId": SecureThing.createFilteredMethod(o, component, "getLocalId"),
+        "getSuper": SecureThing.createFilteredMethod(o, component, "getSuper"),
+        "getReference": SecureThing.createFilteredMethod(o, component, "getReference"),
+        "getVersion": SecureThing.createFilteredMethod(o, component, "getVersion"),
+        "clearReference": SecureThing.createFilteredMethod(o, component, "clearReference"),
+        "autoDestroy": SecureThing.createFilteredMethod(o, component, "autoDestroy"),
+        "isConcrete": SecureThing.createFilteredMethod(o, component, "isConcrete"),
+        "addValueProvider": SecureThing.createFilteredMethod(o, component, "addValueProvider"),
+        "getConcreteComponent": SecureThing.createFilteredMethod(o, component, "getConcreteComponent"),
+        "find": SecureThing.createFilteredMethod(o, component, "find"),
+        "set": SecureThing.createFilteredMethod(o, component, "set"),
+        "getElement": SecureThing.createFilteredMethod(o, component, "getElement"),
+        "getElements": SecureThing.createFilteredMethod(o, component, "getElements")
     });
     // The shape of the component depends on the methods exposed in the definitions:
     var defs = component.getDef().methodDefs;
     if (defs) {
         defs.forEach(function(method) {
-            Object.defineProperty(o, method.name, SecureThing.createFilteredMethod(component, method.name));
+            Object.defineProperty(o, method.name, SecureThing.createFilteredMethod(o, component, method.name));
         }, o);
     }
 
     setLockerSecret(component, "secure", o); // backpointer
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", component);
-    return Object.seal(o);
+    
+    return o;
 }

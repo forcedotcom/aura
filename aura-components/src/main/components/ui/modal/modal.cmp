@@ -37,6 +37,7 @@
     <aura:attribute name="closeAnimation" type="String" description="Adds animation to the dialog"/>
     <aura:attribute name="autoFocus" type="Boolean" default="true" description="Sets initial focus on the first item in the panel" />
     <aura:attribute name="icon" type="Aura.Component[]" description="The icon for the modal"/>
+    <aura:attribute name="trapFocus" type="Boolean" default="true" description="Indicate if we should trap the focus inside the modal. The default is true."/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" />
@@ -55,7 +56,7 @@
             <div aura:id="content" class="{!join(' ', 'modal-container', token('uiModal.container'))}">
                 <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
-                <div class="{!join(' ', 'modal-header', and(empty(v.header), empty(v.title)) ? 'empty' : '', token('uiModal.header'), v.headerClass)}">
+                <div class="{!join(' ', 'modal-header', token('uiModal.header'), v.headerClass, and(empty(v.header), empty(v.title)) ? 'empty ' + token('uiModal.headerEmpty') : '')}">
                     {!v.icon}
                     <aura:if isTrue="{!!empty(v.title)}">
                         <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title ' + token('uiModal.title') : 'assistiveText'}">{!v.title}</h2>

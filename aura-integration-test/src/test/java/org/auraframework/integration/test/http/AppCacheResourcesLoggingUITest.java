@@ -171,6 +171,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
         expectedChange.add(new Request(getUrl(app), null, 302)); // hard refresh
+        expectedChange.add(new Request("/auraResource", "js", 200));
         switch (getBrowserType()) {
         case GOOGLECHROME:
             expectedChange.add(new Request(3, "/auraResource", "manifest", 200));
@@ -183,7 +184,6 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
             //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
             //there should be an app.js and an inline.js here.
             //expectedChange.add(new Request("/auraResource", "js", 200));
-            expectedChange.add(new Request("/auraResource", "js", 200));
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -253,6 +253,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
 
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
         expectedChange.add(new Request(getUrl(app), null, 302)); // hard refresh
+        expectedChange.add(new Request(2, "/auraResource", "js", 200));
         switch (getBrowserType()) {
         case GOOGLECHROME:
             expectedChange.add(new Request(3, "/auraResource", "manifest", 200));
@@ -265,7 +266,6 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
             //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
             //expectedChange.add(new Request("/auraResource", "js", 200), there should be an app.js and an
             //inline.js here.
-            expectedChange.add(new Request(2, "/auraResource", "js", 200));
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);

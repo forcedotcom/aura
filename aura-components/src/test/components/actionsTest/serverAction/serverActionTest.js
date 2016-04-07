@@ -35,30 +35,30 @@
 				    		newResponse["responseText"] = responseText;
 				    		//change recordObjCounter to 10
 				    		var idx = response.indexOf("Counter");
-				    		var idxNumberStart = idx;// Counter":1 
+				    		var idxNumberStart = idx;// Counter":1
 				    		var idxNumberEnd = response.indexOf(",", idx);
 				    		var numberStr = response.substring(idxNumberStart, idxNumberEnd);
 			    			newResponse["response"] = newResponse["response"].replace(numberStr, "Counter\": 10");
 			    			newResponse["responseText"] = newResponse["responseText"].replace(numberStr, "Counter\": 10");
 			    			decode_done = true;
 			    			$A.test.removePreDecodeCallback(cb_handle);
-			    			
+
 			    			//new feed decode with the new response
 				    		return newResponse;
 			    		} else {
 			    			return oldResponse;
 			    		}
-			    		
+
 			    	};
-			    	
+
 			    	cb_handle = $A.test.addPreDecodeCallback(modifyResponse);
-		            
+
 		            $A.test.addWaitFor(true, function() { return decode_done; });
-		    	   
+
 		    	   //now enqueue the Action
 		    	   var action = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:1});
 				   $A.enqueueAction(action);
-				   $A.test.addWaitForWithFailureMessage(true, 
+				   $A.test.addWaitForWithFailureMessage(true,
 						   function(){ return $A.test.areActionsComplete([action])},
 						   "fail waiting for server action to finish",
 						   function() {
@@ -67,7 +67,7 @@
 		       }
 		]
 	},
-	
+
 	testServerActionWithStoredResponseGetStorageFirst : {
 		test: [
 		function primeActionStorage(cmp) {
@@ -323,6 +323,30 @@
     },
 
     /**
+     * When requesting a component via an action, the returned config should be consumed on the client in the Action
+     * callback. If it is not, a warning should be logged.
+     */
+    testCreateComponentAfterGetComponent : {
+        test : function(cmp) {
+            var actual = null;
+            var action = $A.get("c.aura://ComponentController.getComponent");
+            action.setParams({
+                "name" : "markup://loadLevelTest:serverComponent"
+            });
+            action.setCallback(this, function(a) {
+                // Should be fine.
+                $A.createComponent("aura:html", {}, function(auraHtml) {
+                    actual = auraHtml;
+                });
+            });
+
+            $A.enqueueAction(action);
+
+            $A.test.addWaitFor(true, function() { return !!actual; }, function(){});
+        }
+    },
+
+    /**
      * Storable actions without a callback are a special case and should have their unused component configs cleared
      * automatically without an error or warning.
      */
@@ -375,25 +399,22 @@
             $A.enqueueAction(a);
             $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
         }, function(cmp) {
-            var errorMsg = "Action callback error from test",
-                warningMsg = "Finishing cached action failed. Trying to refetch from server",
-                errorThrown = false,
-                that = this;
+            var warningMsg = "Finishing cached action failed. Trying to refetch from server";
+            var errorThrown = false;
+            var that = this;
 
             // Actions from storage will log a warning instead of displaying error box
             $A.test.expectAuraWarning(warningMsg);
-            $A.test.expectAuraError(errorMsg);
             var a = $A.test.getAction(cmp, "c.executeInForeground", undefined, function(a) {
                 if (!errorThrown) {
                     // First callback is action from storage
                     $A.test.assertTrue(a.isFromStorage(), "First action callback should be from storage");
                     errorThrown = true;
-                    $A.error(errorMsg);
-                    throw new Error("Thrown by test");
+                    throw new Error("Action callback error from test");
                 } else {
                     // Second callback is retry action from server. Error from stored action should not be present.
                     $A.test.assertFalse(a.isFromStorage(), "Second action callback should be from server");
-                    $A.test.assertFalse(that.isAuraErrorDivVisible());
+                    $A.test.assertFalse(that.isAuraErrorDivVisible(), "Unexpected error showed up");
                 }
             });
             a.setStorable();
@@ -433,9 +454,9 @@
                     $A.test.assertFalse(that.isAuraErrorDivVisible());
                 } else {
                     // Verify error message displayed from retry action
-                    $A.test.assertTrue(that.isAuraErrorDivVisible());
+                    $A.test.assertTrue(that.isAuraErrorDivVisible(), "Error div should have been visible");
                     var error = $A.test.getAuraErrorMessage();
-                    $A.test.assertTrue(error.indexOf(errorMsg) !== -1);
+                    $A.test.assertTrue(error.indexOf(errorMsg) !== -1), "Error div didn't contain expected text (" + errorMsg + "), was actually (" + error + ")";
                 }
                 throw new Error(thrownErrorMsg);
             });

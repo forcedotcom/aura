@@ -16,7 +16,7 @@
 ({
 	showDialog: function(cmp, event) {
 		var msg = cmp.find('overlay');
-		var open = $A.get("e.ui:openDialog");
+		var open = $A.getEvt("markup://ui:openDialog");
 		open.setParams({
 			dialog : msg,
 			//triggerEvent is optional, unless when the trigger is a ui:press event
@@ -28,7 +28,7 @@
 	
 	hideDialog: function(cmp){
 		var msg= cmp.find('overlay');
-		var close = $A.get("e.ui:closeDialog");
+		var close = $A.getEvt("markup://ui:closeDialog");
 		close.setParams({
 			dialog : msg
 		});

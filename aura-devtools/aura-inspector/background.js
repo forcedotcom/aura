@@ -12,6 +12,11 @@
         var stored = new Map();
 
         var MAX_QUEUE_LENGTH = 100000;
+        
+        // List of inspectors we want to pair with.
+        var EXTERNAL_INSPECTOR_EXTENSION_IDS = [
+            "eihmlihnchelfaplbpcpgelolkommnib" // Sfdc Inspector
+        ];
 
         this.init = function() {
             chrome.runtime.onConnect.addListener(BackgroundPage_OnConnect.bind(this));
@@ -157,6 +162,12 @@
             if(tabInfo.subscriptions.has(message.action)){
                 tabInfo.port.postMessage(message);
             }
+
+            // Uncomment to enable pushing publish messages to external extensions (Sfdc Inspector)
+            // message.tabId = tabId;
+            // for(var c=0;c<EXTERNAL_INSPECTOR_EXTENSION_IDS.length;c++) {
+            //     chrome.runtime.sendMessage(EXTERNAL_INSPECTOR_EXTENSION_IDS[c], message);
+            // }
         }
 
         function getTabInfo(tabId) {

@@ -29,6 +29,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.http.CSPReporterServlet;
+import org.auraframework.impl.test.util.LoggingTestAppender;
 import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
@@ -313,12 +314,10 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
         List<String> cspRecords = new ArrayList<>();
         if(expectedLogsSize == 0 ) {
             List<LoggingEvent> logs = appender.getLog();
-            synchronized(logs) {
-                while (!logs.isEmpty()) {
-                    LoggingEvent log = logs.remove(0);
-                    if (log.getMessage().toString().contains(CSPReporterServlet.JSON_NAME)) {
-                        cspRecords.add(log.getMessage().toString());
-                    }
+            while (!logs.isEmpty()) {
+                LoggingEvent log = logs.remove(0);
+                if (log.getMessage().toString().contains(CSPReporterServlet.JSON_NAME)) {
+                    cspRecords.add(log.getMessage().toString());
                 }
             }
         } else {
@@ -326,16 +325,14 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
                 @Override
                 public Boolean apply(WebDriver d) {
                     List<LoggingEvent> logs = appender.getLog();
-                        synchronized(logs) {
-                            while (!logs.isEmpty()) {
-                                LoggingEvent log = logs.remove(0);
-                                if (log.getMessage().toString().contains(CSPReporterServlet.JSON_NAME)) {
-                                    cspRecords.add(log.getMessage().toString());
-                                    return cspRecords.size() == expectedLogsSize;
-                                }
+                    while (!logs.isEmpty()) {
+                        LoggingEvent log = logs.remove(0);
+                        if (log.getMessage().toString().contains(CSPReporterServlet.JSON_NAME)) {
+                            cspRecords.add(log.getMessage().toString());
+                            return cspRecords.size() == expectedLogsSize;
                         }
-                        return false;
                     }
+                    return false;
                 }
             },
             10,

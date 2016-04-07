@@ -274,7 +274,9 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             try {
                 runTestWithBrowser(browser);
             } catch (Throwable t) {
-                failures.add(addAuraInfoToTestFailure(t));
+                Throwable th = addAuraInfoToTestFailure(t);
+                logger.warning(AuraExceptionUtil.getStackTrace(th));
+                failures.add(th);
             } finally {
                 quitDriver();
             }

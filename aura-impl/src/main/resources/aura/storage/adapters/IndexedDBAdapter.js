@@ -587,6 +587,15 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
         }
         return;
     }
+
+    // TODO W-2481519 - ensure aura framework-required data is never evicted without having a
+    // blacklist in every adapter.
+    //
+    // blacklist copied from AuraComponentService.js
+    var actionsBlackList = ["globalValueProviders",                                 /* GlobalValueProviders.js */
+                            "aura://ComponentController/ACTION$getApplication",     /* AuraClientService.js */
+                            "$AuraContext$"];                                       /* AuraContext.js */
+
     this.lastSweep = now;
     try {
         var transaction = this.db.transaction([this.tableName], "readwrite");
@@ -610,7 +619,24 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
             if (icursor) {
                 var store = icursor.value;
                 if (store) {
+                    var shouldEvict = false;
+
                     if (store["expires"] < expireDate || expiredSize < removeSize) {
+                        shouldEvict = true;
+
+                        // TODO W-2481519 - ensure aura framework-required data is never evicted without having a
+                        // blacklist in every adapter.
+                        if (that.instanceName === "actions") {
+                            for (var i = 0; i < actionsBlackList.length; i++) {
+                                if (icursor.primaryKey.indexOf(actionsBlackList[i]) > -1) {
+                                    shouldEvict = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (shouldEvict) {
                         that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "expireCache(): sweep removing "+icursor.primaryKey);
                         icursor['delete']();
                         expiredSize += store["size"];

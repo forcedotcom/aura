@@ -30,13 +30,7 @@
      */
     testAnchorFragment: {
         test: function(component){
-            var expected;
-            if ($A.util.supportsTouchEvents()) {
-                // Wrap href in javascript:void on mobile browsers
-                expected = "javascript:void(0/*#*/);";
-            } else {
-                expected = window.location.href + "#";
-            }
+            var expected = window.location.href + "#";
             var tag = component.find("hash").getElement();
             $A.test.assertEquals("hash", $A.test.getText(tag), "textContent not expected");
             $A.test.assertEquals(expected, tag.href, "href not expected");
@@ -48,13 +42,7 @@
      */
     testAnchorFragmentString: {
         test: function(component){
-            var expected;
-            if ($A.util.supportsTouchEvents()) {
-                // Wrap href in javascript:void on mobile browsers
-                expected = "javascript:void(0/*#layout*/);";
-            } else {
-                expected = window.location.href + "#layout";
-            }
+            var expected = window.location.href + "#layout";
             var tag = component.find("hashString").getElement();
             $A.test.assertEquals("layout", $A.test.getText(tag), "textContent not expected");
             $A.test.assertEquals(expected, tag.href, "href not expected");

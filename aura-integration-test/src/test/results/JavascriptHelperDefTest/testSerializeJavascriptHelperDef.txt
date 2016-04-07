@@ -1,0 +1,5 @@
+{
+    "getHelp":function() {
+        return 'simply';
+    }
+  }

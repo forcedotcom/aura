@@ -16,19 +16,14 @@
 
 -->
 <aura:component>
+    <aura:attribute name="value" type="Decimal" default=""/>
 
-    <!-- Attributes -->
-    <aura:attribute name="amount" type="string" default="12"/>
+    <ui:inputCurrency aura:id="input" value="{! v.value }" label="Input" updateOn="keyup"/>
+    <p>v.value: <span class="vvalue">{!v.value}</span></p>
 
-    <!--Layout -->
-    <div style="padding:15px;">
-        <ui:inputCurrency aura:id="inputCurrency" value="{! v.amount }" label="amount: " />
-        <h1>The value is : {! v.amount }</h1>
-        <hr/>
-        <ui:button label="Set number - 1234" press="{! c.setNewValueAsNumber }"></ui:button>
-        <ui:button label="Set string number - '5678'" press="{! c.setNewValueAsString }"></ui:button>
-        <ui:button label="Set a well formatted string number '$5,678.00'" press="{! c.setNewValueAsWellFormatted }"></ui:button>
-        <ui:button label="Set incorrent  '35Aai#i'" press="{! c.setNewValueIncorrect }"></ui:button>
-    </div>
-
+    <hr/>
+    <ui:button label="Set number - 1234" press="{! c.setNewValueAsNumber }"></ui:button>
+    <ui:button label="Set string number - '5678'" press="{! c.setNewValueAsString }"></ui:button>
+    <ui:button label="Set a well formatted string number '$5,678.00'" press="{! c.setNewValueAsWellFormatted }"></ui:button>
+    <ui:button label="Set incorrent  '35Aai#i'" press="{! c.setNewValueIncorrect }"></ui:button>
 </aura:component>

@@ -15,10 +15,19 @@
     limitations under the License.
 
 -->
-<aura:component implements="aura:requireLocker" controller="java://org.auraframework.components.test.java.controller.TestController">
-    <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
+<aura:component implements="aura:requireLocker" controller="java://org.auraframework.components.test.java.controller.JavaTestController">
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+    <aura:attribute name="testComplete" type="Boolean" default="false"/>
 
-    <aura:method name="getSecureAction" action="{!c.getSecureAction}"/>
+    <aura:method name="testServerActionIsSecureAction" action="{!c.testServerActionIsSecureAction}"/>
+    <aura:method name="testClientActionIsSecureAction" action="{!c.testClientActionIsSecureAction}"/>
+    <aura:method name="testActionThatErrors" action="{!c.testActionThatErrors}"/>
+    <aura:method name="testDifferentNamespacedActionPassedFromSystemMode" action="{!c.testDifferentNamespacedActionPassedFromSystemMode}">
+        <aura:attribute name="facetAction" type="Object"/>
+    </aura:method>
+    <aura:method name="testGlobalControllerBlocked" action="{!c.testGlobalControllerBlocked}"/>
+    <aura:method name="testSetParams" action="{!c.testSetParams}"/>
 
     <div>SecureAction test</div>
+    <actionsTest:serverAction aura:id="facet"/>
 </aura:component>

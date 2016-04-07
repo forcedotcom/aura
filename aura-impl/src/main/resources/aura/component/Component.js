@@ -1211,7 +1211,7 @@ Component.prototype.fireChangeEvent=function(key,oldValue,newValue,index){
             }
         }
         if (observers.length) {
-            var eventDef = $A.get("e").getEventDef("aura:valueChange");
+            var eventDef = $A.eventService.getEventDef("aura:valueChange");
             var dispatcher = {};
             dispatcher[eventDef.getDescriptor().getQualifiedName()] = observers;
             var changeEvent = new Aura.Event.Event({
@@ -1676,6 +1676,7 @@ Component.prototype.unrender = function() {
  * Get the expected version number of a component based on its caller's requiredVersionDefs
  * Note that for various rendering methods, we cannot rely on access stack.
  * We use creation version instead.
+ * @platform
  * @export
  */
 Component.prototype.getVersion = function() {
@@ -1784,9 +1785,9 @@ Component.prototype.setupComponentDef = function(config) {
     }
 
     var key = getLockerSecret(this.componentDef, "key");
-	if (key) {
-    	$A.lockerService.util.applyKey(this, key);
-	}
+    if (key) {
+        setLockerSecret(this, "key", key);
+    }
 };
 
 Component.prototype.createComponentStack = function(facets, valueProvider){
@@ -2114,7 +2115,7 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
 Component.prototype.getMethodHandler = function(valueProvider,name,action,attributes){
     var observer=this.getActionCaller(valueProvider,action||("c."+name));
     return function(/*param1,param2,paramN*/){
-        var eventDef = $A.get("e").getEventDef("aura:methodCall");
+        var eventDef = $A.eventService.getEventDef("aura:methodCall");
         var dispatcher = {};
         dispatcher[eventDef.getDescriptor().getQualifiedName()] = [observer];
         var methodEvent = new Aura.Event.Event({

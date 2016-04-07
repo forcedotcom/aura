@@ -73,7 +73,7 @@
     
     
     checkResponseForEventsWithoutHandler : function(cmp, expectedState, eventName){
-    	$A.test.assertUndefinedOrNull($A.eventService.getEventDef(eventName),
+    	$A.test.assertUndefinedOrNull($A.getEvt(eventName),
 			"Test setup failure, eventdef known before hand.");
         cmp.find("trigger").get("e.press").fire();
         //Wait till action's call back is invoked
@@ -82,7 +82,7 @@
             function(){
             	var action = cmp.get("v.response");
                 $A.test.assertEquals(expectedState, action.state, "Unexpected state: ");
-                $A.test.assertDefined($A.eventService.getEventDef(eventName), 
+                $A.test.assertDefined($A.getEvt(eventName), 
                 	"Failed to add new event def from action response.");
             }
         );

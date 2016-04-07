@@ -19,7 +19,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -31,16 +30,17 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * In prod mode, the error message has two lines:
-     *   Something has gone wrong. [MESSAGES]
+     * In prod mode, the error message has three lines:<br>
+     *   Something has gone wrong. [MESSAGES]<br>
+     *   Failing descriptor: [DESCRIPTOR]<br>
      *   Please try again.
      */
-    private static int NUM_OF_MSG_LINES_PROD_MODE = 2;
+    private static int NUM_OF_MSG_LINES_PROD_MODE = 3;
     /**
-     * In non-prod mode, the error message has three lines, excluding stack trace:
-     *   Something has gone wrong. [MESSAGES]
-     *   Failing descriptor: [DESCRIPTOR]
-     *   [STACKTRACE]
+     * In non-prod mode, the error message has three lines, excluding stack trace:<br>
+     *   Something has gone wrong. [MESSAGES]<br>
+     *   Failing descriptor: [DESCRIPTOR]<br>
+     *   [STACKTRACE]<br>
      *   Please try again.
      */
     private static int NUM_OF_MSG_LINES_NON_PROD_MODE = 3;
@@ -77,11 +77,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
-   /**
-    * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
-    * or show anything in error object in the handler.
-    */
-   @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI, BrowserType.FIREFOX })
     public void testMessageFromErrorContainsStacktraceInDevMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.DEV);
 
@@ -104,11 +99,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertClientErrorNotContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_PROD_MODE);
     }
 
-    /**
-     * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
-     * or show anything in error object in the handler.
-     */
-    @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI, BrowserType.FIREFOX })
     public void testErrorMessageFromAuraAssertContainsStacktraceInDevMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.DEV);
 
@@ -131,11 +121,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertClientErrorNotContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_PROD_MODE);
     }
 
-    /**
-     * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
-     * or show anything in error object in the handler.
-     */
-    @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI, BrowserType.FIREFOX })
     public void testErrorMessageFromAuraErrorContainsStacktraceDevMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.DEV);
 
@@ -170,12 +155,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
     /**
      * Verify new error message can be retrieved in Aura Friendly Error data
-     *
-     * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
-     * or show anything in error object in the handler.
-     * Firefox is in lower version in autobuild, which has this issue too.
      */
-    @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI, BrowserType.FIREFOX })
     public void testAuraFriendlyErrorMessageFromData() throws Exception {
         String expectedContainedMessage = "Friendly Error Message from data";
         open("/auratest/errorHandlingApp.app?useFriendlyErrorMessageFromData=true&handleSystemError=true", Mode.PROD);
@@ -552,6 +532,26 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         String actualMessage = findErrorMessage();
         String expectedMsg = "Failed to initialize application";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
+    }
+
+    /**
+     * Verify that client error is handled by default handler when custom handler has error.
+     */
+    public void testErrorIsHandledByDefaultHandlerWhenCustomHandlerHasError() throws Exception {
+        // the error is handled by custom error but an error is thrown from custom handler
+        open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorInHandler=true", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
+
+        String actualMessage = findErrorMessage();
+        String expectedMsg = "Error from app client controller";
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
+
+        // at this point, the custom handler should be removed from systemError event subscribers.
+        // generate error again to see the error still can be handled by default handler.
+        findAndClickElement(ERROR_CLOSE_LOCATOR);
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
+        actualMessage = findErrorMessage();
         assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 

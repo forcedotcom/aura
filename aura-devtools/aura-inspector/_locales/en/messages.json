@@ -13,27 +13,27 @@
 	},
 	"tabs_componenttree": {
 		"message": "Component Tree",
-		"description": ""
+		"description": "Tab inside the inspector that shows the tree of components that make up the application."
 	},
 	"tabs_performance": {
 		"message": "Performance",
-		"description": ""
+		"description": "Tab inside the inspector that shows the panel which measures the time taken to create components."
 	},
 	"tabs_transactions": {
 		"message": "Transactions",
-		"description": ""
+		"description": "Tab inside the inspector that shows data on communication with the server. We've called these transactions since it is grouping of measures for a feature."
 	},
 	"tabs_eventlog": {
 		"message": "Event Log",
-		"description": ""
+		"description": "Tab inside the inspector that shows all the events that are being fired and handled."
 	},
 	"tabs_actions": {
 		"message": "Actions",
-		"description": ""
+		"description": "Tab inside the inspector that shows all the actions. Actions are calls to functionality on the server."
 	},
 	"tabs_storage": {
 		"message": "Storage",
-		"description": ""
+		"description": "Tab inside the inspector that shows what we're storing and caching on the different client side data stores."
 	},
 	"tabs_help": {
 		"message": "Help",
@@ -381,6 +381,10 @@
 	},
 	"componentview_super": {
 		"message": "Super",
+		"description": ""
+	},
+	"componentview_handlers": {
+		"message": "Handlers",
 		"description": ""
 	}
 	/*,

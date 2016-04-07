@@ -18,6 +18,7 @@ package org.auraframework.integration.test.logging;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.test.util.LoggingTestAppender;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 
 /**

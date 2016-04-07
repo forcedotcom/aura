@@ -127,7 +127,7 @@
 
             if (activateOverflowMenu) {
                 //always focus on the first menu item
-                cmp.find("overflowMenu").setActive(true, 0);
+                cmp.find("overflowMenu").focus();
             } else {
                 cmp.get('e.onTabActivated').setParams({"index": srcIndex, "oldTab": oldTab}).fire();
             }
@@ -344,6 +344,21 @@
 
         overflowData.tabCache = tabCache;
     },
+
+    onResize: function(cmp) {
+        var overflowData = cmp.get("v.overflowData");
+        var barWidth = this.getBarWidth(cmp);
+        if (barWidth > 0 && overflowData.barWidth !== barWidth) {
+            var helper = this;
+            requestAnimationFrame($A.getCallback(function () {
+                if (cmp.isValid()) {
+                    helper.adjustOverflow(cmp);
+                }
+            })
+            );
+        }
+    },
+
 
     updateVisibleTabs: function(overflowData, tabItems, startIndex) {
         var visibleTabs = [];

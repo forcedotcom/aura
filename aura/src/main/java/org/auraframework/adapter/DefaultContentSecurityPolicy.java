@@ -39,7 +39,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
 
     private static List<String> sameOrigin = null;
 
-    private boolean inlineStyle;
+    private boolean allowInline;
 
     /**
      * Returns the content security report URL.
@@ -55,7 +55,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
      * @param inline whether to allow inline script and style. It's better not to, but legacy is what legacy is.
      */
     public DefaultContentSecurityPolicy(boolean inline) {
-        inlineStyle = inline;
+        allowInline = inline;
     }
 
     /**
@@ -80,19 +80,21 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
      */
     @Override
     public Collection<String> getScriptSources() {
-        List<String> list = new ArrayList<>(inlineStyle ? 4 : 3);
+        List<String> list = new ArrayList<>(allowInline ? 4 : 3);
         list.add(null); // Same origin allowed
+
         list.add("chrome-extension:");
-        // always enable UNSAFE_INLINE to support CSP 1.x, but if the nonce is
-        // also added, browsers with CSP 2.x will automatically disable UNSAFE_INLINE
-        // in favor of a nonce.
-        list.add(CSP.UNSAFE_INLINE);
-        if (!Aura.getConfigAdapter().isLockerServiceEnabled()) {
+
+        boolean lockerServiceEnabled = Aura.getConfigAdapter().isLockerServiceEnabled();
+
+        if (allowInline || !lockerServiceEnabled) {
+            list.add(CSP.UNSAFE_INLINE);
+        }
+        
+		if (!lockerServiceEnabled) {
             list.add(CSP.UNSAFE_EVAL);
         }
-        if (!inlineStyle) {
-            list.add("'nonce-LockerServiceTemporaryNonce'");
-        }
+        
         return list;
     }
 
@@ -153,10 +155,10 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
 
     @Override
     public String getCspHeaderValue() {
-        String header = inlineStyle ? inlineHeader : defaultHeader;
+        String header = allowInline ? inlineHeader : defaultHeader;
         if (header == null) {
             header = buildHeaderNormally(this);
-            if (inlineStyle) {
+            if (allowInline) {
                 inlineHeader = header;
             } else {
                 defaultHeader = header;

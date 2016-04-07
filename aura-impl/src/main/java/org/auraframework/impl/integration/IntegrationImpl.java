@@ -153,8 +153,7 @@ public class IntegrationImpl implements Integration {
                     String eventHandlers = jsonEventHandlers != null ? jsonEventHandlers.toString() : "undefined";
                     String def = String.format(COMPONENT_DEF_TEMPLATE, tag, jsonAttributes.toString(), localId);
                     
-                    // DCHASMAN TODO Either switch this to $A.getRoot()._aisScopedCallback() which requires some sync init code or switch everything to LO!
-                    String newComponentScript = String.format("$A.run(function() { $A.clientService.injectComponentAsync(%s, '%s', %s); });", def, locatorDomId, eventHandlers);
+                    String newComponentScript = String.format("$A.__aisScopedCallback(function() { $A.clientService.injectComponentAsync(%s, '%s', %s); });", def, locatorDomId, eventHandlers);
 
                     init.append(newComponentScript);
 
@@ -202,7 +201,7 @@ public class IntegrationImpl implements Integration {
                         init.append(";\n");
                     }
 
-                    init.append(String.format("$A.getRoot()._aisScopedCallback(function() { $A.clientService.injectComponent(config, \"%s\", \"%s\"); });", locatorDomId, localId));
+                    init.append(String.format("$A.__aisScopedCallback(function() { $A.clientService.injectComponent(config, \"%s\", \"%s\"); });", locatorDomId, localId));
                 }
 
                 rc.pushScript();

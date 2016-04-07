@@ -21,7 +21,10 @@
     handleVisible: function(component, event, helper) {
         helper.lib.panelPositioning.reposition();
         if(component.get('v.visible') === true) {
-           component.getElement().style.opacity = 0;
+            var element = component.getElement();
+            if (element) {
+                element.style.opacity = 0;
+            }
             setTimeout($A.getCallback(function() {
                 if(component.isValid()) {
 

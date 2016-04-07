@@ -144,6 +144,9 @@ AuraClientService = function AuraClientService () {
     this.namespaces={internal:{},privileged:{}};
     this.lastSendTime = Date.now();
 
+    // This will be only changed after the unload event
+    this._appNotTearingDown = true;
+
     // XHR timeout (milliseconds)
     this.xhrTimeout = undefined;
 
@@ -223,7 +226,7 @@ AuraClientService.prototype.setQueueSize = function(queueSize) {
 /**
  * Mark all currently queued (but not sent) actions as 'deferred'.
  *
- * This is intended for use when componenes are kept 'alive' after they are no longer on the screen for better
+ * This is intended for use when components are kept 'alive' after they are no longer on the screen for better
  * performance going back and forth between various displays.
  */
 AuraClientService.prototype.deferPendingActions = function() {
@@ -279,7 +282,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
     // now that we have a response from a server.
     //
     if (this._isDisconnected) {
-        e = $A.get("e.aura:connectionResumed");
+        e = $A.getEvt("markup://aura:connectionResumed");
         if (e) {
             this._isDisconnected = false;
             e.fire();
@@ -464,8 +467,18 @@ AuraClientService.prototype.throwExceptionEvent = function(resp) {
 };
 
 AuraClientService.prototype.fireDoneWaiting = function() {
-    $A.get("e.aura:doneWaiting").fire();
+    $A.eventService.getNewEvent("markup://aura:doneWaiting").fire();
 };
+
+/**
+ * This will be called by the unload event
+ *
+ * @private
+ */
+AuraClientService.prototype.tearDown = function() {
+    this._appNotTearingDown = false;
+};
+
 
 /**
  * make the current thread be 'in aura collections'
@@ -702,31 +715,31 @@ AuraClientService.prototype.dumpCachesAndReload = function() {
         return;
     }
     this.reloadFunction = function() {
-    // reload even if storage clear fails
-    var actionStorage = Action.getStorage();
-    var actionClear = actionStorage && actionStorage.isPersistent() ? actionStorage.clear() : Promise["resolve"]([]);
+        // reload even if storage clear fails
+        var actionStorage = Action.getStorage();
+        var actionClear = actionStorage && actionStorage.isPersistent() ? actionStorage.clear() : Promise["resolve"]([]);
 
-    actionClear.then(
-        undefined, // noop on success
-        function(e) {
-            $A.log("Failed to clear persistent actions cache", e);
-            // do not rethrow to return to resolve state
-        }
-    ).then(
-        function() {
-            return $A.componentService.clearDefsFromStorage();
-        }
-    ).then(
-        undefined, // noop on success
-        function(e) {
-            $A.log("Failed to clear persistent component def storage", e);
-            // do not rethrow to return to resolve state
-        }
-    ).then(
-        function() {
-            window.location.reload(true);
-        }
-    );
+        actionClear.then(
+            undefined, // noop on success
+            function(e) {
+                $A.log("Failed to clear persistent actions cache", e);
+                // do not rethrow to return to resolve state
+            }
+        ).then(
+            function() {
+                return $A.componentService.clearDefsFromStorage();
+            }
+        ).then(
+            undefined, // noop on success
+            function(e) {
+                $A.log("Failed to clear persistent component def storage", e);
+                // do not rethrow to return to resolve state
+            }
+        ).then(
+            function() {
+                window.location.reload(true);
+            }
+        );
     };
     if (this.reloadPointPassed) {
         this.reloadFunction();
@@ -889,7 +902,7 @@ AuraClientService.prototype.setConnected = function(isConnected) {
         return;
     }
 
-    var e = $A.get(isDisconnected ? "e.aura:connectionLost" : "e.aura:connectionResumed");
+    var e = $A.eventService.getNewEvent(isDisconnected ? "aura:connectionLost" : "aura:connectionResumed");
     if (e) {
         this._isDisconnected = isDisconnected;
         e.fire();
@@ -1681,7 +1694,7 @@ AuraClientService.prototype.sendActionXHRs = function() {
     if (background.length) {
         this.sendAsSingle(background, background.length);
     }
-    
+
     if (deferred.length) {
         if (this.idle()) {
             this.sendAsSingle(deferred, 1);
@@ -1921,10 +1934,12 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     auraXHR.length = qs.length;
     auraXHR.request = this.createXHR();
     auraXHR.marker = Aura.Services.AuraClientServiceMarker++;
-    auraXHR.request["open"](method, url, true);
-    if ("withCredentials" in auraXHR.request) {
+    auraXHR.request["open"](method, url, this._appNotTearingDown);
+
+    if (this._appNotTearingDown && "withCredentials" in auraXHR.request) {
         auraXHR.request["withCredentials"] = true;
     }
+
     //
     // Careful! On some browsers "onreadystatechange" is a write only property, so make
     // sure that we only write it. And for safety's sake, just write it once.
@@ -1978,7 +1993,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 
     // legacy code, spinner actually relies on the waiting event, need a proper fix
     setTimeout(function() {
-        $A.get("e.aura:waiting").fire();
+        $A.eventService.getNewEvent("markup://aura:waiting").fire();
     }, 1);
 
     this.lastSendTime = Date.now();

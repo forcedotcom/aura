@@ -722,10 +722,10 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
 AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
     if (!$A["hasErrors"]) {
         Aura.bootstrapMark("createAndRenderAppInit");
+        $A.addTearDownHandler();
         var app = $A.clientService["init"](config, token, $A.util.getElement(container));
         $A.setRoot(app);
         Aura.bootstrapMark("createAndRenderAppReady");
-
         if (!$A.initialized) {
             $A.initialized = true;
             $A.addDefaultErrorHandler(app);
@@ -736,6 +736,14 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
             });
         }
     }
+};
+
+/**
+ * Add default handler to aura:systemError event
+ * @private
+ */
+AuraInstance.prototype.addTearDownHandler = function () {
+    window.addEventListener('unload', $A.getCallback($A.clientService.tearDown.bind($A.clientService)));
 };
 
 /**
@@ -763,7 +771,7 @@ AuraInstance.prototype.finishInit = function(doNotInitializeServices) {
         $A.util.removeClass(document.body, "loading");
         delete $A.globalValueProviders;
         this["finishedInit"] = true;
-        $A.get("e.aura:initialized").fire();
+        $A.eventService.getNewEvent("markup://aura:initialized").fire();
         $A.metricsService.applicationReady();
     }
 
@@ -821,29 +829,28 @@ AuraInstance.prototype.handleError = function(message, e) {
             e["handled"] = true;
         }
 
-        if (e["name"] === "AuraError") {
+        if (e instanceof $A.auraFriendlyError) {
+            e.severity = e.severity || this.severity.QUIET;
+            evtArgs = {"message":e["message"],"error":e["name"],"auraError":e};
+        } else if (e instanceof $A.auraError) {
             var format = "Something has gone wrong. {0}.\nPlease try again.\n";
             var displayMessage = e.message || e.name;
             e.severity = e.severity || this.severity["ALERT"];
-
+            displayMessage += "\n" + (e.component ? "Failing descriptor: {" + e.component + "}" : "");
             //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-            displayMessage += "\n" + (e.component ? "Failing descriptor: {" + e.component + "}\n" : "") + e.stackTrace;
+            displayMessage += "\n" + e.stackTrace;
             //#end
             dispMsg = $A.util.format(format, displayMessage);
-        }
-
-        if (e["name"] === "AuraFriendlyError") {
-            e.severity = e.severity || this.severity.QUIET;
-            evtArgs = {"message":e["message"],"error":e["name"],"auraError":e};
-        }
-        else {
             // use null error string to specify non auraFriendlyError type.
             evtArgs = {"message":dispMsg,"error":null,"auraError":e};
         }
     }
 
     if ($A.initialized) {
-        $A.getEvt("aura:systemError").fire(evtArgs);
+        // fire the event later so the current handleError could return even if an error occurs in the event handler.
+        window.setTimeout(function() {
+            $A.eventService.getNewEvent('markup://aura:systemError').fire(evtArgs);
+        }, 0);
     } else {
         if ($A.showErrors()) {
             $A.message(dispMsg);
@@ -871,6 +878,12 @@ AuraInstance.prototype.reportError = function(message, error) {
     $A.handleError(message, error);
     if ($A.initialized) {
         $A.getCallback(function() {
+            if (error && message) {
+                // if there's extra info in the message that's not in error.message, include it for report.
+                if (message !== error.message && message.indexOf(error.message) > -1) {
+                    error.message = message;
+                }
+            }
             $A.logger.reportError(error);
         })();
         $A.services.client.postProcess();
@@ -939,7 +952,7 @@ AuraInstance.prototype.getCallback = function(callback) {
                 $A.lastKnownError = e;
                 throw e;
             } else {
-                var errorWrapper = new $A.auraError("Uncaught error in $A.getCallback()", e);
+                var errorWrapper = new $A.auraError("Error in $A.getCallback()", e);
                 if (context && context.getDef) {
                     errorWrapper.component = context.getDef().getDescriptor().toString();
                 }
@@ -1292,7 +1305,7 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
         if(descriptor && descriptor.indexOf("e.") !== -1) {
             descriptor = descriptor.replace("e.", "");
             isEvent = true;
-            def =this.eventService.getEventDef(descriptor);
+            def =this.eventService.getDef(descriptor);
         } else {
             def = this.componentService.getDef(descriptor);
             isEvent = false;
@@ -1301,7 +1314,7 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
             returnDefinitions[c] = def;
         } else {
             // detect without access checks
-            if((isEvent && !this.eventService.hasDefinition(descriptor)) ||
+            if((isEvent && !this.eventService.getEventDef(descriptor)) ||
                     (!isEvent && !this.componentService.getComponentDef(this.componentService.createDescriptorConfig(descriptor)))) {
 
                 requestDefinitions.push(descriptors[c]);
@@ -1332,7 +1345,7 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
                 if(pendingMap.hasOwnProperty(requestedDescriptor)) {
                     pendingInfo = pendingMap[requestedDescriptor];
                     if(pendingInfo["isEvent"]) {
-                        returnDefinitions[pendingInfo["position"]] = this.eventService.getEventDef(requestedDescriptor) || null;
+                        returnDefinitions[pendingInfo["position"]] = this.eventService.getDef(requestedDescriptor) || null;
                     } else {
                         returnDefinitions[pendingInfo["position"]] = this.componentService.getDef(requestedDescriptor) || null;
                     }

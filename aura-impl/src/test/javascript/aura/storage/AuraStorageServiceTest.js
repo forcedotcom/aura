@@ -156,7 +156,7 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
         }
 
         [Fact]
-        function NegativeMaxSizeDefaults1MB() {
+        function ZeroMaxSizeDefaults1MB() {
             var actual;
             var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
                 "AuraStorage": function(config) {
@@ -165,7 +165,7 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
             });
 
             mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, -1);
+                targetService.initStorage("name", true, true, 0);
             })});
 
             Assert.Equal(1000*1024, actual);

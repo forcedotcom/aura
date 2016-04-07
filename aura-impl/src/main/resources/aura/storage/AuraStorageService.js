@@ -74,7 +74,7 @@ AuraStorageService.prototype.initStorage = function(name, persistent, secure, ma
     persistent = !!persistent;
     secure = !!secure;
     maxSize = $A.util.isFiniteNumber(maxSize) && maxSize > 0 ? maxSize : 1000 * 1024;
-    defaultExpiration = $A.util.isFiniteNumber(defaultExpiration) && defaultExpiration >= 0 ? defaultExpiration : 10;
+    defaultExpiration = $A.util.isFiniteNumber(defaultExpiration) && defaultExpiration > 0 ? defaultExpiration : 10;
     defaultAutoRefreshInterval = $A.util.isFiniteNumber(defaultAutoRefreshInterval) && defaultAutoRefreshInterval >= 0 ? defaultAutoRefreshInterval : 30;
     debugLoggingEnabled = !!debugLoggingEnabled;
     clearStorageOnInit = $A.util.isBoolean(clearStorageOnInit) ? clearStorageOnInit : true;
@@ -171,7 +171,7 @@ AuraStorageService.prototype.createAdapter = function(adapter, name, maxSize, de
 };
 
 AuraStorageService.prototype.fireModified = function() {
-    var e = $A.get("e.auraStorage:modified");
+    var e = $A.eventService.getNewEvent("markup://auraStorage:modified");
     if (e) {
         e.fire();
     }

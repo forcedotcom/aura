@@ -31,6 +31,9 @@
         }
     },
     handleOnChange : function (cmp, event, helper) {
+        // we stop propagation 'cause change event need to be fired only when
+        // v.value get a new value
+        event.stopPropagation();
         if (helper.weHaveToUpdate(cmp,'change')) {
             helper.setNewValue(cmp);
             helper.formatInputValue(cmp);

@@ -1,96 +1,88 @@
 ({
     /**
-     * Note that the test is not in the locker so many of the test cases must delegate to the controller or helper
-     * to get objects and then return them to the test for verification.
+     * Note that this test file operates in system mode (objects are not Lockerized) so the tests delegate logic and
+     * verification to the controller and helper files, which operate in user mode.
      */
+
+    setUp: function(cmp) {
+        cmp.set("v.testUtils", $A.test);
+    },
 
     testCreateDocumentFragmentReturnsSecureElement: {
         test: function(cmp) {
-            cmp.getDocumentFragment();
-            var wrapped = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureElement", wrapped.toString(), "Expected document.createDocumentFragment()"
-                    + " to return a SecureElement");
+            cmp.testCreateDocumentFragmentReturnsSecureElement();
         }
     },
 
     testCreateScriptElementReturnsSecureScript: {
         test: function(cmp) {
-            cmp.getScriptElement();
-            var wrapped = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureScript", wrapped.toString(), "Expected document.createElement(script)"
-                    + " to return a SecureScript");
+            cmp.testCreateScriptElementReturnsSecureScript();
         }
     },
 
     testCreateIframeElementReturnsSecureIframeElement: {
         test: function(cmp) {
-            cmp.getIframeElement();
-            var wrapped = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureIFrameElement", wrapped.toString(), "Expected document.createElement('iframe')"
-                    + " to return a SecureIFrameElement");
+            cmp.testCreateIframeElementReturnsSecureIframeElement();
         }
     },
 
     testCreateTextNodeReturnsSecureElement: {
         test: function(cmp) {
-            cmp.getTextNode();
-            var wrapped = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureElement", wrapped.toString(), "Expected document.createTextNode()"
-                    + " to return a SecureElement");
+            cmp.testCreateTextNodeReturnsSecureElement();
         }
     },
 
     testCreateElementsAndPushToMarkup: {
         test: function(cmp) {
-            cmp.createElementsPushToMarkup();
-            var content = cmp.find("content").getElement();
-            $A.test.assertEquals("hello from the locker", content.getElementsByTagName("span")[0].getAttribute("lockerAttr"), "Unexpected attribute on document"
-                    + " elements created in controller");
+            cmp.testCreateElementsAndPushToMarkup();
         }
     },
 
     testGetElementByIdReturnsSecureElement: {
         test: function(cmp) {
-            cmp.getElementById();
-            var wrapped = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureElement", wrapped.toString(), "Expected document.getElementById()"
-                    + " to return a SecureElement");
+            cmp.testGetElementByIdReturnsSecureElement();
         }
     },
 
     testQuerySelectorReturnsSecureElement: {
         test: function(cmp) {
-            cmp.getQuerySelector();
-            var wrapped = cmp.get("v.log");
-            $A.test.assertStartsWith("SecureElement", wrapped.toString(), "Expected document.querySelector()"
-                    + " to return a SecureElement");
+            cmp.testQuerySelectorReturnsSecureElement();
         }
     },
 
     testSecureDocumentCookie: {
         test: function(cmp) {
-            cmp.getCookie();
-            var cookie = cmp.get("v.log");
-            $A.test.assertEquals(document.cookie, cookie);
+            cmp.testSecureDocumentCookie(document.cookie);
         }
     },
 
     testDocumentTitle: {
         test: function(cmp) {
-            cmp.setTitle();
-            cmp.getDocument();
-            var secureDoc = cmp.get("v.log");
-            $A.test.assertEquals("secureDocumentTest", secureDoc.title);
+            cmp.testDocumentTitle();
+            // Verify title is set in system-mode
+            $A.test.assertEquals("secureDocumentTest", document.title);
         }
     },
     
     testQuerySelectorAllReturnsSecureNodeList: {
         test: function(cmp) {
-            cmp.doQuerySelectorAll();
-            var result = cmp.get("v.log");
-            $A.test.assertTrue($A.util.isArray(result), "Expected document.querySelectorAll('*') to return an Array");
-            $A.test.assertStartsWith("SecureThing", result[0].toString(), "Expected document.querySelectorAll('*') to" +
-            		" return SecureThing elements");
+            cmp.testQuerySelectorAllReturnsSecureNodeList();
+        }
+    },
+    
+    testDocumentBodyConstructorNotExposed: {
+        test: function(cmp) {
+            cmp.testDocumentBodyConstructorNotExposed();
+        }
+    },
+    
+    /**
+     * Prevent malicious users from passing in a carefully designed object to SecureDocument.createElement() that may
+     * break out of the Locker.
+     */
+    testCreateElementCoersionExploit: {
+        test: function(cmp) {
+            cmp.testCreateElementCoersionExploit();
         }
     }
 })

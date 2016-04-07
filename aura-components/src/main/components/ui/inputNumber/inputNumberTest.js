@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 ({
+    EMPTY_STRING : '',
     /**
      * Test when value is not assigned.
      */
@@ -310,6 +311,8 @@
            $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
            component.set("v.value", 49322);
        }, function(component){
+           // after dirty component is re-rendered, now input element
+           // should be displaying the new value
     	   var value = component.getElement().value;
     	   $A.test.assertEquals(49322, component.get("v.value"), "Cmp: Value not formatted correctly.");
            $A.test.assertEquals('4,93,22.00', value, "Element: Value not formatted correctly.");
@@ -327,6 +330,8 @@
            $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
            component.set("v.format", '.000');
        }, function(component){
+           // updating format dynamically is not supported
+           // value stays the same
            var value = component.getElement().value;
     	   $A.test.assertEquals(22.7, component.get("v.value"), "Cmp: Value not formatted correctly.");
            $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
@@ -338,7 +343,6 @@
      * internal v.value should be undefined
      * displayed value should be empty
      */
-    EMPTY_STRING : '',
     testSetInvalidValue: {
         attributes: {value: 12},
         test: [function (cmp) {
@@ -346,7 +350,7 @@
         }, function(cmp){
             var inputValue = cmp.getElement().value;
             $A.test.assertEquals(this.EMPTY_STRING, inputValue, "Cmp: input value should be empty string");
-            $A.test.assertEquals(undefined, cmp.get("v.value"), "Cmp: value should be undefined.");
+            $A.test.assertEquals(null, cmp.get("v.value"), "Cmp: value should be undefined.");
         }]
     }
 })// eslint-disable-line semi

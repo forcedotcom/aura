@@ -19,7 +19,7 @@
     afterRender: function (component, helper) {
         this.superAfterRender(component, helper);
         // register async image with AsyncComponentManager for asynchronous loading
-        $A.get("e.ui:asyncComponentRegister").setParams({
+        $A.getEvt("markup://ui:asyncComponentRegister").setParams({
             "asyncComponent": component
         }).fire();
     }

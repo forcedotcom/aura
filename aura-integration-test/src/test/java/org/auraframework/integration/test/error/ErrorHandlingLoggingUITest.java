@@ -23,8 +23,8 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 import org.auraframework.impl.ExceptionAdapterImpl;
+import org.auraframework.impl.test.util.LoggingTestAppender;
 import org.auraframework.integration.test.logging.AbstractLoggingUITest;
-import org.auraframework.integration.test.logging.LoggingTestAppender;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.hamcrest.CoreMatchers;
@@ -44,6 +44,26 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         super(name, ExceptionAdapterImpl.class);
     }
 
+    public void testClientErrorIdMatchesLoggedErrorId() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+        // generate an error on the client side
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+        String clientErrorId = getText(By.cssSelector("div[id='appErrorIdOutput']"));
+
+        // Client error is sent via Caboose Actions, force a foreground action to sent error to server
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        String errorIdHeader = "Client error id: ";
+        int errorIdStart = log.indexOf(errorIdHeader) + errorIdHeader.length();
+        // error id's length is 36
+        String loggedErrorId = log.substring(errorIdStart, errorIdStart + 36);
+        assertEquals(clientErrorId, loggedErrorId);
+    }
+
     public void testClientErrorFromClientController() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         // generate an error on the client side
@@ -57,7 +77,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
 
         boolean requireErrorId = true;
         String failingDescriptor = "auratest$errorHandlingApp$controller$throwErrorFromClientController";
-        String expectedMessage = String.format("AuraError: Action failed: %s [Error from app client controller]", failingDescriptor);
+        String expectedMessage = String.format("Action failed: %s [Error: Error from app client controller]", failingDescriptor);
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
@@ -73,7 +93,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         String log = logs.get(0);
 
         boolean requireErrorId = true;
-        String expectedMessage = "AuraError: Uncaught error in $A.getCallback() [Error from server action callback in app]";
+        String expectedMessage = "Error in $A.getCallback() [Error: Error from server action callback in app]";
         String failingDescriptor = "markup://auratest:errorHandlingApp";
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
@@ -93,9 +113,172 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         String log = logs.get(0);
 
         boolean requireErrorId = true;
-        String expectedMessage = "AuraError: Uncaught error in $A.getCallback() [Error from function wrapped in getCallback in app]";
+        String expectedMessage = "Error in $A.getCallback() [Error: Error from function wrapped in getCallback in app]";
         String failingDescriptor = "markup://auratest:errorHandlingApp";
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    public void testClientErrorFromRerender() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+        // generate a client error in rerender()
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromRerenderButton"));
+        // Client error is sent via Caboose Actions, force a foreground action to sent error to server
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String failingDescriptor = "markup://auratest:errorHandlingApp";
+        String expectedMessage = String.format("rerender threw an error in '%s' [Error: Error from app rerender]", failingDescriptor);
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    public void testClientErrorFromUnrerender() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+        // generate a client error in rerender()
+        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromUnrenderButton"));
+        // Client error is sent via Caboose Actions, force a foreground action to sent error to server
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String failingDescriptor = "markup://auratest:errorHandlingApp";
+        String expectedMessage = String.format("unrender threw an error in '%s' [Error: Error from app unrender]", failingDescriptor);
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    public void testClientErrorFromContainedCmpClientController() throws Exception {
+        open("/auratest/errorHandlingApp.app", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String failingDescriptor = "auratest$errorHandling$controller$throwErrorFromClientController";
+        String expectedMessage = String.format("Action failed: %s [Error: Error from component client controller]", failingDescriptor);
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    public void testClientErrorFromContainedCmpActionCallback() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromServerActionCallbackButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String expectedMessage = "Error in $A.getCallback() [Error: Error from component server action callback]";
+        String failingDescriptor = "markup://auratest:errorHandling";
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    public void testClientErrorFromGetcallbackWrappedFunctionInContainCmp() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromFunctionWrappedInGetCallbackButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String expectedMessage = "Error in $A.getCallback() [Error: Error from function wrapped in getCallback in component]";
+        String failingDescriptor = "markup://auratest:errorHandling";
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    public void testClientErrorFromContainedCmpRerender() throws Exception {
+        open("/auratest/errorHandlingApp.app", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromRerenderButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String failingDescriptor = "markup://auratest:errorHandling";
+        String expectedMessage = String.format("rerender threw an error in '%s' [Error: Error from component rerender]", failingDescriptor);
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    public void testClientErrorFromContainedCmpUnrerender() throws Exception {
+        open("/auratest/errorHandlingApp.app", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromUnrenderButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        List<String> logs = getClientErrorLogs(appender, 1);
+        String log = logs.get(0);
+
+        boolean requireErrorId = true;
+        String failingDescriptor = "markup://auratest:errorHandling";
+        String expectedMessage = String.format("unrender threw an error in '%s' [Error: Error from component unrender]", failingDescriptor);
+        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    /**
+     * Verify that the client error in error handler gets logged on the server side.
+     * On the server side, there should be two error logs, the original error's log and the error handler error's log.
+     */
+    public void testClientErrorFromCustomErrorHandler() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorInHandler=true", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        // expecting two error logs
+        List<String> logs = getClientErrorLogs(appender, 2);
+
+        String handlerErrorLog = null;
+        // the order of the logs may not be guaranteed, using message to identify
+        if(logs.get(0).contains("Error from error handler")) {
+            handlerErrorLog = logs.get(0);
+        } else {
+            handlerErrorLog = logs.get(1);
+        }
+
+        boolean requireErrorId = true;
+        // the failing descriptor is the failing error handler, so that we can find out it's handler's error
+        String failingDescriptor = "auratest$errorHandlingApp$controller$handleSystemError";
+        String expectedMessage = String.format("Action failed: %s [Error: Error from error handler]", failingDescriptor);
+        assertClientErrorLogContains(handlerErrorLog, expectedMessage, requireErrorId, failingDescriptor);
+    }
+
+    /**
+     * Verify that client side error gets logged even if custom error handler has error.
+     */
+    public void testClientErrorGetsLoggedWhenCustomErrorHandlerHasError() throws Exception {
+        open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorInHandler=true", Mode.PROD);
+        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
+        findAndClickElement(By.className("serverActionButton"));
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+
+        // expecting two error logs, one for the original error and one for the handler's error
+        List<String> logs = getClientErrorLogs(appender, 2);
+
+        String originalErrorLog = null;
+        // the order of the logs may not be guaranteed, using message to identify
+        if(logs.get(0).contains("Error from component client controller")) {
+            originalErrorLog = logs.get(0);
+        } else {
+            originalErrorLog = logs.get(1);
+        }
+
+        boolean requireErrorId = true;
+        String failingDescriptor = "auratest$errorHandling$controller$throwErrorFromClientController";
+        String expectedMessage = String.format("Action failed: %s [Error: Error from component client controller]", failingDescriptor);
+        assertClientErrorLogContains(originalErrorLog, expectedMessage, requireErrorId, failingDescriptor);
     }
 
     private void assertClientErrorLogContains(String log, String expectedMessage, boolean requireErrorId, String failingDescriptor) {
@@ -117,18 +300,16 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
             @Override
             public Boolean apply(WebDriver d) {
                 List<LoggingEvent> logs = appender.getLog();
-                synchronized(logs) {
-                    while (!logs.isEmpty()) {
-                        LoggingEvent log = logs.remove(0);
-                        Level level = log.getLevel();
-                        // client error is logged as ERROR
-                        if (level.equals(Level.ERROR)) {
-                            cspRecords.add(log.getMessage().toString());
-                            return cspRecords.size() == expectedLogsSize;
-                        }
+                while (!logs.isEmpty()) {
+                    LoggingEvent log = logs.remove(0);
+                    Level level = log.getLevel();
+                    // client error is logged as ERROR
+                    if (level.equals(Level.ERROR)) {
+                        cspRecords.add(log.getMessage().toString());
+                        return cspRecords.size() == expectedLogsSize;
                     }
-                    return false;
                 }
+                return false;
             }
         },
         10,

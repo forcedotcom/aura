@@ -185,31 +185,56 @@ function AuraInspectorComponentTree(devtoolsPanel) {
         // Generates the whole tree
         generateTreeRecusively(rootComponent, currentTreeNode, callback);
 
+        // Handles an array of components
         function generateTreeRecusively(component, treeNode, callback) {
-            var globalId = component.globalId;
-            if(allnodes.has(globalId)) { return callback(null); }
-
-            var newTreeNode = createTreeNodeForComponent(component);
-            treeNode.addChild(newTreeNode);
-            allnodes.add(globalId);
-
-            // Get Body ID's
-            getBodyFromComponent(component, function(bodyComponents){
-                var count = bodyComponents.length;
-                var processed = 0;
+            if(Array.isArray(component)) {
+                var count = component.length;
+                var processedcount = 0;
 
                 if(!count) {
-                    return callback(newTreeNode);
+                    return callback(treeNode);
                 }
 
-                for(var c=0;c<bodyComponents.length;c++) {
-                    generateTreeRecusively(bodyComponents[c], newTreeNode, function(){
-                        if(++processed === count) {
-                            callback(newTreeNode);
+                for(var c=0;c<count;c++) {
+                    generateTreeRecursivelyInternal(component[c], treeNode, function(result){
+                        if(++processedcount === count) {
+                            return callback(treeNode);
                         }
                     });
                 }
-            });
+            } else {
+                generateTreeRecursivelyInternal(component, treeNode, callback);
+            }
+
+
+            // Handles a single component
+            function generateTreeRecursivelyInternal(component, treeNode, callback) {
+                var globalId = component.globalId;
+                if(allnodes.has(globalId)) { return callback(treeNode); }
+
+                var newTreeNode = createTreeNodeForComponent(component);
+
+                // A ByValue: {#...} reference. We show the actual value, not the {#...} portion.
+                if(isExpression(component) && !component.expressions.value && isFacets(component.attributes.value)) {
+                    getBodyFromComponent(component, function(bodyComponents){
+                        generateTreeRecusively(bodyComponents, newTreeNode, function(facetTreeNode){
+                            // Not to newTreeNode, that gets discared in this code path.
+                            treeNode.addChild(newTreeNode.getChildren());
+                            
+                            callback(facetTreeNode)
+                        });
+                    });
+                    return;
+                }
+                
+                treeNode.addChild(newTreeNode);
+                allnodes.add(globalId);
+                
+                // Get Body ID's
+                getBodyFromComponent(component, function(bodyComponents){
+                    generateTreeRecusively(bodyComponents, newTreeNode, callback);
+                });
+            }
         }
 
         function getBodyFromComponent(component, callback) {

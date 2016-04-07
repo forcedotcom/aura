@@ -138,6 +138,48 @@
 		</div>
 	</aura:if>
 	
+	<aura:if isTrue="{! v.renderItem == 'overflow'}">
+		<div class="block">
+			<h1>Tab Overflow</h1>
+			<uitest:tabset_extendsTest aura:id="tabset2" class="tabset1" lazyRenderTabs="{!v.lazyRender}" useOverflowMenu="true">
+	        	
+	        	<ui:tab title="Accounts" aura:id="inputForActivateByIndex" closable="{!v.closable}">
+	                tab 1 contents
+	            </ui:tab>
+	            <ui:tab title="Contacts" name="contacts" closable="{!v.closable}">
+	                    tab 2 contents
+	            </ui:tab> 
+	            <ui:tab title="Opportunities" closable="{!v.closable}">
+	                    tab 3 contents
+	            </ui:tab>
+	            <ui:tab title="Leads" closable="{!v.closable}">
+					tab 4 contents
+	            </ui:tab>
+	            <ui:tab title="Chatter" aura:id="chatter" >
+	                    tab 5 contents
+	            </ui:tab>
+	             <ui:tab title="Icon" aura:id="icon" >
+	                    tab 6 contents
+	            </ui:tab>
+	            <ui:tab title="Dashboards" active="true" aura:id="dashboard" closable="{!v.closable}">
+	                    tab 7 contents
+	            </ui:tab> 
+	            <ui:tab title="Campaigns" aura:id="campaigns">
+	                    tab 8 contents
+	            </ui:tab> 
+	            <ui:tab title="Calendars" aura:id="calendars">
+	                    tab 9 contents
+	            </ui:tab>
+	            <ui:tab title="Events" aura:id="events">
+	                    tab 10 contents
+	            </ui:tab>
+	            <ui:tab title="Tasks" aura:id="tasks">
+	                    tab 11 contents
+	            </ui:tab>
+	        </uitest:tabset_extendsTest>
+		</div>
+	</aura:if>
+	
 	<!---extra data-->
 	<div class="extraFooter">
 		<div>

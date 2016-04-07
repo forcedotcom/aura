@@ -49,6 +49,7 @@ import org.auraframework.instance.Wrapper;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
@@ -310,6 +311,10 @@ public class AttributeSetImpl implements AttributeSet {
             value = ((ValueProvider) value).getValue(stem);
         } else if (stem != null) {
             AttributeDef attributeDef = rootDefDescriptor.getDef().getAttributeDef(expr.getRoot());
+            if (attributeDef == null) {
+                // no such attribute.
+                throw new NoAccessException("No attribute "+expr.getRoot()+" in "+rootDefDescriptor);
+            }
             value = attributeDef.getTypeDef().wrap(value);
             if (value instanceof ValueProvider) {
                 value = ((ValueProvider) value).getValue(stem);

@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -46,6 +47,7 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
@@ -53,6 +55,7 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -68,6 +71,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class AuraContextImpl implements AuraContext {
+    // JBUCH: TEMPORARY FLAG FOR 202 CRUC. REMOVE IN 204.
+    protected boolean enableAccessChecks = true;
+
     private static final Logger logger = Logger.getLogger(AuraContextImpl.class);
 
     private static class DefSorter implements Comparator<Definition> {
@@ -92,9 +98,10 @@ public class AuraContextImpl implements AuraContext {
             }
         }
 
-        @Override
+		@Override
         public void serialize(Json json, AuraContext ctx) throws IOException {
-            json.writeMapBegin();
+        	
+        	json.writeMapBegin();
             json.writeMapEntry("mode", ctx.getMode());
 
             DefDescriptor<? extends BaseComponentDef> appDesc = ctx.getApplicationDescriptor();
@@ -105,7 +112,7 @@ public class AuraContextImpl implements AuraContext {
                     json.writeMapEntry("cmp", String.format("%s:%s", appDesc.getNamespace(), appDesc.getName()));
                 }
             }
-
+                        
             String contextPath = ctx.getContextPath();
             if (!contextPath.isEmpty()) {
                 // serialize servlet context path for html component to prepend for client created components
@@ -118,22 +125,6 @@ public class AuraContextImpl implements AuraContext {
                     locales.add(locale.toString());
                 }
                 json.writeMapEntry("requestedLocales", locales);
-            }
-            Map<String, String> loadedStrings = Maps.newHashMap();
-            Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
-            clientLoaded.putAll(ctx.getClientLoaded());
-            for (Map.Entry<DefDescriptor<?>, String> entry : ctx.getLoaded().entrySet()) {
-                loadedStrings.put(String.format("%s@%s", entry.getKey().getDefType().toString(),
-                        entry.getKey().getQualifiedName()), entry.getValue());
-                clientLoaded.remove(entry.getKey());
-            }
-            for (DefDescriptor<?> deleted : clientLoaded.keySet()) {
-                loadedStrings.put(String.format("%s@%s", deleted.getDefType().toString(),
-                        deleted.getQualifiedName()), DELETED);
-            }
-            if (loadedStrings.size() > 0) {
-                json.writeMapKey("loaded");
-                json.writeMap(loadedStrings);
             }
 
             TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
@@ -194,6 +185,37 @@ public class AuraContextImpl implements AuraContext {
                 writeDefs(json, "libraryDefs", libraryDefs);
             }
 
+			try {
+				addTrackedDefs(appDesc, defMap);
+			} catch (QuickFixException e) {
+				// If we fail, we have nothing to do.
+			}
+
+			// Create the new loaded array.
+			// loaded = server + (client - server) @ DELETED.
+            
+			// Step 1: Start with client defintion set
+            Set<DefDescriptor<?>> currentLoaded = new HashSet<>();
+            currentLoaded.addAll(ctx.getClientLoaded().keySet());
+
+            // Step 2: serialize the server set and subtract the server set from the client set.
+			Map<String, String> loadedStrings = new HashMap<>();
+            for (Map.Entry<DefDescriptor<?>, String> entry : ctx.getLoaded().entrySet()) {
+                loadedStrings.put(String.format("%s@%s", entry.getKey().getDefType().toString(),
+                        entry.getKey().getQualifiedName()), entry.getValue());
+                currentLoaded.remove(entry.getKey());
+            }
+
+            // Step 3: serialize remaining not found client definitions, now unused.
+            for (DefDescriptor<?> deleted : currentLoaded) {
+                loadedStrings.put(String.format("%s@%s", deleted.getDefType().toString(),
+                        deleted.getQualifiedName()), DELETED);
+            }
+            if (loadedStrings.size() > 0) {
+                json.writeMapKey("loaded");
+                json.writeMap(loadedStrings);
+            }
+
             ctx.serializeAsPart(json);
 
             //
@@ -228,10 +250,42 @@ public class AuraContextImpl implements AuraContext {
             if (started) {
                 json.writeArrayEnd();
             }
+
+            // JBUCH: TEMPORARY CRUC FIX FOR 202. REMOVE IN 204
+            json.writeMapEntry("enableAccessChecks",((AuraContextImpl)ctx).enableAccessChecks);
+
             json.writeMapEnd();
+
         }
     }
 
+    private static void addTrackedDefs(DefDescriptor<? extends BaseComponentDef> appDesc, 
+    		Map<DefDescriptor<? extends Definition>, Definition> defMap) throws QuickFixException {
+
+    	if (appDesc == null || defMap == null || defMap.isEmpty()) {
+    		return;
+    	}
+
+    	BaseComponentDef appDef = appDesc.getDef();
+        List<DefDescriptor<ComponentDef>> trackedDefs = appDef.getTrackedDependencies();
+		if (trackedDefs == null || trackedDefs.isEmpty()) {
+			return;
+		}
+
+        DefinitionService definitionService = Aura.getDefinitionService();
+        for (DefDescriptor<? extends Definition> desc : defMap.keySet()) {
+        	if (trackedDefs.contains(desc)) {
+				try {
+					definitionService.updateLoaded(desc);
+				} catch (ClientOutOfSyncException e) {
+					// We can swallow the exception here since desc is taken
+					// from the set of definition we are already returning
+					// and out of sync would have already been processed.
+				}
+        	}
+        }
+    }
+    
     // serializer with everything for the client
     public static final Serializer FULL_SERIALIZER = new Serializer();
 

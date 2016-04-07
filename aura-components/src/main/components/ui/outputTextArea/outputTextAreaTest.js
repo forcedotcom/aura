@@ -19,12 +19,12 @@
      * Changing the element type would affect styling of third party apps.
      */
     testHtmlElementOfOutputTextArea:{
-        attributes:{value : 'Salesforce.com, ....some literature about the company.'},
+        attributes:{value : 'Salesforce, ....some literature about the company.'},
         test:function(cmp){
             var span = cmp.find('span');
             //Make sure a span tag is used for outputTextArea. Failure might mean breaking styling of third party app
             $A.test.assertEquals('SPAN', span.getElement().tagName, "OutputTextArea is expected to use a span tag to display value.");
-            $A.test.assertEquals('Salesforce.com, ....some literature about the company.', $A.test.getText(span.getElement()));
+            $A.test.assertEquals('Salesforce, ....some literature about the company.', $A.test.getText(span.getElement()));
         }
     },
     /**
@@ -37,7 +37,44 @@
             $A.test.assertNotNull(span);
             $A.test.assertEquals('', $A.test.getText(span.getElement()));
         }
-    }
+    },
+
+    testHtmlElementWithLink:{
+        attributes:{value : 'Salesforce.com, ....some literature about the company.'},
+        test:function(cmp){
+            var span = cmp.find('span');
+            //Make sure a span tag is used for outputTextArea. Failure might mean breaking styling of third party app
+            $A.test.assertEquals('SPAN', span.getElement().tagName, "OutputTextArea is expected to use a span tag to display value.");
+            this.assertLinksPresent(cmp, "href=\"http://Salesforce.com\"");
+        }
+    },
+
+    testHtmlElementWithTagEscaped:{
+        attributes:{value : '<span>Salesforce</span>, ....some literature about the company.'},
+        test:function(cmp){
+            var span = cmp.find('span');
+            //Make sure a span tag is used for outputTextArea. Failure might mean breaking styling of third party app
+            $A.test.assertEquals('SPAN', span.getElement().tagName, "OutputTextArea is expected to use a span tag to display value.");
+            this.assertTextNotPresent(cmp, "<span>Salesforce</span>");
+            this.assertLinksPresent(cmp, "&lt;span&gt;Salesforce&lt;/span&gt;");
+        }
+    },
+
+    assertLinksPresent: function(cmp, hrefText) {
+        $A.test.addWaitForWithFailureMessage(true,
+            function() {
+                var htmlValue = cmp.find("span").getElement().innerHTML;
+                return $A.test.contains(htmlValue, hrefText);
+            }, "couldn't find " + hrefText + " in: "  + cmp.find("span").getElement().innerHTML);
+    },
+
+    assertTextNotPresent: function(cmp, text) {
+    $A.test.addWaitForWithFailureMessage(true,
+        function() {
+            var htmlValue = cmp.find("span").getElement().innerHTML;
+            return !$A.test.contains(htmlValue, text);
+        }, "Found " + text + " in: "  + cmp.find("span").getElement().innerHTML);
+}
 /*eslint-disable semi*/
 })
 /*eslint-enable semi*/

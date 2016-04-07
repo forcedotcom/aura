@@ -18,7 +18,20 @@
 <aura:component access="GLOBAL" support="GA" implements="ui:visible" extensible="true" description="Displays the text area as specified by the value attribute.">
 
     <aura:attribute access="GLOBAL" name="value" type="String" required="true" description="The text to display."/>
+    <aura:attribute access="PRIVATE" name="displayValue" type="String" description="The value after being escaped and activated."/>
+    <aura:attribute name="linkify" type="Boolean" default="true" description="Indicates if the URLs in the text should be rendered as hyperlinks."/>
 
-    <span aura:id='span' class="{!v.class}">{!v.value}</span>
+    <aura:import library="ui:urlLib" property="urlLib"/>
+
+        <span aura:id='span' class="{!v.class}">
+            <aura:if isTrue="{!v.linkify}">
+                <aura:unescapedHTML value="{!v.displayValue}" />
+
+                <aura:set attribute="else">
+                    {!v.displayValue}
+                </aura:set>
+
+            </aura:if>
+        </span>
 
 </aura:component>

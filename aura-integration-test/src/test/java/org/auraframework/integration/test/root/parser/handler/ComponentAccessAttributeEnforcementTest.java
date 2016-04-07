@@ -45,7 +45,7 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
      */
     /**
      * access to template in a custom namespace
-     * for template in customnamespace, we cannot have access='Privileged'
+     * for template in custom namespace, we cannot have access='Privileged'
      */
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithSameCustomNamespace() throws QuickFixException {

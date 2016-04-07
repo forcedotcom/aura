@@ -16,10 +16,11 @@
 
 -->
 <aura:component extensible="true" description="Panel manager for the ui:panel and ui:modal components.">
-    <aura:attribute name="registeredPanels"   type="Aura.ComponentDefRef[]" description="The panel and modal components handled by the panel manager." />
-    <aura:attribute name="useSharedContainer" type="Boolean" default="false" description=""/>
+    <aura:attribute name="registeredPanels"         type="Aura.ComponentDefRef[]" description="The panel and modal components handled by the panel manager." />
+    <aura:attribute name="useSharedContainer"       type="Boolean" default="false" description=""/>
+    <aura:attribute name="closeOnLocationChange"    type="Boolean" description="Set to false if the panel should not be closed when the browser's location changes" default="false"/>
 
-    <aura:import library="ui:containerManagerLib" property="cmLib" />
+    <aura:import library="ui:containerManagerLib" property="cmLib"/>
     <aura:import library="ui:stackManagerLib"     property="smLib" />
 
     <!-- To be integrated -->
@@ -28,12 +29,11 @@
     <aura:handler name="init"   value="{!this}"   action="{!c.init}"/>
     <aura:handler name="notify" event="ui:notify" action="{!c.handleNotify}"/>
 
-    <aura:handler event="ui:createPanel"    action="{!c.createPanel}"/>
-    <aura:handler event="ui:destroyPanel"   action="{!c.destroyPanel}"/>
-    <aura:handler event="ui:getActivePanel" action="{!c.getActivePanel}"/>
-    <aura:handler event="ui:stackPanel"     action="{!c.stackPanel}"/>
-    <aura:handler event="ui:registerPanels" action="{!c.registerPanels}"/>
-
+    <aura:handler event="ui:createPanel"      action="{!c.createPanel}"/>
+    <aura:handler event="ui:destroyPanel"     action="{!c.destroyPanel}"/>
+    <aura:handler event="ui:getActivePanel"   action="{!c.getActivePanel}"/>
+    <aura:handler event="ui:stackPanel"       action="{!c.stackPanel}"/>
+    <aura:handler event="ui:registerPanels"   action="{!c.registerPanels}"/>
 
     <aura:dependency resource="markup://ui:panelTransitionBegin" type="EVENT" />
     <aura:dependency resource="markup://ui:panelTransitionEnd" type="EVENT" />

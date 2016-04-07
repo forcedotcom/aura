@@ -94,6 +94,10 @@
         	$A.test.expectAuraError("Access Check Failed!");
         	var evt = this.componentCreated.getEvent("NS2eventWithDefaultAccessRegisteredWithGlobalAccess");
         },
+        function cannotAccessNS2PrivateEventRegisteredWithPrivateAccess(cmp) {
+            $A.test.expectAuraError("Access Check Failed!");
+            var evt = this.componentCreated.getEvent("NS2eventWithPrivateAccessRegisteredWithPrivateAccess");
+        },
         function cannotAccessNS2PrivateEventRegisteredWithDefaultAccess(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var evt = this.componentCreated.getEvent("NS2eventWithPrivateAccessRegisteredWithDefaultAccess");

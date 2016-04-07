@@ -43,7 +43,8 @@
   	type='testPrivilegedNS2:componentEventWithDefaultAccess'/>
   	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithGlobalAccess' 
   	type='testPrivilegedNS2:componentEventWithDefaultAccess' access='Global'/>
-  	
+    <aura:registerEvent name='NS2eventWithPrivateAccessRegisteredWithPrivateAccess'
+                        type='testPrivilegedNS2:componentEventWithPrivateAccess' access="PRIVATE"/>
   	<aura:registerEvent name='NS2eventWithPrivateAccessRegisteredWithDefaultAccess' 
   	type='testPrivilegedNS2:componentEventWithPrivateAccess'/>
   	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithDefaultAccess' 

@@ -16,7 +16,6 @@
 
 -->
 <aura:event type="COMPONENT"
-            access="PRIVATE"
             description="Test Private Event.">
 
     <aura:attribute name="Private" type="String" access="PRIVATE" default="PRIVATE"/>

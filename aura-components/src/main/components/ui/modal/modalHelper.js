@@ -17,7 +17,8 @@
     init: function(cmp) {
     	var closeAction = cmp.get("v.closeAction");
         //handler for tab key to trap the focus within the modal
-        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true}, closeAction);
+    	var trapFocus = $A.util.getBooleanValue(cmp.get('v.trapFocus'));
+        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: trapFocus}, closeAction);
         this.initCloseBtn(cmp);
     },
     
@@ -44,7 +45,8 @@
     _getKeyHandler: function(cmp) {
         if (!cmp._keyHandler && cmp.isValid()) {
         	var closeAction = cmp.get("v.closeAction");
-            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true}, closeAction);
+        	var trapFocus = $A.util.getBooleanValue(cmp.get('v.trapFocus'));
+            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: trapFocus}, closeAction);
         }
         return cmp._keyHandler;
     },

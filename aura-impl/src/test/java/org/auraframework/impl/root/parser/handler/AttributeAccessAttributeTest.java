@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -34,9 +32,6 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
 	public AttributeAccessAttributeTest(String name) {
 		super(name);
-		 ConfigAdapter adapter = Aura.getConfigAdapter();
-		 adapter.addPrivilegedNamespace("privilegedNS");
-
 	}
 	
 	/***********************************************************************************

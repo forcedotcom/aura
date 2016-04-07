@@ -27,32 +27,17 @@
 	
     testCreateComponentWithDefaultAccessOfAnotherPrivilegedNS:{
         test:[
-        function canCreateComponentWithDefaultAccess(cmp){ //Different
-        	//so the default access level for privileged namespace is Global?
+        function canCreateComponentWithDefaultAccess(cmp){ 
         	var completed = false;
-        	var that = this;
+        	$A.test.expectAuraError("Access Check Failed!");
             $A.createComponent(
             	"markup://testPrivilegedNS2:componentWithDefaultAccess", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS2$componentWithDefaultAccess");
-            		that.componentCreated = newCmp;
             		completed = true;
             	}
             );
             $A.test.addWaitFor(true, function(){ return completed; });
-        }, 
-        function cannotAccessPrivateAttribute(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
-        	var actual = this.componentCreated.get("v.privateAttribute");
-        },
-        function cannotAccessPublicAttribute(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
-        	var actual = this.componentCreated.get("v.publicAttribute");
-        },
-        function canAccessGlobalAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.globalAttribute");
-        	$A.test.assertEquals(actual, "GLOBAL");
         }
         ]
     },
@@ -213,31 +198,17 @@
 	***************************************************************************************************/
 	testCreateComponentWithDefaultAccessOfSystemNS:{
         test:[
-        function canCreateComponentWithDefaultAccess(cmp){//Different
+        function canCreateComponentWithDefaultAccess(cmp){
         	var completed = false;
-        	var that = this;
+        	$A.test.expectAuraError("Access Check Failed!");
             $A.createComponent(
             	"markup://auratest:accessDefaultComponent", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"auratest$accessDefaultComponent");
-            		that.componentCreated = newCmp;
             		completed = true;
             	}
             );
             $A.test.addWaitFor(true, function(){ return completed; });
-        },
-        function cannotAccessPrivateAttribute(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
-        	var actual = this.componentCreated.get("v.privateAttribute");
-        },
-        function cannotAccessPublicAttribute(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
-        	var actual = this.componentCreated.get("v.publicAttribute");
-        },
-        function canAccessGlobalAttribute(cmp) {
-        	var actual = this.componentCreated.get("v.globalAttribute");
-        	$A.test.assertEquals(actual, "GLOBAL");
         }
         ]
     },

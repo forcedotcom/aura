@@ -137,8 +137,13 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     
     private static final Set<String> SYSTEM_TEST_PRIVILEGED_NAMESPACES = new ImmutableSortedSet.Builder<>(
             String.CASE_INSENSITIVE_ORDER)
-                    .add("testPrivilegedNS1", "testPrivilegedNS2")
+                    .add("privilegedNS", "testPrivilegedNS1", "testPrivilegedNS2")
                     .build();
+    
+    private static final Set<String> SYSTEM_TEST_CUSTOM_NAMESPACES = new ImmutableSortedSet.Builder<>(
+    		String.CASE_INSENSITIVE_ORDER)
+    		.add("testCustomNS1", "testCustomNS2")
+    		.build();
 
     private Boolean isClientAppcacheEnabled = null;
     private Boolean isProduction = null;
@@ -233,6 +238,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     public Set<String> getPrivilegedNamespaces() {
         Set<String> namespaces = Sets.newTreeSet(super.getPrivilegedNamespaces());
         namespaces.removeAll(unprivilegedNamespaces);
+        namespaces.addAll(SYSTEM_TEST_PRIVILEGED_NAMESPACES);
         return namespaces;
     }
 
@@ -261,6 +267,8 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     public Set<String> getInternalNamespaces() {
         Set<String> namespaces = Sets.newTreeSet(super.getInternalNamespaces());
         namespaces.removeAll(nonInternalNamespaces);
+        namespaces.removeAll(SYSTEM_TEST_PRIVILEGED_NAMESPACES);
+        namespaces.removeAll(SYSTEM_TEST_CUSTOM_NAMESPACES);
         return namespaces;
     }
 
@@ -268,6 +276,10 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     public boolean isInternalNamespace(String namespace) {
         if (nonInternalNamespaces.contains(namespace)) {
             return false;
+        }
+        
+        if(SYSTEM_TEST_CUSTOM_NAMESPACES.contains(namespace) || SYSTEM_TEST_PRIVILEGED_NAMESPACES.contains(namespace)) {
+        	return false;
         }
 
         if (StringSourceLoader.getInstance().isInternalNamespace(namespace)

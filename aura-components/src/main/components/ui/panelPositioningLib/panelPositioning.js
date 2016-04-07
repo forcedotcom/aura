@@ -28,7 +28,9 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
     var eventsBound = false;
     var constraints = [];
 
-    var timeoutHandler = null;
+    var timeoutId = 0;
+
+    var repositionCallbacks = [];
     
 
     var directionMap = {
@@ -50,12 +52,27 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
     }
 
 
+    function dispatchRespositionCallbacks() {
+        while(repositionCallbacks.length > 0) {
+            repositionCallbacks.shift()();
+        }
+    }
 
 
     function reposition(callback) {
-
         var toSplice = [];
-        timeoutHandler = false;
+
+        // all the callbacks will be called
+        if(typeof callback === 'function') {
+            repositionCallbacks.push(callback);
+        }
+        
+
+        // this is for throttling
+        clearTimeout(timeoutId);
+        timeoutId = 0;
+
+
         // this semaphore is to make sure
         // if reposition is called twice within one frame
         // we only run this once
@@ -80,10 +97,7 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
                 }
 
                 elementProxyFactory.bakeOff();
-
-                if(callback) {
-                    callback();
-                }
+                dispatchRespositionCallbacks();
             });
             repositionScheduled = true;
         }
@@ -95,8 +109,8 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
     // that should still support 30fps updates
     // on most machines
     function handleRepositionEvents() {
-        if(!timeoutHandler) {
-            timeoutHandler = setTimeout(reposition, 10);
+        if(timeoutId === 0) {
+            timeoutId = setTimeout(reposition, 10);
         }
     }
 

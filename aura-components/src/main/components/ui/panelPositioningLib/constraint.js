@@ -82,7 +82,7 @@ function lib() { //eslint-disable-line no-unused-vars
                 this._exp = function(targetBox, elementBox) {
                     
                     return {
-                        left: self._transformX(targetBox.left, targetBox, elementBox) - 0.5 * elementBox.width
+                        left: Math.floor(self._transformX(targetBox.left, targetBox, elementBox) - 0.5 * elementBox.width)
                     };
                 };
                 break;

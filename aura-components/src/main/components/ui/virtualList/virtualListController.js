@@ -27,6 +27,10 @@
         cmp._initializing = false;
     },
     handleItemsChange: function (cmp, event, helper) {
+    	if (cmp._initializing || cmp._appending) {
+    		return;
+    	}
+    
         helper.ignorePTVChanges(cmp, true);
 
         helper.markClean(cmp, 'v.items');
@@ -49,7 +53,9 @@
         cmp = helper._getRootComponent(cmp);
 
         if (items && items.length) {
+        	cmp._appending = true;
             helper.appendVirtualRows(cmp, items);
+            cmp._appending = false;
         }
     },
     updateItem: function (cmp, event, helper) {

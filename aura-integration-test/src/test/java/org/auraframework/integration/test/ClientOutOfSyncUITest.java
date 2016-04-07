@@ -41,6 +41,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import com.google.common.base.Function;
@@ -720,6 +721,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
      *
      * See W-2909975 for additional details.
      */
+    // This tests persistent storage, exclude on Safari based browsers
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testReloadAfterMarkupChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,

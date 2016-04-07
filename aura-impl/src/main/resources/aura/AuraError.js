@@ -55,19 +55,24 @@ function AuraError() {
         }
 
         function getStack() {
-            var map = {};
-            var stack = [];
-            var caller = getStack.caller && getStack.caller.caller;
-            while (caller) {
-                if (map[caller]) {
-                    stack.push(getName(caller) + " (Recursion Entry Point)");
-                    break;
+            // in strict mode accessing .caller throws an error
+            try {
+                var map = {};
+                var stack = [];
+                var caller = getStack.caller && getStack.caller.caller;
+                while (caller) {
+                    if (map[caller]) {
+                        stack.push(getName(caller) + " (Recursion Entry Point)");
+                        break;
+                    }
+                    stack.push(getName(caller));
+                    map[caller]=true;
+                    caller=caller.caller;
                 }
-                stack.push(getName(caller));
-                map[caller]=true;
-                caller=caller.caller;
+                return stack.join('\n\tat ');
+            } catch (e) {
+                return '(Unavailable)';
             }
-            return stack.join('\n\tat ');
         }
 
         function getStackTrace(err) {

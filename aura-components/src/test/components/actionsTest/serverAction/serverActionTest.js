@@ -341,7 +341,7 @@
             });
 
             $A.enqueueAction(action);
-            
+
             $A.test.addWaitFor(true, function() { return !!actual; }, function(){});
         }
     },
@@ -454,9 +454,9 @@
                     $A.test.assertFalse(that.isAuraErrorDivVisible());
                 } else {
                     // Verify error message displayed from retry action
-                    $A.test.assertTrue(that.isAuraErrorDivVisible());
+                    $A.test.assertTrue(that.isAuraErrorDivVisible(), "Error div should have been visible");
                     var error = $A.test.getAuraErrorMessage();
-                    $A.test.assertTrue(error.indexOf(errorMsg) !== -1);
+                    $A.test.assertTrue(error.indexOf(errorMsg) !== -1), "Error div didn't contain expected text (" + errorMsg + "), was actually (" + error + ")";
                 }
                 throw new Error(thrownErrorMsg);
             });

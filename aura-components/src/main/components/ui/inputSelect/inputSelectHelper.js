@@ -127,10 +127,13 @@
         var multiSelect = cmp.get("v.multiple");
         var options = cmp.get("v.options");
         var newLabel = "";
+        var optionSelected = false;
 
         for (var i = 0; i < options.length; i++) {
             var option = options[i];
             if (option.selected === true) {
+                optionSelected = true;
+
                 if (multiSelect && newLabel.length > 0) {
                     newLabel += this.optionSeparator;
                 }
@@ -141,6 +144,12 @@
                 }
             }
         }
+
+        // If nothing was selected, just default the label to the first item
+        if (!optionSelected && options.length > 0) {
+            newLabel = options[0].label;
+        }
+
         cmp.set("v.selectedLabel", newLabel);
     },
 

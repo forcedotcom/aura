@@ -20,9 +20,11 @@
 		
 		for (var i = 0; i < 10; i++) {
 			items.push({
-				id : i,
-				name : "Name" + i,
-				grade : i,
+				data : {
+					id : i,
+					name : "Name" + i,
+					grade : i
+				},
 				status : {},
 				errors : {}
 			});

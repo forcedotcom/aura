@@ -30,21 +30,7 @@ function lib() { //eslint-disable-line no-unused-vars
      *
      * For more details on how this regex is constructed, refer to UrlUtil.java in core.
      */
-    var linksMatchingRegex = new RegExp(
-        "(<a[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/a>|<a[\\s]+[^>]+\/>|" +
-        "<i?frame[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/i?frame>|<i?frame[\\s]+[^>]+\/>|" +
-        "<area[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/area>|<area[\\s]+[^>]+\/>|" +
-        "<link[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/link>|<link[\\s]+[^>]+\/>|" +
-        "<img[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/img>|<img[\\s]+[^>]+>|" +
-        "<form[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/form>|<form[\\s]+[^>]+\/>|" +
-        "<body[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/body>|<body[\\s]+[^>]+\/>|" +
-        "<head[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/head>|<head[\\s]+[^>]+\/>|" +
-        "<input[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/input>|<input[\\s]+[^>]+\/>|" +
-        "<button[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/button>|<button[\\s]+[^>]+\/>|" +
-        "<blockquote[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/blockquote>|<blockquote[\\s]+[^>]+\/>|" +
-        "<q[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/q>|<q[\\s]+[^>]+\/>|" +
-        "<del[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/del>|<del[\\s]+[^>]+\/>|" +
-        "<ins[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/ins>|<ins[\\s]+[^>]+\/>" + ")|" +
+    var linksMatchingRegex =
         "((?:(?:https?|ftp)://[\\w\\-\\|=&%~#/+*@\\.,;:\\?!']{0,2047}(?:[\\w=/+#-]|\\([^\\s()]*\\)))|(?:\\b(?:[a-z0-9]" +
         "(?:[-a-z0-9]{0,62}[a-z0-9])?\\.)+(?:AC|AD|AE|AERO|AF|AG|AI|AL|AM|AN|AO|AQ|AR|ARPA|AS|ASIA|AT|AU|AW|AX|AZ|BA|BB|" +
         "BD|BE|BF|BG|BH|BI|BIZ|BJ|BM|BN|BO|BR|BS|BT|BV|BW|BY|BZ|CA|CAT|CC|CD|CF|CG|CH|CI|CK|CL|CM|CN|CO|COM|COOP|CR|CU|" +
@@ -68,11 +54,30 @@ function lib() { //eslint-disable-line no-unused-vars
         "XN--HGBK6AJ7F53BBA|XN--HLCJ6AYA9ESC7A|XN--J6W193G|XN--JXALPDLP|XN--KGBECHTV|XN--KPRW13D|XN--KPRY57D|XN--MGBAAM7A8H|" +
         "XN--MGBERP4A5D4AR|XN--P1AI|XN--WGBH1C|XN--ZCKZAH|YE|YT|ZA|ZM|ZW))(?:/[\\w\\-=?/.&;:%~,+@#*]{0,2048}(?:[\\w=/+#-]|" +
         "\\([^\\s()]*\\)))?(?:$|(?=\\.$)|(?=\\.\\s)|(?=[^\\w\\.]))))|((?:\\\\|[A-Za-z]:)(?:\\\\[^/:*?\"<>| \\t\\n\\f\\r]" +
-        "{1,255})+)|([\\w-\\.\\+_]{1,64}@(?:[\\w-]){1,255}(?:\\.[\\w-]{1,255}){1,10})", "gi");
+        "{1,255})+)|([\\w-\\.\\+_]{1,64}@(?:[\\w-]){1,255}(?:\\.[\\w-]{1,255}){1,10})";
 
+    var whitelistedTagsMatchingRegex =
+        "(<a[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/a>|<a[\\s]+[^>]+\/>|" +
+        "<i?frame[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/i?frame>|<i?frame[\\s]+[^>]+\/>|" +
+        "<area[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/area>|<area[\\s]+[^>]+\/>|" +
+        "<link[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/link>|<link[\\s]+[^>]+\/>|" +
+        "<img[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/img>|<img[\\s]+[^>]+>|" +
+        "<form[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/form>|<form[\\s]+[^>]+\/>|" +
+        "<body[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/body>|<body[\\s]+[^>]+\/>|" +
+        "<head[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/head>|<head[\\s]+[^>]+\/>|" +
+        "<input[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/input>|<input[\\s]+[^>]+\/>|" +
+        "<button[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/button>|<button[\\s]+[^>]+\/>|" +
+        "<blockquote[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/blockquote>|<blockquote[\\s]+[^>]+\/>|" +
+        "<q[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/q>|<q[\\s]+[^>]+\/>|" +
+        "<del[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/del>|<del[\\s]+[^>]+\/>|" +
+        "<ins[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/ins>|<ins[\\s]+[^>]+\/>)";
+
+    var escapeCharacterMatchingRegex = "([\\n<>&\"\'])";
 
     var createHttpLink = function(match) {
         var href = match;
+        // lastIndexOf starting from index 0 checks if the match begins with the string.
+        // It has performance advantages over indexOf when the match doesn't begin with the string because it only checks index 0.
         if (match.lastIndexOf("http", 0) !== 0 && match.lastIndexOf("ftp", 0) !== 0) {
             href = "http://" + href;
         }
@@ -85,6 +90,24 @@ function lib() { //eslint-disable-line no-unused-vars
     var createEmailLink = function(match) {
         return "<a href=\"mailto:" + match + "\">" + match + "</a>";
     };
+    var escapeCharacter = function(match) {
+        switch (match) {
+            case '\n':
+                return "<br>";
+            case '<':
+                return "&lt;";
+            case '>':
+                return "&gt;";
+            case '&':
+                return "&amp;";
+            case '\"':
+                return "&quot;";
+            case '\'':
+                return "&#39;";
+            default:
+                return match;
+        }
+    };
 
     return {
 
@@ -93,22 +116,45 @@ function lib() { //eslint-disable-line no-unused-vars
                 return text;
             }
 
-            return text.replace(linksMatchingRegex, function(match, tagMatch, hrefMatch, uncMatch, emailMatch) {
+            var regex = new RegExp(whitelistedTagsMatchingRegex + "|" + linksMatchingRegex, "gi");
+            return text.replace(regex, function(match, tagMatch, hrefMatch, fileMatch, emailMatch) {
                 if (tagMatch) {
                     // if a tag with href was found, don't linkify it.
                     return tagMatch;
                 } else if (hrefMatch) {
                     // got href
                     return createHttpLink(hrefMatch);
-                } else if (uncMatch) {
+                } else if (fileMatch) {
                     // got UNC or DOS drive path
-                    return createFileLink(uncMatch);
+                    return createFileLink(fileMatch);
                 } else if (emailMatch) {
                     // got an email address
                     return createEmailLink(emailMatch);
                 }
             });
-        }
+        },
 
+        escapeAndLinkifyText: function(text) {
+            if ($A.util.isEmpty(text)) {
+                return text;
+            }
+
+            var regex = new RegExp(linksMatchingRegex + "|" + escapeCharacterMatchingRegex, "gi");
+            return text.replace(regex, function(match, hrefMatch, fileMatch, emailMatch, escapeMatch) {
+                if (hrefMatch) {
+                    // got href
+                    return createHttpLink(hrefMatch);
+                } else if (fileMatch) {
+                    // got UNC or DOS drive path
+                    return createFileLink(fileMatch);
+                } else if (emailMatch) {
+                    // got an email address
+                    return createEmailLink(emailMatch);
+                } else if (escapeMatch) {
+                    // got an escape character match
+                    return escapeCharacter(escapeMatch);
+                }
+            });
+        }
     };
 }

@@ -44,7 +44,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.contextPath = config["contextPath"] || "";
     this.allowedGlobals = config["allowedGlobals"];
     this.globals = config["globals"];
-    this.enableAccessChecks=false;
+    this.enableAccessChecks=true;
     // JBUCH: TOGGLE LOGGING OFF BY DEFAULT IN PROD MODE
     this.logAccessFailures= true
                             // #if {"modes" : ["PRODUCTION"]}

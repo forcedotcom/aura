@@ -15,8 +15,7 @@
  */
 
 ({	
-	init: function (cmp, event, helper) {
-		helper.initializeHandlers(cmp);
+	init: function (cmp) {
         if (!cmp.get('v.name')) {
             cmp.set('v.name', cmp.get('v.title'));
         }

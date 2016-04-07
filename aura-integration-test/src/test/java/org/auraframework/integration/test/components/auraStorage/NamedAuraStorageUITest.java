@@ -18,25 +18,28 @@ package org.auraframework.integration.test.components.auraStorage;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.util.WebDriverTestCase;
+import org.openqa.selenium.By;
 
 public class NamedAuraStorageUITest extends WebDriverTestCase {
     public NamedAuraStorageUITest(String name){
         super(name);
     }
-    
+
     /**
      * Verify that registering duplicate named storage using auraStorage:init in a template will throw an error.
      */
     public void testDuplicateNamedStorageInTemplate() throws Exception{
         String bodyMarkup = "<aura:set attribute='auraPreInitBlock'><auraStorage:init name='dup'/><auraStorage:init name='dup'/></aura:set>";
-        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, 
-                String.format(baseComponentTag, "isTemplate='true' extends='aura:template'", 
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "isTemplate='true' extends='aura:template'",
                         bodyMarkup));
-        DefDescriptor<ComponentDef> testCmp = addSourceAutoCleanup(ComponentDef.class, 
+        DefDescriptor<ComponentDef> testCmp = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "render='client' template='"+template.getDescriptorName()+"'", ""));
-        
+
         openNoAura(getUrl(testCmp));
-        String jsErrors = (String)getAuraUITestingUtil().getRawEval("return window.$A.test.getAuraErrorMessage()");
+        waitForElement("Error mask is not visible.", findDomElement(By.cssSelector("div[id='auraErrorMask']")), true);
+        String jsErrors = getText(By.cssSelector("div[id='auraErrorMessage']"));
+
         assertNotNull("Expected to see JS errors while loading component.", jsErrors);
         assertTrue("Unexpected error message: "+jsErrors, jsErrors.contains("Storage named 'dup' already exists!"));
     }

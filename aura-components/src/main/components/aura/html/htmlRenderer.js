@@ -27,11 +27,8 @@
 		for ( var attribute in HTMLAttributes) {
 			helper.createHtmlAttribute(component, element, attribute, HTMLAttributes[attribute]);
 		}
-
-		if (element.tagName === "A" && !element.getAttribute("href")) {
-			 /*eslint-disable no-script-url*/
-            element.setAttribute("href", "javascript:void(0);");
-		}
+		
+		helper.processJavascriptHref(element);
 
 		if (helper.canHaveBody(component)) {
             var body=component.get("v.body");
@@ -104,10 +101,7 @@
 			}
 		}
 
-		if (element.tagName === "A" && !element.getAttribute("href")) {
-			/*eslint-disable no-script-url*/
-			element.setAttribute("href", "javascript:void(0);");
-		}
+		helper.processJavascriptHref(element);
 
 		if (helper.canHaveBody(component)) {
             $A.renderingService.rerenderFacet(component,component.get("v.body"),element);

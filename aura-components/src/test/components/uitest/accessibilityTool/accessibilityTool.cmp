@@ -484,7 +484,7 @@
 
     <!-- Test for Anchor inner text. All anchors should have some innerText. This test does not have innerText-->
     <aura:if isTrue="{!v.caseToRender == 'anchorWOInnerText'}">
-          <a href="javascript:void(0)">
+          <a>
             <table>
                 <th scope="col"></th>
                 <tr>
@@ -499,7 +499,7 @@
 
     <!-- Test for Anchor inner text. All anchors should have some innerText. This test has innerText-->
     <aura:if isTrue="{!v.caseToRender == 'anchorWInnerText'}">
-          <a href="javascript:void(0)">
+          <a>
             <table>
                 <th scope="col"></th>
                 <tr>
@@ -521,7 +521,7 @@
      This test should not have a failure
      -->
     <aura:if isTrue="{!v.caseToRender == 'anchorInOutputURLInfo'}">
-         <a href="javascript:void(0);" title="" dir="ltr" class="uiOutputURL">
+         <a title="" dir="ltr" class="uiOutputURL">
             <img class="/auraFW/resources/aura/s.gif uiImage" alt="heloo" src="/auraFW/resources/aura/s.gif" />
         </a>
     </aura:if>
@@ -529,7 +529,7 @@
         This test should fail since no alt is defined
     -->
      <aura:if isTrue="{!v.caseToRender == 'anchorInOutputURLDeco'}">
-         <a href="javascript:void(0);" title="" dir="ltr" class="uiOutputURL">
+         <a title="" dir="ltr" class="uiOutputURL">
             <img class="/auraFW/resources/aura/s.gif uiImage" src="/auraFW/resources/aura/s.gif" />
         </a>
     </aura:if>

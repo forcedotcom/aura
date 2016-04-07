@@ -51,8 +51,8 @@
         <div class="scroller" aura:id="scroller" onclick="{!c.trapClicks}">
             <aura:if isTrue="{!v.hasTime}">
                 <div class="headerBar">
-                    <a aura:id="cancel" onclick="{!c.cancel}" class="calCancel button" href="javascript:void(0);">Cancel</a>
-                    <a aura:id="set" onclick="{!c.set}" class="calSet button" href="javascript:void(0);">Set</a>
+                    <a aura:id="cancel" onclick="{!c.cancel}" class="calCancel button">Cancel</a>
+                    <a aura:id="set" onclick="{!c.set}" class="calSet button">Set</a>
                 </div>
             </aura:if>
             <div class="dateBar">

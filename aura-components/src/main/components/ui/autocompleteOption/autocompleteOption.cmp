@@ -29,7 +29,7 @@
     <aura:handler name="mouseout" action="{!c.handleMouseout}"/>
 
     <li role="presentation" class="{!'lookup__item ' + v.class + ' ' + v.theme + (v.visible == false ? ' invisible' : '') + (v.highlighted == false ? '' : ' highlighted')}">
-        <a id="{!v.domId}" class="{!v.class}" aura:id="option" href="javascript:void(0);" role="option">
+        <a id="{!v.domId}" class="{!v.class}" aura:id="option" role="option">
             <aura:renderIf isTrue="{!v.body.length == 0}">
                 {!v.displayText}
                 <aura:set attribute="else">

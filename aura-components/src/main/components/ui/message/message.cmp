@@ -23,7 +23,7 @@
         <ui:block>
             <aura:set attribute="right">
                 <aura:renderIf isTrue="{!v.closable}">
-                    <a href="javascript:void(0);" aura:id="closeMessageLink" class="close" onclick="{!c.press}">&times;</a>
+                    <a aura:id="closeMessageLink" class="close" onclick="{!c.press}">&times;</a>
                 </aura:renderIf>
             </aura:set>
             <aura:set attribute="left"><ui:image aura:id="messageIcon" class="icon" alt="{!v.severity}"/></aura:set>

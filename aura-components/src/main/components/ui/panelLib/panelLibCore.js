@@ -351,7 +351,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     }
                 }
             }
-            callback && callback();
+            callback && callback(panel);
         },
 
         _updateAVP: function(cmps, avp) {

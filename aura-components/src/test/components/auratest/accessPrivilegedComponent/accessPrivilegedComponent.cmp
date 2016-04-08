@@ -15,18 +15,19 @@
     limitations under the License.
 
 -->
-<aura:component access='Global'>
+<aura:component access='Privileged'>
 	<aura:attribute name="privateAttribute" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
     <aura:attribute name="publicAttribute" type="String" access="PUBLIC" description="public" default="PUBLIC"/>
     <aura:attribute name="globalAttribute" type="String" access="GLOBAL" description="global" default="GLOBAL"/>
     <aura:attribute name="privilegedAttribute" type="String" access="PRIVILEGED" description="privileged" default="PRIVILEGED"/>
     
-    <aura:method name="globalMethod" action="{!c.globalMethod}" access="GLOBAL"/>
+     <aura:method name="globalMethod" action="{!c.globalMethod}" access="GLOBAL"/>
     <aura:method name="publicMethod" action="{!c.publicMethod}" access="PUBLIC"/>
     <aura:method name="privateMethod" action="{!c.privateMethod}" access="PRIVATE"/>
     <aura:method name="privilegedMethod" action="{!c.privilegedMethod}" access="PRIVILEGED"/>
+  
     
     <div class='whoAmI'>
-    	testPrivilegedNS1:componentWithGlobalAccess.cmp
+    	auratest:accessPrivilegedComponent.cmp
     </div>
 </aura:component>

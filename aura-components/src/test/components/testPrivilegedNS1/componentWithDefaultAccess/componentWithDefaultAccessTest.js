@@ -17,19 +17,102 @@
 	componentCreated: {},//we use this to store component created in the test, so next test stage can try to access attributes etc
 	
 	setUp: function(cmp){
-		this.componentCreated = undefined; 
+		this.componentCreated = undefined;
     },
-	
-	
+    
 	/*****************************************************************************************
 	    Test for creating component belong to a DIFFERENT privileged namespace starts
 	******************************************************************************************/
 	
+    testCreateComponentWithPrivilegedAccessOfAnotherPrivilegedNS:{
+        test:[
+        function canCreateComponentWithPrivilegedAccess(cmp){ 
+        	var completed = false;
+        	var that = this;
+            $A.createComponent(
+            	"markup://testPrivilegedNS2:componentWithPrivilegedAccess", 
+            	{}, 
+            	function(newCmp){
+            		$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS2$componentWithPrivilegedAccess");
+            		that.componentCreated = newCmp;
+            		completed = true;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        }, 
+        //tests for attribute
+        function cannotAccessPrivateAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.privateAttribute");
+        },
+        function cannotAccessPublicAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.publicAttribute");
+        },
+        function canAccessGlobalAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.globalAttribute");
+        	$A.test.assertEquals(actual, "GLOBAL");
+        }, 
+        function canAccessPrivilegedAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.privilegedAttribute");
+        	$A.test.assertEquals(actual, "PRIVILEGED");
+        }, 
+        //tests for method
+        function canAccessPrivateMethod(cmp) {// Bug?
+        	this.componentCreated.privateMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privateMethod', "get unexpected outcome from calling private method");
+        },
+        function canAccessPublicMethod(cmp) {// Bug?
+        	this.componentCreated.publicMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'publicMethod', "get unexpected outcome from calling public method");
+       
+        },
+        function canAccessGlobalMethod(cmp) {
+        	this.componentCreated.globalMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'globalMethod', "get unexpected outcome from calling global method");
+        },
+        function canAccessPrivilegedMethod(cmp) {
+        	this.componentCreated.privilegedMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privilegedMethod', "get unexpected outcome from calling privileged method");
+        },
+         //test for component event registered in the component we created
+        function canAccessPrivigedEventRegisteredWithDefaultAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("NS1eventWithPrivilegedAccessRegisteredWithDefaultAccess");
+        	$A.test.assertTrue(evt.getName() === 'NS1eventWithPrivilegedAccessRegisteredWithDefaultAccess', "get unexpected event name");
+        },
+        function canAccessNS1PrivigedEventRegisteredWithPrivateAccess(cmp) {// bug?
+        	var evt = this.componentCreated.getEvent("NS1eventWithPrivilegedAccessRegisteredWithPrivateAccess");
+        	$A.test.assertTrue(evt.getName() === 'NS1eventWithPrivilegedAccessRegisteredWithPrivateAccess', "get unexpected event name");
+        },
+        function cannotAccessNS2DefaultEventRegisteredWithDefaultAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS2eventWithDefaultAccessRegisteredWithDefaultAccess");
+        },
+        function cannotAccessNS2DefaultEventRegisteredWithGlobalAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS2eventWithDefaultAccessRegisteredWithGlobalAccess");
+        },
+        function cannotAccessNS2PrivateEventRegisteredWithDefaultAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS2eventWithPrivateAccessRegisteredWithDefaultAccess");
+        },
+        function cannotAccessNS2PublicEventRegisteredWithDefaultAccess(cmp) {
+       	    $A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS2eventWithPublicAccessRegisteredWithDefaultAccess");
+        },
+        function cannotAccessNS2PrivilegedEventRegisteredWithDefaultAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("NS2eventWithPrivilegedAccessRegisteredWithDefaultAccess");
+        	$A.test.assertTrue(evt.getName() === 'NS2eventWithPrivilegedAccessRegisteredWithDefaultAccess', "get unexpected event name");
+        }
+        ]
+    },
+    
+    //we cannot create component with default access in a different privileged namespace
     testCreateComponentWithDefaultAccessOfAnotherPrivilegedNS:{
         test:[
         function canCreateComponentWithDefaultAccess(cmp){ 
-        	var completed = false;
         	$A.test.expectAuraError("Access Check Failed!");
+        	var completed = false;
             $A.createComponent(
             	"markup://testPrivilegedNS2:componentWithDefaultAccess", 
             	{}, 
@@ -76,6 +159,7 @@
             );
             $A.test.addWaitFor(true, function(){ return completed; });
         }, 
+        //tests for attribute
         function cannotAccessPrivateAttribute(cmp) {
        	 	$A.test.expectAuraError("Access Check Failed!");
         	var actual = this.componentCreated.get("v.privateAttribute");
@@ -87,6 +171,28 @@
         function cannotAccessGlobalAttribute(cmp) { 
         	var actual = this.componentCreated.get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
+        },
+        function canAccessPrivilegedAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.privilegedAttribute");
+        	$A.test.assertEquals(actual, "PRIVILEGED");
+        },
+        //tests for method
+        function canAccessPrivateMethod(cmp) {// Bug?
+        	this.componentCreated.privateMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privateMethod', "get unexpected outcome from calling private method");
+        },
+        function canAccessPublicMethod(cmp) {// Bug?
+        	this.componentCreated.publicMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'publicMethod', "get unexpected outcome from calling public method");
+       
+        },
+        function canAccessGlobalMethod(cmp) {
+        	this.componentCreated.globalMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'globalMethod', "get unexpected outcome from calling global method");
+        },
+        function canAccessPrivilegedMethod(cmp) {
+        	this.componentCreated.privilegedMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privilegedMethod', "get unexpected outcome from calling privileged method");
         }
         ]
     },
@@ -98,7 +204,6 @@
 	testCreateComponentWithDefaultAccessOfSamePrivilegedNS:{
         test:[
         function canCreateComponentWithDefaultAccess(cmp){ 
-        	//so the default access level for privileged namespace is Global?
         	var completed = false;
         	var that = this;
             $A.createComponent(
@@ -123,6 +228,37 @@
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
+        },
+        function canAccessPrivilegedAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.privilegedAttribute");
+        	$A.test.assertEquals(actual, "PRIVILEGED");
+        },
+        //tests for method
+        function canAccessPrivateMethod(cmp) {// Bug?
+        	this.componentCreated.privateMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privateMethod', "get unexpected outcome from calling private method");
+        },
+        function canAccessPublicMethod(cmp) {// Bug?
+        	this.componentCreated.publicMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'publicMethod', "get unexpected outcome from calling public method");
+       
+        },
+        function canAccessGlobalMethod(cmp) {
+        	this.componentCreated.globalMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'globalMethod', "get unexpected outcome from calling global method");
+        },
+        function canAccessPrivilegedMethod(cmp) {
+        	this.componentCreated.privilegedMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privilegedMethod', "get unexpected outcome from calling privileged method");
+        },
+        //test for component event registered in the component we created
+        function canAccessPrivigedEventRegisteredWithDefaultAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("NS1eventWithPrivilegedAccessRegisteredWithDefaultAccess");
+        	$A.test.assertTrue(evt.getName() === 'NS1eventWithPrivilegedAccessRegisteredWithDefaultAccess', "get unexpected event name");
+        },
+        function canAccessPrivigedEventRegisteredWithPrivateAccess(cmp) {// bug?
+        	var evt = this.componentCreated.getEvent("NS1eventWithPrivilegedAccessRegisteredWithPrivateAccess");
+        	$A.test.assertTrue(evt.getName() === 'NS1eventWithPrivilegedAccessRegisteredWithPrivateAccess', "get unexpected event name");
         }
         ]
     },
@@ -155,6 +291,28 @@
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
+        },
+        function canAccessPrivilegedAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.privilegedAttribute");
+        	$A.test.assertEquals(actual, "PRIVILEGED");
+        },
+        //tests for method
+        function canAccessPrivateMethod(cmp) {// Bug?
+        	this.componentCreated.privateMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privateMethod', "get unexpected outcome from calling private method");
+        },
+        function canAccessPublicMethod(cmp) {// Bug?
+        	this.componentCreated.publicMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'publicMethod', "get unexpected outcome from calling public method");
+       
+        },
+        function canAccessGlobalMethod(cmp) {
+        	this.componentCreated.globalMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'globalMethod', "get unexpected outcome from calling global method");
+        },
+        function canAccessPrivilegedMethod(cmp) {
+        	this.componentCreated.privilegedMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privilegedMethod', "get unexpected outcome from calling privileged method");
         }
         ]
     },
@@ -187,6 +345,28 @@
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
+        },
+        function canAccessPrivilegedAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.privilegedAttribute");
+        	$A.test.assertEquals(actual, "PRIVILEGED");
+        },
+        //tests for method
+        function canAccessPrivateMethod(cmp) {// Bug?
+        	this.componentCreated.privateMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privateMethod', "get unexpected outcome from calling private method");
+        },
+        function canAccessPublicMethod(cmp) {// Bug?
+        	this.componentCreated.publicMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'publicMethod', "get unexpected outcome from calling public method");
+       
+        },
+        function canAccessGlobalMethod(cmp) {
+        	this.componentCreated.globalMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'globalMethod', "get unexpected outcome from calling global method");
+        },
+        function canAccessPrivilegedMethod(cmp) {
+        	this.componentCreated.privilegedMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privilegedMethod', "get unexpected outcome from calling privileged method");
         }
         ]
     },
@@ -196,11 +376,65 @@
 	/**************************************************************************************************
 	    Test for creating component belong to Internal/System namespace starts
 	***************************************************************************************************/
-	testCreateComponentWithDefaultAccessOfSystemNS:{
+    testCreateComponentWithPrivilegedAccessOfSystemNS:{
         test:[
         function canCreateComponentWithDefaultAccess(cmp){
         	var completed = false;
+        	var that = this;
+            $A.createComponent(
+            	"markup://auratest:accessPrivilegedComponent", 
+            	{}, 
+            	function(newCmp){
+            		$A.test.assertEquals(newCmp.getName(),"auratest$accessPrivilegedComponent");
+            		that.componentCreated = newCmp;
+            		completed = true;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+        function cannotAccessPrivateAttribute(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.privateAttribute");
+        },
+        function cannotAccessPublicAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.publicAttribute");
+        },
+        function canAccessGlobalAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.globalAttribute");
+        	$A.test.assertEquals(actual, "GLOBAL");
+        },
+        function canAccessPrivilegedAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.privilegedAttribute");
+        	$A.test.assertEquals(actual, "PRIVILEGED");
+        },
+        //tests for method
+        function canAccessPrivateMethod(cmp) {// Bug?
+        	this.componentCreated.privateMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privateMethod', "get unexpected outcome from calling private method");
+        },
+        function canAccessPublicMethod(cmp) {// Bug?
+        	this.componentCreated.publicMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'publicMethod', "get unexpected outcome from calling public method");
+       
+        },
+        function canAccessGlobalMethod(cmp) {
+        	this.componentCreated.globalMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'globalMethod', "get unexpected outcome from calling global method");
+        },
+        function canAccessPrivilegedMethod(cmp) {
+        	this.componentCreated.privilegedMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privilegedMethod', "get unexpected outcome from calling privileged method");
+        }
+        ]
+    },
+    
+    //we cannot create component with default access in internal/system namespace
+	testCreateComponentWithDefaultAccessOfSystemNS:{
+        test:[
+        function canCreateComponentWithDefaultAccess(cmp){
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var completed = false;
             $A.createComponent(
             	"markup://auratest:accessDefaultComponent", 
             	{}, 
@@ -257,6 +491,28 @@
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
+        },
+        function canAccessPrivilegedAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.privilegedAttribute");
+        	$A.test.assertEquals(actual, "PRIVILEGED");
+        },
+        //tests for method
+        function canAccessPrivateMethod(cmp) {// Bug?
+        	this.componentCreated.privateMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privateMethod', "get unexpected outcome from calling private method");
+        },
+        function canAccessPublicMethod(cmp) {// Bug?
+        	this.componentCreated.publicMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'publicMethod', "get unexpected outcome from calling public method");
+       
+        },
+        function canAccessGlobalMethod(cmp) {
+        	this.componentCreated.globalMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'globalMethod', "get unexpected outcome from calling global method");
+        },
+        function canAccessPrivilegedMethod(cmp) {
+        	this.componentCreated.privilegedMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privilegedMethod', "get unexpected outcome from calling privileged method");
         }
         ]
     }

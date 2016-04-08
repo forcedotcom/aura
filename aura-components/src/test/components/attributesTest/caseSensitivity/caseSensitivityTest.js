@@ -33,6 +33,7 @@
      * Trying to get a simple attribute with the wrong case will throw and Access Check Failure
      */
     testGetWrongCaseThrowsAccessCheckFailure: {
+    	labels : ["UnAdaptableTest"],
         test: function(cmp) {
             $A.test.assertEquals("An Aura of Lightning Lumenated the Plume", cmp.get("v.attr"));
             $A.test.expectAuraError("Access Check Failed!");
@@ -44,6 +45,7 @@
      * Trying to set a simple attribute with the wrong case will throw an Access Check Failure
      */
     testSetWrongCaseThrowsAccessCheckFailure: {
+    	labels : ["UnAdaptableTest"],
         test: function(cmp) {
             // Reading the old value
             $A.test.expectAuraError("Access Check Failed!");

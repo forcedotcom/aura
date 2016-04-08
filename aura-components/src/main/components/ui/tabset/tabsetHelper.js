@@ -315,12 +315,12 @@
             var name = def.getDescriptor().getName();
             //don't want to pass the body to tabItems
             if (name !== "body") {
-                values[name] = tab.get("v." + name);
+                values[name] = tab.getReference("v." + name);
             }
         });
 
-        if ($A.util.isUndefinedOrNull(values["ariaControlId"])) {
-            values["ariaControlId"] = tab.getGlobalId();
+        if (!tab.get("v.ariaControlId")){
+            tab.set("v.ariaControlId",tab.getGlobalId());
         }
 
         config.localId = values.name || cmp.get('v.name');

@@ -24,6 +24,7 @@ function SecureIFrameElement(el, key) {
             }
         }
     });
+    
     Object.defineProperties(o, {
         // Standard list of iframe's properties from:
         // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
@@ -38,10 +39,12 @@ function SecureIFrameElement(el, key) {
         blur: SecureThing.createFilteredMethod(o, el, "blur"),
         focus: SecureThing.createFilteredMethod(o, el, "focus")
     });
+    
     // applying standard secure element properties
     SecureElement.addSecureProperties(o, el);
 
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", el);
-    return Object.seal(o);
+    
+    return o;
 }

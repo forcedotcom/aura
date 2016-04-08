@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
+/*jslint sub: true */
+
 function SecureScriptElement(key) {
 	"use strict";
 
 	var src;
+	var eventListeners = {};
+	
 	var o = Object.create(null, {
 		src : {
 			enumerable: true,
@@ -28,6 +32,7 @@ function SecureScriptElement(key) {
 				src = value;
 			}
 		},
+		
 		$run : {
 			value : function() {
 				if (!src) {
@@ -39,6 +44,12 @@ function SecureScriptElement(key) {
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState === 4 && xhr.status === 200) {
 						$A.lockerService.create(xhr.responseText, key);
+
+						// Fire onload event
+						var listeners = eventListeners["load"];
+						for (var n = 0; n < listeners.length; n++) {
+							listeners[n].call(o);
+						}
 					}
 
 					// DCHASMAN TODO W-2837800 Add in error handling for 404's etc
@@ -56,13 +67,22 @@ function SecureScriptElement(key) {
 		},
 
 		addEventListener : {
-			enumerable: true,
-			value : function(/*event, callback*/) {
-				// DCHASMAN TOOD W-2837803 Add support for onload event
+			value : function(event, callback) {
+				if (!callback) {
+					return; // by spec, missing callback argument does not throw, just ignores it.
+				}
+				
+				var listeners = eventListeners[event];
+				if (!listeners) {
+					eventListeners[event] = [callback];
+				} else {
+					listeners.push(callback);
+				}
 			}
 		}
 	});
 
 	setLockerSecret(o, "key", key);
-	return Object.seal(o);
+	
+	return o;
 }

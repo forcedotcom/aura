@@ -42,8 +42,10 @@
           script.type = 'text/javascript';
           window[hookFn] = undefined;
           script.appendChild(document.createTextNode(src));
+          
           placeholder.appendChild(script);
           placeholder.removeChild(script);
+          
           var result = window[hookFn];
           window[hookFn] = undefined;
           return result;

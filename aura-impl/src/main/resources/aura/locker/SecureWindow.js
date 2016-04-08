@@ -66,8 +66,16 @@ function SecureWindow(win, key) {
 		}
 	});
 
+
+	Object.defineProperties(o, {
+		addEventListener: SecureElement.createAddEventListenerDescriptor(o, win, key),
+
+		// DCHASMAN TOOD This is unlikely to be acceptable in writeable form
+		location: SecureThing.createFilteredProperty(o, win, "location")
+	});
+
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", win);
-	
+
 	return o;
 }

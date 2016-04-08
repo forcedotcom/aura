@@ -53,7 +53,7 @@
         <a  aura:id="tabItemAnchor"
             class="tabHeader"
             data-tab-name="{!v.name}"
-            href="javascript:void(0);"
+           
             title="{!v.title}"
             aria-controls="{!v.ariaControlId}"
             aria-selected="{!v.active ? 'true' : 'false'}"
@@ -67,7 +67,7 @@
             <aura:if isTrue="{!v.closable}">
                 <a  aura:id="close" 
                     class="close" 
-                    href="javascript:void(0);" 
+                    
                     onclick="{!c.close}" 
                     tabindex="{!v.active ? 0: -1}">&times;
                     <span class="assistiveText">Close</span>

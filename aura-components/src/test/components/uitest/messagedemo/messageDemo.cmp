@@ -17,18 +17,18 @@
 -->
 <aura:component>
     <ui:message title="Alert" closable="true">
-        The sky is falling.  <a href="javascript:void(0);">Link</a>
+        The sky is falling.  <a>Link</a>
     </ui:message>
     <ui:message title="Alert" severity="error">
-        The sky is falling.  <a href="javascript:void(0);">Link</a>
+        The sky is falling.  <a>Link</a>
     </ui:message>
     <ui:message title="Warn" severity="warning">
-        Keep doing that and you will break things.  <a href="javascript:void(0);">Link</a>
+        Keep doing that and you will break things.  <a>Link</a>
     </ui:message>
     <ui:message title="Confirmation" severity="confirm">
-        Changes to your account were successfully processed.  <a href="javascript:void(0);">Link</a>
+        Changes to your account were successfully processed.  <a>Link</a>
     </ui:message>
     <ui:message title="Information" severity="info">
-        The sky is blue.  <a href="javascript:void(0);">Link</a>
+        The sky is blue.  <a>Link</a>
     </ui:message>
 </aura:component>

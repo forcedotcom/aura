@@ -262,5 +262,23 @@
         if ($A.util.isExpression(attribute)) {
             attribute.removeChangeHandler(component, "HTMLAttributes." + name);
         }
-    }
+    },
+    
+    processJavascriptHref: function (element) {
+		if (element.tagName === "A") {
+	    	var lockerServiceEnabled = $A.getContext().isLockerServiceEnabled;
+			var href = element.getAttribute("href");
+
+	    	/*eslint-disable no-script-url*/
+			if (!href || (lockerServiceEnabled && href.toLowerCase().indexOf("javascript:") === 0)) {				
+				element.setAttribute("href", "javascript:void(0);");
+				
+				if (lockerServiceEnabled) {
+					element.addEventListener("click", function (event) {
+						event.preventDefault();
+					});
+				}
+			}
+		}
+	}
 })// eslint-disable-line semi

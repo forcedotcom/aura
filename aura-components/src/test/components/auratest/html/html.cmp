@@ -25,7 +25,7 @@
     <a aura:id="nohash" href="http://www.salesforce.com/">salesforce</a>
     <a aura:id="hashString" href="#layout">layout</a>
     <a aura:id="hash" href="#">hash</a>
-    <a aura:id="testAnchorA" href="javascript:void(0);" onmouseover="{!c.handleOnMouseOver}" onmouseout="{!c.handleOnMouseOut}">Anchor A</a>
+    <a aura:id="testAnchorA" onmouseover="{!c.handleOnMouseOver}" onmouseout="{!c.handleOnMouseOut}">Anchor A</a>
     <area aura:id="noHashArea" href="http://www.salesforce.com/" />
     <area aura:id="hashStringArea" href="#layout" />
     <area aura:id="hashArea" href="#" />

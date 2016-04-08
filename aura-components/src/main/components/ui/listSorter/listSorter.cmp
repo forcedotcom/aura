@@ -59,11 +59,11 @@
 				</ui:menu>
 			</div>
 			<div aura:id="headerBar" class="headerBar">
-	            <a aura:id="cancel" onclick="{!c.onCancel}" class="cancel button" href="javascript:void(0);">
+	            <a aura:id="cancel" onclick="{!c.onCancel}" class="cancel button">
 	            	{!v.cancelLabel}
 	            </a>
 	            <span aura:id="title" class="title">{!v.title}</span>
-	            <a aura:id="set" onclick="{!c.onApply}" class="apply button hidden" href="javascript:void(0);">
+	            <a aura:id="set" onclick="{!c.onApply}" class="apply button hidden">
 	            	{!v.applyLabel}
 	            </a>
 	        </div>

@@ -1,4 +1,6 @@
 ({
+	labels : ["UnAdaptableTest"],
+	
     testCanAccessGlobalAttributeOnBaseComponent: {
         test: function(cmp) {
             cmp.testAttributeAccess("Global");

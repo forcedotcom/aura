@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 ({
+	
+	labels : ["UnAdaptableTest"],
+	
     testComponentCanUseAllAccessLevelsInMarkup:{
         test:function(cmp){
             var expected="PRIVATE\nPUBLIC\nINTERNAL\nGLOBAL";

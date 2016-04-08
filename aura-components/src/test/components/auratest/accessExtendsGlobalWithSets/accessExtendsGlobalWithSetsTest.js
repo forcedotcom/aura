@@ -1,4 +1,6 @@
 ({
+	labels : ["UnAdaptableTest"],
+	
     /**
      * aura:set should work for all types except PRIVATE access.
      */

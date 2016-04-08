@@ -343,9 +343,9 @@
         	$A.test.expectAuraError("Access Check Failed!");
         	var actual = this.componentCreated.get("v.privateAttribute");
         },
-        function cannotAccessPublicAttribute(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
+        function canAccessPublicAttribute(cmp) {
         	var actual = this.componentCreated.get("v.publicAttribute");
+        	$A.test.assertEquals(actual, "PUBLIC");
         },
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");
@@ -356,17 +356,31 @@
     
     testCreateComponentWithPublicAccessOfPrivilegedNS:{
         test:[
-        function cannotCreateComponentWithPublicAccess(cmp){//Different
+        function canCreateComponentWithPublicAccess(cmp){
         	var completed = false;
-        	$A.test.expectAuraError("Access Check Failed!");
+        	var that = this;
             $A.createComponent(
             	"markup://testPrivilegedNS1:componentWithPublicAccess", 
             	{}, 
-            	function(newCmp){//newCmp will be null
+            	function(newCmp){
+            		$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS1$componentWithPublicAccess");
+            		that.componentCreated = newCmp;
             		completed = true;
             	}
             );
             $A.test.addWaitFor(true, function(){ return completed; });
+        },
+        function cannotAccessPrivateAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.privateAttribute");
+        },
+        function canAccessPublicAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.publicAttribute");
+        	$A.test.assertEquals(actual, "PUBLIC");
+        },
+        function canAccessGlobalAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.globalAttribute");
+        	$A.test.assertEquals(actual, "GLOBAL");
         }
         ]
     },
@@ -392,8 +406,8 @@
         	var actual = this.componentCreated.get("v.privateAttribute");
         },
         function cannotAccessPublicAttribute(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
         	var actual = this.componentCreated.get("v.publicAttribute");
+        	$A.test.assertEquals(actual, "PUBLIC");
         },
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");

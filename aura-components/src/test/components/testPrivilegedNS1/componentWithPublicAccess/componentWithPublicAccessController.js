@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 ({
-    /**
-     * Get attribute from self and create a text component with it.
-     */
     privateMethod: function(component, event, helper){
-    
+    	component.set("v.globalAttribute", "privateMethod");
     },
     
     publicMethod: function(component, event, helper){
-    
+    	component.set("v.globalAttribute", "publicMethod");
     },
     
     globalMethod: function(component, event, helper){
+    	component.set("v.globalAttribute", "globalMethod"); 
+    },
     
+    privilegedMethod: function(component, event, helper){
+    	component.set("v.globalAttribute", "privilegedMethod");
     }
 
 })

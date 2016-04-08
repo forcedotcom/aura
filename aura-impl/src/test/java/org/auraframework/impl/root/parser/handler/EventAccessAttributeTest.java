@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
@@ -34,8 +32,6 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
 
 	public EventAccessAttributeTest(String name) {
 		super(name);
-		 ConfigAdapter adapter = Aura.getConfigAdapter();
-		 adapter.addPrivilegedNamespace("privilegedNS");
 
 	}
 	

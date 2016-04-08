@@ -251,8 +251,10 @@
     merge: function(target, source) {
         var property;
 
-        if (target) {
+        if (target && source) {
             for (property in source) {
+                $A.logger.info('aura.flexipage.cke.debug : ui:inputRichTextHelepr.merge : ' + 
+                     ' merging property "' + property + '" to target');
                 target[property] = source[property];
             }
         }

@@ -175,8 +175,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             definitionService.getDefinition(cmpDescriptor.getQualifiedName(), ComponentDef.class);
             fail("DefinitionNotFoundException should be thrown when getting a definition of component using descriptor of a component without helper.");
         } catch (Exception e) {
-            String errorMessage = String.format("No HELPER named js://%s.%s found : [%s]",
-                    cmpWithoutHelperDescriptor.getNamespace(), cmpWithoutHelperDescriptor.getName(), cmpDescriptor.getQualifiedName());
+            String errorMessage = String.format("No HELPER named js://%s.%s found",
+                    cmpWithoutHelperDescriptor.getNamespace(), cmpWithoutHelperDescriptor.getName());
             this.checkExceptionContains(e, DefinitionNotFoundException.class, errorMessage);
         }
     }

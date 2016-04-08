@@ -137,12 +137,12 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         IncludeDefRef def = builder.build();
 
 	    try {
-	        def.validateDefinition();
+	        def.validateReferences();
 	        fail("Invalid breaking JS wasn't validated");
 	    } catch (InvalidDefinitionException t) {
 	        assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
 	        		String.format("JS Processing Error: %s (line 2, char 1) : Parse error. missing ) after argument list\n",
-	                JavascriptIncludeClass.getClientDescriptor(includeDesc), source));
+	                includeDesc, source));
 	    }
 	}
 
@@ -160,12 +160,12 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         IncludeDefRef def = builder.build();
 
 		try {
-			def.validateDefinition();
+			def.validateReferences();
           	fail("Invalid unclosed JS wasn't validated");
 		} catch (InvalidDefinitionException t) {
 			assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
                   String.format("JS Processing Error: %s (line 2, char 0) : Parse error. syntax error\n",
-                  JavascriptIncludeClass.getClientDescriptor(includeDesc), source));
+                  includeDesc, source));
 		}
 	}
 
@@ -184,12 +184,12 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         IncludeDefRef def = builder.build();
 
      	try {
-     		def.validateDefinition();
+     		def.validateReferences();
      		fail("Invalid unclosed JS wasn't validated");
      	} catch (InvalidDefinitionException t) {
      		assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
-                String.format("JS Processing Error: %s (line 2, char 12) : Parse error. missing } after function body\n",
-                JavascriptIncludeClass.getClientDescriptor(includeDesc), source));
+                String.format("JS Processing Error: %s (line 3, char 2) : Parse error. missing } after function body\n",
+                includeDesc, source));
      	}
 	}
 
@@ -205,8 +205,8 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
 		builder.setDescriptor(includeDesc.getDef().getDescriptor());
         IncludeDefRef def = builder.build();
 
-		def.validateDefinition();
-		assertEquals(String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s);\n",
+		def.validateReferences();
+		assertEquals(String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s\n);\n",
     		  JavascriptIncludeClass.getClientDescriptor(includeDesc), source), def.getCode(false));
 	}
 }

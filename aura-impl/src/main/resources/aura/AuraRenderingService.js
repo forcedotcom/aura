@@ -664,7 +664,7 @@ AuraRenderingService.prototype.rerenderDirty = function(stackName) {
             this.statsIndex["rerenderDirty"].push(cmpsWithWhy);
         }
         // #end
-        $A.getEvt("markup://aura:doneRendering").fire();
+        $A.eventService.getNewEvent("markup://aura:doneRendering").fire();
     }
 };
 

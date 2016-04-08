@@ -58,6 +58,15 @@ AuraEventService.prototype.newEvent = function(eventDef, eventName, sourceCmp) {
     return this.getNewEvent(eventDef, eventName, sourceCmp);
 };
 
+/**
+ * Get a new Event instance, but do not do an access check on the event definition. This method is private to 
+ * aura and should only be used within trusted portions of the framework.
+ *
+ * @param {String} eventDef The event object in the format namespace:component
+ * @param {String=} eventName The event name if the event is a "COMPONENT" type event
+ * @param {sourceCmp=} eventName The component source if the event is a "COMPONENT" type event
+ * @return {Event} new Event
+ */
 AuraEventService.prototype.getNewEvent = function(eventDefinition, eventName, sourceCmp) {
     var eventDef = eventDefinition;
     if(typeof eventDefinition === "string") {

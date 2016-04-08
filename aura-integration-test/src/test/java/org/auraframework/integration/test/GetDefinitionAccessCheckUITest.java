@@ -35,7 +35,7 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
         getMockConfigAdapter().setLockerServiceEnabled(false);
     }
 
-    public void _testGetEventDefinitionWithoutAccess() throws Exception {
+    public void testGetEventDefinitionWithoutAccess() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("clientApiTest");
         open("/clientApiTest/getDefinition.cmp");
         findDomElement(By.cssSelector(".getEventDefinitionWithoutAccessButton")).click();
@@ -55,7 +55,7 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
         assertEquals("null", actual);
     }
 
-    public void _testGetMutilpleDefinitionsWithoutAccess() throws Exception {
+    public void testGetMutilpleDefinitionsWithoutAccess() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("clientApiTest");
         open("/clientApiTest/getDefinition.cmp");
         findDomElement(By.cssSelector(".getDefinitionsWithoutAccessButton")).click();

@@ -17,9 +17,7 @@ package org.auraframework.integration.test;
 
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 @ThreadHostileTest("Tests modify what namespaces are Internal or not and locker service enabled")
 //I'm doing the AccessChecks with component tests now, this file will get removed soon
@@ -224,9 +222,9 @@ public class AccessChecksUITest extends WebDriverTestCase {
         executor.executeScript("arguments[0].click();", webElement);
     }
 
-    private void verifyComponentCreated(String expected) {
-        waitForElementTextPresent(getDriver().findElement(By.className("output")), expected);
-    }
+//    private void verifyComponentCreated(String expected) {
+//        waitForElementTextPresent(getDriver().findElement(By.className("output")), expected);
+//    }
     
     private void verifyComponentCreated(String expected, boolean exactMatch) {
     	if(exactMatch == true) {

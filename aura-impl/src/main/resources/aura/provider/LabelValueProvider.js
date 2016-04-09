@@ -59,9 +59,12 @@ LabelValueProvider.prototype.requestServerLabel = function(section, name, callba
                     this.values[section]={};
                 }
                 this.values[section][name] = returnValue;
+                //JBUCH: HACK. FIX IN PRV REWRITE
+                $A.expressionService.updateGlobalReference(["$Label",section,name].join('.'),null,returnValue);
             } else {
                 $A.log("Error getting label: " + section + "." +name);
             }
+
 
             var callbacks = queue.getCallbacks();
             for (var i = 0; i < callbacks.length; i++) {

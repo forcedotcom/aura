@@ -24,7 +24,10 @@
     <div class='whoAmI'>
     	testPrivilegedNS1:componentWithDefaultAccess.cmp
     </div>
-    
+    <!-- just like accessing the event in controller, this won't work :W-2999718
+    <auratest:accessGlobalComponent aura:id="accessGlobalComponent"
+    eventWithDefaultAccessInSameSystemNamespaceRegisteredWithGlobalAccess="{!c.globalMethod}"/>
+    -->
     <div aura:id="componentCreatedByController" class="componentCreatedByController"/>
     
 </aura:component>

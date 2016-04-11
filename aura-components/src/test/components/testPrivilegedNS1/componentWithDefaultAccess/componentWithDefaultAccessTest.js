@@ -519,7 +519,17 @@
         function canAccessPrivilegedMethod(cmp) {
         	this.componentCreated.privilegedMethod();
         	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privilegedMethod', "get unexpected outcome from calling privileged method");
+        },
+        //tests for events
+        function canAccessSystemNSGLobalEventRegisteredWithGlobalAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSameSystemNamespaceRegisteredWithGlobalAccess");
+        	$A.test.assertTrue(evt.getName() === "eventWithGlobalAccessInSameSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());
         }
+        //W-2999718
+        /*function canAccessSystemNSDefaultEventRegisteredWithGlobalAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSameSystemNamespaceRegisteredWithGlobalAccess");
+        	$A.test.assertTrue(evt.getName() === "eventWithDefaultAccessInSameSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());
+        }*/
         ]
     }
  })

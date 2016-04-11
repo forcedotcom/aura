@@ -85,6 +85,9 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
             String name = ex.getName();
             builder.addExample(name, ex);
 
+        } else if ("aura:meta".equalsIgnoreCase(tag)) {
+            // TODO: implement MetaDef
+            // allow aura:meta tags to be manually parsed outside of Aura
         } else {
             throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));
         }

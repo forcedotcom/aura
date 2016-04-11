@@ -108,7 +108,7 @@
   /**
    * Verify Virtual List works with large Number of Items
    */
-  testWithLargeData : {
+  _testWithLargeData : {
 	  labels : ["extended"],
       attributes : {"pageSize" : 3000},
       test : function(cmp){

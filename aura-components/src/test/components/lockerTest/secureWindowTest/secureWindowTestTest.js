@@ -33,5 +33,17 @@
                 return !!cmp.get("v.testComplete");
             });
         }
+    },
+    
+    testLocationExposedOnWindow: {
+        test: function(cmp) {
+            cmp.testLocationExposedOnWindow();
+        }
+    },
+    
+    testNavigatorExposedOnWindow: {
+        test: function(cmp) {
+            cmp.testNavigatorExposedOnWindow();
+        }
     }
 })

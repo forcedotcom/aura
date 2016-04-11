@@ -83,6 +83,11 @@
         cmp.set("v.componentStore", secureComponent);
     },
 
+    testLocationExposed: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertDefined(location, "Expected location to be defined");
+    },
+
 	testEvalBlocking : function(cmp, event, helper) {
 		var testUtils = cmp.get("v.testUtils");
 		

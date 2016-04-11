@@ -1,0 +1,34 @@
+{
+  "s":1,
+  "v":{
+    "descriptor":"markup://aura:test",
+    "superDef":{
+      "s":2,
+      "v":{
+        "xs":"G",
+        "descriptor":"markup://aura:component",
+        "attributeDefs":[
+          {
+            "s":3,
+            "v":{
+              "name":"body",
+              "type":"aura://Aura.Component[]",
+              "xs":"G"
+            }
+          }
+        ],
+        "interfaces":[
+          "markup://aura:rootComponent"
+        ],
+        "isAbstract":true,
+        "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:component\",function() {\nvar aura$component = {\n  \"meta\":{\n    \"name\":\"aura$component\"\n  },\n  \"renderer\":{\n    \"render\":function(component) {\n        var rendering = component.getRendering();\n        return rendering||$A.renderingService.renderFacet(component,component.get(\"v.body\"));\n    },\n    \"afterRender\":function(component) {\n        var body = component.get(\"v.body\");\n        $A.afterRender(body);\n    },\n    \"rerender\":function(component) {\n        var body = component.get(\"v.body\");\n        return $A.renderingService.rerenderFacet(component,body);\n    },\n    \"unrender\":function(component) {\n        var body = component.get(\"v.body\");\n        $A.renderingService.unrenderFacet(component,body);\n    }\n  }\n};\nreturn aura$component;\n});\n}"
+      }
+    },
+    "attributeDefs":[
+      {
+        "r":3
+      }
+    ],
+    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nvar aura$test = {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\nreturn aura$test;\n});\n}"
+  }
+}

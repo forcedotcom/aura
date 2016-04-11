@@ -26,7 +26,8 @@
     },
     
     globalMethod: function(component, event, helper){
-    
     }
+    
+    
 
 })

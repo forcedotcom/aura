@@ -19,12 +19,14 @@
 	<aura:attribute name="privateAttribute" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
     <aura:attribute name="publicAttribute" type="String" access="PUBLIC" description="public" default="PUBLIC"/>
     <aura:attribute name="globalAttribute" type="String" access="GLOBAL" description="global" default="GLOBAL"/>
+    <aura:attribute name="privilegedAttribute" type="String" access="PRIVILEGED" description="privileged" default="PRIVILEGED"/>
+    
     
     <aura:method name="globalMethod" action="{!c.globalMethod}" access="GLOBAL"/>
     <aura:method name="publicMethod" action="{!c.publicMethod}" access="PUBLIC"/>
     <aura:method name="privateMethod" action="{!c.privateMethod}" access="PRIVATE"/>
     
-    <div aura:id="attributeDiv">
-    	privateAttribute:{!v.privateAttribute}; publicAttribute:{!v.publicAttribute}; globalAttribute:{!v.globalAttribute};
+    <div class='whoAmI'>
+    	testPrivilegedNS2:componentWithPublicAccess.cmp
     </div>
 </aura:component>

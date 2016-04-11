@@ -17,7 +17,6 @@ package org.auraframework.impl;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,6 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
@@ -62,7 +60,6 @@ import aQute.bnd.annotation.component.Component;
 
 @Component (provide=AuraServiceProvider.class)
 public class ServerServiceImpl implements ServerService {
-
     private static final long serialVersionUID = -2779745160285710414L;
 
     @Override
@@ -330,14 +327,11 @@ public class ServerServiceImpl implements ServerService {
         MasterDefRegistry masterDefRegistry = context.getDefRegistry();
 
         StringBuilder sb = new StringBuilder();
-        List<JavascriptProcessingError> errors = new ArrayList<>();
-
 
         // Append component classes.
         Collection<BaseComponentDef> componentDefs = filterAndLoad(BaseComponentDef.class, dependencies, null);
         for (BaseComponentDef def : componentDefs) {
         	sb.append(def.getCode(minify));
-        	errors.addAll(def.getCodeErrors());
             masterDefRegistry.setClientClassLoaded(def.getDescriptor(), true);
         }
 
@@ -347,7 +341,6 @@ public class ServerServiceImpl implements ServerService {
         	List<IncludeDefRef> includeDefs = libraryDef.getIncludes();
 	        for (IncludeDefRef defRef : includeDefs) {
                 sb.append(defRef.getCode(minify));
-                errors.addAll(defRef.getCodeErrors());
                 masterDefRegistry.setClientClassLoaded(defRef.getDescriptor(), true);
             }
         }
@@ -392,14 +385,6 @@ public class ServerServiceImpl implements ServerService {
         Aura.getSerializationService().writeCollection(controllers, ControllerDef.class, sb, "JSON");
 
         sb.append("});\n\n");
-
-        // if not production instance, add all errors found during compilation,
-        // even in DEV mode, so developers are informed of errors encountered in JS.
-        if (!Aura.getConfigAdapter().isProduction()) {
-    		if (errors != null && !errors.isEmpty()) {
-    			appendCommentedCodeErrors(errors, sb);
-            }
-        }
 
         return sb.toString();
     }
@@ -460,21 +445,4 @@ public class ServerServiceImpl implements ServerService {
         }
         return out;
     }
-
-    /**
-     * Loops through list of javascript errors and return commented text to display
-     *
-     * @param errors list of javascript syntax errors
-     * @return commented errors
-     */
-    private void appendCommentedCodeErrors(List<JavascriptProcessingError> errors, StringBuilder out) {
-        out
-        .append("/**")
-        .append(System.lineSeparator())
-        .append("Errors are preventing some components from being minimized")
-        .append(System.lineSeparator())
-        .append(errors)
-        .append("**/");
-    }
-
 }

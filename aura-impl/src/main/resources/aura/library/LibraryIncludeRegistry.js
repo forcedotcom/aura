@@ -81,6 +81,9 @@ LibraryIncludeRegistry.prototype.getLibraryInclude = function(descriptor) {
         instance = this.instance[descriptor];
     } else {
 
+        // Reset the queue from amy passed failed run.
+        this.clearDependencyQueue();
+
         // If we don't have an instance, schedule it for addition.
         this.enqueueDependency(descriptor);
 
@@ -153,6 +156,13 @@ LibraryIncludeRegistry.prototype.buildLibraryInclude = function(descriptor) {
 
         return instance;
     }
+};
+
+/**
+ * Reset the queue.
+ */
+LibraryIncludeRegistry.prototype.clearDependencyQueue = function() {
+    this.dependencyQueue = [];
 };
 
 /**

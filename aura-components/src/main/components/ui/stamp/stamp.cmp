@@ -20,7 +20,7 @@
     <aura:attribute name="title" type="String" description="The title text for the stamp."/>
     <aura:attribute name="onclick" type="Aura.Action" description="The controller method that runs when the stamp is clicked."/>
     
-    <a aura:id="uiStamp" title="{!v.title}" class="{!'stamp-'+v.severity+' '+v.class}" href="javascript:void(0);" onclick="{!v.onclick}">
+    <a aura:id="uiStamp" title="{!v.title}" class="{!'stamp-'+v.severity+' '+v.class}" onclick="{!v.onclick}">
         {!v.body}
     </a>
 </aura:component>

@@ -47,6 +47,10 @@ function SecureWindow(win, key) {
 				return o;
 			}
 		},
+		navigator: {
+			enumerable: true,
+			value: SecureNavigator(win.navigator, key)
+		},
 		setTimeout: {
 			enumerable: true,
 			value: function (callback) {
@@ -66,8 +70,14 @@ function SecureWindow(win, key) {
 		}
 	});
 
+
+	Object.defineProperties(o, {
+		addEventListener: SecureElement.createAddEventListenerDescriptor(o, win, key),
+		location: SecureThing.createFilteredProperty(o, win, "location")
+	});
+
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", win);
-	
+
 	return o;
 }

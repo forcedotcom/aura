@@ -1,0 +1,58 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component access='Privileged'>
+	<aura:attribute name="privateAttribute" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
+    <aura:attribute name="publicAttribute" type="String" access="PUBLIC" description="public" default="PUBLIC"/>
+    <aura:attribute name="globalAttribute" type="String" access="GLOBAL" description="global" default="GLOBAL"/>
+    <aura:attribute name="privilegedAttribute" type="String" access="PRIVILEGED" description="privileged" default="PRIVILEGED"/>
+    
+    <aura:method name="globalMethod" action="{!c.globalMethod}" access="GLOBAL"/>
+    <aura:method name="publicMethod" action="{!c.publicMethod}" access="PUBLIC"/>
+    <aura:method name="privateMethod" action="{!c.privateMethod}" access="PRIVATE"/>
+    <aura:method name="privilegedMethod" action="{!c.privilegedMethod}" access="PRIVILEGED"/>
+    
+    <!-- register event in a DIFFERENT privileged ns -->
+    <aura:registerEvent name='NS1eventWithPrivilegedAccessRegisteredWithDefaultAccess' 
+  	type='testPrivilegedNS1:componentEventWithPrivilegedAccess'/>
+  	<aura:registerEvent name='NS1eventWithPrivilegedAccessRegisteredWithPrivateAccess' 
+  	type='testPrivilegedNS1:componentEventWithPrivilegedAccess' access='Private'/>
+  	<!-- cannot register event in a different privileged namespace with default or public access
+  	<aura:registerEvent name='NS1eventWithDefaultAccessRegisteredWithDefaultAccess' 
+  	type='testPrivilegedNS1:componentEventWithDefaultAccess'/>
+  	<aura:registerEvent name='NS1eventWithPublicAccessRegisteredWithDefaultAccess' 
+  	type='testPrivilegedNS1:componentEventWithPublicAccess'/>
+  	-->
+  	
+  	<!-- register event in SAME privileged ns -->
+  	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithDefaultAccess' 
+  	type='testPrivilegedNS2:componentEventWithDefaultAccess'/>
+  	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithGlobalAccess' 
+  	type='testPrivilegedNS2:componentEventWithDefaultAccess' access='Global'/>
+    <aura:registerEvent name='NS2eventWithPrivateAccessRegisteredWithPrivateAccess'
+                        type='testPrivilegedNS2:componentEventWithPrivateAccess' access="PRIVATE"/>
+  	<aura:registerEvent name='NS2eventWithPrivateAccessRegisteredWithDefaultAccess' 
+  	type='testPrivilegedNS2:componentEventWithPrivateAccess'/>
+  	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithDefaultAccess' 
+  	type='testPrivilegedNS2:componentEventWithPublicAccess'/>
+  	<aura:registerEvent name='NS2eventWithPrivilegedAccessRegisteredWithDefaultAccess' 
+  	type='testPrivilegedNS2:componentEventWithPrivilegedAccess'/>
+    
+    <div class='whoAmI'>
+    	testPrivilegedNS2:componentWithPrivilegedAccess.cmp
+    </div>
+</aura:component>

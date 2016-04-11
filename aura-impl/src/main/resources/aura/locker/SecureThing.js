@@ -155,31 +155,46 @@ SecureThing.unfilterEverything = function(st, value) {
 	return value;
 };
 
-SecureThing.createFilteredMethod = function(st, raw, methodName) {
+SecureThing.createFilteredMethod = function(st, raw, methodName, options) {
 	"use strict";
 
 	return {
 		enumerable: true,
 		value : function() {
 			var fnReturnedValue = raw[methodName].apply(raw, SecureThing.unfilterEverything(st, SecureThing.ArrayPrototypeSlice.call(arguments)));
+
+			if (options && options.afterCallback) {
+				fnReturnedValue = options.afterCallback(fnReturnedValue);
+			}
+
 			return SecureThing.filterEverything(st, fnReturnedValue);
 		}
 	};
 };
 
-SecureThing.createFilteredProperty = function(st, raw, propertyName) {
+SecureThing.createFilteredProperty = function(st, raw, propertyName, options) {
 	"use strict";
 
-	return {
-		enumerable: true,
-		get : function() {
-			var value = raw[propertyName];
-			return SecureThing.filterEverything(st, value);
-		},
-		set : function(value) {
-			raw[propertyName] = SecureThing.unfilterEverything(st, value);
-		}
+	var descriptor = {
+		enumerable: true
 	};
+
+	descriptor.get = function() {
+		var value = options && options.returnValue ? options.returnValue : raw[propertyName];
+		return SecureThing.filterEverything(st, value);
+	};
+
+	if (!options || options.writable !== false) {
+		descriptor.set = function(value) {
+			raw[propertyName] = SecureThing.unfilterEverything(st, value);
+
+			if (options && options.afterSetCallback) {
+				options.afterSetCallback();
+			}
+		};
+	}
+
+	return descriptor;
 };
 
 SecureThing.FunctionPrototypeBind = Function.prototype.bind;

@@ -1,5 +1,8 @@
 ({
-    getConstructor: function (cmp) {
+	//Exclude from Safari and IE since File() constructor is not supported
+	browsers : [ "GOOGLECHROME", "FIREFOX"],
+	
+	getConstructor: function (cmp) {
         return cmp.helper.lib.contentType;
     },
     MOCK_FILE_JPG : function () {

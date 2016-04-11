@@ -98,7 +98,7 @@
             <div aura:id="auraErrorMask" class="{! 'auraMsgMask' + ( v.forceError ? ' auraForcedErrorBox' : '' )}" >
                 <div class="auraMsgBox auraErrorBox" aura:id="auraError">
                     <h2>
-                        <a class="close" id="dismissError" href="javascript:void(0);">&times;</a>
+                        <a class="close" id="dismissError">&times;</a>
                         {!v.errorTitle}
                     </h2>
                     <div id="auraErrorMessage">{!v.errorMessage}</div>

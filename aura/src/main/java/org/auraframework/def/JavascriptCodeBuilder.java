@@ -15,10 +15,7 @@
  */
 package org.auraframework.def;
 
-import java.util.List;
-
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.util.javascript.JavascriptProcessingError;
 
 /**
  * Interface for builders that support client code.
@@ -30,18 +27,6 @@ public interface JavascriptCodeBuilder {
      * @param code the client JavaScript code.
      */
 	void setCode(String code);
-
-   /**
-     * Set the minified version of the JavaScript code.
-     * @param minifiedCode the minified JavaScript code.
-     */
-	void setMinifiedCode(String minifiedCode);
-
-    /**
-     * Set the JavaScript processing errors.
-     * @param codeErrors {@link List} of JavaScript processing errors.
-     */
-	void setCodeErrors(List<JavascriptProcessingError> codeErrors);
 
     /**
      * Add a label (global value provider) found in the JavaScript code.

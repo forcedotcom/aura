@@ -71,7 +71,7 @@
                 <div aura:id="pullDown" class="pullToRefresh pullDown">
                     <span class="pullDownIcon"></span>
                     <div>
-                        <div class="label pullLabel"><a onclick="{!v.onPullToRefresh}" href="javascript:void('scroller')">{!v.pullToRefreshPull}</a></div>
+                        <div class="label pullLabel"><a onclick="{!v.onPullToRefresh}">{!v.pullToRefreshPull}</a></div>
                         <div class="label releaseLabel">{!v.pullToRefreshRelease}</div>
                         <div class="label loadingLabel">{!v.pullToRefreshUpdating}</div>
                         <span class="subtitle">{!v.pullToRefreshSubtitle}</span>
@@ -93,7 +93,7 @@
                 <div aura:id="pullUp" class="pullToRefresh pullDown">
                     <span class="pullDownIcon"></span>
                     <div>
-                        <div class="label pullLabel"><a onclick="{!v.onPullToShowMore}" href="javascript:void('scroller')">{!v.pullToShowMorePull}</a></div>
+                        <div class="label pullLabel"><a onclick="{!v.onPullToShowMore}">{!v.pullToShowMorePull}</a></div>
                         <div class="label releaseLabel">{!v.pullToShowMoreRelease}</div>
                         <div class="label loadingLabel">{!v.pullToShowMoreUpdating}</div>
                         <span class="subtitle">{!v.pullToShowMoreSubtitle}</span>

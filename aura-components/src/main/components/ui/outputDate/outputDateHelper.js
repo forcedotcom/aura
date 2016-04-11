@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({    
+({
     formatDate: function(component) {
         var value = component.get("v.value");
         var format = component.get("v.format");
-        var langLocale = component.get("v.langLocale");
-        var displayValue = value ? value : ""; 
+        var langLocale = component.get("v.langLocale") || $A.get("$Locale.langLocale");
+        var displayValue = value ? value : "";
         if (value) {
             var d = $A.localizationService.parseDateTimeUTC(value, "YYYY-MM-DD", langLocale);
             if (d) {
@@ -27,7 +27,7 @@
                 displayValue = v ? v : displayValue;
             }
         }
-        
+
         var outputCmp = component.find("span");
         var elem = outputCmp ? outputCmp.getElement() : null;
         if (elem) {

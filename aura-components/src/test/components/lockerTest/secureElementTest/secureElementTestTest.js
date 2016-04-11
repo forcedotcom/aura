@@ -5,8 +5,8 @@
      */
 
     // TODO(tbliss): make these lists on SecureElement accessible here for maintainablility
-    ElementPropertiesWhitelist: ['childElementCount', 'classList', 'className', 'id', 'tagName'],
-    ElementProperitesBlacklist: ['attributes', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
+    ElementPropertiesWhitelist: ['childElementCount', 'classList', 'className', 'id', 'tagName', 'innerHTML'],
+    ElementProperitesBlacklist: ['attributes', 'firstElementChild', 'lastElementChild', 'namespaceURI',
                                  'nextElementSibling', 'previousElementSibling'],
 
     HTMLPropertiesWhitelist: ['accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable',

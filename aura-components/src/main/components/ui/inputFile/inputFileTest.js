@@ -15,6 +15,9 @@
  */
 
 ({ /* eslint-disable */
+	//Exclude from Safari and IE since File() constructor is not supported
+	browsers : [ "GOOGLECHROME", "FIREFOX"],
+	
     JPG_FILE : {
         name : 'file.jpg',
         type : 'image/jpg',

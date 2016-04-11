@@ -21,6 +21,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -1133,7 +1134,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
-        descriptor.getDef();
+        try {
+            descriptor.getDef();
+            fail("Attribute marked as PRIVATE cannot be accessed even in the same privileged namespace");
+        } catch(NoAccessException e) {
+            String msg = e.getMessage();
+            assertTrue("get un-expected error message: " + msg, msg.contains("with access PRIVATE"));
+        }
     }
     @Test
     public void testApplicationWithPrivilegedNamespaceHasComponentWithOtherPrivilegedNamespaceInMarkupAccessPrivate() throws QuickFixException {
@@ -1283,7 +1290,14 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
-        descriptor.getDef();
+        try {
+            cmpDescriptor.getDef();
+            descriptor.getDef();
+            fail("Attribute marked as PRIVATE cannot be accessed even in the same custom namespace");
+        } catch(NoAccessException e) {
+            String msg = e.getMessage();
+            assertTrue("get un-expected error message: " + msg, msg.contains("with access PRIVATE"));
+        }
     }
     
     /**
@@ -1300,12 +1314,12 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", false);
         try {
-        	descriptor.getDef();
-        	fail("application of custom namespace shouldn't be able to set attribute of component with other custom namespace with access='Private'");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-        	//Access to attribute 'cstring:testcomponnet1.testattribute' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            descriptor.getDef();
+            fail("application of custom namespace shouldn't be able to set attribute of component with other custom namespace with access='Private'");
+        } catch (NoAccessException expected) {
+            //expect
+            //System.out.println(e.getMessage());
+            //Access to attribute 'cstring:testcomponnet1.testattribute' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
         }
     }
     

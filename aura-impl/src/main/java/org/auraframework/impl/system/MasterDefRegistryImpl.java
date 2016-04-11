@@ -1354,6 +1354,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                             .format("Access to %s '%s' from namespace '%s' in '%s(%s)' disallowed by MasterDefRegistry.assertAccess()",
                                     defType.toString().toLowerCase(), target, referencingNamespace,
                                     referencingDescriptor, referencingDescriptor.getDefType());
+                } else if (access.isPrivate()) {
+                    status = String
+                            .format("Access to %s '%s' with access PRIVATE from namespace '%s' in '%s(%s)' disallowed by MasterDefRegistry.assertAccess()",
+                                    defType.toString().toLowerCase(), target, referencingNamespace,
+                                    referencingDescriptor, referencingDescriptor.getDefType());
                 }
             }
 

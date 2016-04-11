@@ -27,7 +27,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * Common base for ComponentDef and ApplicationDef
  */
-public interface BaseComponentDef extends RootDefinition, MinifiedCodeDefinition {
+public interface BaseComponentDef extends RootDefinition {
 
     @Override
     DefDescriptor<? extends BaseComponentDef> getDescriptor();
@@ -51,7 +51,7 @@ public interface BaseComponentDef extends RootDefinition, MinifiedCodeDefinition
 
     /**
      * Get the set of dependencies tracked by the server.
-     * 
+     *
      * These only dependencies that the client should indicates has having or not, using the 'loaded"
      * context attribute during communications.
      *
@@ -85,6 +85,10 @@ public interface BaseComponentDef extends RootDefinition, MinifiedCodeDefinition
     ModelDef getModelDef() throws QuickFixException;
 
     ControllerDef getControllerDef() throws QuickFixException;
+    HelperDef getHelperDef() throws QuickFixException;
+    RendererDef getRendererDef() throws QuickFixException;
+    ProviderDef getProviderDef() throws QuickFixException;
+
     ControllerDef getLocalControllerDef() throws QuickFixException;
 
     DefDescriptor<? extends BaseComponentDef> getExtendsDescriptor();
@@ -122,8 +126,6 @@ public interface BaseComponentDef extends RootDefinition, MinifiedCodeDefinition
     };
 
     RenderType getRender();
-
-    HelperDef getHelperDef() throws QuickFixException;
 
     Set<DefDescriptor<InterfaceDef>> getInterfaces();
 
@@ -203,4 +205,17 @@ public interface BaseComponentDef extends RootDefinition, MinifiedCodeDefinition
      * @throws QuickFixException If there is a problem loading a flavor or parent def.
      */
     Set<String> getAllFlavorNames() throws QuickFixException;
+
+ 	/**
+     * Gets the client JavaScript code, normally a client class.
+     * @param minify whether to return minified code or not.
+     * @return the client JavaScript code.
+     * @throws QuickFixException
+     */
+    String getCode(boolean minify) throws QuickFixException;
+
+	ControllerDef getRemoteControllerDef() throws QuickFixException;
+	HelperDef getRemoteHelperDef() throws QuickFixException;
+	ProviderDef getRemoteProviderDef() throws QuickFixException;
+	RendererDef getRemoteRendererDef() throws QuickFixException;
 }

@@ -36,9 +36,7 @@
         <aura:attribute name="focus" type="Boolean" description="Indicates the tab item should be focused or not."/>
         <aura:attribute name="callback" type="Object" description="Callback function"/>
     </aura:method>
-
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-
+    
     <li aura:id="li" class="{!v.class + ' tabs__item' + (v.active ? ' active' : '') + (v.hidden ? ' hidden' : '')}"  role="presentation">
 
         <!-- 
@@ -52,8 +50,8 @@
 
         <a  aura:id="tabItemAnchor"
             class="tabHeader"
-            data-tab-name="{!v.name}"
-            href="javascript:void(0);"
+            data-tab-name="{!v.name||v.title}"
+           
             title="{!v.title}"
             aria-controls="{!v.ariaControlId}"
             aria-selected="{!v.active ? 'true' : 'false'}"
@@ -67,7 +65,7 @@
             <aura:if isTrue="{!v.closable}">
                 <a  aura:id="close" 
                     class="close" 
-                    href="javascript:void(0);" 
+                    
                     onclick="{!c.close}" 
                     tabindex="{!v.active ? 0: -1}">&times;
                     <span class="assistiveText">Close</span>

@@ -140,7 +140,7 @@ public class AuraContextImpl implements AuraContext {
             } else {
                 json.writeMapEntry("fwuid", Aura.getConfigAdapter().getAuraFrameworkNonce());
             }
-
+            
             //
             // Now comes the tricky part, we have to serialize all of the definitions that are
             // required on the client side, and, of all types. This way, we won't have to handle
@@ -253,6 +253,10 @@ public class AuraContextImpl implements AuraContext {
 
             // JBUCH: TEMPORARY CRUC FIX FOR 202. REMOVE IN 204
             json.writeMapEntry("enableAccessChecks",((AuraContextImpl)ctx).enableAccessChecks);
+            
+            if (Aura.getConfigAdapter().isLockerServiceEnabled()) {
+                json.writeMapEntry("lockerEnabled", true);
+            }
 
             json.writeMapEnd();
 

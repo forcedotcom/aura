@@ -45,9 +45,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -144,13 +142,13 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         setupTemplate(true);
         D def = buildDefinition();
         
-        // verify that controllerDef was called while building the definition
-        Mockito.verify(this.mockControllerDesc, Mockito.times(1)).getDef();
+        // verify that controllerDef was not called while building the definition
+        Mockito.verify(this.mockControllerDesc, Mockito.times(0)).getDef();
 
         def.validateDefinition();
 
         //verify we didn't touch controllerDef during validateDefinition
-        Mockito.verify(this.mockControllerDesc, Mockito.times(1)).getDef();
+        Mockito.verify(this.mockControllerDesc, Mockito.times(0)).getDef();
         //verify we didn't touch modelDef during build and validateDefinition, that's validateReference's job       
         Mockito.verify(this.modelDefDescriptor, Mockito.times(0)).getDef();
     }

@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 ({
-    afterRender: function(cmp, helper){
+    render: function (cmp, helper) {
+        helper.initializeHandlers(cmp);
+        return this.superRender();
+    },
+
+    afterRender: function (cmp, helper) {
         this.superAfterRender();
         helper.initWidth(cmp);
     }
-}) // eslint-disable-line semi
+
+}); // eslint-disable-line semi

@@ -30,7 +30,6 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.LibraryDefRef;
-import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LibraryDef;
@@ -52,7 +51,6 @@ import com.google.common.collect.Lists;
  */
 @Model
 public class ComponentDefModel {
-    @SuppressWarnings("unchecked")
 	public ComponentDefModel() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
@@ -159,7 +157,7 @@ public class ComponentDefModel {
 
                         // Treat the included js files specially because they load source differently:
                         for (IncludeDefRef includeDef : libraryDef.getIncludes()) {
-                            includeDefs.add(new IncludeDefModel((DefDescriptor<IncludeDef>) includeDef.getDescriptor()));
+                            includeDefs.add(new IncludeDefModel(includeDef.getDescriptor()));
                         }
                     }
                 }

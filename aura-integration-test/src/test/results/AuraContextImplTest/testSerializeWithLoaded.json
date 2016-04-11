@@ -1,10 +1,11 @@
 {
   "mode":"UTEST",
   "app":"test:laxSecurity",
+  "test":"org.auraframework.integration.test.context.AuraContextImplTest.testSerializeWithLoaded",
+  "fwuid":"#FAKEUID#",
   "loaded":{
     "EVENT@markup://auratest:iwasadded":"somegenerateduid"
   },
-  "test":"org.auraframework.integration.test.context.AuraContextImplTest.testSerializeWithLoaded",
-  "fwuid":"#FAKEUID#",
-  "enableAccessChecks":true
+  "enableAccessChecks":true,
+  "lockerEnabled":true
 }

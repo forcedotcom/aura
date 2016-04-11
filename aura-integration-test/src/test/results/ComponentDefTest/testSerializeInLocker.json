@@ -1,7 +1,7 @@
 {
   "s":1,
   "v":{
-    "descriptor":"markup://fake:component",
+    "descriptor":"markup://nonInternal:component",
     "superDef":{
       "s":2,
       "v":{
@@ -29,6 +29,6 @@
         "r":3
       }
     ],
-    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://fake:component\",function() {\n  var def = $A.componentService.getDef(\"markup://fake:component\");  var locker = $A.lockerService.createForDef(\n\"var fake$component = {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"fake$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:component\\\"\\n  }\\n};\\nreturn fake$component;\\n\", def);\n  return locker.$result;\n});\n}"
+    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\n  var def = $A.componentService.getDef(\"markup://nonInternal:component\");  var locker = $A.lockerService.createForDef(\n\"var nonInternal$component = {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"nonInternal$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:component\\\"\\n  }\\n};\\nreturn nonInternal$component;\\n\", def);\n  return locker.$result;\n});\n}"
   }
 }

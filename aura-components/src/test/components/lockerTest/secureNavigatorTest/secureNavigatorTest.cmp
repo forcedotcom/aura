@@ -17,14 +17,9 @@
 -->
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
-    <aura:attribute name="testComplete" type="Boolean" default="false" description="Flag to set to signal async operations are complete and test can complete"/>
 
-    <aura:method name="test$AExposedOnWindow" action="{!c.test$AExposedOnWindow}"/>
-    <aura:method name="testDocumentExposedOnWindow" action="{!c.testDocumentExposedOnWindow}"/>
-    <aura:method name="testCircularReferenceIsSecureWindow" action="{!c.testCircularReferenceIsSecureWindow}"/>
-    <aura:method name="testNoAccessToWindowViaSetTimeout" action="{!c.testNoAccessToWindowViaSetTimeout}"/>
-    <aura:method name="testLocationExposedOnWindow" action="{!c.testLocationExposedOnWindow}"/>
-    <aura:method name="testNavigatorExposedOnWindow" action="{!c.testNavigatorExposedOnWindow}"/>
+    <aura:method name="testPropertiesExposed" action="{!c.testPropertiesExposed}"/>
+    <aura:method name="testLanguage" action="{!c.testLanguage}"/>
 
-    <div>SecureWindow test</div>
+    <div id="title">SecureNavigator test</div>
 </aura:component>

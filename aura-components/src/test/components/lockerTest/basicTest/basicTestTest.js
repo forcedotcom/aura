@@ -106,6 +106,12 @@
             $A.test.assertStartsWith("markup://lockerTest:facet", component.toString());
         }
     },
+    
+    testLocationExposed: {
+        test: function(cmp) {
+            cmp.testLocationExposed();
+        }
+    },
 
     testAttemptToEvalToWindow: {
         browsers: ["-IE11"],

@@ -31,6 +31,7 @@
     <aura:method name="testDefineGetterExploit" action="{!c.testDefineGetterExploit}"/>
     <aura:method name="testSetTimeoutNonFunctionParamExploit" action="{!c.testSetTimeoutNonFunctionParamExploit}"/>
     <aura:method name="testComponentUnfilteredFromUserToSystemMode" action="{!c.testComponentUnfilteredFromUserToSystemMode}"/>
+    <aura:method name="testLocationExposed" action="{!c.testLocationExposed}"/>
 
     <div>LockerService test</div>
     <div aura:id="content"/>

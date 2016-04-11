@@ -99,6 +99,7 @@
     "SecureThing": true,
     "SecureComponentRef": true,
     "SecureComponent": true,
+    "SecureNavigator": true,
     "SecureWindow": true,
     "SecureDocument": true,
     "SecureElement": true,

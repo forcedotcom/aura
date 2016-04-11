@@ -178,6 +178,7 @@ window['$A'] = {};
 //#include aura.locker.SecureScriptElement
 //#include aura.locker.SecureDocument
 //#include aura.locker.SecureAura
+//#include aura.locker.SecureNavigator
 //#include aura.locker.SecureWindow
 //#include aura.locker.SecureAuraEvent
 //#include aura.locker.SecureAction

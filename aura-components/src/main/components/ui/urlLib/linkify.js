@@ -114,6 +114,8 @@ function lib() { //eslint-disable-line no-unused-vars
         linkifyText: function(text) {
             if ($A.util.isEmpty(text)) {
                 return text;
+            } else if (typeof text !== "string") {
+                text = text.toString();
             }
 
             var regex = new RegExp(whitelistedTagsMatchingRegex + "|" + linksMatchingRegex, "gi");
@@ -137,7 +139,10 @@ function lib() { //eslint-disable-line no-unused-vars
         escapeAndLinkifyText: function(text) {
             if ($A.util.isEmpty(text)) {
                 return text;
+            } else if (typeof text !== "string") {
+                text = text.toString();
             }
+
 
             var regex = new RegExp(linksMatchingRegex + "|" + escapeCharacterMatchingRegex, "gi");
             return text.replace(regex, function(match, hrefMatch, fileMatch, emailMatch, escapeMatch) {

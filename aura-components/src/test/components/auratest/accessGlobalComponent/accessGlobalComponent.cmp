@@ -25,9 +25,13 @@
     <aura:method name="publicMethod" action="{!c.publicMethod}" access="PUBLIC"/>
     <aura:method name="privateMethod" action="{!c.privateMethod}" access="PRIVATE"/>
     <aura:method name="privilegedMethod" action="{!c.privilegedMethod}" access="PRIVILEGED"/>
-  
+ 
+ 	<aura:registerEvent name='eventWithGlobalAccessInSameSystemNamespaceRegisteredWithGlobalAccess' 
+ 	type='auratest:accessGlobalEvent' access='GLOBAL'/> 
+ 	<aura:registerEvent name='eventWithDefaultAccessInSameSystemNamespaceRegisteredWithGlobalAccess' 
+ 	type='auratest:accessDefaultEvent' access='GLOBAL'/> 
     
-     <div aura:id="attributeDiv">
+    <div aura:id="attributeDiv">
     	privateAttribute:{!v.privateAttribute}; publicAttribute:{!v.publicAttribute}; globalAttribute:{!v.globalAttribute};
     </div>
     

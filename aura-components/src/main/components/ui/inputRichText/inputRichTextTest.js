@@ -318,8 +318,116 @@
     		var content = component.get("v.value");
     		$A.test.assertNotNull(content,
     			"Content should be present (note: can not verify styling)");
-    	}]    },
+    	}]
+    },
 
+    
+    /**
+     * Verify setting value.
+     * Disabled due to W-2996437
+     */
+    _testValue: {
+        attributes : {isRichText: false, value: "Initial value"},
+        test: [function(component){
+            $A.test.assertEquals("Initial value", component.getElement().value, "Textarea value not correctly initialized.");
+            component.set("v.value", "Changed value");
+        }, function(component){
+            $A.test.assertEquals("Changed value", component.getElement().value, "Textarea value not correctly changed.");
+        }]
+    },
+    
+    /**
+     * Verify setting disabled attribute to true, then switching to false.
+     */
+    testDisabled: {
+        attributes : {isRichText: false, disabled: true},
+        test: [function(component){
+            $A.test.assertTrue(component.getElement().disabled, "Textarea not correctly disabled");
+            component.set("v.disabled", false);
+        }, function(component){
+            $A.test.assertFalse(component.getElement().disabled, "Textarea disabled attribute not correct after switching.");
+        }]
+    },
+    
+    /**
+     * Verify not setting disabled attribute to false, then switching to true.
+     */
+    testNotDisabled: {
+        attributes : {isRichText: false, disabled: false},
+        test: [function(component){
+            $A.test.assertFalse(component.getElement().disabled, "Textarea not correctly enabled");
+            component.set("v.disabled", true);
+        }, function(component){
+            $A.test.assertTrue(component.getElement().disabled, "Textarea disabled attribute not correct after switching.");
+        }]
+    },
+    
+    /**
+     * Verify setting readonly attribute to true, then switching to false.
+     */
+    testReadonly: {
+        attributes : {isRichText: false, readonly: 'true'},
+        test: [function(component){
+            $A.test.assertTrue(component.getElement().readOnly, "Textarea readonly attribute not correct");
+            component.set("v.readonly", false);
+        }, function(component){
+            $A.test.assertFalse(component.getElement().readOnly, "Textarea readonly attribute not correct after switching.");
+        }]
+    },
+    
+    /**
+     * Verify setting readonly attribute to false, then switching to true.
+     */
+    testNotReadonly: {
+        attributes : {isRichText: false, readonly: 'false'},
+        test: [function(component){
+            $A.test.assertFalse(component.getElement().readOnly, "Textarea readonly attribute not correct");
+            component.set("v.readonly", true);
+        }, function(component){
+            $A.test.assertTrue(component.getElement().readOnly, "Textarea readonly attribute not correct after switching.");
+        }]
+    },
+    
+    /**
+     * Verify setting rows attribute.
+     */
+    testRows: {
+        attributes : {isRichText: false, rows: "15"},
+        test: function(component){
+            $A.test.assertEquals(15, component.getElement().rows, "Textarea rows attribute not correct");
+        }
+    },
+    
+    /**
+     * Verify setting columns attribute.
+     */
+    testCols: {
+        attributes : {isRichText: false, cols: "15"},
+        test: function(component){
+            $A.test.assertEquals(15, component.getElement().cols, "Textarea cols attribute not correct");
+        }
+    },
+    
+    /**
+     * Verify setting resizable attribute to true, then switching to false.
+     * Do not run in IE7 because hasAttribute() support is IE8+
+     */
+    testResizable: {
+    	browsers : ["-IE7"],
+        attributes : {isRichText: false, resizable: true},
+        doNotWrapInAuraRun : true,
+        test: function(component){
+        	var textarea = document.createElement('textarea');
+        	if (textarea.hasAttribute("resizable")) {
+        		// resizable is supported
+            	$A.test.assertEquals('both', $A.util.style.getCSSProperty(component.getElement(),'resize'), "Textarea not correctly resizable");
+                component.set("v.resizable", false);
+                $A.rerender(component);
+                $A.test.assertEquals('none', $A.util.style.getCSSProperty(component.getElement(),'resize'), "Textarea resizable attribute not correct after switching.");
+        	}
+        }
+    },
+    	
     assertRichTextInitalized : function() {
     	$A.test.addWaitFor(true, function(){
     		return !$A.util.isUndefinedOrNull(

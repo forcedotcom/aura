@@ -391,39 +391,42 @@
 							data = data.replace( /<body[^>]*>/, '$&<!-- cke-content-start -->'  );
 					}
 
+					// -> HACK-1 from @cpatino: we can't have the bootstrapCode as inline script inside the content
+					//    iframe, instead we need to wait for the iframe to be ready differently.
+					// ---------------------------------------------------------------------------
 					// The script that launches the bootstrap logic on 'domReady', so the document
 					// is fully editable even before the editing iframe is fully loaded (#4455).
-					var bootstrapCode =
-						'<script id="cke_actscrpt" type="text/javascript"' + ( CKEDITOR.env.ie ? ' defer="defer" ' : '' ) + '>' +
-							'var wasLoaded=0;' +	// It must be always set to 0 as it remains as a window property.
-							'function onload(){' +
-								'if(!wasLoaded)' +	// FF3.6 calls onload twice when editor.setData. Stop that.
-									'window.parent.CKEDITOR.tools.callFunction(' + this._.frameLoadedHandler + ',window);' +
-								'wasLoaded=1;' +
-							'}' +
-							( CKEDITOR.env.ie ? 'onload();' : 'document.addEventListener("DOMContentLoaded", onload, false );' ) +
-						'</script>';
-
-					// For IE<9 add support for HTML5's elements.
-					// Note: this code must not be deferred.
-					if ( CKEDITOR.env.ie && CKEDITOR.env.version < 9 ) {
-						bootstrapCode +=
-							'<script id="cke_shimscrpt">' +
-								'window.parent.CKEDITOR.tools.enableHtml5Elements(document)' +
-							'</script>';
-					}
-
-					// IE<10 needs this hack to properly enable <base href="...">.
-					// See: http://stackoverflow.com/a/13373180/1485219 (#11910).
-					if ( baseTag && CKEDITOR.env.ie && CKEDITOR.env.version < 10 ) {
-						bootstrapCode +=
-							'<script id="cke_basetagscrpt">' +
-								'var baseTag = document.querySelector( "base" );' +
-								'baseTag.href = baseTag.href;' +
-							'</script>';
-					}
-
-					data = data.replace( /(?=\s*<\/(:?head)>)/, bootstrapCode );
+					// var bootstrapCode =
+					// 	'<script id="cke_actscrpt" type="text/javascript"' + ( CKEDITOR.env.ie ? ' defer="defer" ' : '' ) + '>' +
+					// 		'var wasLoaded=0;' +	// It must be always set to 0 as it remains as a window property.
+					// 		'function onload(){' +
+					// 			'if(!wasLoaded)' +	// FF3.6 calls onload twice when editor.setData. Stop that.
+					// 				'window.parent.CKEDITOR.tools.callFunction(' + this._.frameLoadedHandler + ',window);' +
+					// 			'wasLoaded=1;' +
+					// 		'}' +
+					// 		( CKEDITOR.env.ie ? 'onload();' : 'document.addEventListener("DOMContentLoaded", onload, false );' ) +
+					// 	'</script>';
+					//
+					// // For IE<9 add support for HTML5's elements.
+					// // Note: this code must not be deferred.
+					// if ( CKEDITOR.env.ie && CKEDITOR.env.version < 9 ) {
+					// 	bootstrapCode +=
+					// 		'<script id="cke_shimscrpt">' +
+					// 			'window.parent.CKEDITOR.tools.enableHtml5Elements(document)' +
+					// 		'</script>';
+					// }
+					//
+					// // IE<10 needs this hack to properly enable <base href="...">.
+					// // See: http://stackoverflow.com/a/13373180/1485219 (#11910).
+					// if ( baseTag && CKEDITOR.env.ie && CKEDITOR.env.version < 10 ) {
+					// 	bootstrapCode +=
+					// 		'<script id="cke_basetagscrpt">' +
+					// 			'var baseTag = document.querySelector( "base" );' +
+					// 			'baseTag.href = baseTag.href;' +
+					// 		'</script>';
+					// }
+					//
+					// data = data.replace( /(?=\s*<\/(:?head)>)/, bootstrapCode );
 
 					// Current DOM will be deconstructed by document.write, cleanup required.
 					this.clearCustomData();
@@ -442,6 +445,16 @@
 							doc.write( data );
 						}, 0 );
 					}
+
+					// -> HACK-2 from @cpatino: since document.write is sync, we should be fine to execute whatever
+					//    bootstrap process we need to right after executing the write command, or in the next turn
+					//    in case the previous block fails.
+					// ---------------------------------------------------------------------------
+					var win = this.getWindow().$;
+					var handler = this._.frameLoadedHandler;
+					setTimout(function () {
+						CKEDITOR.tools.callFunction( handler, win );
+					}, 1 );
 				}
 			},
 

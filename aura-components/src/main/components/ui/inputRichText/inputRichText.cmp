@@ -24,30 +24,31 @@
     <aura:attribute access="GLOBAL" name="maxlength" type="Integer" description="The maximum number of characters that can be typed into the input field. Corresponds to the maxlength attribute of the rendered HTML textarea element."/>
     <aura:attribute name="toolbar" type="String" default="basic" description="Specify the toolbar config to be used. Possible values: standard, full, email and custom. Default value is &quot;basic&quot;. Custom config can be added in inputRichTextHelper"/>
     <aura:attribute name="customToolbarConfig" type="Object" description="A custom configuration for the toolbar"/>
-    <aura:attribute name="toolbarLocation" type="String" default="top" description="Location of the toolbar. Possible options are &quot;top&quot; and &quot;bottom&quot;." /> 
-     
+    <aura:attribute name="toolbarLocation" type="String" default="top" description="Location of the toolbar. Possible options are &quot;top&quot; and &quot;bottom&quot;." />
+
     <aura:attribute access="GLOBAL" name="width" type="String"  description="The editor UI outer width. This can be an integer, for pixel sizes, or any CSS-defined unit. If isRichText is set to false, use the cols attribute instead." />
     <aura:attribute access="GLOBAL" name="height" type="String" default="200" description="The height of the editing area (that includes the editor content). This can be an integer, for pixel sizes, or any CSS-defined length unit." />
-    
-    <aura:attribute name="isRichText" type="Boolean" default="true" description="Indicates if the input is in rich text or plain text. If set to false, a text area replaces the rich text editor." />  
-    
+
+    <aura:attribute name="isRichText" type="Boolean" default="true" description="Indicates if the input is in rich text or plain text. If set to false, a text area replaces the rich text editor." />
+
     <aura:handler event="ui:toggleRichText" action="{!c.toggle}" description="Handler for ui:toggleRichText event" />
-     
+
     <aura:registerevent name="editorInstanceReady" type="ui:load" description="Fired when the rich text instance is ready"/>
 
     <aura:clientLibrary name="CkEditor" type="JS" />
 
     <aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
 
-    <!-- fixme - move to iframe -->
-    <textarea aura:id="textAreaElem"
-              id="{!v.domId}"
-              class="{!v.class + ' textarea' + (v.resizable?'':' noresize')}"
-              cols="{!v.cols}"
-              rows="{!v.rows}"
-              disabled="{!v.disabled}"
-              readonly="{!v.readonly}"
-              maxlength="{!v.maxlength}"
-              placeholder="{!v.placeholder}"
-              aria-describedby="{!v.ariaDescribedBy}"/>
+    <div aura:id="container">
+        <textarea aura:id="textAreaElem"
+                  id="{!v.domId}"
+                  class="{!v.class + ' textarea' + (v.resizable?'':' noresize')}"
+                  cols="{!v.cols}"
+                  rows="{!v.rows}"
+                  disabled="{!v.disabled}"
+                  readonly="{!v.readonly}"
+                  maxlength="{!v.maxlength}"
+                  placeholder="{!v.placeholder}"
+                  aria-describedby="{!v.ariaDescribedBy}"/>
+    </div>
 </aura:component>

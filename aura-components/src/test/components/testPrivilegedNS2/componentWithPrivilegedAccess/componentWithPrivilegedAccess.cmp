@@ -31,7 +31,7 @@
   	type='testPrivilegedNS1:componentEventWithPrivilegedAccess'/>
   	<aura:registerEvent name='NS1eventWithPrivilegedAccessRegisteredWithPrivateAccess' 
   	type='testPrivilegedNS1:componentEventWithPrivilegedAccess' access='Private'/>
-  	<!-- cannot register event in a different privileged namespace with default or public access
+  	<!-- we cannot register event in a different privileged namespace with default or public access
   	<aura:registerEvent name='NS1eventWithDefaultAccessRegisteredWithDefaultAccess' 
   	type='testPrivilegedNS1:componentEventWithDefaultAccess'/>
   	<aura:registerEvent name='NS1eventWithPublicAccessRegisteredWithDefaultAccess' 
@@ -43,11 +43,7 @@
   	type='testPrivilegedNS2:componentEventWithDefaultAccess'/>
   	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithGlobalAccess' 
   	type='testPrivilegedNS2:componentEventWithDefaultAccess' access='Global'/>
-    <aura:registerEvent name='NS2eventWithPrivateAccessRegisteredWithPrivateAccess'
-                        type='testPrivilegedNS2:componentEventWithPrivateAccess' access="PRIVATE"/>
-  	<aura:registerEvent name='NS2eventWithPrivateAccessRegisteredWithDefaultAccess' 
-  	type='testPrivilegedNS2:componentEventWithPrivateAccess'/>
-  	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithDefaultAccess' 
+	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithDefaultAccess' 
   	type='testPrivilegedNS2:componentEventWithPublicAccess'/>
   	<aura:registerEvent name='NS2eventWithPrivilegedAccessRegisteredWithDefaultAccess' 
   	type='testPrivilegedNS2:componentEventWithPrivilegedAccess'/>

@@ -286,6 +286,7 @@ AuraEventService.prototype.getDef = function(descriptor) {
         //   }
         //    return null;
         //} else {
+            $A.reportError(message);
             if(context.logAccessFailures){
                 $A.warning(message);
             }
@@ -316,6 +317,7 @@ AuraEventService.prototype.hasDefinition = function(descriptor) {
         //   }
         //   return false;
         //}else{
+            $A.reportError(message);
             if(context.logAccessFailures){
                 $A.warning(message);
             }

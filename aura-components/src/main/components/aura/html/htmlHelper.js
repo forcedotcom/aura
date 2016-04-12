@@ -265,17 +265,17 @@
     },
 
     processJavascriptHref: function (element) {
-    	function inlineJavasciptCSPViolationPreventer(event) {
-  			// Check for javascript: inline javascript
+		function inlineJavasciptCSPViolationPreventer() {
+			// Check for javascript: inline javascript
 
-  			/*eslint-disable no-script-url*/
-  			var hrefTarget = event.target.href;
-  			if (hrefTarget && hrefTarget.toLowerCase().indexOf("javascript:") === 0) {
-  				event.preventDefault();
-  			}
-  		}
-
-      if (element.tagName === "A") {
+			/*eslint-disable no-script-url*/
+			var hrefTarget = this.href;
+			if (hrefTarget && hrefTarget.toLowerCase().indexOf("javascript:") === 0) {
+				event.preventDefault();
+			}
+		}
+  		
+		if (element.tagName === "A") {
   			var href = element.getAttribute("href");
 
   			if (!href) {

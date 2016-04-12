@@ -203,7 +203,7 @@ AuraEventService.prototype.get = function(name, callback) {
         }
         return this.getDefinition(name, callback);
     }
-    return this.newEvent(name);
+    return newEvent;
 };
 
 /**

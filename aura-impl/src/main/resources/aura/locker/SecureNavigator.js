@@ -39,7 +39,7 @@ function SecureNavigator(navigator, key) {
 		}
 	});
 
-	["appCodeName", "appName", "appVersion", "connection", "cookieEnabled", "geolocation", 
+	["appCodeName", "appName", "appVersion", "cookieEnabled", "geolocation", 
 	 "language", "onLine", "platform", "product", "userAgent"].forEach(function (name) {
 		Object.defineProperty(o, name, SecureThing.createFilteredProperty(o, navigator, name));
 	});

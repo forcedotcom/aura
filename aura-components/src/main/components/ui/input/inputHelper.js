@@ -272,15 +272,17 @@
         var errorCmp = cmp.get('v.errorComponent')[0];
 
         errorCmp.set("v.errors", errors);
-        this.updateAriaDescribedBy(cmp, errorCmp.getGlobalId());
+        var concreteHelper = cmp.getConcreteComponent().getDef().getHelper();
+        concreteHelper.updateAriaDescribedBy(cmp, errorCmp.getGlobalId());
     },
     _createDefaultErrorComponent : function (cmp, errors) {
         $A.componentService.newComponentAsync(
             this,
             function (errorCmp) {
                 cmp.set("v.errorComponent", errorCmp);
-                this.updateAriaDescribedBy(cmp, errorCmp.getGlobalId());
-            }.bind(this),
+                var concreteCmpHelper = cmp.getConcreteComponent().getDef().getHelper();
+                concreteCmpHelper.updateAriaDescribedBy(cmp, errorCmp.getGlobalId());
+            },
             {
                 "componentDef": "markup://ui:inputDefaultError",
                 "attributes": {

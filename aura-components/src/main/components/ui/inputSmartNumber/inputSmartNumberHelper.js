@@ -176,6 +176,10 @@
     removeSymbols : function (string) {
         var decimalSeparator  = $A.get("$Locale.decimal");
         var groupingSeparator = $A.get("$Locale.grouping");
+
+        // case where parenthesis means negative
+        string = string.replace(/(^\()(.+)(\)$)/,'-$2');
+
         var reg = '[^\\' + groupingSeparator + '\\' + decimalSeparator +'\\d\+\-]';
             reg = new RegExp(reg,'g');
         return string.replace(reg,'');

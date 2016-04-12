@@ -600,7 +600,11 @@
 				refElementLoc = cmp.find(referenceElemId).getElement().getBoundingClientRect().right;
 			    autoCompleteListLoc = autocomplete.getSuper().find("list").getElement().getBoundingClientRect().right;
 			}
-			return refElementLoc===autoCompleteListLoc;
+
+            // these values must be rounded because panel position is integer only
+            // but browsers support fractions of pixels
+            
+			return Math.ceil(refElementLoc)===Math.ceil(autoCompleteListLoc);
 		}, "List should be position below "+referenceElemId);
     }
 })

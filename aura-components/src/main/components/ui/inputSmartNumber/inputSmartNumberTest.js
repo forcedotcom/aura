@@ -131,6 +131,25 @@
             $A.test.assertEquals('number', typeof value, 'The type of value should be and Number');
         }]
     },
+    testNegativeFormatWithparenthesis : {
+        attributes : {
+            format : '$#,##0;($#,##0)',
+            value  : -1234
+        },
+        test : [
+            function (cmp) {
+                this.assertCmpElemValues(cmp, -1234, "($1,234)");
+                cmp.set('v.value',1234);
+            },
+            function (cmp) {
+                this.assertCmpElemValues(cmp, 1234, "$1,234");
+                cmp.set('v.value',-1234);
+            },
+            function (cmp) {
+                this.assertCmpElemValues(cmp, -1234, "($1,234)");
+            }
+        ]
+    },
 
     /*****************
      * Helpers

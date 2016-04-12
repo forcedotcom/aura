@@ -2,8 +2,8 @@
     testPropertiesExposed: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         
-        ["appCodeName", "appName", "appVersion", "connection", "cookieEnabled", "geolocation", 
-	 "language", "onLine", "platform", "product", "userAgent"].forEach(function(name) {
+        ["appCodeName", "appName", "appVersion", "cookieEnabled", "geolocation", 
+         "language", "onLine", "platform", "product", "userAgent"].forEach(function(name) {
         	testUtils.assertTrue(name in window.navigator, "Expected window.navigator." + name + " to be exposed as a property");
     	});
     },

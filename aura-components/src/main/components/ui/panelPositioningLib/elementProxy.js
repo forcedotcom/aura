@@ -152,13 +152,16 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 //force paint
                 this._node.offsetHeight;
                 box = this._node.getBoundingClientRect();
+
+                // not using intergers causes weird rounding errors
                 for(x in box) {
-                    this[x] = box[x];
+                    this[x] = Math.floor(box[x]);
                 }
-                this.top = this.top + scrollTop;
-                this.bottom = this.top + box.height;
-                this.left = this.left + scrollLeft;
-                this.right = this.left + box.width;
+                this.top = Math.floor(this.top + scrollTop);
+                this.bottom = Math.floor(this.top + box.height);
+                this.left = Math.floor(this.left + scrollLeft);
+                this.right = Math.floor(this.left + box.width);
+
             } else {
                 box = {};
                 this.width = w.document.documentElement.clientWidth;

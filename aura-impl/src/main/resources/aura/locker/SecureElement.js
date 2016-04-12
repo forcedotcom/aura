@@ -86,7 +86,9 @@ function SecureElement(el, key) {
 
 		innerHTML : SecureThing.createFilteredProperty(o, el, "innerHTML", { returnValue: undefined, afterSetCallback: function() {
 			// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
-			$A.lockerService.trust(o, el.firstChild);
+			if (el.firstChild) {
+				$A.lockerService.trust(o, el.firstChild);
+			}
 		} }),
 
         cloneNode: SecureThing.createFilteredMethod(o, el, "cloneNode", { afterCallback: function(fnReturnedValue) {

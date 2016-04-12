@@ -15,8 +15,6 @@
  */
 package org.auraframework.integration.test.root.parser.handler;
 
-import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -31,9 +29,6 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
 
     public ApplicationAccessAttributeEnforcementTest(String name) throws Exception {
         super(name);
-        
-        ConfigAdapter adapter = Aura.getConfigAdapter();
-        adapter.addPrivilegedNamespace("privilegedNS");
     }
     
     /**

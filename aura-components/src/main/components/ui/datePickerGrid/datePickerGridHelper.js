@@ -127,6 +127,7 @@
         // the 1st of the given month
         var firstDayOfWeek = $A.get("$Locale.firstDayOfWeek") - 1; // In Java, week day is 1 - 7
         var startDay = d.getDay();
+        var firstFocusableDate;
         while (startDay !== firstDayOfWeek) {
             d.setDate(d.getDate() - 1);
             startDay = d.getDay();
@@ -154,6 +155,10 @@
                     className += " nextMonth";
                 }
 
+                if (d.getMonth() === month && d.getDate() === 1) {
+                    firstFocusableDate = cellCmp;
+                }
+
                 if (this.dateEquals(d, today)) {
                     className += " todayDate";
                     tdClassName += " is-today";
@@ -161,10 +166,10 @@
                 if (this.dateEquals(d, selectedDate)) {
                     tdClassName += " is-selected";
                     className += " selectedDate";
-                    cellCmp.set("v.tabIndex", 0);
-                } else {
-                    cellCmp.set("v.tabIndex", -1);
+                    firstFocusableDate = cellCmp;
                 }
+
+                cellCmp.set("v.tabIndex", -1);
                 if (this.dateInRange(d, rangeStart, rangeEnd)) {
                     className += " " + rangeClass;
                     if (tdClassName.indexOf("is-selected") < 0) {
@@ -205,6 +210,9 @@
                 }
             }
             d.setDate(d.getDate() + 1);
+        }
+        if (firstFocusableDate) {
+            firstFocusableDate.set("v.tabIndex", 0);
         }
         component.set("v._setFocus", true);
     },

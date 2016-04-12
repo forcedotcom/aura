@@ -34,6 +34,8 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private final String PARAM_PANEL_TYPE = "&testPanelType=";
     private final String PARAM_DIRECTION = "&testDirection=";
     private final String PARAM_USE_FOOTER = "&testUseFooter=";
+    private final String PARAM_TRAP_FOCUS = "&testTrapFocus=";
+    private final String PARAM_CLOSE_ON_LOCATION_CHANGE = "&testCloseOnLocationChange";
     private final String FLAVOR = "&testFlavor=";
     private final String CREATE_PANEL_BUTTON = ".createPanelBtnClass";
     private final String PANEL_DIALOG = ".uiPanel";
@@ -44,6 +46,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private final String ENABLE_CUSTOM_CLOSEACTION = ".inputCustomizeCloseAction";
     private final String INPUT_PANELTYPE = ".inputPanelTypeClass";
     private final String INPUT_AUTOFOCUS = ".inputAutoFocusClass";
+    private final String INPUT_CLOSE_ON_LOCATION_CHANGE = ".inputCloseOnLocationChange";
 
     private final String ACTIVE_ELEMENT = "return $A.test.getActiveElement()";
     private final String APP_INPUT = ".appInput";
@@ -447,6 +450,45 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
         // check focus on footer's button
         waitTillFocusOnParticularElement("defaultCustomPanelFooterBtn", "Active element is not button in footer");
     }
+    
+    /**
+     * Test panel when trapFocus is false
+     */
+    public void testPanelTabingWithTrapFocusFalse() throws Exception {
+    	String url = APP + "?" + PARAM_TRAP_FOCUS + "false";
+
+        open(url);
+        cycleThroughPanelInputElements(url, "modal", false);
+
+        // check focus outside of panel
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                WebElement activeElement = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
+                String tag = activeElement.getTagName();
+                return "body".equals(tag);
+            }
+        }, "Focus should be on element outside of panel.");
+    }
+    
+    /**
+     * Test back button on browser closes panel.
+     */
+    public void testBrowserBackButton() throws Exception {
+    	String url = APP + "?" + PARAM_CLOSE_ON_LOCATION_CHANGE + "true";
+    	open(url);
+    	
+    	openPanel();
+        waitForModalOpen();
+        
+        WebElement closeOnLocationChangeCheckbox = findDomElements(By.cssSelector(INPUT_CLOSE_ON_LOCATION_CHANGE)).get(1);
+        closeOnLocationChangeCheckbox.click();
+        openPanel(2);
+        waitForNumberOfPanels(PANEL_MODAL, 2);
+        
+        getDriver().navigate().back();
+        waitForModalClose();
+    }
 
     private void cycleThroughPanelInputElements(String url, String panelType, boolean doesPanelClose) throws Exception {
         openPanel();
@@ -459,7 +501,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
         firstInput.get(1).click();
         WebElement activeElement = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
         // assertEquals("Focus should be on first element", panelType, auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
-        int numElements = 24;
+        int numElements = 26;
         // cycle through input elements on panel
         for (int i = 1; i < numElements; i++) {
             WebElement prevActiveElement = activeElement;

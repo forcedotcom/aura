@@ -685,6 +685,21 @@
     	}]
     },
     
+    testPanelDoesNotTrapFocus: {
+    	attributes : {"testTrapFocus" : false},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForModalOpen();
+    	}, function(cmp) {
+    		var panel = cmp._panel;
+    		if (panel == null) {
+    			panel = this.getPanelFromDomElement(cmp, "modal");
+    		}
+    		$A.test.assertFalse(panel.get("v.trapFocus"), "trapFocus was not false");
+    	}]
+    },
+    
     /**************************************************PANEL POSITION TEST**************************************************/
     
     /**

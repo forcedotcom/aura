@@ -108,7 +108,7 @@ function lib() { // eslint-disable-line no-unused-vars
             // it not case sensitive
             var regString = '^' + const1 + '((\\s*(\\+|\\-)?\\s*)' + const1 + ')?' +
                             '(\\d+(\\' + groupingSeparator + '\\d*)*)*' +
-                            '(\\' + decimalSeparator + '\\d{0,' + maxFractionDigits + '})?' +
+                            '(\\' + decimalSeparator + '\\d*)?' +
                             '(K|B|M|T)?$';
 
 

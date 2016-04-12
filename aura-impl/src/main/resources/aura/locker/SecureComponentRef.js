@@ -26,13 +26,13 @@ function SecureComponentRef(component, key) {
         }
     });
     Object.defineProperties(o, {
-        "isValid": SecureThing.createFilteredMethod(o, component, "isValid"),
-        "isInstanceOf": SecureThing.createFilteredMethod(o, component, "isInstanceOf"),
-        "isRendered": SecureThing.createFilteredMethod(o, component, "isRendered"),
-        "getGlobalId": SecureThing.createFilteredMethod(o, component, "getGlobalId"),
-        "getLocalId": SecureThing.createFilteredMethod(o, component, "getLocalId"),
-        "addValueProvider": SecureThing.createFilteredMethod(o, component, "addValueProvider"),
-        "set": SecureThing.createFilteredMethod(o, component, "set"),
+        "isValid": SecureObject.createFilteredMethod(o, component, "isValid"),
+        "isInstanceOf": SecureObject.createFilteredMethod(o, component, "isInstanceOf"),
+        "isRendered": SecureObject.createFilteredMethod(o, component, "isRendered"),
+        "getGlobalId": SecureObject.createFilteredMethod(o, component, "getGlobalId"),
+        "getLocalId": SecureObject.createFilteredMethod(o, component, "getLocalId"),
+        "addValueProvider": SecureObject.createFilteredMethod(o, component, "addValueProvider"),
+        "set": SecureObject.createFilteredMethod(o, component, "set"),
         "get": {
             enumerable: true,
             value: function(name) {
@@ -40,7 +40,7 @@ function SecureComponentRef(component, key) {
                 if (typeof name !== "string" || name.length < 3 || name.indexOf("v.") !== 0) {
                     throw new SyntaxError('Invalid key '+ name);
                 }
-                return SecureThing.filterEverything(o, component["get"](name));
+                return SecureObject.filterEverything(o, component["get"](name));
             }
         }
     });

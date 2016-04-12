@@ -163,7 +163,7 @@ function LockerService() {
 			return env;
 		},
 
-		getEnvForSecureThing : function(st, doNotCreate) {
+		getEnvForSecureObject : function(st, doNotCreate) {
 			var key = getLockerSecret(st, "key");
 			return key && key !== masterKey ? this.getEnv(key, doNotCreate) : undefined;
 		},
@@ -321,7 +321,11 @@ function LockerService() {
 	})();
 
 	service["createForDef"] = service.createForDef;
-	service["getEnvForSecureThing"] = service.getEnvForSecureThing;
+	service["getEnvForSecureObject"] = service.getEnvForSecureObject;
+	
+	// DCHASMAN TODO Remove this once we get 202 synced up to using SecureObject name instead of SecureThing
+	service["getEnvForSecureThing"] = service.getEnvForSecureObject;
+	
 	service["trust"] = service.trust;
 	service["showLockedNodes"] = service.showLockedNodes;
 

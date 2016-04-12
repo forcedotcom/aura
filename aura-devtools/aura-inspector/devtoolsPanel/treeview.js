@@ -84,11 +84,12 @@ function TreeNode(text, id) {
                     //pattern.push(' <span class="component-attribute">globalId</span>="{globalId}"');
                     var globalid = document.createElement("span");
                     globalid.className = "component-attribute";
-                    globalid.appendChild(document.createTextNode("globalId"));
+                    globalid.appendChild(document.createTextNode(" globalId"));
 
                     fragment.appendChild(globalid);
-                    fragment.appendChild(document.createTextNode("="));
+                    fragment.appendChild(document.createTextNode('="'));
                     fragment.appendChild(document.createTextNode(value.globalId));
+                    fragment.appendChild(document.createTextNode('"'));
                 }
             });
 

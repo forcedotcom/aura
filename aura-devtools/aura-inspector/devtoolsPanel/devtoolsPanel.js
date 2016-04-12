@@ -27,6 +27,7 @@
      * AuraInspector:ShowComponentInTree            Indicates you want to show the specified globalID in the component tree.
      * AuraInspector:OnClientActionStart
      * AuraInspector:OnClientActionEnd
+     * AuraInspector:OnDescriptorSelect             A descriptor was clicked on, we may want to take some action here such as showing a panel that has more information. 
      */
 
     var panel = new AuraInspectorDevtoolsPanel();
@@ -67,6 +68,7 @@
         var ACTION_CONTROL_CHAR = "\u2744"; // ❄ - This is an action
         var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
         var tabId;
+        var currentPanel;
 
 
         this.connect = function(){
@@ -187,6 +189,15 @@
             var sections = document.querySelectorAll("section.tab-body:not(.sidebar)");
             var panelKey = key.indexOf("tabs-")==0?key.substring(5):key;
             var buttonKey = "tabs-"+panelKey;
+            var current = panels.get(panelKey);
+
+            // When you try to show the panel that already is shown, we don't want to refire render. 
+            // That does setup stuff and that shouldn't happen while you are using a panel.
+            if(current === currentPanel) {
+                return;
+            } else {
+                currentPanel = current;
+            }
 
             for(var c=0;c<buttons.length;c++){
                 if(buttons[c].id===buttonKey) {
@@ -200,12 +211,11 @@
             }
 
             // Render the output. Panel is responsible for not redrawing if necessary.
-            var current = panels.get(panelKey);
             if(current) {
                 current.render(options);
+                AuraInspectorOptions.set("activePanel", panelKey);
             }
 
-            AuraInspectorOptions.set("activePanel", panelKey);
         };
 
         /**
@@ -432,6 +442,17 @@
             return ResolveJSONReferences(JSON.parse(jsonString));
         };
 
+        this.openTab = function(url) {
+            if(url.startsWith("/")) {
+                // Resolve to be absolute first.
+                chrome.devtools.inspectedWindow.eval("window.location.origin", function(origin) {
+                    runtime.postMessage({ "open": origin + url });
+                });
+            } else {
+                runtime.postMessage({ "open": url });
+            }
+        };
+
         /*
          =========== END REFACTOR! ===============
          */
@@ -546,14 +567,7 @@
                 event.stopPropagation();
                 event.preventDefault();
                 var url = event.target.getAttribute("href");
-                if(url.startsWith("/")) {
-                    // Resolve to be absolute first.
-                    chrome.devtools.inspectedWindow.eval("window.location.origin", function(origin) {
-                        runtime.postMessage({ "open": origin + url });
-                    });
-                } else {
-                    runtime.postMessage({ "open": url });
-                }
+                this.openTab(url);
             }
         }
 

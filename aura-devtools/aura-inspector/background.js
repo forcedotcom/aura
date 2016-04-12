@@ -10,17 +10,21 @@
         var ports = new Map();
         // Messages we are queuing up till the dev tools panel is launched.
         var stored = new Map();
+        // External Plugins connecting to the Aura Inspector
+        var external = new Map();
 
         var MAX_QUEUE_LENGTH = 100000;
         
         // List of inspectors we want to pair with.
-        var EXTERNAL_INSPECTOR_EXTENSION_IDS = [
-            "eihmlihnchelfaplbpcpgelolkommnib" // Sfdc Inspector
-        ];
+        var EXTERNAL_INSPECTOR_EXTENSION_IDS = {
+            "hmoenmfdbkbjcpiibpfakppdpahlfnpo": true // Sfdc Inspector
+        };
 
         this.init = function() {
             chrome.runtime.onConnect.addListener(BackgroundPage_OnConnect.bind(this));
             // onSuspend?
+
+            chrome.runtime.onConnectExternal.addListener(BackgroundPage_OnConnectExternal.bind(this));
 
             chrome.runtime.onMessageExternal.addListener(BackgroundPage_OnMessageExternal.bind(this));
 
@@ -141,6 +145,15 @@
             passMessageToDevTools(message, tabId);
         }
 
+        function BackgroundPage_OnConnectExternal(port){
+            var id = port.sender.id;
+            // Possibly a bit paranoid since they shouldn't be able to connect if we don't have their ID in the manifest
+            // But lets just be extra sure who we are communicating with.
+            if(EXTERNAL_INSPECTOR_EXTENSION_IDS[id]) {
+                external.set(id, port);
+            }
+        }
+
         function passMessageToDevTools(message, tabId) {
             var tabInfo = getTabInfo(tabId);
 
@@ -163,11 +176,11 @@
                 tabInfo.port.postMessage(message);
             }
 
-            // Uncomment to enable pushing publish messages to external extensions (Sfdc Inspector)
-            // message.tabId = tabId;
-            // for(var c=0;c<EXTERNAL_INSPECTOR_EXTENSION_IDS.length;c++) {
-            //     chrome.runtime.sendMessage(EXTERNAL_INSPECTOR_EXTENSION_IDS[c], message);
-            // }
+            // Send messages to other Inspector plugins connected to the Aura Inspector
+            message.tabId = tabId;
+            external.forEach(function(externalPort, key) {
+                chrome.runtime.sendMessage(key, message);
+            });
         }
 
         function getTabInfo(tabId) {

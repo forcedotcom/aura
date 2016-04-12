@@ -39,9 +39,11 @@
 	<aura:attribute name="panelHeader"  type="Aura.Component[]"/>
 	<aura:attribute name="panelFooter"  type="Aura.Component[]"/>
 	<aura:attribute name="makeScrollable"     type="Boolean" default="false"/>
-	<aura:attribute name="nonScrollable"     type="Boolean" default="false"/>
+	<aura:attribute name="nonScrollable"      type="Boolean" default="false"/>
 	<aura:attribute name="customizeCloseAction"     type="Boolean" default="false"/>
-	<aura:attribute name="closeActionCalled"    type="String"  default=""/>
+	<aura:attribute name="closeActionCalled"  type="String"  default=""/>
+	<aura:attribute name="trapFocus"    type="Boolean"  default="true"/>
+	<aura:attribute name="closeOnLocationChange"    type="Boolean" default="false"/>
 
 	<aura:dependency resource="markup://ui:createPanel" type="EVENT"/> 
 	
@@ -75,13 +77,15 @@
 			<ui:inputText     aura:id="inputDirection"          label="Direction"        value="{!v.direction}"      class="inputDirectionClass"/>
 			<ui:inputCheckbox aura:id="inputShowPointer"        label="Show Pointer"     value="{!v.showPointer}"    class="inputShowPointerClass"/>
 			<ui:inputCheckbox aura:id="inputUseReferenceElementSelector" label="Use Reference Element Selector" value="{!v.useReferenceElementSelector}" class="inputUseReferenceElementSelector"/>
-			<ui:inputCheckbox aura:id="inputUseReferenceElement"      label="Use Reference Element"          value="{!v.useReferenceElement}"         class="inputUseReferenceElement"/>
-			<ui:inputText     aura:id="inputReferenceElementSelector" label="Reference Element Selector"     value="{!v.referenceElementSelector}"    class="inputReferenceElementSelector"/>
+			<ui:inputCheckbox aura:id="inputUseReferenceElement"      label="Use Reference Element"             value="{!v.useReferenceElement}"         class="inputUseReferenceElement"/>
+			<ui:inputText     aura:id="inputReferenceElementSelector" label="Reference Element Selector"        value="{!v.referenceElementSelector}"    class="inputReferenceElementSelector"/>
 			<ui:inputCheckbox aura:id="inputUseHeader"          label="Use Header"       value="{!v.useHeader}"      class="inputUseHeaderClass"/>
 			<ui:inputCheckbox aura:id="inputUseFooter"          label="Use Footer"       value="{!v.useFooter}"      class="inputUseFooterClass"/>
 			<ui:inputCheckbox aura:id="inputMakeScrollable"     label="Make Scrollable"  value="{!v.makeScrollable}" class="inputMakeScrollableClass"/>
-			<ui:inputCheckbox aura:id="inputNonScrollable"     label="Non Scrollable Modal"  value="{!v.nonScrollable}" class="inputNonScrollableClass"/>
-			<ui:inputCheckbox aura:id="inputCustomizeCloseAction"     label="Customize CloseAction"  value="{!v.customizeCloseAction}" class="inputCustomizeCloseAction"/>
+			<ui:inputCheckbox aura:id="inputNonScrollable"      label="Non Scrollable Modal"           value="{!v.nonScrollable}"         class="inputNonScrollableClass"/>
+			<ui:inputCheckbox aura:id="inputCustomizeCloseAction"     label="Customize CloseAction"    value="{!v.customizeCloseAction}"  class="inputCustomizeCloseAction"/>
+			<ui:inputCheckbox aura:id="inputTrapFocus"          label="Trap Focus"  value="{!v.trapFocus}"           class="inputTrapFocus"/>
+			<ui:inputCheckbox aura:id="inputCloseOnLocationChange"    label="Close on Location Change" value="{!v.closeOnLocationChange}" class="inputCloseOnLocationChange"/>
 			<ui:button aura:id="createPanelBtn" label="Create Panel" press="{!c.createPanel}" class="createPanelBtnClass"/>
 		</div>
 		{!v.body}		

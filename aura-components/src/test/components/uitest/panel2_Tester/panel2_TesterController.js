@@ -77,7 +77,8 @@
 		config["autoFocus"] = $A.util.getBooleanValue(cmp.get("v.autoFocus"));
 		config["class"] = cmp.get("v.class");
 		config["flavor"] = cmp.get("v.flavor");
-
+		config["trapFocus"] = $A.util.getBooleanValue(cmp.get("v.trapFocus"));
+		
 		// provide an option not to destroy the panel when closeOnClickOut is
 		// set to true.
 		// Bug: W-2619406
@@ -149,6 +150,7 @@
 					panelType : type,
 					visible : cmp.get("v.isVisible"),
 					panelConfig : config,
+					closeOnLocationChange : $A.util.getBooleanValue(cmp.get("v.closeOnLocationChange")),
 
 					onCreate : $A.getCallback(function(panel) {
 						cmp._panel = panel;

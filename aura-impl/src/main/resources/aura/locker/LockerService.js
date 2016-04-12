@@ -96,7 +96,8 @@ function LockerService() {
 	    "confirm",
 	    "console",
 	    "Intl",
-	    "location"
+	    "location",
+	    "Node"
 	];
 
 	var nsKeys = {};

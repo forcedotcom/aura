@@ -49,6 +49,7 @@ Aura.Event      = {};
 Aura.Layouts    = {};
 Aura.Controller = {};
 Aura.Attribute  = {};
+Aura.Method     = {};
 Aura.L10n       = {};
 Aura.Services   = {};
 Aura.Storage    = {};
@@ -143,6 +144,9 @@ window['$A'] = {};
 // #include aura.attribute.AttributeDef
 // #include aura.attribute.AttributeSet
 // #include aura.attribute.AttributeDefSet
+
+// -- Method ----------------------------------------------------------
+// #include aura.method.MethodDef
 
 // -- RequiredVersion ----------------------------------------------------------
 // #include aura.requiredVersion.RequiredVersionDef

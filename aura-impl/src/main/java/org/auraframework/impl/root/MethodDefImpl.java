@@ -71,7 +71,8 @@ public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implement
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
-        json.writeMapEntry("name", descriptor);
+        // JBUCH: HACK: FIND BETTER FIX
+        json.writeMapEntry("name", parentDescriptor.getNamespace()+":"+descriptor.getName());
         json.writeValue(getAccess());
         if(!AuraTextUtil.isNullEmptyOrWhitespace(action)) {
             json.writeMapEntry("action", action);

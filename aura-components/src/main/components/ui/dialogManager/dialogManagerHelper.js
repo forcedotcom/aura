@@ -113,9 +113,9 @@
         var self          = this,
             oldFocus      = document.activeElement,
             newFocus      = this.getFirstFocusableElement(dialog),
-            keydown       = function(event) { self.getKeydownHandler(dialog, isModal, newFocus, event); },
-            click         = function(event) { self.getClickHandler(dialog, clickOutToClose, event); },
-            resize        = function() { self.getResizeHandler(dialog, isModal); };
+            keydown       = $A.getCallback(function(event) { self.getKeydownHandler(dialog, isModal, newFocus, event); }),
+            click         = $A.getCallback(function(event) { self.getClickHandler(dialog, clickOutToClose, event); }),
+            resize        = $A.getCallback(function() { self.getResizeHandler(dialog, isModal); });
 
         return {
             oldFocus       : oldFocus,

@@ -280,17 +280,18 @@ AuraEventService.prototype.getDef = function(descriptor) {
     if(definition && !$A.clientService.allowAccess(definition)) {
         var context=$A.getContext();
         var message="Access Check Failed! EventService.getEventDef():'" + definition.getDescriptor().toString() + "' is not visible to '" + (context&&context.getCurrentAccess()) + "'.";
-        if(context.enableAccessChecks) {
-            if(context.logAccessFailures){
-                $A.error(message);
-           }
-            return null;
-        } else {
+        //if(context.enableAccessChecks) {
+        //    if(context.logAccessFailures){
+        //        $A.error(message);
+        //   }
+        //    return null;
+        //} else {
+            $A.logger.reportError(new $A.auraError("[NoErrorObjectAvailable] " + message));
             if(context.logAccessFailures){
                 $A.warning(message);
             }
             // Intentional fallthrough
-        }
+        //}
     }
     
     return definition;
@@ -310,17 +311,18 @@ AuraEventService.prototype.hasDefinition = function(descriptor) {
     if(definition && !$A.clientService.allowAccess(definition)) {
         var context=$A.getContext();
         var message="Access Check Failed! EventService.hasDefinition():'" + definition.getDescriptor().toString() + "' is not visible to '" + (context&&context.getCurrentAccess()) + "'.";
-        if(context.enableAccessChecks) {
-           if(context.logAccessFailures){
-               $A.error(message);
-           }
-           return false;
-        }else{
+        //if(context.enableAccessChecks) {
+        //   if(context.logAccessFailures){
+        //       $A.error(message);
+        //   }
+        //   return false;
+        //}else{
+            $A.logger.reportError(new $A.auraError("[NoErrorObjectAvailable] " + message));
             if(context.logAccessFailures){
                 $A.warning(message);
             }
             //Intentional fallthrough
-        }
+        //}
     }
     return !!definition;
 };

@@ -227,13 +227,13 @@ Aura.Context.AuraContext.prototype.loadFromStorage = function(callback) {
         return;
     }
 
-    var that = this;
-    storage.get(this.storageKey).then(function (item) {
+    //var that = this;
+    storage.get(this.storageKey).then(function (/*item*/) {
         $A.run(function() {
             // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
-            if (item && item.value) {
-                that.joinLoaded(item.value["loaded"]);
-            }
+            // if (item && item.value) {
+            //     that.joinLoaded(item.value["loaded"]);
+            // }
             callback();
         });
     }, function() {

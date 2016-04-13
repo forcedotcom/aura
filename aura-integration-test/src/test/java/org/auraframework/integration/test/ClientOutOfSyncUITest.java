@@ -723,7 +723,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
      */
     // This tests persistent storage, exclude on Safari based browsers
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
-    public void testReloadAfterMarkupChange() throws Exception {
+    public void _testReloadAfterMarkupChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(

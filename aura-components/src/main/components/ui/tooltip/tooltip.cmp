@@ -51,8 +51,8 @@
    
      <aura:attribute name="domId" type="String" access="INTERNAL" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
 
-    <aura:method name="show" access="INTERNAL"/>
-    <aura:method name="hide" access="INTERNAL"/>
+    <aura:method name="show"/>
+    <aura:method name="hide"/>
 
     <aura:handler name="change" value="{!v.tooltipBody}" action="{!c.handleBodyChange}"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>

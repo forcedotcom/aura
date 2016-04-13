@@ -30,6 +30,33 @@ CKEDITOR.dom.domObject = function( nativeDomObject ) {
 		 * @property {Object}
 		 */
 		this.$ = nativeDomObject;
+		// monkey patching .close and .addEventListener on all new iframes
+		if (nativeDomObject.defaultView && nativeDomObject.close) {
+			var close = nativeDomObject.close;
+			var write = nativeDomObject.write;
+			var addEventListener = nativeDomObject.addEventListener;
+			nativeDomObject.close = function () {
+				var ret = close.apply(nativeDomObject, Array.prototype.slice.call(arguments));
+				console.log('doc.close()');
+				var safeEval = window["$$safe-eval-compat$$"];
+				if (safeEval) {
+					// super hack to initialize any iframe created by ckeditor, but only if safeEval worker
+					// is in place, which means CSP rules are enforced
+					var code = Array.prototype.slice.call(nativeDomObject.getElementsByTagName('script')).map(function (el) {
+						return el.getAttribute('src') ? '' : el.textContent;
+					}).join('\n');
+					safeEval(code, nativeDomObject.defaultView);
+				}
+				return ret;
+			};
+			nativeDomObject.addEventListener = function (event, fn) {
+				if (event === "DOMContentLoaded") {
+					setTimeout(fn, 0);
+				} else {
+					return addEventListener.apply(nativeDomObject, Array.prototype.slice.call(arguments));
+				}
+			}
+		}
 	}
 };
 

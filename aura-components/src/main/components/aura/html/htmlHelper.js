@@ -265,9 +265,9 @@
     },
 
     processJavascriptHref: function (element) {
-		function inlineJavasciptCSPViolationPreventer() {
+		function inlineJavasciptCSPViolationPreventer(event) {
 			// Check for javascript: inline javascript
-
+			
 			/*eslint-disable no-script-url*/
 			var hrefTarget = this.href;
 			if (hrefTarget && hrefTarget.toLowerCase().indexOf("javascript:") === 0) {

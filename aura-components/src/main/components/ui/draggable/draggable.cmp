@@ -37,11 +37,11 @@
 	
 	<aura:handler name="dropComplete" action="{!c.handleDropComplete}"/>
 	
-	<aura:method name="setDropStatus" action="{!c.setDropStatus}" access="public">
+	<aura:method name="setDropStatus" action="{!c.setDropStatus}">
 		<aura:attribute name="isSuccessful" type="Boolean" default="true" description="Set to true if drop is performed or false if it's aborted."/>
 	</aura:method>
 	
-	<aura:method name="fireDragEnd" action="{!c.fireDragEnd}" access="public">
+	<aura:method name="fireDragEnd" action="{!c.fireDragEnd}">
 		<aura:attribute name="target" type="Object" description="The event target for dragend."/>
 		<aura:attribute name="isValid" type="Boolean" default="true" description="Set to true if dragEnd is performed or false if it's aborted."/>
 		<aura:attribute name="isInAccessibilityMode" type="Boolean" default="true" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>

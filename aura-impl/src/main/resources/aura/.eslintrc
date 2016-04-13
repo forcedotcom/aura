@@ -96,7 +96,7 @@
     "getLockerSecret": true,
     "setLockerSecret": true,
     "SecureAura": true,
-    "SecureThing": true,
+    "SecureObject": true,
     "SecureComponentRef": true,
     "SecureComponent": true,
     "SecureNavigator": true,

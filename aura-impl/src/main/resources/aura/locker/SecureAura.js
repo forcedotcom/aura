@@ -40,19 +40,19 @@ function SecureAura(AuraInstance, key) {
         }
     });
     Object.defineProperties(o, {
-        "createComponent": SecureThing.createFilteredMethod(o, AuraInstance, "createComponent"),
-        "createComponents": SecureThing.createFilteredMethod(o, AuraInstance, "createComponents"),
-        "enqueueAction": SecureThing.createFilteredMethod(o, AuraInstance, "enqueueAction"),
-        "errorReport": SecureThing.createFilteredMethod(o, AuraInstance, "errorReport"),
-        "get": SecureThing.createFilteredMethod(o, AuraInstance, "get"),
-        "getCallback": SecureThing.createFilteredMethod(o, AuraInstance, "getCallback"),
-        "getComponent": SecureThing.createFilteredMethod(o, AuraInstance, "getComponent"),
-        "getRoot": SecureThing.createFilteredMethod(o, AuraInstance, "getRoot"),
-        "log": SecureThing.createFilteredMethod(o, AuraInstance, "log"),
-        "warning": SecureThing.createFilteredMethod(o, AuraInstance, "warning")
+        "createComponent": SecureObject.createFilteredMethod(o, AuraInstance, "createComponent"),
+        "createComponents": SecureObject.createFilteredMethod(o, AuraInstance, "createComponents"),
+        "enqueueAction": SecureObject.createFilteredMethod(o, AuraInstance, "enqueueAction"),
+        "errorReport": SecureObject.createFilteredMethod(o, AuraInstance, "errorReport"),
+        "get": SecureObject.createFilteredMethod(o, AuraInstance, "get"),
+        "getCallback": SecureObject.createFilteredMethod(o, AuraInstance, "getCallback"),
+        "getComponent": SecureObject.createFilteredMethod(o, AuraInstance, "getComponent"),
+        "getRoot": SecureObject.createFilteredMethod(o, AuraInstance, "getRoot"),
+        "log": SecureObject.createFilteredMethod(o, AuraInstance, "log"),
+        "warning": SecureObject.createFilteredMethod(o, AuraInstance, "warning")
     });
     ["isEmpty", "hasClass", "addClass", "removeClass", "toggleClass"].forEach(function(name) {
-        Object.defineProperty(su, name, SecureThing.createFilteredMethod(su, AuraInstance["util"], name));
+        Object.defineProperty(su, name, SecureObject.createFilteredMethod(su, AuraInstance["util"], name));
     });
 
     setLockerSecret(o, "key", key);

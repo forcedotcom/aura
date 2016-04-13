@@ -54,13 +54,13 @@ function SecureWindow(win, key) {
 		setTimeout: {
 			enumerable: true,
 			value: function (callback) {
-				setTimeout.apply(win, [SecureThing.FunctionPrototypeBind.call(callback, o)].concat(SecureThing.ArrayPrototypeSlice.call(arguments, 1)));
+				setTimeout.apply(win, [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(SecureObject.ArrayPrototypeSlice.call(arguments, 1)));
 			}
 		},
 		setInterval: {
 			enumerable: true,
 			value: function (callback) {
-				setInterval.apply(win, [SecureThing.FunctionPrototypeBind.call(callback, o)].concat(SecureThing.ArrayPrototypeSlice.call(arguments, 1)));
+				setInterval.apply(win, [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(SecureObject.ArrayPrototypeSlice.call(arguments, 1)));
 			}
 		},
 		toString: {
@@ -73,7 +73,7 @@ function SecureWindow(win, key) {
 
 	Object.defineProperties(o, {
 		addEventListener: SecureElement.createAddEventListenerDescriptor(o, win, key),
-		location: SecureThing.createFilteredProperty(o, win, "location")
+		location: SecureObject.createFilteredProperty(o, win, "location")
 	});
 
 	setLockerSecret(o, "key", key);

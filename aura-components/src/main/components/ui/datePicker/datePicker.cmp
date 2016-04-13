@@ -37,7 +37,7 @@
     <!-- private attributes -->
     <aura:attribute name="_today" type="String" description="The date string (yyyy-MM-dd) of today based on the Aura time zone."/>
 
-    <aura:method name="highlightRange" action="{!c.highlightRange}" access="PUBLIC"
+    <aura:method name="highlightRange" action="{!c.highlightRange}"
                  description="highlight the dates between rangeStart and rangeEnd inclusive">
         <aura:attribute name="rangeStart" type="String" description="Start date of the range in the format yyyy-mm-dd"/>
         <aura:attribute name="rangeEnd" type="String" description="End date of the range in the format yyyy-mm-dd"/>

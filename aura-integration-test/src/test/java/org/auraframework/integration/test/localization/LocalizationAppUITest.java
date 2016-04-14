@@ -216,7 +216,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         // Submit click
         elementInput.click();
         elementInput.clear();
-        elementInput.sendKeys("123.456");
+        elementInput.sendKeys("123.45");
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='Currency']"));
         elementButton.click();
 

@@ -23,6 +23,18 @@ function lib() { //eslint-disable-line no-unused-vars
         return parent;
     };
 
+    var hasNonScopedScrollingWrapper = function (element) {
+        var parent = element;
+        while (parent && !parent._scopedScroll) {
+            if (parent.scrollHeight !== parent.clientHeight) {
+                return true;
+            } else {
+                parent = parent.parentElement;
+            }
+        }
+        return false;
+    };
+
     var mouseWheelHandler = function (e) {
         if (e.scopedScroll) {
             return;
@@ -40,7 +52,12 @@ function lib() { //eslint-disable-line no-unused-vars
         var delta        = e.wheelDelta;
         var up           = delta > 0;
 
-        if (!up && (scrollHeight - height) === scrollTop) {
+        if (hasNonScopedScrollingWrapper(e.target)) {
+            // ignore mousewheel event in these cases
+            // this prevents preventDefault from being called and allows
+            // elements with scrollbars (textarea, ckeditor etc) to scroll
+            // @bug W-2961153@ @bug W-2960382@
+        } else if (!up && (scrollHeight - height) === scrollTop) {
             // Scrolling down, but this will take us past the bottom.
             wrapper.scrollTop = scrollHeight;
             e.preventDefault();

@@ -28,6 +28,10 @@
     
     privilegedMethod: function(component, event, helper){
     	component.set("v.globalAttribute", "privilegedMethod");
+    },
+    
+    internalMethod: function(component, event, helper){
+    	component.set("v.globalAttribute", "internalMethod");
     }
 
 })

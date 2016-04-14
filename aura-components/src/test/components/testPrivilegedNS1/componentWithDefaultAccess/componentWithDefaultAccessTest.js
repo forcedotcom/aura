@@ -417,6 +417,10 @@
         function canAccessPrivilegedMethod(cmp) {
         	this.componentCreated.privilegedMethod();
         	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privilegedMethod', "get unexpected outcome from calling privileged method");
+        },
+        function canNotAccessInternalMethod(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	this.componentCreated.internalMethod();
         }
         ]
     },
@@ -439,6 +443,7 @@
         ]
     },
     
+    //we cannot create component with public access in internal/system namespace
 	testCreateComponentWithPublicAccessOfSystemNS:{
         test:[
         function cannotCreateComponentWithPublicAccess(cmp){ 
@@ -504,6 +509,10 @@
         function canAccessPrivilegedMethod(cmp) {
         	this.componentCreated.privilegedMethod();
         	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privilegedMethod', "get unexpected outcome from calling privileged method");
+        },
+        function canNotAccessInternalMethod(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	this.componentCreated.internalMethod();
         },
         //tests for events
         function canAccessSystemNSGLobalEventRegisteredWithGlobalAccess(cmp) {

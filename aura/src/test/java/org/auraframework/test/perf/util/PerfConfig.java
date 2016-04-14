@@ -15,8 +15,9 @@
  */
 package org.auraframework.test.perf.util;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+
 
 // Immutable Java bean to serialize/deserialize json config
 // This must exactly match the config param names
@@ -48,7 +49,7 @@ public class PerfConfig {
 	}
 	
 	public Map<String,String> getOptions(){
-		return options;
+		return options != null ? options: new HashMap<>();
 	}
 	
 	public List<Map<String, Map<String, Object>>> getCustomOptions(){

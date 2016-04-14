@@ -1,4 +1,5 @@
 ({
+    browsers : [ "GOOGLECHROME", "FIREFOX"],
     JPG_FILE : {
         name : 'file.jpg',
         type : 'image/jpg',

@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 ({
+    init: function (cmp) {
+        var bodyAttribute = cmp.get("v.body");
+        var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
+        if (hasBodyAttribute) {
+            cmp.find("anchor").set("v.body", bodyAttribute);
+        }
+    },
+
     onClick: function (cmp, event) {
         if (cmp.isValid()) {
             $A.util.squash(event, true);

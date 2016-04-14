@@ -301,12 +301,13 @@
 
                     if ($A.util.hasClass(cmp._openRow, 'open'))  {
                         this.fireRowClose(cmp, cmp._openRow);
-                        $A.util.removeClass(cmp._openRow, 'open');
+                        this.updateAttributes(cmp._openRow, false);
                     }
 
                     cmp._openRow = null;
                 }
 
+                var self = this;
                 this.setCheckedTimeout(cmp, function () {
                     cmp._isSnapping = false;
                     swipe.body.style.transition = '';
@@ -314,7 +315,7 @@
 
                     if (shouldSnapOpen) {
                         cmp._openRow = swipe.row;
-                        $A.util.addClass(cmp._openRow, 'open');
+                        self.updateAttributes(cmp._openRow, true);
                     }
                 }, this.SNAP_TIMEOUT);
             }
@@ -406,8 +407,9 @@
         }
 
         // Null these fields as 'touchend' will not execute.
-        $A.util.removeClass(cmp._openRow, 'open');
+        this.updateAttributes(cmp._openRow, false);
         $A.util.removeClass(cmp._openRow, 'swiping');
+        
         cmp._openRow = null;
         cmp._swipe = null;
 
@@ -426,6 +428,22 @@
             cmp._isClosing = false;
             self.unblock(cmp);
         }, this.CLOSE_TIMEOUT);
+    },
+    
+    /**
+     *
+     */
+    updateAttributes: function(row, isOpen) {
+    	var swipeBody = row.querySelector('.swipeBody');
+    	var classOp = isOpen ? $A.util.addClass.bind($A.util) : $A.util.removeClass.bind($A.util);
+    	
+    	// Update aria attributes on swipe body
+    	if (swipeBody) {
+    		swipeBody.setAttribute('aria-hidden', !isOpen);
+    	}
+    	
+    	// Add or remove classes on the row
+    	classOp(row, 'open');
     },
 
     isBlocked: function (cmp) {

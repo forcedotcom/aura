@@ -31,6 +31,6 @@
 	 -->
 	<li aura:id="containerLI" class="{!v.class}" style="{! $Browser.isWindowsPhone ? 'touch-action: pan-y' : ''}">
 		<div aura:id="body" class="body">{!v.body}</div>
-		<div aura:id="swipeBody" class="swipeBody">{!v.swipeBody}</div>
+		<div aura:id="swipeBody" class="swipeBody" aria-hidden="true">{!v.swipeBody}</div>
 	</li>
 </aura:component>

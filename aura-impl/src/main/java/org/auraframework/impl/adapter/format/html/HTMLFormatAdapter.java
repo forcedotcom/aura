@@ -21,17 +21,16 @@ import java.util.List;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.impl.adapter.format.BaseFormatAdapter;
+import org.auraframework.impl.util.TemplateUtil;
+import org.auraframework.system.AuraContext;
 
 /**
  */
 @ThreadSafe
 public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T> {
+    private TemplateUtil templateUtil = new TemplateUtil();
 
     protected static final String name = "HTML";
-
-    private static final String HTML_STYLE = "        <link href=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n";
-    private static final String HTML_SCRIPT = "       <script src=\"%s\" ></script>\n";
-    private static final String HTML_LAZY_SCRIPT = "       <script data-src=\"%s\" ></script>\n";
 
     @Override
     public String getFormatName() {
@@ -39,28 +38,15 @@ public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T> {
     }
 
     protected void writeHtmlStyle(String url, Appendable out) throws IOException {
-        if (url != null) {
-            out.append(String.format(HTML_STYLE, url));
-        }
+        templateUtil.writeHtmlStyle(url, out);
     }
 
     protected void writeHtmlStyles(List<String> urls, Appendable out) throws IOException {
-        if (urls != null) {
-            for (String url : urls) {
-                writeHtmlStyle(url, out);
-            }
-        }
+        templateUtil.writeHtmlStyles(urls, out);
     }
 
-    protected void writeHtmlScripts(List<String> scripts, Appendable out) throws IOException {
-        writeHtmlScripts(scripts, false, out);
-    }
-
-    protected void writeHtmlScripts(List<String> scripts, boolean lazy, Appendable out) throws IOException {
-        if (scripts != null) {
-            for (String script : scripts) {
-                out.append(String.format(lazy ? HTML_LAZY_SCRIPT : HTML_SCRIPT, script));
-            }
-        }
+    protected void writeHtmlScripts(AuraContext context, List<String> scripts, boolean canBeAsync, Appendable out)
+            throws IOException {
+        templateUtil.writeHtmlScripts(context, scripts, canBeAsync, out);
     }
 }

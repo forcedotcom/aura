@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -83,16 +84,19 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 attributes.put("defaultBodyClass", "");
                 attributes.put("autoInitialize", "false");
             } else {
+                ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
+
                 if (manifestUtil.isManifestEnabled()) {
                     attributes.put("manifest", Aura.getServletUtilAdapter().getManifestUrl(context, componentAttributes));
                 }
 
                 sb.setLength(0);
-                writeHtmlScripts(Aura.getServletUtilAdapter().getBaseScripts(context, componentAttributes), sb);
+                writeHtmlScripts(context, servletUtilAdapter.getBaseScripts(context, componentAttributes), false, sb);
                 attributes.put("auraBaseScriptTags", sb.toString());
 
                 sb.setLength(0);
-                writeHtmlScripts(Aura.getServletUtilAdapter().getFrameworkScripts(context, true, componentAttributes), true, sb);
+                writeHtmlScripts(context, servletUtilAdapter.getFrameworkScripts(context, true, componentAttributes),
+                        true, sb);
                 attributes.put("auraNamespacesScriptTags", sb.toString());
 
                 if(mode != Mode.PROD && mode != Mode.PRODDEBUG &&

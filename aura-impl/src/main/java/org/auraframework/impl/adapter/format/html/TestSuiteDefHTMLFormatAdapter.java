@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
@@ -50,12 +51,14 @@ public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDe
         attribs.put("autoInitialize", "false");
         attribs.put("bodyClass", " ");
 
+        ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
+
         StringBuilder sb = new StringBuilder();
-        writeHtmlStyles(Aura.getServletUtilAdapter().getStyles(context), sb);
+        writeHtmlStyles(servletUtilAdapter.getStyles(context), sb);
         attribs.put("auraStyleTags", sb.toString());
 
         sb = new StringBuilder();
-        writeHtmlScripts(Aura.getServletUtilAdapter().getScripts(context, true, attributes), sb);
+        writeHtmlScripts(context, servletUtilAdapter.getScripts(context, true, attributes), false, sb);
         attribs.put("auraScriptTags", sb.toString());
 
         sb = new StringBuilder();

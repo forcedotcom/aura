@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -63,11 +64,14 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             writeHtmlStyle(Aura.getConfigAdapter().getResetCssURL(), sb);
             attributes.put("auraResetTags", sb.toString());
 
+            ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
+
             sb.setLength(0);
             writeHtmlStyles(Aura.getServletUtilAdapter().getStyles(context), sb);
             attributes.put("auraStyleTags", sb.toString());
+
             sb.setLength(0);
-            writeHtmlScripts(Aura.getServletUtilAdapter().getScripts(context, true, componentAttributes), sb);
+            writeHtmlScripts(context, servletUtilAdapter.getScripts(context, true, componentAttributes), false, sb);
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
                 attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());

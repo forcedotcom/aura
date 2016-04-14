@@ -18,11 +18,20 @@ package org.auraframework.impl.util;
 import java.io.IOException;
 import java.util.List;
 
+import org.auraframework.system.AuraContext;
+
 public class TemplateUtil {
 
     private static final String HTML_STYLE = "        <link href=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n";
-    private static final String HTML_SCRIPT = "       <script src=\"%s\" ></script>\n";
+    private static final String HTML_INLINE_SCRIPT = "       <script src=\"%s\"></script>\n";
     private static final String HTML_LAZY_SCRIPT = "       <script data-src=\"%s\" ></script>\n";
+    private static final String HTML_DEFER_SCRIPT = "       <script src=\"%s\" defer ></script>\n";
+
+    public void writeHtmlStyle(String url, Appendable out) throws IOException {
+        if (url != null) {
+            out.append(String.format(HTML_STYLE, url));
+        }
+    }
 
     public void writeHtmlStyles(List<String> styles, Appendable out) throws IOException {
         if (styles != null) {
@@ -32,14 +41,35 @@ public class TemplateUtil {
         }
     }
 
-    public void writeHtmlScripts(List<String> scripts, Appendable out) throws IOException {
-    	writeHtmlScripts(scripts, false, out);
-    }
-
-    public void writeHtmlScripts(List<String> scripts, boolean lazy, Appendable out) throws IOException {
+    public void writeInlineHtmlScripts(AuraContext context, List<String> scripts, Appendable out) throws IOException {
         if (scripts != null) {
             for (String script : scripts) {
-                out.append(String.format(lazy ? HTML_LAZY_SCRIPT : HTML_SCRIPT, script));
+                out.append(String.format(HTML_INLINE_SCRIPT, script));
+            }
+        }
+    }
+
+    public void writeHtmlScripts(AuraContext context, List<String> scripts, boolean canBeAsync, Appendable out)
+            throws IOException {
+        if (scripts != null) {
+            String format = null;
+            switch (context.getClient().getType()) {
+            case IE9:
+            case IE8:
+            case IE7:
+            case IE6:
+                if (canBeAsync) {
+                    format = HTML_LAZY_SCRIPT;
+                } else {
+                    format = HTML_INLINE_SCRIPT;
+                }
+                break;
+            default:
+                format = HTML_DEFER_SCRIPT;
+                break;
+            }
+            for (String script : scripts) {
+                out.append(String.format(format, script));
             }
         }
     }

@@ -205,7 +205,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
 
 
             //endAnimationHandler: cleanup all classes and events
-            var finishHandler = function () {
+            var finishHandler = $A.getCallback(function () {
                 if(!cmp.isValid()) {
                     return;
                 }
@@ -237,7 +237,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 }).fire();
 
                 config.onFinish && config.onFinish();
-            };
+            });
 
             panel.setAttribute("aria-hidden", 'false');
             if (useTransition) {
@@ -476,6 +476,28 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     var focusables = this.getFocusables(el);
                     focusables.initial && focusables.initial.focus();
                 }
+            }
+        },
+
+        scopeScrollables: function (cmp) {
+            var self = this;
+            var dom = cmp.getElement();
+            var scrollables = dom.querySelectorAll('.scrollable');
+            var observerConfig = { attributes: true, childList: true, characterData: true, subtree: true };
+
+            for (var i = 0; i < scrollables.length; i++) {
+                this.scopeScroll(scrollables[i]);
+            }
+
+            // watch for changes to the subtree so that scroll can
+            // be re-scoped
+            if(!cmp._observer && !$A.util.isUndefinedOrNull(window.MutationObserver)) { //phantomjs check
+                cmp._observer = new MutationObserver($A.getCallback(function() {
+                    if(cmp.isValid()) {
+                        self.scopeScrollables(cmp);
+                    } 
+                }));
+                cmp._observer.observe(dom, observerConfig);
             }
         },
         

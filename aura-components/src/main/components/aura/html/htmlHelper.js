@@ -185,8 +185,9 @@
                         });
                     }
                 }, this.NAMES.hashHandler);
-
-                element.setAttribute("target", target);
+                if(target){
+                	element.setAttribute("target", target);
+                }
                 element.setAttribute("href", value);
             } else if (!$A.util.isUndefinedOrNull(value) && (lowerName === "role" || lowerName.lastIndexOf("aria-", 0) === 0)) {
                 // use setAttribute to render accessibility attributes to markup
@@ -274,8 +275,7 @@
 				event.preventDefault();
 			}
 		}
-  		
-		if (element.tagName === "A") {
+  		if (element.tagName === "A") {
   			var href = element.getAttribute("href");
 
   			if (!href) {

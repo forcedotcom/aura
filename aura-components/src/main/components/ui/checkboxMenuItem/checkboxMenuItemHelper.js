@@ -29,13 +29,8 @@
         var bodyAttribute = cmp.get("v.body");
         var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
 
-        $A.util.clearNode(anchorElement);
-
-        anchorElement.appendChild(document.createElement("b"));
-
-        if (hasBodyAttribute) {
-            $A.renderingService.renderFacet(cmp, bodyAttribute, anchorElement);
-        } else {
+        if (!hasBodyAttribute) {
+            $A.util.clearNode(anchorElement);
             anchorElement.appendChild(document.createTextNode(label));
         }
 

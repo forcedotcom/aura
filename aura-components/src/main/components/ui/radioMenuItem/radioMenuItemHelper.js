@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 ({
+    // TODO: Extract this, checkboxMenuItemHelper & actionMenuItemHelper in a common library
     buildBody: function (cmp) {
         var anchorElement = cmp.find("anchor").getElement();
 
@@ -29,12 +30,13 @@
         var bodyAttribute = cmp.get("v.body");
         var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
 
-        $A.util.clearNode(anchorElement);
+        if (!hasBodyAttribute) {
+            $A.util.clearNode(anchorElement);
 
-        if (hasBodyAttribute) {
-            $A.renderingService.renderFacet(cmp, bodyAttribute, anchorElement);
-        } else {
+            // Once this marker element is removed this would be a carbon copy of the checkboxMenuItem,
+            // and a near identical copy of actionMenuItem with the exception of aria-checked & selected classes
             anchorElement.appendChild(document.createElement("b"));
+
             anchorElement.appendChild(document.createTextNode(label));
         }
 

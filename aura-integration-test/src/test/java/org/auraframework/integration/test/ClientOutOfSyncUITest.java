@@ -710,14 +710,16 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     /**
-     * After every server action response we persist in storage what apps/cmps have been loaded from the server
-     * that weren't included in the initial load. When we start a new context on the client, we load this info
-     * from storage so the server can know on the next request if the client is out of sync or not.
+     * This test verifies that changes to components which are dynamically received are correctly identified
+     * after the client is restarted. This is complex to make work: dynamically received defs must be
+     * persisted with sufficient versioning information which is later restored (during client restart / framework
+     * init), then sent to the server so the server can detect the version change and trigger a client out-of-date
+     * message.
      *
-     * This test verifies that behavior by retrieving a component from the server, modifying its source on the server,
+     * This test verifies the behavior by retrieving a component from the server, modifying its source on the server,
      * reloading the page, then requesting the same component from the server, asserting that the new source is returned.
-     * Without persisting the context on the client, the server would never know the client's version of the component
-     * we're loading is out of date and after a page reload the old component would be displayed.
+     * Without persisting the component version on the client, the server would never know the client's version of
+     * the component we're loading is out of date and after a page reload the old component would be displayed.
      *
      * See W-2909975 for additional details.
      */
@@ -749,15 +751,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
         open(appDesc);
 
-        // Grab whatever context is currently persisted in storage to compare later
-        final String getPersistedContextScript = "var callback = arguments[arguments.length - 1];" +
-                "if ($A && $A.storageService.getStorage('actions')){" +
-                "var storage = $A.storageService.getStorage('actions');" +
-                "storage.get('$AuraContext$').then(function(item) { callback(item ? item.value : null) })" +
-                "} else { callback(null);}";
-
-        getDriver().manage().timeouts().setScriptTimeout(getAuraUITestingUtil().getTimeout(), TimeUnit.SECONDS);
-        final Object initialLoaded = ((JavascriptExecutor) getDriver()).executeAsyncScript(getPersistedContextScript);
 
         // Retrieve cmp from server and wait for callback output
         getAuraUITestingUtil().findDomElement(By.cssSelector("button")).click();
@@ -772,16 +765,21 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         // Update the source of the component we retrieve from storage
         String newCmpText = "<div>cmpNew" + new Date().getTime() + "</div>";
         updateStringSource(cmpDesc, String.format(baseComponentTag, "", newCmpText));
-
-        // Wait for the context returned from server during the cmp retrieval to be persisted on the client. We wait
-        // until what was in the storage before the server call has changed.
+        
+        // Wait for dynamically received component def to be persisted.
+        final String getPersistedDef = "var callback = arguments[arguments.length - 1];" +
+                "if (!$A) { callback('Aura not initialized'); return; };" +
+                "var storage = $A.storageService.getStorage('ComponentDefStorage');" +
+                "if (!storage) { callback('No storage'); return; };" +
+                "storage.get('markup://" + cmpDefString + "').then(function(item) { callback(item ? 'SUCCESS' : 'empty') });";
         getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                Object newLoaded = ((JavascriptExecutor) getDriver()).executeAsyncScript(getPersistedContextScript);
-                return initialLoaded != newLoaded;
+            	d.manage().timeouts().setScriptTimeout(1, TimeUnit.SECONDS);
+                Object result = ((JavascriptExecutor) getDriver()).executeAsyncScript(getPersistedDef);
+                return "SUCCESS".equals(result);
             }
-        }, "Context never persisted on client after server call");
+        }, "Definition never persisted on client after server call");
 
         getDriver().navigate().refresh();
 

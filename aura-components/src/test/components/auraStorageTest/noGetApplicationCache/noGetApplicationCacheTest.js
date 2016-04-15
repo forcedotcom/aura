@@ -25,9 +25,9 @@
                 });
             },
             function verifyStorageGets(cmp) {
-                // Two gets: AuraContext then GVP
+                // Two gets: getApplication and GVP
                 var gets = document.getElementById("myFrame").contentWindow._storageGets;
-                $A.test.assertEquals(3, gets.length, "Expected three storage.get() on reload! " + JSON.stringify(gets));
+                $A.test.assertEquals(2, gets.length, "Expected two storage.get() on reload! " + JSON.stringify(gets));
             }
         ]
     },
@@ -47,9 +47,9 @@
                 });
             },
             function verifyStorageGets(cmp) {
-                // Two gets: AuraContext then GVP
+                // One get: GVP
                 var gets = document.getElementById("myFrame").contentWindow._storageGets;
-                $A.test.assertEquals(2, gets.length, "More than two storage.get() on reload! " + JSON.stringify(gets));
+                $A.test.assertEquals(1, gets.length, "More than one storage.get() on reload! " + JSON.stringify(gets));
             }
         ]
     }

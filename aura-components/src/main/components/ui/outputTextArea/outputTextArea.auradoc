@@ -20,7 +20,7 @@
 		<p>
 			A <code>ui:outputTextArea</code> component represents text output that is wrapped in an HTML <code>span</code> tag.
 			This component can be used with <code>ui:inputTextArea</code>, which takes in a multi-line text input. 
-			To display text, you can use an attribute value and bind it to the <code>ui:outputTextArea</code> component.
+			To display text, you can use an attribute value and bind it to the <code>ui:outputTextArea</code> component. A <code>ui:outputTextArea</code> component displays URLs and email addresses as hyperlinks.
 		</p>
 		<pre>&lt;aura:attribute name="myTextArea" type="String" default="some string"/>
 &lt;ui:outputTextArea value="{!v.myTextArea}"/></pre>

@@ -32,6 +32,12 @@ ComponentDefStorage.prototype.EVICTION_TARGET_LOAD = 0.75;
  */
 ComponentDefStorage.prototype.EVICTION_HEADROOM = 0.1;
 
+/**
+ * Queue of operations on the def store. Used to prevent concurrent DML on the def store, or analysis
+ * of the def store during DML, which often results in a broken def graph. This is set to an array
+ * when an operation is in-flight.
+ */
+ComponentDefStorage.prototype.queue = undefined;
 
 /**
  * Whether to use storage for component definitions.
@@ -102,7 +108,7 @@ ComponentDefStorage.prototype.getStorage = function () {
 };
 
 /**
- * Stores component and library definitions into storage.
+ * Stores component and library definitions into storage. Should always be called from within a call to #enqueue().
  * @param {Array} cmpConfigs the component definitions to store
  * @param {Array} libConfigs the lib definitions to store
  * @return {Promise} promise that resolves when storing is complete.
@@ -139,7 +145,7 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, conte
 };
 
 /**
- * Removes definitions from storage.
+ * Removes definitions from storage. Should always be called from within a call to #enqueue().
  * @param {String[]} descriptors the descriptors identifying the definitions to remove.
  * @return {Promise} a promise that resolves when the definitions are removed.
  */
@@ -166,7 +172,7 @@ ComponentDefStorage.prototype.removeDefs = function(descriptors) {
 
 
 /**
- * Gets all definitions from storage.
+ * Gets all definitions from storage. Should always be called from within a call to #enqueue().
  * @return {Promise} a promise that resolves with an array of the configs from storage. If decoding
  *  the configs fails the promise rejects. If the underlying storage fails or is disabled the promise
  *  resolves to an empty array.
@@ -201,49 +207,93 @@ ComponentDefStorage.prototype.getAll = function () {
  * @return {Promise} a promise that resolves when definitions are restored.
  */
 ComponentDefStorage.prototype.restoreAll = function(context) {
-    var defRegistry = this;
-    if (this.currentPromise) {
-        return this.currentPromise;
+    var that = this;
+    return this.enqueue(function(resolve) {
+        that.getAll()
+            .then(
+                function(items) {
+                    var libCount = 0;
+                    var cmpCount = 0;
+
+                    // decode all items
+                    for (var i = 0; i < items.length; i++) {
+                        var config = items[i]["value"];
+                        if (config["includes"]) {
+                            if (!$A.componentService.hasLibrary(config["descriptor"])) {
+                                $A.componentService.saveLibraryConfig(config);
+                            }
+                            libCount++;
+                        } else {
+                            if (config["uuid"]) {
+                                context.addLoaded(config["uuid"]);
+                            }
+                            if (!$A.componentService.getComponentDef(config)) {
+                                $A.componentService.saveComponentConfig(config);
+                            }
+                            cmpCount++;
+                        }
+                    }
+
+                    $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries from storage into registry");
+                    resolve();
+                }
+            ).then(
+                undefined, // noop
+                function(e) {
+                    $A.log("ComponentDefStorage: error during restore from storage, no component or library defs restored", e);
+                    resolve();
+                }
+            );
+    });
+};
+
+
+/**
+ * Enqueues a function that requires isolated access to def storage.
+ * @param {function} execute the function to execute.
+ * @return {Promise} a promise that resolves when the provided function executes.
+ */
+ComponentDefStorage.prototype.enqueue = function(execute) {
+    var that = this;
+    
+    // run the next item on the queue
+    function executeQueue() {
+        // should never happen
+        if (!that.queue) {
+            return;
+        }
+        
+        $A.log("ComponentDefStorage.enqueue: " + that.queue.length + " items in queue, running next");
+        var next = that.queue.pop();
+        
+        if (next) {
+            next["execute"](next["resolve"], next["reject"]);
+        } else {
+            that.queue = undefined;
+        }
     }
 
-    this.currentPromise = this.getAll()
-        .then(
-            function(items) {
-                var libCount = 0;
-                var cmpCount = 0;
-
-                // decode all items
-                for (var i = 0; i < items.length; i++) {
-                    var config = items[i]["value"];
-                    if (config["includes"]) {
-                        if (!$A.componentService.hasLibrary(config["descriptor"])) {
-                            $A.componentService.saveLibraryConfig(config);
-                        }
-                        libCount++;
-                    } else {
-                        if (config["uuid"]) {
-                            context.addLoaded(config["uuid"]);
-                        }
-                        if (!$A.componentService.getComponentDef(config)) {
-                            $A.componentService.saveComponentConfig(config);
-                        }
-                        cmpCount++;
-                    }
-                }
-
-                $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries from storage into registry");
-                defRegistry.currentPromise = null;
-            }
-        ).then(
-            undefined, // noop
-            function(e) {
-                $A.log("ComponentDefStorage: error during restore from storage, no component or library defs restored", e);
-                defRegistry.currentPromise = null;
-            }
-        );
-
-    return this.currentPromise;
+    var promise = new Promise(function(resolve, reject) {
+        // if something is in-flight then just enqueue
+        if (that.queue) {
+            that.queue.push({ "execute":execute, "resolve":resolve, "reject":reject });
+            return;
+        }
+        
+        // else run it immediately
+        that.queue = [];
+        execute(resolve, reject);
+    });
+    
+    // when this promise resolves or rejects, run the next item in the queue
+    promise.then(
+        function() { executeQueue(); },
+        function() { executeQueue(); }
+    );
+    
+    return promise;
 };
+
 
 /**
  * Clears all definitions from storage.

@@ -1312,7 +1312,8 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
     var defSizeKb = $A.util.estimateSize(cmpConfigs) / 1024;
     var libSizeKb = $A.util.estimateSize(libConfigs) / 1024;
 
-    return this.pruneDefsFromStorage(defSizeKb + libSizeKb)
+    return this.componentDefStorage.enqueue(function(resolve, reject) {
+        self.pruneDefsFromStorage(defSizeKb + libSizeKb)
         .then(
             function() {
                 return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs, context);
@@ -1360,7 +1361,9 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
 
                 return Promise["all"](promises);
             }
-    );
+        )
+        .then(resolve, reject);
+    });
 };
 
 AuraComponentService.prototype.createComponentPrivAsync = function (config, callback, forceClientCreation) {
@@ -1754,46 +1757,46 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
 
     var currentSize = 0;
     var newSize = 0;
-
+   
     // check space to determine if eviction is required. this is an approximate check meant to
     // avoid storage.getAll() and graph analysis which are expensive operations.
     return defStorage.getSize()
         .then(
-        function(size) {
-            currentSize = size;
-            var maxSize = defStorage.getMaxSize();
-            newSize = currentSize + requiredSpaceKb + maxSize * self.componentDefStorage.EVICTION_HEADROOM;
-            if (newSize < maxSize) {
-                return undefined;
-            }
-
-            // some eviction is required.
-            //
-            // note: buildDependencyGraph() loads all actions and defs from storage. this forces
-            // scanning all rows in the respectives stores. this results in the stores returning an
-            // accurate value to getSize().
-            //
-            // as items are evicted from the store it's important that getSize() continues returning
-            // a value that is close to accurate.
+            function(size) {
+                currentSize = size;
+                var maxSize = defStorage.getMaxSize();
+                newSize = currentSize + requiredSpaceKb + maxSize * self.componentDefStorage.EVICTION_HEADROOM;
+                if (newSize < maxSize) {
+                    return undefined;
+                }
+    
+                // some eviction is required.
+                //
+                // note: buildDependencyGraph() loads all actions and defs from storage. this forces
+                // scanning all rows in the respectives stores. this results in the stores returning an
+                // accurate value to getSize().
+                //
+                // as items are evicted from the store it's important that getSize() continues returning
+                // a value that is close to accurate.
                 return self.buildDependencyGraph()
                     .then(
                         function(graph) {
-                var keysToEvict = self.sortDependencyGraph(graph);
-                return self.evictDefsFromStorage(keysToEvict, graph, requiredSpaceKb);
+                            var keysToEvict = self.sortDependencyGraph(graph);
+                            return self.evictDefsFromStorage(keysToEvict, graph, requiredSpaceKb);
                         }
                     )
-            .then(
-                function(evicted) {
-                    $A.log("AuraComponentService.pruneDefsFromStorage: evicted " + evicted.length + " component defs and actions");
-                    $A.metricsService.transaction('AURAPERF', 'defsEvicted', {
-                        "defsRequiredSize" : requiredSpaceKb,
-                        "storageCurrentSize" : currentSize,
-                        "storageRequiredSize" : newSize,
-                        "evicted" : evicted
-                    });
+                    .then(
+                        function(evicted) {
+                            $A.log("AuraComponentService.pruneDefsFromStorage: evicted " + evicted.length + " component defs and actions");
+                            $A.metricsService.transaction('AURAPERF', 'defsEvicted', {
+                                "defsRequiredSize" : requiredSpaceKb,
+                                "storageCurrentSize" : currentSize,
+                                "storageRequiredSize" : newSize,
+                                "evicted" : evicted
+                            });
+                        }
+                    );
                 }
-            );
-            }
         );
 };
 

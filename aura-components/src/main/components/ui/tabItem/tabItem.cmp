@@ -31,7 +31,7 @@
     <aura:registerevent name="onTabHover"   type="ui:onTabHover" />
     <aura:registerevent name="onTabUnhover" type="ui:onTabHover" />
 
-    <aura:method name="setActive" action="{!c.setActive}" access="PUBLIC" description="Set the tab item to active or inactive">
+    <aura:method name="setActive" action="{!c.setActive}" description="Set the tab item to active or inactive">
         <aura:attribute name="active" type="Boolean" description="Indicates the tab is active or not."/>
         <aura:attribute name="focus" type="Boolean" description="Indicates the tab item should be focused or not."/>
         <aura:attribute name="callback" type="Object" description="Callback function"/>

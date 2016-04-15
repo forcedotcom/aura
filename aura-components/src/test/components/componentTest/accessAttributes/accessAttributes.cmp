@@ -26,8 +26,7 @@
     <aura:registerEvent name="globalEvent" type="auratest:accessGlobalEvent"/>
     <aura:registerEvent name="publicEvent" type="auratest:accessPublicEvent"/>
     <aura:registerEvent name="internalEvent" type="auratest:accessInternalEvent"/>
-    <aura:registerEvent name="privateEvent" type="auratest:accessPrivateEvent"/>
-
+    
     <aura:method name="globalMethod" action="{!c.globalMethod}" access="GLOBAL"/>
     <aura:method name="publicMethod" action="{!c.publicMethod}" access="PUBLIC"/>
     <aura:method name="internalMethod" action="{!c.internalMethod}" access="INTERNAL"/>

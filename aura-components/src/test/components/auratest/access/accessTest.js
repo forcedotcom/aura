@@ -149,15 +149,6 @@
 
                 var actual = cmp.get("v.output").getDef().getDescriptor().getQualifiedName();
                 $A.test.assertEquals(expected, actual);
-            },
-            function canAccessPrivateEvent(cmp) {
-                var expected = "markup://auratest:accessPrivateEvent";
-                cmp.set("v.testType", "privateEvent");
-
-                cmp.find("testEvent").getElement().click();
-
-                var actual = cmp.get("v.output").getDef().getDescriptor().getQualifiedName();
-                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -189,17 +180,6 @@
                cmp.find("testRemoteEvent").getElement().click();
 
                var actual = cmp.get("v.output").getDef().getDescriptor().getQualifiedName();
-               $A.test.assertEquals(expected, actual);
-           },
-           function canAccessPrivateEvent(cmp) {
-               // Cannot access remote private event
-               var expected = null;
-               cmp.set("v.testType", "privateEvent");
-               $A.test.expectAuraError("Access Check Failed!");
-
-               cmp.find("testRemoteEvent").getElement().click();
-
-               var actual = cmp.get("v.output");
                $A.test.assertEquals(expected, actual);
            }
        ]
@@ -468,7 +448,7 @@
            cmp.testMethods("INTERNAL");
            $A.test.assertEquals("internalMethod", cmp.get("v.output"));
        },
-       function canAccessGlobalMethod(cmp) {
+       function canAccessPrivateMethod(cmp) {
            cmp.testMethods("PRIVATE");
            $A.test.assertEquals("privateMethod", cmp.get("v.output"));
        }]

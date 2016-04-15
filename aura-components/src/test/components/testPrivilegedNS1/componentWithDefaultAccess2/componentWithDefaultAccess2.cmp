@@ -25,6 +25,9 @@
     <aura:method name="publicMethod" action="{!c.publicMethod}" access="PUBLIC"/>
     <aura:method name="privateMethod" action="{!c.privateMethod}" access="PRIVATE"/>
     <aura:method name="privilegedMethod" action="{!c.privilegedMethod}" access="PRIVILEGED"/>
+    <!-- only component in sytem/internal namespace can have method with internal access
+    <aura:method name="internalMethod" action="{!c.internalMethod}" access="INTERNAL"/>
+  	-->
   
   	<aura:registerEvent name='NS1eventWithPrivilegedAccessRegisteredWithDefaultAccess' 
   	type='testPrivilegedNS1:componentEventWithPrivilegedAccess'/>

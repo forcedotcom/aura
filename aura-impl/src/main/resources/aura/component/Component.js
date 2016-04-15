@@ -2112,9 +2112,25 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
     }
 };
 
-Component.prototype.getMethodHandler = function(valueProvider,name,action,attributes){
-    var observer=this.getActionCaller(valueProvider,action||("c."+name));
+Component.prototype.getMethodHandler = function(methodDef){
+    var component=this;
+    var observer=this.getActionCaller(this,methodDef.action||("c."+methodDef.getDescriptor().name));
     return function(/*param1,param2,paramN*/){
+        if(!$A.clientService.allowAccess(methodDef,component)) {
+            var context = $A.getContext();
+            var message = "Access Check Failed! Component.method():'" + methodDef.getDescriptor().toString() + "' is not visible to '" + (context && context.getCurrentAccess()) + "'.";
+            if (context.enableAccessChecks) {
+                if (context.logAccessFailures) {
+                    $A.error(message);
+                }
+                return false;
+            } else {
+                if (context.logAccessFailures) {
+                    $A.warning(message);
+                }
+                //Intentional fallthrough
+            }
+        }
         var eventDef = $A.eventService.getEventDef("aura:methodCall");
         var dispatcher = {};
         dispatcher[eventDef.getDescriptor().getQualifiedName()] = [observer];
@@ -2123,14 +2139,14 @@ Component.prototype.getMethodHandler = function(valueProvider,name,action,attrib
             "eventDispatcher" : dispatcher
         });
         var params={
-            "name" : name,
+            "name" : methodDef.getDescriptor().name,
             "arguments": null
         };
-        if(attributes) {
+        if(methodDef.attributes) {
             params["arguments"]={};
             var counter=0;
-            for (var attribute in attributes){
-                params["arguments"][attribute]=(arguments[counter] === undefined ? attributes[attribute]["default"] : arguments[counter]) ;
+            for (var attribute in methodDef.attributes){
+                params["arguments"][attribute]=(arguments[counter] === undefined ? methodDef.attributes[attribute]["default"] : arguments[counter]) ;
                 counter++;
             }
             for(var i=counter;i<arguments.length;i++){
@@ -2297,8 +2313,8 @@ Component.prototype.setupMethods = function() {
     if (defs) {
         var method;
         for(var i=0;i<defs.length;i++){
-            method=defs[i];
-            this[method.name]=this.getMethodHandler(this,method.name,method.action,method.attributes);
+            method=new Aura.Method.MethodDef(defs[i]);
+            this[method.getDescriptor().name]=this.getMethodHandler(method);
         }
     }
 };

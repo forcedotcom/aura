@@ -1006,7 +1006,7 @@ Action.prototype.isAbortable = function() {
  * [Deprecated] Does nothing.
  *
  * @public
- * @returns {Boolean} Set to true if the Action should be exclusive, or false otherwise.
+ * @returns {Boolean} false
  * @export
  * @deprecated
  */
@@ -1015,7 +1015,7 @@ Action.prototype.setExclusive = function() {
 };
 
 /**
- * [Deprecated] Returns false
+ * [Deprecated] Returns false.
  *
  * @public
  * @returns {Boolean} false

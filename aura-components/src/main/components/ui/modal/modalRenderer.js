@@ -22,5 +22,12 @@
     rerender: function (cmp, helper) {
         this.superRerender();
         helper.scopeScrollables(cmp);
+    },
+
+    unrender: function (cmp) {
+    	if (cmp._observer) {
+            cmp._observer.disconnect();
+        }
+        this.superUnrender();
     }
 })// eslint-disable-line semi

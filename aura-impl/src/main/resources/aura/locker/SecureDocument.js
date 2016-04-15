@@ -77,25 +77,25 @@ function SecureDocument(doc, key) {
     Object.defineProperties(o, {
         addEventListener: SecureElement.createAddEventListenerDescriptor(o, doc, key),
 
-        body: SecureThing.createFilteredProperty(o, doc, "body"),
-        head: SecureThing.createFilteredProperty(o, doc, "head"),
+        body: SecureObject.createFilteredProperty(o, doc, "body"),
+        head: SecureObject.createFilteredProperty(o, doc, "head"),
 
-        childNodes: SecureThing.createFilteredProperty(o, doc, "childNodes"),
+        childNodes: SecureObject.createFilteredProperty(o, doc, "childNodes"),
 
-        nodeType: SecureThing.createFilteredProperty(o, doc, "nodeType"),
+        nodeType: SecureObject.createFilteredProperty(o, doc, "nodeType"),
 
-        getElementById: SecureThing.createFilteredMethod(o, doc, "getElementById"),
-        getElementsByClassName: SecureThing.createFilteredMethod(o, doc, "getElementsByClassName"),
-        getElementsByName: SecureThing.createFilteredMethod(o, doc, "getElementsByName"),
-        getElementsByTagName: SecureThing.createFilteredMethod(o, doc, "getElementsByTagName"),
+        getElementById: SecureObject.createFilteredMethod(o, doc, "getElementById"),
+        getElementsByClassName: SecureObject.createFilteredMethod(o, doc, "getElementsByClassName"),
+        getElementsByName: SecureObject.createFilteredMethod(o, doc, "getElementsByName"),
+        getElementsByTagName: SecureObject.createFilteredMethod(o, doc, "getElementsByTagName"),
 
-        querySelector: SecureThing.createFilteredMethod(o, doc, "querySelector"),
-        querySelectorAll: SecureThing.createFilteredMethod(o, doc, "querySelectorAll"),
+        querySelector: SecureObject.createFilteredMethod(o, doc, "querySelector"),
+        querySelectorAll: SecureObject.createFilteredMethod(o, doc, "querySelectorAll"),
 
-        title: SecureThing.createFilteredProperty(o, doc, "title"),
+        title: SecureObject.createFilteredProperty(o, doc, "title"),
 
         // DCHASMAN TODO W-2839646 Figure out how much we want to filter cookie access???
-        cookie: SecureThing.createFilteredProperty(o, doc, "cookie")
+        cookie: SecureObject.createFilteredProperty(o, doc, "cookie")
     });
 
     setLockerSecret(o, "key", key);

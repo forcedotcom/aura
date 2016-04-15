@@ -23,17 +23,6 @@ function lib() { // eslint-disable-line no-unused-vars
         trillion : 't'
     };
 
-    function getMaxFractionDigits (pattern, symbols) {
-        var decimalSeparator = symbols && symbols.decimalSeparator ? symbols.decimalSeparator : '.';
-        var zero = symbols && symbols.zero ? symbols.zero : '0';
-        var patternSplit = pattern.split(decimalSeparator);
-        var reg = new RegExp('[^(#'+ zero + ']','g');
-        if (patternSplit.length > 1) {
-            return patternSplit[1].replace(reg,'').length;
-        }
-        return 0;
-    }
-
 
     return {
         formatNumber: function (number, formatter) {
@@ -90,11 +79,9 @@ function lib() { // eslint-disable-line no-unused-vars
         isNumber: function (number) {
             return $A.util.isNumber(number);
         },
-        isFormattedNumber: function (string, formatter) {
-            var zero              = $A.get("$Locale.zero");
+        isFormattedNumber: function (string) {
             var decimalSeparator  = $A.get("$Locale.decimal");
             var groupingSeparator = $A.get("$Locale.grouping");
-            var maxFractionDigits = getMaxFractionDigits(formatter, { decimalSeparator : decimalSeparator, zero : zero});
 
             var const1 = '(?!(K|B|M|T|\\' + decimalSeparator + '))';
 
@@ -108,7 +95,7 @@ function lib() { // eslint-disable-line no-unused-vars
             // it not case sensitive
             var regString = '^' + const1 + '((\\s*(\\+|\\-)?\\s*)' + const1 + ')?' +
                             '(\\d+(\\' + groupingSeparator + '\\d*)*)*' +
-                            '(\\' + decimalSeparator + '\\d{0,' + maxFractionDigits + '})?' +
+                            '(\\' + decimalSeparator + '\\d*)?' +
                             '(K|B|M|T)?$';
 
 

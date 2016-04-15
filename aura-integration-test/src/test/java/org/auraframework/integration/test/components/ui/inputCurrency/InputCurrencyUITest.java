@@ -47,6 +47,6 @@ public class InputCurrencyUITest extends BaseInputSmartNumber {
      */
     public void testDefaultFormatOnlyTwoDecimalPlacesAllowed() throws Exception {
         open(this.URL);
-        inputAndVerifyElmValueWithoutFormat(INPUT_SEL, "0.12345", "0.12");
+        inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "0.12345", "0.12", "$0.12");
     }
 }

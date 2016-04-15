@@ -897,7 +897,7 @@ Test.Aura.Controller.ActionTest = function() {
         }
     }
 
-    [ Fixture ]
+    [Fixture]
     function RunAfter() {
         [Fact]
         function AddsActionParamToQueue() {
@@ -2210,6 +2210,78 @@ Test.Aura.Controller.ActionTest = function() {
             });
 
             Assert.Equal(actual, true);
+        }
+    }
+
+    [Fixture]
+    function getAbortableId() {
+        [Fact]
+        function ReturnsUndefined() {
+            var target;
+            var expected = undefined;
+            var actual;
+
+            mockActionDependencies(function(){
+                target = new Action();
+                actual = target.getAbortableId();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function setExclusive() {
+        [Fact]
+        function ReturnsFalse() {
+            var target;
+            var expected = false;
+            var actual;
+
+            mockActionDependencies(function(){
+                target = new Action();
+                actual = target.setExclusive();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function isExclusive() {
+        [Fact]
+        function ReturnsFalse() {
+            var target;
+            var expected = false;
+            var actual;
+
+            mockActionDependencies(function(){
+                target = new Action();
+                target.setExclusive();
+                actual = target.isExclusive();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function run() {
+        [Fact]
+        function CallsRunDeprecated() {
+            var target;
+            var expected = "action";
+            var actual;
+
+            mockActionDependencies(function(){
+                target = new Action();
+                target.runDeprecated = function(action) {
+                    actual = action;
+                }
+                target.run(expected);
+            });
+
+            Assert.Equal(expected, actual);
         }
     }
 }

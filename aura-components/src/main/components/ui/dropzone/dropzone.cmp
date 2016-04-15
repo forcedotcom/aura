@@ -34,20 +34,20 @@
 	<aura:registerEvent name="dragLeave" type="ui:dragEvent" description="Event fired when a dragged component leaves this drop target."/>
 	<aura:registerEvent name="drop" type="ui:dragEvent" description="Event fired when a component is dropped on this drop target."/>
 		
-	<aura:method name="enterDragOperation" action="{!c.enterDragOperation}" access="public"/>
-	<aura:method name="exitDragOperation" action="{!c.exitDragOperation}" access="public"/>
+	<aura:method name="enterDragOperation" action="{!c.enterDragOperation}"/>
+	<aura:method name="exitDragOperation" action="{!c.exitDragOperation}"/>
 	
-	<aura:method name="fireDragEnter" action="{!c.fireDragEnter}" access="public">
+	<aura:method name="fireDragEnter" action="{!c.fireDragEnter}">
 		<aura:attribute name="target" type="Object" description="The event target for dragend."/>
 		<aura:attribute name="isInAccessibilityMode" type="Boolean" default="true" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>
 	</aura:method>
 	
-	<aura:method name="fireDragLeave" action="{!c.fireDragLeave}" access="public">
+	<aura:method name="fireDragLeave" action="{!c.fireDragLeave}">
 		<aura:attribute name="target" type="Object" description="The event target for dragend."/>
 		<aura:attribute name="isInAccessibilityMode" type="Boolean" default="true" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>
 	</aura:method>
 	
-	<aura:method name="fireDrop" action="{!c.fireDrop}" access="public">
+	<aura:method name="fireDrop" action="{!c.fireDrop}">
 		<aura:attribute name="target" type="Object" description="The event target for dragend."/>
 		<aura:attribute name="dragComponents" type="Aura.Component[]" required="true" description="The drag components that are dropped."/>
 		<aura:attribute name="isInAccessibilityMode" type="Boolean" default="true" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>

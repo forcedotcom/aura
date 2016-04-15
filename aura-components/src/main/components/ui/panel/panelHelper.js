@@ -502,26 +502,9 @@
     },
     
     scopeScrollables: function (cmp) {
-        var self = this;
-        var dom = cmp.getElement();
-        var scrollables = dom.querySelectorAll('.scrollable');
-        var observerConfig = { attributes: true, childList: true, characterData: true, subtree: true };
-
-        for (var i = 0; i < scrollables.length; i++) {
-            this.lib.panelLibCore.scopeScroll(scrollables[i]);
-        }
-
-        // watch for changes to the subtree so that scroll can
-        // be re-scoped
-        if(!cmp._observer && !$A.util.isUndefinedOrNull(window.MutationObserver)) { //phantomjs check
-            cmp._observer = new MutationObserver(function() {
-                if(cmp.isValid()) {
-                    self.scopeScrollables(cmp);
-                } 
-            });
-            cmp._observer.observe(dom, observerConfig);
-        }
+        this.lib.panelLibCore.scopeScrollables(cmp);
     },
+    
     startY : 0,
     iNoBounceEnabled : false,
     iNoBounce : function (el) {

@@ -26,18 +26,6 @@
         this.superRerender();
 
         helper.buildBody(cmp);
-    },
-
-    afterRender: function (cmp) {
-        this.superAfterRender();
-
-        $A.renderingService.afterRender(cmp.get("v.body"));
-    },
-
-    unrender: function (cmp) {
-        $A.renderingService.unrender(cmp.get("v.body"));
-
-        this.superUnrender();
     }
 
 });

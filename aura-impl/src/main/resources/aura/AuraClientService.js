@@ -419,10 +419,6 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
         } else {
             $A.util.json.resolveRefsObject(responseMessage);
         }
-
-        if (responseMessage["context"]) {
-            $A.componentService.saveDefsToStorage(responseMessage["context"]);
-        }
     }
 
     ret["status"] = "SUCCESS";
@@ -706,6 +702,42 @@ AuraClientService.prototype.isDevMode = function() {
     return !$A.util.isUndefined(context) && context.getMode() === "DEV";
 };
 
+/**
+ * the code to 
+ * @private
+ */
+AuraClientService.prototype.actualDumpCachesAndReload = function() {
+    // concurrently empty actions + cmp def storage.
+    // when both complete (and even if they fail) reload.
+
+    var actionClear;
+    var actionStorage = Action.getStorage();
+    if (actionStorage && actionStorage.isPersistent()) {
+        actionClear = actionStorage.clear().then(
+            undefined, // noop on success
+            function(e) {
+                $A.log("AuraClientService.dumpCachesAndReload(): failed to clear persistent actions cache", e);
+                // do not rethrow to return to resolve state
+            }
+        );
+    } else {
+        actionClear = Promise["resolve"]();
+    }
+
+    var defClear = $A.componentService.clearDefsFromStorage().then(
+        undefined, // noop on success
+        function(e) {
+            $A.log("AuraClientService.dumpCachesAndReload(): failed to clear persistent component def storage", e);
+            // do not rethrow to return to resolve state
+        }
+    );
+
+    Promise.all([actionClear, defClear]).then(
+        function() {
+            window.location.reload(true);
+        }
+    );
+};
 
 /**
  * Clears actions and ComponentDefStorage stores then reloads the page.
@@ -714,33 +746,9 @@ AuraClientService.prototype.dumpCachesAndReload = function() {
     if (this.reloadFunction) {
         return;
     }
-    this.reloadFunction = function() {
-        // reload even if storage clear fails
-        var actionStorage = Action.getStorage();
-        var actionClear = actionStorage && actionStorage.isPersistent() ? actionStorage.clear() : Promise["resolve"]([]);
 
-        actionClear.then(
-            undefined, // noop on success
-            function(e) {
-                $A.log("Failed to clear persistent actions cache", e);
-                // do not rethrow to return to resolve state
-            }
-        ).then(
-            function() {
-                return $A.componentService.clearDefsFromStorage();
-            }
-        ).then(
-            undefined, // noop on success
-            function(e) {
-                $A.log("Failed to clear persistent component def storage", e);
-                // do not rethrow to return to resolve state
-            }
-        ).then(
-            function() {
-                window.location.reload(true);
-            }
-        );
-    };
+    this.reloadFunction = this.actualDumpCachesAndReload.bind(this);
+
     if (this.reloadPointPassed) {
         this.reloadFunction();
     }
@@ -1694,7 +1702,7 @@ AuraClientService.prototype.sendActionXHRs = function() {
     if (background.length) {
         this.sendAsSingle(background, background.length);
     }
-
+    
     if (deferred.length) {
         if (this.idle()) {
             this.sendAsSingle(deferred, 1);
@@ -2160,7 +2168,10 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         if(!priorAccess){
             context.setCurrentAccess($A.getRoot());
         }
-        context['merge'](responseMessage["context"]);
+        if (responseMessage["context"]) {
+            context['merge'](responseMessage["context"]);
+            $A.componentService.saveDefsToStorage(responseMessage["context"], context);
+        }
     } catch (e) {
         $A.logger.reportError(e);
     }finally{

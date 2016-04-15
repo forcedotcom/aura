@@ -59,7 +59,7 @@ ComponentDefStorage.prototype.setupDefinitionStorage = function() {
         // the label placeholder in non-prod mode).
 
         var actions = Action.getStorage();
-        if (actions && actions.isPersistent() && $A.getContext().getApp()) {
+        if (actions && actions.isPersistent()) {
 
             var storage = $A.storageService.getStorage("ComponentDefStorage");
             var removeStorage = false;
@@ -107,13 +107,14 @@ ComponentDefStorage.prototype.getStorage = function () {
  * @param {Array} libConfigs the lib definitions to store
  * @return {Promise} promise that resolves when storing is complete.
  */
-ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs) {
+ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, context) {
     if (this.useDefinitionStorage() && (cmpConfigs.length || libConfigs.length)) {
         var promises = [];
         var descriptor, encodedConfig, i;
 
         for (i = 0; i < cmpConfigs.length; i++) {
             descriptor = cmpConfigs[i]["descriptor"];
+            cmpConfigs[i]["uuid"] = context.findLoaded(descriptor);
             encodedConfig = $A.util.json.encode(cmpConfigs[i]);
             promises.push(this.definitionStorage.put(descriptor, encodedConfig));
         }
@@ -199,7 +200,7 @@ ComponentDefStorage.prototype.getAll = function () {
  * Asynchronously retrieves all definitions from storage and adds to component service.
  * @return {Promise} a promise that resolves when definitions are restored.
  */
-ComponentDefStorage.prototype.restoreAll = function() {
+ComponentDefStorage.prototype.restoreAll = function(context) {
     var defRegistry = this;
     if (this.currentPromise) {
         return this.currentPromise;
@@ -220,6 +221,9 @@ ComponentDefStorage.prototype.restoreAll = function() {
                         }
                         libCount++;
                     } else {
+                        if (config["uuid"]) {
+                            context.addLoaded(config["uuid"]);
+                        }
                         if (!$A.componentService.getComponentDef(config)) {
                             $A.componentService.saveComponentConfig(config);
                         }

@@ -25,6 +25,8 @@
     <aura:method name="publicMethod" action="{!c.publicMethod}" access="PUBLIC"/>
     <aura:method name="privateMethod" action="{!c.privateMethod}" access="PRIVATE"/>
     <aura:method name="privilegedMethod" action="{!c.privilegedMethod}" access="PRIVILEGED"/>
+    <aura:method name="internalMethod" action="{!c.internalMethod}" access="INTERNAL"/>
+  
  
  	<aura:registerEvent name='eventWithGlobalAccessInSameSystemNamespaceRegisteredWithGlobalAccess' 
  	type='auratest:accessGlobalEvent' access='GLOBAL'/> 

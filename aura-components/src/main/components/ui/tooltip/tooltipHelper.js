@@ -94,8 +94,10 @@
 		
 		component.set('v.isVisible', true);
 		this.buildTooltip(component, $A.getCallback(function(tt) {
-			tt.set('v.isVisible', true);
-			self.smLib.stackManager.bringToFront(tt);
+			if (tt && tt.isValid()) {
+				tt.set('v.isVisible', true);
+				self.smLib.stackManager.bringToFront(tt);
+			}
 		}));
 	},
 

@@ -72,7 +72,7 @@ function lib() { //eslint-disable-line no-unused-vars
         "<del[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/del>|<del[\\s]+[^>]+\/>|" +
         "<ins[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/ins>|<ins[\\s]+[^>]+\/>)";
 
-    var escapeCharacterMatchingRegex = "([\\n<>&\"\'])";
+    var escapeCharacterMatchingRegex = "([<>&\"\'])";
 
     var createHttpLink = function(match) {
         var href = match;
@@ -92,8 +92,6 @@ function lib() { //eslint-disable-line no-unused-vars
     };
     var escapeCharacter = function(match) {
         switch (match) {
-            case '\n':
-                return "<br>";
             case '<':
                 return "&lt;";
             case '>':

@@ -25,13 +25,13 @@ function SecureAuraEvent(event, key) {
         }
     });
     Object.defineProperties(o, {
-        "fire": SecureThing.createFilteredMethod(o, event, "fire"),
-        "getName": SecureThing.createFilteredMethod(o, event, "getName"),
-        "getParam": SecureThing.createFilteredMethod(o, event, "getParam"),
-        "getParams": SecureThing.createFilteredMethod(o, event, "getParams"),
-        "getSource": SecureThing.createFilteredMethod(o, event, "getSource"),
-        "setParam": SecureThing.createFilteredMethod(o, event, "setParam"),
-        "setParams": SecureThing.createFilteredMethod(o, event, "setParams")
+        "fire": SecureObject.createFilteredMethod(o, event, "fire"),
+        "getName": SecureObject.createFilteredMethod(o, event, "getName"),
+        "getParam": SecureObject.createFilteredMethod(o, event, "getParam"),
+        "getParams": SecureObject.createFilteredMethod(o, event, "getParams"),
+        "getSource": SecureObject.createFilteredMethod(o, event, "getSource"),
+        "setParam": SecureObject.createFilteredMethod(o, event, "setParam"),
+        "setParams": SecureObject.createFilteredMethod(o, event, "setParams")
     });
 
     setLockerSecret(o, "key", key);

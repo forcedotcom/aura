@@ -21,7 +21,7 @@
 	
 	<aura:attribute name="draggables" type="Aura.Component[]" description="Dropzone components to be rendered as menuItem."/>
 	
-	<aura:method name="startDragAndDrop" action="{!c.startDragAndDrop}" access="public">
+	<aura:method name="startDragAndDrop" action="{!c.startDragAndDrop}">
 		<aura:attribute name="draggables" type="Aura.Component[]" required="true" description="Draggable components that are being dragged. Must be of type ui:draggable."/>
 		<aura:attribute name="target" type="Object" required="true" description="The event target in which accessibility element should be relative to."/>
 	</aura:method>

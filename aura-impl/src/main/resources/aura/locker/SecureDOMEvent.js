@@ -28,9 +28,9 @@ function SecureDOMEvent(event, key) {
     var DOMEventSecureDescriptors = {
         // Events properties that are DOM Elements were compiled from
         // https://developer.mozilla.org/en-US/docs/Web/Events
-        target: SecureThing.createFilteredProperty(o, event, "target"),
-        currentTarget: SecureThing.createFilteredProperty(o, event, "currentTarget"),
-        relatedTarget: SecureThing.createFilteredProperty(o, event, "relatedTarget"),
+        target: SecureObject.createFilteredProperty(o, event, "target"),
+        currentTarget: SecureObject.createFilteredProperty(o, event, "currentTarget"),
+        relatedTarget: SecureObject.createFilteredProperty(o, event, "relatedTarget"),
 
         // Touch Events are special on their own:
         // https://developer.mozilla.org/en-US/docs/Web/API/Touch
@@ -47,9 +47,9 @@ function SecureDOMEvent(event, key) {
         },
 
         // non-standard properties and aliases
-        srcElement: SecureThing.createFilteredProperty(o, event, "srcElement"),
-        explicitOriginalTarget: SecureThing.createFilteredProperty(o, event, "explicitOriginalTarget"),
-        originalTarget: SecureThing.createFilteredProperty(o, event, "originalTarget")
+        srcElement: SecureObject.createFilteredProperty(o, event, "srcElement"),
+        explicitOriginalTarget: SecureObject.createFilteredProperty(o, event, "explicitOriginalTarget"),
+        originalTarget: SecureObject.createFilteredProperty(o, event, "originalTarget")
     };
 
     // re-exposing externals
@@ -58,7 +58,7 @@ function SecureDOMEvent(event, key) {
         if (!(name in o)) {
             // every DOM event has a different shape, we apply filters when possible,
             // and bypass when no secure filter is found.
-            Object.defineProperty(o, name, DOMEventSecureDescriptors[name] || SecureThing.createFilteredProperty(o, event, name));
+            Object.defineProperty(o, name, DOMEventSecureDescriptors[name] || SecureObject.createFilteredProperty(o, event, name));
         }
     }
 
@@ -89,7 +89,7 @@ SecureDOMEvent.filterTouchesDescriptor = function (se, event, propName) {
                         // all props in a touch object are readonly by spec:
                         // https://developer.mozilla.org/en-US/docs/Web/API/Touch
                         get: function() {
-                            return SecureThing.filterEverything(se, touch[p]);
+                            return SecureObject.filterEverything(se, touch[p]);
                         }
                     });
                 }, {});

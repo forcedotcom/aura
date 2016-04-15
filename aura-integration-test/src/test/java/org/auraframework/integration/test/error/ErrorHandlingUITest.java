@@ -63,6 +63,22 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
+     * Verify that error message box displays via $A.error.
+     */
+    public void testErrorMessageDisplayAndCloseViaAError() throws Exception {
+        open("/auratest/errorHandlingApp.app", Mode.PROD);
+        assertErrorMaskIsNotVisible();
+
+        String errorMsg = "Something went haywire!";
+        getAuraUITestingUtil().getEval("$A.error('" + errorMsg + "')");
+        String actualMessage = findErrorMessage();
+        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(errorMsg));
+
+        findAndClickElement(ERROR_CLOSE_LOCATOR);
+        assertErrorMaskIsNotVisible();
+    }
+
+    /**
      * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button
      * when $A has not been initialized yet.
      */

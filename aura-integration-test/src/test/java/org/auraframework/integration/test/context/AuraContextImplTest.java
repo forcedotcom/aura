@@ -77,6 +77,13 @@ public class AuraContextImplTest extends AuraImplTestCase {
         super(name, false);
     }
 
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        // Force LockerService to be enabled for consistency between environments
+        getMockConfigAdapter().setLockerServiceEnabled(true);
+    }
+
     /**
      * Verify the serialized format of a ComponentDef when it was 'preloaded'.
      *

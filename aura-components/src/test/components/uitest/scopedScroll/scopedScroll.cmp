@@ -1,0 +1,31 @@
+<aura:component>
+    <aura:import library="ui:panelLib" property="lib"/>
+    <div style="width:300px">
+    <div class="scrollable" style="height:50px;border:1px solid black;background:salmon;overflow:auto;padding:10px">
+        <div class="scrollable" style="height:70px;border:1px solid black;background:olivedrab;overflow:auto;padding:10px">
+            <textarea>
+                1
+                2
+                3
+                4
+                5
+                6
+                7
+                8
+                9
+                10
+                1
+                2
+                3
+                4
+                5
+                6
+                7
+                8
+                9
+                10
+            </textarea>
+        </div>
+    </div>
+    </div>
+</aura:component>

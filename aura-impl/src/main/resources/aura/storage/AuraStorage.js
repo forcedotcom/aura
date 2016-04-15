@@ -27,6 +27,7 @@ var AuraStorage = function AuraStorage(config) {
     this.defaultExpiration = config["defaultExpiration"] * 1000;
     this.defaultAutoRefreshInterval = config["defaultAutoRefreshInterval"] * 1000;
     this.debugLoggingEnabled = config["debugLoggingEnabled"];
+    this.getOperationsInFlight = 0;
 
     this.isolationKey = config["isolationKey"];
     this.setVersion(config["version"]);
@@ -144,19 +145,35 @@ AuraStorage.prototype.clear = function() {
  * @export
  */
 AuraStorage.prototype.get = function(key) {
+    this.getOperationsInFlight += 1;
     var that = this;
     var promise = this.adapter.getItem(this.keyPrefix + key).then(function(item) {
         that.log("get() " + (item ? "HIT" : "MISS") + " - key: " + key + ", value: " + item);
+        that.getOperationsInFlight -= 1;
 
         if (!item) {
             return undefined;
         }
         return { "value" : item["value"], "isExpired" : (new Date().getTime() > item["expires"]) };
+    },function (err) {
+        that.getOperationsInFlight -= 1;
+        return Promise["reject"](err);
     });
 
     this.sweep();
 
     return promise;
+};
+
+
+/**
+ * In flight operations counter
+ * @returns {Integer} Number of operations currently waiting on being resolved
+
+ * @export
+ */
+AuraStorage.prototype.inFlightOperations = function() {
+    return this.getOperationsInFlight;
 };
 
 /**

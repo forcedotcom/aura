@@ -49,6 +49,7 @@ Aura.Event      = {};
 Aura.Layouts    = {};
 Aura.Controller = {};
 Aura.Attribute  = {};
+Aura.Method     = {};
 Aura.L10n       = {};
 Aura.Services   = {};
 Aura.Storage    = {};
@@ -144,6 +145,9 @@ window['$A'] = {};
 // #include aura.attribute.AttributeSet
 // #include aura.attribute.AttributeDefSet
 
+// -- Method ----------------------------------------------------------
+// #include aura.method.MethodDef
+
 // -- RequiredVersion ----------------------------------------------------------
 // #include aura.requiredVersion.RequiredVersionDef
 // #include aura.requiredVersion.RequiredVersionDefSet
@@ -171,7 +175,7 @@ window['$A'] = {};
 // #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}
 
 //-- LockerService -----------------------------------------------------------
-//#include aura.locker.SecureThing
+//#include aura.locker.SecureObject
 //#include aura.locker.SecureDOMEvent
 //#include aura.locker.SecureIFrameElement
 //#include aura.locker.SecureElement
@@ -608,31 +612,33 @@ AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; 
 AuraInstance.prototype.initAsync = function(config) {
     Aura.bootstrapMark("initAsync");
 
-    //
-    // This hook is to allow for reloading after aura is initialized, including
-    // any storage setup, as we may well have to clear persistent storage.
-    //
-    this.clientService.reloadPointPassed = true;
-    if (this.clientService.reloadFunction) {
-        this.clientService.reloadFunction();
-        return;
-    }
-
     var regexpDetectURLProcotolSegment = /^(.*?:)?\/\//;
 
     function createAuraContext() {
         // Context is created async because of the GVPs go though async storage checks
         $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
+            //
+            // This hook is to allow for reloading after aura is initialized, including
+            // any storage setup, as we may well have to clear persistent storage.
+            //
+            $A.context = context;
+            $A.clientService.reloadPointPassed = true;
+            if ($A.clientService.reloadFunction) {
+                $A.clientService.reloadFunction();
+                return;
+            }
             if (!window["$$safe-eval$$"] && !regexpDetectURLProcotolSegment.test(config["host"])) {
                 throw new $A.auraError("Aura(): Failed to initialize locker worker.", null, $A.severity.QUIET);
             }
-            $A.context = context;
             $A.clientService.initHost(config["host"]);
             $A.setLanguage();
 
             $A.metricsService.initialize();
 
-            $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
+            // Restore component definitions from AuraStorage into memory (if persistent)
+            $A.componentService.restoreDefsFromStorage($A.getContext()).then(function () {
+                $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
+            });
         });
     }
 
@@ -730,11 +736,7 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
         if (!$A.initialized) {
             $A.initialized = true;
             $A.addDefaultErrorHandler(app);
-            // Restore component definitions from AuraStorage into memory (if persistent)
-            $A.componentService.restoreDefsFromStorage().then(function () {
-                $A.getContext().pruneLoaded();
-                $A.finishInit(doNotInitializeServices);
-            });
+            $A.finishInit(doNotInitializeServices);
         }
     }
 };

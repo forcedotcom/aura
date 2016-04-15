@@ -74,8 +74,8 @@
         var testUtils = cmp.get("v.testUtils");
         var result = document.querySelectorAll('*');
         //testUtils.assertTrue($A.util.isArray(result), "Expected document.querySelectorAll('*') to return an Array");
-        testUtils.assertStartsWith("SecureThing", result[0].toString(), "Expected document.querySelectorAll('*') to" +
-                " return SecureThing elements");
+        testUtils.assertStartsWith("SecureObject", result[0].toString(), "Expected document.querySelectorAll('*') to" +
+                " return SecureObject elements");
     },
     
     testDocumentBodyConstructorNotExposed: function(cmp) {

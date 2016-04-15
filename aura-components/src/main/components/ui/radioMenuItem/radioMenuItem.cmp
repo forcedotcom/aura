@@ -22,6 +22,8 @@
 
     <aura:method name="select" action="{!c.select}"/>
 
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
     <li aura:id="listitem" class="{!v.class}" role="presentation">
         <a aura:id="anchor" role="menuitemradio" onclick="{!c.onClick}"/>
     </li>

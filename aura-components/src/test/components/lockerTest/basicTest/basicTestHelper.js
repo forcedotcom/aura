@@ -1,6 +1,6 @@
 ({
     testCannotAccessDocumentBodyFromHelper: function(testUtils) {
-        testUtils.assertStartsWith("SecureThing", document.body.toString(), "Expected document.body in helper to be an SecureThing");
+        testUtils.assertStartsWith("SecureObject", document.body.toString(), "Expected document.body in helper to be an SecureObject");
     },
 
     testAuraLockerInHelper: function(testUtils) {

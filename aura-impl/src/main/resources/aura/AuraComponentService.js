@@ -662,7 +662,7 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
         }
 
         // We won't be able to do an access check if the access is invalid, so
-        // just skip trying to do anything. 
+        // just skip trying to do anything.
         var currentAccess = $A.getContext().getCurrentAccess();
         if(currentAccess && !currentAccess.isValid()) {
             return;
@@ -1312,6 +1312,7 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
     var defSizeKb = $A.util.estimateSize(cmpConfigs) / 1024;
     var libSizeKb = $A.util.estimateSize(libConfigs) / 1024;
 
+    // use enqueue() to prevent concurrent get/analyze/prune/save operations
     return this.componentDefStorage.enqueue(function(resolve, reject) {
         self.pruneDefsFromStorage(defSizeKb + libSizeKb)
         .then(
@@ -1757,7 +1758,7 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
 
     var currentSize = 0;
     var newSize = 0;
-   
+
     // check space to determine if eviction is required. this is an approximate check meant to
     // avoid storage.getAll() and graph analysis which are expensive operations.
     return defStorage.getSize()
@@ -1769,11 +1770,11 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                 if (newSize < maxSize) {
                     return undefined;
                 }
-    
+
                 // some eviction is required.
                 //
                 // note: buildDependencyGraph() loads all actions and defs from storage. this forces
-                // scanning all rows in the respectives stores. this results in the stores returning an
+                // scanning all rows in the respective stores. this results in the stores returning an
                 // accurate value to getSize().
                 //
                 // as items are evicted from the store it's important that getSize() continues returning

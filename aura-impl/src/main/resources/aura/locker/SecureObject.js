@@ -28,6 +28,9 @@ function SecureObject(thing, key) {
 
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", thing);
+
+	$A.lockerService.markOpaque(o);
+	
 	return Object.seal(o);
 }
 
@@ -85,6 +88,7 @@ SecureObject.filterEverything = function (st, raw) {
 			var key = getLockerSecret(st, "key");
 			var hasAccess = $A.lockerService.util.hasAccess(st, raw);
 			$A.assert(key, "A secure object should always have a key.");
+			
 			if ($A.util.isAction(raw)) {
 				swallowed = hasAccess ?
 						SecureAction(raw, key) : SecureObject(raw, key);
@@ -94,8 +98,7 @@ SecureObject.filterEverything = function (st, raw) {
 						SecureComponent(raw, key) : SecureComponentRef(raw, key);
 				mutated = raw !== swallowed;
 			} else if (SecureObject.isDOMElementOrNode(raw)) {
-				swallowed = hasAccess ?
-						SecureElement(raw, key) : SecureObject(raw, key);
+				swallowed = hasAccess || raw === document.body || raw === document.head ? SecureElement(raw, key) : SecureObject(raw, key);
 				mutated = true;
 			} else if ($A.lockerService.util.isKeyed(raw)) {
 				swallowed = SecureObject(raw, key);
@@ -161,7 +164,13 @@ SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
 	return {
 		enumerable: true,
 		value : function() {
-			var fnReturnedValue = raw[methodName].apply(raw, SecureObject.unfilterEverything(st, SecureObject.ArrayPrototypeSlice.call(arguments)));
+			var args = SecureObject.ArrayPrototypeSlice.call(arguments);
+			
+			if (options && options.beforeCallback) {
+				options.beforeCallback.apply(raw, args);
+			}
+			
+			var fnReturnedValue = raw[methodName].apply(raw, SecureObject.unfilterEverything(st, args));
 
 			if (options && options.afterCallback) {
 				fnReturnedValue = options.afterCallback(fnReturnedValue);
@@ -186,6 +195,10 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
 
 	if (!options || options.writable !== false) {
 		descriptor.set = function(value) {
+			if (options && options.beforeSetCallback) {
+				options.beforeSetCallback();
+			}
+			
 			raw[propertyName] = SecureObject.unfilterEverything(st, value);
 
 			if (options && options.afterSetCallback) {

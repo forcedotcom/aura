@@ -1,8 +1,12 @@
 ({
-    testCannotAccessDocumentBodyFromHelper: function(testUtils) {
-        testUtils.assertStartsWith("SecureObject", document.body.toString(), "Expected document.body in helper to be an SecureObject");
+    testCanAccessDocumentBodyFromHelper: function(testUtils) {
+    	this.verifySharedSecureElement(testUtils, "body");
     },
 
+    testCanAccessDocumentHeadFromHelper: function(testUtils) {
+    	this.verifySharedSecureElement(testUtils, "head");
+    },
+    
     testAuraLockerInHelper: function(testUtils) {
         testUtils.assertStartsWith("SecureAura", $A.toString(), "Expected $A in helper to be a SecureAura");
     },
@@ -65,5 +69,17 @@
     testExpression : function(testCase) {
         var result = testCase();
         return "Global window via " + testCase.toString() + ": " + result;
-    }
+    },
+    
+    verifySharedSecureElement: function(testUtils, property) {
+        var el = document[property];
+        testUtils.assertStartsWith("SecureElement", el.toString(), "Expected document.body in helper to be a SecureElement");
+        
+        try {
+        	el.innerHTML = "<div>Should throw an Aura exception</div>";
+        	testUtils.fail("Should not be able to set innerHTML property on shared SecureElement: " + property);
+    	} catch(e) {
+	        testUtils.assertEquals("SecureElement.innerHTML cannot be used with " + property.toUpperCase() + " elements!", e.toString());
+    	}
+	}
 })

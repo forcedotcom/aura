@@ -16,6 +16,10 @@
 
 function SecureElement(el, key) {
 	"use strict";
+	
+	function isSharedElement(element) {
+		return element === document.body || element === document.head;
+	}
 
 	// A secure element can have multiple forms, this block allows us to apply
 	// some polymorphic behavior to SecureElement depending on the tagName
@@ -35,11 +39,10 @@ function SecureElement(el, key) {
 
 		appendChild : {
 			value : function(child) {
-				$A.lockerService.util.verifyAccess(o, child);
+				$A.lockerService.util.verifyAccess(o, child, { verifyNotOpaque: true });
 
 				if (child.$run) {
 					// special case for SecureScriptElement to execute without insertion.
-					// TODO: improve
 					child.$run();
 				} else {
 					el.appendChild(getLockerSecret(child, "ref"));
@@ -76,7 +79,12 @@ function SecureElement(el, key) {
         nodeName: SecureObject.createFilteredProperty(o, el, "nodeName"),
         nodeType: SecureObject.createFilteredProperty(o, el, "nodeType"),
 
-        removeChild: SecureObject.createFilteredMethod(o, el, "removeChild"),
+        removeChild: SecureObject.createFilteredMethod(o, el, "removeChild", { 
+        	beforeCallback: function(child) {
+        		// Verify that the passed in child is not opaque!
+				$A.lockerService.util.verifyAccess(o, child, { verifyNotOpaque: true });
+        	}	
+    	}),
 
 		// Standard HTMLElement methods
 		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
@@ -84,12 +92,21 @@ function SecureElement(el, key) {
 		click: SecureObject.createFilteredMethod(o, el, "click"),
 		focus: SecureObject.createFilteredMethod(o, el, "focus"),
 
-		innerHTML : SecureObject.createFilteredProperty(o, el, "innerHTML", { returnValue: "", afterSetCallback: function() {
-			// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
-			if (el.firstChild) {
-				$A.lockerService.trust(o, el.firstChild);
-			}
-		} }),
+		innerHTML : SecureObject.createFilteredProperty(o, el, "innerHTML", { 
+			returnValue: "", 
+			beforeSetCallback: function() {				
+				// Do not allow innerHTML on shared elements (body/head)
+				if (isSharedElement(el)) {
+		            throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
+				}
+			},
+			afterSetCallback: function() {
+				// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
+				if (el.firstChild) {
+					$A.lockerService.trust(o, el.firstChild);
+				}
+			} 
+		}),
 
         cloneNode: SecureObject.createFilteredMethod(o, el, "cloneNode", { afterCallback: function(fnReturnedValue) {
 			// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
@@ -160,5 +177,9 @@ SecureElement.addElementSpecificProperties = function(se, el) {
 };
 
 SecureElement.elementSpecificWhitelists = {
-	"A": ["hash", "host", "hostname", "href", "origin", "pathname", "port", "protocol", "search"]
+	"A": ["hash", "host", "hostname", "href", "origin", "pathname", "port", "protocol", "search"],
+	
+	// DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values for http-equiv/httpEquiv
+	
+	"META": ["content", "name"]
 };

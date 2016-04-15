@@ -31,6 +31,18 @@ function SecureDocument(doc, key) {
         $A.lockerService.trust(st, el);
         return SecureElement(el, key);
     }
+    
+    function createElement(tag, namespace) {
+    	// Insure that no object to string coercion tricks can be applied to evade tag name based logic
+        tag = tag + "";
+        switch (tag.toLowerCase()) {
+            case "script":
+                return SecureScriptElement(key);
+
+            default:
+                return trust(o, namespace ? doc.createElementNS(namespace, tag) : doc.createElement(tag));
+        }
+    }
 
     var o = Object.create(null, {
         toString: {
@@ -40,15 +52,12 @@ function SecureDocument(doc, key) {
         },
         createElement: {
             value: function(tag) {
-                // Insure that no object to string coercion tricks can be applied to evade tag name based logic
-                tag = tag + "";
-                switch (tag.toLowerCase()) {
-                    case "script":
-                        return SecureScriptElement(key);
-
-                    default:
-                        return trust(o, doc.createElement(tag));
-                }
+                return createElement(tag);
+            }
+        },       
+        createElementNS: {
+            value: function(namespace, tag) {
+                return createElement(tag, namespace);
             }
         },
         createDocumentFragment: {

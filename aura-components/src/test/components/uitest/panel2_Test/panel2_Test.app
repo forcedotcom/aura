@@ -43,6 +43,8 @@
 	<aura:attribute name="testCustomizeCloseAction"     type="Boolean" default="false"/>
 	<aura:attribute name="testTrapFocus"    type="Boolean" default="true"/>
 	<aura:attribute name="testCloseOnLocationChange"    type="Boolean" default="false"/>
+
+	<aura:dependency resource="markup://ui:block" type="COMPONENT"/>
 	
 <div style="z-index:1; position:relative;">
 	<ui:block aura:id="overflowHidden">

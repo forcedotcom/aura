@@ -157,16 +157,29 @@
     			return $A.test.getStyle(panel.getElement(),'display')
     		}, "Positioned panels should have display:none when hiding it.");
     		$A.test.assertEquals(0, parseInt($A.test.getStyle(panel.getElement(),'opacity')), "Opacity of the panel should be 0 after hiding the panel");
-        /* TODO: Uncomment once W-2802284 is fixed
+            $A.test.addWaitForWithFailureMessage(0, function () {
+                return parseInt($A.test.getStyle(panel.getElement(),'opacity'));
+
+            }, "Opacity of the panel should be 0 after hiding the panel");
+        }, function(cmp) {
+           
         	panel.show();
         }, function(cmp) {
+
         	this.waitForPanelDialogOpen();
         }, function(cmp) {
         	$A.test.addWaitForWithFailureMessage("block", function () {
     			return $A.test.getStyle(panel.getElement(),'display')
     		}, "Positioned panels should have display:block after showing it.");
-    		$A.test.assertEquals(1, parseInt($A.test.getStyle(panel.getElement(),'opacity')), "Opacity of the panel should be 1 after showing the panel");
-        */
+        }, function(cmp) {
+            var x = false;
+            setTimeout(function() {
+                x = true;
+            }, 1000);
+            $A.test.addWaitForWithFailureMessage(1, function () {
+                return parseInt($A.test.getStyle(panel.getElement(),'opacity'));
+            }, "Opacity of the panel should be 1 after showing the panel");
+
 		}]
     },
     

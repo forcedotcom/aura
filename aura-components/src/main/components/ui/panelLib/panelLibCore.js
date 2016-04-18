@@ -149,11 +149,13 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 if (!panelCmp.isValid()) {
                     return;
                 }
+
+                var isVisible = $A.util.getBooleanValue(panelCmp.get('v.visible'));
                 
                 var event = e || window.event,
                     panelEl = panelCmp.getElement(),
                     target = event.target || event.srcElement;
-                if (config.closeOnClickOut) {
+                if (config.closeOnClickOut && isVisible) {
                     var clickedInside = $A.util.contains(panelEl, target);
                     if (panelEl && !clickedInside) {
 

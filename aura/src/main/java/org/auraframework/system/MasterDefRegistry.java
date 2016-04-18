@@ -161,6 +161,8 @@ public interface MasterDefRegistry {
      */
     String getCachedString(String uid, DefDescriptor<?> descriptor, String key);
 
+	String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key);
+
     /**
      * Get a named string from the cache for a cacheable definition.
      *
@@ -170,6 +172,9 @@ public interface MasterDefRegistry {
      */
     String getCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader) 
     		throws QuickFixException, IOException;
+
+	String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader)
+			throws QuickFixException, IOException;
 
     /**
      * Put a named string in the cache for a def.

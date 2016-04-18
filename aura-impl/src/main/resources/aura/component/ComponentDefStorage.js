@@ -149,13 +149,20 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, conte
                     return that.definitionStorage.remove(that.TRANSACTION_SENTINEL_KEY)
                         .then(
                             undefined,
-                            function() {}
+                            function() {
+                                // we can't recover: the defs were properly stored but the sentinel is still there.
+                                // W-2365447 removes the need for a sentinel which eliminates this possibility.
+                            }
                         );
                 },
                 function (e) {
                     $A.warning("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries", e);
-                    // leave sentinel in place! AuraComponentService.saveDefsToStorage() will clear the store but in case page reloads
-                    // before that happens the sentinel tells getAll() to not hydrate any defs.
+                    // error storing defs so the persisted def graph is broken. do not remove the sentinel:
+                    // 1. reject this promise so the caller, AuraComponentService.saveDefsToStorage(), will
+                    //    clear the def + action stores which removes the sentinel.
+                    // 2. if the page reloads before the stores are cleared the sentinel prevents getAll()
+                    //    from restoring any defs.
+                    throw e;
                 }
             );
         });
@@ -185,13 +192,20 @@ ComponentDefStorage.prototype.removeDefs = function(descriptors) {
                     return that.definitionStorage.remove(that.TRANSACTION_SENTINEL_KEY)
                     .then(
                         undefined,
-                        function() {}
+                        function() {
+                            // we can't recover: the defs were properly removed but the sentinel is still there.
+                            // W-2365447 removes the need for a sentinel which eliminates this possibility.
+                        }
                     );
                 },
                 function (e) {
                     $A.log("ComponentDefStorage: Error removing  " + promises.length + " descriptors", e);
-                    // leave sentinel in place! AuraComponentService.saveDefsToStorage() will clear the store but in case page reloads
-                    // before that happens the sentinel tells getAll() to not hydrate any defs.
+                    // error removing defs so the persisted def graph is broken. do not remove the sentinel:
+                    // 1. reject this promise so the caller, AuraComponentService.evictDefsFromStorage(), will
+                    //    clear the def + action stores which removes the sentinel.
+                    // 2. if the page reloads before the stores are cleared the sentinel prevents getAll()
+                    //    from restoring any defs.
+                    throw e;
                 }
             );
         });

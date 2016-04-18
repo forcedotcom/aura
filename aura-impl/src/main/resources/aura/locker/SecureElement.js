@@ -20,6 +20,15 @@ function SecureElement(el, key) {
 	function isSharedElement(element) {
 		return element === document.body || element === document.head;
 	}
+	
+	function runIfRunnable(st) {
+		var isRunnable = st.$run;
+		if (isRunnable) {
+			// special case for SecureScriptElement to execute without insertion.
+			st.$run();
+		}
+		return isRunnable;
+	}
 
 	// A secure element can have multiple forms, this block allows us to apply
 	// some polymorphic behavior to SecureElement depending on the tagName
@@ -41,14 +50,24 @@ function SecureElement(el, key) {
 			value : function(child) {
 				$A.lockerService.util.verifyAccess(o, child, { verifyNotOpaque: true });
 
-				if (child.$run) {
-					// special case for SecureScriptElement to execute without insertion.
-					child.$run();
-				} else {
+				if (!runIfRunnable(child)) {
 					el.appendChild(getLockerSecret(child, "ref"));
 				}
 
 				return child;
+			}
+		},
+		
+		insertBefore : {
+			value : function(newNode, referenceNode) {
+				$A.lockerService.util.verifyAccess(o, newNode, { verifyNotOpaque: true });
+				$A.lockerService.util.verifyAccess(o, referenceNode, { verifyNotOpaque: true });
+
+				if (!runIfRunnable(newNode)) {
+					el.insertBefore(getLockerSecret(newNode, "ref"), getLockerSecret(referenceNode, "ref"));
+				}
+				
+				return newNode;
 			}
 		}
 	});
@@ -121,6 +140,7 @@ function SecureElement(el, key) {
 	SecureElement.addSecureProperties(o, el);
 
 	SecureElement.addElementSpecificProperties(o, el);
+	SecureElement.addElementSpecificMethods(o, el);
 
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", el);
@@ -140,8 +160,11 @@ SecureElement.addSecureProperties = function(se, raw) {
 		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
 		'accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable',
 		'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang', 'spellcheck',
-		'style', 'tabIndex', 'title'
-		// Note: ignoring 'offsetParent' from the list above.
+		'style', 'tabIndex', 'title',
+		
+		'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth'
+		
+		// DCHASMAN TODO This list needs to be revisted as it is missing a ton of valid attributes!
 	].forEach(function (name) {
 		Object.defineProperty(se, name, SecureObject.createFilteredProperty(se, raw, name));
 	});
@@ -164,10 +187,25 @@ SecureElement.createAddEventListenerDescriptor = function(st, el, key) {
 	};
 };
 
+SecureElement.createAddEventListener = function(st, el, key) {
+	return function(event, callback, useCapture) {
+		if (!callback) {
+			return; // by spec, missing callback argument does not throw, just ignores it.
+		}
+
+		var sCallback = function(e) {
+			var se = SecureDOMEvent(e, key);
+			callback.call(st, se);
+		};
+
+		el.addEventListener(event, sCallback, useCapture);
+	};
+};
+
 SecureElement.addElementSpecificProperties = function(se, el) {
 	var tagName = el.tagName && el.tagName.toUpperCase();
 	if (tagName) {
-		var whitelist = SecureElement.elementSpecificWhitelists[tagName];
+		var whitelist = SecureElement.elementSpecificAttributeWhitelists[tagName];
 		if (whitelist) {
 			whitelist.forEach(function(name) {
 				Object.defineProperty(se, name, SecureObject.createFilteredProperty(se, el, name));
@@ -176,10 +214,26 @@ SecureElement.addElementSpecificProperties = function(se, el) {
 	}
 };
 
-SecureElement.elementSpecificWhitelists = {
+SecureElement.addElementSpecificMethods = function(se, el) {
+	var tagName = el.tagName && el.tagName.toUpperCase();
+	if (tagName) {
+		var whitelist = SecureElement.elementSpecificMethodWhitelists[tagName];
+		if (whitelist) {
+			whitelist.forEach(function(name) {
+				Object.defineProperty(se, name, SecureObject.createFilteredMethod(se, el, name));
+			});
+		}
+	}
+};
+
+SecureElement.elementSpecificAttributeWhitelists = {
 	"A": ["hash", "host", "hostname", "href", "origin", "pathname", "port", "protocol", "search"],
 	
 	// DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values for http-equiv/httpEquiv
 	
 	"META": ["content", "name"]
+};
+
+SecureElement.elementSpecificMethodWhitelists = {
+	"SVG": ["createSVGRect"]
 };

@@ -40,7 +40,7 @@ function SecureDocument(doc, key) {
                 return SecureScriptElement(key);
 
             default:
-                return trust(o, namespace ? doc.createElementNS(namespace, tag) : doc.createElement(tag));
+                return trust(o, doc.createElementNS(namespace, tag));
         }
     }
 
@@ -52,7 +52,7 @@ function SecureDocument(doc, key) {
         },
         createElement: {
             value: function(tag) {
-                return createElement(tag);
+                return createElement(tag, "http://www.w3.org/1999/xhtml");
             }
         },       
         createElementNS: {

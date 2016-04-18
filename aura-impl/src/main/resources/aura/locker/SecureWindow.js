@@ -51,6 +51,10 @@ function SecureWindow(win, key) {
 			enumerable: true,
 			value: SecureNavigator(win.navigator, key)
 		},
+		XMLHttpRequest: {
+			enumerable: true,
+			value: SecureXMLHttpRequest(key)
+		},
 		setTimeout: {
 			enumerable: true,
 			value: function (callback) {

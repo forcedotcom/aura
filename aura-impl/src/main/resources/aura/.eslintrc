@@ -100,6 +100,7 @@
     "SecureComponentRef": true,
     "SecureComponent": true,
     "SecureNavigator": true,
+    "SecureXMLHttpRequest": true,
     "SecureWindow": true,
     "SecureDocument": true,
     "SecureElement": true,

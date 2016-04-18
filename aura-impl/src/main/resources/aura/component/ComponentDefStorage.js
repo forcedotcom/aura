@@ -224,8 +224,17 @@ ComponentDefStorage.prototype.getAll = function () {
     }
 
     var that = this;
+    var actions = Action.getStorage();
+
     return this.definitionStorage.getAll().then(
         function(items) {
+            function clearActionsCache() {
+                if (actions && actions.isPersistent()) {
+                    return actions.clear();
+                }
+                return Promise["resolve"]();
+            }
+
             function throwSentinelError() {
                 throw new $A.auraError("Sentinel value found in def storage indicating a corrupt def graph", null, $A.severity.QUIET);
             }
@@ -237,7 +246,9 @@ ComponentDefStorage.prototype.getAll = function () {
                 // if sentinel key is found then the persisted graph is corrupt. clear it and
                 // cause the parent promise to error.
                 if (item["key"] === that.TRANSACTION_SENTINEL_KEY) {
-                    return that.definitionStorage.clear().then(throwSentinelError, throwSentinelError);
+                    return that.definitionStorage.clear()
+                        .then(clearActionsCache, clearActionsCache)
+                        .then(throwSentinelError, throwSentinelError);
                 }
 
                 var config = $A.util.json.decode(item["value"]);

@@ -32,6 +32,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     }
     this.fwuid = config["fwuid"];
     this.num = 0;
+
     // To keep track of re-rendering service call
     this.renderNum = 0;
     this.transaction = 0;
@@ -95,6 +96,16 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
             }
         });
 };
+
+/**
+ * Unique id for the current instance of Aura. In a multi-tab scenario
+ * each tab will have a unique id.
+ */
+Aura.Context.AuraContext.CLIENT_SESSION_ID = [
+    window.pageStartTime, // first byte sent
+    Math.round(Aura.time() * 1000000), // current time (microseconds)
+    Math.random().toString(16).substr(2)
+].join('').substring(0, 32);
 
 /**
  * Temporary shim, until W-2812858 is addressed to serialize GVPs as a map and fix $A GVPs.

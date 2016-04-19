@@ -20,7 +20,8 @@ Test.Aura.isEmpty = function(){
     var Aura = {Utils:{
         Style: function() {},
         SizeEstimator: function() {},
-        SecureFilters:{}
+        SecureFilters:{},
+        Mutex: function() {}
     }};
 
     var targetUtil;

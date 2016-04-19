@@ -142,12 +142,20 @@ function CrossTabLib () { //eslint-disable-line no-unused-vars
         this._onMasterChange = fn;
     };
 
+    CrossTab.prototype.detach = function (event, fn) {
+        var pos = this.listeners[event].indexOf(fn);
+        if (pos !== -1) {
+            this.listeners[event].splice(pos, 1);
+        }
+    };
+
     CrossTab.prototype.on = function (event, fn) {
         if (!this.listeners[event]) {
             this.listeners[event] = [];
         }
 
         this.listeners[event].push(fn);
+        return this.detach.bind(this, event, fn);
     };
 
     // We want to instanciate it only if explicitly called

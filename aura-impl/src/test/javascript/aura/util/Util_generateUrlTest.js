@@ -20,7 +20,8 @@ Test.Aura.Util.generateUrl = function() {
     var Aura = {Utils:{
         Style: function() {},
         SizeEstimator: function() {},
-        SecureFilters:{}
+        SecureFilters:{},
+        Mutex: function() {}
     }};
 
     var targetUtil;

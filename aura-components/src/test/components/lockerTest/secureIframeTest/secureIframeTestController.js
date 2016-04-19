@@ -21,6 +21,18 @@
         methodsWhitelist.forEach(function(name) {
             testUtils.assertDefined(iframe[name]);
         });
+    },
+    
+    testContentWindow: function(cmp, event, handler) {
+        var testUtils = cmp.get("v.testUtils");
+        var iframe = cmp.find("iframe").getElement();
+        var cw = iframe.contentWindow;       
         
+        testUtils.assertStartsWith("SecureIFrameContentWindow", cw.toString(), "iframe.contentWindow expected to be a SecureIFrameContentWindow");
+        testUtils.assertDefined(cw.postMessage);
+        
+        cw.postMessage({ data: "test data" }, "*");
+        
+        // DCHASMAN TODO TrevorB Figure out the best way to test the end-to-end postMessage call itself
     }
 })

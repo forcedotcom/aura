@@ -25,6 +25,7 @@
     <aura:method name="testIframeMethods" action="{!c.testIframeMethods}">
         <aura:attribute name="methodsWhitelist" type="List"/>
     </aura:method>
+    <aura:method name="testContentWindow" action="{!c.testContentWindow}"/>
 
     <div aura:id="title">SecureIFrameElement test</div>
     <iframe aura:id="iframe"/>

@@ -464,7 +464,8 @@
        }
    },
 
-   testCanNotAccessRemotePublicMethod: {
+   //UNCOMMENT TEST WHEN METHOD ACFs GO LIVE
+    _testCanNotAccessRemotePublicMethod: {
        attributes: {
            "testType": "PUBLIC"
        },

@@ -97,5 +97,29 @@ Test.Aura.Library.LibraryRegistryTest = function () {
             // Assert
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        function LibraryExporterWithErrorNotCauseValidLibraryFail() {
+            // Arrange
+            var expected = {};
+            var actual;
+
+            // Act
+            mockFramework(function(){
+                var target = new Aura.Library.LibraryIncludeRegistry();
+                target.addLibraryInclude("test:one", [], function() { throw Error("error from exporter") });
+                target.addLibraryInclude("test:two", [], function() { return expected; });
+
+                try {
+                    target.getLibraryInclude("test:one");
+                    Assert.Fail("Expecting an error.");
+                } catch(e) {}
+                // the error is unexpectedly thrown if the invalid library is still in queue.
+                actual = target.getLibraryInclude("test:two");
+            });
+
+            // Assert
+            Assert.True(expected === actual);
+        }
     }
 }

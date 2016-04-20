@@ -69,19 +69,29 @@
             });
         }]
     },
-    testMissingRequiredAttribute:{
+
+    testMissingRequiredAttribute: {
         attributes: {testMissingRequiredAttribute:"true"},
-        test:[function(cmp){
-            var helper = cmp.getDef().getHelper();
-            $A.test.assertEquals("placeholder", cmp.find("lazyWReqAttr").getDef().getDescriptor().getName());
-            helper.resumeGateId(cmp, "lazyWReqAttr");
-            $A.test.addWaitFor("text", function(){
-                return cmp.find("lazyWReqAttr").getDef().getDescriptor().getName();
-            },function(){
-                $A.test.assertTrue(cmp.find("lazyWReqAttr").isRendered());
-                $A.test.assertTrue($A.test.getText(cmp.find("lazyWReqAttr").getElement()).indexOf(
-                            "org.auraframework.throwable.quickfix.MissingRequiredAttributeException: COMPONENT markup://loadlevelTest:serverComponentWReqAttr is missing required attribute 'stringAttribute'") != -1);
-            });
-        }]
+        test: function(cmp) {
+            var initCmpName = cmp.find("lazyWReqAttr").getName();
+            $A.test.assertEquals("aura$placeholder", initCmpName);
+
+            cmp.helper.resumeGateId(cmp, "lazyWReqAttr");
+
+            $A.test.addWaitForWithFailureMessage("aura$text",
+                function(){
+                    return cmp.find("lazyWReqAttr").getName();
+                },
+                "Failed to get Lazy loaded component. Actual Component: " + cmp.find("lazyWReqAttr").getName(),
+                function() {
+                    var targetCmp = cmp.find("lazyWReqAttr");
+                    $A.test.assertTrue(targetCmp.isRendered(), "Lazy loaded component didn't get rendered.");
+
+                    var expectedMsg = "org.auraframework.throwable.quickfix.MissingRequiredAttributeException: " +
+                            "COMPONENT markup://loadLevelTest:serverComponentWReqAttr is missing required attribute 'stringAttribute'";
+                    var actual = $A.test.getText(targetCmp.getElement());
+                    $A.test.assertTrue(actual.indexOf(expectedMsg) > -1, "The component should contain text error message: " + actual);
+                });
+        }
     }
 })

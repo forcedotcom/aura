@@ -32,6 +32,18 @@ ComponentDefStorage.prototype.EVICTION_TARGET_LOAD = 0.75;
  */
 ComponentDefStorage.prototype.EVICTION_HEADROOM = 0.1;
 
+/**
+ * Storage key used to track transactional bounds.
+ * TODO W-2365447 - replace this with bulk remove + put
+ */
+ComponentDefStorage.prototype.TRANSACTION_SENTINEL_KEY = "sentinel_key";
+
+/**
+ * Queue of operations on the def store. Used to prevent concurrent DML on the def store, or analysis
+ * of the def store during DML, which often results in a broken def graph. This is set to an array
+ * when an operation is in-flight.
+ */
+ComponentDefStorage.prototype.queue = undefined;
 
 /**
  * Whether to use storage for component definitions.
@@ -102,71 +114,106 @@ ComponentDefStorage.prototype.getStorage = function () {
 };
 
 /**
- * Stores component and library definitions into storage.
+ * Stores component and library definitions into storage. Should always be called from within a call to #enqueue().
  * @param {Array} cmpConfigs the component definitions to store
  * @param {Array} libConfigs the lib definitions to store
  * @return {Promise} promise that resolves when storing is complete.
  */
 ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, context) {
-    if (this.useDefinitionStorage() && (cmpConfigs.length || libConfigs.length)) {
-        var promises = [];
-        var descriptor, encodedConfig, i;
-
-        for (i = 0; i < cmpConfigs.length; i++) {
-            descriptor = cmpConfigs[i]["descriptor"];
-            cmpConfigs[i]["uuid"] = context.findLoaded(descriptor);
-            encodedConfig = $A.util.json.encode(cmpConfigs[i]);
-            promises.push(this.definitionStorage.put(descriptor, encodedConfig));
-        }
-
-        for (i = 0; i < libConfigs.length; i++) {
-            descriptor = libConfigs[i]["descriptor"];
-            encodedConfig = $A.util.json.encode(libConfigs[i]);
-            promises.push(this.definitionStorage.put(descriptor, encodedConfig));
-        }
-
-        return Promise["all"](promises).then(
-            function () {
-                $A.log("ComponentDefStorage: Successfully stored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries");
-            },
-            function (e) {
-                $A.warning("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries", e);
-                throw e;
-            }
-        );
+    if (!this.useDefinitionStorage() || (!cmpConfigs.length && !libConfigs.length)) {
+        return Promise["resolve"]();
     }
-    return Promise["resolve"]();
+
+    var that = this;
+    return this.definitionStorage.put(this.TRANSACTION_SENTINEL_KEY, {})
+        .then(function() {
+            var promises = [];
+            var descriptor, encodedConfig, i;
+
+            for (i = 0; i < cmpConfigs.length; i++) {
+                descriptor = cmpConfigs[i]["descriptor"];
+                cmpConfigs[i]["uuid"] = context.findLoaded(descriptor);
+                encodedConfig = $A.util.json.encode(cmpConfigs[i]);
+                promises.push(that.definitionStorage.put(descriptor, encodedConfig));
+            }
+
+            for (i = 0; i < libConfigs.length; i++) {
+                descriptor = libConfigs[i]["descriptor"];
+                encodedConfig = $A.util.json.encode(libConfigs[i]);
+                promises.push(that.definitionStorage.put(descriptor, encodedConfig));
+            }
+
+            return Promise["all"](promises).then(
+                function () {
+                    $A.log("ComponentDefStorage: Successfully stored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries");
+                    return that.definitionStorage.remove(that.TRANSACTION_SENTINEL_KEY)
+                        .then(
+                            undefined,
+                            function() {
+                                // we can't recover: the defs were properly stored but the sentinel is still there.
+                                // W-2365447 removes the need for a sentinel which eliminates this possibility.
+                            }
+                        );
+                },
+                function (e) {
+                    $A.warning("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries", e);
+                    // error storing defs so the persisted def graph is broken. do not remove the sentinel:
+                    // 1. reject this promise so the caller, AuraComponentService.saveDefsToStorage(), will
+                    //    clear the def + action stores which removes the sentinel.
+                    // 2. if the page reloads before the stores are cleared the sentinel prevents getAll()
+                    //    from restoring any defs.
+                    throw e;
+                }
+            );
+        });
 };
 
 /**
- * Removes definitions from storage.
+ * Removes definitions from storage. Should always be called from within a call to #enqueue().
  * @param {String[]} descriptors the descriptors identifying the definitions to remove.
  * @return {Promise} a promise that resolves when the definitions are removed.
  */
 ComponentDefStorage.prototype.removeDefs = function(descriptors) {
-    if (this.useDefinitionStorage() && descriptors.length) {
-        var promises = [];
-        for (var i = 0; i < descriptors.length; i++) {
-            promises.push(this.definitionStorage.remove(descriptors[i], true));
-        }
-
-        return Promise["all"](promises).then(
-            function () {
-                $A.log("ComponentDefStorage: Successfully removed " + promises.length + " descriptors");
-            },
-            function (e) {
-                $A.log("ComponentDefStorage: Error removing  " + promises.length + " descriptors", e);
-                throw e;
-            }
-        );
+    if (!this.useDefinitionStorage() || !descriptors.length) {
+        return Promise["resolve"]();
     }
 
-    return Promise["resolve"]();
+    var that = this;
+    return this.definitionStorage.put(this.TRANSACTION_SENTINEL_KEY, {})
+        .then(function() {
+            var promises = [];
+            for (var i = 0; i < descriptors.length; i++) {
+                promises.push(that.definitionStorage.remove(descriptors[i], true));
+            }
+
+            return Promise["all"](promises).then(
+                function () {
+                    $A.log("ComponentDefStorage: Successfully removed " + promises.length + " descriptors");
+                    return that.definitionStorage.remove(that.TRANSACTION_SENTINEL_KEY)
+                    .then(
+                        undefined,
+                        function() {
+                            // we can't recover: the defs were properly removed but the sentinel is still there.
+                            // W-2365447 removes the need for a sentinel which eliminates this possibility.
+                        }
+                    );
+                },
+                function (e) {
+                    $A.log("ComponentDefStorage: Error removing  " + promises.length + " descriptors", e);
+                    // error removing defs so the persisted def graph is broken. do not remove the sentinel:
+                    // 1. reject this promise so the caller, AuraComponentService.evictDefsFromStorage(), will
+                    //    clear the def + action stores which removes the sentinel.
+                    // 2. if the page reloads before the stores are cleared the sentinel prevents getAll()
+                    //    from restoring any defs.
+                    throw e;
+                }
+            );
+        });
 };
 
 
 /**
- * Gets all definitions from storage.
+ * Gets all definitions from storage. Should always be called from within a call to #enqueue().
  * @return {Promise} a promise that resolves with an array of the configs from storage. If decoding
  *  the configs fails the promise rejects. If the underlying storage fails or is disabled the promise
  *  resolves to an empty array.
@@ -176,11 +223,34 @@ ComponentDefStorage.prototype.getAll = function () {
         return Promise["resolve"]([]);
     }
 
+    var that = this;
+    var actions = Action.getStorage();
+
     return this.definitionStorage.getAll().then(
         function(items) {
+            function clearActionsCache() {
+                if (actions && actions.isPersistent()) {
+                    return actions.clear();
+                }
+                return Promise["resolve"]();
+            }
+
+            function throwSentinelError() {
+                throw new $A.auraError("Sentinel value found in def storage indicating a corrupt def graph", null, $A.severity.QUIET);
+            }
+
             var i, len, result = [];
             for (i = 0, len = items.length; i < len; i++) {
                 var item = items[i];
+
+                // if sentinel key is found then the persisted graph is corrupt. clear it and
+                // cause the parent promise to error.
+                if (item["key"] === that.TRANSACTION_SENTINEL_KEY) {
+                    return that.definitionStorage.clear()
+                        .then(clearActionsCache, clearActionsCache)
+                        .then(throwSentinelError, throwSentinelError);
+                }
+
                 var config = $A.util.json.decode(item["value"]);
                 if (config === null) {
                     throw new $A.auraError("Error decoding definition from storage: " + item["key"], null, $A.severity.QUIET);
@@ -201,49 +271,93 @@ ComponentDefStorage.prototype.getAll = function () {
  * @return {Promise} a promise that resolves when definitions are restored.
  */
 ComponentDefStorage.prototype.restoreAll = function(context) {
-    var defRegistry = this;
-    if (this.currentPromise) {
-        return this.currentPromise;
+    var that = this;
+    return this.enqueue(function(resolve) {
+        that.getAll()
+            .then(
+                function(items) {
+                    var libCount = 0;
+                    var cmpCount = 0;
+
+                    // decode all items
+                    for (var i = 0; i < items.length; i++) {
+                        var config = items[i]["value"];
+                        if (config["includes"]) {
+                            if (!$A.componentService.hasLibrary(config["descriptor"])) {
+                                $A.componentService.saveLibraryConfig(config);
+                            }
+                            libCount++;
+                        } else {
+                            if (config["uuid"]) {
+                                context.addLoaded(config["uuid"]);
+                            }
+                            if (!$A.componentService.getComponentDef(config)) {
+                                $A.componentService.saveComponentConfig(config);
+                            }
+                            cmpCount++;
+                        }
+                    }
+
+                    $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries from storage into registry");
+                    resolve();
+                }
+            ).then(
+                undefined, // noop
+                function(e) {
+                    $A.log("ComponentDefStorage: error during restore from storage, no component or library defs restored", e);
+                    resolve();
+                }
+            );
+    });
+};
+
+
+/**
+ * Enqueues a function that requires isolated access to def storage.
+ * @param {function} execute the function to execute.
+ * @return {Promise} a promise that resolves when the provided function executes.
+ */
+ComponentDefStorage.prototype.enqueue = function(execute) {
+    var that = this;
+
+    // run the next item on the queue
+    function executeQueue() {
+        // should never happen
+        if (!that.queue) {
+            return;
+        }
+
+        $A.log("ComponentDefStorage.enqueue: " + that.queue.length + " items in queue, running next");
+        var next = that.queue.pop();
+
+        if (next) {
+            next["execute"](next["resolve"], next["reject"]);
+        } else {
+            that.queue = undefined;
+        }
     }
 
-    this.currentPromise = this.getAll()
-        .then(
-            function(items) {
-                var libCount = 0;
-                var cmpCount = 0;
+    var promise = new Promise(function(resolve, reject) {
+        // if something is in-flight then just enqueue
+        if (that.queue) {
+            that.queue.push({ "execute":execute, "resolve":resolve, "reject":reject });
+            return;
+        }
 
-                // decode all items
-                for (var i = 0; i < items.length; i++) {
-                    var config = items[i]["value"];
-                    if (config["includes"]) {
-                        if (!$A.componentService.hasLibrary(config["descriptor"])) {
-                            $A.componentService.saveLibraryConfig(config);
-                        }
-                        libCount++;
-                    } else {
-                        if (config["uuid"]) {
-                            context.addLoaded(config["uuid"]);
-                        }
-                        if (!$A.componentService.getComponentDef(config)) {
-                            $A.componentService.saveComponentConfig(config);
-                        }
-                        cmpCount++;
-                    }
-                }
+        // else run it immediately
+        that.queue = [];
+        execute(resolve, reject);
+    });
 
-                $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries from storage into registry");
-                defRegistry.currentPromise = null;
-            }
-        ).then(
-            undefined, // noop
-            function(e) {
-                $A.log("ComponentDefStorage: error during restore from storage, no component or library defs restored", e);
-                defRegistry.currentPromise = null;
-            }
-        );
+    // when this promise resolves or rejects, run the next item in the queue
+    promise.then(
+        function() { executeQueue(); },
+        function() { executeQueue(); }
+    );
 
-    return this.currentPromise;
+    return promise;
 };
+
 
 /**
  * Clears all definitions from storage.

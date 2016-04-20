@@ -46,6 +46,7 @@
 	<aura:attribute name="closeOnLocationChange"    type="Boolean" default="false"/>
 
 	<aura:dependency resource="markup://ui:createPanel" type="EVENT"/> 
+	<aura:dependency resource="markup://ui:block" type="COMPONENT"/>
 	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"></aura:handler> 
 	

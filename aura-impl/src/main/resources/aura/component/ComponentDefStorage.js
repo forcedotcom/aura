@@ -28,6 +28,11 @@ function ComponentDefStorage(){}
 ComponentDefStorage.prototype.EVICTION_TARGET_LOAD = 0.75;
 
 /**
+ * Key to use of the MutexLocker to guarantee atomic execution across tabs.
+ */
+ComponentDefStorage.prototype.LOCK_STORAGE_KEY = 'DEF_STORAGE';
+
+/**
  * Minimum head room, as a percent of max size, to allocate after eviction and adding new definitions.
  */
 ComponentDefStorage.prototype.EVICTION_HEADROOM = 0.1;
@@ -298,6 +303,7 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
                         }
                     }
 
+
                     $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries from storage into registry");
                     resolve();
                 }
@@ -327,11 +333,16 @@ ComponentDefStorage.prototype.enqueue = function(execute) {
             return;
         }
 
-        $A.log("ComponentDefStorage.enqueue: " + that.queue.length + " items in queue, running next");
         var next = that.queue.pop();
-
         if (next) {
-            next["execute"](next["resolve"], next["reject"]);
+            $A.log("ComponentDefStorage.enqueue: " + (that.queue.length+1) + " items in queue, running next");
+            $A.util.Mutex.lock(that.LOCK_STORAGE_KEY , function (unlock) {
+                // next["execute"] is run within a promise so may do async things (eg return other promises,
+                // use setTimeout) before calling resolve/reject. the mutex must be held until the promise
+                // resolves/rejects.
+                that.mutexUnlock = unlock;
+                next["execute"](next["resolve"], next["reject"]);
+            });
         } else {
             that.queue = undefined;
         }
@@ -345,14 +356,20 @@ ComponentDefStorage.prototype.enqueue = function(execute) {
         }
 
         // else run it immediately
-        that.queue = [];
-        execute(resolve, reject);
+        that.queue = [{ "execute":execute, "resolve":resolve, "reject":reject }];
+        executeQueue();
     });
 
-    // when this promise resolves or rejects, run the next item in the queue
+    // when this promise resolves or rejects, unlock the mutex then run the next item in the queue
     promise.then(
-        function() { executeQueue(); },
-        function() { executeQueue(); }
+        function() {
+            try { that.mutexUnlock(); } catch (ignore) { /* ignored */ }
+            executeQueue();
+        },
+        function() {
+            try { that.mutexUnlock(); } catch (ignore) { /* ignored */ }
+            executeQueue();
+        }
     );
 
     return promise;

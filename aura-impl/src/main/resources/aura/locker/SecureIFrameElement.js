@@ -53,7 +53,10 @@ function SecureIFrameElement(el, key) {
         }
     });
     
-	["height", "width", "name", "src"].forEach(function (name) {
+    // Standard list of iframe's properties from:
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
+    // Note: ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
+    ["height", "width", "name", "src"].forEach(function (name) {
 		Object.defineProperty(o, name, SecureObject.createFilteredProperty(o, el, name));
 	});
     

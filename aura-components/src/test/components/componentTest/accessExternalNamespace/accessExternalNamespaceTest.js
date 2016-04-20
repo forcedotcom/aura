@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 ({
+	labels : ["UnAdaptableTest"],
+	
 	componentCreated: {},//we use this to store component created in the test, so next test stage can try to access attributes etc
 	
 	setUp: function(cmp){

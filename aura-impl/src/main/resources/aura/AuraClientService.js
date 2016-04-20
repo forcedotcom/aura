@@ -703,7 +703,7 @@ AuraClientService.prototype.isDevMode = function() {
 };
 
 /**
- * the code to 
+ * the code to
  * @private
  */
 AuraClientService.prototype.actualDumpCachesAndReload = function() {
@@ -1702,7 +1702,7 @@ AuraClientService.prototype.sendActionXHRs = function() {
     if (background.length) {
         this.sendAsSingle(background, background.length);
     }
-    
+
     if (deferred.length) {
         if (this.idle()) {
             this.sendAsSingle(deferred, 1);

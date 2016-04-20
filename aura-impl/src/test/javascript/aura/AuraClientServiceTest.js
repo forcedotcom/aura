@@ -914,7 +914,8 @@ Test.Aura.AuraClientServiceTest = function() {
             window:{
                 "applicationCache": mockApplicationCache,
                 "localStorage": mockStorage,
-                "sessionStorage": mockStorage
+                "sessionStorage": mockStorage,
+                "location": mockLocation
             },
             document: document,
             Aura: Aura,
@@ -936,7 +937,16 @@ Test.Aura.AuraClientServiceTest = function() {
                     };
                 }
             },
-            location: mockLocation
+            location: mockLocation,
+            Promise: {
+                all: function() {
+                    return {
+                        then: function(f) {
+                            return f();
+                        }
+                    }
+                }
+            }
         });
 
         [Fact]

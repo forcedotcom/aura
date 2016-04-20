@@ -48,16 +48,24 @@ public class DocsController {
 
     @AuraEnabled
     public static Component getReference(@Key("topic") String topic, @Key("descriptor") String descriptor,
-            @Key("defType") String defType) throws QuickFixException {
+        @Key("defType") String defType) throws QuickFixException {
 
         Map<String, Object> attributes = Maps.newHashMap();
+        String defaultTopic = "referenceTabTopic";
+
         if (topic == null && defType == null && descriptor == null) {
             // Show an overview topic for orientation. It's similar to topics in
             // the Help tab and is in the auradocs
             // namespace.
-            return getTopic("referenceTabTopic");
+            return getTopic(defaultTopic);
         } else if (topic != null) {
-            return getTopic(topic);
+            try {
+                return getTopic(topic);
+            } catch (QuickFixException e) {
+                // Would be good to have a "not found" topic instead, but for now let's just
+                // use the default one.
+                return getTopic(defaultTopic);
+            }
         } else {
             Preconditions.checkNotNull(descriptor);
             Preconditions.checkNotNull(defType);

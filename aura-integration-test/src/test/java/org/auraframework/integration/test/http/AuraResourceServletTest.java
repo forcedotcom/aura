@@ -190,7 +190,7 @@ public class AuraResourceServletTest extends AuraTestCase {
 
         final String key = "CSS:" + context.getClient().getType().name().toLowerCase() + "$" + mKey + uid;
         // Verify something was actually added to cache
-        String cssCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
+        String cssCache = context.getDefRegistry().getAltCachedString(uid, appDesc, key);
         assertNotNull("Nothing added to CSS cache", cssCache);
         if (!cssMsgToVerify.isEmpty()) {
             assertTrue(cssCache.contains(cssMsgToVerify));
@@ -234,7 +234,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         final String key = "CSS:" + context.getClient().getType().name().toLowerCase() + "$" + mKey + uid;
 
         // Verify something was actually added to cache
-        String cssCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
+        String cssCache = context.getDefRegistry().getAltCachedString(uid, appDesc, key);
         assertNotNull("Nothing added to CSS cache", cssCache);
 
         // Now force a source change event and verify cache is emptied
@@ -274,7 +274,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         final String key = "JS:" + mKey + uid;
 
         // Verify something was actually added to cache
-        String jsCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
+        String jsCache = context.getDefRegistry().getAltCachedString(uid, appDesc, key);
         assertNotNull("Nothing added to JS cache", jsCache);
 
         // Now force a source change event and verify cache is emptied

@@ -52,6 +52,7 @@ public class CachingServiceImpl implements CachingService {
 
     /** Default size of string caches, in number of entries */
     private final static int STRING_CACHE_SIZE = 100;
+    private final static int ALT_STRINGS_CACHE_SIZE = 100;
 
     /** Default size of client lib caches, in number of entries */
     private final static int CLIENT_LIB_CACHE_SIZE = 30;
@@ -67,6 +68,7 @@ public class CachingServiceImpl implements CachingService {
     private final Cache<DefDescriptor<?>, Boolean> existsCache;
     private final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
     private final Cache<String, String> stringsCache;
+    private final Cache<String, String> altStringsCache;
     private final Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
     private final Cache<String, DependencyEntry> depsCache;
     private final Cache<String, String> clientLibraryOutputCache;
@@ -94,6 +96,14 @@ public class CachingServiceImpl implements CachingService {
 
         size = getCacheSize("aura.cache.stringsCacheSize", STRING_CACHE_SIZE);
         stringsCache = this.<String, String> getCacheBuilder()
+                .setInitialSize(size)
+                .setMaximumSize(size)
+                .setRecordStats(true)
+                .setName("stringsCache")
+                .setSoftValues(true).build();
+
+        size = getCacheSize("aura.cache.stringsCacheSize", ALT_STRINGS_CACHE_SIZE);
+        altStringsCache = this.<String, String> getCacheBuilder()
                 .setInitialSize(size)
                 .setMaximumSize(size)
                 .setRecordStats(true)
@@ -149,7 +159,12 @@ public class CachingServiceImpl implements CachingService {
     public final Cache<String, String> getStringsCache() {
         return stringsCache;
     }
-    
+
+    @Override
+    public final Cache<String, String> getAltStringsCache() {
+        return altStringsCache;
+    }
+
     @Override
     public final Cache<String, Set<DefDescriptor<?>>> getDescriptorFilterCache() {
         return descriptorFilterCache;
@@ -184,7 +199,7 @@ public class CachingServiceImpl implements CachingService {
      * The driver for cache-consistency management in response to source changes. MDR drives the process, will notify
      * all registered listeners while write blocking, then invalidate it's own caches. If this routine can't acquire the
      * lock , it will log it as an non-fatal error, as it only results in staleness.
-     * 
+     *
      * @param listeners - collections of listeners to notify of source changes
      * @param source - DefDescriptor that changed - for granular cache clear (currently not considered here, but other
      *            listeners may make use of it)

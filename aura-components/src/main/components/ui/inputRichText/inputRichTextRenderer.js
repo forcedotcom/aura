@@ -51,8 +51,12 @@
 									var code = el.getAttribute(type);
 									if (code && code !== "") {
 										el.removeAttribute(type);
-										el[type] = function () {
-											return safeEval("(function(){" + code + "})()", window);
+										el.setAttribute('data-' + type, code);
+										el[type] = function (event) {
+											return safeEval("(function(){" + code + "}).apply($implicitEventElement)", window, {
+												event: event,
+												$implicitEventElement: el
+											});
 										};
 									}
 								});

@@ -29,8 +29,14 @@
           // only add return statement if source it starts with [, {, or (
           var match = src.match(returnableEx);
           if (match) src = src.replace(match[1], 'return ');
-          if (useStrict) src = '"use strict";\n' + src;
-          src = 'return (function(){\n' + src + '\n})()';
+          if (useStrict) {
+              // forcing strict mode
+              src = 'return (function(){\n"use strict";\n' + src + '\n})()';
+          } else {
+              // forcing the value of `this` for non-strict code to prevent leaking
+              // the safeEval.html's window reference
+              src = 'return (function(){\n' + src + '\n}).bind(arguments[0])()';
+          }
           for (var i = 0; i < levels; i++) {
               src = 'with(arguments[' + i + ']||{}){' + src + '}';
           }
@@ -42,10 +48,10 @@
           script.type = 'text/javascript';
           window[hookFn] = undefined;
           script.appendChild(document.createTextNode(src));
-          
+
           placeholder.appendChild(script);
           placeholder.removeChild(script);
-          
+
           var result = window[hookFn];
           window[hookFn] = undefined;
           return result;

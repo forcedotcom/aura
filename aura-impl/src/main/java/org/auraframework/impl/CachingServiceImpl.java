@@ -102,12 +102,12 @@ public class CachingServiceImpl implements CachingService {
                 .setName("stringsCache")
                 .setSoftValues(true).build();
 
-        size = getCacheSize("aura.cache.stringsCacheSize", ALT_STRINGS_CACHE_SIZE);
+        size = getCacheSize("aura.cache.altStringsCacheSize", ALT_STRINGS_CACHE_SIZE);
         altStringsCache = this.<String, String> getCacheBuilder()
                 .setInitialSize(size)
                 .setMaximumSize(size)
                 .setRecordStats(true)
-                .setName("stringsCache")
+                .setName("altStringsCache")
                 .setSoftValues(true).build();
 
         size = getCacheSize("aura.cache.filterCacheSize", FILTER_CACHE_SIZE);

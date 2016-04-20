@@ -82,6 +82,8 @@ function SecureDocument(doc, key) {
             }
         }
     });
+    
+	SecureElement.addSecureGlobalEventHandlers(o, doc, key);
 
     Object.defineProperties(o, {
         addEventListener: SecureElement.createAddEventListenerDescriptor(o, doc, key),

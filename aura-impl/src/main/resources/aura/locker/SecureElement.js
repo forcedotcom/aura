@@ -138,6 +138,7 @@ function SecureElement(el, key) {
 
 	// applying standard secure element properties
 	SecureElement.addSecureProperties(o, el);
+	SecureElement.addSecureGlobalEventHandlers(o, el, key);
 
 	SecureElement.addElementSpecificProperties(o, el);
 	SecureElement.addElementSpecificMethods(o, el);
@@ -167,6 +168,24 @@ SecureElement.addSecureProperties = function(se, raw) {
 		// DCHASMAN TODO This list needs to be revisted as it is missing a ton of valid attributes!
 	].forEach(function (name) {
 		Object.defineProperty(se, name, SecureObject.createFilteredProperty(se, raw, name));
+	});
+};
+
+SecureElement.addSecureGlobalEventHandlers = function(se, raw, key) {
+	[
+		// Standard Global Event handlers
+		// https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers
+		// Note: ignoring "onclose", "oncontextmenu", "onerror", "onreset", "onsubmit" from the list above
+		"onabort", "onblur", "onchange", "onclick", "ondblclick", "onfocus", "oninput", "onkeydown", "onkeypress",
+		"onkeyup", "onload", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onresize", "onscroll", "onselect"		
+	].forEach(function (name) {
+		Object.defineProperty(se, name, {
+			set: function(callback) {
+				raw[name] = function(e) {
+					callback.call(se, SecureDOMEvent(e, key));
+				};
+			}
+		});
 	});
 };
 

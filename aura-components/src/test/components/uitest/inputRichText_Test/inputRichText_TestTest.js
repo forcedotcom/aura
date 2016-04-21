@@ -65,7 +65,8 @@
      * Test RTE placeholder when value is set
      * RTE content should show value, when value is removed, placeholder should be shown
      */
-    testRtePlaceholderWhenValueIsSet: {
+    // TODO(W-3027564): Cannot call set("v.value", "foo") on inputRichText
+    _testRtePlaceholderWhenValueIsSet: {
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET"],
         attributes: {placeholder: "Test placeholder", testContent: "Test content"},
         test: [function(component) {

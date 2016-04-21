@@ -38,7 +38,7 @@ Aura.Services.MetricsService = function MetricsService() {
 Aura.Services.MetricsService.VERSION  = '2.1.0';
 
 Aura.Services.MetricsService.PERFTIME = !!(window.performance && window.performance.now);
-Aura.Services.MetricsService.TIMER    = Aura.Services.MetricsService.PERFTIME ? window.performance.now.bind(performance) : Date.now.bind(Date);
+Aura.Services.MetricsService.TIMER    = Aura.Services.MetricsService.PERFTIME ? function () { return Math.round(window.performance.now() * 100) / 100; } : Date.now.bind(Date);
 Aura.Services.MetricsService.START    = 'start';
 Aura.Services.MetricsService.END      = 'end';
 Aura.Services.MetricsService.STAMP    = 'stamp';
@@ -164,7 +164,9 @@ Aura.Services.MetricsService.prototype.applicationReady = function () {
         transaction["duration"] = Math.round((now - bootstrapStart) * 100) / 100;
     });
 
-    this.clearMarks();
+    if (!this.inTransaction()) {
+        this.clearMarks();
+    }
 
     // #if {"modes" : ["PRODUCTION"]}
     var beacons = this.beaconProviders;
@@ -352,11 +354,9 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
                     pluginPostProcess = instance && instance.postProcess,
                     parsedMarks       = pluginPostProcess ? instance.postProcess(tMarks, transactionCfg) : tMarks;
 
-                //#if {"excludeModes" : ["PRODUCTION"]}
                 if (!pluginPostProcess && tMarks.length) {
                     parsedMarks = this.defaultPostProcessing(tMarks);
                 }
-                //#end
 
                 if (parsedMarks && parsedMarks.length) {
                     parsedTransaction["marks"][plugin] = parsedMarks;

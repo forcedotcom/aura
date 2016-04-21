@@ -38,6 +38,8 @@ Aura.Utils.Util = function Util() {
     this.dataAttributeCache = {};
     this.debugToolWindow = undefined;
     this.sizeEstimator = new Aura.Utils.SizeEstimator();
+    this.Mutex = new Aura.Utils.Mutex();
+    this["Mutex"] = this.Mutex;
 };
 
 /**

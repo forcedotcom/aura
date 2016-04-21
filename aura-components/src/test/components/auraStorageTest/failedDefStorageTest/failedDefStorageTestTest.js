@@ -40,7 +40,7 @@
                         "Unexpected component returned via $A.createComponent on first call");
                 completed = true;
             });
-            
+
             $A.test.addWaitFor(true, function(){ return completed; });
         },
         function createSameComponent(cmp) {
@@ -59,7 +59,7 @@
             $A.test.addWaitFor(true, function(){ return completed; });
         }]
     },
-    
+
     testDynamicallyCreatingComponentOnClient: {
         test: [
         function createComponentOnClient(cmp) {
@@ -72,7 +72,7 @@
                         "Unexpected component returned via $A.createComponent on second call");
                 completed = true;
             });
-            
+
             $A.test.addWaitFor(true, function(){ return completed; });
         },
         function createSameComponent(cmp) {
@@ -105,11 +105,17 @@
                         return actual !== undefined;
                     },
                     function() {
-                        $A.test.assertTrue(window.mockComponentDefStorage.clearCallCount > 0,
-                                "Expected clear() to be called on ComponentDefStorage when storage operations fail");
                         $A.test.assertEquals("markup://test:text", actual.getDef().getDescriptor().getQualifiedName(),
                                 "Unexpected component returned from createComponent() when storage operations fail");
                     }
+            );
+            // run as a separate waitFor because def persistence and the subsequent clearing is async to cmp creation
+            $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function() {
+                        return window.mockComponentDefStorage.clearCallCount > 0;
+                    },
+                    "ComponentDefStorage didn't have clear() called"
             );
         }
     },
@@ -118,7 +124,7 @@
      * When we get a new def from the server we will attempt to prune the storages to see if items need to be evicted
      * and then store the new defs to storage. If we error out during the store operation the app should continue
      * functioning and storages should be cleared.
-     * 
+     *
      * Failing specifically on setItem rather than all operations is important because it will fail further down the
      * promise chain and may hit different error handlers (see W-2839691).
      */

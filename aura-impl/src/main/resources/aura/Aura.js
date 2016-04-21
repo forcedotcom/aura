@@ -68,24 +68,28 @@ window['$A'] = {};
 // #include aura.polyfill.Json
 // #include aura.polyfill.Promise
 
-// -- Utils ------------------------------------------------------------
+// -- Exporter ---------------------------------------------------------
 // #include aura.util.ExportSymbolsHelper
+
+// -- Context -----------------------------------------------------------
+// #include aura.context.AuraContext
+
+// -- Utils ------------------------------------------------------------
 // #include aura.util.Style
 // #include aura.util.Bitset
 // #include aura.util.NumberFormat
+// #include aura.util.Mutex
 // #include aura.util.DocLevelHandler
 // #include aura.util.SizeEstimator
 // #include aura.util.SecureFilters
 // #include aura.util.Util
+
 // #include aura.Logger
 // #include aura.util.Override
 
 // -- Errors ------------------------------------------------------------
 // #include aura.AuraError
 // #include aura.AuraFriendlyError
-
-// -- Context -----------------------------------------------------------
-// #include aura.context.AuraContext
 
 // -- System ------------------------------------------------------------
 // #include aura.system.DefDescriptor

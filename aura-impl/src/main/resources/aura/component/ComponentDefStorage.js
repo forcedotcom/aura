@@ -132,25 +132,25 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, conte
     var that = this;
     return this.definitionStorage.put(this.TRANSACTION_SENTINEL_KEY, {})
         .then(function() {
-            var promises = [];
-            var descriptor, encodedConfig, i;
+        var promises = [];
+        var descriptor, encodedConfig, i;
 
-            for (i = 0; i < cmpConfigs.length; i++) {
-                descriptor = cmpConfigs[i]["descriptor"];
-                cmpConfigs[i]["uuid"] = context.findLoaded(descriptor);
-                encodedConfig = $A.util.json.encode(cmpConfigs[i]);
+        for (i = 0; i < cmpConfigs.length; i++) {
+            descriptor = cmpConfigs[i]["descriptor"];
+            cmpConfigs[i]["uuid"] = context.findLoaded(descriptor);
+            encodedConfig = $A.util.json.encode(cmpConfigs[i]);
                 promises.push(that.definitionStorage.put(descriptor, encodedConfig));
-            }
+        }
 
-            for (i = 0; i < libConfigs.length; i++) {
-                descriptor = libConfigs[i]["descriptor"];
-                encodedConfig = $A.util.json.encode(libConfigs[i]);
+        for (i = 0; i < libConfigs.length; i++) {
+            descriptor = libConfigs[i]["descriptor"];
+            encodedConfig = $A.util.json.encode(libConfigs[i]);
                 promises.push(that.definitionStorage.put(descriptor, encodedConfig));
-            }
+        }
 
-            return Promise["all"](promises).then(
-                function () {
-                    $A.log("ComponentDefStorage: Successfully stored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries");
+        return Promise["all"](promises).then(
+            function () {
+                $A.log("ComponentDefStorage: Successfully stored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries");
                     return that.definitionStorage.remove(that.TRANSACTION_SENTINEL_KEY)
                         .then(
                             undefined,
@@ -159,17 +159,17 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, conte
                                 // W-2365447 removes the need for a sentinel which eliminates this possibility.
                             }
                         );
-                },
-                function (e) {
-                    $A.warning("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries", e);
+            },
+            function (e) {
+                $A.warning("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries", e);
                     // error storing defs so the persisted def graph is broken. do not remove the sentinel:
                     // 1. reject this promise so the caller, AuraComponentService.saveDefsToStorage(), will
                     //    clear the def + action stores which removes the sentinel.
                     // 2. if the page reloads before the stores are cleared the sentinel prevents getAll()
                     //    from restoring any defs.
-                    throw e;
-                }
-            );
+                throw e;
+            }
+        );
         });
 };
 
@@ -188,7 +188,7 @@ ComponentDefStorage.prototype.removeDefs = function(descriptors) {
         .then(function() {
             var promises = [];
             for (var i = 0; i < descriptors.length; i++) {
-                promises.push(that.definitionStorage.remove(descriptors[i], true));
+                    promises.push(that.definitionStorage.remove(descriptors[i], true));
             }
 
             return Promise["all"](promises).then(
@@ -279,41 +279,40 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
     var that = this;
     return this.enqueue(function(resolve) {
         that.getAll()
-            .then(
-                function(items) {
-                    var libCount = 0;
-                    var cmpCount = 0;
+        .then(
+            function(items) {
+                var libCount = 0;
+                var cmpCount = 0;
 
-                    // decode all items
-                    for (var i = 0; i < items.length; i++) {
-                        var config = items[i]["value"];
-                        if (config["includes"]) {
-                            if (!$A.componentService.hasLibrary(config["descriptor"])) {
-                                $A.componentService.saveLibraryConfig(config);
-                            }
-                            libCount++;
-                        } else {
-                            if (config["uuid"]) {
-                                context.addLoaded(config["uuid"]);
-                            }
-                            if (!$A.componentService.getComponentDef(config)) {
-                                $A.componentService.saveComponentConfig(config);
-                            }
-                            cmpCount++;
+                // decode all items
+                for (var i = 0; i < items.length; i++) {
+                    var config = items[i]["value"];
+                    if (config["includes"]) {
+                        if (!$A.componentService.hasLibrary(config["descriptor"])) {
+                            $A.componentService.saveLibraryConfig(config);
                         }
+                        libCount++;
+                    } else {
+                        if (config["uuid"]) {
+                            context.addLoaded(config["uuid"]);
+                        }
+                        if (!$A.componentService.getComponentDef(config)) {
+                            $A.componentService.saveComponentConfig(config);
+                        }
+                        cmpCount++;
                     }
-
-
-                    $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries from storage into registry");
-                    resolve();
                 }
-            ).then(
-                undefined, // noop
-                function(e) {
-                    $A.log("ComponentDefStorage: error during restore from storage, no component or library defs restored", e);
-                    resolve();
-                }
-            );
+
+                $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries from storage into registry");
+                resolve();
+            }
+        ).then(
+            undefined, // noop
+            function(e) {
+                $A.log("ComponentDefStorage: error during restore from storage, no component or library defs restored", e);
+                resolve();
+            }
+        );
     });
 };
 

@@ -16,6 +16,7 @@
 package org.auraframework.integration.test.components.ui.inputCurrency;
 
 import org.auraframework.integration.test.components.ui.inputSmartNumber.BaseInputSmartNumber;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 
 public class InputCurrencyUITest extends BaseInputSmartNumber {
 
@@ -45,6 +46,7 @@ public class InputCurrencyUITest extends BaseInputSmartNumber {
     /**
      * Test only two decimal places allowed; extra are not allowed to enter
      */
+    @ExcludeBrowsers({BrowserType.IPHONE, BrowserType.IPAD})
     public void testDefaultFormatOnlyTwoDecimalPlacesAllowed() throws Exception {
         open(this.URL);
         inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "0.12345", "0.12", "$0.12");

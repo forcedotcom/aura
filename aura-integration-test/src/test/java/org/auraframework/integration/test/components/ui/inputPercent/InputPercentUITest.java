@@ -16,6 +16,7 @@
 package org.auraframework.integration.test.components.ui.inputPercent;
 
 import org.auraframework.integration.test.components.ui.inputSmartNumber.BaseInputSmartNumber;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 
 public class InputPercentUITest extends BaseInputSmartNumber {
 
@@ -43,8 +44,9 @@ public class InputPercentUITest extends BaseInputSmartNumber {
     }
 
     /**
-     * Test decimal number
+     * Test default format decimal places not allowed
      */
+    @ExcludeBrowsers({BrowserType.IPHONE, BrowserType.IPAD})
     public void testDefaultFormatDecimalPlacesNotSupported() throws Exception {
         open(this.URL);
         inputAndVerifyValuesAfterFormatted(INPUT_SEL, OUTPUT_SEL, "1.23", "0.01", "1%");

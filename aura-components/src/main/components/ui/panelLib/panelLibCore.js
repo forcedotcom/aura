@@ -332,7 +332,10 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
          */
         updatePanel: function(panel, facets, callback) {
             if ($A.util.isObject(facets)) {
-                var facet, body = facets.body || panel.get('v.body');
+                var facet, 
+                    currentHeader = panel.get('v.header'),
+                    currentFooter = panel.get('v.footer'),
+                    body = facets.body || panel.get('v.body');
                 for (var key in facets) {
                     facet = facets[key];
                     if (facets.hasOwnProperty(key) && ($A.util.isComponent(facet) || $A.util.isArray(facet))) {
@@ -343,11 +346,13 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     //set body as value provider to route the events to the body
                     //presume only one root body component
                     var avp = $A.util.isComponent(body) ? body : body[0],
-                        header = facets.header || panel.get('v.header'),
-                        footer = facets.footer || panel.get('v.footer');
+                        header = facets.header,
+                        footer = facets.footer;
                     
                     if ($A.util.isComponent(avp)) {
                         avp.setAttributeValueProvider(panel);
+                        this._updateAVP(currentHeader, avp);
+                        this._updateAVP(currentFooter, avp);
                         this._updateAVP(header, avp);
                         this._updateAVP(footer, avp);
                     }

@@ -75,9 +75,9 @@ function SecureWindow(win, key) {
 	});
 
 	SecureElement.addSecureGlobalEventHandlers(o, win, key);
+	SecureElement.addEventTargetMethods(o, win, key);
 
 	Object.defineProperties(o, {
-		addEventListener: SecureElement.createAddEventListenerDescriptor(o, win, key),
 		location: SecureObject.createFilteredProperty(o, win, "location")
 	});
 

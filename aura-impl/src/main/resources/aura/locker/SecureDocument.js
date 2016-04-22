@@ -84,10 +84,9 @@ function SecureDocument(doc, key) {
     });
     
 	SecureElement.addSecureGlobalEventHandlers(o, doc, key);
+	SecureElement.addEventTargetMethods(o, doc, key);
 
     Object.defineProperties(o, {
-        addEventListener: SecureElement.createAddEventListenerDescriptor(o, doc, key),
-
         body: SecureObject.createFilteredProperty(o, doc, "body"),
         head: SecureObject.createFilteredProperty(o, doc, "head"),
 

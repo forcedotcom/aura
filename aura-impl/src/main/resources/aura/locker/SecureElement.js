@@ -73,11 +73,6 @@ function SecureElement(el, key) {
 	});
 
 	Object.defineProperties(o, {
-		addEventListener : SecureElement.createAddEventListenerDescriptor(o, el, key),
-
-		removeEventListener : SecureObject.createFilteredMethod(o, el, "removeEventListener"),
-		dispatchEvent : SecureObject.createFilteredMethod(o, el, "dispatchEvent"),
-
 		childNodes : SecureObject.createFilteredProperty(o, el, "childNodes"),
 		children : SecureObject.createFilteredProperty(o, el, "children"),
 
@@ -139,6 +134,7 @@ function SecureElement(el, key) {
 	// applying standard secure element properties
 	SecureElement.addSecureProperties(o, el);
 	SecureElement.addSecureGlobalEventHandlers(o, el, key);
+	SecureElement.addEventTargetMethods(o, el, key);
 
 	SecureElement.addElementSpecificProperties(o, el);
 	SecureElement.addElementSpecificMethods(o, el);
@@ -189,6 +185,22 @@ SecureElement.addSecureGlobalEventHandlers = function(se, raw, key) {
 	});
 };
 
+SecureElement.addEventTargetMethods = function(se, raw, key) {
+	Object.defineProperties(se, {
+		addEventListener : SecureElement.createAddEventListenerDescriptor(se, raw, key),
+		dispatchEvent : SecureObject.createFilteredMethod(se, raw, "dispatchEvent"),
+		
+		// removeEventListener() is special in that we do not want to unfilter/unwrap the listener argument or it will not match what 
+		// was actually wired up originally
+		removeEventListener : {
+			value: function(type, listener, options) {
+				var sCallback = getLockerSecret(listener, "sCallback");
+				raw.removeEventListener(type, sCallback, options);
+			}
+		}
+	});
+};
+
 SecureElement.createAddEventListenerDescriptor = function(st, el, key) {
 	return {
 		value : function(event, callback, useCapture) {
@@ -201,6 +213,9 @@ SecureElement.createAddEventListenerDescriptor = function(st, el, key) {
 				callback.call(st, se);
 			};
 
+			// Back reference for removeEventListener() support
+			setLockerSecret(callback, "sCallback", sCallback);
+			
 			el.addEventListener(event, sCallback, useCapture);
 		}
 	};

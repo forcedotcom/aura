@@ -63,6 +63,13 @@
 		// No visible divs actually added to the DOM Document yet
 		helper.verifyElementCount("smoothAsButter", 0);
 
+		var removeEventListenerTest = component.find("removeEventListenerTest").getElement();
+		removeEventListenerTest.addEventListener("click", function oneTimeClicker() {
+			alert("oneTimeClicker invoked!");
+
+			removeEventListenerTest.removeEventListener("click", oneTimeClicker);
+		});
+
 		return ret;
 	},
 

@@ -14,4 +14,6 @@
     <aura:unescapedHtml value="{!v.xss}"/>
 
     <div aura:id="content"/>
+    
+    <div aura:id="removeEventListenerTest">RemoveEventListenerTest</div>
 </aura:component>

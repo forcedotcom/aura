@@ -134,7 +134,8 @@ SecureObject.unfilterEverything = function(st, value) {
 		// wrapping functions to guarantee that they run in user-mode, usually
 		// callback functions privided by non-privilege code.
 		return function () {
-			var fnReturnedValue = value.apply(SecureObject.filterEverything(st, this), SecureObject.filterEverything(st, SecureObject.ArrayPrototypeSlice.call(arguments)));
+			var filteredArguments = SecureObject.filterEverything(st, SecureObject.ArrayPrototypeSlice.call(arguments));
+			var fnReturnedValue = value.apply(SecureObject.filterEverything(st, this), filteredArguments);
 			return SecureObject.unfilterEverything(st, fnReturnedValue);
 		};
 	}
@@ -170,7 +171,8 @@ SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
 				options.beforeCallback.apply(raw, args);
 			}
 			
-			var fnReturnedValue = raw[methodName].apply(raw, SecureObject.unfilterEverything(st, args));
+			var unfilteredArgs = SecureObject.unfilterEverything(st, args);
+			var fnReturnedValue = raw[methodName].apply(raw, unfilteredArgs);
 
 			if (options && options.afterCallback) {
 				fnReturnedValue = options.afterCallback(fnReturnedValue);

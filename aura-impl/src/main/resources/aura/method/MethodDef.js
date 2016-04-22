@@ -20,20 +20,18 @@
  * @param {Object} config
  * @export
  */
-function MethodDef(config){
+Aura.Method.MethodDef=function(config){
     this.descriptor = new DefDescriptor(config["name"]);
     this.access=config[Json.ApplicationKey.ACCESS];
     this.action=config["action"];
     this.attributes=config["attributes"];
-}
+};
 
 /**
  * Gets the descriptor. Returns a DefDescriptor object that contains the metadata for the attribute.
  * @returns {DefDescriptor} The qualified name for a DefDescriptor object has the format <code>prefix://namespace:name</code>.
  * @export
  */
-MethodDef.prototype.getDescriptor = function(){
+Aura.Method.MethodDef.prototype.getDescriptor = function(){
     return this.descriptor;
 };
-
-Aura.Method.MethodDef = MethodDef;

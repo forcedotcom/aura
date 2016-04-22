@@ -27,11 +27,69 @@
     <aura:method name="privilegedMethod" action="{!c.privilegedMethod}" access="PRIVILEGED"/>
     <aura:method name="internalMethod" action="{!c.internalMethod}" access="INTERNAL"/>
   
- 
- 	<aura:registerEvent name='eventWithGlobalAccessInSameSystemNamespaceRegisteredWithGlobalAccess' 
- 	type='auratest:accessGlobalEvent' access='GLOBAL'/> 
- 	<aura:registerEvent name='eventWithDefaultAccessInSameSystemNamespaceRegisteredWithGlobalAccess' 
- 	type='auratest:accessDefaultEvent' access='GLOBAL'/> 
+ 	<!-- register component events of same namespace, with different access level -->
+ 	
+ 	<!-- component event with Default access -->
+ 	<aura:registerEvent name='eventWithDefaultAccessInSystemNamespaceRegisteredWithDefaultAccess' 
+ 	type='auratest:accessDefaultEvent'/> 
+ 	<aura:registerEvent name='eventWithDefaultAccessInSystemNamespaceRegisteredWithPrivateAccess' 
+ 	type='auratest:accessDefaultEvent' access='Private'/>
+ 	<aura:registerEvent name='eventWithDefaultAccessInSystemNamespaceRegisteredWithPublicAccess' 
+ 	type='auratest:accessDefaultEvent' access='PUBLIC'/>
+ 	<aura:registerEvent name='eventWithDefaultAccessInSystemNamespaceRegisteredWithPrivilegedAccess' 
+ 	type='auratest:accessDefaultEvent' access='Privileged'/>
+ 	<aura:registerEvent name='eventWithDefaultAccessInSystemNamespaceRegisteredWithGlobalAccess' 
+ 	type='auratest:accessDefaultEvent' access='GLOBAL'/>
+ 	
+ 	<!-- component event with Internal access -->
+ 	<aura:registerEvent name='eventWithInternalAccessInSystemNamespaceRegisteredWithDefaultAccess' 
+ 	type='auratest:accessInternalEvent'/> 
+ 	<aura:registerEvent name='eventWithInternalAccessInSystemNamespaceRegisteredWithPrivateAccess' 
+ 	type='auratest:accessInternalEvent' access='Private'/>
+ 	<aura:registerEvent name='eventWithInternalAccessInSystemNamespaceRegisteredWithPublicAccess' 
+ 	type='auratest:accessInternalEvent' access='PUBLIC'/>
+ 	<aura:registerEvent name='eventWithInternalAccessInSystemNamespaceRegisteredWithPrivilegedAccess' 
+ 	type='auratest:accessInternalEvent' access='Privileged'/>
+ 	<aura:registerEvent name='eventWithInternalAccessInSystemNamespaceRegisteredWithGlobalAccess' 
+ 	type='auratest:accessInternalEvent' access='GLOBAL'/>
+ 	
+ 	<!-- component event with Public access -->
+ 	<aura:registerEvent name='eventWithPublicAccessInSystemNamespaceRegisteredWithDefaultAccess' 
+ 	type='auratest:accessPublicEvent'/> 
+ 	<aura:registerEvent name='eventWithPublicAccessInSystemNamespaceRegisteredWithPrivateAccess' 
+ 	type='auratest:accessPublicEvent' access='Private'/>
+ 	<aura:registerEvent name='eventWithPublicAccessInSystemNamespaceRegisteredWithPublicAccess' 
+ 	type='auratest:accessPublicEvent' access='PUBLIC'/>
+ 	<aura:registerEvent name='eventWithPublicAccessInSystemNamespaceRegisteredWithPrivilegedAccess' 
+ 	type='auratest:accessPublicEvent' access='Privileged'/>
+ 	<aura:registerEvent name='eventWithPublicAccessInSystemNamespaceRegisteredWithGlobalAccess' 
+ 	type='auratest:accessPublicEvent' access='GLOBAL'/>
+ 	
+ 	<!-- component event with Privileged access -->
+ 	<aura:registerEvent name='eventWithPrivilegedAccessInSystemNamespaceRegisteredWithDefaultAccess' 
+ 	type='auratest:accessPrivilegedEvent'/> 
+ 	<aura:registerEvent name='eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPrivateAccess' 
+ 	type='auratest:accessPrivilegedEvent' access='Private'/>
+ 	<aura:registerEvent name='eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPublicAccess' 
+ 	type='auratest:accessPrivilegedEvent' access='PUBLIC'/>
+ 	<aura:registerEvent name='eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPrivilegedAccess' 
+ 	type='auratest:accessPrivilegedEvent' access='Privileged'/>
+ 	<aura:registerEvent name='eventWithPrivilegedAccessInSystemNamespaceRegisteredWithGlobalAccess' 
+ 	type='auratest:accessPrivilegedEvent' access='GLOBAL'/>
+ 	
+ 	<!-- component event with Global access -->
+ 	<aura:registerEvent name='eventWithGlobalAccessInSystemNamespaceRegisteredWithDefaultAccess' 
+ 	type='auratest:accessGlobalEvent'/>
+ 	<aura:registerEvent name='eventWithGlobalAccessInSystemNamespaceRegisteredWithPrivateAccess' 
+ 	type='auratest:accessGlobalEvent' access='Private'/>
+ 	<aura:registerEvent name='eventWithGlobalAccessInSystemNamespaceRegisteredWithPublicAccess' 
+ 	type='auratest:accessGlobalEvent' access='PUBLIC'/>
+ 	<aura:registerEvent name='eventWithGlobalAccessInSystemNamespaceRegisteredWithPrivilegedAccess' 
+ 	type='auratest:accessGlobalEvent' access='Privileged'/>
+ 	<aura:registerEvent name='eventWithGlobalAccessInSystemNamespaceRegisteredWithGlobalAccess' 
+ 	type='auratest:accessGlobalEvent' access='GLOBAL'/>
+ 	
+ 	
     
     <div aura:id="attributeDiv">
     	privateAttribute:{!v.privateAttribute}; publicAttribute:{!v.publicAttribute}; globalAttribute:{!v.globalAttribute};

@@ -501,7 +501,8 @@
         	var actual = this.componentCreated.get("v.privilegedAttribute");
         	$A.test.assertEquals(actual, "PRIVILEGED");
         },
-        //tests for method
+        
+        /********************* tests for method ****************************/
 		//UNCOMMENT TEST WHEN METHOD ACFs GO LIVE
         //function canNotAccessPrivateMethod(cmp) {
 		//	$A.test.expectAuraError("Access Check Failed!");
@@ -524,16 +525,120 @@
         	//$A.test.expectAuraError("Access Check Failed!");
         	//this.componentCreated.internalMethod();
         //},
-        //tests for events
-        function canAccessSystemNSGLobalEventRegisteredWithGlobalAccess(cmp) {
-        	var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSameSystemNamespaceRegisteredWithGlobalAccess");
-        	$A.test.assertTrue(evt.getName() === "eventWithGlobalAccessInSameSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());
-        }
-        //W-2999718
-        /*function canAccessSystemNSDefaultEventRegisteredWithGlobalAccess(cmp) {
-        	var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSameSystemNamespaceRegisteredWithGlobalAccess");
+        
+        /********************************** tests for events ****************************************/
+        //Some of these tests are comment out because of W-2999718
+        
+        //tests for accessing event "accessDefaultEvent" in system namespace "auratest", the event itself is defined with default access
+        function canNotAccessSystemNSDefaultAccessEventRegisteredWithDefaultAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSystemNamespaceRegisteredWithDefaultAccess");
+        },
+        function canNotAccessSystemNSDefaultAccessEventRegisteredWithPrivateAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSystemNamespaceRegisteredWithPrivateAccess");
+        },
+        function canNotAccessSystemNSDefaultAccessEventRegisteredWithPublicAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSystemNamespaceRegisteredWithPublicAccess");
+        },
+        /*function canAccessSystemNSDefaultAccessEventRegisteredWithPrivilegedAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+        	$A.test.assertTrue(evt.getName() === "eventWithDefaultAccessInSystemNamespaceRegisteredWithPrivilegedAccess", "get unexpected event name:"+evt.getName());
+        },
+        function canAccessSystemNSDefaultAccessEventRegisteredWithGlobalAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSystemNamespaceRegisteredWithGlobalAccess");
         	$A.test.assertTrue(evt.getName() === "eventWithDefaultAccessInSameSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());
-        }*/
+        },*/
+        
+        //tests for accessing event "accessInternalEvent" in system namespace "auratest", the event itself is defined with internal access
+        function canNotAccessSystemNSInternalAccessEventRegisteredWithDefaultAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithDefaultAccess");
+        },
+        function canNotAccessSystemNSInternalAccessEventRegisteredWithPrivateAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithPrivateAccess");
+        },
+        function canNotAccessSystemNSInternalAccessEventRegisteredWithPublicAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithPublicAccess");
+        },
+        function canAccessSystemNSInternalAccessEventRegisteredWithPrivilegedAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+        },
+        function canAccessSystemNSInternalAccessEventRegisteredWithGlobalAccess(cmp) {
+			$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithGlobalAccess");
+        },
+        
+        //tests for accessing event "accessPublicEvent" in system namespace "auratest", the event itself is defined with public access
+        function canNotAccessSystemNSPublicAccessEventRegisteredWithDefaultAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithDefaultAccess");
+        },
+        function canNotAccessSystemNSPublicAccessEventRegisteredWithPrivateAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithPrivateAccess");
+        },
+        function canNotAccessSystemNSPublicAccessEventRegisteredWithPublicAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithPublicAccess");
+        },
+        function canNotAccessSystemNSPublicAccessEventRegisteredWithPrivilegedAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+        },
+        function canNotAccessSystemNSPublicAccessEventRegisteredWithGlobaldAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithGlobalAccess");
+        },
+        
+        //tests for accessing event "accessPrilegedEvent" in system namespace "auratest", the event itself is defined with prileged access
+        function canAccessSystemNSPrivilegedAccessEventRegisteredWithDefaultAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithDefaultAccess");
+        	$A.test.assertTrue(evt.getName() === "eventWithPrivilegedAccessInSystemNamespaceRegisteredWithDefaultAccess", "get unexpected event name:"+evt.getName());
+        },
+        /*function canNotAccessSystemNSPrivilegedAccessEventRegisteredWithPrivateAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPrivateAccess");
+        },
+        function canNotAccessSystemNSPrivilegedAccessEventRegisteredWithPublicAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPublicAccess");
+        },8?
+        function canAccessSystemNSPrivilegedAccessEventRegisteredWithPrivilegedAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+        	$A.test.assertTrue(evt.getName() === "eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPrivilegedAccess", "get unexpected event name:"+evt.getName());
+        },
+        function canAccessSystemNSPrivilegedAccessEventRegisteredWithGlobalAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithGlobalAccess");
+        	$A.test.assertTrue(evt.getName() === "eventWithPrivilegedAccessInSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());
+        },
+        
+        //tests for accessing event "accessGlobalEvent" in system namespace "auratest", the event itself is defined with global access
+        function canAccessSystemNSGLobalEventRegisteredWithDefaultAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithDefaultAccess");
+        	$A.test.assertTrue(evt.getName() === "eventWithGlobalAccessInSystemNamespaceRegisteredWithDefaultAccess", "get unexpected event name:"+evt.getName());
+        },
+        /*function canNotAccessSystemNSGLobalEventRegisteredWithPrivateAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithPrivateAccess");
+        },
+        function canNotAccessSystemNSGLobalEventRegisteredWithPublicAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithPublicAccess");
+        },
+        */
+        function canAccessSystemNSGLobalEventRegisteredWithPrivilegedAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+        	$A.test.assertTrue(evt.getName() === "eventWithGlobalAccessInSystemNamespaceRegisteredWithPrivilegedAccess", "get unexpected event name:"+evt.getName());
+        },
+        function canAccessSystemNSGLobalEventRegisteredWithGlobalAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithGlobalAccess");
+        	$A.test.assertTrue(evt.getName() === "eventWithGlobalAccessInSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());
+        }
         ]
     }
  })

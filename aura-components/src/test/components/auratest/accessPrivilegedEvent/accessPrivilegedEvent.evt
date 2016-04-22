@@ -17,8 +17,8 @@
 -->
 <aura:event type="COMPONENT"
             extends="ui:command"
-            access="INTERNAL"
-            description="Test Internal Event.">
+            access="Privileged"
+            description="Test Privileged Event.">
 
     <aura:attribute name="Private" type="String" access="PRIVATE" default="PRIVATE"/>
     <aura:attribute name="Public" type="String" access="PUBLIC" default="PUBLIC"/>

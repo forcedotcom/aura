@@ -68,10 +68,10 @@ Aura.Utils.Util.prototype.isIOSWebView = function() {
  *
  * @private
  */
-Aura.Utils.Util.prototype.globalEval = function(src, globals) {
+Aura.Utils.Util.prototype.globalEval = function(src, globals, optionalSourceURL) {
     // Ignoreing IE for now until we figure how to make it work under weird conditions in SFX.
     if (window["$$safe-eval-compat$$"] && !Aura.Utils.Util.prototype.isIE) {
-        return window["$$safe-eval-compat$$"](src, window, globals);
+        return window["$$safe-eval-compat$$"](src, optionalSourceURL || "", window, globals);
     }
     // --- backward compatibility ---
     // If the worker is not ready, we have to fallback to the old mechanism of evaluation.

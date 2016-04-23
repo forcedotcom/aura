@@ -489,6 +489,7 @@
            "testType": "PRIVATE"
        },
        test: function(cmp) {
+           $A.test.expectAuraError("Access Check Failed!");
            cmp.find("testRemoteMethods").getElement().click();
            $A.test.assertUndefined(cmp.find("remote").get("v.output"));
        }

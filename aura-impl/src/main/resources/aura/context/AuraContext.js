@@ -279,7 +279,8 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
         throw new $A.auraError("framework mismatch", null, $A.severity.QUIET);
     }
 
-    this.enableAccessChecks=otherContext["enableAccessChecks"];
+    // JBUCH: CRUC DISABLED IN 204 FOR INTERNAL TEAMS
+    //this.enableAccessChecks=otherContext["enableAccessChecks"];
 
     this["isLockerServiceEnabled"] = otherContext["lockerEnabled"];
 

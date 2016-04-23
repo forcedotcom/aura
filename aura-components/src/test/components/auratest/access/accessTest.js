@@ -462,10 +462,9 @@
            cmp.find("testRemoteMethods").getElement().click();
            $A.test.assertEquals("globalMethod", cmp.find("remote").get("v.output"));
        }
-   },
+    },
 
-   //UNCOMMENT TEST WHEN METHOD ACFs GO LIVE
-    _testCanNotAccessRemotePublicMethod: {
+    testCanNotAccessRemotePublicMethod: {
        attributes: {
            "testType": "PUBLIC"
        },
@@ -485,12 +484,12 @@
        }
    },
 
-   // TODO(W-2769153): Should not be able to access facet's private method
-   _testCanNotAccessRemotePrivateMethod: {
+   testCanNotAccessRemotePrivateMethod: {
        attributes: {
            "testType": "PRIVATE"
        },
        test: function(cmp) {
+           $A.test.expectAuraError("Access Check Failed!");
            cmp.find("testRemoteMethods").getElement().click();
            $A.test.assertUndefined(cmp.find("remote").get("v.output"));
        }

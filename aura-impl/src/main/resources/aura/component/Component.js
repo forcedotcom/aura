@@ -2119,18 +2119,17 @@ Component.prototype.getMethodHandler = function(methodDef){
         if(!$A.clientService.allowAccess(methodDef,component)) {
             var context = $A.getContext();
             var message = "Access Check Failed! Component.method():'" + methodDef.getDescriptor().toString() + "' is not visible to '" + (context && context.getCurrentAccess()) + "'.";
-            //if (context.enableAccessChecks) {
-            //    if (context.logAccessFailures) {
-            //        $A.error(message);
-            //    }
-            //    return false;
-            //} else {
-                $A.logger.reportError(new $A.auraError("[NoErrorObjectAvailable] " + message));
+            if (context.enableAccessChecks) {
+                if (context.logAccessFailures) {
+                    $A.error(message);
+                }
+                return;
+            } else {
                 if (context.logAccessFailures) {
                     $A.warning(message);
                 }
                 //Intentional fallthrough
-            //}
+            }
         }
         var eventDef = $A.eventService.getEventDef("aura:methodCall");
         var dispatcher = {};

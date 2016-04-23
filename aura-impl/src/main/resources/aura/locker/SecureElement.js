@@ -108,11 +108,14 @@ function SecureElement(el, key) {
 
 		innerHTML : SecureObject.createFilteredProperty(o, el, "innerHTML", { 
 			returnValue: "", 
-			beforeSetCallback: function() {				
+			beforeSetCallback: function(value) {				
 				// Do not allow innerHTML on shared elements (body/head)
 				if (isSharedElement(el)) {
 		            throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
 				}
+				
+				/*jslint sub: true */
+				return DOMPurify["sanitize"](value);
 			},
 			afterSetCallback: function() {
 				// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!

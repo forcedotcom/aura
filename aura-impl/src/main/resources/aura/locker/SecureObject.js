@@ -198,7 +198,7 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
 	if (!options || options.writable !== false) {
 		descriptor.set = function(value) {
 			if (options && options.beforeSetCallback) {
-				options.beforeSetCallback();
+				value = options.beforeSetCallback(value);
 			}
 			
 			raw[propertyName] = SecureObject.unfilterEverything(st, value);

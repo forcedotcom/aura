@@ -108,7 +108,8 @@
     "SecureIFrameElement": true,
     "SecureAction": true,
     "SecureDOMEvent": true,
-    "SecureAuraEvent": true
+    "SecureAuraEvent": true,
+    "DOMPurify": true
   },
 
   "rules": {

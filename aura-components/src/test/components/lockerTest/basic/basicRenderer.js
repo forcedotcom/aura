@@ -5,7 +5,7 @@
 		var div = document.createElement("div");
 		div.id = "DutchDidIt";
 		div.className = "smoothAsButter";
-		div.innerHTML = "Smooth As Butter";
+		div.innerHTML = "<h1 onmouseover='javascript:alert(\"This should never even make it into the DOM\");'>Smooth As Butter</h1>";
 
 		helper.log(component, "Lockerized controller scope: { document: " + document + ", window: " + window + ", $A: " + $A + " }");
 

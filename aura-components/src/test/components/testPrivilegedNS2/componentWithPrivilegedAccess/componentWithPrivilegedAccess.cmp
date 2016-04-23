@@ -26,27 +26,94 @@
     <aura:method name="privateMethod" action="{!c.privateMethod}" access="PRIVATE"/>
     <aura:method name="privilegedMethod" action="{!c.privilegedMethod}" access="PRIVILEGED"/>
     
-    <!-- register event in a DIFFERENT privileged ns -->
+    <!-- *************** register event in a DIFFERENT privileged ns  *************** -->
+    
+    <!-- event defined with default access, we cannot register it here
+    <aura:registerEvent name='NS1eventWithDefaultAccessRegisteredWithDefaultAccess' 
+  	type='testPrivilegedNS1:componentEventWithDefaultAccess'/>
+  	-->
+  	
+  	<!-- event defined with public access, we cannot register it here 
+    <aura:registerEvent name='NS1eventWithPublicAccessRegisteredWithDefaultAccess' 
+  	type='testPrivilegedNS1:componentEventWithPublicAccess'/>
+  	-->
+  	
+    <!-- event defined with privileged access -->
     <aura:registerEvent name='NS1eventWithPrivilegedAccessRegisteredWithDefaultAccess' 
   	type='testPrivilegedNS1:componentEventWithPrivilegedAccess'/>
   	<aura:registerEvent name='NS1eventWithPrivilegedAccessRegisteredWithPrivateAccess' 
   	type='testPrivilegedNS1:componentEventWithPrivilegedAccess' access='Private'/>
-  	<!-- we cannot register event in a different privileged namespace with default or public access
-  	<aura:registerEvent name='NS1eventWithDefaultAccessRegisteredWithDefaultAccess' 
-  	type='testPrivilegedNS1:componentEventWithDefaultAccess'/>
-  	<aura:registerEvent name='NS1eventWithPublicAccessRegisteredWithDefaultAccess' 
-  	type='testPrivilegedNS1:componentEventWithPublicAccess'/>
-  	-->
+  	<aura:registerEvent name='NS1eventWithPrivilegedAccessRegisteredWithPrivilegedAccess' 
+  	type='testPrivilegedNS1:componentEventWithPrivilegedAccess' access='Privileged'/>
+  	<aura:registerEvent name='NS1eventWithPrivilegedAccessRegisteredWithPublicAccess' 
+  	type='testPrivilegedNS1:componentEventWithPrivilegedAccess' access='Public'/>
+  	<aura:registerEvent name='NS1eventWithPrivilegedAccessRegisteredWithGlobalAccess' 
+  	type='testPrivilegedNS1:componentEventWithPrivilegedAccess' access='Global'/>
   	
-  	<!-- register event in SAME privileged ns -->
+  	<!-- event defined with global access -->
+    <aura:registerEvent name='NS1eventWithGlobalAccessRegisteredWithDefaultAccess' 
+  	type='testPrivilegedNS1:componentEventWithGlobalAccess'/>
+  	<aura:registerEvent name='NS1eventWithGlobalAccessRegisteredWithPrivateAccess' 
+  	type='testPrivilegedNS1:componentEventWithGlobalAccess' access='Private'/>
+  	<aura:registerEvent name='NS1eventWithGlobalAccessRegisteredWithPublicAccess' 
+  	type='testPrivilegedNS1:componentEventWithGlobalAccess' access='Public'/>
+  	<aura:registerEvent name='NS1eventWithGlobalAccessRegisteredWithPrivilegedAccess' 
+  	type='testPrivilegedNS1:componentEventWithGlobalAccess' access='Privileged'/>
+  	<aura:registerEvent name='NS1eventWithGlobalAccessRegisteredWithGlobalAccess' 
+  	type='testPrivilegedNS1:componentEventWithGlobalAccess' access='Global'/>
+  	
+  	
+  	
+  	<!--  *************** register event in SAME privileged ns  *************** -->
+  	
+  	<!-- event defined with default access -->
   	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithDefaultAccess' 
   	type='testPrivilegedNS2:componentEventWithDefaultAccess'/>
   	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithGlobalAccess' 
   	type='testPrivilegedNS2:componentEventWithDefaultAccess' access='Global'/>
-	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithDefaultAccess' 
+	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithPublicAccess' 
+  	type='testPrivilegedNS2:componentEventWithDefaultAccess' access='Public'/>
+  	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithPrivilegedAccess' 
+  	type='testPrivilegedNS2:componentEventWithDefaultAccess' access='Privileged'/>
+  	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithPrivateAccess' 
+  	type='testPrivilegedNS2:componentEventWithDefaultAccess' access='Private'/>
+  	
+  	<!-- event defined with public access -->
+  	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithDefaultAccess' 
   	type='testPrivilegedNS2:componentEventWithPublicAccess'/>
+  	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithPrivateAccess' 
+  	type='testPrivilegedNS2:componentEventWithPublicAccess' access='Private'/>
+  	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithPublicAccess' 
+  	type='testPrivilegedNS2:componentEventWithPublicAccess' access='Public'/>
+  	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithPrivilegedAccess' 
+  	type='testPrivilegedNS2:componentEventWithPublicAccess' access='Privileged'/>
+  	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithGlobalAccess' 
+  	type='testPrivilegedNS2:componentEventWithPublicAccess' access='Global'/>
+  	
+  	<!-- event defined with privileged access -->
   	<aura:registerEvent name='NS2eventWithPrivilegedAccessRegisteredWithDefaultAccess' 
   	type='testPrivilegedNS2:componentEventWithPrivilegedAccess'/>
+  	<aura:registerEvent name='NS2eventWithPrivilegedAccessRegisteredWithPrivateAccess' 
+  	type='testPrivilegedNS2:componentEventWithPrivilegedAccess' access='Private'/>
+  	<aura:registerEvent name='NS2eventWithPrivilegedAccessRegisteredWithPublicAccess' 
+  	type='testPrivilegedNS2:componentEventWithPrivilegedAccess' access='Public'/>
+  	<aura:registerEvent name='NS2eventWithPrivilegedAccessRegisteredWithPrivilegedAccess' 
+  	type='testPrivilegedNS2:componentEventWithPrivilegedAccess' access='Privileged'/>
+  	<aura:registerEvent name='NS2eventWithPrivilegedAccessRegisteredWithGlobalAccess' 
+  	type='testPrivilegedNS2:componentEventWithPrivilegedAccess' access='Global'/>
+  	
+  	<!-- event defined with global access -->
+  	<aura:registerEvent name='NS2eventWithGlobalAccessRegisteredWithDefaultAccess' 
+  	type='testPrivilegedNS2:componentEventWithGlobalAccess'/>
+  	<aura:registerEvent name='NS2eventWithGlobalAccessRegisteredWithPrivateAccess' 
+  	type='testPrivilegedNS2:componentEventWithGlobalAccess' access='Private'/>
+  	<aura:registerEvent name='NS2eventWithGlobalAccessRegisteredWithPublicAccess' 
+  	type='testPrivilegedNS2:componentEventWithGlobalAccess' access='Public'/>
+  	<aura:registerEvent name='NS2eventWithGlobalAccessRegisteredWithPrivilegedAccess' 
+  	type='testPrivilegedNS2:componentEventWithGlobalAccess' access='Privileged'/>
+  	<aura:registerEvent name='NS2eventWithGlobalAccessRegisteredWithGlobalAccess' 
+  	type='testPrivilegedNS2:componentEventWithGlobalAccess' access='Global'/>
+  	
     
     <div class='whoAmI'>
     	testPrivilegedNS2:componentWithPrivilegedAccess.cmp

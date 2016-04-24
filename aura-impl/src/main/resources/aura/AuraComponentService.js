@@ -1298,8 +1298,9 @@ AuraComponentService.prototype.clearDefsFromStorage = function () {
 AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
     var cmpConfigs = config["componentDefs"];
     var libConfigs = config["libraryDefs"];
+    var evtConfigs = config["eventDefs"];
 
-    if (cmpConfigs.length === 0 && libConfigs.length === 0) {
+    if (cmpConfigs.length === 0 && libConfigs.length === 0 && evtConfigs.length === 0) {
         return Promise["resolve"]();
     }
 
@@ -1311,13 +1312,14 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
     var self = this;
     var defSizeKb = $A.util.estimateSize(cmpConfigs) / 1024;
     var libSizeKb = $A.util.estimateSize(libConfigs) / 1024;
+    var evtSizeKb = $A.util.estimateSize(evtConfigs) / 1024;
 
     // use enqueue() to prevent concurrent get/analyze/prune/save operations
     return this.componentDefStorage.enqueue(function(resolve, reject) {
-        self.pruneDefsFromStorage(defSizeKb + libSizeKb)
+        self.pruneDefsFromStorage(defSizeKb + libSizeKb + evtSizeKb)
         .then(
             function() {
-                return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs, context);
+                return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs, evtConfigs, context);
             }
         )
         .then(
@@ -1771,7 +1773,55 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                     return undefined;
                 }
 
-                // some eviction is required.
+                // If we arrive here, some eviction is required...
+
+                /*
+                * NOTE @dval: Commenting this algorithm since is incorrect right now:
+                * The server does not return all the necessary dependencies to the client.
+                * Missing dependencies that we known of:
+                *   - The ones declared on markup via <aura:dependency/> 
+                *   - The ones spidered from JS (helpers, controllers, etc)
+                *
+                * For now (202), if we need to evict, we just clear everything.
+                * TODO W-3037639 - fix def serialization + persistence in 204
+                *
+                */
+
+                $A.log("AuraComponentService.pruneDefsFromStorage: evicted all defs and actions");
+
+                var actionClear;
+                var actionStorage = Action.getStorage();
+                if (actionStorage && actionStorage.isPersistent()) {
+                    actionClear = actionStorage.clear().then(
+                        undefined, // noop on success
+                        function(e) {
+                            $A.log("AuraClientService.dumpCachesAndReload(): failed to clear persistent actions cache", e);
+                            // do not rethrow to return to resolve state
+                        }
+                    );
+                } else {
+                    actionClear = Promise["resolve"]();
+                }
+
+                var defClear = $A.componentService.clearDefsFromStorage().then(
+                    undefined, // noop on success
+                    function(e) {
+                        $A.log("AuraClientService.dumpCachesAndReload(): failed to clear persistent component def storage", e);
+                        // do not rethrow to return to resolve state
+                    }
+                );
+
+                return Promise.all([actionClear, defClear]).then(function () {
+                    $A.metricsService.transaction('aura', 'defsEvicted', { "context": {
+                        "defsRequiredSize" : requiredSpaceKb,
+                        "storageCurrentSize" : currentSize,
+                        "storageRequiredSize" : newSize,
+                        "evicted" : ['all']
+                    }});
+                });
+
+                /*
+                // Original eviction Algorightm. Unccomment when the problem above has been fixed
                 //
                 // note: buildDependencyGraph() loads all actions and defs from storage. this forces
                 // scanning all rows in the respective stores. this results in the stores returning an
@@ -1780,13 +1830,11 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                 // as items are evicted from the store it's important that getSize() continues returning
                 // a value that is close to accurate.
                 return self.buildDependencyGraph()
-                    .then(
-                        function(graph) {
-                            var keysToEvict = self.sortDependencyGraph(graph);
+                    .then(function(graph) {
+                        var keysToEvict = self.sortDependencyGraph(graph);
                             return self.evictDefsFromStorage(keysToEvict, graph, requiredSpaceKb);
-                        }
-                    )
-                    .then(
+                    })
+                   .then(
                         function(evicted) {
                             $A.log("AuraComponentService.pruneDefsFromStorage: evicted " + evicted.length + " component defs and actions");
                             $A.metricsService.transaction('aura', 'defsEvicted', { "context": {
@@ -1797,7 +1845,8 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                             }});
                         }
                     );
-                }
+                */
+            }
         );
 };
 

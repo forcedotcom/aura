@@ -23,7 +23,7 @@
 
     <aura:attribute access="GLOBAL" name="value" type="String" description="The richly-formatted text used for output."/>
 	<aura:attribute access="PRIVATE" name="displayValue" type="String" description="The value after being escaped and activated."/>
-    <aura:attribute name="linkify" type="Boolean" default="true" description="Indicates if the URLs in the text should be rendered as hyperlinks."/>
+    <aura:attribute access="GLOBAL" name="linkify" type="Boolean" default="true" description="Indicates if the URLs in the text are set to render as hyperlinks."/>
 
     <aura:attribute name="supportedTags" type="String"
 	    description="A list of supported HTML tag names separated by comma; the list is stored in the helper file of this component. Certain tags, such as &lt;script&gt;, are removed. The default value is used if it is not specified."/>

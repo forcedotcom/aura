@@ -19,7 +19,7 @@
 
     <aura:attribute access="GLOBAL" name="value" type="String" required="true" description="The text to display."/>
     <aura:attribute access="PRIVATE" name="displayValue" type="String" description="The value after being escaped and activated."/>
-    <aura:attribute name="linkify" type="Boolean" default="true" description="Indicates if the URLs in the text should be rendered as hyperlinks."/>
+    <aura:attribute access="GLOBAL" name="linkify" type="Boolean" default="true" description="Indicates if the URLs in the text are set to render as hyperlinks."/>
 
     <aura:import library="ui:urlLib" property="urlLib"/>
 

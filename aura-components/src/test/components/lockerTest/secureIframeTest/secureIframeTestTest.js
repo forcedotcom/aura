@@ -4,6 +4,9 @@
      * verification to the controller and helper files, which operate in user mode.
      */
 
+    // LockerService not supported on older IE
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+
     // TODO(tbliss): make these lists on SecureIFrameElement accessible here for maintainablility
     AttributesWhitelist: ['height', 'name', 'src', 'width'],
     AttributesBlacklist: ['contentDocument', 'contentWindow', 'sandbox', 'srcdoc'],

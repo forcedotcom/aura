@@ -5,9 +5,7 @@
     // Test modifies/deletes the persistent database
     labels : [ "threadHostile" ],
 
-
-    // KV - temporarily disabling to get 202/patch work in. will be reenabled shortly.
-    _testComponentDefsPersisted: {
+    testComponentDefsPersisted: {
         test: [
             function loadIframe(cmp) {
                 var iframeSrc = "/auraStorageTest/componentDefStorage.app";
@@ -28,10 +26,10 @@
                 cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
             },
             function waitForAllDefsStored(cmp) {
-                cmp.helper.lib.iframeTest.verifyDefStorage("ui:scroller", true);
-                cmp.helper.lib.iframeTest.verifyDefStorage("ui:resizeObserver", true);
-                cmp.helper.lib.iframeTest.verifyDefStorage("ui:scrollerLib", true);
-                cmp.helper.lib.iframeTest.verifyDefStorage("ui:scopedScroll", true);
+                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
+                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:resizeObserver");
+                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scrollerLib");
+                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scopedScroll");
             },
             function reloadIframe(cmp) {
                 cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload")
@@ -47,8 +45,7 @@
 
     // TODO(W-2979502): this test should keep adding defs until something is evicted instead of adding a set amount and
     // assuming it will get evicted.
-    // KV - temporarily disabling to get 202/patch work in. will be reenabled shortly.
-    _testComponentDefStorageEviction: {
+    testComponentDefStorageEviction: {
         // This may be unreliable because of a flapper with the server sometimes not sending down a def when it should,
         // because Context.loaded is incorrect.
         labels : ["flapper"],
@@ -71,7 +68,7 @@
                 cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
             },
             function verifyFirstCmpStored(cmp) {
-                cmp.helper.lib.iframeTest.verifyDefStorage("ui:scroller", true);
+            	cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
             },
             function fetchDifferentComponentFromServer(cmp) {
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:block");

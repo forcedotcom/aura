@@ -10,6 +10,6 @@
     
     testLanguage: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-    	testUtils.assertEquals(window.navigator.language, "en-US", "Expect window.navigator.language to be 'en-US'");
+    	testUtils.assertEquals("en-us", window.navigator.language.toLowerCase(), "Unexpected window.navigator.language value");
     }
 })

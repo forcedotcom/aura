@@ -27,6 +27,11 @@
 
         // Set the first day of week
         helper.updateNameOfWeekDays(component);
+
+        var setFocus = component.get("v.setFocus");
+        if (!setFocus) {
+            component.set("v._setFocus", false);
+        }
     },
 
     focus: function(component, event, helper) {

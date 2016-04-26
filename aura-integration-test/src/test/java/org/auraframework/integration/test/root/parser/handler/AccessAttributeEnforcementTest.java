@@ -21,6 +21,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
@@ -34,7 +35,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     	String componentCource = "<aura:component><aura:text value='Hello World!' /></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
+                        NamespaceAccess.INTERNAL);
     	componentDescriptor.getDef();
     }
     
@@ -43,7 +45,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     	String componentCource = "<aura:component><aura:text value='Hello World!' /></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
+                        NamespaceAccess.CUSTOM);
     	componentDescriptor.getDef();
     }
     
@@ -53,7 +56,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     	String componentCource = "<aura:component><aura:html tag='b' body='Hello World!' /></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
+                        NamespaceAccess.INTERNAL);
     	componentDescriptor.getDef();
     }
     
@@ -62,7 +66,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     	String componentCource = "<aura:component><aura:html tag='b' body='Hello World!' /></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
+                        NamespaceAccess.CUSTOM);
     	componentDescriptor.getDef();
     }
   
@@ -72,7 +77,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     	String componentCource = "<aura:component><aura:unescapedHtml value='Hello World!'/></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
+                        NamespaceAccess.INTERNAL);
     	componentDescriptor.getDef();
     }
     
@@ -81,7 +87,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     	String componentCource = "<aura:component><aura:unescapedHtml value='Hello World!'/></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
+                        NamespaceAccess.CUSTOM);
     	componentDescriptor.getDef();
     }
     
@@ -90,7 +97,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     	String componentCource = "<aura:component><aura:expression value='Hello + World!' /></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
+                        NamespaceAccess.INTERNAL);
     	componentDescriptor.getDef();
     }
     
@@ -99,7 +107,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     	String componentCource = "<aura:component><aura:expression value='Hello + World!' /></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
+                        NamespaceAccess.CUSTOM);
     	componentDescriptor.getDef();
     }
     
@@ -108,7 +117,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     	String componentCource = "<aura:component><aura:if isTrue='True' body='' else='' /></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
+                        NamespaceAccess.INTERNAL);
     	componentDescriptor.getDef();
     }
     
@@ -117,7 +127,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     	String componentCource = "<aura:component><aura:if isTrue='True' body='' else='' /></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
+                        NamespaceAccess.CUSTOM);
     	componentDescriptor.getDef();
     }
     
@@ -126,7 +137,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     	String componentCource = "<aura:component><aura:renderIf isTrue='True' body='' else='' /></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
+                        NamespaceAccess.INTERNAL);
     	componentDescriptor.getDef();
     }
     
@@ -135,7 +147,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     	String componentCource = "<aura:component><aura:renderIf isTrue='True' body='' else='' /></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
+                        NamespaceAccess.CUSTOM);
     	componentDescriptor.getDef();
     }
     
@@ -145,7 +158,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
         String componentCource = "<aura:component><aura:dependency resource='" + cmpDescA.getQualifiedName() + "'/></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface", true);
+				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
+                        NamespaceAccess.INTERNAL);
     	componentDescriptor.getDef();
     }
     
@@ -155,7 +169,8 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
         String componentCource = "<aura:component><aura:dependency resource='" + cmpDescA.getQualifiedName() + "'/></aura:component>";
     	DefDescriptor<? extends Definition> componentDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, 
     			componentCource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface", false);
+				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
+                        NamespaceAccess.CUSTOM);
     	componentDescriptor.getDef();
     }
 

@@ -20,10 +20,10 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
-
 
 @UnAdaptableTest("namespace start with c means something special in core")
 public class DesignLayoutDefHandlerTest extends AuraImplTestCase {
@@ -61,7 +61,7 @@ public class DesignLayoutDefHandlerTest extends AuraImplTestCase {
         }
     }
 
-    @Test
+	@Test
     public void testLayoutInNonInternalNS() throws Exception {
         try {
             setupDesignLayoutDef(LAYOUT, false);
@@ -72,16 +72,17 @@ public class DesignLayoutDefHandlerTest extends AuraImplTestCase {
         }
     }
 
-
     private DesignDef setupDesignLayoutDef(String markup, boolean addToInternal) throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":",
+        NamespaceAccess access = addToInternal?NamespaceAccess.INTERNAL:NamespaceAccess.CUSTOM;
+        String namespace = addToInternal?StringSourceLoader.DEFAULT_NAMESPACE:StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE;
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(namespace+":",
                 ComponentDef.class, null);
-        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", ""), addToInternal);
+        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", ""), access);
 
         DefDescriptor<DesignDef> designDesc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
         getAuraTestingUtil().addSourceAutoCleanup(designDesc,
-                String.format("<design:component>%s</design:component>", markup), addToInternal);
+                String.format("<design:component>%s</design:component>", markup), access);
 
         return designDesc.getDef();
     }

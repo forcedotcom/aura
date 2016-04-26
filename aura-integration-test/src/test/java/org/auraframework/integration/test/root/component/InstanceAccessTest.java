@@ -21,7 +21,9 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.service.InstanceService;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -34,6 +36,8 @@ public class InstanceAccessTest extends AuraImplTestCase {
     private static final String DEFAULT = StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE;//'csstring'
     private static final String OTHER = StringSourceLoader.OTHER_CUSTOM_NAMESPACE;//'csstring1'
     private static final String ANOTHER = StringSourceLoader.ANOTHER_CUSTOM_NAMESPACE;//csstring2
+
+    private InstanceService instanceService = Aura.getInstanceService();
 
     @Test
     public void testAccessToNonGlobalInSameNS() throws Exception {
@@ -144,7 +148,8 @@ public class InstanceAccessTest extends AuraImplTestCase {
     @Test
     public void testAccessToOtherGlobalExtendingOtherAbsNonGlobalImplOtherIntf() throws Exception {
         DefDescriptor<InterfaceDef> intf = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
-                "<aura:interface/>", OTHER + ":" + getName(), false);
+                "<aura:interface/>", OTHER + ":" + getName(),
+                        NamespaceAccess.CUSTOM);
         DefDescriptor<ComponentDef> absCmp = buildCmp(OTHER, "abstract",
                 String.format("abstract='true' extensible='true' implements='%s'", intf.getDescriptorName()), "");
         DefDescriptor<ComponentDef> otherCmp = buildCmp(OTHER, "cmp",
@@ -157,18 +162,19 @@ public class InstanceAccessTest extends AuraImplTestCase {
     private DefDescriptor<ComponentDef> buildCmp(String namespace, String namePrefix, String attributes, String body) {
         return getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, attributes, body), namespace + ":" + namePrefix + "_" + getName(),
-                false);
+                NamespaceAccess.CUSTOM);
     }
 
     private DefDescriptor<ApplicationDef> buildApp(String namespace, String attributes, String body) {
         return getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseApplicationTag, attributes, body), namespace + ":" + getName(), false);
+                String.format(baseApplicationTag, attributes, body), namespace + ":" + getName(),
+                NamespaceAccess.CUSTOM);
     }
 
     private void assertNoAccess(DefDescriptor<?> desc) throws Exception {
         DefDescriptor<ApplicationDef> appDesc = buildApp(DEFAULT, "", String.format("<%s/>", desc.getDescriptorName()));
         try {
-            Aura.getInstanceService().getInstance(appDesc);
+            instanceService.getInstance(appDesc);
             fail("Expected NoAccessException");
         } catch (NoAccessException e) {
         }
@@ -176,7 +182,7 @@ public class InstanceAccessTest extends AuraImplTestCase {
 
     private void assertAccess(DefDescriptor<?> desc) throws Exception {
         DefDescriptor<ApplicationDef> appDesc = buildApp(DEFAULT, "", String.format("<%s/>", desc.getDescriptorName()));
-        Aura.getInstanceService().getInstance(appDesc);
+        instanceService.getInstance(appDesc);
     }
 
 }

@@ -24,6 +24,7 @@ import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.instance.Model;
 import org.auraframework.system.Location;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -134,7 +135,8 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
     public void testModelInInternalNamespace() throws Exception {
         String resourceSource = "<aura:component model='java://org.auraframework.impl.java.model.TestModel'>Hello World!</aura:component>";
         DefDescriptor<ComponentDef> cmpDefDesc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testComponent", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testComponent",
+                        NamespaceAccess.INTERNAL);
 
         ComponentDef actual = definitionService.getDefinition(cmpDefDesc);
         assertNotNull(actual);
@@ -148,7 +150,8 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
     public void testExceptionIsThrownWhenUsingJavaModelInExternalNamespace() throws Exception {
         String resourceSource = "<aura:component model='java://org.auraframework.impl.java.model.TestModel'>Hello World!</aura:component>";
         DefDescriptor<ComponentDef> cmpDefDesc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testComponent", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testComponent",
+                        NamespaceAccess.CUSTOM);
 
         try {
             definitionService.getDefinition(cmpDefDesc);

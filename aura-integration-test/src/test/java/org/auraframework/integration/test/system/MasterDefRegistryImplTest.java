@@ -50,9 +50,10 @@ import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
+import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -62,6 +63,7 @@ import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.SourceListener;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.test.util.AuraTestingUtil;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -81,11 +83,16 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-/**
- * @see org.auraframework.impl.registry.RootDefFactoryTest
- */
 @ThreadHostileTest("Don't you go clearing my caches.")
 public class MasterDefRegistryImplTest extends AuraImplTestCase {
+    private CachingService cachingService = Aura.getCachingService();
+
+    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
+
+    private InstanceService instanceService = Aura.getInstanceService();
+
+    private ContextService contextService = Aura.getContextService();
+
     @Mock
     Definition globalDef;
     @Mock
@@ -286,7 +293,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     };
 
     private MasterDefRegistry resetDefRegistry() {
-        ContextService contextService = Aura.getContextService();
         if (contextService.isEstablished()) {
             contextService.endContext();
         }
@@ -302,7 +308,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         AuraTestingUtil util = getAuraTestingUtil();
         MasterDefRegistry mdr;
 
-        dd = DefDescriptorImpl.getInstance(toAdd.getFQN(tld.getNamespace(), tld.getName()),
+        dd = definitionService.getDefDescriptor(toAdd.getFQN(tld.getNamespace(), tld.getName()),
                 toAdd.getDefClass());
         util.addSourceAutoCleanup(dd, toAdd.getContent());
         mdr = resetDefRegistry();
@@ -325,7 +331,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         AuraTestingUtil util = getAuraTestingUtil();
         String uid;
 
-        DefDescriptor<T> tld = DefDescriptorImpl.getInstance(fqn, clazz);
+        DefDescriptor<T> tld = definitionService.getDefDescriptor(fqn, clazz);
         util.addSourceAutoCleanup(tld, content);
         MasterDefRegistry mdr = resetDefRegistry();
         // prime the cache.
@@ -366,10 +372,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testNonInternalStringCache() throws Exception {
         String namespace = "testNonInternalStringCache" + getAuraTestingUtil().getNonce();
 
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
         assertFalse(namespace + "  should not have been internal", configAdapter.isInternalNamespace(namespace));
         DefDescriptor<ApplicationDef> houseboat = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace), false);
+                String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace),
+                        NamespaceAccess.CUSTOM);
         MasterDefRegistryImplOverride masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, houseboat);
         assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
@@ -466,7 +472,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     @Test
     public void testGetUidDescriptorDoesntExist() throws Exception {
         MasterDefRegistryImplOverride registry = getDefRegistry(false);
-        assertNull(registry.getUid(null, DefDescriptorImpl.getInstance("unknown:soldier", ComponentDef.class)));
+        assertNull(registry.getUid(null, definitionService.getDefDescriptor("unknown:soldier", ComponentDef.class)));
     }
 
     @Test
@@ -627,7 +633,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         String descName = String.format("%s:ghost", System.nanoTime());
         ComponentDef def = Mockito.mock(ComponentDef.class);
 
-        Mockito.doReturn(DefDescriptorImpl.getInstance(descName, ComponentDef.class)).when(def).getDescriptor();
+        Mockito.doReturn(definitionService.getDefDescriptor(descName, ComponentDef.class)).when(def).getDescriptor();
 
         // spy on MDR's registries to spy on defs
         final MasterDefRegistryImplOverride registry = getDefRegistry(true);
@@ -681,7 +687,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     @Test
     public void testGetDefDescriptorDoesntExist() throws Exception {
         MasterDefRegistryImplOverride registry = getDefRegistry(false);
-        assertNull(registry.getDef(DefDescriptorImpl.getInstance("unknown:soldier", ComponentDef.class)));
+        assertNull(registry.getDef(definitionService.getDefDescriptor("unknown:soldier", ComponentDef.class)));
     }
 
     @Test
@@ -835,7 +841,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
         DefDescriptor<?> cmpDef = defs.get(DefType.COMPONENT);
-        Aura.getCachingService().notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
+        cachingService.notifyDependentSourceChange(Collections.<WeakReference<SourceListener>>emptySet(),
                 cmpDef, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         assertFalse("ComponentDef not cleared from cache", isInDefsCache(defs.get(DefType.COMPONENT), mdr));
@@ -849,13 +855,13 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * @return List of DefDescriptors that have been added to the mdr caches.
      */
     private Map<DefType, DefDescriptor<?>> addDefsToCaches(MasterDefRegistryImpl mdr) throws Exception {
-        DefDescriptor<ComponentDef> cmpDef = DefDescriptorImpl.getInstance("test:test_button",
+        DefDescriptor<ComponentDef> cmpDef = definitionService.getDefDescriptor("test:test_button",
                 ComponentDef.class);
-        DefDescriptor<ControllerDef> cmpControllerDef = DefDescriptorImpl.getInstance(
+        DefDescriptor<ControllerDef> cmpControllerDef = definitionService.getDefDescriptor(
                 "js://test.test_button", ControllerDef.class);
-        DefDescriptor<RendererDef> otherNamespaceDef = DefDescriptorImpl.getInstance(
+        DefDescriptor<RendererDef> otherNamespaceDef = definitionService.getDefDescriptor(
                 "js://gvpTest.labelProvider", RendererDef.class);
-        DefDescriptor<ApplicationDef> appDef = DefDescriptorImpl.getInstance("test:basicCspTest", ApplicationDef.class);
+        DefDescriptor<ApplicationDef> appDef = definitionService.getDefDescriptor("test:basicCspTest", ApplicationDef.class);
 
 
         Map<DefType, DefDescriptor<?>> map = new HashMap<>();
@@ -947,7 +953,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
-        AuraContext cntx = Aura.getContextService().getCurrentContext();
+        AuraContext cntx = contextService.getCurrentContext();
         cntx.setApplicationDescriptor(appDesc);
         definitionService.updateLoaded(appDesc);
 
@@ -1028,7 +1034,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testAssertAccess_StoreAccessInfoInCacheIfNotPresent() throws Exception {
         DefDescriptor<ComponentDef> desc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""), StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testComp",
-                false);
+                        NamespaceAccess.CUSTOM);
         
         when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn(null);
 
@@ -1043,7 +1049,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     @Test
     public void testExistsCache() throws Exception {
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
         MasterDefRegistry mdr = getAuraMDR();
         MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdri);
@@ -1107,7 +1112,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     @UnAdaptableTest("namespace start with 'c' means something special in core")
     @Test
     public void testDefsCache() throws Exception {
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
         MasterDefRegistry mdr = getAuraMDR();
         MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdri);
@@ -1161,7 +1165,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     @UnAdaptableTest("namesapce start with c means something special in core")
     @Test
     public void testDescriptorFilterCache() throws Exception {
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
         MasterDefRegistry mdr = getAuraMDR();
         MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
         Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdri);
@@ -1220,7 +1223,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     @SuppressWarnings("unchecked")
     public <D extends Definition> void testDescriptorFilterConstant() throws Exception {
         DefRegistry<D> mockedRegistry = Mockito.mock(DefRegistry.class);
-        DefDescriptor<D> dd = (DefDescriptor<D>) DefDescriptorImpl.getInstance("markup", "aura", "mocked", DefType.COMPONENT);
+        DefDescriptor<D> dd = (DefDescriptor<D>) definitionService.getDefDescriptor("markup://aura:mocked", ComponentDef.class);
         Set<DefDescriptor<?>> findable = Sets.newHashSet();
         findable.add(dd);
 
@@ -1251,7 +1254,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     @Test
     public void testDescriptorFilterNameWildcardWithCache() throws Exception {
         DefRegistry<?> mockedRegistry = Mockito.mock(DefRegistry.class);
-        DefDescriptor<?> dd = DefDescriptorImpl.getInstance("markup", "aura", "mocked", DefType.COMPONENT);
+        DefDescriptor<?> dd = definitionService.getDefDescriptor("markup://aura:mocked", ComponentDef.class);
         Set<DefDescriptor<?>> findable = Sets.newHashSet();
         findable.add(dd);
 
@@ -1280,9 +1283,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * PostConditions: (1) registry.find() should be called. (2) We should get exactly one descriptor. (3) It should
      * contain the def descriptor. (4) There should be no cache.
      */
-    public void _testDescriptorFilterNameWildcardWithoutCache() throws Exception {
+    @Test
+    public void testDescriptorFilterNameWildcardWithoutCache() throws Exception {
         DefRegistry<?> mockedRegistry = Mockito.mock(DefRegistry.class);
-        DefDescriptor<?> dd = DefDescriptorImpl.getInstance("markup", "aura", "mocked", DefType.COMPONENT);
+        DefDescriptor<?> dd = definitionService.getDefDescriptor("markup://aura:mocked", ComponentDef.class);
         Set<DefDescriptor<?>> findable = Sets.newHashSet();
         findable.add(dd);
 
@@ -1314,7 +1318,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     @Test
     public void testDescriptorFilterNamespaceWildcard() throws Exception {
         DefRegistry<?> mockedRegistry = Mockito.mock(DefRegistry.class);
-        DefDescriptor<?> dd = DefDescriptorImpl.getInstance("markup", "aura", "mocked", DefType.COMPONENT);
+        DefDescriptor<?> dd = definitionService.getDefDescriptor("markup://aura:mocked", ComponentDef.class);
         Set<DefDescriptor<?>> findable = Sets.newHashSet();
         findable.add(dd);
 
@@ -1345,12 +1349,13 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testDepsCacheCompound() throws Exception {
     	String auraIf = "<aura:if isTrue='{!true}'>It is true</aura:if>";
     	DefDescriptor<ComponentDef> internalCmpWithCompound = getAuraTestingUtil().addSourceAutoCleanup(
-                ComponentDef.class, String.format(baseComponentTag, "access='global'", auraIf), null, true);
+                ComponentDef.class, String.format(baseComponentTag, "access='global'", auraIf), null,
+                        NamespaceAccess.INTERNAL);
     	
-    	 MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
+        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
          MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
          
-         Aura.getInstanceService().getInstance(internalCmpWithCompound, null);
+         instanceService.getInstance(internalCmpWithCompound, null);
          assertTrue(isInDepsCache(null, "compound://aura.if", mdri));
     }
     
@@ -1370,28 +1375,28 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         // in internal namespace
         DefDescriptor<ComponentDef> internalCmp = getAuraTestingUtil().addSourceAutoCleanup(
-                ComponentDef.class, String.format(baseComponentTag, "access='global'", ""), null, true);
+                ComponentDef.class, String.format(baseComponentTag, "access='global'", ""), null,
+                        NamespaceAccess.INTERNAL);
         // in external namespace depending on internal cmp
         DefDescriptor<ComponentDef> externalCmp = getAuraTestingUtil().addSourceAutoCleanup(
-                DefDescriptorImpl.getInstance(String.format("markup://%s:cmp", externalNamespace),
+                definitionService.getDefDescriptor(String.format("markup://%s:cmp", externalNamespace),
                         ComponentDef.class),
                 String.format(baseComponentTag, "access='global'",
                         String.format("<%s/>", internalCmp.getDescriptorName())),
-                false);
+                        NamespaceAccess.CUSTOM);
 
         // in internal namespace depending on external cmp
         DefDescriptor<ComponentDef> internalRoot = getAuraTestingUtil().addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(baseComponentTag, "access='global'",
-                        String.format("<%s/>", externalCmp.getDescriptorName())),
-                null, true);
+                        String.format("<%s/>", externalCmp.getDescriptorName())), null,
+                        NamespaceAccess.INTERNAL);
 
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
         assertTrue(configAdapter.isInternalNamespace(internalCmp.getNamespace()));
         assertFalse(configAdapter.isInternalNamespace(externalCmp.getNamespace()));
         assertTrue(configAdapter.isInternalNamespace(internalRoot.getNamespace()));
 
-        MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
+        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
         MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
 
         try {
@@ -1419,16 +1424,15 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     @Test
     public void testJavaProtocolIsCached() throws Exception {
-        DefDescriptor<ControllerDef> controllerDef = DefDescriptorImpl.getInstance(
+        DefDescriptor<ControllerDef> controllerDef = definitionService.getDefDescriptor(
                 "java://org.auraframework.components.test.java.controller.TestController", ControllerDef.class);
         controllerDef.getDef();
         String prefix = controllerDef.getPrefix();
         assertEquals(prefix, "java");
 
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
         assertFalse(configAdapter.isInternalNamespace(controllerDef.getNamespace()));
 
-        MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
+        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
         // mdr.getDef(controllerDef);
         MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
         assertTrue(isInDepsCache(controllerDef, "", mdri));
@@ -1437,13 +1441,13 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     private MasterDefRegistry restartContextGetNewMDR() {
         // simulate new request
         MasterDefRegistry mdr = getAuraMDR();
-        AuraContext ctx = Aura.getContextService().getCurrentContext();
+        AuraContext ctx = contextService.getCurrentContext();
         Mode mode = ctx.getMode();
         Format format = ctx.getFormat();
         Authentication access = ctx.getAccess();
-        Aura.getContextService().endContext();
+        contextService.endContext();
 
-        Aura.getContextService().startContext(mode, format, access);
+        contextService.startContext(mode, format, access);
         MasterDefRegistry mdr2 = getAuraMDR();
         assertFalse("MasterDefRegistry should be different after restart of context", mdr == mdr2);
         return mdr2;
@@ -1462,10 +1466,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                         + "<aura:attribute name='class' type='String'/>"
                         + "<aura:registerevent name='press' type='test:test_press'/>"
                         + "<div onclick='{!c.press}' class='{!v.class}'>{!v.label}</div>"
-                        + "</aura:component>", "cstring:test_button", false);
+                        + "</aura:component>", "cstring:test_button",
+                        NamespaceAccess.CUSTOM);
         DefDescriptor<ControllerDef> cmpControllerDef = getAuraTestingUtil().addSourceAutoCleanup(ControllerDef.class,
                 "{    press : function(cmp, event){        cmp.getEvent('press').fire();    }}",
-                "cstring.test_button", false);
+                "cstring.test_button",
+                        NamespaceAccess.CUSTOM);
         DefDescriptor<RendererDef> otherNamespaceDef = getAuraTestingUtil()
                 .addSourceAutoCleanup(
                         RendererDef.class,
@@ -1484,10 +1490,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                                 + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);\n"
                                 + "return this.superRender();\n"
                                 + "}})",
-                        "cstring1.labelProvider", false);
+                        "cstring1.labelProvider",
+                        NamespaceAccess.CUSTOM);
         DefDescriptor<ApplicationDef> app = getAuraTestingUtil().addSourceAutoCleanup(
                 ApplicationDef.class,
-                "<aura:application></aura:application>", "cstring1:blank", false);
+                "<aura:application></aura:application>", "cstring1:blank",
+                        NamespaceAccess.CUSTOM);
 
 
         Map<DefType, DefDescriptor<?>> map = new HashMap<>();
@@ -1505,7 +1513,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     private MasterDefRegistry getAuraMDR() {
-        return Aura.getContextService().getCurrentContext().getDefRegistry();
+        return contextService.getCurrentContext().getDefRegistry();
     }
 
 //    /**
@@ -1834,7 +1842,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         }
 
         @Override
-        public <T extends Definition> DependencyEntry compileDE(@Nonnull DefDescriptor<T> descriptor)
+        protected <T extends Definition> DependencyEntry compileDE(@Nonnull DefDescriptor<T> descriptor)
                 throws QuickFixException {
             return super.compileDE(descriptor);
         }

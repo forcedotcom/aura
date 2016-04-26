@@ -15,6 +15,32 @@
  */
 package org.auraframework.test.util;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
+import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener;
+import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsonEncoder;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import javax.annotation.Nullable;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -22,40 +48,23 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.annotation.Nullable;
-
-import org.auraframework.Aura;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.test.source.StringSourceLoader;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Source;
-import org.auraframework.system.SourceListener;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.JsonEncoder;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
 public class AuraTestingUtil {
     public static final long CACHE_CLEARING_TIMEOUT_SECS = 60;
     private static AtomicLong nonce = new AtomicLong(System.currentTimeMillis());
 
     private Set<DefDescriptor<?>> cleanUpDds;
+    private StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
+    private DefinitionService definitionService = Aura.getDefinitionService();
+    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
+    private ContextService contextService = Aura.getContextService();
+
+    public AuraTestingUtil() {
+    }
 
     public void tearDown() {
         if (cleanUpDds != null) {
-            StringSourceLoader loader = StringSourceLoader.getInstance();
             for (DefDescriptor<?> dd : cleanUpDds) {
-                loader.removeSource(dd);
+                stringSourceLoader.removeSource(dd);
             }
             cleanUpDds.clear();
         }
@@ -86,12 +95,14 @@ public class AuraTestingUtil {
         // Look up in the registry if a context is available. Otherwise, we're
         // probably running a context-less unit test
         // and better be using StringSourceLoader
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         if (context != null) {
-            return context.getDefRegistry().getSource(descriptor);
-        } else {
-            return StringSourceLoader.getInstance().getSource(descriptor);
+        	Source<T> res = context.getDefRegistry().getSource(descriptor);
+            if (res != null) {
+                return res;
+            }
         }
+        return stringSourceLoader.getSource(descriptor);
     }
 
     /**
@@ -112,14 +123,14 @@ public class AuraTestingUtil {
                 }
             }
         };
-        Aura.getDefinitionService().subscribeToChangeNotification(changeListener);
+        definitionService.subscribeToChangeNotification(changeListener);
         try {
             src.addOrUpdate(content);
             updated.acquire();
         } catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while waiting for updated source event", e);
         } finally {
-            Aura.getDefinitionService().unsubscribeToChangeNotification(changeListener);
+            definitionService.unsubscribeToChangeNotification(changeListener);
         }
     }
 
@@ -135,7 +146,7 @@ public class AuraTestingUtil {
      */
     public final <D extends Definition, B extends Definition> DefDescriptor<D> createStringSourceDescriptor(
             @Nullable String namePrefix, Class<D> defClass, DefDescriptor<B> bundle) {
-        return StringSourceLoader.getInstance().createStringSourceDescriptor(namePrefix, defClass, bundle);
+        return stringSourceLoader.createStringSourceDescriptor(namePrefix, defClass, bundle);
     }
 
     /**
@@ -146,7 +157,7 @@ public class AuraTestingUtil {
      * @return the {@link DefDescriptor} for the created definition
      */
     public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {
-        return addSourceAutoCleanup(defClass, contents, null);
+        return addSourceAutoCleanup(defClass, contents, null, NamespaceAccess.INTERNAL);
     }
 
     /**
@@ -159,7 +170,7 @@ public class AuraTestingUtil {
      */
     public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
             String namePrefix) {
-        return addSourceAutoCleanup(defClass, contents, namePrefix, true);
+        return addSourceAutoCleanup(defClass, contents, namePrefix, NamespaceAccess.INTERNAL);
     }
 
     /**
@@ -168,29 +179,13 @@ public class AuraTestingUtil {
      * @param defClass interface of the definition represented by this source
      * @param contents source contents
      * @param namePrefix package name prefix
-     * @param isInternalNamespace if true, namespace is internal, if false, it will be customer
+     * @param access the namespace access type.
      * @return the {@link DefDescriptor} for the created definition
      */
     public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
-            String namePrefix, boolean isInternalNamespace) {
-    	return addSourceAutoCleanup(defClass, contents, namePrefix, isInternalNamespace, false);
-    }
-    
-    /**
-     * Convenience method to create a description and load a source in one shot.
-     *
-     * @param defClass interface of the definition represented by this source
-     * @param contents source contents
-     * @param namePrefix package name prefix
-     * @param isInternalNamespace if true, namespace is internal
-     * @param isPrivilegedNamespace if true, namespace is privileged. if both false, it will be customer
-     * @return the {@link DefDescriptor} for the created definition
-     */
-    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
-            String namePrefix, boolean isInternalNamespace, boolean isPrivilegedNamespace) {
-        StringSourceLoader loader = StringSourceLoader.getInstance();
-        DefDescriptor<T> descriptor = loader.addSource(defClass, contents, namePrefix, isInternalNamespace, isPrivilegedNamespace)
-                .getDescriptor();
+            String namePrefix, NamespaceAccess access) {
+        DefDescriptor<T> descriptor = stringSourceLoader.addSource(defClass, contents, namePrefix,
+                access).getDescriptor();
         markForCleanup(descriptor);
         return descriptor;
     }
@@ -203,7 +198,7 @@ public class AuraTestingUtil {
      * @return the {@link DefDescriptor} for the created definition
      */
     public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
-        return addSourceAutoCleanup(descriptor, contents, true);
+        return addSourceAutoCleanup(descriptor, contents, NamespaceAccess.INTERNAL);
     }
 
     /**
@@ -211,26 +206,12 @@ public class AuraTestingUtil {
      *
      * @param descriptor descriptor for the source to be created
      * @param contents source contents
+     * @param access namespace access type.
      * @return the {@link DefDescriptor} for the created definition
      */
     public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
-            boolean isInternalNamespace) {
-    	return addSourceAutoCleanup(descriptor, contents, isInternalNamespace, false);
-    }
-    
-    /**
-     * Convenience method to create a description and load a source in one shot.
-     *
-     * @param descriptor descriptor for the source to be created
-     * @param contents source contents
-     * @param isInternalNamespace if true, will add to internal namespace
-     * @param isPrivilegedNamespace if true, will add to privileged namespace. if both false, will add to customer namespace
-     * @return the {@link DefDescriptor} for the created definition
-     */
-    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
-            boolean isInternalNamespace, boolean isPrivilegedNamespace) {
-        StringSourceLoader loader = StringSourceLoader.getInstance();
-        loader.putSource(descriptor, contents, false, isInternalNamespace, isPrivilegedNamespace);
+            NamespaceAccess access) {
+        stringSourceLoader.putSource(descriptor, contents, false, access);
         markForCleanup(descriptor);
         return descriptor;
     }
@@ -241,7 +222,7 @@ public class AuraTestingUtil {
      * @param descriptor the descriptor identifying the loaded definition to remove.
      */
     public <T extends Definition> void removeSource(DefDescriptor<T> descriptor) {
-        StringSourceLoader.getInstance().removeSource(descriptor);
+        stringSourceLoader.removeSource(descriptor);
         if (cleanUpDds != null) {
             cleanUpDds.remove(descriptor);
         }
@@ -259,8 +240,8 @@ public class AuraTestingUtil {
      */
     protected AuraContext setupContext(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc)
             throws QuickFixException {
-        AuraContext ctxt = Aura.getContextService().startContext(mode, format, Authentication.AUTHENTICATED, desc);
-        ctxt.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+        AuraContext ctxt = contextService.startContext(mode, format, Authentication.AUTHENTICATED, desc);
+        ctxt.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
         String uid = ctxt.getDefRegistry().getUid(null, desc);
         ctxt.addLoaded(desc, uid);
         return ctxt;
@@ -270,10 +251,10 @@ public class AuraTestingUtil {
      * restart context.
      */
     public void restartContext() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         DefDescriptor<? extends BaseComponentDef> cmp = context.getApplicationDescriptor();
         String uid = context.getUid(cmp);
-        Aura.getContextService().endContext();
+        contextService.endContext();
         AuraContext newctxt = setupContext(context.getMode(), context.getFormat(), cmp);
         newctxt.addLoaded(cmp, uid);
     }
@@ -289,7 +270,7 @@ public class AuraTestingUtil {
      */
     public String getContextURL(Mode mode, Format format, String desc, Class<? extends BaseComponentDef> type,
             boolean modified) throws QuickFixException {
-        return getContextURL(mode, format, Aura.getDefinitionService().getDefDescriptor(desc, type), modified);
+        return getContextURL(mode, format, definitionService.getDefDescriptor(desc, type), modified);
     }
 
     @Deprecated
@@ -315,7 +296,7 @@ public class AuraTestingUtil {
             ctxt.addLoaded(desc, uid);
         }
         ctxtString = ctxt.getEncodedURL(AuraContext.EncodingStyle.Normal);
-        Aura.getContextService().endContext();
+        contextService.endContext();
         return ctxtString;
     }
 
@@ -354,16 +335,16 @@ public class AuraTestingUtil {
 
         if (appUid == null) {
             AuraContext ctx = null;
-            if (!Aura.getContextService().isEstablished()) {
-                ctx = Aura.getContextService().startContext(mode, Format.JSON, Authentication.AUTHENTICATED, app);
+            if (!contextService.isEstablished()) {
+                ctx = contextService.startContext(mode, Format.JSON, Authentication.AUTHENTICATED, app);
             }
-            appUid = Aura.getDefinitionService().getDefRegistry().getUid(null, app);
+            appUid = definitionService.getDefRegistry().getUid(null, app);
             if (ctx != null) {
-                Aura.getContextService().endContext();
+                contextService.endContext();
             }
         }
         if (fwuid == null) {
-            fwuid = Aura.getConfigAdapter().getAuraFrameworkNonce();
+            fwuid = configAdapter.getAuraFrameworkNonce();
         }
         if (dn == null) {
             dn = Lists.newArrayList();
@@ -422,6 +403,7 @@ public class AuraTestingUtil {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
         applicationContext.register(configurationClass);
         applicationContext.refresh();
+        applicationContext.close();
     }
 
 }

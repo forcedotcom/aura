@@ -24,6 +24,7 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 
 @Controller
 public class StringSourceController {
@@ -39,7 +40,7 @@ public class StringSourceController {
     @AuraEnabled
     public static DefDescriptor<?> addSource(@Key("name") String name, @Key("content") String content, @Key("defType") String defType) throws Exception {
         StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
-        return stringSourceLoader.addSource(Enum.valueOf(DefType.class, defType).getPrimaryInterface(), content, name, true, false).getDescriptor();
+        return stringSourceLoader.addSource(Enum.valueOf(DefType.class, defType).getPrimaryInterface(), content, name, NamespaceAccess.INTERNAL).getDescriptor();
     }
     /**
      * Removes a specified resource from string source

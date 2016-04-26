@@ -16,7 +16,6 @@
 
 package org.auraframework.integration.test.root.parser.handler.design;
 
-
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
@@ -25,6 +24,7 @@ import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
@@ -70,13 +70,13 @@ public class DesignAttributeDefaultDefHandlerTest extends AuraImplTestCase {
     private DesignAttributeDef createComponentAndDesignWithAttributeDefault(String body) throws Exception {
         final String attr = "attr";
         final String cmp = String.format(baseComponentTag, "", "<aura:attribute name=\"" + attr + "\" type=\"Object[]\"/>");
-        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":",
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(StringSourceLoader.DEFAULT_NAMESPACE + ":",
                 ComponentDef.class, null);
-        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, cmp, true);
+        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, cmp, NamespaceAccess.INTERNAL);
 
         DefDescriptor<DesignDef> desc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
-        getAuraTestingUtil().addSourceAutoCleanup(desc, String.format(DESIGN_TEMPLATE, attr, body), true);
+        getAuraTestingUtil().addSourceAutoCleanup(desc, String.format(DESIGN_TEMPLATE, attr, body), NamespaceAccess.INTERNAL);
 
         return desc.getDef().getAttributeDesignDef(attr);
     }

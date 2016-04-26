@@ -14,14 +14,13 @@
       var trimFirstMultilineCommentEx = /^\/\*([\s\S]*?)\*\//;
       var trimFirstLineCommentEx = /^\/\/.*\n?/;
       var hookFn = '$globalEvalIIFE$';
-      var USE_STRICT = true;
 
       // wrapping the source with `with` statements create a new lexical scope,
       // that can prevent access to the globals in the worker by shodowing them
       // with the members of new scopes passed as arguments into the `hookFn` call.
       // additionally, when specified, strict mode will be enforced to avoid leaking
       // global variables into the worker.
-      function addLexicalScopesToSource(src, levels, useStrict) {
+      function addLexicalScopesToSource(src, options) {
           // removing first line CSFR protection and other comments to facilitate
           // the detection of returnable code
           src = src.replace(trimFirstMultilineCommentEx, '');
@@ -29,18 +28,22 @@
           // only add return statement if source it starts with [, {, or (
           var match = src.match(returnableEx);
           if (match) src = src.replace(match[1], 'return ');
-          if (useStrict) {
+          if (options.useStrict) {
               // forcing strict mode
               src = 'return (function(){\n"use strict";\n' + src + '\n})()';
           } else {
               // forcing the value of `this` for non-strict code to prevent leaking
               // the safeEval.html's window reference
-              src = 'return (function(){\n' + src + '\n}).bind(arguments[0])()';
+              src = 'return (function(){\n' + src + '\n}).call(arguments[0])';
           }
-          for (var i = 0; i < levels; i++) {
+          for (var i = 0; i < options.levels; i++) {
               src = 'with(arguments[' + i + ']||{}){' + src + '}';
           }
-          return 'function ' + hookFn + '(){' + src + '}';
+          var code = 'function ' + hookFn + '(){' + src + '}';
+          if (options.sourceURL) {
+              code += '\n//# sourceURL=' + options.sourceURL;
+          }
+          return code;
       }
 
       function evalAndReturn(src) {
@@ -48,10 +51,8 @@
           script.type = 'text/javascript';
           window[hookFn] = undefined;
           script.appendChild(document.createTextNode(src));
-
           placeholder.appendChild(script);
           placeholder.removeChild(script);
-
           var result = window[hookFn];
           window[hookFn] = undefined;
           return result;
@@ -60,20 +61,32 @@
       // adding non-configurable hooks into parent window.
       Object.defineProperties(parent, {
           '$$safe-eval$$': {
-              value: function(src) {
+              value: function(src, optionalSourceURL) {
                   if (!isStrictModeAvailable) {
-                    throw new Error("$$safe-eval$$ is only supported in strict mode capable browsers!");
+                      throw new Error("$$safe-eval$$ is only supported in strict mode capable browsers!");
                   }
                   if (!src) return undefined;
-                  var fn = evalAndReturn(addLexicalScopesToSource(src, arguments.length - 1, USE_STRICT));
-                  return fn.apply(undefined, Array.prototype.slice.call(arguments, 1));
+                  var args = Array.prototype.slice.call(arguments, 1);
+                  optionalSourceURL = typeof optionalSourceURL === "string" ? args.shift() : undefined;
+                  var fn = evalAndReturn(addLexicalScopesToSource(src, {
+                      levels: args.length,
+                      useStrict: true,
+                      sourceURL: optionalSourceURL
+                  }));
+                  return fn.apply(undefined, args);
               }
           },
           '$$safe-eval-compat$$': {
-              value: function(src, globalScope) {
+              value: function(src, optionalSourceURL) {
                   if (!src) return undefined;
-                  var fn = evalAndReturn(addLexicalScopesToSource(src, arguments.length - 1));
-                  return fn.apply(globalScope, Array.prototype.slice.call(arguments, 1));
+                  var args = Array.prototype.slice.call(arguments, 1);
+                  optionalSourceURL = typeof optionalSourceURL === "string" ? args.shift() : undefined;
+                  var fn = evalAndReturn(addLexicalScopesToSource(src, {
+                      levels: args.length,
+                      useStrict: false,
+                      sourceURL: optionalSourceURL
+                  }));
+                  return fn.apply(args[0], args);
               }
           }
       });

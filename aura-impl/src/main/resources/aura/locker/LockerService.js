@@ -38,7 +38,7 @@ function LockerService() {
 	    "SetIteratorPrototype",
 	    "GeneratorFunction",
 	    "TypedArray",
-	
+
 	    // Intrinsics
 	    // -> from ES5
 	    "Function",
@@ -88,7 +88,7 @@ function LockerService() {
 	    "Float32Array",
 	    "Float64Array",
 	    "DataView",
-	    
+
 	    // Misc
 	    "alert",
 	    "clearInterval",
@@ -145,13 +145,15 @@ function LockerService() {
 	// defining LockerService as a service
 	var service = {
 		createForDef : function(code, def) {
-			var namespace = def.getDescriptor().getNamespace();
+			var descriptor = def.getDescriptor();
+			var namespace = descriptor.getNamespace();
+			var name = descriptor.getName();
+			var descriptorDebuggableURL = "components/" + namespace + "/" + name + ".js";
 			var key = $A.lockerService.util.getKeyForNamespace(namespace);
 
 			// Key this def so we can transfer the key to component instances
 			$A.lockerService.util.applyKey(def, key);
-
-			return this.create(code, key);
+			return this.create(code, key, descriptorDebuggableURL);
 		},
 
 		getEnv : function(key, doNotCreate) {
@@ -168,7 +170,7 @@ function LockerService() {
 			return key && key !== masterKey ? this.getEnv(key, doNotCreate) : undefined;
 		},
 
-		create : function(code, key) {
+		create : function(code, key, optionalSourceURL) {
 			var envRec = this.getEnv(key);
 			var locker;
 			if (!lockerShadows) {
@@ -189,7 +191,7 @@ function LockerService() {
 			try {
 				locker = {
 					"$envRec": envRec,
-					"$result": window['$$safe-eval$$'](code, envRec, lockerShadows)
+					"$result": window['$$safe-eval$$'](code, optionalSourceURL, envRec, lockerShadows)
 				};
 			} catch (x) {
 				throw new Error("Unable to create locker IIFE: " + x);
@@ -254,7 +256,7 @@ function LockerService() {
 				}
 			}
 		},
-		
+
 		markOpaque : function(st) {
 			setLockerSecret(st, "opaque", true);
 		},
@@ -330,7 +332,6 @@ function LockerService() {
 
 	service["createForDef"] = service.createForDef;
 	service["getEnvForSecureObject"] = service.getEnvForSecureObject;
-	
 	service["trust"] = service.trust;
 	service["showLockedNodes"] = service.showLockedNodes;
 

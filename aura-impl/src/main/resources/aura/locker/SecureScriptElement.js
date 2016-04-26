@@ -21,7 +21,7 @@ function SecureScriptElement(key) {
 
 	var src;
 	var eventListeners = {};
-	
+
 	var o = Object.create(null, {
 		src : {
 			enumerable: true,
@@ -32,7 +32,7 @@ function SecureScriptElement(key) {
 				src = value;
 			}
 		},
-		
+
 		$run : {
 			value : function() {
 				if (!src) {
@@ -43,7 +43,7 @@ function SecureScriptElement(key) {
 
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState === 4 && xhr.status === 200) {
-						$A.lockerService.create(xhr.responseText, key);
+						$A.lockerService.create(xhr.responseText, key, src);
 
 						// Fire onload event
 						var listeners = eventListeners["load"];
@@ -71,7 +71,7 @@ function SecureScriptElement(key) {
 				if (!callback) {
 					return; // by spec, missing callback argument does not throw, just ignores it.
 				}
-				
+
 				var listeners = eventListeners[event];
 				if (!listeners) {
 					eventListeners[event] = [callback];
@@ -83,6 +83,6 @@ function SecureScriptElement(key) {
 	});
 
 	setLockerSecret(o, "key", key);
-	
+
 	return o;
 }

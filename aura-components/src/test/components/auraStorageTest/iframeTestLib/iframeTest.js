@@ -109,35 +109,32 @@ function iframeTest() {
             this.waitForStatus("Creating: " + desc, "Created: " + desc);
         },
 
-        /** Verifies a def (format is namespace:name) is present or missing in ComponentDefStorage, with an optional error message. */
-        verifyDefStorage : function(desc, present, msg) {
+        /** Waits for a def (format is namespace:name) to be present in ComponentDefStorage, with an optional error message. */
+        waitForDefInStorage : function(desc, msg) {
             var iframe = this.getIframe();
-            var iframeCmp = this.getIframeRootCmp();
+            var found = false;
 
-            // use a map so multiple search can concurrently happen
-            iframe.defContained = iframe.defContained || {};
-            iframe.defContained[desc] = undefined;
-            iframe.$A.storageService.getStorage("ComponentDefStorage").getAll().then(function(items) {
-                items = items || [];
-                for (var i = 0; i < items.length; i++) {
-                    if (items[i]["key"] === "markup://" + desc) {
-                        iframe.defContained[desc] = true;
-                        return;
+            function checkDefStorage(desc) {
+                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll().then(function(items) {
+                    items = items || [];
+                    for (var i = 0; i < items.length; i++) {
+                        if (items[i]["key"] === "markup://" + desc) {
+                            found = true;
+                            return;
+                        }
                     }
-                }
-                iframe.defContained[desc] = false;
-            });
+                    checkDefStorage(desc);
+                });
+            }
 
-            msg = msg || "Unable to determine whether " + desc + " is in ComponentDefStorage";
+            checkDefStorage(desc);
+
+            msg = msg || "Def " + desc + " never present in ComponentDefStorage";
             $A.test.addWaitForWithFailureMessage(true,
-                function() { return iframe.defContained[desc] !== undefined; },
-                msg,
-                function() {
-                    $A.test.assertEquals(present, iframe.defContained[desc], desc + " def should " + (present ? "" : "not") + " have been present in ComponentDefStorage.\n" + iframeCmp.get("v.log"));
-                }
+                function() { return found; },
+                msg
             );
         },
-
 
         /**
          * Waits for the iframe component to update its status. First wait for the initial message to not be present

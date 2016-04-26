@@ -12,8 +12,7 @@
      * stored to the cache. This is tested with a component test instead of a unit test because the bug may only
      * be present in obfuscated javascript modes, as W-2833015 exemplifies.
      */
-    // KV - temporarily disabling to get 202/patch work in. will be reenabled shortly.
-    _testNoExcessivePruning: {
+    testNoExcessivePruning: {
         test: [
              function clearPersistentStorages(cmp) {
                  this.clearCaches();
@@ -22,23 +21,28 @@
                  var desc = "ui:tab";
                  cmp.set("v.load", desc);
                  cmp.fetchCmp();
-                 $A.test.addWaitFor("Fetched: " + desc, function() { return cmp.get("v.status"); });
+                 this.waitForDefInStorage(desc);
              },
              function addToDefStorage(cmp) {
                  var desc = "ui:tree"
                  cmp.set("v.load", desc);
                  cmp.fetchCmp();
-                 $A.test.addWaitFor("Fetched: " + desc, function() { return cmp.get("v.status"); });
+                 this.waitForDefInStorage(desc);
              },
              function addToDefStorage(cmp) {
                  var desc = "ui:scroller";
                  cmp.set("v.load", desc);
                  cmp.fetchCmp();
-                 $A.test.addWaitFor("Fetched: " + desc, function() { return cmp.get("v.status"); });
+                 this.waitForDefInStorage(desc);
              },
              function verifyDefsNotEvicted(cmp) {
-                 // all items fetches should be in persistent storage. if not then we need to
-                 // tweak the size of ComponentDefStorage in the test template.
+                 // This test assumes pruning is done before inserting defs into the persistent def storage. By waiting
+                 // for each def to be put in persistent storage before continuing on, we know pruning has already
+                 // completed at this point so we can simply check what's currently in storage and verify no defs got
+                 // removed.
+
+                 // If defs are being pruned because the defs have gone over the storage maxSize we need to tweak the
+                 // size of ComponentDefStorage in the test template.
                  var defs = undefined;
                  $A.storageService.getStorage("ComponentDefStorage").getAll().then(function(items) {
                      items = items || [];
@@ -63,6 +67,30 @@
         ]
     },
 
+    waitForDefInStorage: function(desc, msg) {
+        var found = false;
+
+        function checkDefStorage(desc) {
+            $A.storageService.getStorage("ComponentDefStorage").getAll().then(function(items) {
+                items = items || [];
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i]["key"] === "markup://" + desc) {
+                        found = true;
+                        return;
+                    }
+                }
+                checkDefStorage(desc);
+            });
+        }
+
+        checkDefStorage(desc);
+
+        msg = msg || "Def " + desc + " never present in ComponentDefStorage";
+        $A.test.addWaitForWithFailureMessage(true,
+            function() { return found; },
+            msg
+        );
+    },
 
     /**
      * Empty the caches.

@@ -174,9 +174,10 @@ SecureElement.addSecureGlobalEventHandlers = function(se, raw, key) {
 	[
 		// Standard Global Event handlers
 		// https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers
-		// Note: ignoring "onclose", "oncontextmenu", "onerror", "onreset", "onsubmit" from the list above
-		"onabort", "onblur", "onchange", "onclick", "ondblclick", "onfocus", "oninput", "onkeydown", "onkeypress",
-		"onkeyup", "onload", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onresize", "onscroll", "onselect"		
+		"onabort", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "onerror",
+		"onfocus", "oninput", "onkeydown", "onkeypress", "onkeyup", "onload", 
+		"onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", 
+		"onreset", "onresize", "onscroll", "onselect", "onsubmit"	
 	].forEach(function (name) {
 		Object.defineProperty(se, name, {
 			set: function(callback) {

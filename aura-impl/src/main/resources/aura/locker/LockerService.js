@@ -254,6 +254,14 @@ function LockerService() {
 				}
 			}
 		},
+		
+		markOpaque : function(st) {
+			setLockerSecret(st, "opaque", true);
+		},
+
+		isOpaque : function(st) {
+			return getLockerSecret(st, "opaque") === true;
+		},
 
 		showLockedNodes : function showLockedNodes(root) {
 			if (!root) {
@@ -298,8 +306,8 @@ function LockerService() {
 				return (fromKey === masterKey) || (fromKey === toKey);
 			},
 
-			verifyAccess : function(from, to) {
-				if (!$A.lockerService.util.hasAccess(from, to)) {
+			verifyAccess : function(from, to, options) {
+				if (!$A.lockerService.util.hasAccess(from, to) || (options && options.verifyNotOpaque && $A.lockerService.isOpaque(to))) {
 					var fromKey = getLockerSecret(from, "key");
 					var toKey = getLockerSecret(to, "key");
 
@@ -322,9 +330,6 @@ function LockerService() {
 
 	service["createForDef"] = service.createForDef;
 	service["getEnvForSecureObject"] = service.getEnvForSecureObject;
-	
-	// DCHASMAN TODO Remove this once we get 202 synced up to using SecureObject name instead of SecureThing
-	service["getEnvForSecureThing"] = service.getEnvForSecureObject;
 	
 	service["trust"] = service.trust;
 	service["showLockedNodes"] = service.showLockedNodes;

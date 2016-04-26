@@ -18,15 +18,9 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-    <aura:method name="testIframeAttributes" action="{!c.testIframeAttributes}">
-        <aura:attribute name="attributesWhitelist" type="List"/>
-        <aura:attribute name="attributesBlacklist" type="List"/>
-    </aura:method>
-    <aura:method name="testIframeMethods" action="{!c.testIframeMethods}">
-        <aura:attribute name="methodsWhitelist" type="List"/>
-    </aura:method>
-    <aura:method name="testContentWindow" action="{!c.testContentWindow}"/>
+    <aura:method name="testCannotAccessAuraEndpoints" action="{!c.testCannotAccessAuraEndpoints}"/>
+    <aura:method name="testAddEventListener" action="{!c.testAddEventListener}"/>
+    <aura:method name="testOnReadyStateChange" action="{!c.testOnReadyStateChange}"/>
 
-    <div aura:id="title">SecureIFrameElement test</div>
-    <iframe aura:id="iframe"/>
+    <div id="title">SecureXHR test</div>
 </aura:component>

@@ -51,6 +51,10 @@ function SecureWindow(win, key) {
 			enumerable: true,
 			value: SecureNavigator(win.navigator, key)
 		},
+		XMLHttpRequest: {
+			enumerable: true,
+			value: SecureXMLHttpRequest(key)
+		},
 		setTimeout: {
 			enumerable: true,
 			value: function (callback) {
@@ -70,9 +74,10 @@ function SecureWindow(win, key) {
 		}
 	});
 
+	SecureElement.addSecureGlobalEventHandlers(o, win, key);
+	SecureElement.addEventTargetMethods(o, win, key);
 
 	Object.defineProperties(o, {
-		addEventListener: SecureElement.createAddEventListenerDescriptor(o, win, key),
 		location: SecureObject.createFilteredProperty(o, win, "location")
 	});
 

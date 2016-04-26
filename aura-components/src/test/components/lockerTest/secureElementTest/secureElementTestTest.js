@@ -15,9 +15,10 @@
     HTMLPropertiesWhitelist: ['accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable',
                               'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang', 'spellcheck',
                               'style', 'tabIndex', 'title'],
-    HTMLPropertiesBlacklist: ['offsetParent'],
+    
+    HTMLPropertiesBlacklist: [],
 
-    OtherPropertiesWhitelist: ["childNodes", "children", "ownerDocument", "parentNode"],
+    OtherPropertiesWhitelist: ["childNodes", "children", "ownerDocument", "parentNode", "offsetParent"],
 
     MethodsWhitelist: ["appendChild", "addEventListener", "removeEventListener", "dispatchEvent",
                        "getAttribute", "setAttribute", "blur", "click", "focus"],

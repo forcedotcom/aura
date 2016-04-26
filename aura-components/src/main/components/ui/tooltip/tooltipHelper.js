@@ -85,12 +85,13 @@
 	},
 
 	show: function(component) {
+
 		var self = this;
 		component._toggleGuard = true;
 
 		setTimeout(function() {
 			component._toggleGuard = false;
-		}, 100);
+		}, 500);
 		
 		component.set('v.isVisible', true);
 		this.buildTooltip(component, $A.getCallback(function(tt) {
@@ -133,6 +134,7 @@
 	},
 
 	toggle: function(component) {
+		
 		//make sure toggle isn't called 
 		//over and over again
 		if(component._toggleGuard) {
@@ -164,9 +166,13 @@
 		var node = component.getElement();
 		var focusHandled = false;
 
-		var showComponent = self.show.bind(self)(component);
-
-		var hideComponent = self.hide.bind(self)(component);
+		
+		var showComponent = $A.getCallback(function() {
+			self.show(component);
+		});
+		var hideComponent = $A.getCallback(function() {
+			self.hide(component);
+		});
 
 
 		if(!trigger || trigger === 'none') {

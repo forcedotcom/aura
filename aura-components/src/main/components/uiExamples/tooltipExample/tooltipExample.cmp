@@ -33,7 +33,7 @@ Resistentiam quiescentibus et Impetum moventibus tribuit; sed motus et
 quies, uti vulgo concipiuntur, respectu solo distinguuntur ab invicem, neq;
 semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
         <p>This tooltip trigger can be...</p>
-        <p><ui:tooltip advanced="true" triggerClass="my-trigger-class" tooltipBody="You have to use the advanced mode in this case. Also it is very, very large and could never fit on screen in some cases. Wow, this is a lot of text! It just goes on and on and on. It is a whole entire paragraph.">At the edge of the viewport</ui:tooltip></p>
+        <p><ui:tooltip trigger="click" advanced="true" triggerClass="my-trigger-class" tooltipBody="You have to use the advanced mode in this case. Also it is very, very large and could never fit on screen in some cases. Wow, this is a lot of text! It just goes on and on and on. It is a whole entire paragraph.">At the edge of the viewport</ui:tooltip></p>
         <p style="text-align: right">The other <ui:tooltip advanced="true" direction="west" tooltipBody="This is another one">edge</ui:tooltip></p>
         </div>
         <div class="section form">

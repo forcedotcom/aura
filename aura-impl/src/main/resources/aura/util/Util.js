@@ -622,9 +622,16 @@ Aura.Utils.Util.prototype.setClass=function(element,newClass,remove){
         }
     }
     if(element && element.tagName){
-        constructedClass=this.buildClass(element["className"]||"",newClass,remove);
-        if(element["className"]!==constructedClass) {
-            element["className"]=constructedClass;
+        if (element.tagName === "svg") {
+            constructedClass=this.buildClass(element.getAttribute("class")||"",newClass,remove);
+            if(element.getAttribute("class")!==constructedClass) {
+                element.setAttribute("class", constructedClass);
+            }
+        } else {
+            constructedClass=this.buildClass(element["className"]||"",newClass,remove);
+            if(element["className"]!==constructedClass) {
+                element["className"]=constructedClass;
+            }
         }
     }
 };

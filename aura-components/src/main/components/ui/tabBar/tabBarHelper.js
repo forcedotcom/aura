@@ -306,13 +306,18 @@
         var maxTabs = this.calculateMaxTabs(cmp);
         var tabItems = cmp.get("v.tabHeaders");
         var startIndex = cmp._activeTab && cmp._activeTabIndex >= maxTabs ? maxTabs - 1 : maxTabs;
-
+        
+        //To avoid showing overflow menu link when useOverflowMenu is set and tabitems are empty
+        if(tabItems.length === 0){
+        	this.toggleOverflowMenu(cmp, false);
+            overflowData.hasOverflow = false;
+        }
+        
         if (maxTabs === overflowData.visibleTabs.length) {
             return;
         }
 
         this.updateVisibleTabs(overflowData, tabItems, startIndex);
-
         if (maxTabs >= tabItems.length) {
             //enough space, don't need to show overflow tab
             this.toggleOverflowMenu(cmp, false);

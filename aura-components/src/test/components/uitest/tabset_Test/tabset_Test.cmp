@@ -107,7 +107,14 @@
      <aura:if isTrue="{! v.renderItem == 'noTabs'}">
 	    <div class="block">    
 	        <h1 class="header">No Tabs</h1>
-	        <ui:tabset aura:id="noTabsTabSet" class="tabset1" lazyRenderTabs="{!true}">
+	        <ui:tabset aura:id="noTabsTabSet" class="tabset1" lazyRenderTabs="{!true}" >
+	        </ui:tabset>
+	    </div>
+    </aura:if>
+    <aura:if isTrue="{! v.renderItem == 'noTabsWithOverflowMenuSet'}">
+	    <div class="block">    
+	        <h1 class="header">No Tabs</h1>
+	        <ui:tabset aura:id="noTabsTabSet" class="tabset1" lazyRenderTabs="{!true}" useOverflowMenu="true">
 	        </ui:tabset>
 	    </div>
     </aura:if>
@@ -200,6 +207,7 @@
 					<li><a href="/uitest/tabset_Test.cmp?renderItem=basic">basic</a></li>
 					<li><a href="/uitest/tabset_Test.cmp?renderItem=nestedTabs">nestedTabs</a></li>
 					<li><a href="/uitest/tabset_Test.cmp?renderItem=noTabs">noTabs</a></li>
+					<li><a href="/uitest/tabset_Test.cmp?renderItem=noTabsWithOverflowMenuSet">noTabsWithOverflowMenuSet</a></li>
 					<li><a href="/uitest/tabset_Test.cmp?renderItem=tab">tab</a></li>
 					<li><a href="/uitest/tabset_Test.cmp?renderItem=tab_lazyCustomTab">tab_lazyCustomTab</a></li>
 				</ul>

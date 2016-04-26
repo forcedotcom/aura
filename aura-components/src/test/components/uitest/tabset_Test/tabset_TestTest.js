@@ -50,6 +50,17 @@
         }
 	},
 	
+	testEmptyTabWithOverflowMenuSet : {
+		attributes : {"renderItem" : "noTabsWithOverflowMenuSet"},
+        test : function (cmp){
+        	 var ulElem = cmp.find("noTabsTabSet").getElement().getElementsByTagName("ul")[0];
+        	 var ulChldrn = this.ignoreComments(ulElem.children);
+        	 $A.test.assertEquals(1, ulChldrn.length, "There should be overflow menu link present");
+        	 $A.test.assertTrue($A.util.hasClass(ulChldrn[0], "uiTabOverflowMenuItem hidden"), "uiTabOverflowMenuItem should be hidden");
+            
+        }
+	},
+	
 	/**
 	 * Verifying lazy rendering works as expected, With Lazy rendering we should only have a new section 
 	 * when we click on a tab and activate
@@ -228,8 +239,7 @@
 	  */
 	 ignoreComments : function(elements){
 		   	 var elementArray = [];
-	    
-		     for(var i = 0; i < elements.length; i++){
+	         for(var i = 0; i < elements.length; i++){
 		        if(elements[i].tagName != "!"){
 		        	elementArray.push(elements[i]);
 		        }

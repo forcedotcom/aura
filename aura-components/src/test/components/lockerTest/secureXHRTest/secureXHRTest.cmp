@@ -17,6 +17,7 @@
 -->
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+    <aura:attribute name="completed" type="Boolean" default="false" description="Flag set by the test to signal async operations are complete"/>
 
     <aura:method name="testCannotAccessAuraEndpoints" action="{!c.testCannotAccessAuraEndpoints}"/>
     <aura:method name="testAddEventListener" action="{!c.testAddEventListener}"/>

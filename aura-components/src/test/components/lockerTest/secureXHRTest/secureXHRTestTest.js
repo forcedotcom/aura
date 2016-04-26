@@ -13,13 +13,13 @@
             cmp.testCannotAccessAuraEndpoints();
         }
     },
-    
+
     testAddEventListener: {
         test: function(cmp) {
             cmp.testAddEventListener();
         }
     },
-    
+
     testOnReadyStateChange: {
         test: function(cmp) {
             cmp.testOnReadyStateChange();

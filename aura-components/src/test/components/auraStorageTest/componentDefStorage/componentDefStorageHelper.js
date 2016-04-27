@@ -69,7 +69,7 @@
             }
             iterationCount++;
 
-            defs.getAll().then(function(items) {
+            defs.getAll(true).then(function(items) {
                 items = items || [];
 
                 // recurse if transaction key is found

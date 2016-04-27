@@ -113,7 +113,7 @@
                 var storage = $A.storageService.getStorage("getAllIsolation");
                 storage.getAll()
                     .then(function(items) {
-                        $A.test.assertEquals(0, items.length, "storag.getAll() should've returned zero items");
+                        $A.test.assertEquals(0, items.length, "storage.getAll() should've returned zero items");
                     })
                     ["catch"](function(error) { $A.test.fail(error.toString()); });
             }

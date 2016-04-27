@@ -51,7 +51,7 @@
         function(cmp) {
             var completed = false;
             var found = false;
-            $A.storageService.getStorage("actions").getAll()
+            $A.storageService.getStorage("actions").getAll(true)
                 .then(function(items) {
                     for (var i = 0; i < items.length; i++) {
                         if (items[i]["key"].indexOf(cmp._actionDescriptor) > -1
@@ -71,7 +71,7 @@
                     function() {
                         $A.test.assertTrue(found, "Priming action not saved to actions storage");
                     });
-            
+
         }]
     },
 
@@ -112,7 +112,7 @@
         function(cmp) {
             var completed = false;
             var found = false;
-            $A.storageService.getStorage("actions").getAll()
+            $A.storageService.getStorage("actions").getAll(true)
                 .then(function(items) {
                     for (var i = 0; i < items.length; i++) {
                         if (items[i]["key"].indexOf(cmp._actionDescriptor) > -1
@@ -170,7 +170,7 @@
 
             // The priming action is handled in a special way so we cannot wait for the action like we do in other
             // tests. Instead, just wait for the expected error message to be displayed.
-            $A.test.addWaitFor(true, function(){ 
+            $A.test.addWaitFor(true, function(){
                 return $A.test.getText(document.getElementById("auraErrorMessage")).indexOf(expected) > -1;
             });
         }

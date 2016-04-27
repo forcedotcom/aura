@@ -896,11 +896,16 @@
                 );
             },
             function bothRefreshActionsGoToServer(cmp) {
-                $A.test.addWaitForWithFailureMessage(true, function() {
-                    var res = $A.storageService.getStorage("actions").get(cmp._storageKey).then(
-                            function(item) { cmp._newCounter = item.value.returnValue.recordObjCounter; });
-                    return cmp._newCounter&&(cmp._newCounter == cmp._counter+2);
-                }, "fail to update stored response");
+                $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function() {
+                        $A.storageService.getStorage("actions").get(cmp._storageKey, true)
+                            .then(function(value) {
+                                cmp._newCounter = value.returnValue.recordObjCounter;
+                            });
+                        return cmp._newCounter && (cmp._newCounter == cmp._counter+2);
+                    },
+                    "fail to update stored response");
             }
         ]
     },

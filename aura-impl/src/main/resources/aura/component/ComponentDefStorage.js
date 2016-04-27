@@ -241,7 +241,7 @@ ComponentDefStorage.prototype.getAll = function () {
     var that = this;
     var actions = Action.getStorage();
 
-    return this.definitionStorage.getAll().then(
+    return this.definitionStorage.getAll(true).then(
         function(items) {
             function clearActionsCache() {
                 if (actions && actions.isPersistent()) {

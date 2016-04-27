@@ -150,8 +150,8 @@ AuraComponentService.prototype.getAttributeProviderForElement = function(element
 };
 
 /**
- * Returns an iterator over components from cmp to the root through 
- * the value provider chain. The iterator emits an array of the component extension 
+ * Returns an iterator over components from cmp to the root through
+ * the value provider chain. The iterator emits an array of the component extension
  * hierarchy for each concrete component.
  * Example: [Cmp, SuperCmp, SuperSuperCmp] -> [CmpCVP, SuperCmpCVP] -> CmpCVPCVP
  * @param {Component} cmp The source component
@@ -164,7 +164,7 @@ AuraComponentService.prototype.getComponentValueProviderHierarchy = (function() 
         do {
             if(!cmp.isValid()) {
                 // signal an invalid hiearchy to the caller
-                return undefined; 
+                return undefined;
             }
             cmp = cmp.getSuper();
             if(cmp) {
@@ -228,7 +228,7 @@ AuraComponentService.prototype.getComponentValueProviderHierarchy = (function() 
         this.return = function(value) {
             if(!done) {
                 done = true;
-                current = value; 
+                current = value;
             }
             return {
                 value: current,
@@ -1589,9 +1589,9 @@ AuraComponentService.prototype.buildDependencyGraph = function() {
 
     var promises = [];
     var actionStorage = Action.getStorage();
-    var actionsGetAll = actionStorage ? actionStorage.getAll() : Promise["resolve"]([]);
+    var actionsGetAll = actionStorage ? actionStorage.getAll(true) : Promise["resolve"]([]);
     promises.push(actionsGetAll);
-    promises.push(this.componentDefStorage.getAll());
+    promises.push(this.componentDefStorage.getAll(true));
 
     // promise will reject if either getAll rejects
     return Promise.all(promises).then(function (results) {

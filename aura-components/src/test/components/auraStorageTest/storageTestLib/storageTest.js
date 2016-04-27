@@ -54,20 +54,20 @@ function storageTest () {
             .then(function() {
                 append(cmp, "get("+key+");");
                 return storage.get(key);
-            }).then(function(item) {
-                append(cmp, "value="+item);
-                if (item) {
-                    $A.test.assertEquals("value", item.value, "Failed initial get for "+key);
+            }).then(function(value) {
+                append(cmp, "value="+value);
+                if (value) {
+                    $A.test.assertEquals("value", value, "Failed initial get for "+key);
                 }
                 append(cmp,"remove("+key+");");
                 return storage.remove(key);
             }).then(function() {
                 append(cmp,"get("+key+");");
                 return storage.get(key);
-            }).then(function(item) {
-                append(cmp,"value="+item);
+            }).then(function(value) {
+                append(cmp,"value="+value);
                 completed = true;
-                $A.test.assertUndefinedOrNull(item, "remove failed");
+                $A.test.assertUndefinedOrNull(value, "remove failed");
             })['catch'](failTest);
         $A.test.addWaitFor(true, function() { return completed; });
     }
@@ -80,35 +80,35 @@ function storageTest () {
             .then(function() {
                 append(cmp, "get("+key+");");
                 return storage.get(key);
-            }).then(function(item) {
-                append(cmp, "value="+item);
+            }).then(function(v) {
+                append(cmp, "value="+v);
                 if (value instanceof Error) {
-                    $A.test.assertUndefined(item.value.message, "Expected an empty object because errors are not JSON serializable");
+                    $A.test.assertUndefined(v.message, "Expected an empty object because errors are not JSON serializable");
                 } else if ($A.util.isObject(value)) {
                     for (var x in value) {
                         if (value.hasOwnProperty(x)) {
-                            $A.test.assertEquals(value[x], item.value[x], "Failed object match on property "+x);
+                            $A.test.assertEquals(value[x], v[x], "Failed object match on property "+x);
                         }
                     }
                 } else if ($A.util.isArray(value)) {
-                    $A.test.assertEquals(value.length, item.value.length, "Failed match on array length");
+                    $A.test.assertEquals(value.length, v.length, "Failed match on array length");
                     for (var i =0; i < value.length; i++) {
-                        $A.test.assertEquals(value[i], item.value[i], "Failed match on array index "+i);
+                        $A.test.assertEquals(value[i], v[i], "Failed match on array index "+i);
                     }
                 } else if ($A.util.isFunction(value)) {
-                    $A.test.assertEquals(value+"", item.value, "Failed match on serialized function definition");
+                    $A.test.assertEquals(value+"", v, "Failed match on serialized function definition");
                 } else {
-                    $A.test.assertEquals(value, item.value, "Failed initial get for "+value);
+                    $A.test.assertEquals(value, v, "Failed initial get for "+value);
                 }
                 append(cmp, "remove("+key+");");
                 return storage.remove(key);
             }).then(function() {
                 append(cmp, "get("+key+");");
                 return storage.get(key);
-            }).then(function(item) {
-                append(cmp, "value="+item);
+            }).then(function(v) {
+                append(cmp, "value="+v);
                 completed = true;
-                $A.test.assertUndefinedOrNull(item, "remove failed");
+                $A.test.assertUndefinedOrNull(v, "remove failed");
             })['catch'](failTest);
 
         $A.test.addWaitFor(true, function() { return completed; });
@@ -205,8 +205,8 @@ function storageTest () {
         testCacheMiss: function(cmp, storage) {
             var completed = false;
             storage.get("iDontExist")
-                .then(function(item){
-                    $A.test.assertUndefined(item, "Expected to receive undefined on cache miss");
+                .then(function(value){
+                    $A.test.assertUndefined(value, "Expected to receive undefined on cache miss");
                     completed = true;
                 },
                 function(err) { failTest(cmp, err); });
@@ -259,9 +259,9 @@ function storageTest () {
             var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
             var completed = false;
             storage.get("overSize")
-                .then(function (item) {
+                .then(function (value) {
                     completed = true;
-                    $A.test.assertUndefinedOrNull(item, "Value too large should not be stored.");
+                    $A.test.assertUndefinedOrNull(value, "Value too large should not be stored.");
                 })['catch'](failTest);
 
             $A.test.addWaitFor(true, function() { return completed; });
@@ -272,6 +272,7 @@ function storageTest () {
             storage.clear()
             .then(function() {
                 return Promise.all([
+                    // a = key*2+1, b = a+1
                     storage.put("2", { "a" : 5, "b" : 6 }),
                     storage.put("0", { "a" : 1, "b" : 2 }),
                     storage.put("3", { "a" : 7, "b" : 8 }),
@@ -308,7 +309,7 @@ function storageTest () {
 
             storage.put(key, "ORIGINAL")
                 .then(function() { return storage.get("testReplaceExistingWithEntryTooLarge"); })
-                .then(function(item) { $A.test.assertEquals("ORIGINAL", item.value); })
+                .then(function(value) { $A.test.assertEquals("ORIGINAL", value); })
                 .then(function() { return storage.put("testReplaceExistingWithEntryTooLarge", itemTooLarge); })
                 .then(function(){
                         $A.test.fail("Should not be able to save an item above the maxSize");
@@ -326,7 +327,7 @@ function storageTest () {
             var completed = false;
 
             storage.get("testReplaceExistingWithEntryTooLarge")
-                .then(function(item) { $A.test.assertUndefined(item, "Entry should be empty after attemping to put item too large"); })
+                .then(function(value) { $A.test.assertUndefined(value, "Entry should be empty after attemping to put item too large"); })
                 .then(function(){ completed = true;}, function(err) { failTest(cmp, err)});
 
             $A.test.addWaitFor(true, function() { return completed; });
@@ -355,8 +356,8 @@ function storageTest () {
                 )
                 .then(function() { return storage.get("testCyclicObject"); })
                 .then(
-                    function(item){
-                        $A.test.assertUndefined(item, "Expected to receive undefined on twisted object");
+                    function(value){
+                        $A.test.assertUndefined(value, "Expected to receive undefined on twisted object");
                         completed = true;
                     },
                     function(err) { failTest(cmp, err); }
@@ -373,8 +374,8 @@ function storageTest () {
                     stuff["changeling"] = 3;
                     return storage.get("testModifyObject");
                 })
-                .then(function(item) {
-                    $A.test.assertEquals(2, item.value["changeling"],
+                .then(function(value) {
+                    $A.test.assertEquals(2, value["changeling"],
                         "testModifyObject: Object changed while stored");
                     completed = true;
                 })['catch'](failTest);
@@ -408,11 +409,11 @@ function storageTest () {
 
             storage.put("testUpdate", "ORIGINAL")
                 .then(function() { return storage.get("testUpdate"); })
-                .then(function(item) { $A.test.assertEquals("ORIGINAL", item.value); })
+                .then(function(value) { $A.test.assertEquals("ORIGINAL", value); })
                 .then(function() { return storage.put("testUpdate", "DUPLICATE"); })
                 .then(function() { return storage.get("testUpdate"); })
-                .then(function(item) {
-                    $A.test.assertEquals("DUPLICATE", item.value);
+                .then(function(value) {
+                    $A.test.assertEquals("DUPLICATE", value);
                     return storage.remove("testUpdate");
                 }).then(function() {
                     completed = true;

@@ -254,7 +254,7 @@
                 var completed = false;
                 var storage = $A.storageService.getStorage("crypto-store");
                 storage.remove("valueTooLarge")
-                    .then(function () {
+                    .then(function() {
                         return storage.put("valueTooLarge", new Array(32768).join("x"));
                     }).then(function() {
                         $A.test.fail("Successfully stored value that is too large");
@@ -265,12 +265,12 @@
                     $A.test.addWaitFor(true, function() { return completed; });
             }, function(cmp) {
                 var storage = $A.storageService.getStorage("crypto-store");
-                var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error);(cmp, error); }.bind(this);
+                var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); }.bind(this);
                 var completed = false;
                 storage.get("valueTooLarge")
-                    .then(function (item) {
+                    .then(function(value) {
                         completed = true;
-                        $A.test.assertUndefinedOrNull(item, "value too large should not be stored.");
+                        $A.test.assertUndefinedOrNull(value, "value too large should not be stored.");
                     })['catch'](failTest);
                 $A.test.addWaitFor(true, function() { return completed; });
             }]
@@ -292,8 +292,8 @@
                 })
                 .then(function() { return that.storage.get("testErrorValue"); })
                 .then(
-                    function(item){
-                        $A.test.assertDefined(item, "Could not retrieve Error object");
+                    function(value) {
+                        $A.test.assertDefined(value, "Could not retrieve Error object");
                         // TODO: ideally this would have the error object, or fail earlier and let the user know
                         // we can't store it
                         completed = true;

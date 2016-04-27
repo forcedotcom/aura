@@ -127,7 +127,7 @@ function iframeTest() {
                     return;
                 }
 
-                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll().then(function(items) {
+                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll(true).then(function(items) {
                     items = items || [];
                     for (var i = 0; i < items.length; i++) {
                         // wait for transaction key to disappear
@@ -170,7 +170,7 @@ function iframeTest() {
                 }
 
 
-                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll().then(function(items) {
+                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll(true).then(function(items) {
                     items = items || [];
                     for (var i = 0; i < items.length; i++) {
                         // if transaction key or def is present, recurse
@@ -235,9 +235,9 @@ function iframeTest() {
                     return;
                 }
 
-                iframe.$A.storageService.getStorage("actions").get(gvpStorageKey)
-                    .then(function (item) {
-                        if (item) {
+                iframe.$A.storageService.getStorage("actions").get(gvpStorageKey, true)
+                    .then(function (value) {
+                        if (value) {
                             found = true;
                             return;
                         }

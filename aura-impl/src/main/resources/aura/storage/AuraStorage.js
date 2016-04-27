@@ -31,7 +31,7 @@ var AuraStorage = function AuraStorage(config) {
     this.autoRefreshInterval = config["autoRefreshInterval"] * 1000;
     this.debugLogging = config["debugLogging"];
     this.version = "" + config["version"];
-    this.updateKeyPrefix(config["isolationKey"]);
+    this.keyPrefix = this.generateKeyPrefix(config["isolationKey"], this.version);
 
     this.getOperationsInFlight = 0;
 
@@ -120,21 +120,21 @@ AuraStorage.prototype.clear = function() {
 /**
  * Asynchronously gets an item from storage corresponding to the specified key.
  * @param {String} key The item key. This is the key used when the item was added to storage using <code>put()</code>.
- * @returns {Promise} A Promise that resolves to an object in storage or undefined if the key is not found.
- *      The object consists of {value: *, isExpired: Boolean}.
+ * @param {Boolean} includeExpired True to return expired items, falsey to not return expired items.
+ * @returns {Promise} A Promise that resolves to the stored item or undefined if the key is not found.
  * @export
  */
-AuraStorage.prototype.get = function(key) {
+AuraStorage.prototype.get = function(key, includeExpired) {
     this.getOperationsInFlight += 1;
     var that = this;
     var promise = this.adapter.getItem(this.keyPrefix + key).then(function(item) {
         that.log("get() " + (item ? "HIT" : "MISS") + " - key: " + key + ", value: " + item);
         that.getOperationsInFlight -= 1;
 
-        if (!item) {
+        if (!item || (!includeExpired && new Date().getTime() > item["expires"])) {
             return undefined;
         }
-        return { "value" : item["value"], "isExpired" : (new Date().getTime() > item["expires"]) };
+        return item["value"];
     },function (e) {
         that.logError({ "operation": "get", "error": e });
         that.getOperationsInFlight -= 1;
@@ -158,11 +158,12 @@ AuraStorage.prototype.inFlightOperations = function() {
 
 /**
  * Asynchronously gets all items from storage.
+ * @param {Boolean} [includeExpired] True to return expired items, falsey to not return expired items.
  * @returns {Promise} A Promise that resolves to an array of objects in storage. Each
- *      object consists of {key: String, value: *, isExpired: Boolean}.
+ *      object consists of {key: String, value: *}.
  * @export
  */
-AuraStorage.prototype.getAll = function() {
+AuraStorage.prototype.getAll = function(includeExpired) {
     var that = this;
     return this.adapter.getAll().then(function(items) {
         var length = items.length ? items.length : 0;
@@ -171,11 +172,11 @@ AuraStorage.prototype.getAll = function() {
         var results = [];
         for (var i = 0; i < length; i++) {
             var item = items[i];
-            if (item["key"].indexOf(that.keyPrefix) === 0) {
+            if (item["key"].indexOf(that.keyPrefix) === 0 && (includeExpired || now < item["expires"])) {
                 var key = item["key"].replace(that.keyPrefix, "");
-                results.push({ "key": key, "value": item["value"], "isExpired": (now > item["expires"]) });
+                results.push({ "key": key, "value": item["value"] });
             }
-            // wrong isolationKey/version so ignore the entry
+            // wrong isolationKey/version or item is expired so ignore the entry
             // TODO - capture entries to be removed async
         }
 
@@ -461,24 +462,18 @@ AuraStorage.prototype.deleteStorage = function() {
                     throw e;
                 }
             );
-
-    } else {
-        return new Promise(function(success) {
-            that.log("AuraStorage '" + that.name + "' [" + that.getName() + "] : " + "Does not implement deleteStorage(), returning success");
-            success();
-        });
     }
+    return Promise["resolve"]();
 };
 
 /**
- * Update the prefix for all storage keys. This should be called
- * only once during instantiation.
- *
+ * Generates the key prefix for storage.
  * @param {String} isolationKey The isolation key.
+ * @param {String} version The version.
  * @private
  */
-AuraStorage.prototype.updateKeyPrefix = function(isolationKey) {
-    this.keyPrefix = "" + isolationKey + this.version + AuraStorage.KEY_DELIMITER;
+AuraStorage.prototype.generateKeyPrefix = function(isolationKey, version) {
+    return "" + isolationKey + version + AuraStorage.KEY_DELIMITER;
 };
 
 

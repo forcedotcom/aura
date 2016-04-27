@@ -184,9 +184,9 @@
             var that = this;
             this.storage.put("testCyclicObject", stuff)
                 .then(function() { return that.storage.get("testCyclicObject"); })
-                .then(function(item) {
-                    $A.test.assertEquals(2, item.value["a"], "testCyclicObject: constant is wrong");
-                    $A.test.assertEquals(item.value["b"], item.value, "testCyclicObject: looped value should be defined");
+                .then(function(value) {
+                    $A.test.assertEquals(2, value["a"], "testCyclicObject: constant is wrong");
+                    $A.test.assertEquals(value["b"], value, "testCyclicObject: looped value should be defined");
                     completed = true;
                 })['catch'](function(e) {
                    completed = true;
@@ -261,8 +261,8 @@
                 })
                 .then(function() { return that.storage.get("testErrorValue"); })
                 .then(
-                    function(item){
-                        $A.test.assertUndefined(item, "Expected undefined because put() failed");
+                    function(value){
+                        $A.test.assertUndefined(value, "Expected undefined because put() failed");
                         completed = true;
                     },
                     function(err) { failTest(cmp, err); }
@@ -288,8 +288,8 @@
                 )
                 .then(function() { return that.storage.get("testFunctionValue"); })
                 .then(
-                    function(item){
-                        $A.test.assertUndefined(item, "Expected undefined because put() failed");
+                    function(value){
+                        $A.test.assertUndefined(value, "Expected undefined because put() failed");
                         completed = true;
                     },
                     function(e) {
@@ -317,7 +317,7 @@
 
             cmp._storage.put("testGetSize.key1", new Array(1024).join("x"))  // 1kb
                 .then(function() { return cmp._storage.get("testGetSize.key1"); })
-                .then(function(item) { $A.test.assertDefined(item.value, "Fail item."); })
+                .then(function(value) { $A.test.assertDefined(value, "Fail item."); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
                 .then(function(result) { cmp._append("result length = "+result.length); return cmp._storage.getSize(); })
                 .then(function(size) {
@@ -335,7 +335,7 @@
             //Two value to see that size is recalculated
             cmp._storage.put("testGetSize.key2" , new Array(3072).join("y")) //5kb
                 .then(function() { return cmp._storage.get("testGetSize.key2"); })
-                .then(function(item) { $A.test.assertDefined(item.value, "testGetSize: Fail - item undefined."); })
+                .then(function(value) { $A.test.assertDefined(value, "testGetSize: Fail - item undefined."); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
                 .then(function() { return cmp._storage.getSize(); })
                 .then(function(size) {
@@ -352,7 +352,7 @@
             // Careful... this does not calculate size correctly.
             cmp._storage.put("testGetSize.key2" , new Array(1024).join("z")) //1kb
                 .then(function() { return cmp._storage.get("testGetSize.key2"); })
-                .then(function(item) { $A.test.assertDefined(item.value); })
+                .then(function(value) { $A.test.assertDefined(value); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
                 .then(function(results) { return cmp._storage.getSize(); })
                 .then(function(size) {

@@ -430,14 +430,14 @@
 
                 // touch key1 to move it up to the top of the MRU
                 .then(function() {return that.storage.get("key1"); })
-                .then(function(item) { return that.adapter.getMRU(); })
+                .then(function(value) { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key2", "key1"]), mru.toString()); })
 
                 // add another item to push out the oldest item
                 // oldest (key2) item should have been evicted
                 .then(function() { return that.storage.put("key3", {"value" : {"baz" : new Array(3300).join("z")}}); })
                 .then(function() { return that.storage.get("key2"); })
-                .then(function(item) { $A.util.isUndefined(item); })
+                .then(function(value) { $A.util.isUndefined(value); })
                 .then(function() { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key1", "key3"]), mru.toString()); })
                 .then(function() { return that.storage.getSize(); })
@@ -562,16 +562,17 @@
                     // returns undefined indicating sweep has run
 
                     var checkIfItemEvicted = function() {
-                        storage.get(key).then(function(item) {
-                            if (item === undefined) {
-                                completed = true;
-                                return; // so we don't loop
-                            }
+                        storage.get(key).then(
+                            function(value) {
+                                if (value === undefined) {
+                                    completed = true;
+                                    return; // so we don't loop
+                                }
 
-                            // not yet expired so loop
-                            checkIfItemEvicted();
-                        })
-                        ["catch"](function(error) { $A.test.fail(error.toString()); });
+                                // not yet expired so loop
+                                checkIfItemEvicted();
+                            })
+                            ["catch"](function(error) { $A.test.fail(error.toString()); });
                     }
 
                     // start looping...

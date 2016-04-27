@@ -38,11 +38,11 @@
         cmp.set("v.status", "Getting");
         var key = cmp.get("v.key");
         cmp._storage.get(key)
-            .then(function(item) {
-                if (item === undefined) {
+            .then(function(value) {
+                if (value === undefined) {
                     cmp.set("v.return", "undefined");
                 } else {
-                    cmp.set("v.return", item.value);
+                    cmp.set("v.return", value);
                 }
                 cmp.set("v.status", "Done Getting");
             }, function(error) {

@@ -12,13 +12,13 @@
                 foo.put("key1", "value1")
                     .then(function() { return bar.put("key2", "value2"); })
                     .then(function() { return foo.get("key1"); })
-                    .then(function(v) { cmp._fooValue1 = v.value; })
+                    .then(function(v) { cmp._fooValue1 = v; })
                     // Insure that foo and bar are truly isolated stores and do
                     // not contain each other's values
                     .then(function() { return foo.get("key2"); })
                     .then(function(v) { cmp._fooValue2Retrieved = $A.util.isUndefined(v); })
                     .then(function() { return bar.get("key2"); })
-                    .then(function(v) { cmp._barValue2 = v.value; })
+                    .then(function(v) { cmp._barValue2 = v; })
                     // Insure that foo and bar are truly isolated stores and do
                     // not contain each other's values
                     .then(function() { return bar.get("key1"); })

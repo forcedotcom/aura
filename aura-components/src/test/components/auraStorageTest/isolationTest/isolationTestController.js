@@ -9,10 +9,10 @@
             maxSize: 1024
         });
         storage.put("keyA",cmp.get("v.storageItemValue"))
-        .then(function() {
-            cmp.set("v.status", "Done Adding");
-        })
-        ["catch"](function(error) { cmp.set("v.status", "Error adding: " + error)});
+            .then(function() {
+                cmp.set("v.status", "Done Adding");
+            })
+            ["catch"](function(error) { cmp.set("v.status", "Error adding: " + error)});
     },
 
     /**
@@ -24,10 +24,10 @@
         cmp.set("v.status", "Getting");
         var storage = $A.storageService.getStorage("getAllIsolation");
         storage.getAll()
-        .then(function(items) {
-            cmp.set("v.items", items);
-            cmp.set("v.status", "Done Getting");
-        })
-        ["catch"](function(error) { cmp.set("v.status", "Error adding: " + error)});
+            .then(function(items) {
+                cmp.set("v.items", items);
+                cmp.set("v.status", "Done Getting");
+            })
+            ["catch"](function(error) { cmp.set("v.status", "Error adding: " + error)});
     }
 })

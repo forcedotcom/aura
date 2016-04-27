@@ -266,10 +266,40 @@ SecureElement.addElementSpecificMethods = function(se, el) {
 
 SecureElement.elementSpecificAttributeWhitelists = {
 	"A": ["hash", "host", "hostname", "href", "origin", "pathname", "port", "protocol", "search"],
+	"AREA": ["alt", "coords", "download", "href", "hreflang", "media", "rel", "shape", "target", "type"],
+	"AUDIO": ["autoplay", "buffered", "controls", "loop", "muted", "played", "preload", "src", "volume"],
+	"BASE": ["href", "target"],
+	"BDO": ["dir"],
+	"BUTTON": ["autofocus", "disabled", "form", "formaction", "formenctype", "formmethod", "formnovalidate", "formtarget", "name", "type"],
+	"CANVAS": ["height", "width"],
+	"COL": ["span"],
+	"COLGROUP": ["span", "width"],
+	"DATA": ["value"],
+	"DEL": ["cite", "datetime"],
+	"DETAILS": ["open"],
+	"EMBED": ["height", "src", "type", "width"],
+	"FIELDSET": ["disabled", "form", "name"],
+	"FORM": ["acceptCharset", "action", "autocomplete", "enctype", "method", "name", "novalidate", "target"],
+	"IMG": ["alt", "crossorigin", "height", "ismap", "longdesc", "sizesHTML5", "src", "srcsetHTML5", "width", "usemap"],
+	"INPUT": ["type", "accept", "autocomplete", "autofocus", "autosave", "checked", "disabled", "form", "formaction", 
+	          "formenctype", "formmethod", "formnovalidate", "formtarget", "height", "inputmode", "list", "max", "maxlength", 
+	          "min", "minlength", "minlength", "name", "pattern", "placeholder", "readonly", "required", "selectionDirection",
+	          "size", "spellcheck", "src", "step", "tabindex", "value", "width"],
+	"INS": ["cite", "datetime"],
+	"LABEL": ["accesskey", "for", "form"],
+	"LI": ["value"],
+	"LINK": ["crossorigin", "href", "hreflang", "media", "rel", "sizes", "title", "type"],
+	"MAP": ["name"],
+
+	// DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values for http-equiv/httpEquiv	
+	"META": ["content", "name"],
 	
-	// DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values for http-equiv/httpEquiv
-	
-	"META": ["content", "name"]
+	"METER": ["value", "min", "max", "low", "high", "optimum", "form"],
+	"OBJECT": ["data", "form", "height", "height", "type", "typemustmatch", "usemap", "width"],
+	"OL": ["reversed", "start", "type"],
+	"OPTGROUP": ["disabled", "label"],
+	"OPTION": ["disabled", "label", "selected", "selected"],
+	"OUTPUT": ["for", "form", "name"]
 };
 
 SecureElement.elementSpecificMethodWhitelists = {

@@ -139,29 +139,36 @@ public class AuraServlet extends AuraBaseServlet {
             final String fragment = uri.getFragment();
             final String query = uri.getQuery();
             final String scheme = uri.getScheme();
+            final String path = uri.getPath();
             final StringBuffer sb = request.getRequestURL();
             String httpProtocol = "http://";
             String defaultUriScheme = "http";
             String secureUriScheme = "https";
             int dIndex = sb.indexOf(httpProtocol);
 
-            // if nocache has https specified, or the request is secure,
-            // modify sb if it's http
-            if (((scheme != null && scheme.equals(secureUriScheme)) || request.isSecure()) && dIndex == 0) {
-                sb.replace(dIndex, dIndex + defaultUriScheme.length(), secureUriScheme);
-            }
+            //
+            // Make sure we were handed an absolute path, if not, we simply dump the
+            // path and redirect to root.
+            //
+            if (path.charAt(0) == '/') {
+                // if nocache has https specified, or the request is secure,
+                // modify sb if it's http
+                if (((scheme != null && scheme.equals(secureUriScheme)) || request.isSecure()) && dIndex == 0) {
+                    sb.replace(dIndex, dIndex + defaultUriScheme.length(), secureUriScheme);
+                }
 
-            int index = sb.indexOf("//");
-            index = sb.indexOf("/", index + 2); // find the 3rd slash, start of path
-            sb.setLength(index);
-            sb.append(uri.getPath());
-            if (query != null && !query.isEmpty()) {
-                sb.append("?").append(query);
+                int index = sb.indexOf("//");
+                index = sb.indexOf("/", index + 2); // find the 3rd slash, start of path
+                sb.setLength(index);
+                sb.append(uri.getPath());
+                if (query != null && !query.isEmpty()) {
+                    sb.append("?").append(query);
+                }
+                if (fragment != null && !fragment.isEmpty()) {
+                    sb.append("#").append(fragment);
+                }
+                newLocation = sb.toString();
             }
-            if (fragment != null && !fragment.isEmpty()) {
-                sb.append("#").append(fragment);
-            }
-            newLocation = sb.toString();
         } catch (Exception e) {
             // This exception should never happen.
             // If happened: log a gack and redirect

@@ -31,47 +31,31 @@ CKEDITOR.dom.domObject = function( nativeDomObject ) {
 		 */
 		this.$ = nativeDomObject;
 		// monkey patching .close and .addEventListener on all new iframes
-		if (nativeDomObject.defaultView && nativeDomObject.close && !nativeDomObject.$patched) {
-			nativeDomObject.$patched = true;
-			var d = nativeDomObject;
-			var w = d.defaultView;
-			var close = d.close;
-			var write = d.write;
-			var addEventListener = w.addEventListener;
-			d.write = function (markup) {
-				w.$done = false;
-				markup = markup.replace( /(?=\s*<\/(:?script)>)/, '\nwindow.$unsafeInlineAllowed = true;\n' );
-				return write.call(d, markup);
-			};
-			d.close = function () {
-				var ret = close.apply(d, Array.prototype.slice.call(arguments));
-				if (!w.$unsafeInlineAllowed) {
-					var safeEval = window["$$safe-eval-compat$$"];
-					if (safeEval) {
-						// super hack to initialize any iframe created by ckeditor, but only if safeEval worker
-						// is in place, which means CSP rules are enforced
-						var code = Array.prototype.slice.call(d.getElementsByTagName('script')).map(function (el) {
-							return el.getAttribute('src') ? '' : el.textContent;
-						}).join('\n');
-						safeEval(code, w);
-					}
+		if (nativeDomObject.defaultView && nativeDomObject.close) {
+			var close = nativeDomObject.close;
+			var write = nativeDomObject.write;
+			var addEventListener = nativeDomObject.addEventListener;
+			nativeDomObject.close = function () {
+				var ret = close.apply(nativeDomObject, Array.prototype.slice.call(arguments));
+				console.log('doc.close()');
+				var safeEval = window["$$safe-eval-compat$$"];
+				if (safeEval) {
+					// super hack to initialize any iframe created by ckeditor, but only if safeEval worker
+					// is in place, which means CSP rules are enforced
+					var code = Array.prototype.slice.call(nativeDomObject.getElementsByTagName('script')).map(function (el) {
+						return el.getAttribute('src') ? '' : el.textContent;
+					}).join('\n');
+					safeEval(code, nativeDomObject.defaultView);
 				}
 				return ret;
 			};
-			w.addEventListener = w.addEventListener = function (event, fn) {
+			nativeDomObject.addEventListener = function (event, fn) {
 				if (event === "DOMContentLoaded") {
-					if (!w.$done) {
-						var that = this;
-						var args = Array.prototype.slice(arguments);
-						setTimeout(function () {
-							w.$done = true;
-							fn.apply(that, args);
-						}, 0);
-					}
+					setTimeout(fn, 0);
 				} else {
-					return addEventListener.apply(w, Array.prototype.slice.call(arguments));
+					return addEventListener.apply(nativeDomObject, Array.prototype.slice.call(arguments));
 				}
-			};
+			}
 		}
 	}
 };

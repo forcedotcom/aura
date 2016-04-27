@@ -632,9 +632,11 @@ AuraInstance.prototype.initAsync = function(config) {
                 $A.clientService.reloadFunction();
                 return;
             }
-            if (!window["$$safe-eval$$"] && !regexpDetectURLProcotolSegment.test(config["host"])) {
+            
+            if (config["safeEvalWorker"] && !window["$$safe-eval$$"] && !regexpDetectURLProcotolSegment.test(config["host"])) {
                 throw new $A.auraError("Aura(): Failed to initialize locker worker.", null, $A.severity.QUIET);
             }
+            
             $A.clientService.initHost(config["host"]);
             $A.setLanguage();
 
@@ -647,7 +649,8 @@ AuraInstance.prototype.initAsync = function(config) {
         });
     }
 
-    if (!window['$$safe-eval$$'] && !regexpDetectURLProcotolSegment.test(config["host"])) {
+    // DCHASMAN We are temporarily allowing config["safeEvalWorker"] to determine if we use safeEval
+    if (config["safeEvalWorker"] && !window['$$safe-eval$$'] && !regexpDetectURLProcotolSegment.test(config["host"])) {
         // safe eval worker is an iframe that enables the page to run arbitrary evaluation,
         // if this iframe is still loading, we should wait for it before continue with
         // initialization, in the other hand, if the iframe is not available, we create it,

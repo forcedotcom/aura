@@ -343,6 +343,8 @@
             fragment.appendChild(virtualItem);
         }
         container.appendChild(fragment);
+        
+        cmp.set("v.renderInfo", { type : "append" });
         cmp.set('v.items', (cmp.get('v.items') || []).concat(items), true);
         $A.metricsService.markEnd(this.NS, this.NAME + ".appendVirtualRows");
     },
@@ -355,7 +357,8 @@
                 cmp._virtualItems.push(this._generateVirtualRow(cmp, items[i], i));
             }
             $A.metricsService.markEnd(this.NS, this.NAME + ".createVirtualRows");
-        }        
+        }
+        cmp.set("v.renderInfo", {});        
     },
     selectRow: function(cmp, index, value) {
     	var row = cmp._virtualItems[index];
@@ -365,13 +368,17 @@
     },
 
     updateItem: function (cmp, item, index) {
+        // Update the item in the DOM
         this._rerenderDirtyElement(cmp, item, null, index); // (cmp, item, target, index)
-        cmp._updating = true;
+        
+        // Update the item in v.items
         var updatedItems = cmp.get('v.items');
         updatedItems[index] = item;
+        
+        cmp.set("v.renderInfo", { type : "update", index : index });
         cmp.set('v.items', updatedItems, true);
-        cmp._updating = false;
     },
+    
     _getRootComponent: function (cmp) {
         var superCmp   = cmp.getSuper(),
             isExtended = superCmp.getDef().getDescriptor().getName() !== 'component';
@@ -380,6 +387,47 @@
             cmp = superCmp;
         }
         return cmp;
+    },
+
+    _selectiveRerender: function(cmp) {
+        var renderInfo = cmp.get("v.renderInfo") || {};
+        
+        // Rerender the entire grid by default
+        if ($A.util.isEmpty(renderInfo)) {
+            this._rerender(cmp);
+        } else {
+            switch (renderInfo.type) {
+                case "append":
+                    // Currently doesn't need to do anything since elements are directly appended
+                    // into the DOM when the items are appended.
+                    // TODO: Evaluate whether DOM manipulation should be moved to rendering lifecycle
+                    break;
+                case "update":
+                    // Currently doesn't need to do anything since elements are directly updated
+                    // in the DOM when the items are updated.
+                    // TODO: Evaluate whether DOM manipulation should be moved to rendering lifecycle
+                    break;
+                default:
+                    this._rerender(cmp);
+            }
+        }
+        
+        cmp.set("v.renderInfo", {});
+    },
+    
+    _rerender: function(cmp) {
+        var container = this.getGridBody(cmp);
+        var items = cmp._virtualItems;
+        var fragment = document.createDocumentFragment();
+        
+        for (var i = 0; i < items.length; i++) {
+            fragment.appendChild(items[i]);
+        }
+
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
+        container.appendChild(fragment);
     },
 
     /*

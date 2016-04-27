@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-({  
-    /**
-     * Toggle between CKEditor and plain textarea
-     * Triggered by the application event "ui:toggleRichText"
-     */
-    toggle : function(cmp, evt, helper) {
-        helper.toggle(cmp, evt.getParam('isRichText'));     
-    },
-
-    valueChange: function(cmp, evt, helper) {
-        helper.setDomElementValue(cmp);
-    }
+({	
+	/**
+	 * Toggle between CKEditor and plain textarea
+	 * Triggered by the application event "ui:toggleRichText"
+	 */
+	toggle : function(cmp, evt, helper) {
+		helper.toggle(cmp, evt.getParam('isRichText'));		
+	}
 })// eslint-disable-line semi

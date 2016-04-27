@@ -31,33 +31,31 @@
 			cmp._observer = new MutationObserver(function(mutations) {
 				mutations.forEach(function(mutation) {
 					Array.prototype.slice.call(mutation.addedNodes).forEach(function (node) {
-						if (node && node.querySelectorAll) {
-							// dealing with href attempting to evaluate JS
-							Array.prototype.slice.call(node.querySelectorAll("[href]")).forEach(function (el) {
-								var href = el.getAttribute('href');
-								/*eslint-disable no-script-url*/
-								if (href && href.indexOf('javascript:') === 0) {
-									el.onclick = function (event) {
-										event.preventDefault();
+						// dealing with href attempting to evaluate JS
+						Array.prototype.slice.call(node.querySelectorAll("[href]")).forEach(function (el) {
+							var href = el.getAttribute('href');
+							/*eslint-disable no-script-url*/
+							if (href && href.indexOf('javascript:') === 0) {
+								el.onclick = function (event) {
+									event.preventDefault();
+								};
+							}
+						});
+						// dealing with all dom events needed for the ckeditor to function
+						[
+							"onclick", "onfocus", "onblur", "onkeydown", "onkeypress", "onkeyup",
+							"onmousedown", "onmouseout", "onmouseover", "onmouseup", "onchange"
+						].forEach(function (type) {
+							Array.prototype.slice.call(node.querySelectorAll("[" + type + "]")).forEach(function (el) {
+								var code = el.getAttribute(type);
+								if (code && code !== "") {
+									el.removeAttribute(type);
+									el[type] = function () {
+										return safeEval("(function(){" + code + "})()", window);
 									};
 								}
 							});
-							// dealing with all dom events needed for the ckeditor to function
-							[
-								"onclick", "onfocus", "onblur", "onkeydown", "onkeypress", "onkeyup",
-								"onmousedown", "onmouseout", "onmouseover", "onmouseup", "onchange"
-							].forEach(function (type) {
-								Array.prototype.slice.call(node.querySelectorAll("[" + type + "]")).forEach(function (el) {
-									var code = el.getAttribute(type);
-									if (code && code !== "") {
-										el.removeAttribute(type);
-										el[type] = function () {
-											return safeEval("(function(){" + code + "})()", window);
-										};
-									}
-								});
-							});
-						}
+						});
 					});
 				});
 			});

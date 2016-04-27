@@ -63,6 +63,7 @@
             onclick="{!c.handleClick}" 
             onmouseover="{!c.handleMouseOver}"
             onmouseout="{!c.handleMouseOut}" 
+            onmousedown="{!c.handleMouseDown}"
             onkeypress="{!c.handleKeyPress}"
             onfocus="{!c.handleFocus}"
             onblur="{!c.handleBlur}"

@@ -48,10 +48,23 @@
         
     },
 
+    handleMouseDown: function(component) {
+        component._midclick = true;
+    },
+
     handleFocus: function(component, event, helper) {
-        
+
+        // if the mouse was down, this is
+        // a click, so let's let the click
+        // handler handle this one.
+        if(component._midclick) {
+            return;
+        }
+
+
         //focus always works unless trigger is none
         //because of accessibility
+        
         var trigger = component.get('v.trigger');
         if(trigger && trigger !== 'none') {
             event.preventDefault();
@@ -64,6 +77,7 @@
     },
 
     handleClick: function(component, event, helper) {
+        component._midclick = false;
         event.preventDefault();
         if(component.get('v.trigger') === 'click') {
             helper.toggle(component);

@@ -342,10 +342,10 @@
     testDisabled: {
         attributes : {isRichText: false, disabled: true},
         test: [function(component){
-            $A.test.assertTrue(component.find("textAreaElem").getElement().disabled, "Textarea not correctly disabled");
+            $A.test.assertTrue(component.getElement().disabled, "Textarea not correctly disabled");
             component.set("v.disabled", false);
         }, function(component){
-            $A.test.assertFalse(component.find("textAreaElem").getElement().disabled, "Textarea disabled attribute not correct after switching.");
+            $A.test.assertFalse(component.getElement().disabled, "Textarea disabled attribute not correct after switching.");
         }]
     },
     
@@ -355,10 +355,10 @@
     testNotDisabled: {
         attributes : {isRichText: false, disabled: false},
         test: [function(component){
-            $A.test.assertFalse(component.find("textAreaElem").getElement().disabled, "Textarea not correctly enabled");
+            $A.test.assertFalse(component.getElement().disabled, "Textarea not correctly enabled");
             component.set("v.disabled", true);
         }, function(component){
-            $A.test.assertTrue(component.find("textAreaElem").getElement().disabled, "Textarea disabled attribute not correct after switching.");
+            $A.test.assertTrue(component.getElement().disabled, "Textarea disabled attribute not correct after switching.");
         }]
     },
     
@@ -368,10 +368,10 @@
     testReadonly: {
         attributes : {isRichText: false, readonly: 'true'},
         test: [function(component){
-            $A.test.assertTrue(component.find("textAreaElem").getElement().readOnly, "Textarea readonly attribute not correct");
+            $A.test.assertTrue(component.getElement().readOnly, "Textarea readonly attribute not correct");
             component.set("v.readonly", false);
         }, function(component){
-            $A.test.assertFalse(component.find("textAreaElem").getElement().readOnly, "Textarea readonly attribute not correct after switching.");
+            $A.test.assertFalse(component.getElement().readOnly, "Textarea readonly attribute not correct after switching.");
         }]
     },
     
@@ -381,10 +381,10 @@
     testNotReadonly: {
         attributes : {isRichText: false, readonly: 'false'},
         test: [function(component){
-            $A.test.assertFalse(component.find("textAreaElem").getElement().readOnly, "Textarea readonly attribute not correct");
+            $A.test.assertFalse(component.getElement().readOnly, "Textarea readonly attribute not correct");
             component.set("v.readonly", true);
         }, function(component){
-            $A.test.assertTrue(component.find("textAreaElem").getElement().readOnly, "Textarea readonly attribute not correct after switching.");
+            $A.test.assertTrue(component.getElement().readOnly, "Textarea readonly attribute not correct after switching.");
         }]
     },
     
@@ -394,7 +394,7 @@
     testRows: {
         attributes : {isRichText: false, rows: "15"},
         test: function(component){
-            $A.test.assertEquals(15, component.find("textAreaElem").getElement().rows, "Textarea rows attribute not correct");
+            $A.test.assertEquals(15, component.getElement().rows, "Textarea rows attribute not correct");
         }
     },
     
@@ -404,7 +404,7 @@
     testCols: {
         attributes : {isRichText: false, cols: "15"},
         test: function(component){
-            $A.test.assertEquals(15, component.find("textAreaElem").getElement().cols, "Textarea cols attribute not correct");
+            $A.test.assertEquals(15, component.getElement().cols, "Textarea cols attribute not correct");
         }
     },
     

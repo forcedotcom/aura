@@ -148,7 +148,7 @@
 	            }
 	        });
 		} else {
-			console.err("removeActionCard, couldn't find actionId");
+			console.error("removeActionCard, couldn't find actionId");
 		}
 		var that = this;
 		this.parentNode.removeChild(that);

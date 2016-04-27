@@ -141,20 +141,10 @@
             },
             function verifyTargetCmpEvicted(cmp) {
                 // Ideally we would keep adding defs until the original got evicted instead of just waiting here (W-2979502)
-                var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                $A.test.addWaitFor(true, function() {
-                    var defs = iframeCmp._ComponentDefStorage.split(',');
-                    for (var i = 0; i < defs; i++) {
-                        var def = defs[i].trim();
-                        if (def === "markup://ui:scroller") {
-                            return false;
-                        }
-                    }
-                    return true;
-                });
+                cmp.helper.lib.iframeTest.waitForDefRemovedFromStorage("ui:scroller");
             },
             function verifyTargetCmpNotInContext(cmp) {
-                cmp.helper.lib.iframeTest.verifyDefNotInContext("ui:scroller");
+                cmp.helper.lib.iframeTest.verifyDefNotInLoaded("ui:scroller");
             },
             function fetchCmpFromServerThatDependsOnTargetCmp(cmp) {
                 // ui:carousel contains ui:scroller. if aura.context.loaded reports that it still has

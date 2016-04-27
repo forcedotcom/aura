@@ -122,6 +122,11 @@ function iframeTest() {
             var that = this;
 
             function checkDefStorage(desc) {
+                // short-circuit once the test times out
+                if ($A.test.isComplete()) {
+                    return;
+                }
+
                 iframe.$A.storageService.getStorage("ComponentDefStorage").getAll().then(function(items) {
                     items = items || [];
                     for (var i = 0; i < items.length; i++) {
@@ -152,6 +157,42 @@ function iframeTest() {
             );
         },
 
+        /** Waits for a def (format is namespace:name) to be absent from ComponentDefStorage, with an optional error message. */
+        waitForDefRemovedFromStorage : function(desc, msg) {
+            var iframe = this.getIframe();
+            var removed = false;
+            var that = this;
+
+            function checkDefStorage(desc) {
+                // short-circuit once the test times out
+                if ($A.test.isComplete()) {
+                    return;
+                }
+
+
+                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll().then(function(items) {
+                    items = items || [];
+                    for (var i = 0; i < items.length; i++) {
+                        // if transaction key or def is present, recurse
+                        if (items[i]["key"] === that.TRANSACTION_SENTINEL_KEY || items[i]["key"] === "markup://" + desc) {
+                            checkDefStorage(desc);
+                            return;
+                        }
+                    }
+
+                    removed = true;
+                });
+            }
+
+            checkDefStorage(desc);
+
+            msg = msg || "Def " + desc + " never removed from ComponentDefStorage";
+            $A.test.addWaitForWithFailureMessage(true,
+                function() { return removed; },
+                msg
+            );
+        },
+
         /**
          * Waits for the iframe component to update its status. First wait for the initial message to not be present
          * anymore, then verify the expected new status is present. This pattern, as opposed to simply waiting for the
@@ -170,7 +211,7 @@ function iframeTest() {
         /**
          * Verifies a def (format is namespace:name) is not present in $A.context.loaded, with an optional error message.
          */
-        verifyDefNotInContext: function(desc, msg) {
+        verifyDefNotInLoaded: function(desc, msg) {
             var loaded = $A.getContext().loaded;
             var cmpDescriptor = "COMPONENT@markup://"+desc;
             msg = msg || "Def " + desc + " should not have been in Aura.context.loaded";

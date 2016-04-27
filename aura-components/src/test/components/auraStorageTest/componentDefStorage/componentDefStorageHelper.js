@@ -6,7 +6,7 @@
             var log = window.localStorage[this.LOCAL_STORAGE_KEY];
             if (log) {
                 this.log(cmp, log);
-                this.log(cmp, "Restored Log");
+                this.log(cmp, "\nRestored Log");
             }
         } catch (e) { /* noop */ }
     },
@@ -16,13 +16,13 @@
             var now = new Date().toJSON();
             var log = cmp.get("v.log") + "== " + now + " ==\n";
             window.localStorage[this.LOCAL_STORAGE_KEY] = log;
-            this.log(cmp, "Saved Log");
+            this.log(cmp, "\nSaved Log");
         } catch (e) { /* noop */ }
     },
 
     setStatus: function(cmp, status) {
         cmp.set("v.status", status);
-        this.log(cmp, "Status update: " + status);
+        this.log(cmp, "\nStatus update: " + status);
     },
 
     log: function(cmp, log) {

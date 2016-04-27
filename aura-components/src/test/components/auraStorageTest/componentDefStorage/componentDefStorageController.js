@@ -6,6 +6,7 @@
     fetchCmp: function(cmp, evt, helper) {
         var load = cmp.get("v.load");
         helper.setStatus(cmp, "Fetching: " + load);
+        helper.logDefs(cmp);
         var action = $A.get("c.aura://ComponentController.getComponent");
         action.setParams({name: load});
         action.setStorable();

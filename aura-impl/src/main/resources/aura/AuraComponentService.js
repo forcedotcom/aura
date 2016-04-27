@@ -1318,26 +1318,26 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
     // use enqueue() to prevent concurrent get/analyze/prune/save operations
     return this.componentDefStorage.enqueue(function(resolve, reject) {
         self.pruneDefsFromStorage(defSizeKb + libSizeKb + evtSizeKb)
-        .then(
-            function() {
-                return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs, evtConfigs, context);
-            }
-        )
-        .then(
-            undefined, // noop
-            function(e) {
-                // there was an error during analysis, pruning, or saving defs. the persistent components and actions
-                // may now be in an inconsistent state: dependencies may not be available. therefore clear the actions
-                // and cmp def storages.
-                var metricsPayload = {
-                    "cause": "saveDefsToStorage",
-                    "defsRequiredSize" : defSizeKb + libSizeKb + evtSizeKb,
-                    "error" : e
-                };
-                return self.clearDefsFromStorage(metricsPayload);
-            }
-        )
-        .then(resolve, reject);
+            .then(
+                function() {
+                    return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs, evtConfigs, context);
+                }
+            )
+            .then(
+                undefined, // noop
+                function(e) {
+                    // there was an error during analysis, pruning, or saving defs. the persistent components and actions
+                    // may now be in an inconsistent state: dependencies may not be available. therefore clear the actions
+                    // and cmp def storages.
+                    var metricsPayload = {
+                        "cause": "saveDefsToStorage",
+                        "defsRequiredSize" : defSizeKb + libSizeKb + evtSizeKb,
+                        "error" : e
+                    };
+                    return self.clearDefsFromStorage(metricsPayload);
+                }
+            )
+            .then(resolve, reject);
     });
 };
 

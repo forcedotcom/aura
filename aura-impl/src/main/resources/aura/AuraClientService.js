@@ -122,7 +122,7 @@ Aura.Services.AuraClientService$AuraActionCollector = function AuraActionCollect
  *  * Once we have finished processing all actions, check for actions to be put in an XHR.
  *    + All foreground actions go in a single XHR, and are de-duped on send.
  *    + background actions are sent one per XHR, with a de-dupe step during the queue walk.
- *    + deferred actions are sent if we are idle, with a de-dupe step durning the queue walk.
+ *    + deferred actions are sent if we are idle, with a de-dupe step during the queue walk.
  *
  * Queues:
  *  * actionsQueued - queue of actions that have yet to be processed.
@@ -191,6 +191,9 @@ AuraClientService = function AuraClientService () {
     }
 
     this._disconnected = undefined;
+
+    // queue of functions to run when no XHRs in flight
+    this.xhrIdleQueue = [];
 
     //
     // Run client actions synchronously. This is the previous behaviour.
@@ -626,13 +629,17 @@ AuraClientService.prototype.getAvailableXHR = function(isBackground) {
 };
 
 /**
- * Releas an xhr back in to the pool.
+ * Release an xhr back in to the pool.
  *
  * @export
  */
 AuraClientService.prototype.releaseXHR = function(auraXHR) {
     auraXHR.reset();
     this.availableXHRs.push(auraXHR);
+
+    if (this.inFlightXHRs() === 0) {
+        this.processXHRIdleQueue();
+    }
 };
 
 
@@ -1039,6 +1046,43 @@ AuraClientService.prototype.idle = function() {
 };
 
 /**
+ * Enqueues a function to run when no XHRs are in-flight.
+ * @param {Function} f the function to execute.
+ */
+AuraClientService.prototype.runWhenXHRIdle = function(f) {
+    // something in flight so enqueue
+    this.xhrIdleQueue.push(f);
+
+    if (this.inFlightXHRs() === 0) {
+        this.processXHRIdleQueue();
+        return;
+    }
+};
+
+/**
+ * Executes the queue of functions to run when no XHRs are in-flight.
+ */
+AuraClientService.prototype.processXHRIdleQueue = function() {
+    $A.assert(this.inFlightXHRs() === 0, "Idle queue should only be processed when no XHRs are in flight");
+
+    // optimization
+    if (this.xhrIdleQueue.length === 0) {
+        return;
+    }
+
+    // process the queue
+    var queue = this.xhrIdleQueue;
+    this.xhrIdleQueue = [];
+    for (var i = 0 ; i < queue.length; i++) {
+        try {
+            queue[i]();
+        } catch (e) {
+            $A.log("AuraClientService.processXHRIdleQueue: error thrown by enqueued function", e);
+        }
+    }
+};
+
+/**
  * This function is used by the test service to determine if there are outstanding actions queued.
  *
  * @private
@@ -1401,7 +1445,7 @@ AuraClientService.prototype.continueProcessing = function() {
         action = actionList[i];
         try {
             if (action.abortIfComponentInvalid(true)) {
-                // action alrealy aborted.
+                // action already aborted.
                 // this will only occur if the component is no longer valid.
                 continue;
             }

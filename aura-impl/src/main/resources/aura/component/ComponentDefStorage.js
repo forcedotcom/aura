@@ -402,42 +402,64 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
         return Promise["resolve"]();
     }
 
-    // log that we're clearing
-    metricsPayload = $A.util.apply({}, metricsPayload);
-    metricsPayload["evicted"] = "all";
-    $A.metricsService.transaction("aura", "defsEvicted", { "context": metricsPayload });
+    var that = this;
+    return new Promise(function(resolve) {
+        // aura has an optimization whereby the client reports (on every XHR) to the server the
+        // dynamic defs it has and the server doesn't resend those defs. this is managed in
+        // aura.context.loaded.
+        //
+        // by clearing the persisted defs this optimization needs to be reset: the server must
+        // send all defs so the client rebuilds a complete def graph for persistence. (the in-memory
+        // graph remains complete at all times but when the app is restarted memory is reset.)
+        //
+        // to avoid an in-flight XHR from having a stale context.loaded value, the def clearing is
+        // carefully orchestrated:
+        // 1. wait until no XHRs are in flight
+        // 2. synchronously clear aura.context.loaded
+        // 3. async clear the actions store
+        // 4. async clear the def store
+        //
+        // 1 & 2 ensures all future XHRs have a context.loaded value that matches the cleared def store.
+        // because 3 and 4 are async it's possible that XHRs may be sent and received after 2 but
+        // before 3 or 4 completes; that's ok because ComponentDefStorage#enqueue provides mutual exclusion
+        // to persistent def store manipulation.
 
-    $A.warning("ComponentDefStorage.clearAll: clearing all defs, actions, and context.loaded");
+        $A.clientService.runWhenXHRIdle(function() {
+            // log that we're clearing
+            metricsPayload = $A.util.apply({}, metricsPayload);
+            metricsPayload["evicted"] = "all";
+            $A.metricsService.transaction("aura", "defsEvicted", { "context": metricsPayload });
 
-    // persisted def store is being cleared so need the server to send all dependencies
-    // so the persisted graph is complete (aka disable server optimization that doesn't
-    // send defs that the client already has).
+            $A.warning("ComponentDefStorage.clearAll: clearing all defs, actions, and context.loaded");
 
-    $A.context.resetLoaded();
+            // clear aura.context.loaded
+            $A.context.resetLoaded();
 
-    var actionClear;
-    var actionStorage = Action.getStorage();
-    if (actionStorage && actionStorage.isPersistent()) {
-        actionClear = actionStorage.clear().then(
-            undefined, // noop on success
-            function(e) {
-                $A.warning("ComponentDefStorage.clear: failure clearing actions store", e);
-                // do not rethrow to return to resolve state
+            var actionClear;
+            var actionStorage = Action.getStorage();
+            if (actionStorage && actionStorage.isPersistent()) {
+                actionClear = actionStorage.clear().then(
+                    undefined, // noop on success
+                    function(e) {
+                        $A.warning("ComponentDefStorage.clear: failure clearing actions store", e);
+                        // do not rethrow to return to resolve state
+                    }
+                );
+            } else {
+                actionClear = Promise["resolve"]();
             }
-        );
-    } else {
-        actionClear = Promise["resolve"]();
-    }
 
-    var defClear = this.definitionStorage.clear().then(
-        undefined, // noop on success
-        function(e) {
-            $A.warning("ComponentDefStorage.clear: failure clearing cmp def store", e);
-            // do not rethrow to return to resolve state
-        }
-    );
+            var defClear = that.definitionStorage.clear().then(
+                undefined, // noop on success
+                function(e) {
+                    $A.warning("ComponentDefStorage.clear: failure clearing cmp def store", e);
+                    // do not rethrow to return to resolve state
+                }
+            );
 
-    return Promise.all([actionClear, defClear]);
+            resolve(Promise.all([actionClear, defClear]));
+        });
+    });
 };
 
 Aura.Component.ComponentDefStorage = ComponentDefStorage;

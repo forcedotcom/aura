@@ -36,6 +36,20 @@
         }
     },
 
+    createComponent: function(cmp, evt, helper) {
+        var load = cmp.get("v.load");
+        helper.setStatus(cmp, "Creating: " + load);
+        try {
+            $A.componentService.createComponent(load, {}, function(newCmp) {
+                if (newCmp) {
+                    helper.setStatus(cmp, "Created: " + load);
+                }
+            });
+        } catch (e) {
+            helper.setStatus(cmp, "Error: " + e);
+        }
+    },
+
     clearActionAndDefStorage: function(cmp, evt, helper) {
         helper.setStatus(cmp, "Clearing Action and Def Storage");
         helper.clearActionAndDefStorage(cmp)

@@ -19,10 +19,10 @@
                 // now in memory
                 cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
             },
-            function fetchComponentFromServer(cmp) {
+            function fetchTargetCmpFromServer(cmp) {
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
             },
-            function createComponentOnClient(cmp) {
+            function createTargetCmpOnClient(cmp) {
                 cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
             },
             function waitForAllDefsStored(cmp) {
@@ -34,7 +34,8 @@
             function reloadIframe(cmp) {
                 cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload")
             },
-            function createOriginalComponentAndVerify(cmp) {
+            function createTargetCmpAndVerify(cmp) {
+                // avoid any server trip to prove that ui:scroller is on the client
                 cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
             },
             function cleanup(cmp) {
@@ -46,8 +47,7 @@
     // TODO(W-2979502): this test should keep adding defs until something is evicted instead of adding a set amount and
     // assuming it will get evicted.
     testComponentDefStorageEviction: {
-        // This may be unreliable because of a flapper with the server sometimes not sending down a def when it should,
-        // because Context.loaded is incorrect.
+        // TODO - this test should now be reliable. let is run in jenkins for a bit before removing the annotation.
         labels : ["flapper"],
         test: [
             function loadIframe(cmp) {
@@ -61,22 +61,22 @@
                 // now in memory
                 cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
             },
-            function fetchComponentFromServer(cmp) {
+            function fetchTargetCmpFromServer(cmp) {
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
             },
-            function createComponentOnClient(cmp) {
+            function createTargetCmpOnClient(cmp) {
                 cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
             },
-            function verifyFirstCmpStored(cmp) {
+            function verifyTargetCmpStored(cmp) {
             	cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
             },
-            function fetchDifferentComponentFromServer(cmp) {
+            function fetchDifferentCmpFromServer(cmp) {
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:block");
             },
-            function fetchCmpFromServerToEvictFirstCmp(cmp) {
+            function fetchCmpFromServerToEvictTargetCmp(cmp) {
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:menu");
             },
-            function verifyOriginalFetchedCmpEvicted(cmp) {
+            function verifyTargetCmpEvicted(cmp) {
                 // Ideally we would keep adding defs until the original got evicted instead of just waiting here (W-2979502)
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
                 $A.test.addWaitFor(true, function() {
@@ -94,10 +94,88 @@
                 // Reload page to clear anything saved in javascript memory
                 cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload");
             },
-            function fetchOriginalComponentAgain(cmp) {
+            function fetchTargetCmpAgain(cmp) {
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
             },
-            function createOriginalComponentOnClient(cmp) {
+            function createTargetCmpOnClient(cmp) {
+                cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
+            },
+            function cleanup(cmp) {
+                cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
+            }
+        ]
+    },
+
+    // TODO(W-2979502): this test should keep adding defs until something is evicted instead of adding a set amount and
+    // assuming it will get evicted.
+    /**
+     * Verifies that aura.context.loaded is reset when defs are evicted causing evicted defs to be re-downloaded from the server.
+     * If aura.context.loaded is not reset then the client reports that it has more defs than it has persisted, which causes the
+     * server to not send the defs, resulting in a broken def graph being persisted on the client (the in-memory graph is correct
+     * though).
+     */
+    testEvictedDefsAreRefetchedWithoutReload: {
+        test: [
+            function loadIframe(cmp) {
+                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/componentDefStorage.app?overrideStorage=true", "iframeContainer", "first load");
+            },
+            function clearStorages(cmp) {
+                cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
+            },
+            function reloadPage(cmp) {
+                // Need to reload the page here to clear any items that may have been restored on initial load and are
+                // now in memory
+                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
+            },
+            function fetchTargetCmpFromServer(cmp) {
+                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
+            },
+            function verifyTargetCmpStored(cmp) {
+                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
+            },
+            function fetchDifferentCmpFromServer(cmp) {
+                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:block");
+            },
+            function fetchCmpFromServerToEvictTargetCmp(cmp) {
+                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:menu");
+            },
+            function verifyTargetCmpEvicted(cmp) {
+                // Ideally we would keep adding defs until the original got evicted instead of just waiting here (W-2979502)
+                var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
+                $A.test.addWaitFor(true, function() {
+                    var defs = iframeCmp._ComponentDefStorage.split(',');
+                    for (var i = 0; i < defs; i++) {
+                        var def = defs[i].trim();
+                        if (def === "markup://ui:scroller") {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+            },
+            function verifyTargetCmpNotInContext(cmp) {
+                cmp.helper.lib.iframeTest.verifyDefNotInContext("ui:scroller");
+            },
+            function fetchCmpFromServerThatDependsOnTargetCmp(cmp) {
+                // ui:carousel contains ui:scroller. if aura.context.loaded reports that it still has
+                // ui:scroller then the server won't send it, resulting in a broken def graph being persisted
+                // on the client. doing a reload then cmp create would fail.
+                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:carousel");
+            }, function verifyTargetDependentCmpInStorage(cmp) {
+                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:carousel");
+            }, function verifyTargetCmpInStorage(cmp) {
+                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
+            },
+            function reloadPage(cmp) {
+                // Reload page to clear anything saved in javascript memory
+                cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload");
+            },
+            function createTargetDependentCmpOnClient(cmp) {
+                // avoid any server trip to prove that ui:scroller is on the client
+                cmp.helper.lib.iframeTest.createComponentFromConfig("ui:carousel");
+            },
+            function createTargetCmpOnClient(cmp) {
+                // avoid any server trip to prove that ui:scroller is on the client
                 cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
             },
             function cleanup(cmp) {

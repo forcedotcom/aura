@@ -156,7 +156,7 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
 
         return Promise["all"](promises).then(
             function () {
-                $A.log("ComponentDefStorage: Successfully stored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries," + evtConfigs.length + " events");
+                $A.log("ComponentDefStorage: Successfully stored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries, " + evtConfigs.length + " events");
                     return that.definitionStorage.remove(that.TRANSACTION_SENTINEL_KEY)
                         .then(
                             undefined,
@@ -167,7 +167,7 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
                         );
             },
             function (e) {
-                $A.warning("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries," + evtConfigs.length + " events", e);
+                $A.warning("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries, " + evtConfigs.length + " events", e);
                     // error storing defs so the persisted def graph is broken. do not remove the sentinel:
                     // 1. reject this promise so the caller, AuraComponentService.saveDefsToStorage(), will
                     //    clear the def + action stores which removes the sentinel.
@@ -390,16 +390,54 @@ ComponentDefStorage.prototype.enqueue = function(execute) {
     return promise;
 };
 
-
 /**
- * Clears all definitions from storage.
- * @return {Promise} a promise that resolves when storage is cleared.
+ * Clears persisted definitions and all dependent stores and context.
+ * @param {Object} [metricsPayload] optional payload to send to metrics service.
+ * @return {Promise} a promise that resolves when all stores are cleared.
  */
-ComponentDefStorage.prototype.clear = function() {
-    if (this.useDefinitionStorage()) {
-        return this.definitionStorage.clear();
+ComponentDefStorage.prototype.clear = function(metricsPayload) {
+
+    // if def storage isn't in use then nothing to do
+    if (!this.useDefinitionStorage()) {
+        return Promise["resolve"]();
     }
-    return Promise["resolve"]();
+
+    // log that we're clearing
+    metricsPayload = $A.util.apply({}, metricsPayload);
+    metricsPayload["evicted"] = "all";
+    $A.metricsService.transaction("aura", "defsEvicted", { "context": metricsPayload });
+
+    $A.warning("ComponentDefStorage.clearAll: clearing all defs, actions, and context.loaded");
+
+    // persisted def store is being cleared so need the server to send all dependencies
+    // so the persisted graph is complete (aka disable server optimization that doesn't
+    // send defs that the client already has).
+
+    $A.context.resetLoaded();
+
+    var actionClear;
+    var actionStorage = Action.getStorage();
+    if (actionStorage && actionStorage.isPersistent()) {
+        actionClear = actionStorage.clear().then(
+            undefined, // noop on success
+            function(e) {
+                $A.warning("ComponentDefStorage.clear: failure clearing actions store", e);
+                // do not rethrow to return to resolve state
+            }
+        );
+    } else {
+        actionClear = Promise["resolve"]();
+    }
+
+    var defClear = this.definitionStorage.clear().then(
+        undefined, // noop on success
+        function(e) {
+            $A.warning("ComponentDefStorage.clear: failure clearing cmp def store", e);
+            // do not rethrow to return to resolve state
+        }
+    );
+
+    return Promise.all([actionClear, defClear]);
 };
 
 Aura.Component.ComponentDefStorage = ComponentDefStorage;

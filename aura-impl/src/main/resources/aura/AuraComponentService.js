@@ -1281,11 +1281,12 @@ AuraComponentService.prototype.restoreDefsFromStorage = function (context) {
 };
 
 /**
- * Clears storage
+ * Clears persisted definitions and all dependent stores and context.
+ * @param {Object} [metricsPayload] optional payload to send to metrics service.
  * @return {Promise} Promise when storage is cleared
  */
-AuraComponentService.prototype.clearDefsFromStorage = function () {
-    return this.componentDefStorage.clear();
+AuraComponentService.prototype.clearDefsFromStorage = function (metricsPayload) {
+    return this.componentDefStorage.clear(metricsPayload);
 };
 
 /**
@@ -1328,46 +1329,18 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
                 // there was an error during analysis, pruning, or saving defs. the persistent components and actions
                 // may now be in an inconsistent state: dependencies may not be available. therefore clear the actions
                 // and cmp def storages.
-
-                $A.warning("AuraComponentService.saveDefsToStorage: failure during analysis, pruning, or saving; clearing actions and component def storages", e);
-                $A.metricsService.transaction('aura', 'defsEvicted', { "context": {
-                    "defsRequiredSize" : defSizeKb + libSizeKb,
+                var metricsPayload = {
+                    "cause": "saveDefsToStorage",
+                    "defsRequiredSize" : defSizeKb + libSizeKb + evtSizeKb,
                     "error" : e
-                }});
-
-                // collect promises that clear actions + cmp def storage. note that the promises do not reject in order
-                // for the returned promise.all() to not resolve until all operations are complete.
-                var promises = [];
-                var promise;
-
-                var actionStorage = Action.getStorage();
-                if (actionStorage) {
-                    promise = actionStorage.clear()
-                        .then(
-                            undefined, // noop
-                            function(clearError) {
-                                $A.warning("AuraComponentService.saveDefsToStorage: failure clearing actions store", clearError);
-                            }
-                        );
-                    promises.push(promise);
-                }
-
-                // resolve after defs are cleared
-                promise = defStorage.clear()
-                    .then(
-                        undefined, // noop
-                        function(clearError) {
-                            $A.warning("AuraComponentService.saveDefsTostorage: failure clearing cmp def store", clearError);
-                        }
-                    );
-                promises.push(promise);
-
-                return Promise["all"](promises);
+                };
+                return self.clearDefsFromStorage(metricsPayload);
             }
         )
         .then(resolve, reject);
     });
 };
+
 
 AuraComponentService.prototype.createComponentPrivAsync = function (config, callback, forceClientCreation) {
     var descriptor = this.getDescriptorFromConfig(config["componentDef"]);
@@ -1743,7 +1716,7 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
  * Prunes component definitions and dependent actions from persistent storage.
  *
  * This is the entry point for dependency graph generation, analysis, and
- * eviction. Eviction proceedsuntil the component def storage is under a threshold
+ * eviction. Eviction proceeds until the component def storage is under a threshold
  * size or all component defs are evicted from storage.
  *
  * @param {Number} requiredSpaceKb space (in KB) required by new configs to be stored.
@@ -1779,49 +1752,25 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                 * NOTE @dval: Commenting this algorithm since is incorrect right now:
                 * The server does not return all the necessary dependencies to the client.
                 * Missing dependencies that we known of:
-                *   - The ones declared on markup via <aura:dependency/> 
+                *   - The ones declared on markup via <aura:dependency/>
                 *   - The ones spidered from JS (helpers, controllers, etc)
                 *
                 * For now (202), if we need to evict, we just clear everything.
                 * TODO W-3037639 - fix def serialization + persistence in 204
-                *
                 */
 
-                $A.log("AuraComponentService.pruneDefsFromStorage: evicted all defs and actions");
+                var metricsPayload = {
+                    "cause": "sizeAboveThreshold",
+                    "defsRequiredSize" : requiredSpaceKb,
+                    "storageCurrentSize" : currentSize,
+                    "storageRequiredSize" : newSize
+                };
 
-                var actionClear;
-                var actionStorage = Action.getStorage();
-                if (actionStorage && actionStorage.isPersistent()) {
-                    actionClear = actionStorage.clear().then(
-                        undefined, // noop on success
-                        function(e) {
-                            $A.log("AuraClientService.dumpCachesAndReload(): failed to clear persistent actions cache", e);
-                            // do not rethrow to return to resolve state
-                        }
-                    );
-                } else {
-                    actionClear = Promise["resolve"]();
-                }
+                return self.clearDefsFromStorage(metricsPayload);
 
-                var defClear = $A.componentService.clearDefsFromStorage().then(
-                    undefined, // noop on success
-                    function(e) {
-                        $A.log("AuraClientService.dumpCachesAndReload(): failed to clear persistent component def storage", e);
-                        // do not rethrow to return to resolve state
-                    }
-                );
-
-                return Promise.all([actionClear, defClear]).then(function () {
-                    $A.metricsService.transaction('aura', 'defsEvicted', { "context": {
-                        "defsRequiredSize" : requiredSpaceKb,
-                        "storageCurrentSize" : currentSize,
-                        "storageRequiredSize" : newSize,
-                        "evicted" : ['all']
-                    }});
-                });
 
                 /*
-                // Original eviction Algorightm. Unccomment when the problem above has been fixed
+                // Original eviction Algorithm. Uncomment when the problem above has been fixed
                 //
                 // note: buildDependencyGraph() loads all actions and defs from storage. this forces
                 // scanning all rows in the respective stores. this results in the stores returning an

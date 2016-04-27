@@ -707,32 +707,8 @@ AuraClientService.prototype.isDevMode = function() {
  * @private
  */
 AuraClientService.prototype.actualDumpCachesAndReload = function() {
-    // concurrently empty actions + cmp def storage.
-    // when both complete (and even if they fail) reload.
-
-    var actionClear;
-    var actionStorage = Action.getStorage();
-    if (actionStorage && actionStorage.isPersistent()) {
-        actionClear = actionStorage.clear().then(
-            undefined, // noop on success
-            function(e) {
-                $A.log("AuraClientService.dumpCachesAndReload(): failed to clear persistent actions cache", e);
-                // do not rethrow to return to resolve state
-            }
-        );
-    } else {
-        actionClear = Promise["resolve"]();
-    }
-
-    var defClear = $A.componentService.clearDefsFromStorage().then(
-        undefined, // noop on success
-        function(e) {
-            $A.log("AuraClientService.dumpCachesAndReload(): failed to clear persistent component def storage", e);
-            // do not rethrow to return to resolve state
-        }
-    );
-
-    Promise.all([actionClear, defClear]).then(
+    // reload after clearing the persistent caches
+    $A.componentService.clearDefsFromStorage({"cause": "appcache"}).then(
         function() {
             window.location.reload(true);
         }

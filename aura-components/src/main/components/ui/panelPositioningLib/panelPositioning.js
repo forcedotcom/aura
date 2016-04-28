@@ -126,7 +126,25 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
         eventsBound = false;
     }
 
+    function isScrolling(elem) {
+        return elem.scrollHeight > elem.clientHeight;
+    }
 
+    function containsScrollingElement(list) {
+        var len = list.length;
+
+        if(!len) {
+            return false;
+        }
+
+        for (var i = 0; i < len; i++) {
+            if(isScrolling(list[i])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     return {
 
@@ -162,7 +180,39 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
 
             var constraintList = [];
             var handleWheel;
-            var scrollableParent = utils.getScrollableParent(config.target, win);
+            var observer;
+            var proxyWheelEvents = true;
+            var domHandle = config.element;
+            var scrollableParent = utils.getScrollableParent(config.target, w);
+
+
+            // This observer and the test for scrolling children 
+            // is so that if a panel contains a scrol we do not 
+            // proxy the events to the "parent"  (actually the target's parent)
+            if(w.MutationObserver) { // phantomjs :(
+
+                var scrollableChildren = domHandle.querySelectorAll('[data-scoped-scroll="true"]');
+
+
+                observer = new MutationObserver(function() {
+                    scrollableChildren = domHandle.querySelectorAll('[data-scoped-scroll="true"]');
+
+                    proxyWheelEvents = !containsScrollingElement(scrollableChildren);
+
+                });
+
+                if(containsScrollingElement(scrollableChildren)) {
+                    proxyWheelEvents = false;
+                }
+
+
+                observer.observe(domHandle, {
+                    attributes: true,
+                    subtree: true,
+                    childList: true
+                });
+            }
+
 
             if(scrollableParent) {
                 // because this always uses the same listener function
@@ -174,7 +224,7 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
                 // scroll events move that element,
                 // not the parent, also we need to reposition on scroll
                 handleWheel = function(e) {
-                    if(scrollableParent && typeof scrollableParent.scrollTop !== 'undefined') {
+                    if(proxyWheelEvents && scrollableParent && typeof scrollableParent.scrollTop !== 'undefined') {
                         scrollableParent.scrollTop += e.deltaY;
                     }
                 };

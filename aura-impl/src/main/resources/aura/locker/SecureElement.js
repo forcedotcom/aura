@@ -299,7 +299,22 @@ SecureElement.elementSpecificAttributeWhitelists = {
 	"OL": ["reversed", "start", "type"],
 	"OPTGROUP": ["disabled", "label"],
 	"OPTION": ["disabled", "label", "selected", "selected"],
-	"OUTPUT": ["for", "form", "name"]
+	"OUTPUT": ["for", "form", "name"],
+	"PARAM": ["name", "value"],
+	"PROGRESS": ["max", "value"],
+	"Q": ["cite"],
+	"SELECT": ["autofocus", "disabled", "form", "multiple", "name", "required", "size"],
+	"SOURCE": ["src", "type"],
+	"TD": ["colspan", "headers", "rowspan"],
+	"TEMPLATE": ["content"],
+	"TEXTAREA": ["autocomplete", "autofocus", "cols", "disabled", "form", "maxlength", "minlength", "name", 
+	             "placeholder", "readonly", "required", "rows", "selectionDirection", "selectionEnd", "selectionStart", 
+	             "spellcheck", "wrap"],
+	"TH": ["colspan", "headers", "rowspan", "scope"],
+	"TIME": ["datetime"],
+	"TRACK": ["default", "kind", "label", "src", "srclang"],
+	"VIDEO": ["autoplay", "buffered", "controls", "crossorigin", "height", "loop", "muted", "played", "preload", 
+	          "poster", "src", "width"]
 };
 
 SecureElement.elementSpecificMethodWhitelists = {

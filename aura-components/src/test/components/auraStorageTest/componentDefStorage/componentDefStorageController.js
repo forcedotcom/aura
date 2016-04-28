@@ -6,6 +6,7 @@
     fetchCmp: function(cmp, evt, helper) {
         var load = cmp.get("v.load");
         helper.setStatus(cmp, "Fetching: " + load);
+        helper.logDefs(cmp);
         var action = $A.get("c.aura://ComponentController.getComponent");
         action.setParams({name: load});
         action.setStorable();
@@ -31,6 +32,20 @@
             if (newCmp) {
                 helper.setStatus(cmp, "Created: " + load);
             }
+        } catch (e) {
+            helper.setStatus(cmp, "Error: " + e);
+        }
+    },
+
+    createComponent: function(cmp, evt, helper) {
+        var load = cmp.get("v.load");
+        helper.setStatus(cmp, "Creating: " + load);
+        try {
+            $A.componentService.createComponent(load, {}, function(newCmp) {
+                if (newCmp) {
+                    helper.setStatus(cmp, "Created: " + load);
+                }
+            });
         } catch (e) {
             helper.setStatus(cmp, "Error: " + e);
         }

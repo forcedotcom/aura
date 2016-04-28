@@ -37,8 +37,8 @@
         <ui:button press="{!c.fetchCmp}" label="Fetch cmp" /> |
         <ui:button press="{!c.createComponentFromConfig}" label="$A.createComponentFromConfig" /> |
         <ui:button press="{!c.createComponent}" label="$A.createComponent" /> |
-        <ui:button press="{!c.clearActionAndDefStorage}" label="Clear Caches" /> |
-        <ui:button press="{!c.clearCachesAndLog}" label="Clear Caches + Log" /> |
+        <ui:button press="{!c.clearActionAndDefStorage}" label="Clear Caches (not loaded)" /> |
+        <ui:button press="{!c.clearCachesAndLog}" label="Clear Caches (not loaded) + Log" /> |
         <ui:button press="{!c.saveLog}" label="Save Log" /> |
     </div>
 

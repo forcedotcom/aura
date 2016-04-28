@@ -16,6 +16,12 @@
 function iframeTest() {
 
     return {
+        /**
+         * Must match ComponentDefStorage.prototype.TRANSACTION_SENTINEL_KEY;
+         * TODO W-2365447 - eliminate this and its checks when bulk remove + put is added
+         */
+        TRANSACTION_SENTINEL_KEY: "sentinel_key",
+
         /** Gets the iframe window. */
         getIframe: function() {
             return document.getElementById("myFrame").contentWindow;
@@ -113,16 +119,31 @@ function iframeTest() {
         waitForDefInStorage : function(desc, msg) {
             var iframe = this.getIframe();
             var found = false;
+            var that = this;
 
             function checkDefStorage(desc) {
+                // short-circuit once the test times out
+                if ($A.test.isComplete()) {
+                    return;
+                }
+
                 iframe.$A.storageService.getStorage("ComponentDefStorage").getAll().then(function(items) {
                     items = items || [];
+                    for (var i = 0; i < items.length; i++) {
+                        // wait for transaction key to disappear
+                        if (items[i]["key"] === that.TRANSACTION_SENTINEL_KEY) {
+                            checkDefStorage(desc);
+                            return;
+                        }
+                    }
+
                     for (var i = 0; i < items.length; i++) {
                         if (items[i]["key"] === "markup://" + desc) {
                             found = true;
                             return;
                         }
                     }
+
                     checkDefStorage(desc);
                 });
             }
@@ -132,6 +153,42 @@ function iframeTest() {
             msg = msg || "Def " + desc + " never present in ComponentDefStorage";
             $A.test.addWaitForWithFailureMessage(true,
                 function() { return found; },
+                msg
+            );
+        },
+
+        /** Waits for a def (format is namespace:name) to be absent from ComponentDefStorage, with an optional error message. */
+        waitForDefRemovedFromStorage : function(desc, msg) {
+            var iframe = this.getIframe();
+            var removed = false;
+            var that = this;
+
+            function checkDefStorage(desc) {
+                // short-circuit once the test times out
+                if ($A.test.isComplete()) {
+                    return;
+                }
+
+
+                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll().then(function(items) {
+                    items = items || [];
+                    for (var i = 0; i < items.length; i++) {
+                        // if transaction key or def is present, recurse
+                        if (items[i]["key"] === that.TRANSACTION_SENTINEL_KEY || items[i]["key"] === "markup://" + desc) {
+                            checkDefStorage(desc);
+                            return;
+                        }
+                    }
+
+                    removed = true;
+                });
+            }
+
+            checkDefStorage(desc);
+
+            msg = msg || "Def " + desc + " never removed from ComponentDefStorage";
+            $A.test.addWaitForWithFailureMessage(true,
+                function() { return removed; },
                 msg
             );
         },
@@ -149,6 +206,16 @@ function iframeTest() {
                 var actual = iframeCmp.get("v.status");
                 $A.test.assertEquals(finalMessage, actual, "Expected (" + finalMessage + ") !== Actual (" + actual + ").\n" + iframeCmp.get("v.log"));
             });
+        },
+
+        /**
+         * Verifies a def (format is namespace:name) is not present in $A.context.loaded, with an optional error message.
+         */
+        verifyDefNotInLoaded: function(desc, msg) {
+            var loaded = $A.getContext().loaded;
+            var cmpDescriptor = "COMPONENT@markup://"+desc;
+            msg = msg || "Def " + desc + " should not have been in Aura.context.loaded";
+            $A.test.assertUndefined(loaded[cmpDescriptor], msg);
         }
     }
 }

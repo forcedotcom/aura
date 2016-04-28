@@ -34,7 +34,10 @@ function SecureElement(el, key) {
 	// some polymorphic behavior to SecureElement depending on the tagName
 	var tagName = el.tagName && el.tagName.toUpperCase();
 	switch (tagName) {
-		case 'IFRAME':
+		case "FRAME":
+            throw new $A.auraError("The deprecated FRAME element is not supported in LockerService!");
+			
+		case "IFRAME":
 			return SecureIFrameElement(el, key);
 	}
 

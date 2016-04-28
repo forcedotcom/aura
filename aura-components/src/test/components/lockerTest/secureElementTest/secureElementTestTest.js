@@ -55,4 +55,10 @@
             cmp.testExposedMethods(this.MethodsWhitelist);
         }
     },
+    
+    testFramesBlocked: {
+        test: function(cmp) {
+            cmp.testFramesBlocked();
+        }
+    }
 })

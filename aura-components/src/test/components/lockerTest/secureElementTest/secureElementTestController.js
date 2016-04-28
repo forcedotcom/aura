@@ -35,5 +35,16 @@
         methodsWhitelist.forEach(function(name) {
             testUtils.assertDefined(element[name]);
         });
+    },
+    
+    testFramesBlocked: function(cmp, event, helper) {
+        var testUtils = cmp.get("v.testUtils");
+        
+        try {
+        	document.createElement("frame");
+        	testUtils.fail("Should not have ben able to create a FRAME element");
+    	} catch(e) {
+    		testUtils.assertEquals(e.toString(), "The deprecated FRAME element is not supported in LockerService!");
+    	}
     }
 })

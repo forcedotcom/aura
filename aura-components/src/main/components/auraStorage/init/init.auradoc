@@ -1,0 +1,35 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+    <aura:description>
+        <p>Use <code>auraStorage:init</code> to initialize storage in your app’s template for caching server-side action response values.</p>
+        <p>This example uses a template to initialize storage for server-side action response values. The template contains an <code>auraStorage:init</code> tag that specifies storage initialization properties.</p>
+        <pre>
+&lt;aura:component isTemplate="true" extends="aura:template">
+    &lt;aura:set attribute="auraPreInitBlock">
+        &lt;!-- Note that the maxSize attribute in auraStorage:init is in KB -->
+        &lt;auraStorage:init name="actions" persistent="false" secure="false"
+             maxSize="1024" />
+    &lt;/aura:set>
+&lt;/aura:component>
+        </pre>
+        <p>When you initialize storage, you can set certain options, such as the name, maximum cache size, and the default expiration time.</p>
+        <p>Storage for server-side actions caches action response values. The storage name must be <code>actions</code>.</p>
+    </aura:description>
+    
+</aura:documentation>

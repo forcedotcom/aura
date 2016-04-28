@@ -156,8 +156,7 @@
     		$A.test.addWaitForWithFailureMessage("none", function () {
     			return $A.test.getStyle(panel.getElement(),'display')
     		}, "Positioned panels should have display:none when hiding it.");
-    		$A.test.assertEquals(0, parseInt($A.test.getStyle(panel.getElement(),'opacity')), "Opacity of the panel should be 0 after hiding the panel");
-            $A.test.addWaitForWithFailureMessage(0, function () {
+    		$A.test.addWaitForWithFailureMessage(0, function () {
                 return parseInt($A.test.getStyle(panel.getElement(),'opacity'));
 
             }, "Opacity of the panel should be 0 after hiding the panel");

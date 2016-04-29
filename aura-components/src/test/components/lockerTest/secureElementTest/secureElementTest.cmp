@@ -29,7 +29,7 @@
     <aura:method name="testExposedMethods" action="{!c.testExposedMethods}">
         <aura:attribute name="methodsWhitelist" type="List"/>
     </aura:method>
-
+    <aura:method name="testFramesBlocked" action="{!c.testFramesBlocked}"/>
     <aura:method name="getDiv" action="{!c.getDiv}"/>
 
     <div aura:id="title">SecureElement test</div>

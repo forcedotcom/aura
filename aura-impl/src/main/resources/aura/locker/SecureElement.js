@@ -34,7 +34,10 @@ function SecureElement(el, key) {
 	// some polymorphic behavior to SecureElement depending on the tagName
 	var tagName = el.tagName && el.tagName.toUpperCase();
 	switch (tagName) {
-		case 'IFRAME':
+		case "FRAME":
+            throw new $A.auraError("The deprecated FRAME element is not supported in LockerService!");
+			
+		case "IFRAME":
 			return SecureIFrameElement(el, key);
 	}
 
@@ -174,9 +177,10 @@ SecureElement.addSecureGlobalEventHandlers = function(se, raw, key) {
 	[
 		// Standard Global Event handlers
 		// https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers
-		// Note: ignoring "onclose", "oncontextmenu", "onerror", "onreset", "onsubmit" from the list above
-		"onabort", "onblur", "onchange", "onclick", "ondblclick", "onfocus", "oninput", "onkeydown", "onkeypress",
-		"onkeyup", "onload", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onresize", "onscroll", "onselect"		
+		"onabort", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "onerror",
+		"onfocus", "oninput", "onkeydown", "onkeypress", "onkeyup", "onload", 
+		"onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", 
+		"onreset", "onresize", "onscroll", "onselect", "onsubmit"	
 	].forEach(function (name) {
 		Object.defineProperty(se, name, {
 			set: function(callback) {
@@ -265,10 +269,55 @@ SecureElement.addElementSpecificMethods = function(se, el) {
 
 SecureElement.elementSpecificAttributeWhitelists = {
 	"A": ["hash", "host", "hostname", "href", "origin", "pathname", "port", "protocol", "search"],
+	"AREA": ["alt", "coords", "download", "href", "hreflang", "media", "rel", "shape", "target", "type"],
+	"AUDIO": ["autoplay", "buffered", "controls", "loop", "muted", "played", "preload", "src", "volume"],
+	"BASE": ["href", "target"],
+	"BDO": ["dir"],
+	"BUTTON": ["autofocus", "disabled", "form", "formaction", "formenctype", "formmethod", "formnovalidate", "formtarget", "name", "type"],
+	"CANVAS": ["height", "width"],
+	"COL": ["span"],
+	"COLGROUP": ["span", "width"],
+	"DATA": ["value"],
+	"DEL": ["cite", "datetime"],
+	"DETAILS": ["open"],
+	"EMBED": ["height", "src", "type", "width"],
+	"FIELDSET": ["disabled", "form", "name"],
+	"FORM": ["acceptCharset", "action", "autocomplete", "enctype", "method", "name", "novalidate", "target"],
+	"IMG": ["alt", "crossorigin", "height", "ismap", "longdesc", "sizesHTML5", "src", "srcsetHTML5", "width", "usemap"],
+	"INPUT": ["type", "accept", "autocomplete", "autofocus", "autosave", "checked", "disabled", "form", "formaction", 
+	          "formenctype", "formmethod", "formnovalidate", "formtarget", "height", "inputmode", "list", "max", "maxlength", 
+	          "min", "minlength", "minlength", "name", "pattern", "placeholder", "readonly", "required", "selectionDirection",
+	          "size", "spellcheck", "src", "step", "tabindex", "value", "width"],
+	"INS": ["cite", "datetime"],
+	"LABEL": ["accesskey", "for", "form"],
+	"LI": ["value"],
+	"LINK": ["crossorigin", "href", "hreflang", "media", "rel", "sizes", "title", "type"],
+	"MAP": ["name"],
+
+	// DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values for http-equiv/httpEquiv	
+	"META": ["content", "name"],
 	
-	// DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values for http-equiv/httpEquiv
-	
-	"META": ["content", "name"]
+	"METER": ["value", "min", "max", "low", "high", "optimum", "form"],
+	"OBJECT": ["data", "form", "height", "height", "type", "typemustmatch", "usemap", "width"],
+	"OL": ["reversed", "start", "type"],
+	"OPTGROUP": ["disabled", "label"],
+	"OPTION": ["disabled", "label", "selected", "selected"],
+	"OUTPUT": ["for", "form", "name"],
+	"PARAM": ["name", "value"],
+	"PROGRESS": ["max", "value"],
+	"Q": ["cite"],
+	"SELECT": ["autofocus", "disabled", "form", "multiple", "name", "required", "size"],
+	"SOURCE": ["src", "type"],
+	"TD": ["colspan", "headers", "rowspan"],
+	"TEMPLATE": ["content"],
+	"TEXTAREA": ["autocomplete", "autofocus", "cols", "disabled", "form", "maxlength", "minlength", "name", 
+	             "placeholder", "readonly", "required", "rows", "selectionDirection", "selectionEnd", "selectionStart", 
+	             "spellcheck", "wrap"],
+	"TH": ["colspan", "headers", "rowspan", "scope"],
+	"TIME": ["datetime"],
+	"TRACK": ["default", "kind", "label", "src", "srclang"],
+	"VIDEO": ["autoplay", "buffered", "controls", "crossorigin", "height", "loop", "muted", "played", "preload", 
+	          "poster", "src", "width"]
 };
 
 SecureElement.elementSpecificMethodWhitelists = {

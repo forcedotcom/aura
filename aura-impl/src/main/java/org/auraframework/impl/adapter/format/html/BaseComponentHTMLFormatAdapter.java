@@ -96,7 +96,11 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
                 auraInit.put("descriptor", def.getDescriptor());
                 auraInit.put("deftype", def.getDescriptor().getDefType());
                 auraInit.put("host", contextPath);
-                auraInit.put("safeEvalWorker", Aura.getConfigAdapter().getLockerWorkerURL());
+                
+                String lockerWorkerURL = Aura.getConfigAdapter().getLockerWorkerURL();
+                if (lockerWorkerURL != null) {
+                	auraInit.put("safeEvalWorker", lockerWorkerURL);
+                }
 
                 attributes.put("autoInitialize", "false");
                 attributes.put("autoInitializeSync", "true");

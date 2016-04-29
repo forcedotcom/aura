@@ -31,7 +31,7 @@ import org.auraframework.util.test.annotation.ThreadHostileTest;
  * @since 0.0.2.48
  */
 public class AuraServletIntegrationTest extends IntegrationTestCase {
-    public AuraServletIntegrationTest(String name) {
+	public AuraServletIntegrationTest(String name) {
         super(name);
     }
 
@@ -44,7 +44,8 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, desc);
         assertTrue(new ManifestUtil().isManifestEnabled());
         String url = Aura.getServletUtilAdapter().getManifestUrl(Aura.getContextService().getCurrentContext(), null);
-        assertEquals("/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appCache%3Anopreload%22%2C%22test%22%3A%22org.auraframework.integration.test.http.AuraServletIntegrationTest.testGetManifestWithoutPreloads%22%7D/app.manifest", url);
+        assertEquals("/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appCache%3Anopreload%22%2C%22test%22%3A%22org.auraframework.integration.test.http.AuraServletIntegrationTest.testGetManifestWithoutPreloads%22" + 
+        		getLockerServiceContextValue() + "%7D/app.manifest", url);
     }
 
     /**
@@ -56,6 +57,11 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
                 "appCache:withpreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, desc);
         String url = Aura.getServletUtilAdapter().getManifestUrl(Aura.getContextService().getCurrentContext(), null);
-        assertEquals("/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appCache%3Awithpreload%22%2C%22test%22%3A%22org.auraframework.integration.test.http.AuraServletIntegrationTest.testGetManifestWithPreloads%22%7D/app.manifest", url);
+        assertEquals("/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appCache%3Awithpreload%22%2C%22test%22%3A%22org.auraframework.integration.test.http.AuraServletIntegrationTest.testGetManifestWithPreloads%22" + 
+        		getLockerServiceContextValue() + "%7D/app.manifest", url);
     }
+    
+	private String getLockerServiceContextValue() {
+		return Aura.getConfigAdapter().isLockerServiceEnabled() ? "%2C%22ls%22%3A%22E%22" : "";
+	}
 }

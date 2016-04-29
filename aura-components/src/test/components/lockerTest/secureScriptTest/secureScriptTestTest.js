@@ -15,5 +15,11 @@
         test: function(cmp) {
             cmp.testScriptSrcExposed();
         }
+    },
+    
+    testGetSetAttribute: {
+        test: function(cmp) {
+            cmp.testGetSetAttribute();
+        }
     }
 })

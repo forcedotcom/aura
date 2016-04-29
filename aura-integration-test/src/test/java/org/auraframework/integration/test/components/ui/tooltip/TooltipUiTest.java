@@ -29,17 +29,12 @@ public class TooltipUiTest extends WebDriverTestCase {
 	public TooltipUiTest(String name) {
 		super(name);
 	}
-
-	public void testNothing() {
-		
-	}
 	
 	/**
 	 * If tooltip is triggered by click then it should open and close by
 	 * pressing enter on keyboard
-	 * It's a flapper, fix and enable please: W-2846651. also remove testNothing() above.
 	 */
-	public void _testToolTipOpenAndCloseWithEnterKey() throws Exception {
+	public void testToolTipOpenAndCloseWithEnterKey() throws Exception {
 		open(URL_FULL_CMP);
 		WebElement trigger = findDomElement(By.cssSelector(".triggerClick"));
 		

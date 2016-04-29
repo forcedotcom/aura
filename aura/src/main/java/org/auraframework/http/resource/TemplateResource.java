@@ -68,7 +68,7 @@ public abstract class TemplateResource extends AuraResourceImpl {
             internalWrite(request, response, appDefDesc, context);
             // fixme.
         } catch (Throwable t) {
-            servletUtilAdapter.handleServletException(t, false, context, request, response, true);
+            servletUtilAdapter.handleServletException(t, false, context, request, response, false);
         }
     }
 

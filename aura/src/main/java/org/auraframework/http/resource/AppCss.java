@@ -44,7 +44,7 @@ public class AppCss extends AuraResourceImpl {
         try {
             serverService.writeAppCss(dependencies, response.getWriter());
         } catch (Throwable t) {
-            servletUtilAdapter.handleServletException(t, false, context, request, response, true);
+            servletUtilAdapter.handleServletException(t, false, context, request, response, false);
         }
     }
 

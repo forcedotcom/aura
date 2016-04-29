@@ -598,7 +598,7 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
             }
 
             if ( !forceClient && (!def || (def && def.hasRemoteDependencies()) || forceServer )) {
-                var action=this.requestComponent(callbackScope, collectComponent, configItem, attributeValueProvider, i);
+                var action=this.requestComponent(collectComponent, configItem, attributeValueProvider, i);
                 $A.enqueueAction(action);
             } else {
                 if($A.clientService.allowAccess(def)) {
@@ -630,7 +630,7 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
  * @param callback
  * @private
  */
-AuraComponentService.prototype.requestComponent = function(callbackScope, callback, config, avp, index, returnNullOnError) {
+AuraComponentService.prototype.requestComponent = function(callback, config, avp, index, returnNullOnError) {
     var action = $A.get("c.aura://ComponentController.getComponent");
 
     // JBUCH: HALO: TODO: WHERE IS THIS COMING FROM IN MIXED FORM? WHY DO WE ALLOW THIS?
@@ -707,7 +707,7 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
         }
 
         if ( $A.util.isFunction(callback) ) {
-            callback.call(callbackScope, newComp, status, statusMessage, index);
+            callback(newComp, status, statusMessage, index);
         }
     });
     action.setParams({
@@ -1374,7 +1374,7 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
         return;
     }
 
-    action = this.requestComponent(this, callback, config);
+    action = this.requestComponent(callback, config);
     action.setAbortable();
     $A.enqueueAction(action);
 };

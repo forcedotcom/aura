@@ -426,7 +426,8 @@ public class AuraServlet extends AuraBaseServlet {
 
             String fwUID = Aura.getConfigAdapter().getAuraFrameworkNonce();
             if (!fwUID.equals(context.getFrameworkUID())) {
-                throw new ClientOutOfSyncException("Framework has been updated");
+                throw new ClientOutOfSyncException("Framework has been updated. Expected: " + fwUID +
+                        " Actual: " + context.getFrameworkUID());
             }
             context.setFrameworkUID(fwUID);
 

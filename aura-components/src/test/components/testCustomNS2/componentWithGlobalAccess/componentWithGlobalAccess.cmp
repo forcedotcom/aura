@@ -1,0 +1,99 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component access='Global'>
+	<aura:attribute name="privateAttribute" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
+    <aura:attribute name="publicAttribute" type="String" access="PUBLIC" description="public" default="PUBLIC"/>
+    <aura:attribute name="globalAttribute" type="String" access="GLOBAL" description="global" default="GLOBAL"/>
+    
+    <!-- 
+    	only component in system namespace can use access=Internal
+        as for access=Privileged, only component in system/privileged namespace can use it
+    -->
+    <aura:method name="globalMethod" action="{!c.globalMethod}" access="GLOBAL"/>
+    <aura:method name="publicMethod" action="{!c.publicMethod}" access="PUBLIC"/>
+    <aura:method name="privateMethod" action="{!c.privateMethod}" access="PRIVATE"/>
+    
+    <div class='whoAmI'>
+    	testCustomNS2:componentWithGlobalAccess.cmp
+    </div> 
+   
+    <div aura:id="componentCreatedByController" class="componentCreatedByController"/>
+   
+    <!-- just like accessing the event in controller, this won't work :W-2999718
+    <auratest:accessGlobalComponent aura:id="accessGlobalComponent"
+    eventWithDefaultAccessInSameSystemNamespaceRegisteredWithGlobalAccess="{!c.globalMethod}"/>
+    -->
+    
+    <!--  *************** register event in SAME custom namespace  *************** -->
+    <!-- event defined with default access -->
+  	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithDefaultAccess' 
+  		type='testCustomNS2:componentEventWithDefaultAccess'/>
+  	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithGlobalAccess' 
+  		type='testCustomNS2:componentEventWithDefaultAccess' access='Global'/>
+	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithPublicAccess' 
+  		type='testCustomNS2:componentEventWithDefaultAccess' access='Public'/>
+  	<aura:registerEvent name='NS2eventWithDefaultAccessRegisteredWithPrivateAccess' 
+  		type='testCustomNS2:componentEventWithDefaultAccess' access='Private'/>
+  		
+  	<!-- event defined with public access -->
+  	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithDefaultAccess' 
+  		type='testCustomNS2:componentEventWithPublicAccess'/>
+  	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithGlobalAccess' 
+  		type='testCustomNS2:componentEventWithPublicAccess' access='Global'/>
+	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithPublicAccess' 
+  		type='testCustomNS2:componentEventWithPublicAccess' access='Public'/>
+  	<aura:registerEvent name='NS2eventWithPublicAccessRegisteredWithPrivateAccess' 
+  		type='testCustomNS2:componentEventWithPublicAccess' access='Private'/>
+  		
+  	<!-- event defined with global access -->
+  	<aura:registerEvent name='NS2eventWithGlobalAccessRegisteredWithDefaultAccess' 
+  		type='testCustomNS2:componentEventWithGlobalAccess'/>
+  	<aura:registerEvent name='NS2eventWithGlobalAccessRegisteredWithGlobalAccess' 
+  		type='testCustomNS2:componentEventWithGlobalAccess' access='Global'/>
+	<aura:registerEvent name='NS2eventWithGlobalAccessRegisteredWithPublicAccess' 
+  		type='testCustomNS2:componentEventWithGlobalAccess' access='Public'/>
+  	<aura:registerEvent name='NS2eventWithGlobalAccessRegisteredWithPrivateAccess' 
+  		type='testCustomNS2:componentEventWithGlobalAccess' access='Private'/>
+    
+    
+    <!--  *************** register event in Different custom namespace  *************** -->
+    
+    <!-- we cannot register event defined with default access 
+  	<aura:registerEvent name='NS1eventWithDefaultAccessRegisteredWithGlobalAccess' 
+  		type='testCustomNS1:componentEventWithDefaultAccess' access='Global'/>
+  	-->	
+  	
+  	<!-- we cannot register event defined with public access 
+  	<aura:registerEvent name='NS1eventWithPublicAccessRegisteredWithDefaultAccess' 
+  		type='testCustomNS1:componentEventWithPublicAccess'/>
+  	-->
+  	
+  	<!-- event defined with global access -->
+  	<aura:registerEvent name='NS1eventWithGlobalAccessRegisteredWithDefaultAccess' 
+  		type='testCustomNS1:componentEventWithGlobalAccess'/>
+  	<aura:registerEvent name='NS1eventWithGlobalAccessRegisteredWithGlobalAccess' 
+  		type='testCustomNS1:componentEventWithGlobalAccess' access='Global'/>
+  	<aura:registerEvent name='NS1eventWithGlobalAccessRegisteredWithPublicAccess' 
+  		type='testCustomNS1:componentEventWithGlobalAccess' access='Public'/>
+  	<aura:registerEvent name='NS1eventWithGlobalAccessRegisteredWithPrivateAccess' 
+  		type='testCustomNS1:componentEventWithGlobalAccess' access='Private'/>
+  	
+
+    
+    
+</aura:component>

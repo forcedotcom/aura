@@ -59,7 +59,7 @@
         	var actual = this.componentCreated.get("v.privilegedAttribute");
         	$A.test.assertEquals(actual, "PRIVILEGED");
         }, 
-        //tests for method
+         /*********************************** tests for method ******************************************/
         function canNotAccessPrivateMethod(cmp) {
 			$A.test.expectAuraError("Access Check Failed!");
         	this.componentCreated.privateMethod();
@@ -235,7 +235,7 @@
     //we cannot create component with default access in a different privileged namespace
     testCreateComponentWithDefaultAccessOfAnotherPrivilegedNS:{
         test:[
-        function canCreateComponentWithDefaultAccess(cmp){ 
+        function cannotCreateComponentWithDefaultAccess(cmp){ 
         	$A.test.expectAuraError("Access Check Failed!");
         	var completed = false;
             $A.createComponent(
@@ -622,7 +622,7 @@
         	$A.test.assertEquals(actual, "PRIVILEGED");
         },
         
-        /********************* tests for method ****************************/
+        /*********************************** tests for method ******************************************/
         function canNotAccessPrivateMethod(cmp) {
 			$A.test.expectAuraError("Access Check Failed!");
 			this.componentCreated.privateMethod();
@@ -639,7 +639,6 @@
         	this.componentCreated.privilegedMethod();
         	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'privilegedMethod', "get unexpected outcome from calling privileged method");
         },
-		//UNCOMMENT TEST WHEN METHOD ACFs GO LIVE
         function canNotAccessInternalMethod(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	this.componentCreated.internalMethod();

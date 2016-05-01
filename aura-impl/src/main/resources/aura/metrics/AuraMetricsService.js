@@ -813,6 +813,9 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
 
         pageStartTime = this.getPageStartTime();
         bootstrap["pageStartTime"] = pageStartTime;
+        bootstrap["cache"] = {
+            "appCache": !!$A.clientService.appCacheNoUpdate
+        };
 
         if (window.performance && performance.timing && performance.navigation) {
             // TODO: Eventually make this strings smaller to reduce payload

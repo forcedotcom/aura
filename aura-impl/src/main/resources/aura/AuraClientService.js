@@ -827,6 +827,8 @@ AuraClientService.prototype.handleAppCache = function() {
         }
         if (acs.isOutdated) {
             window.location.reload(true);
+        } else {
+            acs.appCacheNoUpdate = true;
         }
     }
 

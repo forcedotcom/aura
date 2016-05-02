@@ -826,7 +826,7 @@ AuraClientService.prototype.handleAppCache = function() {
             showProgress(100);
         }
         if (acs.isOutdated) {
-            window.location.reload(true);
+            acs.dumpCachesAndReload();
         } else {
             acs.appCacheNoUpdate = true;
         }

@@ -21,6 +21,7 @@
             var globalId = component.getGlobalId();
 			helper.setAttribute(component, {key: 'domId', value: globalId});
 		}
+		helper.renderFieldHelpComponent(component);
 
 		return this.superRender();
 	},

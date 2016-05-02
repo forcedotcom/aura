@@ -28,6 +28,7 @@
     <aura:attribute name="showErrors"             type="Boolean"          default="true"                    description="Shows the error component in compound fields. If set to true and errors exist, displays the errors using inputCmp.set(&quot;v.errors&quot;, errors)."/>
     <aura:attribute name="errors"                 type="Object[]"                                           description="The list of errors to be displayed."/>
     <aura:attribute name="errorComponent"         type="Aura.Component[]"                                   description="A component that displays any error messages, such as validation errors, associated with the input field."/>
+    <aura:attribute name="fieldHelpComponent"     type="Aura.Component[]"                                   description="A component that is attached next to the label to display field help for this input item. Must be an instance of ui:tooltip"/>
     <aura:attribute name="type"                   type="String"                                             description="Specifies the input type. Possible values: button, checkbox, file, hidden, image, password, radio, reset, submit, text, textarea. Corresponds to the type attribute of the rendered HTML input element. Override type in a component that extends this component to set it to a different HTML input type."/>
 
     <aura:attribute name="required"               type="Boolean"           default="false"  access="GLOBAL" description="Specifies whether the input is required. Default value is &quot;false&quot;."/>

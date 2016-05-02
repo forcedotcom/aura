@@ -31,7 +31,7 @@ function SecureDocument(doc, key) {
         $A.lockerService.trust(st, el);
         return SecureElement(el, key);
     }
-    
+
     function createElement(tag, namespace) {
     	// Insure that no object to string coercion tricks can be applied to evade tag name based logic
         tag = tag + "";
@@ -54,7 +54,7 @@ function SecureDocument(doc, key) {
             value: function(tag) {
                 return createElement(tag, "http://www.w3.org/1999/xhtml");
             }
-        },       
+        },
         createElementNS: {
             value: function(namespace, tag) {
                 return createElement(tag, namespace);
@@ -82,7 +82,7 @@ function SecureDocument(doc, key) {
             }
         }
     });
-    
+
 	SecureElement.addSecureGlobalEventHandlers(o, doc, key);
 	SecureElement.addEventTargetMethods(o, doc, key);
 
@@ -104,8 +104,9 @@ function SecureDocument(doc, key) {
 
         title: SecureObject.createFilteredProperty(o, doc, "title"),
 
-        // DCHASMAN TODO W-2839646 Figure out how much we want to filter cookie access???
-        cookie: SecureObject.createFilteredProperty(o, doc, "cookie")
+        cookie: SecureObject.createFilteredProperty(o, doc, "cookie", {
+            writable: false
+        })
     });
 
     setLockerSecret(o, "key", key);

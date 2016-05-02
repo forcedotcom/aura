@@ -53,7 +53,7 @@ function SecureXMLHttpRequest(key) {
 		["onloadstart", "onprogress", "onabort", "onerror", "onload", "ontimeout", "onloadend", "onreadystatechange"].forEach(function (name) {
 			Object.defineProperty(o, name, {
 				set: function(callback) {
-					xhr.onreadystatechange = function(e) {
+					xhr[name] = function(e) {
 						callback.call(o, SecureDOMEvent(e, key));
 					};
 				}

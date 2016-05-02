@@ -43,32 +43,47 @@ function SecureXMLHttpRequest(key) {
 			}
 		});
 
-		["readyState", "status", "responseText", "responseXML"].forEach(function (name) {
+		// Properties
+		["readyState", "status", "statusText", "response", "responseType", "responseText", 
+		 "responseXML", "responseURL", "timeout", "withCredentials"].forEach(function (name) {
 			Object.defineProperty(o, name, SecureObject.createFilteredProperty(o, xhr, name));
 		});
-				
-		Object.defineProperties(o, {
-			addEventListener: SecureElement.createAddEventListenerDescriptor(o, xhr, key),
 			
-			onreadystatechange: {
+		// Event handlers
+		["onloadstart", "onprogress", "onabort", "onerror", "onload", "ontimeout", "onloadend", "onreadystatechange"].forEach(function (name) {
+			Object.defineProperty(o, name, {
 				set: function(callback) {
 					xhr.onreadystatechange = function(e) {
 						callback.call(o, SecureDOMEvent(e, key));
 					};
 				}
-			},
+			});
+		});
+		
+		Object.defineProperties(o, {
+			abort: SecureObject.createFilteredMethod(o, xhr, "abort"),		
+
+			addEventListener: SecureElement.createAddEventListenerDescriptor(o, xhr, key),
 
 			open: SecureObject.createFilteredMethod(o, xhr, "open", { 
 	        	beforeCallback: function(method, url) {
 	        		// Block attempts to directly invoke /aura end points
-	        		var urlLower = url.toLowerCase();
+	        		var normalizer = document.createElement("a");
+	        		normalizer.href = decodeURIComponent(url + "");
+	        		var urlLower = normalizer.href.toLowerCase();
+
 	        		if (urlLower.indexOf("/aura") >= 0) {
 			            throw new $A.auraError("SecureXMLHttpRequest.open cannot be used with Aura framework internal API endpoints " + url + "!");
 	        		}
 	        	}	
 	    	}),
 	    	
-			send: SecureObject.createFilteredMethod(o, xhr, "send")
+			send: SecureObject.createFilteredMethod(o, xhr, "send"),
+			
+			getAllResponseHeaders: SecureObject.createFilteredMethod(o, xhr, "getAllResponseHeaders"),	
+			getResponseHeader: SecureObject.createFilteredMethod(o, xhr, "getResponseHeader"),		
+			
+			setRequestHeader: SecureObject.createFilteredMethod(o, xhr, "setRequestHeader")
 		});
 
 		setLockerSecret(o, "key", key);

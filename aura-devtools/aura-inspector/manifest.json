@@ -1,7 +1,7 @@
 {
     "manifest_version":2,
 	"name": "__MSG_manifest_name__",
-	"version": "0.8.3",
+	"version": "0.8.4",
 	"description": "__MSG_manifest_description__",
 	"update_url": "http://download.auraframework.org/aura-inspector/aura-inspector-updates.xml",
 	"icons": {
@@ -32,7 +32,7 @@
 	"externally_connectable": {
 		"ids": [
 			// Sfdc Inspector (Dev mode)
-			"eihmlihnchelfaplbpcpgelolkommnib"
+			"hmoenmfdbkbjcpiibpfakppdpahlfnpo"
 		]
 	},
 

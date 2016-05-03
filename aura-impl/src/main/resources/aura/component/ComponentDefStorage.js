@@ -288,7 +288,7 @@ ComponentDefStorage.prototype.getAll = function () {
  */
 ComponentDefStorage.prototype.restoreAll = function(context) {
     var that = this;
-    return this.enqueue(function(resolve) {
+    return this.enqueue(function(resolve, reject) {
         that.getAll()
         .then(
             function(items) {
@@ -324,14 +324,14 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
                     }
                 }
 
-                $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries," + evtCount + " events from storage into registry");
+                $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries, " + evtCount + " events from storage into registry");
                 resolve();
             }
         ).then(
             undefined, // noop
             function(e) {
                 $A.log("ComponentDefStorage: error during restore from storage, no component, library or event defs restored", e);
-                resolve();
+                reject(e);
             }
         );
     });

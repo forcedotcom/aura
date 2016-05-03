@@ -80,6 +80,10 @@ GlobalValueProviders.prototype.MUTEX_KEY = "GlobalValueProviders";
 GlobalValueProviders.prototype.mutexUnlock = undefined;
 
 /**
+ * True if GVPs were loaded from persistent storage. */
+GlobalValueProviders.prototype.LOADED_FROM_PERSISTENT_STORAGE = false;
+
+/**
  * Merges new GVPs with existing and saves to storage
  *
  * @param {Object} gvps
@@ -202,23 +206,29 @@ GlobalValueProviders.prototype.loadFromStorage = function(callback) {
     var storage = this.getStorage();
     var that = this;
     if (storage) {
-        storage.get(this.STORAGE_KEY).then(
-            function (item) {
-                $A.run(function() {
-                    if (item) {
-                        // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
-                        that.merge(item.value, true);
-                    }
-                    callback(!!item);
-                });
-            },
-            function() {
-                $A.run(function() {
-                    // error retrieving from storage
-                    callback(false);
-                });
-            }
-        );
+        storage.get(this.STORAGE_KEY)
+            .then(function (item) {
+                    $A.run(function() {
+                        if (item) {
+                            // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
+                            that.merge(item.value, true);
+                        }
+
+                        // loading from persistence was successful
+                        that.LOADED_FROM_PERSISTENT_STORAGE = true;
+
+                        callback(!!item);
+                    });
+            })
+            .then(
+                undefined,
+                function() {
+                    $A.run(function() {
+                        // error retrieving from storage
+                        callback(false);
+                    });
+                }
+            );
     } else {
         // nothing loaded from persistent storage
         callback(false);

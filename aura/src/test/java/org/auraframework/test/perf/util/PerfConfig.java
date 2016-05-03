@@ -15,90 +15,88 @@
  */
 package org.auraframework.test.perf.util;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 // Immutable Java bean to serialize/deserialize json config
 // This must exactly match the config param names
 public class PerfConfig {
-	private final List<String> browsers; //required
-	private final int numberOfRuns; //optional, default = 1
-	private final List<Map<String,Integer>> variability; //required
-	private final Map<String,String> options; //optional
-	private final List<Map<String, Map<String, Object>>> customOptions; //optional
-	
-	private PerfConfig(PerfConfigBuilder builder){
-		this.browsers = builder.browsers;
-		this.numberOfRuns = builder.numberOfRuns;
-		this.variability = builder.variability;
-		this.options = builder.options;
-		this.customOptions = builder.customOptions;
-	}
-	
-	public List<String> getBrowsers(){
-		return browsers;
-	}
-	
-	public int getNumberOfRuns(){
-		return numberOfRuns;
-	}
-	
-	public List<Map<String,Integer>> getVariability(){
-		return variability;
-	}
-	
-	public Map<String,String> getOptions(){
-		return options;
-	}
-	
-	public List<Map<String, Map<String, Object>>> getCustomOptions(){
-		return customOptions;
-	}
-	
-	public Integer getVariability(String metric){
-		List<Map<String, Integer>> list = getVariability();
-        for(Map<String, Integer> map: list){
-        	if(map.containsKey(metric))
-        		return map.get(metric);
+    private final List<String> browsers; // required
+    private final int numberOfRuns; // optional, default = 1
+    private final List<Map<String, Integer>> variability; // required
+    private final Map<String, String> options; // optional
+    private final List<Map<String, Map<String, Object>>> customOptions; // optional
+
+    private PerfConfig(PerfConfigBuilder builder) {
+        this.browsers = builder.browsers;
+        this.numberOfRuns = builder.numberOfRuns;
+        this.variability = builder.variability;
+        this.options = builder.options;
+        this.customOptions = builder.customOptions;
+    }
+
+    public List<String> getBrowsers() {
+        return browsers;
+    }
+
+    public int getNumberOfRuns() {
+        return numberOfRuns;
+    }
+
+    public List<Map<String, Integer>> getVariability() {
+        return variability;
+    }
+
+    public Map<String, String> getOptions() {
+        return options != null ? options : new HashMap<>();
+    }
+
+    public List<Map<String, Map<String, Object>>> getCustomOptions() {
+        return customOptions;
+    }
+
+    public Integer getVariability(String metric) {
+        List<Map<String, Integer>> list = getVariability();
+        for (Map<String, Integer> map : list) {
+            if (map.containsKey(metric)) return map.get(metric);
         }
         return null;
-	}
-	
-	public static class PerfConfigBuilder {
-		private List<String> browsers;
-		private int numberOfRuns; 
-		private List<Map<String,Integer>> variability;
-		private Map<String,String> options;
-		private List<Map<String, Map<String, Object>>> customOptions;
+    }
 
-		public PerfConfigBuilder browsers(List<String> browsers){
-			this.browsers = browsers;
-			return this;
-		}
-		
-		public PerfConfigBuilder numberOfRuns(int numberOfRuns){
-			this.numberOfRuns = numberOfRuns;
-			return this;
-		}
-		
-		public PerfConfigBuilder variability(List<Map<String,Integer>> variability){
-			this.variability = variability;
-			return this;
-		}
-		
-		public PerfConfigBuilder options(Map<String,String> options){
-			this.options = options;
-			return this;
-		}
-		
-		public PerfConfigBuilder customOptions(List<Map<String, Map<String, Object>>> customOptions){
-			this.customOptions = customOptions;
-			return this;
-		}
-		
-		public PerfConfig build(){
-			return new PerfConfig(this);
-		}
-		
-	}
+    public static class PerfConfigBuilder {
+        private List<String> browsers;
+        private int numberOfRuns;
+        private List<Map<String, Integer>> variability;
+        private Map<String, String> options;
+        private List<Map<String, Map<String, Object>>> customOptions;
+
+        public PerfConfigBuilder browsers(List<String> browsers) {
+            this.browsers = browsers;
+            return this;
+        }
+
+        public PerfConfigBuilder numberOfRuns(int numberOfRuns) {
+            this.numberOfRuns = numberOfRuns;
+            return this;
+        }
+
+        public PerfConfigBuilder variability(List<Map<String, Integer>> variability) {
+            this.variability = variability;
+            return this;
+        }
+
+        public PerfConfigBuilder options(Map<String, String> options) {
+            this.options = options;
+            return this;
+        }
+
+        public PerfConfigBuilder customOptions(List<Map<String, Map<String, Object>>> customOptions) {
+            this.customOptions = customOptions;
+            return this;
+        }
+
+        public PerfConfig build() {
+            return new PerfConfig(this);
+        }
+
+    }
 }

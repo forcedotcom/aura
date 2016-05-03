@@ -30,7 +30,12 @@ ComponentDefStorage.prototype.EVICTION_TARGET_LOAD = 0.75;
 /**
  * Key to use of the MutexLocker to guarantee atomic execution across tabs.
  */
-ComponentDefStorage.prototype.LOCK_STORAGE_KEY = 'DEF_STORAGE';
+ComponentDefStorage.prototype.MUTEX_KEY = "ComponentDefStorage";
+
+/**
+ * Function to release the mutex, set while the mutex is held.
+ */
+ComponentDefStorage.prototype.mutexUnlock = undefined;
 
 /**
  * Minimum head room, as a percent of max size, to allocate after eviction and adding new definitions.
@@ -297,7 +302,7 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
                 for (var i = 0; i < items.length; i++) {
                     var config = items[i]["value"];
 
-                    if (config["type"] && config["attributes"]) { // It's an event (altough the signature is... interesting)
+                    if (config["type"] && config["attributes"]) { // It's an event (although the signature is... interesting)
                         if (!$A.eventService.getEventDef(config)) {
                             $A.eventService.saveEventConfig(config);
                         }
@@ -351,7 +356,7 @@ ComponentDefStorage.prototype.enqueue = function(execute) {
         var next = that.queue.pop();
         if (next) {
             $A.log("ComponentDefStorage.enqueue: " + (that.queue.length+1) + " items in queue, running next");
-            $A.util.Mutex.lock(that.LOCK_STORAGE_KEY , function (unlock) {
+            $A.util.Mutex.lock(that.MUTEX_KEY , function (unlock) {
                 // next["execute"] is run within a promise so may do async things (eg return other promises,
                 // use setTimeout) before calling resolve/reject. the mutex must be held until the promise
                 // resolves/rejects.

@@ -29,6 +29,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
         tabBody.classList.add("sidebar");
 
         treeComponent = new AuraInspectorTreeView(container);
+        treeComponent.attach("onselect", ComponentView_OnSelect.bind(this));
     };
 
     this.setData = function(globalId) {
@@ -56,6 +57,22 @@ function AuraInspectorComponentView(devtoolsPanel) {
             });
         }
     };
+
+    /** Event Handlers **/
+
+    function ComponentView_OnSelect(event) {
+        if(event && event.data) {
+            var domNode = event.data.domNode;
+            var treeNode = event.data.treeNode;
+            var data = treeNode.getRawLabel();
+
+            if(data && data.key === "Descriptor") {
+                devtoolsPanel.publish("AuraInspector:OnDescriptorSelect", data.value);
+            }
+        }
+    }
+
+    /** Private Methods **/
 
     function renderForComponent(current) {
 

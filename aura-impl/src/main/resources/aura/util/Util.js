@@ -73,7 +73,7 @@ Aura.Utils.Util.prototype.globalEval = function(src, globals, optionalSourceURL)
     if (window["$$safe-eval-compat$$"] && !Aura.Utils.Util.prototype.isIE) {
         return window["$$safe-eval-compat$$"](src, optionalSourceURL || "", window, globals);
     }
-	
+
     // --- backward compatibility ---
     // If the worker is not ready, we have to fallback to the old mechanism of evaluation.
     // This is mostly due to `$A.initConfig()` calls on AuraElement from Aloha and VF, which is due to be removed.
@@ -982,13 +982,13 @@ Aura.Utils.Util.prototype.trim = function(value){
  * @export
  */
 Aura.Utils.Util.prototype.format=function(formatString,arg1,arg2,argN){//eslint-disable-line no-unused-vars
-    $A.assert(!!(formatString&&formatString.toString),"$A.util.format(): 'formatString' must be convertible to String.");
-    var formatArguments=Array.prototype.slice.call(arguments,1);
-    return formatString.toString().replace(/\{(\d+)\}/gm,function(match,index){
-        var substitution=formatArguments[index];
-        if(substitution===undefined){
+    $A.assert($A.util.isString(formatString),"$A.util.format(): 'formatString' must be a String.");
+    var formatArguments = Array.prototype.slice.call(arguments,1);
+    return formatString.replace(/\{(\d+)\}/gm, function(match, index) {
+        var substitution = formatArguments[index];
+        if (substitution === undefined) {
             //#if {"modes" : ["PRODUCTION"]}
-            match='';
+            match = '';
             //#end
             return match;
         }

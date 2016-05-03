@@ -682,14 +682,14 @@
         	$A.test.expectAuraError("Access Check Failed!");
         	var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithPublicAccess");
         },
-        function canAccessSystemNSInternalAccessEventRegisteredWithPrivilegedAccess(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
+        /*function canAccessSystemNSInternalAccessEventRegisteredWithPrivilegedAccess(cmp) {
         	var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+        	$A.test.assertTrue(evt.getName() === "eventWithInternalAccessInSystemNamespaceRegisteredWithPrivilegedAccess", "get unexpected event name:"+evt.getName());
         },
         function canAccessSystemNSInternalAccessEventRegisteredWithGlobalAccess(cmp) {
-			$A.test.expectAuraError("Access Check Failed!");
         	var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithGlobalAccess");
-        },
+        	$A.test.assertTrue(evt.getName() === "eventWithInternalAccessInSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());
+        },*/
         
         //tests for accessing event "accessPublicEvent" in system namespace "auratest", the event itself is defined with public access
         function canNotAccessSystemNSPublicAccessEventRegisteredWithDefaultAccess(cmp) {
@@ -704,16 +704,18 @@
         	$A.test.expectAuraError("Access Check Failed!");
         	var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithPublicAccess");
         },
-        function canNotAccessSystemNSPublicAccessEventRegisteredWithPrivilegedAccess(cmp) {
+        /*function canAccessSystemNSPublicAccessEventRegisteredWithPrivilegedAccess(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+        	$A.test.assertTrue(evt.getName() === "eventWithPublicAccessInSystemNamespaceRegisteredWithPrivilegedAccess", "get unexpected event name:"+evt.getName());
         },
-        function canNotAccessSystemNSPublicAccessEventRegisteredWithGlobaldAccess(cmp) {
+        function canAccessSystemNSPublicAccessEventRegisteredWithGlobaldAccess(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithGlobalAccess");
-        },
+        	$A.test.assertTrue(evt.getName() === "eventWithPublicAccessInSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());
+        },*/
         
-        //tests for accessing event "accessPrilegedEvent" in system namespace "auratest", the event itself is defined with prileged access
+        //tests for accessing event "accessPrilegedEvent" in system namespace "auratest", the event itself is defined with privileged access
         function canAccessSystemNSPrivilegedAccessEventRegisteredWithDefaultAccess(cmp) {
         	var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithDefaultAccess");
         	$A.test.assertTrue(evt.getName() === "eventWithPrivilegedAccessInSystemNamespaceRegisteredWithDefaultAccess", "get unexpected event name:"+evt.getName());
@@ -725,7 +727,7 @@
         function canNotAccessSystemNSPrivilegedAccessEventRegisteredWithPublicAccess(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPublicAccess");
-        },8?
+        },*/
         function canAccessSystemNSPrivilegedAccessEventRegisteredWithPrivilegedAccess(cmp) {
         	var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
         	$A.test.assertTrue(evt.getName() === "eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPrivilegedAccess", "get unexpected event name:"+evt.getName());

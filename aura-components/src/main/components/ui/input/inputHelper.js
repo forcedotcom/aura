@@ -48,8 +48,8 @@
                     title: component.get("v.labelTitle"),
                     requiredIndicator: requiredIndicator
                 }
-            });
-
+            }); 
+            
             // Inserting label inside of innerBody
             (labelPositionAttribute === 'left' || labelPositionAttribute === 'top') ?
                 innerBody.unshift(labelComponent) : innerBody.push(labelComponent);
@@ -68,6 +68,23 @@
             body.push(divComponent);
             component.set("v.body", body);
         }
+    },
+    /**
+     * The reason for passing a fieldHelpComponent instead of setting a 
+     * fieldHelp string is because we want to handle the tooltip differently 
+     * on SFX and S1. Adding the switch logic to a generic ui:input component 
+     * didn't seem like the best way to do it. Also it would have dependencies on 
+     * components like force:icon which is not in the ui namespace.
+     **/
+    renderFieldHelpComponent: function(component){
+    	var fieldHelpComponent = component.get('v.fieldHelpComponent');
+		if($A.util.isArray(fieldHelpComponent)  && 
+		   !$A.util.isEmpty(fieldHelpComponent)	&& 
+		   fieldHelpComponent[0].isInstanceOf('ui:tooltip')){
+			
+		var labelComponent = component.find('inputLabel');
+	    	labelComponent.get('v.body').push(fieldHelpComponent[0]);
+	    }
     },
     getGlobalId: function (component) {
         return component.get("v.domId") || component.getGlobalId();

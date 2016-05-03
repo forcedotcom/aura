@@ -13,31 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.integration.test.components.ui.inputNumber;
+package org.auraframework.integration.test.components.ui.inputSmartNumber;
 
-import org.auraframework.integration.test.components.ui.inputSmartNumber.BaseInputSmartNumber;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 public class InputNumberUITest extends BaseInputSmartNumber {
 
-    private final String INPUT_SEL = ".input";
-    private final String VVAL_OUTPUT_SEL = ".vvalue";
-    private final String SUBMIT_SEL = ".uiButton";
-    private final String SUBMIT_OUTUPT_SEL = ".uiButton ~ .uiOutputText";
-    
     private final String LOCALIZATION_TEST_URL = "/uitest/inputLocalizedNumber_Test.cmp";
-    
+
     public InputNumberUITest() {
-        super("/uitest/inputNumber_Test.cmp");
+        super("/uitest/inputSmartNumber_Test.app?testInputCmp=inputNumber");
     }
 
     public void testInputNumber() throws Exception {
-        open(this.URL);
+        open(LOCALIZATION_TEST_URL);
 
-        WebElement input = findDomElement(By.cssSelector(INPUT_SEL));
-        WebElement submit = findDomElement(By.cssSelector(SUBMIT_SEL));
-        WebElement output = findDomElement(By.cssSelector(SUBMIT_OUTUPT_SEL));
+        WebElement input = findDomElement(By.cssSelector(".input"));
+        WebElement submit = findDomElement(By.cssSelector(".uiButton"));
+        WebElement output = findDomElement(By.cssSelector(".uiOutputText"));
 
         // integer
         input.clear();
@@ -54,9 +48,9 @@ public class InputNumberUITest extends BaseInputSmartNumber {
 
     // FIXME: bug W-1296985 - Aura numbers only handle numbers as large as JavaScript
     public void _testInputNumberDefaultValue() throws Exception {
-        open(this.URL);
+        open(LOCALIZATION_TEST_URL);
 
-        WebElement input = findDomElement(By.cssSelector(INPUT_SEL));
+        WebElement input = findDomElement(By.cssSelector(".input"));
         assertEquals("Default number from model is incorrect",
                 "123456789123456789", input.getAttribute("value"));
     }
@@ -66,9 +60,9 @@ public class InputNumberUITest extends BaseInputSmartNumber {
     public void testLocalizedInputNumber() throws Exception {
         open(LOCALIZATION_TEST_URL);
 
-        WebElement input = findDomElement(By.cssSelector(INPUT_SEL));
-        WebElement submit = findDomElement(By.cssSelector(SUBMIT_SEL));
-        WebElement output = findDomElement(By.cssSelector(SUBMIT_OUTUPT_SEL));
+        WebElement input = findDomElement(By.cssSelector(".input"));
+        WebElement submit = findDomElement(By.cssSelector(".uiButton"));
+        WebElement output = findDomElement(By.cssSelector(".uiOutputText"));
 
         // integer
         input.clear();
@@ -93,21 +87,5 @@ public class InputNumberUITest extends BaseInputSmartNumber {
         input.sendKeys("-123.456");
         submit.click();
         waitForElementTextPresent(output, "-123.456");
-    }
-
-    /**
-     * Test positive number with shortcut
-     */
-    public void testPositiveWithShortcut() throws Exception {
-        open(this.URL);
-        inputAndVerifyValuesAfterFormatted(INPUT_SEL, VVAL_OUTPUT_SEL, "1.23k", "1230", "1,230");
-    }
-
-    /**
-     * Test negative number with shortcut
-     */
-    public void testNegativeWithShortcut() throws Exception {
-        open(this.URL);
-        inputAndVerifyValuesAfterFormatted(INPUT_SEL, VVAL_OUTPUT_SEL, "-1.23k", "-1230", "-1,230");
     }
 }

@@ -2,7 +2,7 @@
 
 <aura:component implements="performance:test">
    
-   <ui:virtualDataGrid aura:id="grid" fixedHeader="true" useRowHeaders="true">
+   <ui:virtualDataGrid aura:id="grid" fixedHeader="true" rowHeaderIndex="0">
       <aura:set attribute="headerColumns">
         <ui:dataGridColumn name="id" label="Id"/>
         <ui:dataGridColumn name="subject" label="Subject"/>

@@ -37,7 +37,13 @@ Test.Aura.Util.UtilTest = function() {
             Bitset:{},
             NumberFormat:{},
             Aura: Aura,
-            $A:{ns:{},assert:Stubs.GetMethod(function(condition,message){if(!condition)throw message;})},
+            $A:{
+                ns:{},
+                assert:Stubs.GetMethod(function(condition,message){if(!condition)throw message;}),
+                util:{
+                    isString: function(arg) { return (typeof arg === 'string' || arg instanceof String); }
+                }
+           },
             navigator:{userAgent:''}
          })(function(){
             [Import("aura-impl/src/main/resources/aura/util/Util.js")]
@@ -400,7 +406,7 @@ Test.Aura.Util.UtilTest = function() {
     function format(){
         [Fact]
         function ThrowsIfFormatStringIsNotConvertibleToString(){
-            var expected="$A.util.format(): 'formatString' must be convertible to String.";
+            var expected="$A.util.format(): 'formatString' must be a String.";
 
             var actual=Record.Exception(function(){
                 auraMock(function(){

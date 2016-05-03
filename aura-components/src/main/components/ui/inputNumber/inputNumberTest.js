@@ -19,7 +19,6 @@
      * Test when value is not assigned.
      */
     testUnassigned: {
-    	attributes : {testCmpName : "UnsetNumber"},
         test : function(component) {
             var attr = component.get("v.value");
             $A.test.assertEquals(undefined, attr);
@@ -62,17 +61,9 @@
     testDisabled: {
         attributes : {disabled : true},
         test : function(component){
+            var inputElm = component.getElement();
             $A.test.assertTrue(component.get("v.disabled"), "disable should be true");
-        }
-    },
-
-    /**
-     * Test value.
-     */
-    testValue: {
-        attributes : {value : 567},
-        test : function(component){
-            $A.test.assertEquals(567, component.get("v.value"), "value does not equal expected");
+            $A.test.assertDefined(inputElm.getAttribute("disabled"), "<input> should have 'disabled' attribute");
         }
     },
 
@@ -300,6 +291,29 @@
         }
     },
 
+    /**
+     * Test well-formatted value
+     */
+    testSetValueWithWellFormattedValue: {
+        test: [function(component) {
+            component.set('v.value', '56,789');
+        }, function(component) {
+            this.assertCmpElemValues(component, 56789, '56,789');
+        }]
+    },
+
+    /**
+     * Test set value using number string
+     */
+    testSetValueWithString: {
+        test: [function(component) {
+            component.set('v.value', '56789');
+        }, function(component) {
+            this.assertCmpElemValues(component, '56789', '56,789');
+        }]
+    },
+
+
    /**
     * Verify that when the value changes it is rerendered with the unformated new value
     */
@@ -345,12 +359,168 @@
      */
     testSetInvalidValue: {
         attributes: {value: 12},
-        test: [function (cmp) {
-            cmp.set('v.value', 'abc');
-        }, function(cmp){
-            var inputValue = cmp.getElement().value;
+        test: [function (component) {
+            component.set('v.value', 'abc');
+        }, function(component){
+            var inputValue = component.getElement().value;
             $A.test.assertEquals(this.EMPTY_STRING, inputValue, "Cmp: input value should be empty string");
-            $A.test.assertEquals(null, cmp.get("v.value"), "Cmp: value should be undefined.");
+            $A.test.assertEquals(null, component.get("v.value"), "Cmp: value should be undefined.");
         }]
+    },
+ 
+    /**
+     * Test shortcut K/k as in thousand
+     */
+    testShortcutK: {
+        test: [function(component) {
+            this.inputValue(component, "1k");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 1000, "1,000");
+        }, function(component) {
+            this.inputValue(component, "1K");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 1000, "1,000");
+        }]
+    },
+
+    /**
+     * Test shortcut M/m as in million
+     */
+    testShortcutM: {
+        test: [function(component) {
+            this.inputValue(component, "1m");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 1000000, "1,000,000");
+        }, function(component) {
+            this.inputValue(component, "1M");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 1000000, "1,000,000");
+        }]
+    },
+
+    /**
+     * Test shortcut B/b as in billion
+     */
+    testShortcutB: {
+        test: [function(component) {
+            this.inputValue(component, "1b");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 1000000000, "1,000,000,000");
+        }, function(component) {
+            this.inputValue(component, "1B");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 1000000000, "1,000,000,000");
+        }]
+    },
+
+    /**
+     * Test shortcut T/t as in trillion
+     */
+    testShortcutT: {
+        test: [function(component) {
+            this.inputValue(component, "1t");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 1000000000000, "1,000,000,000,000");
+        }, function(component) {
+            this.inputValue(component, "1T");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 1000000000000, "1,000,000,000,000");
+        }]
+    },
+
+    /**
+     * Test shortcut should still work after decimal marker
+     */
+    testShortcutAfterDecimalMark: {
+        test: [function(component) {
+            this.inputValue(component, "0.1m");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 100000, "100,000");
+        }]
+    },
+
+    /**
+     * Test input with a positive sign
+     */
+    testPositiveSign: {
+        test: [function(component) {
+            this.inputValue(component, "+123");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 123, "123");
+        }]
+    },
+
+    /**
+     * Test input with a negative sign
+     */
+    testNegativeSign: {
+        test: [function(component) {
+            this.inputValue(component, "-123");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, -123, "-123");
+        }]
+    },
+
+    /**
+     * Any number of thousand marker should be allowed in integer part
+     */
+    testThousandMarkerInIntegerPart: {
+        test: [function(component) {
+            this.inputValue(component, "1,2,3,4,5");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 12345, "12,345");
+        }]
+    },
+
+    /*****************
+     * Helpers
+     *****************/
+
+    // set element value and fire appropriate events to simulate what happens
+    // when user types in input box
+    inputValue: function(component, value) {
+        var inputElm = component.getElement();
+        inputElm.value = value;
+        // typing triggers input event
+        // it tells the component to cache the elem value for when a change/blur event happens
+        $A.test.fireDomEvent(inputElm, "input");
+    },
+
+    // fire blur event to update v.value and format elem value
+    triggerUpdateCmpElmValues: function(component) {
+        var inputElm = component.getElement();
+        $A.test.fireDomEvent(inputElm, "blur");
+    },
+
+    // check component's internval v.value and displayed value on the input box
+    assertCmpElemValues: function (component, expectedCmpVal, expectedElemVal) {
+        $A.test.assertEquals(expectedCmpVal, component.get("v.value"),
+                "Cmp value doesn't equal to expected");
+        $A.test.assertEquals(expectedElemVal, component.getElement().value,
+                "Element value is not displayed/formatted correctly.");
     }
 })// eslint-disable-line semi

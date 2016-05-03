@@ -54,7 +54,6 @@
     handleFocus: function(component, event, helper) {
         var inputCmp = event.getSource();
         if (inputCmp) {
-            inputCmp.set("v.ariaActiveDescendant", "");
             var domEvent = event.getParam("domEvent");
             helper.fireEvent(component, domEvent, helper);
         }

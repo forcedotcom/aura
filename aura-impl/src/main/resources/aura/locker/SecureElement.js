@@ -86,7 +86,8 @@ function SecureElement(el, key) {
 
 		getAttribute: SecureObject.createFilteredMethod(o, el, "getAttribute"),
 		setAttribute: SecureObject.createFilteredMethod(o, el, "setAttribute"),
-
+		removeAttribute: SecureObject.createFilteredMethod(o, el, "removeAttribute"),
+		
         getElementsByClassName: SecureObject.createFilteredMethod(o, el, "getElementsByClassName"),
         getElementsByTagName: SecureObject.createFilteredMethod(o, el, "getElementsByTagName"),
 
@@ -102,6 +103,9 @@ function SecureElement(el, key) {
 				$A.lockerService.util.verifyAccess(o, child, { verifyNotOpaque: true });
         	}	
     	}),
+    	
+    	getBoundingClientRect: SecureObject.createFilteredMethod(o, el, "getBoundingClientRect"),
+    	getClientRects: SecureObject.createFilteredMethod(o, el, "getClientRects"),
 
 		// Standard HTMLElement methods
 		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
@@ -165,7 +169,7 @@ SecureElement.addSecureProperties = function(se, raw) {
 		'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang', 'spellcheck',
 		'style', 'tabIndex', 'title',
 		
-		'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth'
+		'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth', 'nodeValue'
 		
 		// DCHASMAN TODO This list needs to be revisted as it is missing a ton of valid attributes!
 	].forEach(function (name) {

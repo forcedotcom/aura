@@ -64,7 +64,8 @@ function SecureDOMEvent(event, key) {
 
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", event);
-    return Object.seal(o);
+    
+    return o;
 }
 
 SecureDOMEvent.filterTouchesDescriptor = function (se, event, propName) {

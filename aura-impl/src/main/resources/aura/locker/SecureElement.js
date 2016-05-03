@@ -76,20 +76,7 @@ function SecureElement(el, key) {
 	});
 
 	Object.defineProperties(o, {
-		childNodes : SecureObject.createFilteredProperty(o, el, "childNodes"),
-		children : SecureObject.createFilteredProperty(o, el, "children"),
-
-		firstChild : SecureObject.createFilteredProperty(o, el, "firstChild"),
-		lastChild : SecureObject.createFilteredProperty(o, el, "lastChild"),
-
         compareDocumentPosition: SecureObject.createFilteredMethod(o, el, "compareDocumentPosition"),
-
-		getAttribute: SecureObject.createFilteredMethod(o, el, "getAttribute"),
-		setAttribute: SecureObject.createFilteredMethod(o, el, "setAttribute"),
-		removeAttribute: SecureObject.createFilteredMethod(o, el, "removeAttribute"),
-		
-        getElementsByClassName: SecureObject.createFilteredMethod(o, el, "getElementsByClassName"),
-        getElementsByTagName: SecureObject.createFilteredMethod(o, el, "getElementsByTagName"),
 
 		ownerDocument : SecureObject.createFilteredProperty(o, el, "ownerDocument"),
 		parentNode : SecureObject.createFilteredProperty(o, el, "parentNode"),
@@ -103,34 +90,6 @@ function SecureElement(el, key) {
 				$A.lockerService.util.verifyAccess(o, child, { verifyNotOpaque: true });
         	}	
     	}),
-    	
-    	getBoundingClientRect: SecureObject.createFilteredMethod(o, el, "getBoundingClientRect"),
-    	getClientRects: SecureObject.createFilteredMethod(o, el, "getClientRects"),
-
-		// Standard HTMLElement methods
-		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
-		blur: SecureObject.createFilteredMethod(o, el, "blur"),
-		click: SecureObject.createFilteredMethod(o, el, "click"),
-		focus: SecureObject.createFilteredMethod(o, el, "focus"),
-
-		innerHTML : SecureObject.createFilteredProperty(o, el, "innerHTML", { 
-			returnValue: "", 
-			beforeSetCallback: function(value) {				
-				// Do not allow innerHTML on shared elements (body/head)
-				if (isSharedElement(el)) {
-		            throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
-				}
-				
-				/*jslint sub: true */
-				return DOMPurify["sanitize"](value);
-			},
-			afterSetCallback: function() {
-				// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
-				if (el.firstChild) {
-					$A.lockerService.trust(o, el.firstChild);
-				}
-			} 
-		}),
 
         cloneNode: SecureObject.createFilteredMethod(o, el, "cloneNode", { afterCallback: function(fnReturnedValue) {
 			// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
@@ -140,7 +99,35 @@ function SecureElement(el, key) {
 
         textContent: SecureObject.createFilteredProperty(o, el, "textContent", { returnValue: "" })
 	});
+	
+	// Conditionally add things that not all Node types support
+	["childNodes", "children", "firstChild", "lastChild", "getAttribute", "setAttribute", "removeAttribute"].forEach(function(name) {
+		SecureObject.addPropertyIfSupported(o, el, name);
+	});
 
+	["getElementsByClassName", "getElementsByTagName", "getBoundingClientRect", "getClientRects", "blur", "click", "focus"].forEach(function(name) {
+		SecureObject.addMethodIfSupported(o, el, name);
+	});
+
+	SecureObject.addPropertyIfSupported(o, el, "innerHTML", { 
+		returnValue: "", 
+		beforeSetCallback: function(value) {				
+			// Do not allow innerHTML on shared elements (body/head)
+			if (isSharedElement(el)) {
+	            throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
+			}
+			
+			/*jslint sub: true */
+			return DOMPurify["sanitize"](value);
+		},
+		afterSetCallback: function() {
+			// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
+			if (el.firstChild) {
+				$A.lockerService.trust(o, el.firstChild);
+			}
+		} 
+	});
+	
 	// applying standard secure element properties
 	SecureElement.addSecureProperties(o, el);
 	SecureElement.addSecureGlobalEventHandlers(o, el, key);
@@ -148,6 +135,15 @@ function SecureElement(el, key) {
 
 	SecureElement.addElementSpecificProperties(o, el);
 	SecureElement.addElementSpecificMethods(o, el);
+	
+	
+	// DCHASMAN TODO Do not check this in uncommented - it is a security hole! Just trying to get Angular to run
+	/*Object.defineProperty(o, "attributes", {
+		get: function() {
+			return el.attributes;
+		}
+	});*/
+	
 
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", el);
@@ -160,7 +156,7 @@ SecureElement.addSecureProperties = function(se, raw) {
 		// Standard Element interface represents an object of a Document.
 		// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
 		'childElementCount', 'classList', 'className', 'id', 'tagName',
-		// Note: ignoring 'attributes', 'children', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
+		// Note: ignoring 'firstElementChild', 'lastElementChild', 'namespaceURI',
 		//      'nextElementSibling' and 'previousElementSibling' from the list above.
 
 		// Standard HTMLElement interface represents any HTML element
@@ -173,7 +169,7 @@ SecureElement.addSecureProperties = function(se, raw) {
 		
 		// DCHASMAN TODO This list needs to be revisted as it is missing a ton of valid attributes!
 	].forEach(function (name) {
-		Object.defineProperty(se, name, SecureObject.createFilteredProperty(se, raw, name));
+		SecureObject.addPropertyIfSupported(se, raw, name);
 	});
 };
 
@@ -253,7 +249,7 @@ SecureElement.addElementSpecificProperties = function(se, el) {
 		var whitelist = SecureElement.elementSpecificAttributeWhitelists[tagName];
 		if (whitelist) {
 			whitelist.forEach(function(name) {
-				Object.defineProperty(se, name, SecureObject.createFilteredProperty(se, el, name));
+				SecureObject.addPropertyIfSupported(se, el, name);
 			});
 		}
 	}
@@ -265,7 +261,7 @@ SecureElement.addElementSpecificMethods = function(se, el) {
 		var whitelist = SecureElement.elementSpecificMethodWhitelists[tagName];
 		if (whitelist) {
 			whitelist.forEach(function(name) {
-				Object.defineProperty(se, name, SecureObject.createFilteredMethod(se, el, name));
+				SecureObject.addMethodIfSupported(se, el, name);
 			});
 		}
 	}

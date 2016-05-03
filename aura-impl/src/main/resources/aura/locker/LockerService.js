@@ -250,7 +250,7 @@ function LockerService() {
 	setLockerSecret = function(st, type, secret) {
 		function lock(mk) {
 			if (mk !== masterKey) {
-				throw new Error("Access denied");
+				throw new $A.auraError("Access denied");
 			}
 			return secret;
 		}
@@ -258,7 +258,7 @@ function LockerService() {
 			throw new TypeError("Secrets can only be retrieved from Objects and Functions.");
 		}
 		if (typeof st["$ls" + type] === 'function') {
-			throw new Error("Re-setting of " + type + " is prohibited");
+			throw new $A.auraError("Re-setting of " + type + " is prohibited");
 		}
 		validLockSet["add"](lock);
 		Object.defineProperty(st, "$ls" + type, {
@@ -322,7 +322,7 @@ function LockerService() {
 					"$result": window['$$safe-eval$$'](code, optionalSourceURL, envRec, lockerShadows)
 				};
 			} catch (x) {
-				throw new Error("Unable to create locker IIFE: " + x);
+				throw new $A.auraError("Unable to create locker IIFE: " + x);
 			}
 			
 			Object.freeze(locker);
@@ -442,7 +442,7 @@ function LockerService() {
 					var fromKey = getLockerSecret(from, "key");
 					var toKey = getLockerSecret(to, "key");
 
-					throw new Error("Access denied: " + JSON.stringify({
+					throw new $A.auraError("Access denied: " + JSON.stringify({
 						from : fromKey,
 						to : toKey
 					}));

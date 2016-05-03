@@ -25,8 +25,17 @@
             trunc = 1 * trunc;
             value = $A.util.truncate(value, trunc, ellipsis, truncateByWord);
         }
-        return [document.createTextNode($A.util.isUndefinedOrNull(value)?'':value)];
+        
+        var textNode = document.createTextNode($A.util.isUndefinedOrNull(value) ? '' : value);
+        
+        // aura:text is syntactic sugar for document.createTextNode() and the resulting nodes need to be directly visible to the container
+    	// otherwise no code would be able to manipulate them
+    	var parent = component.getComponentValueProvider();
+    	$A.lockerService.trust(parent, textNode);
+    	
+        return [textNode];
     },
+    
     rerender:function(component){
         var element=component.getElement();
         // Check for unowned node so IE doesn't crash

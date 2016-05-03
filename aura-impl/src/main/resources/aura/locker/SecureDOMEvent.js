@@ -30,7 +30,6 @@ function SecureDOMEvent(event, key) {
         // https://developer.mozilla.org/en-US/docs/Web/Events
         target: SecureObject.createFilteredProperty(o, event, "target"),
         currentTarget: SecureObject.createFilteredProperty(o, event, "currentTarget"),
-        relatedTarget: SecureObject.createFilteredProperty(o, event, "relatedTarget"),
 
         // Touch Events are special on their own:
         // https://developer.mozilla.org/en-US/docs/Web/API/Touch
@@ -44,13 +43,13 @@ function SecureDOMEvent(event, key) {
             get: function() {
                 throw Error("Access denied for insecure view");
             }
-        },
-
-        // non-standard properties and aliases
-        srcElement: SecureObject.createFilteredProperty(o, event, "srcElement"),
-        explicitOriginalTarget: SecureObject.createFilteredProperty(o, event, "explicitOriginalTarget"),
-        originalTarget: SecureObject.createFilteredProperty(o, event, "originalTarget")
+        }
     };
+    
+    // non-standard properties and aliases
+    ["relatedTarget", "srcElement", "explicitOriginalTarget", "originalTarget"].forEach(function(property) {
+    	SecureObject.addPropertyIfSupported(o, event, property);
+    });
 
     // re-exposing externals
     // TODO: we might need to include non-enumerables

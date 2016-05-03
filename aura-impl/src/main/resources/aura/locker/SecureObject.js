@@ -162,6 +162,15 @@ SecureObject.unfilterEverything = function(st, value) {
 SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
 	"use strict";
 
+	// Do not expose properties that the raw object does not actually support
+	if (!(methodName in raw)) {
+		if (options && options.ignoreNonexisting) {
+			return undefined;
+		} else {
+			throw new $A.auraError("Underlying raw object " + raw + " does not support method: " + methodName);
+		}
+	}
+	
 	return {
 		enumerable: true,
 		value : function() {
@@ -185,6 +194,15 @@ SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
 
 SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
 	"use strict";
+	
+	// Do not expose properties that the raw object does not actually support
+	if (!(propertyName in raw)) {
+		if (options && options.ignoreNonexisting) {
+			return undefined;
+		} else {
+			throw new $A.auraError("Underlying raw object " + raw + " does not support property: " + propertyName);
+		}
+	}
 
 	var descriptor = {
 		enumerable: true
@@ -210,6 +228,24 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
 	}
 
 	return descriptor;
+};
+
+SecureObject.addIfSupported = function(behavior, st, element, name, options) {
+	options = options || {};
+	options.ignoreNonexisting = true;
+	
+	var prop = behavior(st, element, name, options);
+	if (prop) {
+		Object.defineProperty(st, name, prop);
+	}
+};
+
+SecureObject.addPropertyIfSupported = function(st, raw, name, options) {
+	SecureObject.addIfSupported(SecureObject.createFilteredProperty, st, raw, name, options);
+};
+
+SecureObject.addMethodIfSupported = function(st, raw, name, options) {
+	SecureObject.addIfSupported(SecureObject.createFilteredMethod, st, raw, name, options);
 };
 
 SecureObject.FunctionPrototypeBind = Function.prototype.bind;

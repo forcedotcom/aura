@@ -43,7 +43,7 @@ function SecureAura(AuraInstance, key) {
         "createComponent": SecureObject.createFilteredMethod(o, AuraInstance, "createComponent"),
         "createComponents": SecureObject.createFilteredMethod(o, AuraInstance, "createComponents"),
         "enqueueAction": SecureObject.createFilteredMethod(o, AuraInstance, "enqueueAction"),
-        "errorReport": SecureObject.createFilteredMethod(o, AuraInstance, "errorReport"),
+        "error": SecureObject.createFilteredMethod(o, AuraInstance, "error"),
         "get": SecureObject.createFilteredMethod(o, AuraInstance, "get"),
         "getCallback": SecureObject.createFilteredMethod(o, AuraInstance, "getCallback"),
         "getComponent": SecureObject.createFilteredMethod(o, AuraInstance, "getComponent"),
@@ -51,6 +51,7 @@ function SecureAura(AuraInstance, key) {
         "log": SecureObject.createFilteredMethod(o, AuraInstance, "log"),
         "warning": SecureObject.createFilteredMethod(o, AuraInstance, "warning")
     });
+    
     ["isEmpty", "hasClass", "addClass", "removeClass", "toggleClass"].forEach(function(name) {
         Object.defineProperty(su, name, SecureObject.createFilteredMethod(su, AuraInstance["util"], name));
     });

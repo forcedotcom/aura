@@ -84,7 +84,7 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 
 	// Has to happen last because it depends on the secure getters defined above that require the object to be keyed
 	globalAttributeWhitelist.forEach(function(name) {
-		if (!o[name]) {
+		if (!o[name] && name !== "Object") {
 			// These are direct passthrough's and should never be wrapped in a SecureObject
 			Object.defineProperty(o, name, {
 				enumerable: true,

@@ -235,12 +235,14 @@ CryptoAdapter.prototype.initialize = function() {
                 function() {
                     // decryption failed so flush the store. do not re-throw since we've recovered
                     that.log(CryptoAdapter.LOG_LEVEL.INFO, "initialize(): encryption key is different so clearing storage");
+                    $A.metricsService.transaction("aura", "initializeCryptoStorage");
                     return that.adapter.clear();
                 }
             );
         },
         function(e) {
             that.log(CryptoAdapter.LOG_LEVEL.WARNING, "initialize(): falling back to memory storage", e);
+            $A.metricsService.transaction("aura", "memoryCryptoStorage");
             that.mode = Aura.Storage.MemoryAdapter.NAME; // "memory";
             that.adapter = new Aura.Storage.MemoryAdapter(that.config);
             // do not throw an error so the promise moves to resolve state

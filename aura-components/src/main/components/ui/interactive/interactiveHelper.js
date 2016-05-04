@@ -108,7 +108,7 @@
      * - no need to track event->handler function mappings for later removal
      */
     domEventHandler : function (event) {
-        var element = event.target;
+        var element = event.currentTarget || event.target;
         var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
 
         // cmp might be destroyed, just ignore this event.

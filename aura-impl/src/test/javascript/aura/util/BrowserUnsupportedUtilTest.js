@@ -61,7 +61,8 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                     Bitset:{},
                     NumberFormat:{},
                     SizeEstimator:function() {},
-                    SecureFilters:{}
+                    SecureFilters:{},
+                    Mutex:function() {}
                 }},
                 navigator:{userAgent:''},
                 Array: override === MockArray ? override : Array,

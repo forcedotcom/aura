@@ -92,7 +92,7 @@ public class AppJsTest extends UnitTestCase {
         // And this is the expected call. This must stay.
         //
         Mockito.verify(servletUtilAdapter, Mockito.times(1)).handleServletException(Mockito.eq(t),
-                Mockito.anyBoolean(), Mockito.any(AuraContext.class), Mockito.any(HttpServletRequest.class),
+                Mockito.eq(false), Mockito.any(AuraContext.class), Mockito.any(HttpServletRequest.class),
                 Mockito.any(HttpServletResponse.class), Mockito.anyBoolean());
 
         //

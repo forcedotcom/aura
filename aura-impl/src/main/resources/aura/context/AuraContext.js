@@ -30,8 +30,13 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     if (this.loaded === undefined) {
         this.loaded = {};
     }
+
+    // make a shallow-copy to use when the context is reset
+    this.loadedOriginal = $A.util.apply({}, this.loaded);
+
     this.fwuid = config["fwuid"];
     this.num = 0;
+
     // To keep track of re-rendering service call
     this.renderNum = 0;
     this.transaction = 0;
@@ -45,7 +50,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.allowedGlobals = config["allowedGlobals"];
     this.globals = config["globals"];
     this.enableAccessChecks=true;
-    this.isLockerServiceEnabled=false;
+    this.isLockerServiceEnabled=this["isLockerServiceEnabled"]=false;
 
     // JBUCH: TOGGLE LOGGING OFF BY DEFAULT IN PROD MODE
     this.logAccessFailures= true
@@ -95,6 +100,16 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
             }
         });
 };
+
+/**
+ * Unique id for the current instance of Aura. In a multi-tab scenario
+ * each tab will have a unique id.
+ */
+Aura.Context.AuraContext.CLIENT_SESSION_ID = [
+    window.pageStartTime, // first byte sent
+    Math.round(Aura.time() * 1000000), // current time (microseconds)
+    Math.random().toString(16).substr(2)
+].join('').substring(0, 32);
 
 /**
  * Temporary shim, until W-2812858 is addressed to serialize GVPs as a map and fix $A GVPs.
@@ -268,9 +283,10 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
         throw new $A.auraError("framework mismatch", null, $A.severity.QUIET);
     }
 
-    this.enableAccessChecks=otherContext["enableAccessChecks"];
+    // JBUCH: CRUC DISABLED IN 204 FOR INTERNAL TEAMS
+    //this.enableAccessChecks=otherContext["enableAccessChecks"];
 
-    this["isLockerServiceEnabled"] = otherContext["lockerEnabled"];
+    this.isLockerServiceEnabled = this["isLockerServiceEnabled"] = otherContext["lockerEnabled"];
 
     this.globalValueProviders.merge(otherContext["globalValueProviders"]);
     $A.localizationService.init();
@@ -582,6 +598,13 @@ Aura.Context.AuraContext.prototype.findLoaded = function(descriptor) {
  */
 Aura.Context.AuraContext.prototype.getLoaded = function() {
     return this.loaded;
+};
+
+/**
+ * Reset the loaded set to its original value at launch.
+ */
+Aura.Context.AuraContext.prototype.resetLoaded = function() {
+    this.loaded = $A.util.apply({}, this.loadedOriginal);
 };
 
 /**

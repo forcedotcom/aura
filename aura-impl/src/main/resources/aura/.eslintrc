@@ -100,6 +100,7 @@
     "SecureComponentRef": true,
     "SecureComponent": true,
     "SecureNavigator": true,
+    "SecureXMLHttpRequest": true,
     "SecureWindow": true,
     "SecureDocument": true,
     "SecureElement": true,
@@ -107,7 +108,8 @@
     "SecureIFrameElement": true,
     "SecureAction": true,
     "SecureDOMEvent": true,
-    "SecureAuraEvent": true
+    "SecureAuraEvent": true,
+    "DOMPurify": true
   },
 
   "rules": {

@@ -20,10 +20,11 @@ Test.Aura.Util.UtilTest = function() {
     var Aura = {Utils:{
         Json:function() {},
         Style:function() {},
-        SizeEstimator: function () {},
+        SizeEstimator: function() {},
         Bitset:{},
         NumberFormat:{},
-        SecureFilters:{}
+        SecureFilters:{},
+        Mutex: function() {}
     }};
     var auraMock = function(delegate) {
         Mocks.GetMocks(Object.Global(), {
@@ -32,11 +33,17 @@ Test.Aura.Util.UtilTest = function() {
             document:{createDocumentFragment:function() {}},
             Json:function() {},
             Style:function() {},
-            SizeEstimator: function () {},
+            SizeEstimator: function() {},
             Bitset:{},
             NumberFormat:{},
             Aura: Aura,
-            $A:{ns:{},assert:Stubs.GetMethod(function(condition,message){if(!condition)throw message;})},
+            $A:{
+                ns:{},
+                assert:Stubs.GetMethod(function(condition,message){if(!condition)throw message;}),
+                util:{
+                    isString: function(arg) { return (typeof arg === 'string' || arg instanceof String); }
+                }
+           },
             navigator:{userAgent:''}
          })(function(){
             [Import("aura-impl/src/main/resources/aura/util/Util.js")]
@@ -399,7 +406,7 @@ Test.Aura.Util.UtilTest = function() {
     function format(){
         [Fact]
         function ThrowsIfFormatStringIsNotConvertibleToString(){
-            var expected="$A.util.format(): 'formatString' must be convertible to String.";
+            var expected="$A.util.format(): 'formatString' must be a String.";
 
             var actual=Record.Exception(function(){
                 auraMock(function(){
@@ -890,13 +897,13 @@ Test.Aura.Util.UtilTest = function() {
 
             Assert.False(actual);
         }
-        
+
         [Fact]
         function RetrunsFalseForFunction() {
             var array = function(){};
-            
+
             var actual = targetUtil.isArray(array);
-            
+
             Assert.False(actual);
         }
     }
@@ -947,7 +954,7 @@ Test.Aura.Util.UtilTest = function() {
 
             Assert.False(actual);
         }
-        
+
         [Fact]
         function ReturnsTrueForArrayLikeObject() {
             var object = arguments;
@@ -956,7 +963,7 @@ Test.Aura.Util.UtilTest = function() {
 
             Assert.True(actual);
         }
-        
+
         [Fact]
         function ReturnsFalseForFunction() {
             var object = function(){};
@@ -965,7 +972,7 @@ Test.Aura.Util.UtilTest = function() {
 
             Assert.False(actual);
         }
-        
+
         [Fact]
         function ReturnsTrueForCustomObject() {
             var object = targetUtil;
@@ -1040,7 +1047,7 @@ Test.Aura.Util.UtilTest = function() {
 
             Assert.False(actual);
         }
-        
+
         [Fact]
         function ReturnsFalseForCustomObject() {
             var object = targetUtil;

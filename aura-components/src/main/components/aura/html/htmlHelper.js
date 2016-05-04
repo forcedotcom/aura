@@ -271,7 +271,7 @@
 			
 			/*eslint-disable no-script-url*/
 			var hrefTarget = this.href;
-			if (hrefTarget && hrefTarget.toLowerCase().indexOf("javascript:") === 0) {
+			if (hrefTarget && /javascript:\s*void\(/.test(hrefTarget.toLowerCase())) {
 				event.preventDefault();
 			}
 		}

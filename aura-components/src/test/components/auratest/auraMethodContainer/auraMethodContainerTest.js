@@ -51,12 +51,12 @@
     //Test pass two parameters to a function that only expect one
     //We throw warnings.
     testHasAttrWithExtraPassInParameter:{
+    	failOnWarning: true,
         test:[ 
             function(cmp){
             	$A.test.expectAuraWarning("'argument_1'('second pass in string') is not a valid parameter. Valid parameters are 'name', 'arguments'");
             	var cmpME = cmp.find("auraMethod");
             	cmpME.hasAttr("pass in string","second pass in string");
-            	var res = cmpME.get("v.outputStringAttr");
             	$A.test.addWaitForWithFailureMessage("pass in string, return from hasAttr",
             			function() { return cmpME.get("v.outputStringAttr"); },
             			"fail to change outputStringAttr"

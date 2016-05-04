@@ -4,6 +4,9 @@
      * verification to the controller and helper files, which operate in user mode.
      */
 
+    // LockerService not supported on older IE
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+
     // TODO(tbliss): make these lists on SecureElement accessible here for maintainablility
     ElementPropertiesWhitelist: ['childElementCount', 'classList', 'className', 'id', 'tagName', 'innerHTML'],
     ElementProperitesBlacklist: ['attributes', 'firstElementChild', 'lastElementChild', 'namespaceURI',
@@ -12,9 +15,10 @@
     HTMLPropertiesWhitelist: ['accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable',
                               'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang', 'spellcheck',
                               'style', 'tabIndex', 'title'],
-    HTMLPropertiesBlacklist: ['offsetParent'],
+    
+    HTMLPropertiesBlacklist: [],
 
-    OtherPropertiesWhitelist: ["childNodes", "children", "ownerDocument", "parentNode"],
+    OtherPropertiesWhitelist: ["childNodes", "children", "ownerDocument", "parentNode", "offsetParent"],
 
     MethodsWhitelist: ["appendChild", "addEventListener", "removeEventListener", "dispatchEvent",
                        "getAttribute", "setAttribute", "blur", "click", "focus"],
@@ -51,4 +55,10 @@
             cmp.testExposedMethods(this.MethodsWhitelist);
         }
     },
+    
+    testFramesBlocked: {
+        test: function(cmp) {
+            cmp.testFramesBlocked();
+        }
+    }
 })

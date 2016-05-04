@@ -17,6 +17,133 @@
 
 var getLockerSecret, setLockerSecret;
 
+// DCHASMAN TODO Revert this after we clear issues with CKEditor and unsafe inline from W-3028925
+function lazyInitInlinedSafeEvalWorkaround() {
+	if (!window['$$safe-eval$$']) {
+	  (function (window, placeholder, parent) {
+	      'use strict';
+
+	      // TODO: improve returnable detection. `function (...` is a trick used today
+	      //       to return arbitrary code from actions, it should be legacy in the future.
+	      var returnableEx = /^(\s*)([{(\["']|function\s*\()/;
+	      // TODO: improve first comment removal
+	      var trimFirstMultilineCommentEx = /^\/\*([\s\S]*?)\*\//;
+	      var trimFirstLineCommentEx = /^\/\/.*\n?/;
+	      var hookFn = '$globalEvalIIFE$';
+
+	      // wrapping the source with `with` statements create a new lexical scope,
+	      // that can prevent access to the globals in the worker by shodowing them
+	      // with the members of new scopes passed as arguments into the `hookFn` call.
+	      // additionally, when specified, strict mode will be enforced to avoid leaking
+	      // global variables into the worker.
+	      function addLexicalScopesToSource(src, options) {
+	          // removing first line CSFR protection and other comments to facilitate
+	          // the detection of returnable code
+	          src = src.replace(trimFirstMultilineCommentEx, '');
+	          src = src.replace(trimFirstLineCommentEx, '');
+	          // only add return statement if source it starts with [, {, or (
+	          var match = src.match(returnableEx);
+	          if (match) {
+	        	  src = src.replace(match[1], 'return ');
+	          }
+	          if (options.useStrict) {
+	              // forcing strict mode
+	              src = 'return (function(){\n"use strict";\n' + src + '\n})()';
+	          } else {
+	              // forcing the value of `this` for non-strict code to prevent leaking
+	              // the safeEval.html's window reference
+	              src = 'return (function(){\n' + src + '\n}).call(arguments[0])';
+	          }          
+	          for (var i = 0; i < options.levels; i++) {
+	              src = 'with(arguments[' + i + ']||{}){' + src + '}';
+	          }
+	          var code = 'function ' + hookFn + '(){' + src + '}';
+	          if (options.sourceURL) {
+	              code += '\n//# sourceURL=' + options.sourceURL;
+	          }
+	          return code;
+	      }
+
+	      function evalAndReturn(src) {
+	          var script = document.createElement('script');
+	          script.type = 'text/javascript';
+	          window[hookFn] = undefined;
+	          script.appendChild(document.createTextNode(src));
+	          placeholder.appendChild(script);
+	          placeholder.removeChild(script);
+	          var result = window[hookFn];
+	          window[hookFn] = undefined;
+	          return result;
+	      }
+
+	      // adding non-configurable hooks into parent window.
+	      Object.defineProperties(parent, {
+	          '$$safe-eval$$': {
+	              value: function(src, optionalSourceURL) {
+	                  if (!src) {
+	                	  return undefined;
+	                  }
+	                  var args = Array.prototype.slice.call(arguments, 1);
+	                  optionalSourceURL = typeof optionalSourceURL === "string" ? args.shift() : undefined;
+	                  var fn = evalAndReturn(addLexicalScopesToSource(src, {
+	                      levels: args.length,
+	                      useStrict: true,
+	                      sourceURL: optionalSourceURL
+	                  }));
+	                  return fn.apply(undefined, args);
+	              }
+	          }
+	      });
+
+	      // locking down the environment
+	      try {
+	          // @W-2961201: fixing properties of Object to comply with strict mode
+	          // and ES2016 semantics, we do this by redefining them while in 'use strict'
+	          // https://tc39.github.io/ecma262/#sec-object.prototype.__defineGetter__
+	          [Object, parent.Object].forEach(function (o) {
+	              o.defineProperty(o.prototype, '__defineGetter__', {
+	                  value: function (key, fn) {
+	                      return o.defineProperty(this, key, {
+	                          get: fn
+	                      });
+	                  }
+	              });
+	              o.defineProperty(o.prototype, '__defineSetter__', {
+	                  value: function (key, fn) {
+	                      return o.defineProperty(this, key, {
+	                          set: fn
+	                      });
+	                  }
+	              });
+	              o.defineProperty(o.prototype, '__lookupGetter__', {
+	                  value: function (key) {
+	                      var d, p = this;
+	                      while (p && (d = o.getOwnPropertyDescriptor(p, key)) === undefined) {
+	                          p = o.getPrototypeOf(this);
+	                      }
+	                      return d ? d.get : undefined;
+	                  }
+	              });
+	              o.defineProperty(o.prototype, '__lookupSetter__', {
+	                  value: function (key) {
+	                      var d, p = this;
+	                      while (p && (d = o.getOwnPropertyDescriptor(p, key)) === undefined) {
+	                          p = o.getPrototypeOf(this);
+	                      }
+	                      return d ? d.set : undefined;
+	                  }
+	              });
+	              // Immutable Prototype Exotic Objects
+	              // https://github.com/tc39/ecma262/issues/272
+	              o.seal(o.prototype);
+	          });
+	      } catch (ignore) {
+	    	  // Ignored
+	      }
+	  })(window, document.body, window);
+	}
+}
+
 function LockerService() {
 	"use strict";
 
@@ -38,7 +165,7 @@ function LockerService() {
 	    "SetIteratorPrototype",
 	    "GeneratorFunction",
 	    "TypedArray",
-	
+
 	    // Intrinsics
 	    // -> from ES5
 	    "Function",
@@ -88,7 +215,7 @@ function LockerService() {
 	    "Float32Array",
 	    "Float64Array",
 	    "DataView",
-	    
+
 	    // Misc
 	    "alert",
 	    "clearInterval",
@@ -145,13 +272,15 @@ function LockerService() {
 	// defining LockerService as a service
 	var service = {
 		createForDef : function(code, def) {
-			var namespace = def.getDescriptor().getNamespace();
+			var descriptor = def.getDescriptor();
+			var namespace = descriptor.getNamespace();
+			var name = descriptor.getName();
+			var descriptorDebuggableURL = "components/" + namespace + "/" + name + ".js";
 			var key = $A.lockerService.util.getKeyForNamespace(namespace);
 
 			// Key this def so we can transfer the key to component instances
 			$A.lockerService.util.applyKey(def, key);
-
-			return this.create(code, key);
+			return this.create(code, key, descriptorDebuggableURL);
 		},
 
 		getEnv : function(key, doNotCreate) {
@@ -168,10 +297,12 @@ function LockerService() {
 			return key && key !== masterKey ? this.getEnv(key, doNotCreate) : undefined;
 		},
 
-		create : function(code, key) {
+		create : function(code, key, optionalSourceURL) {
 			var envRec = this.getEnv(key);
 			var locker;
 			if (!lockerShadows) {
+				lazyInitInlinedSafeEvalWorkaround();
+
 				// one time operation to lazily create this giant object with
 				// the value of `undefined` to shadow every global binding in
 				// `window`, except for those with no authority defined in the
@@ -186,10 +317,10 @@ function LockerService() {
 					}
 				});
 			}
-			try {
+			try {				
 				locker = {
 					"$envRec": envRec,
-					"$result": window['$$safe-eval$$'](code, envRec, lockerShadows)
+					"$result": window['$$safe-eval$$'](code, optionalSourceURL, envRec, lockerShadows)
 				};
 			} catch (x) {
 				throw new Error("Unable to create locker IIFE: " + x);
@@ -255,6 +386,14 @@ function LockerService() {
 			}
 		},
 
+		markOpaque : function(st) {
+			setLockerSecret(st, "opaque", true);
+		},
+
+		isOpaque : function(st) {
+			return getLockerSecret(st, "opaque") === true;
+		},
+
 		showLockedNodes : function showLockedNodes(root) {
 			if (!root) {
 				root = document;
@@ -298,8 +437,8 @@ function LockerService() {
 				return (fromKey === masterKey) || (fromKey === toKey);
 			},
 
-			verifyAccess : function(from, to) {
-				if (!$A.lockerService.util.hasAccess(from, to)) {
+			verifyAccess : function(from, to, options) {
+				if (!$A.lockerService.util.hasAccess(from, to) || (options && options.verifyNotOpaque && $A.lockerService.isOpaque(to))) {
 					var fromKey = getLockerSecret(from, "key");
 					var toKey = getLockerSecret(to, "key");
 
@@ -322,10 +461,6 @@ function LockerService() {
 
 	service["createForDef"] = service.createForDef;
 	service["getEnvForSecureObject"] = service.getEnvForSecureObject;
-	
-	// DCHASMAN TODO Remove this once we get 202 synced up to using SecureObject name instead of SecureThing
-	service["getEnvForSecureThing"] = service.getEnvForSecureObject;
-	
 	service["trust"] = service.trust;
 	service["showLockedNodes"] = service.showLockedNodes;
 

@@ -66,6 +66,9 @@ function AuraInspectorComponentTree(devtoolsPanel) {
         devtoolsPanel.subscribe("AuraInspector:ShowComponentInTree", function(id) {
             if(treeComponent.isRendered()) {
                 treeComponent.selectById(id);
+
+                devtoolsPanel.updateComponentView(id);
+                devtoolsPanel.showSidebar();
             } else {
                 selectedNodeId = id;
             }
@@ -100,6 +103,11 @@ function AuraInspectorComponentTree(devtoolsPanel) {
                 treeComponent.addChild(treeNode);
                 treeComponent.render({ "collapsable" : true, "selectedNodeId": selectedNodeId });
                 isDirty = false;
+
+                if(selectedNodeId) {
+                    devtoolsPanel.updateComponentView(id);
+                    devtoolsPanel.showSidebar();
+                }
 
                 devtoolsPanel.hideLoading();
             });

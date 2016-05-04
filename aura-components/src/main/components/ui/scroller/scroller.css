@@ -20,6 +20,10 @@
     /* TODO: height property may need to live outside, here does not makes much sense ?*/
     width: 100%;
     height : 100%;
+
+    /* workaround for safari bug where scrollbars are obscured by contents 
+     when context are in a new stacking context */
+    transform: translateZ(0);
 }
 .THIS > * {
     box-sizing: border-box;

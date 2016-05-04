@@ -32,6 +32,18 @@ function SecureDocument(doc, key) {
         return SecureElement(el, key);
     }
 
+    function createElement(tag, namespace) {
+    	// Insure that no object to string coercion tricks can be applied to evade tag name based logic
+        tag = tag + "";
+        switch (tag.toLowerCase()) {
+            case "script":
+                return SecureScriptElement(key);
+
+            default:
+                return trust(o, doc.createElementNS(namespace, tag));
+        }
+    }
+
     var o = Object.create(null, {
         toString: {
             value: function() {
@@ -40,15 +52,12 @@ function SecureDocument(doc, key) {
         },
         createElement: {
             value: function(tag) {
-                // Insure that no object to string coercion tricks can be applied to evade tag name based logic
-                tag = tag + "";
-                switch (tag.toLowerCase()) {
-                    case "script":
-                        return SecureScriptElement(key);
-
-                    default:
-                        return trust(o, doc.createElement(tag));
-                }
+                return createElement(tag, "http://www.w3.org/1999/xhtml");
+            }
+        },
+        createElementNS: {
+            value: function(namespace, tag) {
+                return createElement(tag, namespace);
             }
         },
         createDocumentFragment: {
@@ -74,9 +83,10 @@ function SecureDocument(doc, key) {
         }
     });
 
-    Object.defineProperties(o, {
-        addEventListener: SecureElement.createAddEventListenerDescriptor(o, doc, key),
+	SecureElement.addSecureGlobalEventHandlers(o, doc, key);
+	SecureElement.addEventTargetMethods(o, doc, key);
 
+    Object.defineProperties(o, {
         body: SecureObject.createFilteredProperty(o, doc, "body"),
         head: SecureObject.createFilteredProperty(o, doc, "head"),
 
@@ -94,8 +104,9 @@ function SecureDocument(doc, key) {
 
         title: SecureObject.createFilteredProperty(o, doc, "title"),
 
-        // DCHASMAN TODO W-2839646 Figure out how much we want to filter cookie access???
-        cookie: SecureObject.createFilteredProperty(o, doc, "cookie")
+        cookie: SecureObject.createFilteredProperty(o, doc, "cookie", {
+            writable: false
+        })
     });
 
     setLockerSecret(o, "key", key);

@@ -160,8 +160,11 @@ public class Manifest extends AuraResourceImpl {
             }
 
             // Add locker service safe eval worker url
-            sw.write(configAdapter.getLockerWorkerURL());
-            sw.write('\n');
+            String lockerWorkerURL = configAdapter.getLockerWorkerURL();
+            if (lockerWorkerURL != null) {
+				sw.write(lockerWorkerURL);
+	            sw.write('\n');
+            }
 
             // Add in any application specific resources
             if (descr != null && descr.getDefType().equals(DefType.APPLICATION)) {

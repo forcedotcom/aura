@@ -16,6 +16,22 @@
 
 function SecureIFrameElement(el, key) {
     "use strict";
+    
+    function SecureIFrameContentWindow(w) {
+    	var sicw = Object.create(null, {
+            toString: {
+                value: function() {
+                    return "SecureIFrameContentWindow: " + w + "{ key: " + JSON.stringify(key) + " }";
+                }
+            }
+        });
+    	
+    	Object.defineProperties(sicw, {
+            postMessage: SecureObject.createFilteredMethod(sicw, w, "postMessage")
+    	});
+    	
+    	return sicw;
+    }
 
     var o = Object.create(null, {
         toString: {
@@ -26,19 +42,23 @@ function SecureIFrameElement(el, key) {
     });
     
     Object.defineProperties(o, {
-        // Standard list of iframe's properties from:
-        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
-        // Note: ignoring 'contentDocument', 'contentWindow', 'sandbox' and 'srcdoc' from the list above.
-        height: SecureObject.createFilteredProperty(o, el, "height"),
-        width: SecureObject.createFilteredProperty(o, el, "width"),
-        name: SecureObject.createFilteredProperty(o, el, "name"),
-        src: SecureObject.createFilteredProperty(o, el, "src"),
-
         // Standard HTMLElement methods
         // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
         blur: SecureObject.createFilteredMethod(o, el, "blur"),
-        focus: SecureObject.createFilteredMethod(o, el, "focus")
+        focus: SecureObject.createFilteredMethod(o, el, "focus"),
+        contentWindow: {
+        	get: function() {
+        		return SecureIFrameContentWindow(el.contentWindow);
+        	}
+        }
     });
+    
+    // Standard list of iframe's properties from:
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
+    // Note: ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
+    ["height", "width", "name", "src"].forEach(function (name) {
+		Object.defineProperty(o, name, SecureObject.createFilteredProperty(o, el, name));
+	});
     
     // applying standard secure element properties
     SecureElement.addSecureProperties(o, el);

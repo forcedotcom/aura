@@ -1032,7 +1032,9 @@ Action.prototype.isExclusive = function() {
  * @public
  * @param {Object}
  *            config Optional. A set of key/value pairs that specify the storage options to set. You can set the
- *            following options: <code>ignoreExisting</code> and <code>refresh</code>.
+ *            following option:
+ *            <code>ignoreExisting</code>: Set to <code>true</code> to refresh the stored item with a newly retrieved value,
+ *              regardless of whether the item has expired or not. The default value is <code>false</code>.
  * @platform
  * @export
  */

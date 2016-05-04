@@ -4,16 +4,25 @@
      * verification to the controller and helper files, which operate in user mode.
      */
 
+    // LockerService not supported on older IE
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+
     setUp: function(cmp) {
         cmp.set("v.testUtils", $A.test);
     },
 
-    testCannotAccessDocumentBodyFromHelper: {
+    testCanAccessDocumentBodyFromHelper: {
         test: function(cmp) {
-            cmp.helper.testCannotAccessDocumentBodyFromHelper($A.test);
+            cmp.helper.testCanAccessDocumentBodyFromHelper($A.test);
         }
     },
 
+    testCanAccessDocumentHeadFromHelper: {
+        test: function(cmp) {
+            cmp.helper.testCanAccessDocumentHeadFromHelper($A.test);
+        }
+    },
+    
     testAlertExposed: {
         test: function(cmp) {
             cmp.testAlertExposed();

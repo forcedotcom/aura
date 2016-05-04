@@ -35,8 +35,13 @@
     reset: function (cmp) {
         this.initialize(cmp);
     },
-    verifyInterfaces: function () {
+    verifyInterfaces: function (cmp) {
         // TODO
+        
+        // Verify rowHeaders attributes
+        if (cmp.get("v.useRowHeaders") && (cmp.get("v.rowHeaderIndex") < 0)) {
+        	cmp.set("v.rowHeaderIndex", 0);
+        }
     },
     initializeDataModel: function(cmp) {
         var dataModel = cmp.get("v.dataModel")[0];
@@ -74,7 +79,7 @@
         }
 
         cmp._ptv = ptv;
-        cmp._rowTemplate = this._initializeRowTemplate(templates, cmp.get("v.useRowHeaders"));
+        cmp._rowTemplate = this._initializeRowTemplate(templates, cmp.get("v.rowHeaderIndex"));
         ptv.ignoreChanges = true;
         ptv.dirty = false;
 
@@ -117,21 +122,18 @@
         var concreteCmp = cmp.getConcreteComponent();
         concreteCmp.set('v._dirty', ++cmp._dirtyFlag);
     },
-    _initializeRowTemplate: function (templates, useRowHeader) {
+    _initializeRowTemplate: function (templates, rowHeaderIndex) {
         var row = document.createElement(this.DEFAULT_TEMPLATES.row),
         	startIndex = 0,
         	column;
         
-        // Make the first column a header column
-        if (useRowHeader) {
-        	column = this._createColumn(this.DEFAULT_TEMPLATES.header, templates[0]);
-        	column.setAttribute("scope", "row");
-        	row.appendChild(column);
-        	startIndex = 1;
-        }
-        
         for (var i = startIndex; i < templates.length; i++) {
-        	column = this._createColumn(this.DEFAULT_TEMPLATES.column, templates[i]);
+        	if (i === rowHeaderIndex) {
+        		column = this._createColumn(this.DEFAULT_TEMPLATES.header, templates[i]);
+        		column.setAttribute("scope", "row");
+        	} else {
+        		column = this._createColumn(this.DEFAULT_TEMPLATES.column, templates[i]);
+        	}
             row.appendChild(column);
         }
         return row;
@@ -246,7 +248,7 @@
                 	delete actionHandlerScope.targetCmp.getElement;
                 }
             }
-            
+
             if (ptv.dirty) {
                 this._rerenderDirtyElement(cmp, item, target);
             }

@@ -501,9 +501,9 @@ public class MenuUITest extends WebDriverTestCase {
     private void waitForMenuPositionedCorrectly(final String trigger, final String menuList, String failureMessage) {
         getAuraUITestingUtil().waitUntilWithCallback(
             check -> {
-                double triggerLeftPos = Double.valueOf(getAuraUITestingUtil().getBoundingRectPropOfElement(trigger, "left"));
-                double menuListLeftPos = Double.valueOf(getAuraUITestingUtil().getBoundingRectPropOfElement(menuList, "left"));
-                return Math.floor(triggerLeftPos) == Math.floor(menuListLeftPos);
+                String triggerLeftPos = getAuraUITestingUtil().getBoundingRectPropOfElement(trigger, "left");
+                String menuListLeftPos = getAuraUITestingUtil().getBoundingRectPropOfElement(menuList, "left");
+                return triggerLeftPos.equals(menuListLeftPos);
             }, check -> {
                 String triggerLeftPos = getAuraUITestingUtil().getBoundingRectPropOfElement(trigger, "left");
                 String menuListLeftPos = getAuraUITestingUtil().getBoundingRectPropOfElement(menuList, "left");

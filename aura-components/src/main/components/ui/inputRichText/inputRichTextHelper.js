@@ -45,9 +45,7 @@
                 //use a flag here prevent the component rerender every time the value is changed
                 //It is also used to prevent the editor content getting set again in the value change handler
                 //change event still fires even if "ignoreChange"(third argument) is set to true if v.value is an expression
-                cmp._updatingValue = true;
                 cmp.set('v.value', content);
-                cmp._updatingValue = false;
             }
         }
     },
@@ -156,6 +154,12 @@
     setContent : function(cmp, content) {
         var editorInstance = this.getEditorInstance(cmp);
         if (editorInstance) {
+            //This code stops a cycle of setting the value and updating the content in a change handler
+            //The regex normallizes the value to what is being set in the value for in the inputTextArea
+            //which is extended
+            if (content === this.getContent(cmp).replace(/(\r\n)|\n/g,'\r\n')) {
+                return;
+            }
             /* W-2905193
                Setting the content before completion of the previous setContent causes a "Permission Denied" error
                in IE11. So we collect content in an array while other calls to setData are pending. Then we unwind
@@ -253,8 +257,6 @@
 
         if (target && source) {
             for (property in source) {
-                $A.logger.info('aura.flexipage.cke.debug : ui:inputRichTextHelepr.merge : ' + 
-                     ' merging property "' + property + '" to target');
                 target[property] = source[property];
             }
         }

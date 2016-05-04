@@ -122,7 +122,7 @@ Aura.Services.AuraClientService$AuraActionCollector = function AuraActionCollect
  *  * Once we have finished processing all actions, check for actions to be put in an XHR.
  *    + All foreground actions go in a single XHR, and are de-duped on send.
  *    + background actions are sent one per XHR, with a de-dupe step during the queue walk.
- *    + deferred actions are sent if we are idle, with a de-dupe step durning the queue walk.
+ *    + deferred actions are sent if we are idle, with a de-dupe step during the queue walk.
  *
  * Queues:
  *  * actionsQueued - queue of actions that have yet to be processed.
@@ -191,6 +191,9 @@ AuraClientService = function AuraClientService () {
     }
 
     this._disconnected = undefined;
+
+    // queue of functions to run when no XHRs in flight
+    this.xhrIdleQueue = [];
 
     //
     // Run client actions synchronously. This is the previous behaviour.
@@ -626,13 +629,17 @@ AuraClientService.prototype.getAvailableXHR = function(isBackground) {
 };
 
 /**
- * Releas an xhr back in to the pool.
+ * Release an xhr back in to the pool.
  *
  * @export
  */
 AuraClientService.prototype.releaseXHR = function(auraXHR) {
     auraXHR.reset();
     this.availableXHRs.push(auraXHR);
+
+    if (this.inFlightXHRs() === 0) {
+        this.processXHRIdleQueue();
+    }
 };
 
 
@@ -703,36 +710,12 @@ AuraClientService.prototype.isDevMode = function() {
 };
 
 /**
- * the code to 
+ * the code to
  * @private
  */
 AuraClientService.prototype.actualDumpCachesAndReload = function() {
-    // concurrently empty actions + cmp def storage.
-    // when both complete (and even if they fail) reload.
-
-    var actionClear;
-    var actionStorage = Action.getStorage();
-    if (actionStorage && actionStorage.isPersistent()) {
-        actionClear = actionStorage.clear().then(
-            undefined, // noop on success
-            function(e) {
-                $A.log("AuraClientService.dumpCachesAndReload(): failed to clear persistent actions cache", e);
-                // do not rethrow to return to resolve state
-            }
-        );
-    } else {
-        actionClear = Promise["resolve"]();
-    }
-
-    var defClear = $A.componentService.clearDefsFromStorage().then(
-        undefined, // noop on success
-        function(e) {
-            $A.log("AuraClientService.dumpCachesAndReload(): failed to clear persistent component def storage", e);
-            // do not rethrow to return to resolve state
-        }
-    );
-
-    Promise.all([actionClear, defClear]).then(
+    // reload after clearing the persistent caches
+    $A.componentService.clearDefsFromStorage({"cause": "appcache"}).then(
         function() {
             window.location.reload(true);
         }
@@ -844,6 +827,8 @@ AuraClientService.prototype.handleAppCache = function() {
         }
         if (acs.isOutdated) {
             window.location.reload(true);
+        } else {
+            acs.appCacheNoUpdate = true;
         }
     }
 
@@ -1060,6 +1045,43 @@ AuraClientService.prototype.inFlightXHRs = function(excludeBackground) {
 AuraClientService.prototype.idle = function() {
     return (this.actionsQueued.length === 0 && this.actionsDeferred.length === 0
         && this.availableXHRs.length === this.allXHRs.length);
+};
+
+/**
+ * Enqueues a function to run when no XHRs are in-flight.
+ * @param {Function} f the function to execute.
+ */
+AuraClientService.prototype.runWhenXHRIdle = function(f) {
+    // something in flight so enqueue
+    this.xhrIdleQueue.push(f);
+
+    if (this.inFlightXHRs() === 0) {
+        this.processXHRIdleQueue();
+        return;
+    }
+};
+
+/**
+ * Executes the queue of functions to run when no XHRs are in-flight.
+ */
+AuraClientService.prototype.processXHRIdleQueue = function() {
+    $A.assert(this.inFlightXHRs() === 0, "Idle queue should only be processed when no XHRs are in flight");
+
+    // optimization
+    if (this.xhrIdleQueue.length === 0) {
+        return;
+    }
+
+    // process the queue
+    var queue = this.xhrIdleQueue;
+    this.xhrIdleQueue = [];
+    for (var i = 0 ; i < queue.length; i++) {
+        try {
+            queue[i]();
+        } catch (e) {
+            $A.log("AuraClientService.processXHRIdleQueue: error thrown by enqueued function", e);
+        }
+    }
 };
 
 /**
@@ -1425,7 +1447,7 @@ AuraClientService.prototype.continueProcessing = function() {
         action = actionList[i];
         try {
             if (action.abortIfComponentInvalid(true)) {
-                // action alrealy aborted.
+                // action already aborted.
                 // this will only occur if the component is no longer valid.
                 continue;
             }
@@ -1702,7 +1724,7 @@ AuraClientService.prototype.sendActionXHRs = function() {
     if (background.length) {
         this.sendAsSingle(background, background.length);
     }
-    
+
     if (deferred.length) {
         if (this.idle()) {
             this.sendAsSingle(deferred, 1);

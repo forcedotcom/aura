@@ -4,7 +4,8 @@
         "fastclick/fastclick.js",
         "moment/moment.js",
         "walltime-js/walltime.js",
-        "text-encoder/encoding.js"
+        "text-encoder/encoding.js",
+        "domPurify/purify.js"
     ],
     "walltimeLocaleDir": "walltime-js/olson"
 }

@@ -42,7 +42,9 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.http.CSP;
 import org.auraframework.instance.InstanceStack;
-import org.auraframework.service.*;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -342,7 +344,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         }
 
         ret.add(configAdapter.getJSLibsURL());
-
+        
         ret.addAll(getClientLibraryUrls(context, ClientLibraryDef.Type.JS));
         // framework js should be after other client libraries
         ret.add(configAdapter.getAuraJSURL());

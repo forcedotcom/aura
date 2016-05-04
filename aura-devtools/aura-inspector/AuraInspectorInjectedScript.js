@@ -314,6 +314,13 @@
 
         };
 
+        // Overriden by some tricky code down below to try to get into the context of the app.
+        this.accessTrap = function(callback) {
+            if(typeof callback === "function") {
+                callback();
+            }
+        };
+
         this.getComponent = function(componentId, options) {
             var component = $A.getComponent(componentId);
             var configuration = Object.assign({
@@ -761,6 +768,27 @@
             $Aura.Inspector.count(this.getGlobalId() + "_rerendered");
         });
 
+        /*
+            I'll admit, this is a  hack into the Aura access check framework. 
+            I shouldn't rely on this, it's merely a best case scenario work around.
+            Fallbacks should be present if I use this method.
+         */
+        var originalRender = Component.prototype.render;
+        wrapFunction(Component.prototype, "render", function(){
+            var current = this.getDef();
+            while(current.getSuperDef()) {
+                current = current.getSuperDef();
+            }
+            if(current.getDescriptor().getQualifiedName() === "markup://aura:application") {
+                $Aura.Inspector.accessTrap = $A.getCallback(function(callback) {
+                    if(typeof callback === "function") {
+                        callback();
+                    }
+                });
+                // No need anymore to do the override. It's simply to attach this access trap.
+                Component.prototype.render = originalRender;
+            }
+        });
         // No way of displaying this at the moment.
         // wrapFunction(Component.prototype, "unrender", function(){
         //     $Aura.Inspector.count("component_unrendered");

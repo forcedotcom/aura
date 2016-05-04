@@ -5,6 +5,7 @@
 		var div = document.createElement("div");
 		div.id = "DutchDidIt";
 		div.className = "smoothAsButter";
+		div.innerHTML = "<h1 onmouseover='javascript:alert(\"This should never even make it into the DOM\");'>Smooth As Butter</h1>";
 
 		helper.log(component, "Lockerized controller scope: { document: " + document + ", window: " + window + ", $A: " + $A + " }");
 
@@ -34,15 +35,9 @@
 			}
 		}
 
-		try {
-			// Should not be allowed because SecureElement is Object.freeze()'ed - we can support this if we want to though using Object.defineProperty
-			div.onclick = function(event) {
-			};
-		} catch (x) {
-			if (x.toString().indexOf("TypeError") < 0) {
-				throw new Error("Unexpected exception: " + x.toString());
-			}
-		}
+		div.onclick = function(event) {
+			alert("Hello from the smooth as butter div\n\nevent: " + event.toString() + "\nthis: " + this);
+		};
 
 		var clickTestDiv = component.find("clickTest").getElement();
 		clickTestDiv.addEventListener("click", function(e) {
@@ -68,6 +63,13 @@
 		// No visible divs actually added to the DOM Document yet
 		helper.verifyElementCount("smoothAsButter", 0);
 
+		var removeEventListenerTest = component.find("removeEventListenerTest").getElement();
+		removeEventListenerTest.addEventListener("click", function oneTimeClicker() {
+			alert("oneTimeClicker invoked!");
+
+			removeEventListenerTest.removeEventListener("click", oneTimeClicker);
+		});
+
 		return ret;
 	},
 
@@ -81,13 +83,9 @@
 		var nodes = document.querySelectorAll("div.smoothAsButter");
 		var sel = nodes[0];
 		sel.addEventListener('click', function(sev) {
-			// DCHASMAN TODO W-2966000 This throws a stack overflow inside of filterEverything()
-			// helper.log(component, "sev.path[sev.path.length-1]: " + sev.path[sev.path.length-1]);
-
 			helper.log(component, "sev.toElement: " + sev.toElement);
 			helper.log(component, "sev.currentTarget: " + sev.currentTarget); 
 		}); 
-		sel.click(); 
 
 		try {
 			var content = component.find("content");

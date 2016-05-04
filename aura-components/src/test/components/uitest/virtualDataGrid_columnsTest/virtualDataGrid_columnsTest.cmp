@@ -26,7 +26,7 @@
     <aura:attribute name="rowIndex" type="Integer"/>
     <aura:attribute name="gridItems" type="List"/>
     <aura:attribute name="gridSelectedItems" type="List"/>
-    <aura:attribute name="useRowHeaders" type="Boolean" default="false"/>
+    <aura:attribute name="rowHeaderIndex" type="Integer" default="-1"/>
     
     <aura:attribute name="provideNoData" type="Boolean"/>
 
@@ -42,7 +42,7 @@
 			<ui:inputCheckbox label="Provide no data" value="{!v.provideNoData}"/> 
 			<ui:outputText label="Sorting By:" value="{!v.sortBy}"/>
 		</div>
-		<ui:virtualDataGrid aura:id="grid" onsort="{!c.onsort}" fixedHeader="true" useRowHeaders="{!v.useRowHeaders}">
+		<ui:virtualDataGrid aura:id="grid" onsort="{!c.onsort}" fixedHeader="true" rowHeaderIndex="{!v.rowHeaderIndex}">
 			<aura:set attribute="headerColumns">
 				<ui:dataGridColumn name="id" 			label="Id"			sortable="true"/>
 				<ui:dataGridColumn name="subject" 		label="Subject"		sortable="true"/>

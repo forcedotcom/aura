@@ -16,7 +16,7 @@
 ({
 	handleVis: function (cmp, evt, helper) {
 		
-		var isVis = evt.getParam("value");
+		var isVis = $A.util.getBooleanValue(cmp.get('v.isVisible'));
 		
 		if(isVis) {
 			helper.show(cmp);

@@ -914,7 +914,8 @@ Test.Aura.AuraClientServiceTest = function() {
             window:{
                 "applicationCache": mockApplicationCache,
                 "localStorage": mockStorage,
-                "sessionStorage": mockStorage
+                "sessionStorage": mockStorage,
+                "location": mockLocation
             },
             document: document,
             Aura: Aura,
@@ -936,7 +937,16 @@ Test.Aura.AuraClientServiceTest = function() {
                     };
                 }
             },
-            location: mockLocation
+            location: mockLocation,
+            Promise: {
+                all: function() {
+                    return {
+                        then: function(f) {
+                            return f();
+                        }
+                    }
+                }
+            }
         });
 
         [Fact]
@@ -1618,6 +1628,192 @@ Test.Aura.AuraClientServiceTest = function() {
 
             target.dumpCachesAndReload();
             Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function releaseXHR() {
+        [Fact]
+        function CallsProcessXHRIdleQueueIfNoInFlightXhrs() {
+            var actual = false;
+            var target;
+            var mockXhr = {
+                    reset: function() {}
+            };
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            target.inFlightXHRs = function() {
+                return 0;
+            };
+            target.processXHRIdleQueue = function() {
+                actual = true;
+            };
+
+            target.releaseXHR(mockXhr);
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function DoesNotCallProcessXHRIdleQueueIfInFlightXhrs() {
+            var actual = false;
+            var target;
+            var mockXhr = {
+                    reset: function() {}
+            };
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            target.inFlightXHRs = function() {
+                return 1;
+            };
+            target.processXHRIdleQueue = function() {
+                actual = true;
+            };
+
+            target.releaseXHR(mockXhr);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function CallsResetOnXhr() {
+            var actual = false;
+            var target;
+            var mockXhr = {
+                    reset: function() {
+                        actual = true;
+                    }
+            };
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            target.inFlightXHRs = function() { return 1; };
+            target.processXHRIdleQueue = function() {};
+
+            target.releaseXHR(mockXhr);
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function AddsXhrToAvailableXhrs() {
+            var target;
+            var mockXhr = {
+                    reset: function() {}
+            };
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            target.inFlightXHRs = function() { return 1; };
+            target.processXHRIdleQueue = function() {};
+            target.availableXHRs = [];
+
+            target.releaseXHR(mockXhr);
+
+            Assert.Equal([mockXhr], target.availableXHRs);
+        }
+    }
+    
+    [Fixture]
+    function runWhenXHRIdle() {
+        [Fact]
+        function AddsParameterToXhrIdleQueue() {
+            var target;
+            var expected = "expected";
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            target.inFlightXHRs = function() { return 1; };
+            target.processXHRIdleQueue = function() {};
+            target.xhrIdleQueue = [];
+
+            target.runWhenXHRIdle(expected);
+
+            Assert.Equal([expected], target.xhrIdleQueue);
+        }
+
+        [Fact]
+        function CallsProcessXHRIdleQueueIfNoInFlightXhrs() {
+            var actual = false;
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            target.inFlightXHRs = function() { return 0; };
+            target.processXHRIdleQueue = function() {
+                actual = true;
+            };
+
+            target.runWhenXHRIdle();
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function DoesNotCallProcessXHRIdleQueueIfInFlightXhrs() {
+            var actual = false;
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            target.inFlightXHRs = function() { return 1; };
+            target.processXHRIdleQueue = function() {
+                actual = true;
+            };
+
+            target.runWhenXHRIdle();
+
+            Assert.False(actual);
+        }
+    }
+
+    [Fixture]
+    function processXHRIdleQueue() {
+        [Fact]
+        function ExecutesSingleFunctionInXhrIdleQueue() {
+            var actual = false;
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+                assert: function(){}
+            });
+            var queueItem = function() {
+                actual = true;
+            };
+            target.xhrIdleQueue = [queueItem];
+
+            mockAssert(function() {
+                target.processXHRIdleQueue();
+            });
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ExecutesMultipleFunctionsInXhrIdleQueue() {
+            var actual = false;
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+                assert: function(){}
+            });
+            var fillerItem = function() {};
+            var queueItem = function() {
+                actual = true;
+            };
+            target.xhrIdleQueue = [fillerItem, fillerItem, queueItem];
+
+            mockAssert(function() {
+                target.processXHRIdleQueue();
+            });
+
+            Assert.True(actual);
         }
     }
 }

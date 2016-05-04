@@ -1,0 +1,101 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.THIS .inline-edit-example {
+	width: 100%;
+	margin: 0.5rem;
+}
+
+.THIS .inline-edit-example table {
+	border-bottom: 1px solid #d8dde6;
+	width: 90%;
+	font-size: 0.75rem;
+}
+
+.THIS .inline-edit-example th {
+	padding: 0.5rem;
+}
+
+.THIS .inline-edit-example td,
+.THIS .inline-edit-example th {
+	padding: 0;
+	border-top: 1px solid #d8dde6;
+	text-align: left;
+}
+
+.THIS .inline-edit-example th:hover,
+.THIS .inline-edit-example td:hover {
+	background-color: rgb(244, 246, 249)
+}
+
+.THIS .panel-content {
+	padding: 0.5rem;
+	width: 25rem;
+}
+
+.THIS .inline-edit-example .panel-content .content {
+	padding: 0;
+}
+
+.THIS .inline-edit-example .panel-content input {
+	box-sizing: border-box;
+	padding: 0 1rem 0 0.75rem;
+	width: 90%;
+}
+
+.THIS .inline-edit-example .uiPanel {
+	border-radius: initial;
+}
+
+.THIS .inline-edit-example tr td .content,
+.THIS .inline-edit-example .panel-content input {
+	background-color: white;
+    color: #16325c;
+    display: inline-block;
+    padding: 0 1rem 0 0.75rem;
+    font-weight: 400;
+    line-height: 1.75em;
+    max-height: calc(1.875rem - 2px);
+    min-height: 0;
+    height: 21px;
+}
+
+.THIS .inline-edit-example tr td:nth-child(1) .content {
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+    width: 100%;
+    transition: border 0.1s linear, background-color 0.1s linear;
+}
+
+
+.THIS .inline-edit-example .footer {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.THIS .inline-edit-example button {
+	background: white;
+	box-shadow: none;
+    color: #16325c;
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+    transition: border 0.1s linear, background-color 0.1s linear;
+    display: inline-block;
+    padding: 0 1rem 0 0.75rem;
+    font-size: inherit;
+    font-weight: 400;
+    line-height: 1.75em;
+}

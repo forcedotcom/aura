@@ -18,7 +18,7 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-		  A <code>ui:outputRichText</code> component represents rich text and can be used to display input from a <code>ui:inputRichText</code> component.
+		  A <code>ui:outputRichText</code> component represents rich text and can be used to display input from a <code>ui:inputRichText</code> component. This component displays URLs and email addresses within rich text fields as hyperlinks.
 		</p>
 		<p>
 		  For example, you can enter bold or colored text via a <code>ui:inputRichText</code> component and bind its value to a <code>ui:outputRichText</code> component, which results in the following HTML. 

@@ -108,7 +108,11 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 auraInit.put("descriptor", value.getDescriptor());
                 auraInit.put("deftype", value.getDescriptor().getDefType());
                 auraInit.put("host", contextPath);
-                auraInit.put("safeEvalWorker", Aura.getConfigAdapter().getLockerWorkerURL());
+                
+                String lockerWorkerURL = Aura.getConfigAdapter().getLockerWorkerURL();
+                if (lockerWorkerURL != null) {
+                	auraInit.put("safeEvalWorker", lockerWorkerURL);
+                }
 
                 auraInit.put("context", new Literal(context.serialize(AuraContext.EncodingStyle.Full)));
 

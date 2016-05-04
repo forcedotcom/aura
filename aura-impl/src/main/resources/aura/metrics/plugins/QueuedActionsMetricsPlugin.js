@@ -150,7 +150,7 @@ QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks, trxCon
                 queue[id] = $A.util.apply({}, actionMark, true, true);
 
             } else if (phase === 'start' && mark) {
-                mark["enqueueWait"] = actionMark["ts"] - mark["ts"];
+                mark["enqueueWait"] = Math.round((actionMark["ts"] - mark["ts"]) * 100) / 100;
 
             } else if (phase === 'end' && mark) {
                 mark["context"]["state"] = actionMark["context"]["state"];

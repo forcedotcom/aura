@@ -79,12 +79,10 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
                         	if(withComponentDefStorage == true) {
                         		if (name === "ComponentDefStorage") {
                                     return {
-                                        isPersistent: function() { return true; },
+                                        isPersistent: function() { return persistent; },
                                         suspendSweeping: function() {}
                                     }
                                 }
-                        	} else {
-                        		return;
                         	}
                         }
                     },
@@ -141,7 +139,7 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
 
             Assert.False(initStorageCalled);
         }
-        
+
         [Fact]
         function DoNotCreateComponentDefStorageIfActionStorageIsNotPersistent() {
             var target = new Aura.Component.ComponentDefStorage();

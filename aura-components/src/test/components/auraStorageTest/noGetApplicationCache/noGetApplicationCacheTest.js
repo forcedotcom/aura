@@ -32,7 +32,7 @@
         ]
     },
 
-    _testOnlineLaunch: {
+    testOnlineLaunch: {
         test: [
             function loadIframe(cmp) {
                 $A.test.setTestTimeout(100000);

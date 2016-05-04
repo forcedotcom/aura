@@ -56,7 +56,9 @@ public interface CachingService extends AuraService {
     Cache<DefDescriptor<?>, Optional<? extends Definition>> getDefsCache();
 
     Cache<String, String> getStringsCache();
-    
+
+    Cache<String, String> getAltStringsCache();
+
     Cache<String, Set<DefDescriptor<?>>> getDescriptorFilterCache();
 
     Cache<String, DependencyEntry> getDepsCache();

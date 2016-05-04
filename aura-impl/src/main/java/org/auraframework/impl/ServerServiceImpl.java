@@ -221,7 +221,7 @@ public class ServerServiceImpl implements ServerService {
         if (skipCache) {
         	cached = getAppCssString(dependencies);
         } else {
-        	cached = context.getDefRegistry().getCachedString(uid, appDesc, key,
+        	cached = context.getDefRegistry().getAltCachedString(uid, appDesc, key,
             	new Callable<String>() {
 	        		@Override
 					public String call() throws Exception {
@@ -303,13 +303,13 @@ public class ServerServiceImpl implements ServerService {
         final String uid = context.getUid(appDesc);
         final String key = "JS:" + mKey + uid;
 
-        String cached = context.getDefRegistry().getCachedString(uid, appDesc, key,
+        String cached = context.getDefRegistry().getAltCachedString(uid, appDesc, key,
         		new Callable<String>() {
 		    		@Override
 					public String call() throws Exception {
 		    			String res = getDefinitionsString(dependencies, key);
 		    			//log the cache miss here
-		    			Aura.getCachingService().getStringsCache().logCacheStatus("StringsCache", "cache miss for key: "+key+";");
+		    			Aura.getCachingService().getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
 		    			return res;
 		    		}
 		    	});

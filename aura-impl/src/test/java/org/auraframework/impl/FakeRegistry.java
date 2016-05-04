@@ -109,7 +109,18 @@ public class FakeRegistry implements MasterDefRegistry {
     }
 
 	@Override
+    public String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key) {
+        return null;
+    }
+
+	@Override
 	public String getCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader)
+			throws QuickFixException, IOException {
+		return null;
+	}    
+
+	@Override
+	public String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader)
 			throws QuickFixException, IOException {
 		return null;
 	}    

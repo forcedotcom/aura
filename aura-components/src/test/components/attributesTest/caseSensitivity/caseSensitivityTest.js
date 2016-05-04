@@ -14,9 +14,23 @@
  * limitations under the License.
  */
 ({
-    // TODO(W-2192746): There should be an error here saying that there is a problem with case sensitivity.
-    testCaseSensitivityWhenSettingParentAttributes:{
+	labels : ["UnAdaptableTest"],
+	/*
+		This test and the one below creates a component(attributesTest:caseInsensitiveChild), 
+		the component extends another component(attributesTest:parent), setting its attribute
+		with wrong case sensitive name ('SIMPLEAttribute', instead of 'SimpleAttribute').
+		
+		this test get the definition of "attributesTest:caseInsensitiveChild" from server first,
+		then create the component on the client by calling $A.createComponent. $A.createComponent 
+		won't go to server for def.
+		
+		the test below call $A.createComponent directly, it will go to server requesting the def.
+		
+		both test verify we error out with ACF.
+	*/
+    testCaseSensitivityWhenSettingParentAttributes_ComponentCreatedOnClient:{
         test:function(){
+        	var testCompleted = false;
             var def=null;
             $A.getDefinition("attributesTest:caseInsensitiveChild",function(newDef){
                 def=newDef;
@@ -24,10 +38,28 @@
 
             $A.test.runAfterIf(function(){return !!def},function(){
                 $A.test.expectAuraError("Access Check Failed!");
-                $A.createComponent("attributesTest:caseInsensitiveChild",{},function(){});
+                $A.createComponent("attributesTest:caseInsensitiveChild",{},
+                function(){
+                	testCompleted = true;
+                });
+                
+                $A.test.addWaitFor(true, function() { return testCompleted; } );
             })
         }
     },
+    
+    testCaseSensitivityWhenSettingParentAttributes_ComponentRequestedFromServer:{
+        test:function(){
+        		var testCompleted = false;
+                $A.test.expectAuraError("Access Check Failed!");
+                $A.createComponent("attributesTest:caseInsensitiveChild",{},
+                function(){
+                	testCompleted = true;
+                });
+                $A.test.addWaitFor(true, function() { return testCompleted; } );
+        }
+    },
+    
 
     /**
      * Trying to get a simple attribute with the wrong case will throw and Access Check Failure

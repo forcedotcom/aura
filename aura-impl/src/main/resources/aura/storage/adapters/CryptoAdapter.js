@@ -202,6 +202,14 @@ CryptoAdapter.prototype.getName = function() {
     return CryptoAdapter.NAME;
 };
 
+
+CryptoAdapter.prototype.fallbackToMemoryAdapter = function(e) {
+    this.log(CryptoAdapter.LOG_LEVEL.WARNING, "initialize(): falling back to memory storage", e);
+    $A.metricsService.transaction("aura", "memoryCryptoStorage");
+    this.mode = Aura.Storage.MemoryAdapter.NAME; // "memory";
+    this.adapter = new Aura.Storage.MemoryAdapter(this.config);
+};
+
 /**
  * Initializes the adapter by waiting for the app-wide crypto key to be set,
  * then validates the key works for items already in persistent storage. If a
@@ -211,6 +219,13 @@ CryptoAdapter.prototype.getName = function() {
  */
 CryptoAdapter.prototype.initialize = function() {
     var that = this;
+
+    if (!$A.util.isLocalStorageEnabled()) {
+        this.fallbackToMemoryAdapter("DisabledLocalStorage");
+        // do not throw an error so the promise moves to resolve state
+        return Promise["resolve"]();
+    }
+
     return CryptoAdapter.key
     .then(
         function(key) {
@@ -241,10 +256,7 @@ CryptoAdapter.prototype.initialize = function() {
             );
         },
         function(e) {
-            that.log(CryptoAdapter.LOG_LEVEL.WARNING, "initialize(): falling back to memory storage", e);
-            $A.metricsService.transaction("aura", "memoryCryptoStorage");
-            that.mode = Aura.Storage.MemoryAdapter.NAME; // "memory";
-            that.adapter = new Aura.Storage.MemoryAdapter(that.config);
+            that.fallbackToMemoryAdapter(e);
             // do not throw an error so the promise moves to resolve state
         }
     ).then(

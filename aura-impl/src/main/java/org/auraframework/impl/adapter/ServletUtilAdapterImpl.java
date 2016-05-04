@@ -35,6 +35,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
@@ -57,6 +58,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 
+import aQute.bnd.annotation.component.Component;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -65,6 +68,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     private ConfigAdapter configAdapter = Aura.getConfigAdapter();
     private ExceptionAdapter exceptionAdapter = Aura.getExceptionAdapter();
     private SerializationService serializationService = Aura.getSerializationService();
+    private ClientLibraryService clientLibraryService = Aura.getClientLibraryService();
     protected DefinitionService definitionService = Aura.getDefinitionService();
 
     /**
@@ -318,7 +322,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     private Set<String> getClientLibraryUrls(AuraContext context, ClientLibraryDef.Type type)
             throws QuickFixException {
-        return Aura.getClientLibraryService().getUrls(context, type);
+        return clientLibraryService.getUrls(context, type);
     }
 
     /**
@@ -580,19 +584,19 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
 
     /**
      * check the top level component/app and get dependencies.
-     * 
+     *
      * This routine checks to see that we have a valid top level component. If our top level component is out of sync,
      * we have to ignore it here, but we _must_ force the client to not cache the response.
-     * 
+     *
      * If there is a QFE, we substitute the QFE descriptor for the one given us, and continue. Again, we cannot allow
      * caching.
-     * 
+     *
      * Finally, if there is no descriptor given, we simply ignore the request and give them an empty response. Which is
      * done here by returning null.
-     * 
+     *
      * Also note that this handles the 'if-modified-since' header, as we want to tell the browser that nothing changed
      * in that case.
-     * 
+     *
      * @param request the request (for exception handling)
      * @param response the response (for exception handling)
      * @param context the context to get the definition.
@@ -713,5 +717,12 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     public void setSerializationService(SerializationService serializationService) {
         this.serializationService = serializationService;
+    }
+
+    /**
+     * Injection override.
+     */
+    public void setClientLibraryService(ClientLibraryService clientLibraryService) {
+        this.clientLibraryService = clientLibraryService;
     }
 }

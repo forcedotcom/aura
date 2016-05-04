@@ -54,11 +54,17 @@ public class RenderContextImpl implements RenderContext {
 
     @Override
     public String getScript() {
+        if(script == null) {
+            return null;
+        }
         return script.toString();
     }
 
     @Override
     public String getStandard() {
+        if(standard == null) {
+            return null;
+        }
         return standard.toString();
     }
 }

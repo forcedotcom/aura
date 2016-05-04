@@ -55,8 +55,8 @@ public abstract class TemplateResource extends AuraResourceImpl {
     protected RenderingService renderingService = Aura.getRenderingService();
     protected ManifestUtil manifestUtil = new ManifestUtil();
 
-    public TemplateResource(String name, Format format, boolean requiresCSRF) {
-        super(name, format, requiresCSRF);
+    public TemplateResource(String name, Format format) {
+        super(name, format);
     }
 
     @Override
@@ -120,70 +120,70 @@ public abstract class TemplateResource extends AuraResourceImpl {
     private <T extends BaseComponentDef> void writeTemplate(AuraContext context, T value,
             Map<String, Object> componentAttributes, Appendable out) throws IOException, QuickFixException {
 
-            ComponentDef templateDef = value.getTemplateDef();
-            Map<String, Object> attributes = Maps.newHashMap();
+        ComponentDef templateDef = value.getTemplateDef();
+        Map<String, Object> attributes = Maps.newHashMap();
 
-            StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         writeHtmlStyles(Lists.newArrayList(Arrays.asList(configAdapter.getResetCssURL())), sb);
         attributes.put("auraResetCss", sb.toString());
 
-            sb.setLength(0);
+        sb.setLength(0);
         writeHtmlStyles(servletUtilAdapter.getStyles(context), sb);
-            attributes.put("auraStyleTags", sb.toString());
+        attributes.put("auraStyleTags", sb.toString());
 
-            DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
-            if (styleDefDesc != null) {
-                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
+        DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
+        if (styleDefDesc != null) {
+            attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
+        }
+
+        String contextPath = context.getContextPath();
+        Mode mode = context.getMode();
+
+        if (mode.allowLocalRendering() && value.isLocallyRenderable()) {
+            BaseComponent<?, ?> cmp = null;
+
+            cmp = (BaseComponent<?, ?>) instanceService.getInstance(value, componentAttributes);
+
+            attributes.put("body", Lists.<BaseComponent<?, ?>> newArrayList(cmp));
+            attributes.put("bodyClass", "");
+            attributes.put("defaultBodyClass", "");
+            attributes.put("autoInitialize", "false");
+        } else {
+            if (manifestUtil.isManifestEnabled()) {
+                attributes.put("manifest", servletUtilAdapter.getManifestUrl(context, componentAttributes));
             }
 
-            String contextPath = context.getContextPath();
-            Mode mode = context.getMode();
-
-            if (mode.allowLocalRendering() && value.isLocallyRenderable()) {
-                BaseComponent<?, ?> cmp = null;
-
-                cmp = (BaseComponent<?, ?>) instanceService.getInstance(value, componentAttributes);
-
-                attributes.put("body", Lists.<BaseComponent<?, ?>> newArrayList(cmp));
-                attributes.put("bodyClass", "");
-                attributes.put("defaultBodyClass", "");
-                attributes.put("autoInitialize", "false");
-            } else {
-                if (manifestUtil.isManifestEnabled()) {
-                    attributes.put("manifest", servletUtilAdapter.getManifestUrl(context, componentAttributes));
-                }
-
-                sb.setLength(0);
+            sb.setLength(0);
             writeHtmlScripts(servletUtilAdapter.getBaseScripts(context, componentAttributes), sb);
-                attributes.put("auraBaseScriptTags", sb.toString());
+            attributes.put("auraBaseScriptTags", sb.toString());
 
-                sb.setLength(0);
+            sb.setLength(0);
             writeHtmlScripts(servletUtilAdapter.getFrameworkScripts(context, true, false, componentAttributes), true, sb);
-                attributes.put("auraNamespacesScriptTags", sb.toString());
+            attributes.put("auraNamespacesScriptTags", sb.toString());
 
             if(mode != Mode.PROD && mode != Mode.PRODDEBUG && context.getIsDebugToolEnabled()) {
-                    attributes.put("auraInitBlock", "<script>var debugWindow=window.open('/aura/debug.cmp','Aura Debug Tool','width=900,height=305,scrollbars=0,location=0,toolbar=0,menubar=0');$A.util.setDebugToolWindow(debugWindow);</script>");
-                }
-
-                Map<String, Object> auraInit = Maps.newHashMap();
-                if (componentAttributes != null && !componentAttributes.isEmpty()) {
-                    auraInit.put("attributes", componentAttributes);
-                }
-
-                auraInit.put("descriptor", value.getDescriptor());
-                auraInit.put("deftype", value.getDescriptor().getDefType());
-                auraInit.put("host", contextPath);
-                
-                String lockerWorkerURL = Aura.getConfigAdapter().getLockerWorkerURL();
-                if (lockerWorkerURL != null) {
-                	auraInit.put("safeEvalWorker", lockerWorkerURL);
-                }
-
-                auraInit.put("context", new Literal(context.serialize(AuraContext.EncodingStyle.Full)));
-
-                attributes.put("auraInit", JsonEncoder.serialize(auraInit));
+                attributes.put("auraInitBlock", "<script>var debugWindow=window.open('/aura/debug.cmp','Aura Debug Tool','width=900,height=305,scrollbars=0,location=0,toolbar=0,menubar=0');$A.util.setDebugToolWindow(debugWindow);</script>");
             }
-            Component template = instanceService.getInstance(templateDef.getDescriptor(), attributes);
+
+            Map<String, Object> auraInit = Maps.newHashMap();
+            if (componentAttributes != null && !componentAttributes.isEmpty()) {
+                auraInit.put("attributes", componentAttributes);
+            }
+
+            auraInit.put("descriptor", value.getDescriptor());
+            auraInit.put("deftype", value.getDescriptor().getDefType());
+            auraInit.put("host", contextPath);
+
+            String lockerWorkerURL = Aura.getConfigAdapter().getLockerWorkerURL();
+            if (lockerWorkerURL != null) {
+                auraInit.put("safeEvalWorker", lockerWorkerURL);
+            }
+
+            auraInit.put("context", new Literal(context.serialize(AuraContext.EncodingStyle.Full)));
+
+            attributes.put("auraInit", JsonEncoder.serialize(auraInit));
+        }
+        Component template = instanceService.getInstance(templateDef.getDescriptor(), attributes);
         doRender(template, out);
     }
 
@@ -202,7 +202,7 @@ public abstract class TemplateResource extends AuraResourceImpl {
     }
 
     protected void writeHtmlScripts(List<String> scripts, Appendable out) throws IOException {
-    	writeHtmlScripts(scripts, false, out);
+        writeHtmlScripts(scripts, false, out);
     }
 
     protected void writeHtmlScripts(List<String> scripts, boolean lazy, Appendable out) throws IOException {

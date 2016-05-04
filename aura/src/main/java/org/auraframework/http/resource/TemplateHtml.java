@@ -31,7 +31,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class TemplateHtml extends TemplateResource {
     public TemplateHtml() {
-        super("template.html", Format.HTML, false);
+        super("template.html", Format.HTML);
     }
 
     @Override

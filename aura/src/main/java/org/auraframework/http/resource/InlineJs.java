@@ -29,7 +29,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class InlineJs extends TemplateResource {
     public InlineJs() {
-        super("inline.js", Format.JS, false);
+        super("inline.js", Format.JS);
     }
 
     @Override

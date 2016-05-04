@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 package org.auraframework.integration.test.http;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -68,48 +63,6 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraPrivateAccessor.invoke(servlet, "doGet", request, response);
     }
 
-
-    /**
-     * verify we response SC_NOT_FOUND when getting app.manifest where manifest is not enabled
-     * @throws Exception
-     */
-    @Test
-    public void testWriteManifestException() throws Exception {
-        // Start a context to fetch manifests; the other details don't matter
-        // much 'cause we'll error out. Then try to fetch one, with that error:
-        Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
-                AuraContext.Authentication.AUTHENTICATED);
-
-        HttpServletRequest request = new DummyHttpServletRequest("app.manifest") {
-            @Override
-            //This will throw exception from ManifestUtil.isManifestEnabled
-            public String getHeader(String name) {
-                if ("user-agent".equals(name)) {
-                    throw new SimulatedErrorException();
-                }
-                return "";
-            }
-        };
-        // Careful. Resin apparently has no getStatus().
-        DummyHttpServletResponse response = new DummyHttpServletResponse() {
-            int status = -1;
-
-            @Override
-            public void setStatus(int status) {
-                this.status = status;
-            }
-
-            @Override
-            public int getStatus() {
-                return status;
-            }
-        };
-        AuraResourceServlet servlet = new AuraResourceServlet();
-        doGet(servlet, request, response);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
-    }
-
-    @Test
     public void testAddAppManifestCookie() throws Exception {
         Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
                 AuraContext.Authentication.UNAUTHENTICATED);
@@ -422,96 +375,4 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertTrue(headers.contains("attachment; filename=resources.svg"));
     }
 
-    /**
-     * Verify that context path is prepended on all Aura urls in appcache manifest
-     */
-    @UnAdaptableTest("W-2929438")
-    @Test
-    public void testManifestContentWithContextPath() throws Exception {
-        if (Aura.getContextService().isEstablished()) {
-            Aura.getContextService().endContext();
-        }
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:testApp",
-                ApplicationDef.class);
-        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.MANIFEST,
-                AuraContext.Authentication.AUTHENTICATED, appDesc);
-        context.setApplicationDescriptor(appDesc);
-        String coolContext = "/cool";
-        context.setContextPath(coolContext);
-        String uid = context.getDefRegistry().getUid(null, appDesc);
-        context.addLoaded(appDesc, uid);
-        DummyHttpServletRequest request = new DummyHttpServletRequest("app.manifest");
-        DummyHttpServletResponse response = new MyDummyHttpServletResponse();
-        AuraResourceServlet servlet = new AuraResourceServlet();
-        doGet(servlet, request, response);
-
-        String content = response.getContentType();
-        Pattern pattern = Pattern.compile("/auraFW|/l/");
-        Matcher matcher = pattern.matcher(content);
-        while(matcher.find()) {
-            int start =  matcher.start();
-            String cool = content.substring(start - 5, start);
-            if (!cool.equals(coolContext)) {
-                fail("Context path was not prepended to Aura urls");
-            }
-        }
-
-    }
-
-    /**
-     * Verify framework UID exists in auraFW javascript urls in appcache manifest
-     */
-    @UnAdaptableTest("W-2929438")
-    @Test
-    public void testManifestFwJsUrlContainsFWId() throws Exception {
-        // Arrange
-        if (Aura.getContextService().isEstablished()) {
-            Aura.getContextService().endContext();
-        }
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:testApp",
-                ApplicationDef.class);
-        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV,
-                AuraContext.Format.MANIFEST, AuraContext.Authentication.AUTHENTICATED, appDesc);
-        String uid = context.getDefRegistry().getUid(null, appDesc);
-        context.addLoaded(appDesc, uid);
-        DummyHttpServletRequest request = new DummyHttpServletRequest("app.manifest");
-        DummyHttpServletResponse response = new MyDummyHttpServletResponse();
-        AuraResourceServlet servlet = new AuraResourceServlet();
-
-        // Act
-        doGet(servlet, request, response);
-
-        // Assert
-        String content = response.getContentType();
-        Pattern pattern = Pattern.compile("FW=(.*)\n");
-        Matcher matcher = pattern.matcher(content);
-        if(matcher.find()) {
-            String fwId = matcher.group(1);
-            Pattern p = Pattern.compile("/auraFW/.*\\.js\n");
-            Matcher m = p.matcher(content);
-            while(m.find()) {
-                String url = m.group(0);
-                if(!url.contains(fwId)) {
-                    fail("AuraFW JS url does not contain FW UID: " + url);
-                }
-            }
-        }
-    }
-
-
-
-    private static class MyDummyHttpServletResponse extends DummyHttpServletResponse {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(stringWriter);
-        @Override
-        public PrintWriter getWriter() throws IOException {
-            return writer;
-        }
-
-        // Hacking method to verify content of PrintWriter. This is never called in writeManifest
-        @Override
-        public String getContentType() {
-            return stringWriter.toString();
-        }
-    }
 }

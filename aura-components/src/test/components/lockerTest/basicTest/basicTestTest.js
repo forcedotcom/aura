@@ -93,6 +93,8 @@
     },
 
     testDefineGetterExploit: {
+        // Remove UnAdaptableTest label when unsafe-eval and unsafe-inline are added back to CSP
+        labels: ["UnAdaptableTest"],
         test: function(cmp) {
             cmp.testDefineGetterExploit();
         }

@@ -51,7 +51,8 @@
      * Test RTE placeholder when value is not set
      * RTE content should show placeholder
      */
-    testRtePlaceholderWhenValueIsNotSet: {
+    // TODO W-2988423 Rich text depends on CKEditor library that is not CPS compliant! 
+    _testRtePlaceholderWhenValueIsNotSet: {
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET"],
         attributes: {placeholder: "Test placeholder"},
         test: [function(component) {
@@ -66,6 +67,7 @@
      * RTE content should show value, when value is removed, placeholder should be shown
      */
     // TODO(W-3027564): Cannot call set("v.value", "foo") on inputRichText
+    // TODO W-2988423 Rich text depends on CKEditor library that is not CPS compliant! 
     _testRtePlaceholderWhenValueIsSet: {
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET"],
         attributes: {placeholder: "Test placeholder", testContent: "Test content"},

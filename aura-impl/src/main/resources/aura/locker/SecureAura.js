@@ -43,7 +43,7 @@ function SecureAura(AuraInstance, key) {
         "createComponent": SecureObject.createFilteredMethod(o, AuraInstance, "createComponent"),
         "createComponents": SecureObject.createFilteredMethod(o, AuraInstance, "createComponents"),
         "enqueueAction": SecureObject.createFilteredMethod(o, AuraInstance, "enqueueAction"),
-        "error": SecureObject.createFilteredMethod(o, AuraInstance, "error"),
+        "reportError": SecureObject.createFilteredMethod(o, AuraInstance, "reportError"),
         "get": SecureObject.createFilteredMethod(o, AuraInstance, "get"),
         "getCallback": SecureObject.createFilteredMethod(o, AuraInstance, "getCallback"),
         "getComponent": SecureObject.createFilteredMethod(o, AuraInstance, "getComponent"),

@@ -136,15 +136,6 @@ function SecureElement(el, key) {
 	SecureElement.addElementSpecificProperties(o, el);
 	SecureElement.addElementSpecificMethods(o, el);
 	
-	
-	// DCHASMAN TODO Do not check this in uncommented - it is a security hole! Just trying to get Angular to run
-	/*Object.defineProperty(o, "attributes", {
-		get: function() {
-			return el.attributes;
-		}
-	});*/
-	
-
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", el);
 

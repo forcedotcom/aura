@@ -7,6 +7,8 @@
 
     run : function(cmp, event, helper) {
 
+
+
         var grid = cmp.find("myGrid");
         var headers = grid.get("v.headerColumns");
         var columns = grid.get("v.columns");
@@ -23,6 +25,7 @@
             var randColumn = shuffledColumnsIndices.splice(0, 1);
 
             // get the configuration of the random column
+            debugger;
             var config = cmp._columnConfigs[headers[randColumn].get("v.name")];
 
             $A.createComponent("ui:dataGridColumn", config.header.attributes.values, function(newCmp, status, statusMessagesList) {
@@ -31,6 +34,7 @@
                 newColumns[i] = config.column;
                 // set the grid's attributes when we're done building the arrays 
                 if (shuffledColumnsIndices.length === 0) {
+                    debugger;
                     grid.set("v.headerColumns", newHeaders);
                     grid.set("v.columns", newColumns);
                     event.getParam('arguments').done.immediate();

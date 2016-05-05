@@ -23,6 +23,8 @@
     },
 
     testGvpsPersistedToStorage: {
+        // tbliss: this should be fixed but leave flapper for a bit to verify it's solid
+        labels : ["flapper"],
         test: [
         function getLabelFromServer(cmp) {
             // Requesting a label the client doesn't know about will force a server trip and save the label to storage
@@ -32,61 +34,39 @@
                     false,
                     $A.test.isActionPending,
                     function() {
+                        // GVP should be merged in-memory when action response is processed
                         $A.test.assertEquals("Today", $A.get("$Label.Related_Lists.task_mode_today"),
                             "Test setup failure: unexpeted label retrieved from server");
                     });
         },
         function verifyLabelSavedToStorage(cmp) {
-            var completed = false;
-            var actual = undefined;
-            var failTest = function(error) { this.failTest(error); }.bind(this);
-
-            // Get label from storage
-            var storage = $A.storageService.getStorage("actions");
-            storage.get("globalValueProviders")
-                .then(function(gvps) {
-                    for(var i = 0; i < gvps.value.length; i++) {
-                        if (gvps.value[i]["type"] === "$Label") {
-                            var values = gvps.value[i]["values"];
-                            actual = values["Related_Lists"] ? values["Related_Lists"]["task_mode_today"] : undefined;
-                        }
-                    }
-                    completed = true;
-                })
-                ["catch"](failTest);
-
-            $A.test.addWaitFor(
-                    true,
-                    function() { return completed; },
-                    function() {
-                        $A.test.assertEquals("Today", actual, "Unexpected label retrieved from storage");
-                    });
+            this.waitForGvpInStorage();
         }]
     },
 
     testGvpsLoadedFromStorageWhenOffline: {
+        // tbliss: this should be fixed but leave flapper for a bit to verify it's solid
+        labels : ["flapper"],
         test: [
         function getLabelFromServer(cmp) {
             // Requesting a label the client doesn't know about will force a server trip and save the label to storage
             $A.get("$Label.Related_Lists.task_mode_today");
             $A.test.addWaitFor(false, $A.test.isActionPending);
         },
+        function waitForGvpInStorage(cmp) {
+            this.waitForGvpInStorage();
+        },
         function modifyLabelEntryInStorage(cmp) {
             var completed = false;
             var failTest = function(error) { this.failTest(error); }.bind(this);
 
-            // Get label from storage
+            // Get label from storage and change value
             var storage = $A.storageService.getStorage("actions");
             storage.get("globalValueProviders")
                 .then(function(gvps) {
                     for(var i = 0; i < gvps.value.length; i++) {
                         if (gvps.value[i]["type"] === "$Label") {
-                            var values = gvps.value[i]["values"];
-                            if (values["Related_Lists"] && values["Related_Lists"]["task_mode_today"]) {
-                                values["Related_Lists"]["task_mode_today"] = "Updated";
-                            } else {
-                                $A.test.fail("Label from server not persisted to storage");
-                            }
+                            gvps.value[i]["values"]["Related_Lists"]["task_mode_today"] = "Updated";
                         }
                     }
                     return storage.put("globalValueProviders", gvps.value);
@@ -109,5 +89,39 @@
 
             $A.test.addWaitFor(true, function(){ return completed; });
         }]
+    },
+
+    waitForGvpInStorage: function() {
+        var found = false;
+        var failTest = function(error) { this.failTest(error); }.bind(this);
+        var storage = $A.storageService.getStorage("actions");
+
+        function getGvpFromStorage() {
+            if ($A.test.isComplete()) {
+                return;
+            }
+            storage.get("globalValueProviders")
+            .then(function(gvps) {
+                if (gvps && gvps.value) {
+                    gvps = gvps.value;
+                    for(var i = 0; i < gvps.length; i++) {
+                        if (gvps[i]["type"] === "$Label") {
+                            var values = gvps[i]["values"];
+                            var actual = values["Related_Lists"] && values["Related_Lists"]["task_mode_today"];
+                            if (actual === "Today") {
+                                found = true;
+                                return;
+                            }
+                        }
+                    }
+                }
+                getGvpFromStorage();
+            })
+            ["catch"](failTest);
+        }
+
+        getGvpFromStorage();
+
+        $A.test.addWaitFor(true, function() { return found; });
     }
 })

@@ -48,15 +48,21 @@
         }
     },
 
-    testRemoveEventListener: function(cmp) {
+    testRemoveEventListener: function(cmp, event) {
         var testUtils = cmp.get("v.testUtils");
         var counter = 0;
 
         var element = cmp.find("title").getElement();
+        var testWithUseCapture = event.getParam("arguments").testWithUseCapture;
+        var useCapture = undefined;
+        if(testWithUseCapture) {
+            useCapture = true;
+        }
+
         element.addEventListener("click", function oneTimeClicker() {
-            counter += 1;
-            element.removeEventListener("click", oneTimeClicker);
-        });
+                counter += 1;
+                element.removeEventListener("click", oneTimeClicker, useCapture);
+            }, useCapture);
 
         testUtils.clickOrTouch(element);
         // the event listener has been removed

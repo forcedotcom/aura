@@ -14,7 +14,7 @@
 
     HTMLPropertiesWhitelist: ['accessKey', 'contentEditable', 'isContentEditable',
                               'dataset', 'dir', 'lang', 'spellcheck', 'style', 'tabIndex', 'title'],
-    
+
     HTMLPropertiesBlacklist: [],
 
     OtherPropertiesWhitelist: ["childNodes", "children", "ownerDocument", "parentNode", "offsetParent"],
@@ -67,7 +67,13 @@
      */
     testRemoveEventListener: {
         test: function(cmp) {
-            cmp.testRemoveEventListener();
+            cmp.testRemoveEventListener(false);
+        }
+    },
+
+    testRemoveEventListenerWithUseCapture: {
+        test: function(cmp) {
+            cmp.testRemoveEventListener(true);
         }
     }
 })

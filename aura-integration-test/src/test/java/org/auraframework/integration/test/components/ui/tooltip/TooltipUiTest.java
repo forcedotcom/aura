@@ -25,36 +25,44 @@ import org.openqa.selenium.WebElement;
 @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD, BrowserType.IE7, BrowserType.IE8})
 public class TooltipUiTest extends WebDriverTestCase {
 	private final String URL_FULL_CMP = "/uitest/tooltip_FullTest.cmp";
-	
+
 	public TooltipUiTest(String name) {
 		super(name);
 	}
-	
+
 	/**
 	 * If tooltip is triggered by click then it should open and close by
 	 * pressing enter on keyboard
 	 */
 	public void testToolTipOpenAndCloseWithEnterKey() throws Exception {
 		open(URL_FULL_CMP);
+
 		WebElement trigger = findDomElement(By.cssSelector(".triggerClick"));
-		
+
 		// click on element to gain focus and verify tooltip opens
 		trigger.click();
 		waitForToolTipPresent();
-		
+		turnOffToggleGuard();
+
 		// close by sending enter key
-		trigger.sendKeys(Keys.ENTER);
+		getAuraUITestingUtil().pressEnter(trigger);
 		waitForToolTipAbsent();
-		
+		turnOffToggleGuard();
+
 		// open by sending enter key
-		trigger.sendKeys(Keys.ENTER);
+		getAuraUITestingUtil().pressEnter(trigger);
 		waitForToolTipPresent();
 	}
 	
-	private void waitForToolTipPresent() {
-		waitForElementAppear("Tooltip should been present but is not", By.cssSelector(".uiTooltipAdvanced.visible"));
+	private void turnOffToggleGuard() {
+	    // turn off toggleGuard so we can toggle it immediately without waiting
+        getAuraUITestingUtil().getEval("$A.getRoot().find('triggerclick')._toggleGuard = false;");
 	}
-	
+
+	private void waitForToolTipPresent() {
+		waitForElementAppear("Tooltip should be present but is not", By.cssSelector(".uiTooltipAdvanced.visible"));
+	}
+
 	private void waitForToolTipAbsent() {
 		waitForElementDisappear("Tooltip should not be present but is", By.cssSelector(".uiTooltipAdvanced.visible"));
 	}

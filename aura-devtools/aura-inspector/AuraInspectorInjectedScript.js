@@ -47,6 +47,7 @@
                     'actionStorageKey': obj,
                     'nextResponse': obj,
                     'nextError': obj
+                    'byChaosRun' boolean //true if we add action for replay chaos run
                     };
         */
         "AuraDevToolService.AddActionToWatch": function(data) {
@@ -69,25 +70,31 @@
                         actionsStorage.get(actionStorageKey)
                         .then(
                             function() {
-                                console.log("find storage item for action:", data);
+                                //console.log("find storage item for action:", data);
                                 actionsStorage.remove(actionStorageKey)
                                 .then(function () {
-                                    console.log("successfully remove storage for action:", data);
+                                    //console.log("successfully remove storage for action:", data);
                                     //notify Storage View
                                     $Aura.Inspector.publish("AuraInspector:RemoveStorageData", {'storageKey': actionStorageKey});
                                 });
                             },
                             function(e) {
-                                console.log("cannot find storage item for action:", data);
+                                console.warn("cannot find storage item for action:", data);
                             }
                         );
                     } else {
-                        console.log("actionStorageKey missing, or there is no actionsStorage(what?)", data);
+                        console.warn("actionStorageKey missing, or there is no actionsStorage(what?)", data);
                     }
                 }
             }//end of aleadyAdded is false
             //if we already watching this action, this will replace the old one
             actionsToWatch[data.actionName] = data; 
+            
+            //ask chaos view to create a chaos card
+            if(data.byChaosRun) {  
+                $Aura.Inspector.publish("AuraInspector:OnCreateChaosCard", 
+                    {"message": "add action "+data.actionName+" to watch list"} );
+            }
         },
 
 
@@ -224,10 +231,807 @@
                 // Only do once, we wouldn't want to instrument twice, that would give us double listeners.
                 this["AuraDevToolService.Bootstrap"] = function(){};
             } else {
-                console.log('Could not attach AuraDevTools Extension.');
+                console.warn('Could not attach AuraDevTools Extension.');
             }
         }
-    };
+    };//end of $Aura.actions
+
+    /****************************************************************
+    ****************** Chaos Functions Starts **********************
+    ****************************************************************/
+
+    //Keep a list of element class we know gonna make the element clickable
+    var clicableClassList = [
+        'actionCardAnchor',
+        'cuf-feedItemActionTrigger',
+        'forceActionLink',
+        'forceEntityIcon',//left navigation
+        'header-label',
+        'likeIconAnchor',
+        //'inputTextArea',
+        'menuTriggerLink',
+        'outputLookupLink',
+        'select',
+        'triggerLinkText', 
+        'tabHeader',  
+        'uiButton', 
+        //'uiInput', 
+        'uiPill'
+    ];
+
+    var intervalFunctionRef_elementInNextStepReady = undefined;
+    var intervalFunctionRef_anyAuraRenderedElementPresent = undefined;
+    //temp place to store chaos run. before we save them to local, or server
+    var currentChaosRun = {}; 
+    var currentChaosRunSteps = [];
+    /*
+        currentChaosRunSteps is a list of chaos run step. we use this list to record new chaos run.
+        {
+            //if it's a click operation
+            'textContent': string,
+            'locator': undefined or
+            {
+                        "id":"888:1;0", 
+                        "root":"tabItemAnchor",
+                        "parent":"pathAssistant",
+                        "selector":"AtabHeader",
+                        "context":{"tab-name":"Id.DecisionMakers"}
+            },
+            'cssPath': string like "body > button + button > span"
+            //if it's an action drop operation
+            'actionName': string,
+            'actionOperation': string //"Drop",
+            'actionId': string //why we care
+            'actionParameter': string //"{..}"
+            'actionIsStorable': boolean
+            'actionStorageKey': string
+            'actionIsAbortable': boolean
+            'actionIsBackground': boolean
+        }
+    */
+    var currentChaosRunTimeMachine = {};
+    /*currentChaosRunTimeMachine looks like this: {
+        samplingInterval: in ms,
+        currentChaosRunTimeMachine: obj
+        currentChaosRunSteps: list
+        indexOfStep: int 
+    }*/
+    var chaosRunToReplay;
+    var defaultMaxTry = 10;//sometimes we need to wait for some element to show up
+    var defaultSamplingInterval = 4000;
+    var actionDropPercentage = 0; //out of 100
+
+    $Aura.chaos = {
+
+        /*
+            event handler for "AuraInspector:OnSomeActionGetDropped", 
+            called from ActionsView's AuraInspectorActionsView_OnDropActionInChaosRun
+            {
+                'id': string like "969;a", 
+                'defName': string like "serviceComponent://ui.force.bla/ACTION$getRecord",
+                'params': string "{"recrodDescriptor":"bla", "$serId$":4767}"
+                'storable': boolean
+                'storageKey': string, defName+params
+                'abortable': boolean
+                'background': boolean
+            }
+        */
+        "AuraDevToolService.RecordDroppedAction": function(data) {
+            if(data && data.defName) {
+                currentChaosRunSteps.push(
+                {
+                        'actionName': data.defName, 
+                        'actionOperation': 'Drop',
+                        'actionId': data.id,
+                        'actionParameter': data.params,
+                        'actionIsStorable': data.storable,
+                        'actionStorageKey': data.storageKey,
+                        'actionIsAbortable': data.abortable,
+                        'actionIsBackground': data.background
+                });
+                //let chaos view know
+                $Aura.Inspector.publish("AuraInspector:OnRecordActionDropForChaosRun", data);
+            }
+        },
+
+        /*
+        event handler for AuraInspector:OnStartChaosRun , called from AuraInspectorChaosView.startChaosRun
+        { 'samplingInterval': number like 4000, 'actionDropPercentage': number between 0 to 100 };
+        */
+        "AuraDevToolService.StartChaosRun": function(data) {
+            var samplingInterval = defaultSamplingInterval;
+            if(data && data.samplingInterval && data.samplingInterval > 0 ) { 
+                samplingInterval = data.samplingInterval; 
+            }
+            if(data && data.actionDropPercentage && data.actionDropPercentage > 0) {
+                actionDropPercentage = data.actionDropPercentage;
+            }
+
+            //clean up
+            currentChaosRun = {};
+            currentChaosRunSteps = [];
+            sessionStorage.removeItem("chaosRunToReplay");
+            //and stop all intervals if there is any
+            clearInterval(intervalFunctionRef_elementInNextStepReady);
+            intervalFunctionRef_elementInNextStepReady = undefined;
+            count_waitForElementFromAStepToAppear = 0;
+            clearInterval(intervalFunctionRef_anyAuraRenderedElementPresent);
+            intervalFunctionRef_anyAuraRenderedElementPresent = undefined;
+            count_waitAnyAuraRenderedElementPresent = 0;
+
+            //build a client-side timemachine
+            if(typeof(Storage) !== "undefined") {
+                currentChaosRunTimeMachine = {};
+                var startUrl = window.location.href;
+                if(startUrl.indexOf("?t=") > 0) {
+                    startUrl = startUrl.substr(0,startUrl.indexOf("?t="));
+                    //console.log("rip ?t= from current href:"+startUrl);
+                }
+                currentChaosRunTimeMachine['startUrl'] = startUrl;
+                currentChaosRunTimeMachine['localCache'] = {}; //TODO, look into what we have in storage/ADS/etc
+                currentChaosRun['currentChaosRunTimeMachine'] = currentChaosRunTimeMachine;
+                //console.log("Save timeMachine:", currentChaosRunTimeMachine);
+            } else {
+                console.warn("There is no Web Storage, cannot build timemachine to survice browser location change");
+            }
+
+            if(intervalFunctionRef_anyAuraRenderedElementPresent != undefined) {
+                console.warn("we have previous new chaos run in progress(what why?), clear it up.");
+                clearInterval(intervalFunctionRef_anyAuraRenderedElementPresent);
+                intervalFunctionRef_anyAuraRenderedElementPresent = undefined;
+                count_waitAnyAuraRenderedElementPresent = 0;
+            }
+            intervalFunctionRef_anyAuraRenderedElementPresent = setInterval(waitAnyAuraRenderedElementPresent, defaultSamplingInterval);
+        },
+    
+        //event handler for AuraInspector:stopChaosRun, called by AuraInspectorChaosView.stopChaosRun
+        "AuraDevToolService.StopChaosRun": function(data) {
+            actionDropPercentage = 0;
+
+            clearInterval(intervalFunctionRef_anyAuraRenderedElementPresent);
+            intervalFunctionRef_anyAuraRenderedElementPresent = undefined;
+            count_waitAnyAuraRenderedElementPresent = 0;
+
+            removeCircleElement();
+
+            //console.log("ChaosRun Stopped");
+        },
+
+        //event handler for AuraInspector:stopAllChaosRun, called by AuraInspectorChaosView.stopAllChaosRun
+        "AuraDevToolService.StopAllChaosRun": function(data) {
+            //clean up
+            actionDropPercentage = 0; 
+            currentChaosRun = {};
+            currentChaosRunSteps = [];
+            sessionStorage.removeItem("chaosRunToReplay");
+            //and stop all intervals
+            clearInterval(intervalFunctionRef_elementInNextStepReady);
+            intervalFunctionRef_elementInNextStepReady = undefined;
+            count_waitForElementFromAStepToAppear = 0;
+            clearInterval(intervalFunctionRef_anyAuraRenderedElementPresent);
+            intervalFunctionRef_anyAuraRenderedElementPresent = undefined;
+            count_waitAnyAuraRenderedElementPresent = 0;
+
+            removeCircleElement();
+
+            console.warn("All ongoing ChaosRun, including replaying will be Stopped");
+        },
+
+        /*
+            event handler for AuraInspector:saveChaosRun, called by AuraInspectorChaosView.saveChaosRun
+            {'samplingInterval': number like 4000, 'actionDropPercentage': number between 0 and 100}
+        */
+        "AuraDevToolService.SaveChaosRun": function(data) {
+            currentChaosRun["currentChaosRunSteps"] = currentChaosRunSteps;
+            if(data && data.samplingInterval) {
+                currentChaosRun["samplingInterval"] = data.samplingInterval;
+            }
+            if(data && data.actionDropPercentage) {
+                currentChaosRun["actionDropPercentage"] = data.actionDropPercentage;
+            }
+            
+            //this will call AuraInspectorChaosView_OnChaosRunSaved in AuarInspectorChaosView, just to clear out chaos cards
+            $Aura.Inspector.publish("AuraInspector:OnChaosRunSaved", {});
+
+            //save the run to local file
+            var json = JSON.stringify(currentChaosRun);
+            var blob = new Blob([json], {type: "application/json"});
+            var url  = URL.createObjectURL(blob);
+
+            var ele = document.createElement('a');
+            var d = new Date();
+            var timeStamp = (d.getMonth()+1)+"_"+d.getDate()+"_"+d.getHours()+"_"+d.getMinutes()+"_"+d.getSeconds();
+            ele.download    = "chaosRun_"+timeStamp+".json";
+            ele.href        = url;
+            ele.click();
+
+            //console.log("ChaosRun Saved", currentChaosRun);
+
+            //clear up
+            currentChaosRunTimeMachine = {};
+            currentChaosRun = {};
+        },
+
+        //event handler for AuraInspector:OnLoadChaosRun, called by AuraInspectorChaosView.loadChaosRun
+        //{ 'chaosRunFromFile': string }
+        "AuraDevToolService.LoadChaosRun": function(data) {
+            if(data && data.chaosRunFromFile) {
+                var chaosRunFromFile = data.chaosRunFromFile;
+                
+                //console.log("get chaos run from local file:", chaosRunFromFile);
+
+                if(typeof(Storage) !== "undefined") {
+                    //store it in localStorage
+                    sessionStorage.setItem("chaosRunToReplay", chaosRunFromFile);
+
+                    //call AuraInspectorChaosView_OnChaosRunLoaded in AuarInspectorChaosView to display steps of the chaosRun
+                    //var chaosRunToReplay =  JSON.parse(chaosRunFromFile);
+                    $Aura.Inspector.publish("AuraInspector:OnChaosRunLoaded", JSON.parse(chaosRunFromFile));
+                } else {
+                    console.error("no localStorage found");
+                }
+            } else {
+                console.error("bad data: reading chaos run from file", data);
+            }
+        },
+
+        /*
+            event handler for AuraInspector:OnReplayChaosRun, called by AuraInspectorChaosView.replayChaosRun
+            build time machine, replay the loaded chaos run
+            {'samplingInterval': number like 4000}
+        */
+        "AuraDevToolService.ReplayChaosRun": function(data) {
+            actionDropPercentage = 0;//make sure we don't drop action randomly when replaying
+            if(typeof(Storage) !== "undefined" && sessionStorage.getItem("chaosRunToReplay")) {
+                //chaosRunToReplay is global
+                chaosRunToReplay = JSON.parse(sessionStorage.getItem("chaosRunToReplay"));
+                //chaosRunToReplay["samplingInterval"] = samplingInterval;
+                //console.log("replay chaos run from sessionStorage: ", chaosRunToReplay);
+
+                //set indexOfStep, also update it in session storage
+                chaosRunToReplay["indexOfStep"] = 0;
+                //we honor the samplingInterval in the recording, if any. if not, use the number use choose, from chaosView
+                if(chaosRunToReplay.samplingInterval && chaosRunToReplay.samplingInterval > 0) {} 
+                else if(data && data.samplingInterval){
+                    chaosRunToReplay["samplingInterval"] = data.samplingInterval;
+                }
+                sessionStorage.setItem("chaosRunToReplay", JSON.stringify(chaosRunToReplay));
+
+                if(chaosRunToReplay.currentChaosRunTimeMachine && chaosRunToReplay.currentChaosRunTimeMachine.startUrl) {
+                    var message = "Time Machine Start\n Page is going to refresh with this url in 3s\n"+chaosRunToReplay.currentChaosRunTimeMachine.startUrl;
+                    //console.log(message);   
+                    //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
+                    $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
+                    setTimeout(function()
+                    {
+                        var newLocation = JSON.parse(sessionStorage.getItem("chaosRunToReplay")).currentChaosRunTimeMachine.startUrl; 
+                        if(newLocation.indexOf("#") > 0) {//stupid # stop it from reloading
+                            window.location = newLocation;
+                            window.location.reload();
+                        } else {
+                            window.location = newLocation;
+                        }
+                    }, 3000);
+                } else {
+                    console.warn("replay chaos run from sessionStorage, there is no timeMachine", chaosRunToReplay);
+                }
+            } else {
+                console.error("cannot replay chaos run, either there is no local storage, or there is no chaosRunToReplay in it");
+            } 
+            
+        },
+
+        /*
+            event handler for 'AuraInspector:OnContinueChaosRun', called from AuraInspectorChaosView_OnBootstrap of AuraInspectorChaosView
+            this happen after browser refresh with the new location set by above function 'AuraDevToolService.ReplayChaosRun'
+        */
+        "AuraDevToolService.ContinueChaosRun": function(data) {
+            if(typeof(Storage) !== "undefined" && sessionStorage.getItem("chaosRunToReplay")) {
+                //chaosRunToReplay is global
+                chaosRunToReplay = JSON.parse(sessionStorage.getItem("chaosRunToReplay"));
+                if(chaosRunToReplay) {   
+                    //store steps in currentChaosRunSteps, repeately check if the first element show up in dom
+                    currentChaosRunSteps = chaosRunToReplay.currentChaosRunSteps;
+                    var samplingInterval = defaultSamplingInterval;
+                    if(chaosRunToReplay.samplingInterval && chaosRunToReplay.samplingInterval > 0) {
+                        samplingInterval = chaosRunToReplay.samplingInterval;
+                    } 
+                    
+                    var message = "We are in the middle of the replaying a chaos run, samplingInterval="+samplingInterval;
+                    //console.log(message, chaosRunToReplay); 
+                    //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView  
+                    $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
+
+                    intervalFunctionRef_elementInNextStepReady = setInterval(waitForElementFromAStepToAppear, samplingInterval);
+                } else {
+                    console.error("we would like to continue with chaos run, but there is no valid chaosRunToReplay in local storage");
+                }
+            } else {
+                console.error("cannot continue with chaos run because either there is no local storage, or there is no chaos run stored in it");
+            }
+        }
+
+    };//end of $Aura.chaos
+
+    /*  a step looks like this {
+            //if it's a click
+            'textContent': string,
+            'locator': undefined or
+                {
+                    "id":"888:1;0", 
+                    "root":"tabItemAnchor",
+                    "parent":"pathAssistant",
+                    "selector":"AtabHeader",
+                    "context":{"tab-name":"Id.DecisionMakers"}
+                },
+            'cssPath': string like "body > button + button > span"
+            //if it's action operation
+            'actionName': string,
+            'actionOperation': string //"Drop",
+            'actionId': string //why we care
+            'actionParameter': string //"{..}"
+            'actionIsStorable': boolean
+            'actionStorageKey': string
+            'actionIsAbortable': boolean
+            'actionIsBackground': boolean
+        }
+    */
+
+    /****************************************** functions for replay a chaos run *************************************/
+
+    function scheduleActionOperationForNextStep() {
+        var nextStepIndex = chaosRunToReplay.indexOfStep + 1;
+        //it's possible we drop more than one action right after a click, let's schedule them all
+        while(nextStepIndex <= (chaosRunToReplay["currentChaosRunSteps"].length - 1) && 
+            chaosRunToReplay["currentChaosRunSteps"][nextStepIndex] &&
+            chaosRunToReplay["currentChaosRunSteps"][nextStepIndex].hasOwnProperty('actionName') &&
+            chaosRunToReplay["currentChaosRunSteps"][nextStepIndex].hasOwnProperty('actionOperation') ) {
+
+            var nextStep = chaosRunToReplay["currentChaosRunSteps"][nextStepIndex];
+
+            var message = "schedule action:"+nextStep.actionName+" to "+nextStep.actionOperation;
+            //console.log(message, nextStep);
+            //call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
+            $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
+
+            //add the action to watch list
+            if(nextStep.actionOperation === 'Drop') {
+                var actionToDrop = {
+                        'actionName': nextStep.actionName, 
+                        'actionParameter': nextStep.actionParameter, 
+                        'actionId': nextStep.actionId, //713;a
+                        'actionIsStorable': nextStep.actionIsStorable,
+                        'actionStorageKey': nextStep.actionStorageKey,
+                        'actionIsAbortable': nextStep.actionIsAbortable,
+                        'actionIsBackground': nextStep.actionIsBackground,
+                        'nextResponse': undefined //this has to be undefined
+                }
+                //call AuraInspectorActionsView's AuraInspectorActionsView_OnEnqueueNextDropForChaosReplay
+                $Aura.Inspector.publish("AuraInspector:EnqueueNextDropForChaosReplay", actionToDrop);
+
+                //action scheduled to be drop, now remove the step
+                chaosRunToReplay["currentChaosRunSteps"].splice(nextStepIndex,1);
+            }
+        }
+    }
+
+    //we need to wait for the element in chaos run step to appear before clicking it
+    var count_waitForElementFromAStepToAppear = 0;
+    function waitForElementFromAStepToAppear() {
+        if( !chaosRunToReplay || !chaosRunToReplay.hasOwnProperty("indexOfStep") ) {
+            //could this happen if page refresh during replay?
+            console.error("no chaosRunToReplay in memory !!!");
+        }
+        var step = chaosRunToReplay["currentChaosRunSteps"][chaosRunToReplay.indexOfStep];
+        if(step && step.hasOwnProperty("cssPath")) {
+            var message = "Replay Step#"+chaosRunToReplay.indexOfStep+":"+step.textContent
+            +", try count:"+count_waitForElementFromAStepToAppear;
+            //console.log(message, step);
+            //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
+            $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
+
+            //meh
+            if(count_waitForElementFromAStepToAppear > defaultMaxTry) {
+                clearInterval(intervalFunctionRef_elementInNextStepReady);
+                var errMsg = "We have to stop replaying chaos run because element on the next step wouldn't show up";
+                //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in AuarInspectorChaosView
+                $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {'error': errMsg});
+                console.error(errMsg, step);
+            }
+
+            if( findElementWithLocatorOrCSSPath(step.locator, step.cssPath) )  {//yay
+                //if we want to drop some action right after this click, now it's the time to schedule it.
+                scheduleActionOperationForNextStep();
+                //now click the element, then increase indexOfStep
+                count_waitForElementFromAStepToAppear = 0;
+                var previousIndexOfStep = clickElement(step);
+                //now either there are more steps after this one, or we are at the end of replaying
+                if(previousIndexOfStep >= 0 && previousIndexOfStep < chaosRunToReplay["currentChaosRunSteps"].length - 1)
+                {
+                    chaosRunToReplay.indexOfStep = previousIndexOfStep + 1;
+                } else {
+                    //clear the interval 
+                    clearInterval(intervalFunctionRef_elementInNextStepReady);
+                    intervalFunctionRef_elementInNextStepReady = undefined;
+                    if(chaosRunToReplay.indexOfStep === chaosRunToReplay["currentChaosRunSteps"].length - 1) {
+                        removeCircleElement();
+
+                        var message = "ChaosRun Finished";
+                        //console.log(message);
+                        //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
+                        $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
+                        //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in AuarInspectorChaosView
+                        $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {});
+
+                    } else {
+                        removeCircleElement();
+
+                        var errMsg = "Chaos Run Stop because indexOfStep="+chaosRunToReplay.indexOfStep+" is out of bound";
+                        console.error(errMsg, chaosRunToReplay["currentChaosRunSteps"]);
+                        //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in AuarInspectorChaosView
+                        $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {'error': errMsg});
+                    }
+                }
+            } else {
+                count_waitForElementFromAStepToAppear = count_waitForElementFromAStepToAppear + 1;
+                //console.log("waitForElementFromAStepToAppear, try#"+count_waitForElementFromAStepToAppear+" of maxTry="+defaultMaxTry);
+            }
+        } else {
+            removeCircleElement();
+
+            var errMsg = "Chaos Run Stop because indexOfStep="+chaosRunToReplay.indexOfStep+" is bogus";
+            console.error(errMsg, chaosRunToReplay["currentChaosRunSteps"]);
+            //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in AuarInspectorChaosView
+            $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {'error': errMsg});
+        }
+    }
+
+    //click on element from a step of chaosrun
+    //return chaosRunToReplay.indexOfStep if everything goes well, -1 if we cannot find element to click
+    function clickElement(step) {
+                //console.log("Click element for step#"+chaosRunToReplay.indexOfStep, step);
+                //try locator first
+                var elementToClick;
+                elementToClick = findElementWithLocatorOrCSSPath(step.locator, step.cssPath);
+                
+                if(elementToClick) {
+                    //console.log("click on "+step.textContent, step);
+                    //this will call AuraInspectorChaosView_OnClickSomeElement in AuarInspectorChaosView to create chaos card
+                    $Aura.Inspector.publish("AuraInspector:OnClickSomeElement", step);
+                    
+                    //highlight then actually click on the element
+                    highlightElement(elementToClick);
+                    setTimeout( function() { elementToClick.click(); }, 1000 );
+                    
+                    return chaosRunToReplay.indexOfStep;
+                    
+                } else {
+                    var errMsg = "Chaos Run Stop because we cannot find element to click for step";
+                    console.error(errMsg, step);
+                    //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in AuarInspectorChaosView
+                    $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {'error': errMsg});
+
+                    return -1;
+                } 
+    }
+
+    function findElementWithLocatorOrCSSPath(locator, cssPath) {
+        var selector = '[data-aura-rendered-by] '; // retrieve all aura elements
+        var elements = [];
+
+        if (!locator) {
+            //console.log("we don't have locator for this step, use cssPath instead", cssPath);
+            var elementByCssPath = document.querySelector(cssPath);
+            return elementByCssPath;
+        }
+        // Add context to selector if we have it        
+        if (locator && locator.context) {
+            var keys = Object.keys(locator.context);
+            var datamap = keys.map(function(k) { return '[' + k + '=\'' + locator.context[k] + '\']'});
+            selector += datamap.join();
+        }
+        //console.log("try to find element with selector:"+selector);
+        // Filter by aura tag + context
+        elements = Array.prototype.slice.call(document.querySelectorAll(selector));
+
+        if(elements.length === 1) {
+            //console.log("found element with selector in locator("+selector+")",locator);
+            return elements[0];
+        }
+        else if(elements.length > 1) {
+            // Filter given the localId's
+            elements = elements.filter(function(el) {
+                var parentId;
+                var cmp = $A.componentService.getRenderingComponentForElement(el);
+                var localId = cmp && cmp.getLocalId();
+                var tmp = cmp && cmp.getComponentValueProvider()
+
+                if (localId && localId === locator.root) {
+                    while (tmp && tmp !== cmp) {
+                        var parentId = tmp.getLocalId();
+                        if (parentId === locator.parent) {
+                                return true;
+                        }
+
+                        cmp = tmp;
+                        tmp = tmp.getComponentValueProvider();
+                    }
+                }
+            });
+
+            if (elements.length === 1) {
+                //console.log("found element with parentId&localId in locator("+selector+")",locator);
+                return elements[0];
+            } else {
+                //console.log("found more than one elements based on locator's context and localId, use cssPath instead", locator, cssPath);
+                var elementByCssPath = document.querySelector(cssPath);
+                return elementByCssPath;
+            }
+        } else {
+            //console.log("couldn't find any element based on locator's context, use cssPath instead", locator, cssPath);
+            var elementByCssPath = document.querySelector(cssPath);
+            return elementByCssPath;
+        }
+    }
+    
+    /****************************************** functions for a new chaos run *************************************/
+
+    //when we click through the app, if the page load slowly, need to wait till at least one aura-rendered element show up
+    var count_waitAnyAuraRenderedElementPresent = 0;
+    function waitAnyAuraRenderedElementPresent() {
+        if(count_waitAnyAuraRenderedElementPresent > defaultMaxTry) {
+            clearInterval(intervalFunctionRef_anyAuraRenderedElementPresent);
+            var errMsg = "We have to stop the new chaos run because no aura rendered element show up";
+            //ask chaos tab to create a chaos card, this will call stopChaosRun in AuraInspectorChaosView
+            $Aura.Inspector.publish("AuraInspector:OnStopNewChaosRunWithError", {'error': errMsg});
+            //above will end up calling "AuraDevToolService.StopChaosRun" here to clear up intervalFunctionRef_anyAuraRenderedElementPresent
+            console.error(errMsg);
+        }
+        var selector = '[data-aura-rendered-by]';
+        var elementNodeList = document.querySelectorAll(selector);
+        if(elementNodeList.length > 0) {
+            count_waitAnyAuraRenderedElementPresent = 0;
+            clearInterval(intervalFunctionRef_anyAuraRenderedElementPresent);
+            clickRandomClickableElement();
+        } else {
+            //console.log("waitAnyAuraRenderedElementPresent, try#"+count_waitAnyAuraRenderedElementPresent+" of maxTry="+defaultMaxTry);
+            count_waitAnyAuraRenderedElementPresent = count_waitAnyAuraRenderedElementPresent + 1;
+        }
+
+    }
+
+    //click on a random element. this is called during a new chaos run
+    function clickRandomClickableElement() {
+        var elementToClickObj = getRandomClickableAuraElement();
+        if(!elementToClickObj) {//we get into a place where we cannot find clickable element, stop chaos run
+            var errMsg = "We have to stop the new chaos run because we couldn't find any clickable element";
+            //ask chaos tab to create a chaos card, this will call stopChaosRun in AuraInspectorChaosView
+            $Aura.Inspector.publish("AuraInspector:OnStopNewChaosRunWithError", {'error': errMsg});
+            //above will end up calling "AuraDevToolService.StopChaosRun" here to clear up intervalFunctionRef_anyAuraRenderedElementPresent
+    
+            console.error(errMsg);
+        }
+        var elementToClick = elementToClickObj.element;
+        
+        var cssPath = getCssPath(elementToClick);
+        if(!document.querySelector(cssPath)) {
+            console.error("get bad cssPath?");
+            getCssPath(elementToClick);
+        }
+        //ask AuraInspectorChaosView to create a chaos card
+        var data = {
+            'textContent': elementToClick.textContent,
+            'locator': elementToClickObj.locator,
+            'cssPath': getCssPath(elementToClick)
+        };
+        currentChaosRunSteps.push(data);
+        //this will call AuraInspectorChaosView_OnClickSomeElement in AuarInspectorChaosView to create a chaos card
+        $Aura.Inspector.publish("AuraInspector:OnClickSomeElement", data);
+        //acutally click the element
+        highlightElement(elementToClick);
+        setTimeout( function() { elementToClick.click(); }, 800 );
+
+        intervalFunctionRef_anyAuraRenderedElementPresent = setInterval(waitAnyAuraRenderedElementPresent, defaultSamplingInterval);
+    }
+
+    function getRandomClickableAuraElement() {
+        var res = {};
+        var resLocator = {};
+        var elementNodeList; var elements = [];
+        var randomClickableClassIndex;
+        var randomElementsIndex;
+        var element;
+        var renderingComponent;
+        var idx;
+
+        var tryCount = 0;
+        do {
+            tryCount = tryCount + 1;
+            randomClickableClassIndex = Math.floor( Math.random() * clicableClassList.length );
+            selector = '.'+clicableClassList[randomClickableClassIndex]+'[data-aura-rendered-by] ';            
+            elementNodeList = document.querySelectorAll(selector);
+            for (idx = 0; idx < elementNodeList.length; idx++) {
+                if( isElementVisible(elementNodeList.item(idx)) ) {
+                    elements.push(elementNodeList.item(idx));
+                }
+            }
+            //console.log("try selector#"+randomClickableClassIndex+":"+selector);
+        } while(elements.length === 0 && tryCount < defaultMaxTry*5)
+
+        if(tryCount >= defaultMaxTry*5) {
+            return null;
+        }
+        
+        randomElementsIndex = Math.floor( Math.random() * elements.length );
+        element = elements[randomElementsIndex];
+        res['element'] = element;
+        renderingComponent = $A.componentService.getRenderingComponentForElement(element);
+        if(renderingComponent.getLocalId()) { 
+            var parentCmp = getClosestAncestorWithLocalId(renderingComponent);
+            if(parentCmp.getLocalId()) {//yay
+                    resLocator['root'] = renderingComponent.getLocalId();
+                    resLocator['parent'] = parentCmp.getLocalId();
+                    //console.log(renderingComponent.getLocalId()+","+parentCmp.getLocalId());
+                    resLocator['context'] = getElementAttributesStartWithDataDash(element);
+                    res['locator'] = resLocator;
+                    //console.log("1.get randomEle #"+randomElementsIndex+":"+element.textContent, res);
+                    return res;
+            } else {//meh, let's just use the css selector 
+                    //console.log("2.get randomEle #"+randomElementsIndex+":"+element.textContent, res);
+                    return res;
+            }
+        } else {//meh, let's just use the css selector 
+            //console.log("3.get randomEle #"+randomElementsIndex+":"+element.textContent, res);
+            return res;
+        }
+    }
+
+    /****************************************************************
+    ****************** Utility Functions Starts **********************
+    ****************************************************************/
+
+    function getElementAttributesStartWithDataDash(element) {
+        var resObj = {}; var attr;
+        for(var item in element.attributes) {
+            attr = element.attributes[item];
+            if(attr.name && attr.name.startsWith("data-") && !attr.name.endsWith("rendered-by")) {
+                resObj[attr.name] = attr.nodeValue;
+            }
+        }
+        return resObj;
+
+    }
+
+    function getClosestAncestorWithLocalId(cmp) {
+        var parent = cmp && cmp.getComponentValueProvider();
+        var tmp = cmp;
+        while( parent && parent !== tmp && !parent.getLocalId() ) {
+            tmp = parent;
+            parent = parent.getComponentValueProvider();
+        }
+        return parent;
+    }
+
+    function isElementVisible(element) {
+        if( '0' === element.style.opacity ||'none' === element.style.display || 'hidden' === element.style.visibility 
+            || element.getBoundingClientRect().left <=0 || element.getBoundingClientRect().top <= 0
+            || element.getBoundingClientRect().bottom >= window.innerHeight 
+            || element.getBoundingClientRect().right >= window.innerWidth
+            ) {
+            return false;
+        } else {
+            //var centerLeft = getCenterPositionLeftOfElement(element);
+            //var centerTop = getCenterPositionTopOfElement(element);
+            var topElement = document.elementFromPoint(element.getBoundingClientRect().left, element.getBoundingClientRect().top);
+            if(topElement && topElement === element) {
+                return true;
+            } else {
+                return false;
+            }
+            
+        }
+    }
+
+    function getCenterPositionLeftOfElement(element) {
+        return element.getBoundingClientRect().left+element.getBoundingClientRect().width/3;
+    }
+
+    function getCenterPositionTopOfElement(element) {
+        return element.getBoundingClientRect().top+element.getBoundingClientRect().height/3;
+    }
+
+    //functions highlight the element we gonna with greenCircle
+    function createCircleElement() {
+            var circleEle = document.createElement("div");
+            circleEle.setAttribute("id", "greenCircle");
+            circleEle.className = "greenCircle";
+            circleEle.style.background = "greenyellow";
+            circleEle.style.width = "25px";
+            circleEle.style.height = "25px";
+            circleEle.style.borderRadius = "50px";
+            circleEle.style.opacity = "0.5";
+            circleEle.style.transition="left .5s ease-in, top .5s ease-in";
+            circleEle.style.zIndex = "9999";
+            circleEle.style.position = "fixed";
+            circleEle.style.left = "50px";
+            circleEle.style.top = "50px";
+
+
+            window.document.body.appendChild(circleEle);
+            return circleEle;
+    }
+
+    function removeCircleElement() {
+        var circleEle = document.querySelector("#greenCircle");
+        circleEle.parentElement.removeChild(circleEle);
+    }
+
+    function moveCircleToWhatWeJustClicked(left, top) {
+            var circleEle = document.querySelector("#greenCircle");
+            circleEle.style.left = left+"px";
+            circleEle.style.top = top+"px";
+    }
+
+    function highlightElement(element) {
+        if(!window.document.querySelector("#greenCircle")) {
+            createCircleElement();
+        }
+        moveCircleToWhatWeJustClicked(getCenterPositionLeftOfElement(element), getCenterPositionTopOfElement(element));
+    } 
+    //end of functions to highlight the element we gonna with greenCircle
+
+    //functions to get css path of some element
+    function previousElementSibling (element) {
+      if (element.previousElementSibling !== 'undefined') {
+        return element.previousElementSibling;
+      } else {
+        // Loop through ignoring anything not an element
+        while (element = element.previousSibling) {
+          if (element.nodeType === Node.ELEMENT_NODE) {
+            return element;
+          }
+        }
+      }
+    }
+
+    function getCssPath (element) {
+      // False on non-elements
+      if (!(element instanceof HTMLElement)) { return false; }
+      var path = [];
+      while (element.nodeType === Node.ELEMENT_NODE) {
+        var selector = element.nodeName;
+        if (element.id && element.id.indexOf(";a")<0) { selector += ('#' + element.id); }
+        else {
+          // Walk backwards until there is no previous sibling
+          var sibling = element;
+          // Will hold nodeName to join for adjacent selection
+          var siblingSelectors = [];
+          while (sibling !== null && sibling.nodeType === Node.ELEMENT_NODE) {
+            siblingSelectors.unshift(sibling.nodeName);
+            sibling = previousElementSibling(sibling);
+          }
+          // :first-child does not apply to HTML
+          if (siblingSelectors[0] !== 'HTML') {
+            siblingSelectors[0] = siblingSelectors[0] + ':first-child';
+          }
+          selector = siblingSelectors.join(' + ');
+        }
+        path.unshift(selector);
+        element = element.parentNode;
+      }
+      return path.join(' > ');
+    }//end of functions to get css path of some element
+
+
+    /****************************************************************
+    ****************** Utility Functions Ends **********************
+    ****************************************************************/
+
+    /****************************************************************
+    ****************** Chaos Functions Ends **********************
+    ****************************************************************/
+
+
 
     // Subscribes!
     $Aura.Inspector.subscribe("AuraInspector:OnPanelConnect", function AuraInspector_OnPanelLoad() {
@@ -250,7 +1054,17 @@
 
     $Aura.Inspector.subscribe("AuraInspector:OnActionToWatchEnqueue", $Aura.actions["AuraDevToolService.AddActionToWatch"]);
     $Aura.Inspector.subscribe("AuraInspector:OnActionToRemoveFromWatchEnqueue", $Aura.actions["AuraDevToolService.RemoveActionFromWatch"]);
-    $Aura.Inspector.subscribe("AuraInspector:OnActionToWatchClear", $Aura.actions["AuraDevToolService.RemoveActionsFromWatch"])
+    $Aura.Inspector.subscribe("AuraInspector:OnActionToWatchClear", $Aura.actions["AuraDevToolService.RemoveActionsFromWatch"]);
+
+    $Aura.Inspector.subscribe("AuraInspector:OnStartChaosRun", $Aura.chaos["AuraDevToolService.StartChaosRun"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnStopChaosRun", $Aura.chaos["AuraDevToolService.StopChaosRun"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnSaveChaosRun", $Aura.chaos["AuraDevToolService.SaveChaosRun"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnLoadChaosRun", $Aura.chaos["AuraDevToolService.LoadChaosRun"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnReplayChaosRun", $Aura.chaos["AuraDevToolService.ReplayChaosRun"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnContinueChaosRun", $Aura.chaos["AuraDevToolService.ContinueChaosRun"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnStopAllChaosRun", $Aura.chaos["AuraDevToolService.StopAllChaosRun"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnSomeActionGetDropped", $Aura.chaos["AuraDevToolService.RecordDroppedAction"]);
+        
 
     function AuraInspector() {
         var subscribers = new Map();
@@ -312,6 +1126,13 @@
                 return item !== callback;
             }));
 
+        };
+
+        // Overriden by some tricky code down below to try to get into the context of the app.
+        this.accessTrap = function(callback) {
+            if(typeof callback === "function") {
+                callback();
+            }
         };
 
         this.getComponent = function(componentId, options) {
@@ -761,6 +1582,27 @@
             $Aura.Inspector.count(this.getGlobalId() + "_rerendered");
         });
 
+        /*
+            I'll admit, this is a  hack into the Aura access check framework. 
+            I shouldn't rely on this, it's merely a best case scenario work around.
+            Fallbacks should be present if I use this method.
+         */
+        var originalRender = Component.prototype.render;
+        wrapFunction(Component.prototype, "render", function(){
+            var current = this.getDef();
+            while(current.getSuperDef()) {
+                current = current.getSuperDef();
+            }
+            if(current.getDescriptor().getQualifiedName() === "markup://aura:application") {
+                $Aura.Inspector.accessTrap = $A.getCallback(function(callback) {
+                    if(typeof callback === "function") {
+                        callback();
+                    }
+                });
+                // No need anymore to do the override. It's simply to attach this access trap.
+                Component.prototype.render = originalRender;
+            }
+        });
         // No way of displaying this at the moment.
         // wrapFunction(Component.prototype, "unrender", function(){
         //     $Aura.Inspector.count("component_unrendered");
@@ -882,13 +1724,14 @@
                 for(actionWatchedId in actionsWatched) {
                     if(oldResponseText.indexOf(actionWatchedId) > 0) {
                         var actionWatched = actionsWatched[actionWatchedId];
-                        if( /*( actionWatched.nextResponse || actionWatched.nextError) &&*/ oldResponseText.startsWith("while(1);") ) {
+                        if( oldResponseText.startsWith("while(1);") ) {
                             //parse oldResponseObj out of oldResponseText
                             var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
                             //replace returnValue in oldResponseObj's actions
                             if(oldResponseObj && oldResponseObj.actions) {
                                 var actionsFromOldResponse = oldResponseObj.actions;
                                 for(var i = 0; i < actionsFromOldResponse.length; i++) {
+                                    //console.log("decode action#"+actionsFromOldResponse[i].id, actionsFromOldResponse[i]);
                                     if(actionsFromOldResponse[i].id && actionsFromOldResponse[i].id === actionWatchedId) {
                                         if(actionWatched.nextError) {//we would like to return error response 
                                             var errsArr = []; 
@@ -944,7 +1787,6 @@
                                         "error": actionWatched.nextError,//we don't show error on processed actionAcard, but pass it anyway
                                         "sentTime": performance.now()//do we need this?
                                 });
-                                //delete actionsWatched[actionWatchedId];
                                 break;//get out of looping over actionsWatched
                             } else if(responseModified === true) {
                                 oldResponseObj.actions = actionsFromOldResponse;
@@ -957,7 +1799,6 @@
                                         "state": "RESPONSEMODIFIED",
                                         "sentTime": performance.now()//do we need this?
                                 });
-                                //delete actionsWatched[actionWatchedId];
                                 break;//get out of looping over actionsWatched
                             } else if(responseWithIncomplete === true) {
                                 //move the actionCard from watch list to Processed
@@ -966,15 +1807,58 @@
                                         "id": actionWatchedId,
                                         "idtoWatch": actionWatched.idtoWatch,
                                         "state": "RESPONSEMODIFIED",
-                                        "sentTime": performance.now()//do we need this?
+                                        "sentTime": performance.now(),//do we need this?
+                                        "byChaosRun": actionWatched.byChaosRun
                                 });
-                                //delete actionsWatched[actionWatchedId];
+                                if(actionWatched.byChaosRun) {
+                                    $Aura.Inspector.publish("AuraInspector:OnCreateChaosCard",
+                                        {"message": "Drop Action#"+actionWatched.id + ", the old actionId from replay:"+actionWatched.idtoWatch} );
+                                    if(actionWatched.id === actionWatched.idtoWatch) {
+                                        console.warn("The action in your replay has the same id as the action being dropped, this will confuse ActionTab, as it use actionId to find and move actionCard around. Please change action id in your replay file to something else, like 9999 :-) ");
+                                    }
+                                }
                                 break;//get out of looping over actionsWatched
                             }
                         }//end of actionWatched has nextResponse and oldResponseText start with 'while(1);'
                     }//end of oldResponseText contains the actionWatchedId we care
                 }//end of looping over actionsWatched
             }//end of actionsWatched is not empty
+
+            //if we are in a new chaos run, and user would like to drop action randomly
+            if( !responseWithIncomplete && actionDropPercentage ) {
+                var r = Math.random() * 100;
+                if( r < actionDropPercentage ) {
+                    if( oldResponseText.startsWith("while(1);") ) {
+                        //parse oldResponseObj out of oldResponseText
+                        try {
+                            var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
+                            //replace returnValue in oldResponseObj's actions
+                            if(oldResponseObj && oldResponseObj.actions && oldResponseObj.actions.length > 0) {
+                                responseWithIncomplete = true;
+                                var actionsFromOldResponse = oldResponseObj.actions;
+                                for(var i = 0; i < actionsFromOldResponse.length; i++) {
+                                    if(actionsFromOldResponse[i] && actionsFromOldResponse[i].id) {
+                                            //console.log("drop action by request of new Chaos Run.", actionsFromOldResponse[i]);
+                                            //push this action to actionsWatched, so actionTab know what to do
+                                            actionsFromOldResponse[i]['idtoWatch'] = actionsFromOldResponse[i].id;
+                                            actionsFromOldResponse[i]['nextError'] = undefined;//these 2 are useful against howDidWeModifyResponse
+                                            actionsFromOldResponse[i]['nextResponse'] = undefined;
+                                            actionsWatched[actionsFromOldResponse[i].id] = actionsFromOldResponse[i];
+                                            //call AuraInspectorActionsView_OnDropActionInChaosRun in AuraInspectorActionsView
+                                            $Aura.Inspector.publish("AuraInspector:DropActionInChaosRun",
+                                                {
+                                                    'id': actionsFromOldResponse[i].id
+                                                }
+                                            );
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.warn("we try to drop action during the new chaos run, but run into error while parsing response from server. will do nothing", e);
+                        } 
+                    }
+                }//end of actionDropPercentage allow us to drop the current action
+            }//end of we are dropping action for new chaos run
 
             if(responseWithIncomplete) {
                 oldResponse.status = 0;//so AuraClientService.isDisconnectedOrCancelled will return true
@@ -995,7 +1879,7 @@
                 return ret;
             }
         } else {
-            console.log("AuraInspectorInjectedScript.onDecode, receive bad response, just pass it along, let aura worry about it");
+            console.warn("AuraInspectorInjectedScript.onDecode, receive bad response, just pass it along, let aura worry about it");
             var ret = config["fn"].call(config["scope"], oldResponse, noStrip);
             return ret;
         }
@@ -1013,12 +1897,15 @@
                             if(actionToWatch.actionName.indexOf(action.getDef().name) >= 0) {
                                 //udpate the record of what we are watching, this is mainly for action we want to modify response
                                 if(actionsWatched[''+action.getId()]) {
-                                    console.log("Error: we already watching this action:", action);
+                                    console.warn("Error: we already watching this action:", action);
                                 } else {
                                     //copy nextResponse to actionWatched
                                     action['nextError'] = actionToWatch.nextError;
                                     action['nextResponse'] = actionToWatch.nextResponse;
                                     action['idtoWatch'] = actionToWatch.actionId;
+                                    if(actionToWatch.byChaosRun) {
+                                        action['byChaosRun'] = actionToWatch.byChaosRun;
+                                    }
                                     actionsWatched[''+action.getId()] = action;
                                 }
                                 //remove from actionsToWatch

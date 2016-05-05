@@ -50,6 +50,31 @@ Aura.Utils.Util = function Util() {
  */
 Aura.Utils.Util.prototype.isIE = (navigator.userAgent.indexOf("MSIE") !== -1) || (navigator.userAgent.indexOf("Trident/") !== -1);
 
+
+/**
+ * Browser check for localStorage enablement
+ *
+ * @returns {Boolean} true if LocalStorage is available
+ * @export
+ */
+Aura.Utils.Util.prototype.isLocalStorageEnabled = function () {
+    if (this.localStorageEnabled === undefined) {
+        this.localStorageEnabled = false;
+        if (window.localStorage) { 
+            try {
+                window.localStorage.setItem("__AURA_LOCAL_STORAGE_ENABLED_TEST", "");
+                window.localStorage.removeItem("__AURA_LOCAL_STORAGE_ENABLED_TEST");
+                this.localStorageEnabled = true;
+            } catch (ignore) {
+                // do nothing
+            }
+        }
+    }
+
+    return this.localStorageEnabled;
+
+};
+
 /**
  * Whether IOS7 UIWebView
  * @returns {boolean} true if IOS UIWebView

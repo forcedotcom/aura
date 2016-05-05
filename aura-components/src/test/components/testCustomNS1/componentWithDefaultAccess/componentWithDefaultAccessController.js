@@ -15,7 +15,6 @@
  */
 ({
     privateMethod: function(component, event, helper){
-    
     },
     
     publicMethod: function(component, event, helper){

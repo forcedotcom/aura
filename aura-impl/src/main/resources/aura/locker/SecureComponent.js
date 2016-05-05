@@ -61,6 +61,7 @@ function SecureComponent(component, key) {
             }
         }
     });
+    
     Object.defineProperties(o, {
         // these four super* methods are exposed as a temporary solution until we figure how to re-arrange the render flow
         "superRender": SecureObject.createFilteredMethod(o, component, "superRender"),
@@ -88,11 +89,12 @@ function SecureComponent(component, key) {
         "getElement": SecureObject.createFilteredMethod(o, component, "getElement"),
         "getElements": SecureObject.createFilteredMethod(o, component, "getElements")
     });
+    
     // The shape of the component depends on the methods exposed in the definitions:
     var defs = component.getDef().methodDefs;
     if (defs) {
         defs.forEach(function(method) {
-            Object.defineProperty(o, method.name, SecureObject.createFilteredMethod(o, component, method.name));
+    		SecureObject.addMethodIfSupported(o, component, method.name);
         }, o);
     }
 

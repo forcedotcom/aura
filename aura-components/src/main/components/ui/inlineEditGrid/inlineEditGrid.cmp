@@ -25,7 +25,7 @@
 	
 	<aura:attribute name="class" type="String" />
 	
-	<aura:attribute name="stale" type="Object" access="PRIVATE"/>
+	<aura:attribute name="editedItems" type="Object" access="PRIVATE"/>
 	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<aura:handler name="change" value="columns" action="{!c.handleColumnsChange}"/>
@@ -40,12 +40,5 @@
 			<ui:button label="Cancel" press="{!c.cancel}"/>
 			<ui:button label="Save" press="{!c.save}"/>
 		</div>
-		<div class="manager">
-	        <ui:panelManager2 aura:id="pm">
-	            <aura:set attribute="registeredPanels">
-	                    <ui:panel alias="panel"/>
-	            </aura:set>
-	        </ui:panelManager2>
-	    </div>
 	</div>
 </aura:component>

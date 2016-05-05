@@ -68,7 +68,7 @@
                 cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
             },
             function verifyTargetCmpStored(cmp) {
-            	cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
+                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
             },
             function fetchDifferentCmpFromServer(cmp) {
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:block");
@@ -78,17 +78,7 @@
             },
             function verifyTargetCmpEvicted(cmp) {
                 // Ideally we would keep adding defs until the original got evicted instead of just waiting here (W-2979502)
-                var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                $A.test.addWaitFor(true, function() {
-                    var defs = iframeCmp._ComponentDefStorage.split(',');
-                    for (var i = 0; i < defs; i++) {
-                        var def = defs[i].trim();
-                        if (def === "markup://ui:scroller") {
-                            return false;
-                        }
-                    }
-                    return true;
-                });
+                cmp.helper.lib.iframeTest.waitForDefRemovedFromStorage("ui:scroller");
             },
             function reloadPage(cmp) {
                 // Reload page to clear anything saved in javascript memory

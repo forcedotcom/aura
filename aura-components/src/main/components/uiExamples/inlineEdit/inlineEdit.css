@@ -46,17 +46,17 @@
 	width: 25rem;
 }
 
-.THIS .inline-edit-example .panel-content .content {
+.THIS .panel-content .content {
 	padding: 0;
 }
 
-.THIS .inline-edit-example .panel-content input {
+.THIS .panel-content input {
 	box-sizing: border-box;
 	padding: 0 1rem 0 0.75rem;
 	width: 90%;
 }
 
-.THIS .inline-edit-example .uiPanel {
+.THIS .uiPanel {
 	border-radius: initial;
 }
 
@@ -72,14 +72,6 @@
     min-height: 0;
     height: 21px;
 }
-
-.THIS .inline-edit-example tr td:nth-child(1) .content {
-    border: 1px solid #d8dde6;
-    border-radius: 0.25rem;
-    width: 100%;
-    transition: border 0.1s linear, background-color 0.1s linear;
-}
-
 
 .THIS .inline-edit-example .footer {
 	text-align: center;

@@ -27,13 +27,16 @@ import java.util.Map;
 
 import org.auraframework.util.IOUtil;
 
+import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+import com.google.javascript.jscomp.ErrorFormat;
 import com.google.javascript.jscomp.JSError;
+import com.google.javascript.jscomp.MessageFormatter;
 import com.google.javascript.jscomp.PropertyRenamingPolicy;
 import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
@@ -115,7 +118,8 @@ public enum JavascriptWriter {
         }
 
         @Override
-        public List<JavascriptProcessingError> compress(InputStream in, Writer out, String filename) throws IOException {
+        public List<JavascriptProcessingError> compress(InputStream in, Writer out, String filename)
+                throws IOException {
             IOUtil.copyStream(new InputStreamReader(in), out);
             return new ArrayList<>();
         }
@@ -194,14 +198,14 @@ public enum JavascriptWriter {
     private List<JavascriptProcessingError> compress(SourceFile in, Writer out, Writer sourceMapWriter,
             String filename, Map<String, String> sourceMapLocationMapping) throws IOException {
 
-    	List<JavascriptProcessingError> msgs = new ArrayList<>();
+        List<JavascriptProcessingError> msgs = new ArrayList<>();
 
         CompilerOptions options = new CompilerOptions();
         options.setCheckGlobalThisLevel(CheckLevel.OFF);
-    	options.setLanguageIn(LanguageMode.ECMASCRIPT5);
-    	options.setLanguageOut(LanguageMode.ECMASCRIPT5);
+        options.setLanguageIn(LanguageMode.ECMASCRIPT5);
+        options.setLanguageOut(LanguageMode.ECMASCRIPT5);
 
-    	if (sourceMapWriter != null) {
+        if (sourceMapWriter != null) {
             options.sourceMapFormat = SourceMap.Format.V3;
             options.sourceMapOutputPath = filename;
         }
@@ -222,35 +226,42 @@ public enum JavascriptWriter {
         options.addWarningsGuard(NON_STANDARD_JSDOC_GUARD);
 
         try {
-        	Compiler compiler = new Compiler();
-	        Result result = compiler.compile(externs, Arrays.asList(in), options);
-	        String source = compiler.toSource();
+            Compiler compiler = new Compiler();
 
-	        if (isSelfScoping()) {
-	            // Encase the compressed output in a self-executing function to
-	            // scope everything.
-	            // Global APIs are exported explicitly in the code.
-	            out.append("(function(){").append(source).append("})();");
-	        } else {
-		        out.append(source);
-	        }
+            // use a custom error manager so that we can keep the error source code snippet
+            // it makes more sense for the line and char number with the code snippet.
+            CustomErrorManager manager = new CustomErrorManager(ErrorFormat.MULTILINE.toFormatter(compiler, false));
+            compiler.setErrorManager(manager);
+            Result result = compiler.compile(externs, Arrays.asList(in), options);
+            String source = compiler.toSource();
 
-	        // Write sourcemap
-	        if (result != null && sourceMapWriter != null) {
-	            StringBuilder sb = new StringBuilder();
-	            result.sourceMap.validate(true);
-	            result.sourceMap.appendTo(sb, filename);
+            if (isSelfScoping()) {
+                // Encase the compressed output in a self-executing function to
+                // scope everything.
+                // Global APIs are exported explicitly in the code.
+                out.append("(function(){").append(source).append("})();");
+            } else {
+                out.append(source);
+            }
 
-	            sourceMapWriter.write(sb.toString());
-	        }
+            // Write sourcemap
+            if (result != null && sourceMapWriter != null) {
+                StringBuilder sb = new StringBuilder();
+                result.sourceMap.validate(true);
+                result.sourceMap.appendTo(sb, filename);
 
-	        // errors and warnings
-	        for (JSError e : compiler.getErrors()) {
-	            JavascriptProcessingError.makeError(msgs, e.description, e.lineNumber, e.getCharno(), in.getName(), null);
-	        }
-	        for (JSError e : compiler.getWarnings()) {
-	            JavascriptProcessingError.makeWarning(msgs, e.description, e.lineNumber, e.getCharno(), in.getName(), null);
-	        }
+                sourceMapWriter.write(sb.toString());
+            }
+
+            // errors and warnings
+            for (JSError e : compiler.getErrors()) {
+                JavascriptProcessingError.makeError(msgs, manager.getErrorMessage(), e.lineNumber, e.getCharno(),
+                        in.getName(), null);
+            }
+            for (JSError e : compiler.getWarnings()) {
+                JavascriptProcessingError.makeWarning(msgs, manager.getErrorMessage(), e.lineNumber, e.getCharno(),
+                        in.getName(), null);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -288,6 +299,51 @@ public enum JavascriptWriter {
             externs = CommandLineRunner.getDefaultExterns();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private class CustomErrorManager extends BasicErrorManager {
+        private final MessageFormatter formatter;
+        private String errorMessage;
+        private String errorSummary;
+
+        public CustomErrorManager(MessageFormatter formatter) {
+            this.formatter = formatter;
+        }
+
+        public String getErrorMessage() {
+            return errorMessage;
+        }
+
+        public String getErrorSummary() {
+            return errorSummary;
+        }
+
+        @Override
+        public void println(CheckLevel level, JSError error) {
+            switch (level) {
+            case ERROR:
+                errorMessage = error.format(level, formatter);
+                break;
+            case WARNING:
+                errorMessage = error.format(level, formatter);
+                break;
+            case OFF:
+                break;
+            }
+        }
+
+        @Override
+        protected void printSummary() {
+            if (getTypedPercent() > 0.0) {
+                errorSummary = String.format("{0} error(s), {1} warning(s), {2,number,#.#}% typed",
+                        new Object[] { getErrorCount(), getWarningCount(), getTypedPercent() });
+            } else {
+                if (getErrorCount() + getWarningCount() > 0) {
+                    errorSummary = String.format("{0} error(s), {1} warning(s)",
+                            new Object[] { getErrorCount(), getWarningCount() });
+                }
+            }
         }
     }
 }

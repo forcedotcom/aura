@@ -592,6 +592,68 @@ button.toggle:focus {
   text-transform: none;
 }
 
+
+/*
+  ChaosTab Start
+*/
+.chaos_tab {
+  height: 100%;
+  /* .slds-grid  { */
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  position: relative;
+  /* } */
+  overflow: hidden;
+}
+.chaos_run_options, .chaos_run_result {
+  -webkit-overflow-scrolling: touch;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+
+  width: 50%;
+}
+.chaos_run_options {
+  border-right: none;
+  margin-right: 0;
+  padding-right: 0;
+  background-color: #fff;
+
+  border-right:1px solid #d8dde6;
+  z-index: 1;
+}
+.new_chaos_run, .old_chaos_run, .replaying_status .newrun_status{
+  border: 1px solid #e0e5ee;
+  border-radius: 4px;
+  padding: .5rem;
+  margin: 1rem;
+}
+.chaos_run_result {
+  border-bottom: 1px solid #d8dde6;
+  padding-bottom: .5rem;
+  background-color: #f4f6f9;
+}
+.chaos_run_result .chaos_card {
+  border: 1px solid #e0e5ee;
+  border-radius: 4px;
+  display: block;
+  margin: .5rem;
+  padding-bottom: .5rem;
+
+  background-color: #fff;
+}
+
+/*
+  ChaosTab End
+*/
+
 /* Actions List */
 .toolTipElement {
   font-size: 10px;

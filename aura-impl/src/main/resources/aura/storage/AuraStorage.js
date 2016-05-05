@@ -156,6 +156,7 @@ AuraStorage.prototype.get = function(key) {
         }
         return { "value" : item["value"], "isExpired" : (new Date().getTime() > item["expires"]) };
     },function (err) {
+        that.logError({ "operation": "get" });
         that.getOperationsInFlight -= 1;
         return Promise["reject"](err);
     });
@@ -201,6 +202,9 @@ AuraStorage.prototype.getAll = function() {
 
         that.log("getAll() - found " + results.length + " items");
         return results;
+    }, function (e) {
+        that.logError({ "operation": "getAll" });
+        throw e;
     });
 };
 
@@ -236,10 +240,16 @@ AuraStorage.prototype.put = function(key, value) {
 
     var that = this;
     var promise = this.adapter.setItem(this.keyPrefix + key, item, size)
-        .then(function () {
-            that.log("put() - key: " + key + ", value: " + item);
-            $A.storageService.fireModified();
-        });
+        .then(
+            function () {
+                that.log("put() - key: " + key + ", value: " + item);
+                $A.storageService.fireModified();
+            },
+            function (e) {
+                that.logError({ "operation": "put" });
+                throw e;
+            }
+        );
 
     this.sweep();
 
@@ -261,7 +271,11 @@ AuraStorage.prototype.remove = function(key, doNotFireModified) {
             if (!doNotFireModified) {
                 $A.storageService.fireModified();
             }
-        });
+        }, function (e) {
+            that.logError({ "operation": "remove" });
+            throw e;
+        }
+    );
 };
 
 /**
@@ -305,7 +319,7 @@ AuraStorage.prototype.sweep = function() {
             .then(
                 undefined, // noop
                 function() {
-                    // swallow the error
+                    that.logError({ "operation": "sweep" });
                 }
             )
             .then(doneSweeping);
@@ -317,7 +331,7 @@ AuraStorage.prototype.sweep = function() {
         .then(
             undefined, // noop
             function() {
-                // swallow the error, return empty set
+                that.logError({ "operation": "getExpired" });
                 return [];
             }
         )
@@ -394,6 +408,17 @@ AuraStorage.prototype.log = function() {
 };
 
 /**
+ * @private
+ */
+AuraStorage.prototype.logError = function(error) {
+    $A.metricsService.transaction("aura", "errorStorage", { "context": {
+        "name"      : this.name, 
+        "adapter"   : this.getName(),
+        "operation" : error["operation"]
+    }});
+};
+
+/**
  * Whether the storage implementation is persistent.
  * @returns {boolean} true if persistent
  * @export
@@ -444,7 +469,11 @@ AuraStorage.prototype.getVersion  = function() {
 AuraStorage.prototype.deleteStorage = function() {
     var that = this;
     if (this.adapter.deleteStorage) {
-        return this.adapter.deleteStorage();
+        return this.adapter.deleteStorage().then(undefined, function (e) {
+            that.logError({ "operation": "deleteStorage" });
+            throw e;
+        });
+
     } else {
         return new Promise(function(success) {
             that.log("AuraStorage '" + that.name + "' [" + that.getName() + "] : " + "Does not implement deleteStorage(), returning success");

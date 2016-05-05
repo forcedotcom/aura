@@ -18,11 +18,23 @@
 <aura:component implements="ui:hasGridEvents">
 	<aura:attribute name="name" type="String"/>
 	<aura:attribute name="edited" type="Boolean" default="false"/>
+	<aura:attribute name="isPsuedoInput" type="Boolean" default="false"/>
 	
-	<div class="{! 'cellContainer' + (v.edited ? ' edited' : '')}">
-		<span aura:id="contentSpan" class="content">{!v.body}</span>
+	<!-- Cell states -->
+	<aura:attribute name="disabled" type="Boolean" default="false"/>
+	<aura:attribute name="hasErrors" type="Boolean" default="false"/>
+	
+	<!-- Potentially move psuedo input version into separate component -->
+	<span class="{! 'cellContainer' + (v.edited ? ' edited' : '') + (v.hasErrors ? ' errors' : '')}">
+		<aura:renderIf isTrue="{!!v.isPsuedoInput}">
+			<span aura:id="contentSpan" class="content">{!v.body}</span>
+		</aura:renderIf>
 		<span class="triggerContainer">
-			<ui:button class="trigger" press="{!c.trigger}"/>
+			<ui:button class="{! 'trigger' + (v.disabled ? ' disabled' : '')}" press="{!c.trigger}" disabled="{!v.disabled}">
+				<aura:renderIf isTrue="{!v.isPsuedoInput}">
+					<span aura:id="contentSpan" class="content">{!v.body}</span>
+				</aura:renderIf>
+			</ui:button>
 		</span>
-	</div>
+	</span>
 </aura:component>

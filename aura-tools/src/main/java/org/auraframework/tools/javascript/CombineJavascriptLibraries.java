@@ -126,10 +126,23 @@ public class CombineJavascriptLibraries {
                 String ending = fileName.substring(fileName.indexOf("_"), fileName.length());
                 int extIndex = ending.lastIndexOf(".");
                 String timezone = ending.substring(1, extIndex);
+                if (timezone.endsWith(".min")) {
+                    // skip minified files to prevent duplicates
+                    continue;
+                }
                 String tzContent = readFile(path);
+                String tzContentMin;
+
+                Path minFilePath = walltimeLocaleDirectory.resolve(getMinFilePath(fileName));
+                if (Files.exists(minFilePath)) {
+                    tzContentMin = readFile(minFilePath);
+                } else {
+                    tzContentMin = tzContent;
+                }
+
                 // include timezone code and with cached output
                 StringBuilder dev = new StringBuilder(tzContent);
-                StringBuilder min = new StringBuilder(tzContent);
+                StringBuilder min = new StringBuilder(tzContentMin);
                 dev.append(System.lineSeparator()).append(";").append(outputDev);
                 min.append(System.lineSeparator()).append(";").append(outputMin);
                 // write both non-minified and minified files

@@ -19,25 +19,39 @@
 function SecureScriptElement(key) {
 	"use strict";
 
-	var src;
 	var eventListeners = {};
+	var attributes = {};
 
 	var o = Object.create(null, {
 		src : {
 			enumerable: true,
 			get: function () {
-				return src;
+				return o.getAttribute("src");
 			},
 			set: function (value) {
-				src = value;
+				o.setAttribute("src", value);
 			}
 		},
 
+		getAttribute : {
+			value: function(name) {
+				return attributes[name];
+			}
+		},
+		
+		setAttribute : {
+			value: function(name, value) {
+				attributes[name] = value;
+			}
+		},
+		
 		$run : {
 			value : function() {
+				var src = o.getAttribute("src");
 				if (!src) {
 					return;
 				}
+				
 				// XHR in source and secure it using $A.lockerService.create()
 				var xhr = $A.services.client.createXHR();
 
@@ -62,7 +76,7 @@ function SecureScriptElement(key) {
 
 		toString : {
 			value : function() {
-				return "SecureScriptElement: " + src + "{ key: " + JSON.stringify(key) + " }";
+				return "SecureScriptElement: " + o.getAttribute("src") + "{ key: " + JSON.stringify(key) + " }";
 			}
 		},
 
@@ -81,7 +95,7 @@ function SecureScriptElement(key) {
 			}
 		}
 	});
-
+	
 	setLockerSecret(o, "key", key);
 
 	return o;

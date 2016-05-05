@@ -101,27 +101,24 @@ ComponentClassRegistry.prototype.buildInheritance = function(componentProperties
     var superDescriptor = componentProperties["meta"]["extends"];
     var superConstructor = this.getComponentClass(superDescriptor);
 
-    // Apply inheritance
-    for (var name in {"controller":true, "helper":true}) {
+    componentProperties["controller"] = componentProperties["controller"] || {};
+    var superController = superConstructor && superConstructor.prototype["controller"];
 
-        componentProperties[name] = componentProperties[name] || {};
+    if (superController) {
+        componentProperties["controller"] = Object.assign(
+            Object.create(superController),
+            componentProperties["controller"]
+        );
+    }
 
-        // Currently, controller and helper are inherited.
-        var superInnerClass = superConstructor && superConstructor.prototype[name];
-        if (superInnerClass) {
-            // TODO: Update to the following line once all browsers have support for writeable __proto__
-            // (requires IE11+, supported elsewhere).
-            // componentProperties["controller"]['__proto__'] = superController;
-            // componentProperties["helper"]['__proto__'] = superHelper;
-            var innerClass = Object.create(superInnerClass);
-            var instanceProperties = componentProperties[name];
-            if (instanceProperties) {
-                for (var property in instanceProperties) {
-                    innerClass[property] = instanceProperties[property];
-                }
-            }
-            componentProperties[name] = innerClass;
-        }
+    componentProperties["helper"] = componentProperties["helper"] || {};
+    var superHelper = superConstructor && superConstructor.prototype["helper"];
+
+    if (superHelper) {
+        componentProperties["helper"] = Object.assign(
+            Object.create(superHelper),
+            componentProperties["helper"]
+        );
     }
 };
 
@@ -175,11 +172,7 @@ ComponentClassRegistry.prototype.buildConstructor = function(componentProperties
     componentConstructor.prototype.constructor = componentConstructor;
 
     // Mixin inner classes (controller, helper, renderer, provider) and meta properties.
-    for (var property in componentProperties) {
-        if (componentProperties.hasOwnProperty(property)) {
-            componentConstructor.prototype[property] = componentProperties[property];
-        }
-    }
+    Object.assign(componentConstructor.prototype, componentProperties);
 
     return componentConstructor;
 };

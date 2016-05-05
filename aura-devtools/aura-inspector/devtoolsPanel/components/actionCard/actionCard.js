@@ -108,8 +108,7 @@
 		New Action Card created, update it's body
 	 */
 	actionCard.createdCallback = function(){
-    	var template = ownerDocument.querySelector("#actionCardTemplate");
-    	//console.log(template);
+    	var template = ownerDocument.querySelector("template");
 
     	var clone = document.importNode(template.content, true);
 
@@ -149,7 +148,7 @@
 	            }
 	        });
 		} else {
-			console.err("removeActionCard, couldn't find actionId");
+			console.error("removeActionCard, couldn't find actionId");
 		}
 		var that = this;
 		this.parentNode.removeChild(that);

@@ -12,7 +12,7 @@
                     }
                 },
                 column : {
-                    "componentDef" : "markup://ui:outputText",
+                    "componentDef" :  { "descriptor": "markup://ui:outputText" },
                     "attributes" : {
                         "values" : {
                             value : $A.expressionService.create(null, "{!item.firstName}")
@@ -31,7 +31,7 @@
                     }
                 },
                 column : {
-                    "componentDef" : "markup://ui:outputText",
+                    "componentDef" :  { "descriptor": "markup://ui:outputText" },
                     "attributes" : {
                         "values" : {
                             value : $A.expressionService.create(null, "{!item.lastName}")
@@ -50,7 +50,7 @@
                     }
                 },
                 column : {
-                    "componentDef" : "markup://ui:outputText",
+                    "componentDef" :  { "descriptor": "markup://ui:outputText" },
                     "attributes" : {
                         "values" : {
                             value : $A.expressionService.create(null, "{!item._id}")
@@ -69,7 +69,7 @@
                     }
                 },
                 column : {
-                    "componentDef" : "markup://ui:outputText",
+                    "componentDef" :  { "descriptor": "markup://ui:outputText" },
                     "attributes" : {
                         "values" : {
                             value : $A.expressionService.create(null, "{!item.isActive}")
@@ -88,7 +88,7 @@
                     }
                 },
                 column : {
-                    "componentDef" : "markup://ui:outputText",
+                    "componentDef" :  { "descriptor": "markup://ui:outputText" },
                     "attributes" : {
                         "values" : {
                             value : $A.expressionService.create(null, "{!item.balance}")
@@ -107,7 +107,7 @@
                     }
                 },
                 column : {
-                    "componentDef" : "markup://ui:outputText",
+                    "componentDef" :  { "descriptor": "markup://ui:outputText" },
                     "attributes" : {
                         "values" : {
                             value : $A.expressionService.create(null, "{!item.age}")
@@ -126,7 +126,7 @@
                     }
                 },
                 column : {
-                    "componentDef" : "markup://ui:outputText",
+                    "componentDef" : { "descriptor": "markup://ui:outputText" },
                     "attributes" : {
                         "values" : {
                             value : $A.expressionService.create(null, "{!item.address}")

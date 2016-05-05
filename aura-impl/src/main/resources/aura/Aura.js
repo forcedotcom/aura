@@ -578,6 +578,19 @@ function AuraInstance () {
         "handler" : function(evt) {
             var url = evt.getParam('url');
             if (url != null) {
+                // XSS protection: don't allow javascript or data url
+                var protocolBlacklist = ['javascript', 'data'];
+                var doc = document.implementation.createDocument('http://www.w3.org/1999/xhtml', 'html', null);
+                var testXSSLink = doc.createElement('a');
+                testXSSLink.setAttribute('href', url);
+                if (testXSSLink.protocol != null){
+                    for(var i = 0; i < protocolBlacklist.length; i++){
+                        if(testXSSLink.protocol.indexOf(protocolBlacklist[i]) === 0){
+                            url = encodeURIComponent(url);
+                            break;
+                        }
+                    }
+                }
                 window.location = url;
             }
         }
@@ -632,20 +645,46 @@ AuraInstance.prototype.initAsync = function(config) {
                 $A.clientService.reloadFunction();
                 return;
             }
-            
+
             if (config["safeEvalWorker"] && !window["$$safe-eval$$"] && !regexpDetectURLProcotolSegment.test(config["host"])) {
                 throw new $A.auraError("Aura(): Failed to initialize locker worker.", null, $A.severity.QUIET);
             }
-            
+
             $A.clientService.initHost(config["host"]);
             $A.setLanguage();
 
             $A.metricsService.initialize();
 
-            // Restore component definitions from AuraStorage into memory (if persistent)
-            $A.componentService.restoreDefsFromStorage($A.getContext()).then(function () {
+
+            // the final step in initAsync: trigger the getApplication action
+            function getApplication() {
                 $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
-            });
+            }
+
+            // actions depend on defs depend on GVP (labels). so load the, in dependency order and skip
+            // loading depending items if anything fails to load.
+
+            // start by enabling the actions filter if relevant. populatePersistedActionsFilter() populates it,
+            // called only if GVP + defs are loaded.
+            $A.clientService.setupPersistedActionsFilter();
+
+            if (!context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE) {
+                $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");
+                getApplication();
+            } else {
+                $A.componentService.restoreDefsFromStorage(context)
+                    .then(function() {
+                        return $A.clientService.populatePersistedActionsFilter();
+                    })
+                    .then(
+                        undefined, /* noop */
+                        function(e) {
+                            $A.log("Aura.initAsync: failed to load defs or actions from storage", e);
+                            // do not rethrow
+                        }
+                    )
+                    .then(getApplication, getApplication);
+            }
         });
     }
 

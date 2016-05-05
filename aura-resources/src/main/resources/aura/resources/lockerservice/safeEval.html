@@ -35,7 +35,7 @@
               // forcing the value of `this` for non-strict code to prevent leaking
               // the safeEval.html's window reference
               src = 'return (function(){\n' + src + '\n}).call(arguments[0])';
-          }
+          }          
           for (var i = 0; i < options.levels; i++) {
               src = 'with(arguments[' + i + ']||{}){' + src + '}';
           }

@@ -182,26 +182,6 @@
         this.matchText(concreteCmp, event.getParam("data"));
     },
 
-    handleEsckeydown: function (component) {
-        component.set("v.visible", false);
-    },
-
-    handleKeydown: function (component, event) {
-        var keyCode = event.keyCode;
-        if (keyCode === 39 || keyCode === 40) {  // right or down arrow key
-            event.preventDefault();
-            this.setFocusToNextItem(component, event);
-        } else if (keyCode === 37 || keyCode === 38) {  // left or up arrow key
-            event.preventDefault();
-            this.setFocusToPreviousItem(component, event);
-        } else if (keyCode === 27) {  // Esc key
-            event.stopPropagation();
-            this.handleEsckeydown(component, event);
-        } else if (keyCode === 9) {  // tab key: dismiss the list
-            this.handleTabkeydown(component, event);
-        }
-    },
-
     handleListHighlight: function (component, event) {
         var selectedSection = this.createKeyboardTraversalList(component);
         if (selectedSection) {
@@ -569,7 +549,7 @@
         var updateAriaEvt = component.get("e.updateAriaAttributes");
         if (updateAriaEvt) {
             var obj = {
-                "aria-activedescendant": highlightedCmp.isInstanceOf("ui:autocompleteOption")?highlightedCmp.get("v.domId"):""
+                "aria-activedescendant": highlightedCmp&&highlightedCmp.isInstanceOf("ui:autocompleteOption")?highlightedCmp.get("v.domId"):""
             };
             updateAriaEvt.setParams({
                 attrs: obj
@@ -615,6 +595,9 @@
                 } else {
                 	optionCmp.set("v.highlighted", false);
                 }
+            }
+            if (!found) {
+                this.updateAriaAttributes(component, null);
             }
     	}
     },

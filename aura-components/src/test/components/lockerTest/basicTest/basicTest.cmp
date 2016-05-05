@@ -21,7 +21,6 @@
     <aura:attribute name="componentStore" type="Object"/>
 
     <aura:method name="testAuraLockerInController" action="{!c.testAuraLockerInController}"/>
-    <aura:method name="testAlertExposed" action="{!c.testAlertExposed}"/>
     <aura:method name="testComponentLockerInController" action="{!c.testComponentLockerInController}"/>
     <aura:method name="testDocumentLockerInController" action="{!c.testDocumentLockerInController}"/>
     <aura:method name="testWindowLockerInController" action="{!c.testWindowLockerInController}"/>

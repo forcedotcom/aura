@@ -76,19 +76,7 @@ function SecureElement(el, key) {
 	});
 
 	Object.defineProperties(o, {
-		childNodes : SecureObject.createFilteredProperty(o, el, "childNodes"),
-		children : SecureObject.createFilteredProperty(o, el, "children"),
-
-		firstChild : SecureObject.createFilteredProperty(o, el, "firstChild"),
-		lastChild : SecureObject.createFilteredProperty(o, el, "lastChild"),
-
         compareDocumentPosition: SecureObject.createFilteredMethod(o, el, "compareDocumentPosition"),
-
-		getAttribute: SecureObject.createFilteredMethod(o, el, "getAttribute"),
-		setAttribute: SecureObject.createFilteredMethod(o, el, "setAttribute"),
-
-        getElementsByClassName: SecureObject.createFilteredMethod(o, el, "getElementsByClassName"),
-        getElementsByTagName: SecureObject.createFilteredMethod(o, el, "getElementsByTagName"),
 
 		ownerDocument : SecureObject.createFilteredProperty(o, el, "ownerDocument"),
 		parentNode : SecureObject.createFilteredProperty(o, el, "parentNode"),
@@ -103,31 +91,6 @@ function SecureElement(el, key) {
         	}	
     	}),
 
-		// Standard HTMLElement methods
-		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
-		blur: SecureObject.createFilteredMethod(o, el, "blur"),
-		click: SecureObject.createFilteredMethod(o, el, "click"),
-		focus: SecureObject.createFilteredMethod(o, el, "focus"),
-
-		innerHTML : SecureObject.createFilteredProperty(o, el, "innerHTML", { 
-			returnValue: "", 
-			beforeSetCallback: function(value) {				
-				// Do not allow innerHTML on shared elements (body/head)
-				if (isSharedElement(el)) {
-		            throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
-				}
-				
-				/*jslint sub: true */
-				return DOMPurify["sanitize"](value);
-			},
-			afterSetCallback: function() {
-				// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
-				if (el.firstChild) {
-					$A.lockerService.trust(o, el.firstChild);
-				}
-			} 
-		}),
-
         cloneNode: SecureObject.createFilteredMethod(o, el, "cloneNode", { afterCallback: function(fnReturnedValue) {
 			// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
 			$A.lockerService.trust(o, fnReturnedValue);
@@ -136,7 +99,35 @@ function SecureElement(el, key) {
 
         textContent: SecureObject.createFilteredProperty(o, el, "textContent", { returnValue: "" })
 	});
+	
+	// Conditionally add things that not all Node types support
+	["childNodes", "children", "firstChild", "lastChild", "getAttribute", "setAttribute", "removeAttribute"].forEach(function(name) {
+		SecureObject.addPropertyIfSupported(o, el, name);
+	});
 
+	["getElementsByClassName", "getElementsByTagName", "getBoundingClientRect", "getClientRects", "blur", "click", "focus"].forEach(function(name) {
+		SecureObject.addMethodIfSupported(o, el, name);
+	});
+
+	SecureObject.addPropertyIfSupported(o, el, "innerHTML", { 
+		returnValue: "", 
+		beforeSetCallback: function(value) {				
+			// Do not allow innerHTML on shared elements (body/head)
+			if (isSharedElement(el)) {
+	            throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
+			}
+			
+			/*jslint sub: true */
+			return DOMPurify["sanitize"](value);
+		},
+		afterSetCallback: function() {
+			// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
+			if (el.firstChild) {
+				$A.lockerService.trust(o, el.firstChild);
+			}
+		} 
+	});
+	
 	// applying standard secure element properties
 	SecureElement.addSecureProperties(o, el);
 	SecureElement.addSecureGlobalEventHandlers(o, el, key);
@@ -144,7 +135,7 @@ function SecureElement(el, key) {
 
 	SecureElement.addElementSpecificProperties(o, el);
 	SecureElement.addElementSpecificMethods(o, el);
-
+	
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", el);
 
@@ -156,7 +147,7 @@ SecureElement.addSecureProperties = function(se, raw) {
 		// Standard Element interface represents an object of a Document.
 		// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
 		'childElementCount', 'classList', 'className', 'id', 'tagName',
-		// Note: ignoring 'attributes', 'children', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
+		// Note: ignoring 'firstElementChild', 'lastElementChild', 'namespaceURI',
 		//      'nextElementSibling' and 'previousElementSibling' from the list above.
 
 		// Standard HTMLElement interface represents any HTML element
@@ -165,11 +156,11 @@ SecureElement.addSecureProperties = function(se, raw) {
 		'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang', 'spellcheck',
 		'style', 'tabIndex', 'title',
 		
-		'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth'
+		'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth', 'nodeValue'
 		
 		// DCHASMAN TODO This list needs to be revisted as it is missing a ton of valid attributes!
 	].forEach(function (name) {
-		Object.defineProperty(se, name, SecureObject.createFilteredProperty(se, raw, name));
+		SecureObject.addPropertyIfSupported(se, raw, name);
 	});
 };
 
@@ -249,7 +240,7 @@ SecureElement.addElementSpecificProperties = function(se, el) {
 		var whitelist = SecureElement.elementSpecificAttributeWhitelists[tagName];
 		if (whitelist) {
 			whitelist.forEach(function(name) {
-				Object.defineProperty(se, name, SecureObject.createFilteredProperty(se, el, name));
+				SecureObject.addPropertyIfSupported(se, el, name);
 			});
 		}
 	}
@@ -261,7 +252,7 @@ SecureElement.addElementSpecificMethods = function(se, el) {
 		var whitelist = SecureElement.elementSpecificMethodWhitelists[tagName];
 		if (whitelist) {
 			whitelist.forEach(function(name) {
-				Object.defineProperty(se, name, SecureObject.createFilteredMethod(se, el, name));
+				SecureObject.addMethodIfSupported(se, el, name);
 			});
 		}
 	}
@@ -273,53 +264,54 @@ SecureElement.elementSpecificAttributeWhitelists = {
 	"AUDIO": ["autoplay", "buffered", "controls", "loop", "muted", "played", "preload", "src", "volume"],
 	"BASE": ["href", "target"],
 	"BDO": ["dir"],
-	"BUTTON": ["autofocus", "disabled", "form", "formaction", "formenctype", "formmethod", "formnovalidate", "formtarget", "name", "type"],
+	"BUTTON": ["autofocus", "disabled", "form", "formAction", "formEnctype", "formMethod", "formNoValidate", "formTarget", "name", "type"],
 	"CANVAS": ["height", "width"],
 	"COL": ["span"],
 	"COLGROUP": ["span", "width"],
 	"DATA": ["value"],
-	"DEL": ["cite", "datetime"],
+	"DEL": ["cite", "dateTime"],
 	"DETAILS": ["open"],
 	"EMBED": ["height", "src", "type", "width"],
 	"FIELDSET": ["disabled", "form", "name"],
-	"FORM": ["acceptCharset", "action", "autocomplete", "enctype", "method", "name", "novalidate", "target"],
-	"IMG": ["alt", "crossorigin", "height", "ismap", "longdesc", "sizesHTML5", "src", "srcsetHTML5", "width", "usemap"],
-	"INPUT": ["type", "accept", "autocomplete", "autofocus", "autosave", "checked", "disabled", "form", "formaction", 
-	          "formenctype", "formmethod", "formnovalidate", "formtarget", "height", "inputmode", "list", "max", "maxlength", 
-	          "min", "minlength", "minlength", "name", "pattern", "placeholder", "readonly", "required", "selectionDirection",
-	          "size", "spellcheck", "src", "step", "tabindex", "value", "width"],
-	"INS": ["cite", "datetime"],
-	"LABEL": ["accesskey", "for", "form"],
+	"FORM": ["acceptCharset", "action", "autocomplete", "enctype", "method", "name", "noValidate", "target"],
+	"IMG": ["alt", "crossOrigin", "height", "isMap", "longDesc", "sizes", "src", "srcset", "width", "useMap"],
+	"INPUT": ["type", "accept", "autocomplete", "autofocus", "autosave", "checked", "disabled", "form", "formAction",
+	          "formEnctype", "formMethod", "formNoValidate", "formTarget", "height", "inputmode", "list", "max", "maxLength",
+	          "min", "minLength", "multiple", "name", "pattern", "placeholder", "readOnly", "required", "selectionDirection",
+	          "size", "src", "step", "value", "width"],
+	"INS": ["cite", "dateTime"],
+	"LABEL": ["accessKey", "htmlFor", "form"],
 	"LI": ["value"],
-	"LINK": ["crossorigin", "href", "hreflang", "media", "rel", "sizes", "title", "type"],
+	"LINK": ["crossOrigin", "href", "hreflang", "media", "rel", "sizes", "title", "type"],
 	"MAP": ["name"],
 
 	// DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values for http-equiv/httpEquiv	
 	"META": ["content", "name"],
 	
 	"METER": ["value", "min", "max", "low", "high", "optimum", "form"],
-	"OBJECT": ["data", "form", "height", "height", "type", "typemustmatch", "usemap", "width"],
+	"OBJECT": ["data", "form", "height", "type", "typeMustMatch", "useMap", "width"],
 	"OL": ["reversed", "start", "type"],
 	"OPTGROUP": ["disabled", "label"],
-	"OPTION": ["disabled", "label", "selected", "selected"],
-	"OUTPUT": ["for", "form", "name"],
+	"OPTION": ["disabled", "label", "selected", "value"],
+	"OUTPUT": ["htmlFor", "form", "name"],
 	"PARAM": ["name", "value"],
 	"PROGRESS": ["max", "value"],
 	"Q": ["cite"],
 	"SELECT": ["autofocus", "disabled", "form", "multiple", "name", "required", "size"],
 	"SOURCE": ["src", "type"],
-	"TD": ["colspan", "headers", "rowspan"],
+	"TD": ["colSpan", "headers", "rowSpan"],
 	"TEMPLATE": ["content"],
-	"TEXTAREA": ["autocomplete", "autofocus", "cols", "disabled", "form", "maxlength", "minlength", "name", 
-	             "placeholder", "readonly", "required", "rows", "selectionDirection", "selectionEnd", "selectionStart", 
-	             "spellcheck", "wrap"],
-	"TH": ["colspan", "headers", "rowspan", "scope"],
-	"TIME": ["datetime"],
+	"TEXTAREA": ["autocomplete", "autofocus", "cols", "disabled", "form", "maxLength", "minLength", "name",
+	             "placeholder", "readOnly", "required", "rows", "selectionDirection", "selectionEnd", "selectionStart",
+	             "wrap"],
+	"TH": ["colSpan", "headers", "rowSpan", "scope"],
+	"TIME": ["dateTime"],
 	"TRACK": ["default", "kind", "label", "src", "srclang"],
-	"VIDEO": ["autoplay", "buffered", "controls", "crossorigin", "height", "loop", "muted", "played", "preload", 
+	"VIDEO": ["autoplay", "buffered", "controls", "crossOrigin", "height", "loop", "muted", "played", "preload",
 	          "poster", "src", "width"]
 };
 
 SecureElement.elementSpecificMethodWhitelists = {
+	"CANVAS": ["getContext", "toDataURL", "toBlob"],
 	"SVG": ["createSVGRect"]
 };

@@ -22,12 +22,6 @@
             cmp.helper.testCanAccessDocumentHeadFromHelper($A.test);
         }
     },
-    
-    testAlertExposed: {
-        test: function(cmp) {
-            cmp.testAlertExposed();
-        }
-    },
 
     testAuraLockerInController: {
         test: function(cmp) {
@@ -93,6 +87,8 @@
     },
 
     testDefineGetterExploit: {
+        // Remove UnAdaptableTest label when unsafe-eval and unsafe-inline are added back to CSP
+        labels: ["UnAdaptableTest"],
         test: function(cmp) {
             cmp.testDefineGetterExploit();
         }
@@ -115,7 +111,7 @@
             $A.test.assertStartsWith("markup://lockerTest:facet", component.toString());
         }
     },
-    
+
     testLocationExposed: {
         test: function(cmp) {
             cmp.testLocationExposed();

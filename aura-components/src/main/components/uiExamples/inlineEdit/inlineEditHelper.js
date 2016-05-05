@@ -16,16 +16,24 @@
 ({
 	EDIT_LAYOUTS : {
 		id : {
-			descriptor : 'markup://ui:inputNumber'
+			componentDef : {
+				descriptor : 'markup://ui:inputNumber'
+			}
 		},
 		name : {
-			descriptor : 'markup://ui:inputText'
+			componentDef : {
+				descriptor : 'markup://ui:inputText'
+			}
 		},
 		grade : {
-			descriptor : 'markup://ui:inputNumber'
+			componentDef : {
+				descriptor : 'markup://ui:inputNumber'
+			}
 		},
 		date : {
-			descriptor : 'markup://ui:inputDate',
+			componentDef : {
+				descriptor : 'markup://ui:inputDate'
+			},
 			attributes : {
 				displayDatePicker : true
 			}
@@ -37,12 +45,17 @@
 		
 		for (var i = 0; i < 10; i++) {
 			items.push({
-				id : i,
-				name : "Name" + i,
-				grade : i,
-				date : "2016-3-" + (i + 1),
-				status : {},
-				errors : {}
+				data : {
+					id : i,
+					name : "Name" + i,
+					grade : i,
+					date : "2016-3-" + (i + 1)
+				},
+				status : { 
+					name : {
+						disabled : (i % 2 == 0)
+					}
+				},
 			});
 		}
 		

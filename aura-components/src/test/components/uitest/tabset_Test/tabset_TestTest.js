@@ -56,8 +56,9 @@
         	 var ulElem = cmp.find("noTabsTabSet").getElement().getElementsByTagName("ul")[0];
         	 var ulChldrn = this.ignoreComments(ulElem.children);
         	 $A.test.assertEquals(1, ulChldrn.length, "There should be overflow menu link present");
-        	 $A.test.assertTrue($A.util.hasClass(ulChldrn[0], "uiTabOverflowMenuItem hidden"), "uiTabOverflowMenuItem should be hidden");
-            
+        	 $A.test.addWaitForWithFailureMessage(true, function () {
+ 				return $A.util.hasClass(ulChldrn[0], "uiTabOverflowMenuItem hidden")
+             }, "uiTabOverflowMenuItem should be hidden");
         }
 	},
 	

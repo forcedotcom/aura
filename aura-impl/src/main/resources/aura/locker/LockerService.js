@@ -310,9 +310,8 @@ function LockerService() {
 				Object.getOwnPropertyNames(window).forEach(function (name) {
 					// apply whitelisting to the lockerShadows
 					// TODO: recursive to cover WindowPrototype properties as well
-					if (whitelist.indexOf(name) === -1) {
-						lockerShadows[name] = undefined;
-					}
+					var value = whitelist.indexOf(name) >= 0 ? window[name] : undefined;
+					lockerShadows[name] = value;
 				});
 			}
 

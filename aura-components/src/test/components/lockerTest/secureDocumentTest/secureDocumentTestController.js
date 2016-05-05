@@ -73,9 +73,11 @@
     testQuerySelectorAllReturnsSecureNodeList: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var result = document.querySelectorAll('*');
-        //testUtils.assertTrue($A.util.isArray(result), "Expected document.querySelectorAll('*') to return an Array");
-        testUtils.assertStartsWith("SecureObject", result[0].toString(), "Expected document.querySelectorAll('*') to" +
-                " return SecureObject elements");
+
+        var i = 0;
+        ["HEAD", "BODY", "DIV", "DIV"].forEach(function(tagName) {
+	        testUtils.assertEquals(tagName, result[i++].nodeName, "Expected document.querySelectorAll('*') to return " + tagName + " element");
+        });
     },
     
     testDocumentBodyConstructorNotExposed: function(cmp) {

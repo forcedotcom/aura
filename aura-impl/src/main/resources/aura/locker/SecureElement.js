@@ -60,6 +60,19 @@ function SecureElement(el, key) {
 				return child;
 			}
 		},
+
+		replaceChild : {
+			value : function(newChild, oldChild) {
+				$A.lockerService.util.verifyAccess(o, newChild, { verifyNotOpaque: true });
+				$A.lockerService.util.verifyAccess(o, oldChild, { verifyNotOpaque: true });
+
+				if (!runIfRunnable(newChild)) {
+					el.replaceChild(getLockerSecret(newChild, "ref"), getLockerSecret(oldChild, "ref"));
+				}
+				
+				return oldChild;
+			}
+		},
 		
 		insertBefore : {
 			value : function(newNode, referenceNode) {
@@ -76,10 +89,10 @@ function SecureElement(el, key) {
 	});
 
 	Object.defineProperties(o, {
-        compareDocumentPosition: SecureObject.createFilteredMethod(o, el, "compareDocumentPosition"),
+		compareDocumentPosition: SecureObject.createFilteredMethod(o, el, "compareDocumentPosition"),
 
-		ownerDocument : SecureObject.createFilteredProperty(o, el, "ownerDocument"),
-		parentNode : SecureObject.createFilteredProperty(o, el, "parentNode"),
+		ownerDocument: SecureObject.createFilteredProperty(o, el, "ownerDocument"),
+		parentNode: SecureObject.createFilteredProperty(o, el, "parentNode", { filterOpaque: true }),
 
         nodeName: SecureObject.createFilteredProperty(o, el, "nodeName"),
         nodeType: SecureObject.createFilteredProperty(o, el, "nodeType"),
@@ -91,26 +104,65 @@ function SecureElement(el, key) {
         	}	
     	}),
 
-        cloneNode: SecureObject.createFilteredMethod(o, el, "cloneNode", { afterCallback: function(fnReturnedValue) {
-			// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
-			$A.lockerService.trust(o, fnReturnedValue);
-			return fnReturnedValue;
-		} }),
+        cloneNode: {
+        	value : function(deep) {
+        		// We need to clone only nodes that can be accessed to and prune the rest
+        		var root = el.cloneNode(false);
+        		
+        		function cloneChildren(parent, parentClone) {
+	        		var childNodes = parent.childNodes;
+	        		for (var i = 0; i < childNodes.length; i++) {
+	        			var child = childNodes[i];
+	        			if ($A.lockerService.util.hasAccess(o, child, { verifyNotOpaque: true })) {
+	        				var childClone = child.cloneNode(false);
+	        				parentClone.appendChild(childClone);
+	        				$A.lockerService.trust(o, childClone);
+	            			cloneChildren(child, childClone);
+	        			}
+	        		}
+        		}
+        		
+        		if (deep) {
+        			cloneChildren(el, root);
+        		}
+        		
+        		return SecureElement(root, key);
+        	}
+        },
 
-        textContent: SecureObject.createFilteredProperty(o, el, "textContent", { returnValue: "" })
+        textContent: SecureObject.createFilteredProperty(o, el, "textContent", { 
+        	afterGetCallback: function() { return ""; } 
+        })
 	});
 	
 	// Conditionally add things that not all Node types support
+	SecureObject.addPropertyIfSupported(o, el, "attributes", { 
+		writable: false,
+		afterGetCallback: function(attributes) {
+			// Secure attributes
+			var secureAttributes = [];			
+			for (var i = 0; i < attributes.length; i++) {
+				var attribute = attributes[i];
+				secureAttributes.push({
+					name: attribute.name,
+					value: SecureObject.filterEverything(o, attribute.value)
+				});
+			}
+
+			return secureAttributes;
+		}
+	});
+	
 	["childNodes", "children", "firstChild", "lastChild", "getAttribute", "setAttribute", "removeAttribute"].forEach(function(name) {
-		SecureObject.addPropertyIfSupported(o, el, name);
+		SecureObject.addPropertyIfSupported(o, el, name, { filterOpaque: true });
 	});
 
 	["getElementsByClassName", "getElementsByTagName", "getBoundingClientRect", "getClientRects", "blur", "click", "focus"].forEach(function(name) {
-		SecureObject.addMethodIfSupported(o, el, name);
+		SecureObject.addMethodIfSupported(o, el, name, { filterOpaque: true });
 	});
 
 	SecureObject.addPropertyIfSupported(o, el, "innerHTML", { 
-		returnValue: "", 
+    	afterGetCallback: function() { return ""; },
 		beforeSetCallback: function(value) {				
 			// Do not allow innerHTML on shared elements (body/head)
 			if (isSharedElement(el)) {
@@ -121,10 +173,19 @@ function SecureElement(el, key) {
 			return DOMPurify["sanitize"](value);
 		},
 		afterSetCallback: function() {
-			// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
-			if (el.firstChild) {
-				$A.lockerService.trust(o, el.firstChild);
+			// $A.lockerServer.trust() all of the new nodes!
+			function trust(node, children) {
+				if (node) {
+					$A.lockerService.trust(o, node);
+				}
+
+        		for (var i = 0; i < children.length; i++) {
+        			var child = children[i];
+        			trust(child, child.childNodes);
+        		}
 			}
+			
+			trust(undefined, el.childNodes);
 		} 
 	});
 	

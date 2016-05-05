@@ -8,8 +8,8 @@
     browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
 
     // TODO(tbliss): make these lists on SecureElement accessible here for maintainablility
-    ElementPropertiesWhitelist: ['childElementCount', 'classList', 'className', 'id', 'tagName', 'innerHTML'],
-    ElementProperitesBlacklist: ['attributes', 'firstElementChild', 'lastElementChild', 'namespaceURI',
+    ElementPropertiesWhitelist: ['attributes', 'childElementCount', 'classList', 'className', 'id', 'tagName', 'innerHTML'],
+    ElementProperitesBlacklist: ['firstElementChild', 'lastElementChild', 'namespaceURI',
                                  'nextElementSibling', 'previousElementSibling'],
 
     HTMLPropertiesWhitelist: ['accessKey', 'contentEditable', 'isContentEditable',
@@ -19,7 +19,7 @@
 
     OtherPropertiesWhitelist: ["childNodes", "children", "ownerDocument", "parentNode", "offsetParent"],
 
-    MethodsWhitelist: ["appendChild", "addEventListener", "removeEventListener", "dispatchEvent",
+    MethodsWhitelist: ["appendChild", "replaceChild", "insertBefore", "addEventListener", "removeEventListener", "dispatchEvent",
                        "getAttribute", "setAttribute", "blur", "click", "focus"],
 
     setUp: function(cmp) {

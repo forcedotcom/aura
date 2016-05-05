@@ -66,7 +66,7 @@
         }
     },
 
-    handleEnterkey: function(component) {
+    handleEnterOrTabkey: function(component) {
         var list = this.getListComponent(component);
         if (list.get("v.visible") === true) {
             this.handleEnterkeyOnList(component, list);
@@ -99,10 +99,8 @@
         } else if (keyCode === 27) {  // Esc key
             domEvent.stopPropagation();
             this.handleEsckey(component, event);
-        } else if (keyCode === 9) {  // tab key: dismiss the list
-            this.handleTabkey(component, event);
-        } else if (keyCode === 13) {  // enter key: select the highlighted list option
-            this.handleEnterkey(component, event);
+        } else if (keyCode === 9 || keyCode === 13) {  // enter key: select the highlighted list option
+            this.handleEnterOrTabkey(component, event);
         } else {
             this.handleOtherKeyAction(component, component.find("input"), event);
         }

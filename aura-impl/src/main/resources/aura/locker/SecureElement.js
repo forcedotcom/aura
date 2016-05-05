@@ -312,5 +312,6 @@ SecureElement.elementSpecificAttributeWhitelists = {
 };
 
 SecureElement.elementSpecificMethodWhitelists = {
+	"CANVAS": ["getContext", "toDataURL", "toBlob"],
 	"SVG": ["createSVGRect"]
 };

@@ -101,6 +101,10 @@ function lazyInitInlinedSafeEvalWorkaround() {
 	          // and ES2016 semantics, we do this by redefining them while in 'use strict'
 	          // https://tc39.github.io/ecma262/#sec-object.prototype.__defineGetter__
 	          [Object, parent.Object].forEach(function (o) {
+	        	  if (o === undefined) {
+	        		  return;
+	        	  }
+	        	  
 	              o.defineProperty(o.prototype, '__defineGetter__', {
 	                  value: function (key, fn) {
 	                      return o.defineProperty(this, key, {
@@ -217,14 +221,7 @@ function LockerService() {
 	    "DataView",
 
 	    // Misc
-	    "alert",
-	    "clearInterval",
-	    "clearTimeout",
-	    "confirm",
-	    "console",
-	    "Intl",
-	    "location",
-	    "Node"
+	    "Intl"
 	];
 
 	var nsKeys = {};
@@ -287,8 +284,9 @@ function LockerService() {
 			var psuedoKeySymbol = JSON.stringify(key);
 			var env = keyToEnvironmentMap[psuedoKeySymbol];
 			if (!env && !doNotCreate) {
-				env = keyToEnvironmentMap[psuedoKeySymbol] = SecureWindow(window, key);
+				env = keyToEnvironmentMap[psuedoKeySymbol] = SecureWindow(window, key, whitelist);
 			}
+			
 			return env;
 		},
 
@@ -317,6 +315,7 @@ function LockerService() {
 					}
 				});
 			}
+			
 			try {				
 				locker = {
 					"$envRec": envRec,
@@ -325,6 +324,7 @@ function LockerService() {
 			} catch (x) {
 				throw new Error("Unable to create locker IIFE: " + x);
 			}
+			
 			Object.freeze(locker);
 			lockers.push(locker);
 			return locker;

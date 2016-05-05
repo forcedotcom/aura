@@ -76,19 +76,7 @@ function SecureElement(el, key) {
 	});
 
 	Object.defineProperties(o, {
-		childNodes : SecureObject.createFilteredProperty(o, el, "childNodes"),
-		children : SecureObject.createFilteredProperty(o, el, "children"),
-
-		firstChild : SecureObject.createFilteredProperty(o, el, "firstChild"),
-		lastChild : SecureObject.createFilteredProperty(o, el, "lastChild"),
-
         compareDocumentPosition: SecureObject.createFilteredMethod(o, el, "compareDocumentPosition"),
-
-		getAttribute: SecureObject.createFilteredMethod(o, el, "getAttribute"),
-		setAttribute: SecureObject.createFilteredMethod(o, el, "setAttribute"),
-
-        getElementsByClassName: SecureObject.createFilteredMethod(o, el, "getElementsByClassName"),
-        getElementsByTagName: SecureObject.createFilteredMethod(o, el, "getElementsByTagName"),
 
 		ownerDocument : SecureObject.createFilteredProperty(o, el, "ownerDocument"),
 		parentNode : SecureObject.createFilteredProperty(o, el, "parentNode"),
@@ -103,31 +91,6 @@ function SecureElement(el, key) {
         	}	
     	}),
 
-		// Standard HTMLElement methods
-		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
-		blur: SecureObject.createFilteredMethod(o, el, "blur"),
-		click: SecureObject.createFilteredMethod(o, el, "click"),
-		focus: SecureObject.createFilteredMethod(o, el, "focus"),
-
-		innerHTML : SecureObject.createFilteredProperty(o, el, "innerHTML", { 
-			returnValue: "", 
-			beforeSetCallback: function(value) {				
-				// Do not allow innerHTML on shared elements (body/head)
-				if (isSharedElement(el)) {
-		            throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
-				}
-				
-				/*jslint sub: true */
-				return DOMPurify["sanitize"](value);
-			},
-			afterSetCallback: function() {
-				// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
-				if (el.firstChild) {
-					$A.lockerService.trust(o, el.firstChild);
-				}
-			} 
-		}),
-
         cloneNode: SecureObject.createFilteredMethod(o, el, "cloneNode", { afterCallback: function(fnReturnedValue) {
 			// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
 			$A.lockerService.trust(o, fnReturnedValue);
@@ -136,7 +99,35 @@ function SecureElement(el, key) {
 
         textContent: SecureObject.createFilteredProperty(o, el, "textContent", { returnValue: "" })
 	});
+	
+	// Conditionally add things that not all Node types support
+	["childNodes", "children", "firstChild", "lastChild", "getAttribute", "setAttribute", "removeAttribute"].forEach(function(name) {
+		SecureObject.addPropertyIfSupported(o, el, name);
+	});
 
+	["getElementsByClassName", "getElementsByTagName", "getBoundingClientRect", "getClientRects", "blur", "click", "focus"].forEach(function(name) {
+		SecureObject.addMethodIfSupported(o, el, name);
+	});
+
+	SecureObject.addPropertyIfSupported(o, el, "innerHTML", { 
+		returnValue: "", 
+		beforeSetCallback: function(value) {				
+			// Do not allow innerHTML on shared elements (body/head)
+			if (isSharedElement(el)) {
+	            throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
+			}
+			
+			/*jslint sub: true */
+			return DOMPurify["sanitize"](value);
+		},
+		afterSetCallback: function() {
+			// DCHASMAN TODO We need these to then depth first traverse/visit and $A.lockerServer.trust() all of the new nodes!
+			if (el.firstChild) {
+				$A.lockerService.trust(o, el.firstChild);
+			}
+		} 
+	});
+	
 	// applying standard secure element properties
 	SecureElement.addSecureProperties(o, el);
 	SecureElement.addSecureGlobalEventHandlers(o, el, key);
@@ -144,7 +135,7 @@ function SecureElement(el, key) {
 
 	SecureElement.addElementSpecificProperties(o, el);
 	SecureElement.addElementSpecificMethods(o, el);
-
+	
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", el);
 
@@ -156,7 +147,7 @@ SecureElement.addSecureProperties = function(se, raw) {
 		// Standard Element interface represents an object of a Document.
 		// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
 		'childElementCount', 'classList', 'className', 'id', 'tagName',
-		// Note: ignoring 'attributes', 'children', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
+		// Note: ignoring 'firstElementChild', 'lastElementChild', 'namespaceURI',
 		//      'nextElementSibling' and 'previousElementSibling' from the list above.
 
 		// Standard HTMLElement interface represents any HTML element
@@ -165,11 +156,11 @@ SecureElement.addSecureProperties = function(se, raw) {
 		'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang', 'spellcheck',
 		'style', 'tabIndex', 'title',
 		
-		'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth'
+		'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth', 'nodeValue'
 		
 		// DCHASMAN TODO This list needs to be revisted as it is missing a ton of valid attributes!
 	].forEach(function (name) {
-		Object.defineProperty(se, name, SecureObject.createFilteredProperty(se, raw, name));
+		SecureObject.addPropertyIfSupported(se, raw, name);
 	});
 };
 
@@ -249,7 +240,7 @@ SecureElement.addElementSpecificProperties = function(se, el) {
 		var whitelist = SecureElement.elementSpecificAttributeWhitelists[tagName];
 		if (whitelist) {
 			whitelist.forEach(function(name) {
-				Object.defineProperty(se, name, SecureObject.createFilteredProperty(se, el, name));
+				SecureObject.addPropertyIfSupported(se, el, name);
 			});
 		}
 	}
@@ -261,7 +252,7 @@ SecureElement.addElementSpecificMethods = function(se, el) {
 		var whitelist = SecureElement.elementSpecificMethodWhitelists[tagName];
 		if (whitelist) {
 			whitelist.forEach(function(name) {
-				Object.defineProperty(se, name, SecureObject.createFilteredMethod(se, el, name));
+				SecureObject.addMethodIfSupported(se, el, name);
 			});
 		}
 	}
@@ -286,8 +277,8 @@ SecureElement.elementSpecificAttributeWhitelists = {
 	"IMG": ["alt", "crossorigin", "height", "ismap", "longdesc", "sizesHTML5", "src", "srcsetHTML5", "width", "usemap"],
 	"INPUT": ["type", "accept", "autocomplete", "autofocus", "autosave", "checked", "disabled", "form", "formaction", 
 	          "formenctype", "formmethod", "formnovalidate", "formtarget", "height", "inputmode", "list", "max", "maxlength", 
-	          "min", "minlength", "minlength", "name", "pattern", "placeholder", "readonly", "required", "selectionDirection",
-	          "size", "spellcheck", "src", "step", "tabindex", "value", "width"],
+	          "min", "minlength", "multiple", "name", "pattern", "placeholder", "readonly", "required", "selectionDirection",
+	          "size", "src", "step", "tabindex", "value", "width"],
 	"INS": ["cite", "datetime"],
 	"LABEL": ["accesskey", "for", "form"],
 	"LI": ["value"],
@@ -301,7 +292,7 @@ SecureElement.elementSpecificAttributeWhitelists = {
 	"OBJECT": ["data", "form", "height", "height", "type", "typemustmatch", "usemap", "width"],
 	"OL": ["reversed", "start", "type"],
 	"OPTGROUP": ["disabled", "label"],
-	"OPTION": ["disabled", "label", "selected", "selected"],
+	"OPTION": ["disabled", "label", "selected", "value"],
 	"OUTPUT": ["for", "form", "name"],
 	"PARAM": ["name", "value"],
 	"PROGRESS": ["max", "value"],
@@ -312,7 +303,7 @@ SecureElement.elementSpecificAttributeWhitelists = {
 	"TEMPLATE": ["content"],
 	"TEXTAREA": ["autocomplete", "autofocus", "cols", "disabled", "form", "maxlength", "minlength", "name", 
 	             "placeholder", "readonly", "required", "rows", "selectionDirection", "selectionEnd", "selectionStart", 
-	             "spellcheck", "wrap"],
+	             "wrap"],
 	"TH": ["colspan", "headers", "rowspan", "scope"],
 	"TIME": ["datetime"],
 	"TRACK": ["default", "kind", "label", "src", "srclang"],

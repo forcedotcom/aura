@@ -12,9 +12,8 @@
     ElementProperitesBlacklist: ['attributes', 'firstElementChild', 'lastElementChild', 'namespaceURI',
                                  'nextElementSibling', 'previousElementSibling'],
 
-    HTMLPropertiesWhitelist: ['accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable',
-                              'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang', 'spellcheck',
-                              'style', 'tabIndex', 'title'],
+    HTMLPropertiesWhitelist: ['accessKey', 'contentEditable', 'isContentEditable',
+                              'dataset', 'dir', 'lang', 'spellcheck', 'style', 'tabIndex', 'title'],
     
     HTMLPropertiesBlacklist: [],
 

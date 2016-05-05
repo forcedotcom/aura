@@ -7,9 +7,11 @@
 
     testAlertExposed: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        var alertString = alert.toString();
-        alertString = alertString.trim(); // the string starts with line break in IE
-        testUtils.assertStartsWith("function alert() {", alertString, "alert() not exposed");
+
+        testUtils.assertDefined(alert, "alert() not exposed");
+        testUtils.assertDefined(window.alert, "window.alert() not exposed");
+
+        testUtils.assertTrue(window.alert === alert, "window.alert() !=== alert()");
     },
 
     testComponentLockerInController: function(cmp) {

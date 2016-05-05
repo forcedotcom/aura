@@ -32,7 +32,7 @@
  * @constructor
  * @export
  */
- function GlobalValueProviders (gvp, initCallback) {
+function GlobalValueProviders (gvp, initCallback) {
     this.valueProviders = {
         "$Browser" : new Aura.Provider.ObjectValueProvider(gvp["$Browser"]),
         "$Label": new Aura.Provider.LabelValueProvider(gvp["$Label"]),
@@ -64,6 +64,26 @@
 }
 
 /**
+ * Persistent storage key for GVPs.
+ */
+GlobalValueProviders.prototype.STORAGE_KEY = "globalValueProviders";
+
+
+/**
+ * Key to use of the MutexLocker to guarantee atomic execution across tabs.
+ */
+GlobalValueProviders.prototype.MUTEX_KEY = "GlobalValueProviders";
+
+/**
+ * Function to release the mutex, set while the mutex is held.
+ */
+GlobalValueProviders.prototype.mutexUnlock = undefined;
+
+/**
+ * True if GVPs were loaded from persistent storage. */
+GlobalValueProviders.prototype.LOADED_FROM_PERSISTENT_STORAGE = false;
+
+/**
  * Merges new GVPs with existing and saves to storage
  *
  * @param {Object} gvps
@@ -75,7 +95,6 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
         return;
     }
     var valueProvider, i, storage, type, newGvp, values;
-    var storedGvps = [];
 
     for ( i = 0; i < gvps.length; i++) {
         newGvp = gvps[i];
@@ -95,22 +114,71 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
     if (doNotPersist) {
         return;
     }
-    // Persist our set of valueProviders in storage.
+
+    // persist our set of valueProviders in storage
     storage = this.getStorage();
     if (storage) {
+        var toStore = [];
         for (type in this.valueProviders) {
             if (this.valueProviders.hasOwnProperty(type)) {
                 valueProvider = this.valueProviders[type];
                 values = valueProvider.getStorableValues ? valueProvider.getStorableValues() : (valueProvider.getValues ? valueProvider.getValues() : valueProvider);
-                storedGvps.push({
+                toStore.push({
                     "type" : type,
                     "values" : values
                 });
             }
         }
-        storage.put("globalValueProviders", storedGvps).then(function() {}, function(err) {
-            $A.warning("GlobalValueProvider.merge(), failed to put, error:" + err);
-          });
+
+        // for multi-tab support a single persistent store is shared so it's possible other tabs have updated
+        // the persisted GVP value. therefore lock, load, merge, save, and unlock.
+
+        var that = this;
+        $A.util.Mutex.lock(that.MUTEX_KEY , function (unlock) {
+            that.mutexUnlock = unlock;
+            storage.get(that.STORAGE_KEY)
+                .then(function(item) {
+                    if (item && item.value) {
+                        // NOTE: we merge into the value from storage to avoid modifying toStore, which may hold
+                        // references to mutable objects from the live GVPs (due to getValues() etc above). this means
+                        // the live GVPs don't see the additional values from storage.
+
+                        try {
+                            item = item.value;
+
+                            var j;
+                            var map = {};
+                            for (j in item) {
+                                map[item[j]["type"]] = item[j]["values"];
+                            }
+
+
+                            for (j in toStore) {
+                                type = toStore[j]["type"];
+                                if (!map[type]) {
+                                    map[type] = {};
+                                    item.push({"type":type, "values":map[type]});
+                                }
+                                $A.util.apply(map[type], toStore[j]["values"], true, true);
+                            }
+
+                            toStore = item;
+                        } catch (err) {
+                            $A.warning("GlobalValueProvider.merge(), merging from storage failed, overwriting, error:" + err);
+                        }
+                    }
+                    return storage.put(that.STORAGE_KEY, toStore);
+                })
+                .then(
+                    function() {
+                        that.mutexUnlock();
+                    },
+                    function(err) {
+                        $A.warning("GlobalValueProvider.merge(), failed to put, error:" + err);
+                        that.mutexUnlock();
+                    }
+                );
+        });
     }
 };
 
@@ -138,23 +206,29 @@ GlobalValueProviders.prototype.loadFromStorage = function(callback) {
     var storage = this.getStorage();
     var that = this;
     if (storage) {
-        storage.get("globalValueProviders").then(
-            function (item) {
-                $A.run(function() {
-                    if (item) {
-                        // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
-                        that.merge(item.value, true);
-                    }
-                    callback(!!item);
-                });
-            },
-            function() {
-                $A.run(function() {
-                    // error retrieving from storage
-                    callback(false);
-                });
-            }
-        );
+        storage.get(this.STORAGE_KEY)
+            .then(function (item) {
+                    $A.run(function() {
+                        if (item) {
+                            // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
+                            that.merge(item.value, true);
+                        }
+
+                        // loading from persistence was successful
+                        that.LOADED_FROM_PERSISTENT_STORAGE = true;
+
+                        callback(!!item);
+                    });
+            })
+            .then(
+                undefined,
+                function() {
+                    $A.run(function() {
+                        // error retrieving from storage
+                        callback(false);
+                    });
+                }
+            );
     } else {
         // nothing loaded from persistent storage
         callback(false);

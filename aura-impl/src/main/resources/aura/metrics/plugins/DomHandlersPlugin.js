@@ -76,8 +76,7 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
             "locator" : {
                 "id"       : cmp.getGlobalId(),
                 "root"     : localCmpId,
-                "parent"   : dispatchCmpId,
-                "selector" : target.nodeName + ' ' + target.className.trim()
+                "parent"   : dispatchCmpId
             },
             "actionType" : event.type,
             "action"     : action.getDef().getDescriptor().toString()

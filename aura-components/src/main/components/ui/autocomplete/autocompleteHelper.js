@@ -63,7 +63,9 @@
         var list = this.getListComponent(component);
         if (list && list.get("v.visible") === true) {
             list.set("v.visible", false);
+            return true;
         }
+        return false;
     },
 
     handleEnterOrTabkey: function(component) {
@@ -84,7 +86,7 @@
     },
 
     handleEsckey: function(component) {
-        this.hideList(component);
+        return this.hideList(component);
     },
     
     handleKeyAction: function(component, event) {
@@ -97,8 +99,9 @@
             domEvent.preventDefault();
             this.highlightPrevItem(component, event);
         } else if (keyCode === 27) {  // Esc key
-            domEvent.stopPropagation();
-            this.handleEsckey(component, event);
+            if (this.handleEsckey(component, event)) {
+                domEvent.stopPropagation();
+            }
         } else if (keyCode === 9 || keyCode === 13) {  // enter key: select the highlighted list option
             this.handleEnterOrTabkey(component, event);
         } else {

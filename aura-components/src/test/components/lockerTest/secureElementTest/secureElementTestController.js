@@ -36,15 +36,38 @@
             testUtils.assertDefined(element[name]);
         });
     },
-    
+
     testFramesBlocked: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
-        
+
         try {
-        	document.createElement("frame");
-        	testUtils.fail("Should not have ben able to create a FRAME element");
-    	} catch(e) {
-    		testUtils.assertEquals(e.toString(), "The deprecated FRAME element is not supported in LockerService!");
-    	}
+            document.createElement("frame");
+            testUtils.fail("Should not have ben able to create a FRAME element");
+        } catch(e) {
+            testUtils.assertEquals(e.toString(), "The deprecated FRAME element is not supported in LockerService!");
+        }
+    },
+
+    testRemoveEventListener: function(cmp, event) {
+        var testUtils = cmp.get("v.testUtils");
+        var counter = 0;
+
+        var element = cmp.find("title").getElement();
+        var testWithUseCapture = event.getParam("arguments").testWithUseCapture;
+        var useCapture = undefined;
+        if(testWithUseCapture) {
+            useCapture = true;
+        }
+
+        element.addEventListener("click", function oneTimeClicker() {
+                counter += 1;
+                element.removeEventListener("click", oneTimeClicker, useCapture);
+            }, useCapture);
+
+        testUtils.clickOrTouch(element);
+        // the event listener has been removed
+        testUtils.clickOrTouch(element);
+
+        testUtils.assertEquals(1, counter);
     }
 })

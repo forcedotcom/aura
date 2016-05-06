@@ -22,12 +22,6 @@
             cmp.helper.testCanAccessDocumentHeadFromHelper($A.test);
         }
     },
-    
-    testAlertExposed: {
-        test: function(cmp) {
-            cmp.testAlertExposed();
-        }
-    },
 
     testAuraLockerInController: {
         test: function(cmp) {
@@ -117,7 +111,7 @@
             $A.test.assertStartsWith("markup://lockerTest:facet", component.toString());
         }
     },
-    
+
     testLocationExposed: {
         test: function(cmp) {
             cmp.testLocationExposed();

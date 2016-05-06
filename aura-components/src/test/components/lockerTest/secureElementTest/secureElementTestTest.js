@@ -14,7 +14,7 @@
 
     HTMLPropertiesWhitelist: ['accessKey', 'contentEditable', 'isContentEditable',
                               'dataset', 'dir', 'lang', 'spellcheck', 'style', 'tabIndex', 'title'],
-    
+
     HTMLPropertiesBlacklist: [],
 
     OtherPropertiesWhitelist: ["childNodes", "children", "ownerDocument", "parentNode", "offsetParent"],
@@ -54,10 +54,26 @@
             cmp.testExposedMethods(this.MethodsWhitelist);
         }
     },
-    
+
     testFramesBlocked: {
         test: function(cmp) {
             cmp.testFramesBlocked();
+        }
+    },
+
+    /**
+     * removeEventListener() is special in SecureElement, so besides verifying it's exposed,
+     * it also needs to be verified working correctly.
+     */
+    testRemoveEventListener: {
+        test: function(cmp) {
+            cmp.testRemoveEventListener(false);
+        }
+    },
+
+    testRemoveEventListenerWithUseCapture: {
+        test: function(cmp) {
+            cmp.testRemoveEventListener(true);
         }
     }
 })

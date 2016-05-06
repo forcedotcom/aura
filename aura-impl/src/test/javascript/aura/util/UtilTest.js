@@ -454,7 +454,6 @@ Test.Aura.Util.UtilTest = function() {
             });
 
             Assert.Equal(expected,actual);
-
         }
 
         [Fact]
@@ -484,7 +483,20 @@ Test.Aura.Util.UtilTest = function() {
                 actual=targetUtil.apply(expected,undefined,"test",null);
             });
 
-            Assert.Equal(expected,actual);}
+            Assert.Equal(expected,actual);
+        }
+
+        [Fact]
+        function FormatStringIsEmptyString() {
+            var expected = "";
+
+            var actual = null;
+            auraMock(function() {
+                actual = targetUtil.format(expected);
+            });
+
+            Assert.Equal(expected,actual);
+        }
     }
 
     [Fixture]

@@ -37,16 +37,28 @@
             });
         }
     },
-    
+
     testLocationExposedOnWindow: {
         test: function(cmp) {
             cmp.testLocationExposedOnWindow();
         }
     },
-    
+
     testNavigatorExposedOnWindow: {
         test: function(cmp) {
             cmp.testNavigatorExposedOnWindow();
+        }
+    },
+
+    testWhitelistedGlobalAttributeExposedOnWindow: {
+        test: function(cmp) {
+            cmp.testWhitelistedGlobalAttributeExposedOnWindow();
+        }
+    },
+
+    testHostedDefinedGlobalsExposedOnWindow: {
+        test: function(cmp) {
+            cmp.testHostedDefinedGlobalsExposedOnWindow();
         }
     }
 })

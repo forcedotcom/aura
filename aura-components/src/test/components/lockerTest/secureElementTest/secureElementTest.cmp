@@ -30,6 +30,9 @@
         <aura:attribute name="methodsWhitelist" type="List"/>
     </aura:method>
     <aura:method name="testFramesBlocked" action="{!c.testFramesBlocked}"/>
+    <aura:method name="testRemoveEventListener" action="{!c.testRemoveEventListener}">
+        <aura:attribute name="testWithUseCapture" type="Boolean"/>
+    </aura:method>
     <aura:method name="getDiv" action="{!c.getDiv}"/>
 
     <div aura:id="title">SecureElement test</div>

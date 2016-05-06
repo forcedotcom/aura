@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 ({
-    privateMethod: function(component, event, helper){
+    callGlobalMethodInComponentWithGlobalAccess: function(component, event, helper){
+    	component.find("componentWithGlobalAccess").globalMethod();
     },
     
-    publicMethod: function(component, event, helper){
-    
+    callPublicMethodInComponentWithGlobalAccess: function(component, event, helper){
+    	component.find("componentWithGlobalAccess").publicMethod();
     },
     
-    globalMethod: function(component, event, helper){
-    
+    callPrivateMethodInComponentWithGlobalAccess: function(component, event, helper){
+    	component.find("componentWithGlobalAccess").privateMethod();
     }
-
 })

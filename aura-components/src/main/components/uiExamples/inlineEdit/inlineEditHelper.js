@@ -16,16 +16,24 @@
 ({
 	EDIT_LAYOUTS : {
 		id : {
-			descriptor : 'markup://ui:inputNumber'
+			componentDef : {
+				descriptor : 'markup://ui:inputNumber'
+			}
 		},
 		name : {
-			descriptor : 'markup://ui:inputText'
+			componentDef : {
+				descriptor : 'markup://ui:inputText'
+			}
 		},
 		grade : {
-			descriptor : 'markup://ui:inputNumber'
+			componentDef : {
+				descriptor : 'markup://ui:inputNumber'
+			}
 		},
 		date : {
-			descriptor : 'markup://ui:inputDate',
+			componentDef : {
+				descriptor : 'markup://ui:inputDate'
+			},
 			attributes : {
 				displayDatePicker : true
 			}

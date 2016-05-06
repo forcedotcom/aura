@@ -65,7 +65,7 @@
 				attributes.value = payload.value;
 				attributes.updateOn = 'input';
 				
-				$A.createComponent(editLayout.descriptor, attributes, function (inputComponent) {
+				$A.createComponent(editLayout.componentDef.descriptor, attributes, function (inputComponent) {
 					var panelBodyAttributes = {
 							index : index,
 							key : payload.name,

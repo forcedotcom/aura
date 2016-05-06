@@ -15,11 +15,12 @@
  */
 package org.auraframework.http;
 
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.Aura;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext.Authentication;
@@ -27,6 +28,8 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Ignore;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletConfig;
@@ -37,6 +40,9 @@ public class AuraServletTest extends UnitTestCase {
 
     private AuraServlet servlet;
 
+    @Mock
+    private ServletUtilAdapter servletUtilAdapter;
+    
     public static class SimulatedErrorException extends RuntimeException {
         private static final long serialVersionUID = 411181168049748986L;
     }
@@ -47,49 +53,75 @@ public class AuraServletTest extends UnitTestCase {
 
     @Override
     public void setUp() throws Exception {
-        servlet = new AuraServlet();
+    	super.setUp();
+        servlet = new AuraServlet(servletUtilAdapter);
         MockServletConfig servletConfig = new MockServletConfig();
         servlet.init(servletConfig);
     }
+    
+    @Override
+    public void tearDown() throws Exception {
+    	contextService.endContext();
+    	super.tearDown();
+    }
 
+	/*
+	 * The handling of standard ports may vary (in .getRequestURL) according to
+	 * the version of MockHttpServletRequest provided, so just use a
+	 * non-standard port.
+	 */
     private MockHttpServletRequest getBaseAuraRequest() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setMethod("GET");
         request.setScheme("http");
         request.setServerName("server");
+        request.setServerPort(9090);
         request.setRequestURI("/aura");
         request.addParameter("aura.tag", "aura:text");
         return request;
     }
 
-    private void assertNoCacheHeaders(HttpServletResponse response) {
-        assertEquals("Unexpected cache-control header", "no-cache, no-store",
-                response.getHeader(HttpHeaders.CACHE_CONTROL));
-        assertEquals("Unexpected pragma header", "no-cache", response.getHeader(HttpHeaders.PRAGMA));
+    private void assertSingleHeader(MockHttpServletResponse response, String name, String value) {
+    	List<String> headers = response.getHeaders(name);
+		assertEquals(String.format("Unexpected number of '%s' headers", name),
+				1, headers.size());
+		assertEquals(String.format("Unexpected value for '%s' header", name),
+				value, headers.get(0));
     }
     
     public void testDoGet_NoCacheStartsWithSlash() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		
         MockHttpServletRequest request = getBaseAuraRequest();
-        request.setServerPort(9090);
-        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", "/path?q1=v1+&q2=+v2&q3=v1+v2#a");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
+        
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("Unexpected location", "http://server:9090/path?q1=v1+&q2=+v2&q3=v1+v2#a",
-                response.getHeader(HttpHeaders.LOCATION));
-        assertNoCacheHeaders(response);
+		assertSingleHeader(response, HttpHeaders.LOCATION,
+				"http://server:9090/path?q1=v1+&q2=+v2&q3=v1+v2#a");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
     public void testDoGet_NoCacheIsRoot() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		
         MockHttpServletRequest request = getBaseAuraRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", "/");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
+        
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("Unexpected location", "http://server/", response.getHeader(HttpHeaders.LOCATION));
-        assertNoCacheHeaders(response);
+		assertSingleHeader(response, HttpHeaders.LOCATION, "http://server:9090/");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
     /**
@@ -99,141 +131,214 @@ public class AuraServletTest extends UnitTestCase {
      */
     public void testDoGet_NoCacheDoubleSlash() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		
         MockHttpServletRequest request = getBaseAuraRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", "http://host//somepath");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
+        
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("Unexpected location", "http://server//somepath", response.getHeader(HttpHeaders.LOCATION));
-        assertNoCacheHeaders(response);
+		assertSingleHeader(response, HttpHeaders.LOCATION, "http://server:9090//somepath");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
     public void testDoGet_NoCacheNoFragment() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		
         MockHttpServletRequest request = getBaseAuraRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", "/?q");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
+        
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("Unexpected location", "http://server/?q", response.getHeader(HttpHeaders.LOCATION));
-        assertNoCacheHeaders(response);
+		assertSingleHeader(response, HttpHeaders.LOCATION, "http://server:9090/?q");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
     public void testDoGet_NoCacheNoQuery() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		
         MockHttpServletRequest request = getBaseAuraRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", "/#a");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
+        
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("Unexpected location", "http://server/#a", response.getHeader(HttpHeaders.LOCATION));
-        assertNoCacheHeaders(response);
+		assertSingleHeader(response, HttpHeaders.LOCATION, "http://server:9090/#a");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
     public void testDoGet_NoCacheDoesNotStartWithSlash() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		
         MockHttpServletRequest request = getBaseAuraRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", "urlisnotabsolute");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
+        
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("Unexpected location", "/", response.getHeader(HttpHeaders.LOCATION));
-        assertNoCacheHeaders(response);
+		assertSingleHeader(response, HttpHeaders.LOCATION, "/");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
     public void testDoGet_NoCacheUriExploit() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		
         MockHttpServletRequest request = getBaseAuraRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", "@exploit/");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
+        
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("Unexpected location", "/", response.getHeader(HttpHeaders.LOCATION));
-        assertNoCacheHeaders(response);
+		assertSingleHeader(response, HttpHeaders.LOCATION, "/");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
     public void testDoGet_NoCacheInvalid() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		
         MockHttpServletRequest request = getBaseAuraRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", "://:@:/");
+        
         servlet.doGet(request, response);
+        
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("Unexpected location", "/", response.getHeader(HttpHeaders.LOCATION));
-        assertNoCacheHeaders(response);
+		assertSingleHeader(response, HttpHeaders.LOCATION, "/");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
     public void testDoGet_NoCacheHttpsToHttp() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		
         MockHttpServletRequest request = getBaseAuraRequest();
         request.setScheme("https");
         request.setServerPort(7443);
-        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", "http://user:password@otherserver:otherport/path?q1=v1&q2=v2#a");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
+        
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("Unexpected location", "https://server:7443/path?q1=v1&q2=v2#a",
-                response.getHeader(HttpHeaders.LOCATION));
-        assertNoCacheHeaders(response);
+        assertSingleHeader(response, HttpHeaders.LOCATION, "https://server:7443/path?q1=v1&q2=v2#a");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
     public void testDoGet_NoCacheHttpToHttps() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		
         MockHttpServletRequest request = getBaseAuraRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", "https://user:password@otherserver:otherport/path?q1=v1&q2=v2#a");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
+        
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("Unexpected location", "https://server/path?q1=v1&q2=v2#a",
-                response.getHeader(HttpHeaders.LOCATION));
-        assertNoCacheHeaders(response);
+        assertSingleHeader(response, HttpHeaders.LOCATION, "https://server:9090/path?q1=v1&q2=v2#a");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
     public void testDoGet_NoCacheHttpsToHttps() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		
         MockHttpServletRequest request = getBaseAuraRequest();
         request.setScheme("https");
-        request.setServerPort(443);
-        MockHttpServletResponse response = new MockHttpServletResponse();
+        request.setServerPort(7443);
         request.addParameter("nocache", "https://user:password@otherserver:otherport/path?q1=v1&q2=v2#a");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
+        
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("Unexpected location", "https://server/path?q1=v1&q2=v2#a",
-                response.getHeader(HttpHeaders.LOCATION));
-        assertNoCacheHeaders(response);
+        assertSingleHeader(response, HttpHeaders.LOCATION, "https://server:7443/path?q1=v1&q2=v2#a");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
     @Ignore("W-3041937: of most concern when switching to https, if request or redirect are on non-standard ports")
     public void _testDoGet_NoCacheRetainsRequestAuthority() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		
         MockHttpServletRequest request = getBaseAuraRequest();
-        request.setServerPort(9090);
-        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", "https://user:password@otherserver:otherport/path?q1=v1&q2=v2#a");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
+        
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("Unexpected location", "https://server:9090/path?q1=v1&q2=v2#a",
-                response.getHeader(HttpHeaders.LOCATION));
-        assertNoCacheHeaders(response);
+        assertSingleHeader(response, HttpHeaders.LOCATION, "https://server:9090/path?q1=v1&q2=v2#a");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
     public void testDoGet_NoCacheEmpty() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		Mockito.when(
+				servletUtilAdapter.isValidDefType(Mockito.any(), Mockito.any()))
+				.thenReturn(false); // trigger 404 below
+		
         MockHttpServletRequest request = getBaseAuraRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", "");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
-        // components not directly accessible in PROD mode, but this check happens after nocache processing
-        assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatus());
+        
+        // def type check occurs after nocache processing
+		Mockito.verify(servletUtilAdapter).send404(Mockito.any(), Mockito.eq(request), Mockito.eq(response));
     }
 
     public void testDoGet_NoCacheNull() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+		Mockito.when(
+				servletUtilAdapter.actionServletGetPre(Mockito.any(),Mockito.any()))
+				.thenReturn(false);
+		Mockito.when(
+				servletUtilAdapter.isValidDefType(Mockito.any(), Mockito.any()))
+				.thenReturn(false); // trigger 404 below
+		
         MockHttpServletRequest request = getBaseAuraRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter("nocache", (String)null);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
         servlet.doGet(request, response);
-        // components not directly accessible in PROD mode, but this check happens after nocache processing
-        assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatus());
+        
+        // def type check occurs after nocache processing
+		Mockito.verify(servletUtilAdapter).send404(Mockito.any(), Mockito.eq(request), Mockito.eq(response));
     }
 }

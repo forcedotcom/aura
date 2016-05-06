@@ -107,8 +107,17 @@ public class AuraServlet extends AuraBaseServlet {
 
     private ManifestUtil manifestUtil = new ManifestUtil();
 
-    private ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
+    private ServletUtilAdapter servletUtilAdapter;
 
+	public AuraServlet() {
+		this(Aura.getServletUtilAdapter());
+	}
+
+	AuraServlet(ServletUtilAdapter servletUtilAdapter) {
+		super();
+		this.servletUtilAdapter = servletUtilAdapter;
+	}
+    
     @Override
     public void init() throws ServletException {
         super.init();
@@ -191,7 +200,6 @@ public class AuraServlet extends AuraBaseServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         DefinitionService definitionService;
-        ServletUtilAdapter servletUtil = Aura.getServletUtilAdapter();
         AuraContext context;
         String tagName;
         DefType defType;
@@ -199,7 +207,7 @@ public class AuraServlet extends AuraBaseServlet {
         //
         // Pre-hook
         //
-        if (servletUtil.actionServletGetPre(request, response)) {
+        if (servletUtilAdapter.actionServletGetPre(request, response)) {
             return;
         }
         //
@@ -217,7 +225,7 @@ public class AuraServlet extends AuraBaseServlet {
             // at this point we simply broke.
             //
             Aura.getExceptionAdapter().handleException(re);
-            servletUtil.send404(getServletConfig().getServletContext() ,request, response);
+            servletUtilAdapter.send404(getServletConfig().getServletContext() ,request, response);
             return;
         }
         String nocache = nocacheParam.get(request);
@@ -244,20 +252,20 @@ public class AuraServlet extends AuraBaseServlet {
 
             Mode mode = context.getMode();
             if (!isValidDefType(defType, mode)) {
-                servletUtil.send404(getServletConfig().getServletContext(), request, response);
+                servletUtilAdapter.send404(getServletConfig().getServletContext(), request, response);
                 return;
             }
 
             Class<? extends BaseComponentDef> defClass = defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class;
             defDescriptor = definitionService.getDefDescriptor(tagName, defClass);
         } catch (RequestParam.InvalidParamException ipe) {
-            servletUtil.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
+            servletUtilAdapter.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
             return;
         } catch (RequestParam.MissingParamException mpe) {
-            servletUtil.handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
+            servletUtilAdapter.handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
             return;
         } catch (Throwable t) {
-            servletUtil.handleServletException(new SystemErrorException(t), false, context, request, response, false);
+            servletUtilAdapter.handleServletException(new SystemErrorException(t), false, context, request, response, false);
             return;
         }
 
@@ -341,7 +349,7 @@ public class AuraServlet extends AuraBaseServlet {
     }
 
     protected boolean isValidDefType(DefType defType, Mode mode) {
-        return Aura.getServletUtilAdapter().isValidDefType(defType, mode);
+        return servletUtilAdapter.isValidDefType(defType, mode);
     }
 
     private Map<String, Object> getComponentAttributes(HttpServletRequest request) {

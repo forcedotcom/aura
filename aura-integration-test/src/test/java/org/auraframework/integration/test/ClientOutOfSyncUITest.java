@@ -35,13 +35,13 @@ import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import com.google.common.base.Function;
@@ -738,7 +738,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 String.format(
                         baseApplicationTag,
                         "template='auraStorageTest:componentDefStorageTemplate'",
-                        "<ui:button label='loadCmp' press='{!c.loadCmp}'/><div id='container' aura:id='container'>app</div>"));
+                        "<ui:button label='loadCmp' press='{!c.loadCmp}'/><div id='container' aura:id='container'>app</div>"
+                        + "<aura:handler event='aura:initialized' action='{!c.initialized}'/>"));
 
         String cmpDefString = cmpDesc.getNamespace() + ":" + cmpDesc.getName();
         DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
@@ -746,8 +747,10 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                         ControllerDef.class);
         addSourceAutoCleanup(
                 controllerDesc,
-                "{loadCmp:function(cmp){$A.createComponent('" + cmpDefString
-                        + "', {}, function(newCmp) {cmp.find('container').set('v.body', newCmp);});}}");
+                "{"
+                        + "loadCmp:function(cmp){$A.createComponent('"+cmpDefString+"', {}, function(newCmp){ cmp.find('container').set('v.body', newCmp); });},"
+                        + "initialized:function(cmp){window.initialized=true;}"
+                        + "}");
 
         open(appDesc);
 
@@ -765,8 +768,9 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         // Update the source of the component we retrieve from storage
         String newCmpText = "<div>cmpNew" + new Date().getTime() + "</div>";
         updateStringSource(cmpDesc, String.format(baseComponentTag, "", newCmpText));
-        
+
         // Wait for dynamically received component def to be persisted.
+        // ComponentDefStorage will exist because a dynamic cmp is fetched
         final String getPersistedDef = "var callback = arguments[arguments.length - 1];" +
                 "if (!$A) { callback('Aura not initialized'); return; };" +
                 "var storage = $A.storageService.getStorage('ComponentDefStorage');" +
@@ -785,15 +789,21 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
         // After refresh, the page will fire the getApplication bootstrap action, which will get a ClientOutOfSync
         // as the response, dump the storages and reload. Instead of trying to wait for the double reload, wait for
-        // the storages to clear.
+        // Aura Fwk + the app to finish loading (window.initialize) then create def storage (which won't exist
+        // because no dynamic defs have been received) and verify it is empty.
         getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 String script = "var callback = arguments[arguments.length - 1];" +
-                        "if ($A && $A.storageService.getStorage('ComponentDefStorage')){" +
+                        "if (!window.initialized || !$A) { callback(null); return; }" +
+                        "if (!$A.storageService.getStorage('ComponentDefStorage')) {" +
+                        "  $A.storageService.initStorage('ComponentDefStorage', true, false, 442368, 3600, 0, true, false);" +
+                        "}" +
                         "var storage = $A.storageService.getStorage('ComponentDefStorage');" +
-                        "storage.getAll().then(function(items){ callback(items) })" +
-                        "} else { callback(null);}";
+                        "storage.getAll().then(" +
+                        "  function(items){ callback(items) }," +
+                        "  function() { callback(null); }" +
+                        ")";
                 Object result = null;
                 try {
                     result = ((JavascriptExecutor) getDriver()).executeAsyncScript(script);

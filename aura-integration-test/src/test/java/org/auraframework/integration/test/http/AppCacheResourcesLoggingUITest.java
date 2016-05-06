@@ -32,8 +32,8 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.integration.test.logging.AbstractLoggingUITest;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.FreshBrowserInstance;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -284,7 +284,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         DefDescriptor<StyleDef> styleDesc = createDef(StyleDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, app.namespace, app.cmpName),src_style);
 
         List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, TOKEN, TOKEN);
-        
+
         Request sGif = new Request("/auraFW/resources/qa/images/s.gif", null, 200);
         List<Request> expectedInitialRequests = Lists.newArrayList(getExpectedInitialRequests(app));
 		expectedInitialRequests.add(sGif);
@@ -297,7 +297,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         updateStringSource(styleDesc, src_style.replace(TOKEN, replacement));
 
         logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, replacement, TOKEN);
-        
+
         List<Request> expectedChangeRequests = Lists.newArrayList(getExpectedChangeRequests(app));
         expectedChangeRequests.add(sGif);
 		assertRequests(expectedChangeRequests, logs);
@@ -372,52 +372,54 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
 
         DefDescriptor<ComponentDef> templateDesc = createDef(ComponentDef.class,
                 String.format("%s:%s", app.namespace, templateName),
-                "<aura:component isTemplate='true' extends='aura:template'>"
-                        + "<aura:set attribute='auraPreInitBlock'>"
-                        + "<auraStorage:init name='actions' persistent='true' secure='false' clearStorageOnInit='false' debugLoggingEnabled='true' defaultExpiration='60' defaultAutoRefreshInterval='60'/>"
-                        + "</aura:set>"
+                        "<aura:component isTemplate='true' extends='aura:template'>"
+                        + "  <aura:set attribute='auraPreInitBlock'>"
+                        + "    <auraStorage:init name='actions' persistent='true' secure='false' clearStorageOnInit='false' debugLoggingEnabled='true' defaultExpiration='60' defaultAutoRefreshInterval='60'/>"
+                        + "    <auraStorage:init name='ComponentDefStorage' persistent='true' secure='false' clearStorageOnInit='false' debugLoggingEnabled='true' defaultExpiration='60'/>"
+                        + "  </aura:set>"
                         + "</aura:component>");
 
         DefDescriptor<ComponentDef> storageCmpDesc = createDef(ComponentDef.class,
                 String.format("%s:%s", app.namespace, storageCmpName),
                 "<aura:component>"
-                        + "<aura:attribute name='storageOutput' type='String' default='Waiting'/>"
-                        + "<ui:button label='Add to storage' class='addToStorage' press='{!c.addToStorage}'/>"
-                        + "<ui:button label='Check storage' class='checkStorage' press='{!c.checkStorage}'/>"
-                        + "<div class='storageOutput'>{!v.storageOutput}</div>"
+                        + "  <aura:attribute name='storageOutput' type='String' default='Waiting'/>"
+                        + "    <ui:button label='Add to storage' class='addToStorage' press='{!c.addToStorage}'/>"
+                        + "    <ui:button label='Check storage' class='checkStorage' press='{!c.checkStorage}'/>"
+                        + "    <div class='storageOutput'>{!v.storageOutput}</div>"
                         + "</aura:component>");
 
         createDef(
                 ControllerDef.class,
                 String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, app.namespace, storageCmpName),
                 "{ addToStorage: function(cmp) { "
-                        + "$A.storageService.getStorage('actions').put('testkey','testvalue')"
-                        + ".then(function(){"
-                        + "return $A.storageService.getStorage('ComponentDefStorage').put('testkey','{2:1}');"
-                        + "}).then(function() {"
-                        + "cmp.set('v.storageOutput','Storage Done')"
-                        + "})"
-                        + "['catch'](function(err){ cmp.set('v.storageOutput','Storage Failed ' + err.toString())});"
-                        + "},"
-                        + "checkStorage: function(cmp) {"
-                        + "var findKey = function(name) {"
-                        + "return $A.storageService.getStorage(name).getAll().then(function(items){"
-                        + "for (var i=0; i<items.length; i++) {"
-                        + "var item = items[i];"
-                        + "if (item.key.indexOf('testkey') > -1) {"
-                        + "return Promise.resolve();"
-                        + "}"
-                        + "}"
-                        + "return Promise.reject('Cache miss');"
-                        + "});"
-                        + "};"
-                        + "findKey('actions').then(function() {"
-                        + "return findKey('ComponentDefStorage');"
-                        + "}).then(function(){"
-                        + "cmp.set('v.storageOutput', 'Cache hit');"
-                        + "})"
-                        + "['catch'](function(err){ cmp.set('v.storageOutput', err); });"
-                        + "}}");
+                        + "  $A.storageService.getStorage('actions').put('testkey','testvalue')"
+                        + "    .then(function(){"
+                        + "      return $A.storageService.getStorage('ComponentDefStorage').put('testkey','{2:1}');"
+                        + "    }).then(function() {"
+                        + "      cmp.set('v.storageOutput','Storage Done')"
+                        + "    })"
+                        + "    ['catch'](function(err){ cmp.set('v.storageOutput','Storage Failed ' + err.toString())});"
+                        + "  },"
+                        + "  checkStorage: function(cmp) {"
+                        + "    var findKey = function(name) {"
+                        + "      return $A.storageService.getStorage(name).getAll().then(function(items){"
+                        + "        for (var i=0; i<items.length; i++) {"
+                        + "          var item = items[i];"
+                        + "          if (item.key.indexOf('testkey') > -1) {"
+                        + "            return Promise.resolve();"
+                        + "          }"
+                        + "        }"
+                        + "        return Promise.reject('Cache miss');"
+                        + "      });"
+                        + "    };"
+                        + "  findKey('actions').then(function() {"
+                        + "    return findKey('ComponentDefStorage');"
+                        + "  }).then(function(){"
+                        + "    cmp.set('v.storageOutput', 'Cache hit');"
+                        + "  })"
+                        + "  ['catch'](function(err){ cmp.set('v.storageOutput', err); });"
+                        + "  }"
+                        + "}");
 
         createDef(ApplicationDef.class, String.format("%s:%s", app.namespace, app.appName), String.format(
                 "<aura:application useAppcache='true' render='client' template='%s:%s'>"
@@ -564,7 +566,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      * @param cssToken The text to be found from css.
      * @param fwToken The text to be found from the framework.
      */
-    private List<Request> loadMonitorAndValidateApp(final AppDescription app, 
+    private List<Request> loadMonitorAndValidateApp(final AppDescription app,
             final String markupToken, String jsToken, String cssToken, String fwToken) throws Exception {
         appender.clearLogs();
         // Opening a page through WebDriverTestCase adds a nonce to ensure fresh resources. In this case we want to see

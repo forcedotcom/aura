@@ -45,22 +45,26 @@
 
     logComponentDefStorage: function(cmp) {
         var that = this;
-        $A.storageService.getStorage("ComponentDefStorage").getAll()
-        .then(function(items) {
-            var keys  = [];
-            for (var i = 0; i < items.length; i++) {
-                keys.push(items[i]["key"]);
-            }
+        // def store does not exist until a dynamic def is received
+        var defs = $A.storageService.getStorage("ComponentDefStorage");
+        if (!defs) {
+            return;
+        }
+        defs.getAll()
+            .then(function(items) {
+                var keys  = [];
+                for (var i = 0; i < items.length; i++) {
+                    keys.push(items[i]["key"]);
+                }
 
-            var content = keys.sort().join(", ");
+                var content = keys.sort().join(", ");
 
-            // only log if the value has changed
-            if (cmp._ComponentDefStorage !== content) {
-                that.log(cmp, "ComponentDefStorage content: " + content);
-                cmp._ComponentDefStorage = content;
-            }
-
-        });
+                // only log if the value has changed
+                if (cmp._ComponentDefStorage !== content) {
+                    that.log(cmp, "ComponentDefStorage content: " + content);
+                    cmp._ComponentDefStorage = content;
+                }
+            });
     },
 
     clearActionAndDefStorage: function(cmp) {

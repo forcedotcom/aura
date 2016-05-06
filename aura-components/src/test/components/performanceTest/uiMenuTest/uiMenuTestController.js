@@ -1,7 +1,7 @@
 ({
 
     setup: function(cmp, event, helper) {
-        cmp.NUM_ITEMS = 1400;
+        cmp.NUM_ITEMS = cmp.get("v.numMenuItems");
         cmp.newActionMenuItemComponents = [];
     },
 

@@ -19,6 +19,7 @@
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
     <aura:method name="testElementProperties" action="{!c.testElementProperties}">
+        <aura:attribute name="auraId" type="String"/>
         <aura:attribute name="elementPropertiesWhitelist" type="List"/>
         <aura:attribute name="elementPropertiesBlacklist" type="List"/>
     </aura:method>
@@ -36,4 +37,5 @@
     <aura:method name="getDiv" action="{!c.getDiv}"/>
 
     <div aura:id="title">SecureElement test</div>
+    <input type="text" aura:id="input" value="input" />
 </aura:component>

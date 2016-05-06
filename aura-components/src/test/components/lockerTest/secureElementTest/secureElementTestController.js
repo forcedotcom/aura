@@ -1,9 +1,10 @@
 ({
     testElementProperties: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
+        var auraId = event.getParam("arguments").auraId;
         var elementPropertiesWhitelist = event.getParam("arguments").elementPropertiesWhitelist;
         var elementProperitesBlacklist = event.getParam("arguments").elementPropertiesBlacklist;
-        var element = cmp.find("title").getElement();
+        var element = cmp.find(auraId).getElement();
 
         elementPropertiesWhitelist.forEach(function(name) {
             testUtils.assertTrue(name in element, "Expected property '" + name + "' to be a property on SecureElement");

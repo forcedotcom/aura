@@ -29,5 +29,5 @@
     <aura:method name="testSetParams" action="{!c.testSetParams}"/>
 
     <div>SecureAction test</div>
-    <actionsTest:serverAction aura:id="facet"/>
+    <actionsTest:chainLocalActions aura:id="facet"/>
 </aura:component>

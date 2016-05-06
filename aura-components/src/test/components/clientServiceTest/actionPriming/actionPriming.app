@@ -14,15 +14,8 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<aura:application controller="java://org.auraframework.components.test.java.controller.JavaTestController">
+<aura:application template="auraStorageTest:actionsStorageTemplate" controller="java://org.auraframework.components.test.java.controller.JavaTestController">
     <aura:attribute name="completed" type="Boolean" default="false"/>
-
-    <auraStorage:init name="actions"
-                  persistent="false"
-                  secure="true"
-                  defaultExpiration="900"
-                  defaultAutoRefreshInterval="30"
-                  maxSize="4096"/>
 
     <aura:method name="getStringAction" action="{!c.getStringAction}" />
 </aura:application>

@@ -44,7 +44,7 @@
     testDifferentNamespacedActionPassedFromSystemMode: {
         test: function(cmp) {
             var facet = cmp.find("facet");
-            var facetAction = facet.get("c.cExecuteInForegroundWithReturn");
+            var facetAction = facet.get("c.multiply");
             cmp.testDifferentNamespacedActionPassedFromSystemMode(facetAction);
         }
     },

@@ -13,12 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<aura:component render="client">
-    <auraStorage:init debugLoggingEnabled="false"
-                      name="actions"
-                      secure="true"
-                      persistent="false"
-                      clearStorageOnInit="true"
-                      defaultExpiration="50"
-                      defaultAutoRefreshInterval="60"/>
-</aura:component>
+<aura:application template="auraStorageTest:actionsStorageTemplate">
+
+</aura:application>

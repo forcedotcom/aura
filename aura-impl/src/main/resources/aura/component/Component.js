@@ -455,23 +455,33 @@ Component.prototype.implementsDirectly = function(type) {
  * @param {boolean}
  *            insert The flag to indicate if we should put the handler at the
  *            beginning instead of the end of handlers array.
+ * @param {String}
+ *            phase The target event phase; defaults to "bubble"
  * @public
  * @platform
  * @export
  */
-Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert) {
+Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert, phase) {
     var dispatcher = this.getEventDispatcher(this);
+
+    if(!phase) {
+        phase = "bubble";
+    }
 
     var handlers = dispatcher[eventName];
     if (!handlers) {
-        handlers = [];
-        dispatcher[eventName] = handlers;
+        handlers = dispatcher[eventName] = {};
+    }
+
+    var phasedHandlers = handlers[phase];
+    if(!phasedHandlers) {
+        handlers[phase] = phasedHandlers = [];
     }
 
     if (insert === true) {
-        handlers.unshift(this.getActionCaller(valueProvider, actionExpression));
+        phasedHandlers.unshift(this.getActionCaller(valueProvider, actionExpression));
     } else {
-        handlers.push(this.getActionCaller(valueProvider, actionExpression));
+        phasedHandlers.push(this.getActionCaller(valueProvider, actionExpression));
     }
 };
 
@@ -488,7 +498,7 @@ Component.prototype.addValueHandler = function(config) {
     var value = config["value"];
     if ($A.util.isExpression(value)&&value.getExpression()==="this") {
         var eventQName = this.componentDef.getEventDef(config["event"], true).getDescriptor().getQualifiedName();
-        this.addHandler(eventQName, this, config["action"]);
+        this.addHandler(eventQName, this, config["action"], false, "default");
         return;
     }
     if(config["action"]&&!config["method"]){
@@ -708,8 +718,13 @@ Component.prototype.destroy = function(async) {
             for (key in eventDispatcher) {
                 var vals = eventDispatcher[key];
                 if (vals) {
-                    for (var j = 0; j < vals.length; j++) {
-                        delete vals[j];
+                    for(var phase in vals) {
+                        var arr = vals[phase];
+                        if(arr) {
+                            for (var j = 0; j < arr.length; j++) {
+                                delete arr[j];
+                            }
+                        }
                     }
 
                     delete eventDispatcher[key];
@@ -1213,7 +1228,7 @@ Component.prototype.fireChangeEvent=function(key,oldValue,newValue,index){
         if (observers.length) {
             var eventDef = $A.eventService.getEventDef("aura:valueChange");
             var dispatcher = {};
-            dispatcher[eventDef.getDescriptor().getQualifiedName()] = observers;
+            dispatcher[eventDef.getDescriptor().getQualifiedName()] = {"default": observers};
             var changeEvent = new Aura.Event.Event({
                 "eventDef" : eventDef,
                 "eventDispatcher" : dispatcher
@@ -1408,7 +1423,7 @@ Component.prototype.fire = function(name) {
     var eventDef = this.componentDef.getEventDef(name,true);
     var eventQName = eventDef.getDescriptor().getQualifiedName();
     var handlers = dispatcher[eventQName];
-    if(handlers){
+    if(handlers) {
         var event = new Aura.Event.Event({
             "eventDef" : eventDef,
             "eventDispatcher" : dispatcher
@@ -1495,8 +1510,15 @@ Component.prototype.getHandledEvents = function() {
     var eventDispatcher = concrete.getEventDispatcher();
     if (eventDispatcher) {
         for ( var name in eventDispatcher) {
-            if (eventDispatcher.hasOwnProperty(name) && eventDispatcher[name].length) {
-                ret[name.toLowerCase()] = true;
+            if (eventDispatcher.hasOwnProperty(name)) {
+                // determine if the event has any handlers registered to any phase
+                var eventHandlerConfig = eventDispatcher.hasOwnProperty(name) && eventDispatcher[name];
+                for( var phase in eventHandlerConfig) {
+                    if( eventHandlerConfig.hasOwnProperty(phase) && eventHandlerConfig[phase].length ) {
+                        ret[name.toLowerCase()] = true;
+                        break; // no need to check the other phases
+                    }
+                }
             }
         }
     }
@@ -2133,7 +2155,7 @@ Component.prototype.getMethodHandler = function(methodDef){
         }
         var eventDef = $A.eventService.getEventDef("aura:methodCall");
         var dispatcher = {};
-        dispatcher[eventDef.getDescriptor().getQualifiedName()] = [observer];
+        dispatcher[eventDef.getDescriptor().getQualifiedName()] = {"default": [observer]};
         var methodEvent = new Aura.Event.Event({
             "eventDef" : eventDef,
             "eventDispatcher" : dispatcher
@@ -2229,7 +2251,7 @@ Component.prototype.setupComponentEvents = function(cmp, config) {
         if (len > 0) {
             dispatcher = this.getEventDispatcher(cmp);
             for (var i = 0; i < events.length; i++) {
-                dispatcher[events[i]] = [];
+                dispatcher[events[i]] = {};
             }
         }
 
@@ -2248,7 +2270,7 @@ Component.prototype.setupComponentEvents = function(cmp, config) {
                             "Event handler for " + key
                             + " defined on super component "
                             + this.globalId);
-                    cmp.addHandler(key, valueProvider, eventValue["value"]||eventValue);
+                    cmp.addHandler(key, valueProvider, eventValue["value"]||eventValue, false, "bubble");
                 }
             }
         }
@@ -2258,7 +2280,7 @@ Component.prototype.setupComponentEvents = function(cmp, config) {
     if (cmpHandlers) {
         for (var k = 0; k < cmpHandlers.length; k++) {
             var cmpHandler = cmpHandlers[k];
-            cmp.addHandler(cmpHandler["name"], cmp, cmpHandler["action"]);
+            cmp.addHandler(cmpHandler["name"], cmp, cmpHandler["action"], false, cmpHandler["phase"]);
         }
     }
 };
@@ -2288,6 +2310,7 @@ Component.prototype.setupApplicationEventHandlers = function(cmp) {
             handlerConfig["globalId"] = cmp.globalId;
             handlerConfig["handler"] = this.getHandler(cmp, handlerDef["action"]);
             handlerConfig["event"] = handlerDef["eventDef"].getDescriptor().getQualifiedName();
+            handlerConfig["phase"] = handlerDef["phase"];
             $A.eventService.addHandler(handlerConfig);
         }
     }

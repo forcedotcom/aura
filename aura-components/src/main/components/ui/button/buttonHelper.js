@@ -38,7 +38,7 @@
         var dispatcher = cmp.getConcreteComponent().getEventDispatcher();
 
         for (var e in this.EVENT_DISPATCH) {
-            if (dispatcher[e] && dispatcher[e].length) {
+            if (dispatcher[e] && dispatcher[e]["bubble"] && dispatcher[e]["bubble"].length) {
                 htmlAttr[this.EVENT_DISPATCH[e]] = cmp.getReference('c.' + e);
             }
         }

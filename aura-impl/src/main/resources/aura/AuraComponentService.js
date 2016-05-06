@@ -150,6 +150,107 @@ AuraComponentService.prototype.getAttributeProviderForElement = function(element
 };
 
 /**
+ * Returns an iterator over components from cmp to the root through 
+ * the value provider chain. The iterator emits an array of the component extension 
+ * hierarchy for each concrete component.
+ * Example: [Cmp, SuperCmp, SuperSuperCmp] -> [CmpCVP, SuperCmpCVP] -> CmpCVPCVP
+ * @param {Component} cmp The source component
+ * @private
+ */
+AuraComponentService.prototype.getComponentValueProviderHierarchy = (function() {
+
+    function getSuperHierarchy(cmp) {
+        var list = [cmp];
+        do {
+            if(!cmp.isValid()) {
+                // signal an invalid hiearchy to the caller
+                return undefined; 
+            }
+            cmp = cmp.getSuper();
+            if(cmp) {
+                list.push(cmp);
+            }
+        } while (cmp);
+
+        return list;
+    }
+
+    function ComponentValueProviderHierarchyIterator(cmp) {
+        var done = !cmp;
+        var current = cmp;
+
+        this["next"] = function() {
+
+            if(!current || !current.isValid()) {
+                done = true;
+                current = undefined;
+            }
+
+            var value;
+            if(current) {
+                value = getSuperHierarchy(current);
+                // an "undefined" value here means that we have an
+                // invalid component in the hierarchy
+                if(value === undefined) {
+                    done = true;
+                    current = undefined;
+                }
+            }
+
+            // store the current value before calculating the next one
+            var result = {
+                "value": value
+            };
+
+            if(!done) {
+                // Look for a facet value provider (some providers may just be extending definitions)
+                do {
+                    var next = current.getComponentValueProvider();
+                    if (next === current || !(next instanceof Component)) {
+                        // We are at the top-level now, so we are done
+                        current = undefined;
+                        break;
+                    }
+                    else if (next.getGlobalId() !== current.getGlobalId()) {
+                        // Reached a facet value provider
+                        current = next;
+                        break;
+                    }
+                    current = next;
+                } while (current);
+            }
+
+            result["done"] = done;
+
+            return result;
+        };
+
+        this["return"] = function(value) {
+            if(!done) {
+                done = true;
+                current = value; 
+            }
+            return {
+                "value": current,
+                "done": done
+            };
+        };
+
+        this["throw"] = function(e) {
+            if(!done) {
+                done = true;
+            }
+
+            throw e;
+        };
+    }
+
+    return function(cmp) {
+        return new ComponentValueProviderHierarchyIterator(cmp);
+    };
+})();
+
+/**
  * Create a new component array.
  * @private
  */
@@ -187,7 +288,7 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
 
     var config = {
         "componentDef" : this.createDescriptorConfig(type),
-        "attributes"   : { "values" : attributes },
+        "attributes"   : { "valueProvider": $A.getContext().getCurrentAccess(), "values" : attributes },
         "localId"      : attributes && attributes["aura:id"],
         "flavor"       : (attributes && attributes["aura:flavor"]),
         "skipCreationPath": true
@@ -262,6 +363,14 @@ AuraComponentService.prototype.createComponentFromConfig = function(config) {
     // reliable in the future if we need to.
     if (config["descriptor"]) {
         config = this.createInternalConfig(config);
+    }
+
+    if (!config["attributes"] ) {
+        config["attributes"] = {};
+    }
+
+    if(!config["attributes"]["valueProvider"]) {
+        config["attributes"]["valueProvider"] = $A.getContext().getCurrentAccess();
     }
 
     return this.createComponentPriv(config);
@@ -345,6 +454,10 @@ AuraComponentService.prototype.newComponent = function(config, attributeValuePro
  */
 AuraComponentService.prototype.newComponentDeprecated = function(config, attributeValueProvider, localCreation, doForce){
     $A.assert(config, "config is required in ComponentService.newComponentDeprecated(config)");
+
+    if(!attributeValueProvider) {
+        attributeValueProvider = $A.getContext().getCurrentAccess();
+    }
 
     if ($A.util.isArray(config)){
         return this.newComponentArray(config, attributeValueProvider, localCreation, doForce);
@@ -555,6 +668,10 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
     var overallStatus="SUCCESS";
     var statusList=[];
     var collected=0;
+
+    if(!attributeValueProvider) {
+        attributeValueProvider = $A.getContext().getCurrentAccess();
+    }
 
     function collectComponent(newComponent,status,statusMessage,index){
         components[index]=newComponent;

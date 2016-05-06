@@ -22,6 +22,7 @@
 	<aura:set attribute="logId" value="Root"/>
 
     <aura:handler name="bubblingEvent" event="test:testEventBubblingEvent" action="{!c.handle}"/>
+    <aura:handler name="bubblingEvent" event="test:testEventBubblingEvent" action="{!c.handle}" phase="capture"/>
     <aura:handler name="init" action="{!c.handleInit}" value="{!this}"/>
 
     <div style="position: fixed; left: 60%; padding: 5px; border: 1px solid #333; max-width:40%;">

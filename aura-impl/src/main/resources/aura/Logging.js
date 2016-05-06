@@ -43,6 +43,7 @@
         $A.reportError(message, e);
     });
 
+
     window.onerror = (function() {
         var existing = window.onerror;
         var newHandler = function(message, url, line, col, err) {
@@ -70,4 +71,5 @@
             return newHandler.apply(this, arguments);
         };
     })();
+    
 })();

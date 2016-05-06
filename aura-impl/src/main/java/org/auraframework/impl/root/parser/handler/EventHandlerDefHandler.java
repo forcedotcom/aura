@@ -15,12 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.RootDefinition;
@@ -33,7 +28,10 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
 
@@ -43,9 +41,10 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
     private static final String ATTRIBUTE_EVENT = "event";
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_VALUE = "value";
+    private static final String ATTRIBUTE_PHASE = "phase";
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_ACTION, ATTRIBUTE_EVENT,
-            ATTRIBUTE_NAME, ATTRIBUTE_VALUE, RootTagHandler.ATTRIBUTE_DESCRIPTION);
+            ATTRIBUTE_NAME, ATTRIBUTE_VALUE, ATTRIBUTE_PHASE, RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
     private RootTagHandler<? extends RootDefinition> parentHandler;
     private final EventHandlerDefImpl.Builder builder = new EventHandlerDefImpl.Builder();
@@ -72,6 +71,8 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
         }
 
         builder.setName(getAttributeValue(ATTRIBUTE_NAME));
+
+        builder.setPhase(getAttributeValue(ATTRIBUTE_PHASE));
 
         builder.setDescription(getAttributeValue(RootTagHandler.ATTRIBUTE_DESCRIPTION));
 

@@ -86,8 +86,12 @@ Test.Aura.AuraComponentServiceTest = function(){
                 isFunction:function(obj){
                     return !!obj && Object.prototype.toString.apply(obj) === '[object Function]';
                 }
+            },
+            getContext: function() {
+                return {
+                    getCurrentAccess: function() {}
+                };
             }
-
         });
 
         [Fact]

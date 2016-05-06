@@ -98,6 +98,7 @@ function ComponentDef(config) {
                     cmpHandlerDefs.push({
                         "name"     : handlerConfig["name"],
                         "action"   : handlerConfig["action"],
+                        "phase"    : handlerConfig["phase"],
                         "eventDef" : $A.eventService.createEventDef(handlerConfig["eventDef"])
                     });
                 } else {
@@ -106,6 +107,7 @@ function ComponentDef(config) {
                     }
                     appHandlerDefs.push({
                         "action"   : handlerConfig["action"],
+                        "phase"    : handlerConfig["phase"],
                         "eventDef" : $A.eventService.createEventDef(handlerConfig["eventDef"])
                     });
                 }

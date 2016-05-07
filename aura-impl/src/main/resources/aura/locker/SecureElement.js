@@ -267,13 +267,20 @@ SecureElement.createAddEventListenerDescriptor = function(st, el, key) {
 				return; // by spec, missing callback argument does not throw, just ignores it.
 			}
 
-			var sCallback = function(e) {
-				var se = SecureDOMEvent(e, key);
-				callback.call(st, se);
-			};
-
-			// Back reference for removeEventListener() support
-			setLockerSecret(callback, "sCallback", sCallback);
+			var sCallback = getLockerSecret(callback, "sCallback");
+			if (!sCallback) {
+				sCallback = function(e) {
+					$A.lockerService.util.verifyAccess(st, callback, { verifyNotOpaque: true });
+					
+					var se = SecureDOMEvent(e, key);
+					callback.call(st, se);
+				};
+	
+				// Back reference for removeEventListener() support
+				setLockerSecret(callback, "sCallback", sCallback);
+				
+				$A.lockerService.trust(st, callback);
+			}
 			
 			el.addEventListener(event, sCallback, useCapture);
 		}

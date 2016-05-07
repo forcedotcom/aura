@@ -871,6 +871,11 @@ AuraComponentService.prototype.getDefinition = function(descriptor, callback) {
         if(actionResponse.getState() === 'SUCCESS') {
             // We use getDef at the moment so we do the access check.
             callback(this.getDef(descriptor));
+        } else if (actionResponse.getState() === 'ERROR') {
+            actionResponse.getError().forEach(function(e) {
+                $A.warning(e.message);
+            });
+            callback(null);
         } else {
             callback(null);
         }

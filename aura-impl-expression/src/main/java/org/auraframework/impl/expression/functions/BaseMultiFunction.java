@@ -16,21 +16,40 @@
 package org.auraframework.impl.expression.functions;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
 
 import org.auraframework.expression.Expression;
 
-/**
- * the thing that actually executes some function in the formula engine
- */
-public interface Function extends Serializable {
+public abstract class BaseMultiFunction implements Function {
+	private static final long serialVersionUID = -6256411745359155749L;
 
-    static final String JS_EMPTY = "\"\"";
-    
-    String[] getKeys();
+	@Override
+	public final void compile(Appendable out, List<Expression> args) throws IOException {
+    	int size = args.size();
 
-    Object evaluate(List<Object> args);
+    	if (size == 0) {
+        	out.append(JS_EMPTY);
+        	return;
+		} 
+		
+		out.append(getJsFunction());
+    	out.append("(");
+    	
+		for (int index = 0; index < size; index++) {
+			if (index > 0) {
+	        	out.append(",");
+			}
+	    	Expression ai = args.get(index);
+			if (ai != null) {
+				ai.compile(out);
+			} else {
+	        	out.append(JS_EMPTY);
+			}
+		}
+    	out.append(")");
+    }
 
-	void compile(Appendable out, List<Expression> args) throws IOException;
+	public String getJsFunction() {
+		return "";
+	}
 }

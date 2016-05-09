@@ -56,29 +56,25 @@ public class BooleanFunctions {
      * value. This means that the return value is not really a boolean, but will evaluate as one correctly
      * if isTruthy is used. If you need a boolean, use a !!
      */
-    public static class And implements Function {
+    public static class And extends BaseBinaryFunction {
         private static final long serialVersionUID = -6827790391366942300L;
 
         @Override
-        public Object evaluate(List<Object> args) {
-            if (!isTruthy(args.get(0))) {
-                return args.get(0);
+        public Object evaluate(Object o1, Object o2) {
+            if (!isTruthy(o1)) {
+                return o1;
             }
-            return args.get(1);
-        }
+        	return o2;
+        }       
+
+		@Override
+		public String getJsOperator() {
+			return "&&";
+		}
 
         @Override
         public String[] getKeys() {
             return new String[] { "and" };
-        }
-
-        @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append("&&");
-        	args.get(1).compile(out);
-        	out.append(")");
         }
     }
 
@@ -89,29 +85,25 @@ public class BooleanFunctions {
      * value. This means that the return value is not really a boolean, but will evaluate as one correctly
      * if isTruthy is used. If you need a boolean, use a !!
      */
-    public static class Or implements Function {
+    public static class Or extends BaseBinaryFunction {
         private static final long serialVersionUID = 5302839029031364114L;
 
         @Override
-        public Object evaluate(List<Object> args) {
-            if (isTruthy(args.get(0))) {
-                return args.get(0);
+        public Object evaluate(Object o1, Object o2) {
+            if (isTruthy(o1)) {
+                return o1;
             }
-            return args.get(1);
+        	return o2;
         }
+
+		@Override
+		public String getJsOperator() {
+			return "||";
+		}
 
         @Override
         public String[] getKeys() {
             return new String[] { "or" };
-        }
-
-        @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append("||");
-        	args.get(1).compile(out);
-        	out.append(")");
         }
     }
 
@@ -120,24 +112,22 @@ public class BooleanFunctions {
      *
      * Not will always return a boolean, and evaluates using isTruthy.
      */
-    public static class Not implements Function {
+    public static class Not extends BaseUnaryFunction {
         private static final long serialVersionUID = 2749177700513718436L;
 
         @Override
-        public Object evaluate(List<Object> args) {
-            return Boolean.valueOf(!isTruthy(args.get(0)));
+        public Object evaluate(Object arg) {
+        	return Boolean.valueOf(!isTruthy(arg));
+        }
+
+        @Override
+    	public String getJsFunction() {
+			return "!";
         }
 
         @Override
         public String[] getKeys() {
             return new String[] { "not" };
-        }
-
-        @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("!(");
-        	args.get(0).compile(out);
-        	out.append(")");
         }
     }
 
@@ -152,8 +142,8 @@ public class BooleanFunctions {
 
         @Override
         public Object evaluate(List<Object> args) {
-            // Both the ternary operator and the if() function map here so we need to guard against invalid index.
             int size = args.size();
+            // Both the ternary operator and the if() function map here so we need to guard against invalid index.
             if (size == 2) {
                 return isTruthy(args.get(0)) ? args.get(1) : null;
             }

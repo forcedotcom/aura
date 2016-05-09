@@ -15,11 +15,6 @@
  */
 package org.auraframework.impl.expression.functions;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.auraframework.expression.Expression;
-
 /**
  * functions that do mathy stuff
  */
@@ -32,7 +27,7 @@ public class MathFunctions {
     public static final Function NEGATE = new Negate();
     public static final Function ABSOLUTE = new Absolute();
 
-    private static abstract class BinaryNumberFunction implements Function {
+    private static abstract class BinaryNumberFunction extends BaseBinaryFunction {
         private static final long serialVersionUID = -1225813696832918245L;
 
         private final boolean allowString;
@@ -42,11 +37,8 @@ public class MathFunctions {
         }
 
         @Override
-        public Object evaluate(List<Object> args) {
-            Object o1 = args.get(0);
-            Object o2 = args.get(1);
+        public Object evaluate(Object o1, Object o2) {
             Number a1, a2;
-
             if (allowString && (o1 instanceof String || o2 instanceof String)
                     && !(o1 instanceof Number || o2 instanceof Number)) {
                 String s1 = JavascriptHelpers.stringify(o1);
@@ -75,18 +67,14 @@ public class MathFunctions {
             return Double.valueOf(n1.doubleValue() - n2.doubleValue());
         }
 
+		@Override
+		public String getJsOperator() {
+			return "-";
+		}
+
         @Override
         public String[] getKeys() {
             return new String[] { "sub", "subtract" };
-        }
-
-        @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append("-");
-        	args.get(1).compile(out);
-        	out.append(")");
         }
     }
 
@@ -102,18 +90,14 @@ public class MathFunctions {
             return Double.valueOf(n1.doubleValue() * n2.doubleValue());
         }
 
+		@Override
+		public String getJsOperator() {
+			return "*";
+		}
+
         @Override
         public String[] getKeys() {
             return new String[] { "mult", "multiply" };
-        }
-
-        @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append("*");
-        	args.get(1).compile(out);
-        	out.append(")");
         }
     }
 
@@ -129,18 +113,14 @@ public class MathFunctions {
             return Double.valueOf(n1.doubleValue() / n2.doubleValue());
         }
 
+		@Override
+		public String getJsOperator() {
+			return "/";
+		}
+
         @Override
         public String[] getKeys() {
             return new String[] { "div", "divide" };
-        }
-
-        @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append("/");
-        	args.get(1).compile(out);
-        	out.append(")");
         }
     }
 
@@ -156,64 +136,54 @@ public class MathFunctions {
             return Double.valueOf(n1.doubleValue() % n2.doubleValue());
         }
 
+		@Override
+		public String getJsOperator() {
+			return "%";
+		}
+
         @Override
         public String[] getKeys() {
             return new String[] { "mod", "modulus" };
         }
-
-        @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append("%");
-        	args.get(1).compile(out);
-        	out.append(")");
-        }
     }
 
-    public static class Negate implements Function {
+    public static class Negate extends BaseUnaryFunction {
         private static final long serialVersionUID = -8356257901220555636L;
 
         @Override
-        public Object evaluate(List<Object> args) {
-            Number a1 = JavascriptHelpers.convertToNumber(args.get(0));
-
+        public Object evaluate(Object arg) {
+            Number a1 = JavascriptHelpers.convertToNumber(arg);
             return Double.valueOf(-a1.doubleValue());
+        }
+
+        @Override
+    	public String getJsFunction() {
+        	return " -";
         }
 
         @Override
         public String[] getKeys() {
             return new String[] { "neg", "negate" };
         }
-
-        @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("(-");
-        	args.get(0).compile(out);
-        	out.append(")");
-        }
     }
 
-    public static class Absolute implements Function {
+    public static class Absolute extends BaseUnaryFunction {
         private static final long serialVersionUID = 3242148581747160277L;
 
         @Override
-        public Object evaluate(List<Object> args) {
-            Number a1 = JavascriptHelpers.convertToNumber(args.get(0));
-
+        public Object evaluate(Object arg) {
+            Number a1 = JavascriptHelpers.convertToNumber(arg);
             return Double.valueOf(Math.abs(a1.doubleValue()));
+        }
+
+        @Override
+    	public String getJsFunction() {
+			return "Math.abs";
         }
 
         @Override
         public String[] getKeys() {
             return new String[] { "abs" };
-        }
-
-        @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("Math.abs(");
-        	args.get(0).compile(out);
-        	out.append(")");
         }
     }
 }

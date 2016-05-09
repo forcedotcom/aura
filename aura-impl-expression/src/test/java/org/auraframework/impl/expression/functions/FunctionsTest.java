@@ -54,7 +54,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         return f.evaluate(Lists.newArrayList(args));
     }
 
-    /* ADD 
+    /* ADD
      * we try to make sure ADD() on java side give us the same output as add() on JS side
      * tests on js side are in expressionTest/functions.cmp
      * here every test function (more or less) is a equivalent to a test cmp (expressionTest:test) in function.cmp.
@@ -62,11 +62,18 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
      * 'diff' means js side give us different output
      * just fyi: m.integer = 411; v.integer=7; v.double=3.1; v.doubleString="2.1"; v.string="Component"; v.list=[1,2,3]
               v.emptyString"="";  v.Infinity=Infinity; v.NegativeInfinity=-Infinity; v.NaN=NaN; v.object={};
-    
+
     Note: Add has two keys : 'add' and 'concat', they are the same, that's why we have test like this on JS side
     <expressionTest:test expression="{!concat(4.1,v.integer)}" exprText="concat(4.1,v.integer)" expected="11.1"/>
     I don't see people using concat, why we have two anyway
    */
+    public void testAddNoArgument() throws Exception {
+    	assertEquals(null, evaluate(ADD));
+    }
+
+    public void testAddOneArgument() throws Exception {
+    	assertEquals(10, evaluate(ADD, 10));
+    }
 
     //<expressionTest:test expression="{!m.date + 5}" exprText="m.date + 5" expected="'2004-09-23T16:30:00.000Z5'"/>
     //diff : on JS side we actually resolve the date, here we just output [object Object]
@@ -75,7 +82,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     	Date d = new Date(1095957000000L);
     	assertEquals("[object Object]5", evaluate(ADD, d, 5));
     }
-    
+
     //<expressionTest:test expression="{!m.date + '8'}" exprText="m.date + '8'" expected="'2004-09-23T16:30:00.000Z8'"/>
     //diff : on JS side we actually resolve the date, here we just output [object Object]
     @Test
@@ -83,7 +90,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     	Date d = new Date(1095957000000L);
     	assertEquals("[object Object]8", evaluate(ADD, d, "8"));
     }
-    
+
     //<expressionTest:test expression="{!3146431.43266 + 937.1652}" exprText="3146431.43266 + 937.1652" expected="3147368.59786"/>
     @Test
     public void testAddTwoDoubles() throws Exception {
@@ -145,7 +152,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testAddEmptyStringAndInt() throws Exception {
         assertEquals("314", evaluate(ADD, "", 314));
     }
-    
+
     //<expressionTest:test expression="{!v.Infinity + 2}" exprText="v.Infinity + 2" expected="Infinity"/>
     @Test
     public void testAddInfinityAndInt() throws Exception {
@@ -172,7 +179,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals("Random-Infinity", evaluate(ADD, "Random", Double.NEGATIVE_INFINITY));
     }
 
-    
+
     //<expressionTest:test expression="{!'100' + v.NaN}" exprText="'100' + v.NaN" expected="'100NaN'"/>
     @Test
     public void testAddStringAndNaN() throws Exception {
@@ -190,7 +197,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testAddNullAndString() throws Exception {
         assertEquals("nullb", evaluate(ADD, null, "b"));
     }
-    
+
     //diff: <expressionTest:test expression="{!'b' + !v.nullObj}" exprText="'b' + v.nullObj" expected="'b'"/>
     @Test
     public void testAddStringAndNull() throws Exception {
@@ -289,9 +296,9 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals("[object Object]", evaluate(ADD, map, ""));
     }
 
-    /* 
+    /*
      * EQUALS
-     */    
+     */
     //<expressionTest:test expression="{!2 == 2.0}" exprText="2 == 2.0" expected="true"/>
     @Test
     public void testEqualsSameIntAndDouble() throws Exception {
@@ -303,7 +310,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testEqualsSameIntAndString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, 2, "2"));
     }
-    
+
     //<expressionTest:test expression="{!'bum' == 'bum'}" exprText="'bum' == 'bum'" expected="true"/>
     @Test
     public void testEqualsSameString() throws Exception {
@@ -375,7 +382,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testEqualsNaN() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, Double.NaN, Double.NaN));
     }
-    
+
     //<expressionTest:test expression="{!v.nullObj == true}" exprText="v.nullObj == true" expected="false"/>
     @Test
     public void testEqualsNullAndBooleanTrue() throws Exception {
@@ -413,7 +420,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
 
     //skip: we don't parse Date here on Java side.
     //<expressionTest:test expression="{!m.date == '2004-09-23T16:30:00.000Z'}" exprText="m.date == '2004-09-23T16:30:00.000Z'" expected="true"/>
-    
+
     //skip: Java will error out "/ by zero" if we do 1/0
     //<expressionTest:test expression="{!(1/0) == (2/0)}" exprText="(1/0) == (2/0)" expected="true"/>
 
@@ -430,7 +437,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     //skip: value from modle only apply to JS side
     //<expressionTest:test expression="{!notequals(false, m.booleanTrue)}" exprText="notequals(false, m.booleanTrue)" expected="true"/>
     //<expressionTest:test expression="{!m.booleanFalse ne false}" exprText="m.booleanFalse ne false" expected="false"/>
-    
+
     //<expressionTest:test expression="{!flase  != false}" exprText="false != false" expected="false"/>
     @Test
     public void testNotEqualsSameBoolean() throws Exception {
@@ -460,13 +467,13 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testNotEqualsTwoNulls() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(NOTEQUALS, null, null));
     }
-    
+
     //<expressionTest:test expression="{!v.nullObj != false}" exprText="v.nullObj != false" expected="true"/>
     public void tesNotEqualstNullFalse() throws Exception {
     	assertEquals(Boolean.TRUE, evaluate(NOTEQUALS, null, false));
     }
 
-    /* 
+    /*
      * TERNARY
      */
     //<expressionTest:test expression="{!if(true, 'yes')}" exprText="if(true, 'yes')" expected="'yes'"/>
@@ -474,13 +481,13 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testTernaryTwoParameterTrue() throws Exception {
         assertEquals("1", evaluate(TERNARY, Boolean.TRUE, "1"));
     }
-    
+
     //diff: <expressionTest:test expression="{!if(false, 'yes')}" exprText="if(false, 'yes')" expected="''"/>
     @Test
     public void testTernaryTwoParameterFalse() throws Exception {
         assertEquals(null, evaluate(TERNARY, Boolean.FALSE, "1"));
     }
-    
+
     //<expressionTest:test expression="{!true ? 'yes' : 'no'}" exprText="true ? 'yes' : 'no'" expected="'yes'"/>
     @Test
     public void testTernaryTrueReturnString() throws Exception {
@@ -552,13 +559,23 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testTernaryNaN() throws Exception {
         assertEquals("2", evaluate(TERNARY, Double.NaN, "1", "2"));
     }
-    
+
     // Skip
     // <expressionTest:test expression="{!if(true, 'yes', 'no')}" exprText="if(true, 'yes', 'no')" expected="'yes'"/>
     // <expressionTest:test expression="{!if(false, 'yes', 'no')}" exprText="if(false, 'yes', 'no')" expected="'no'"/>
-   
+
 
     // SUBTRACT
+
+    @Test
+    public void testSubtractNoArgument() throws Exception {
+        assertEquals(null, evaluate(SUBTRACT));
+    }
+
+    @Test
+    public void testSubtractOneArgument() throws Exception {
+        assertEquals(10, evaluate(SUBTRACT, 10));
+    }
 
     @Test
     public void testSubtractDoubleAndNegativeDouble() throws Exception {
@@ -649,6 +666,16 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     // MULTIPLY
 
     @Test
+    public void testMultiplyNoArgument() throws Exception {
+        assertEquals(null, evaluate(MULTIPLY));
+    }
+
+    @Test
+    public void testMultiplyOneArgument() throws Exception {
+        assertEquals(10, evaluate(MULTIPLY, 10));
+    }
+
+    @Test
     public void testMultiplyIntAndDouble() throws Exception {
         assertEquals(1.1, evaluate(MULTIPLY, 1, 1.1));
     }
@@ -731,6 +758,16 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     // DIVIDE
 
     @Test
+    public void testDivideNoArgument() throws Exception {
+        assertEquals(null, evaluate(DIVIDE));
+    }
+
+    @Test
+    public void testDivideOneArgument() throws Exception {
+        assertEquals(10, evaluate(DIVIDE, 10));
+    }
+
+    @Test
     public void testDivideDoubleAndNegativeDouble() throws Exception {
         assertEquals(3146431.43266 / -8426.6, evaluate(DIVIDE, 3146431.43266, -8426.6));
     }
@@ -808,6 +845,16 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     // MODULUS
 
     @Test
+    public void testModulusNoArgument() throws Exception {
+        assertEquals(null, evaluate(MODULUS));
+    }
+
+    @Test
+    public void testModulusOneArgument() throws Exception {
+        assertEquals(10, evaluate(MODULUS, 10));
+    }
+
+    @Test
     public void testModulusDoubleAndNegativeDouble() throws Exception {
         assertEquals(3146431.43266 % -8426.6, evaluate(MODULUS, 3146431.43266, -8426.6));
     }
@@ -870,6 +917,11 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     // ABSOLUTE
 
     @Test
+    public void testAbsoluteNoArgument() throws Exception {
+        assertEquals(null, evaluate(ABSOLUTE));
+    }
+
+    @Test
     public void testAbsoluteValueDouble() throws Exception {
         assertEquals(Math.abs(3146431.43266), evaluate(ABSOLUTE, 3146431.43266));
     }
@@ -912,6 +964,11 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     // NEGATE
 
     @Test
+    public void testNegateNoArgument() throws Exception {
+        assertEquals(null, evaluate(NEGATE));
+    }
+
+    @Test
     public void testNegatePositiveDouble() throws Exception {
         assertEquals(-3146431.43266, evaluate(NEGATE, 3146431.43266));
     }
@@ -952,6 +1009,16 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     }
 
     // GREATER_THAN
+
+    @Test
+    public void testGreaterThanNoArgument() throws Exception {
+        assertEquals(null, evaluate(GREATER_THAN));
+    }
+
+    @Test
+    public void testGreaterThanOneArgument() throws Exception {
+        assertEquals(10, evaluate(GREATER_THAN, 10));
+    }
 
     @Test
     public void testGreaterThanTwoDoubles() throws Exception {
@@ -1188,6 +1255,16 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     // LESS_THAN
 
     @Test
+    public void testLessThanNoArgument() throws Exception {
+        assertEquals(null, evaluate(LESS_THAN));
+    }
+
+    @Test
+    public void testLessThanOneArgument() throws Exception {
+        assertEquals(10, evaluate(LESS_THAN, 10));
+    }
+
+    @Test
     public void testLessThanTwoDoubles() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, 3146431.43266, 937.1652));
     }
@@ -1303,6 +1380,16 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     }
 
     // LESS_THAN_OR_EQUAL
+
+    @Test
+    public void testLessThanOrEqualNoArgument() throws Exception {
+        assertEquals(null, evaluate(LESS_THAN_OR_EQUAL));
+    }
+
+    @Test
+    public void testLessThanOrEqualOneArgument() throws Exception {
+        assertEquals(10, evaluate(LESS_THAN_OR_EQUAL, 10));
+    }
 
     @Test
     public void testLessThanOrEqualTwoDoubles() throws Exception {
@@ -1422,6 +1509,21 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     // AND
 
     @Test
+    public void testAndNoArgument() throws Exception {
+        assertEquals(null, evaluate(AND));
+    }
+
+    @Test
+    public void testAndSingleBooleanFalse() throws Exception {
+        assertEquals(Boolean.FALSE, evaluate(AND, Boolean.FALSE));
+    }
+
+    @Test
+    public void testAndSingleBooleanTrue() throws Exception {
+        assertEquals(Boolean.TRUE, evaluate(AND, Boolean.TRUE));
+    }
+
+    @Test
     public void testAndBooleanTrueAndBooleanFalse() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(AND, Boolean.TRUE, Boolean.FALSE));
     }
@@ -1482,6 +1584,21 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     }
 
     // OR
+
+    @Test
+    public void testOrNoArgument() throws Exception {
+        assertEquals(null, evaluate(OR));
+    }
+
+    @Test
+    public void testOrSingleBooleanFalse() throws Exception {
+        assertEquals(Boolean.FALSE, evaluate(OR, Boolean.FALSE));
+    }
+
+    @Test
+    public void testOrSingleBooleanTrue() throws Exception {
+        assertEquals(Boolean.TRUE, evaluate(OR, Boolean.TRUE));
+    }
 
     @Test
     public void testOrBooleanTrueAndBooleanFalse() throws Exception {
@@ -1546,6 +1663,11 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     // NOT
 
     @Test
+    public void testNotNoArgument() throws Exception {
+        assertEquals(null, evaluate(NOT));
+    }
+
+    @Test
     public void testNotBooleanTrue() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(NOT, Boolean.TRUE));
     }
@@ -1602,6 +1724,11 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     }
 
     // EMPTY
+
+    @Test
+    public void testIsEmptyNoArgument() throws Exception {
+        assertEquals(null, evaluate(EMPTY));
+    }
 
     @Test
     public void testIsEmptyNull() throws Exception {
@@ -1685,7 +1812,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testFormatNull() throws Exception {
         assertEquals("", evaluate(FORMAT, (Object) null));
     }
-    
+
     //skip: java doesn't have 'undefined'
     //<expressionTest:test expression="{!format(undefined)}" exprText="format(undefined)" expected="''"/>
 
@@ -1806,18 +1933,18 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testFormatArgObject() throws Exception {
         assertEquals("X[object Object]Y", evaluate(FORMAT, "X{0}Y", new Object()));
     }
-    
+
     //<expressionTest:test expression="{!format(v.label1, v.string, v.integer)}" exprText="format(v.label1, v.string, v.integer)" expected="'Hello Component'"/>
     @Test
     public void testFormatMoreArgThanExpect() throws Exception {
     	assertEquals("X0Y", evaluate(FORMAT, "X{0}Y", 0, 1, 2));
     }
-    
+
     //<expressionTest:test expression="{!format(v.label1)}" exprText="format(v.label1)" expected="'Hello {0}'"/>
     //<expressionTest:test expression="{!format(v.label2)}" exprText="format(v.label2)" expected="'Hello {0} and {1}'"/>
     @Test
     public void testFormatLessArgThanExpect() throws Exception {
     	assertEquals("X{0}Y", evaluate(FORMAT, "X{0}Y"));
     }
-    
+
 }

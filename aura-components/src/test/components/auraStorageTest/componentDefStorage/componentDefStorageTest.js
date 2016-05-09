@@ -15,7 +15,7 @@
     testNoExcessivePruning: {
         test: [
              function clearPersistentStorages(cmp) {
-                 this.clearCaches();
+                 this.clearCaches(cmp);
              },
              function addToDefStorage(cmp) {
                  var desc = "ui:tab";
@@ -44,13 +44,14 @@
                  // If defs are being pruned because the defs have gone over the storage maxSize we need to tweak the
                  // size of ComponentDefStorage in the test template.
                  var defs = undefined;
-                 $A.storageService.getStorage("ComponentDefStorage").getAll().then(function(items) {
-                     items = items || [];
-                     items = items.map(function(item) {
-                         return item["key"];
+                 $A.storageService.getStorage("ComponentDefStorage").getAll()
+                     .then(function(items) {
+                         items = items || [];
+                         items = items.map(function(item) {
+                             return item["key"];
+                         });
+                         defs = items;
                      });
-                     defs = items;
-                 });
                  $A.test.addWaitForWithFailureMessage(true,
                      function() { return defs !== undefined; },
                      "Failed to get contents of ComponentDefStorage",
@@ -62,7 +63,7 @@
                      });
              },
              function cleanup(cmp) {
-                 this.clearCaches();
+                 this.clearCaches(cmp);
              }
         ]
     },
@@ -71,16 +72,17 @@
         var found = false;
 
         function checkDefStorage(desc) {
-            $A.storageService.getStorage("ComponentDefStorage").getAll().then(function(items) {
-                items = items || [];
-                for (var i = 0; i < items.length; i++) {
-                    if (items[i]["key"] === "markup://" + desc) {
-                        found = true;
-                        return;
+            $A.storageService.getStorage("ComponentDefStorage").getAll()
+                .then(function(items) {
+                    items = items || [];
+                    for (var i = 0; i < items.length; i++) {
+                        if (items[i]["key"] === "markup://" + desc) {
+                            found = true;
+                            return;
+                        }
                     }
-                }
-                checkDefStorage(desc);
-            });
+                    checkDefStorage(desc);
+                });
         }
 
         checkDefStorage(desc);
@@ -97,14 +99,15 @@
      */
     clearCaches: function(cmp) {
         var done = false;
-        var promises = [ $A.storageService.getStorage("ComponentDefStorage").clear(), $A.storageService.getStorage("actions").clear() ];
-        Promise.all(promises)
-            .then(function() {
-                done = true;
-            })
-            ["catch"](function(e) {
-                $A.test.fail("Error clearing ComponentDefStorage or actions stores: " + e);
-            })
+        cmp.helper.clearActionAndDefStorage(cmp)
+            .then(
+                function() {
+                    done = true;
+                },
+                function(e) {
+                    $A.test.fail("Error clearing actions or ComponentDefStorage stores: " + e);
+                }
+            );
 
         $A.test.addWaitForWithFailureMessage(true,
                 function() { return done; },

@@ -33,7 +33,7 @@
                         "ComponentDefStorage",
                         true,      // persistent
                         false,     // secure
-                        442368,    // maxSize
+                        570000,    // maxSize
                         10886400,  // defaultExpiration
                         0,         // defaultAutoRefreshInterval
                         true,      // debugLoggingEnabled

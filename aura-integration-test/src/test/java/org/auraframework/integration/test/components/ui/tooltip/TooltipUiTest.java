@@ -41,13 +41,13 @@ public class TooltipUiTest extends WebDriverTestCase {
 
 		// click on element to gain focus and verify tooltip opens
 		trigger.click();
-		turnOffToggleGuard();
 		waitForToolTipPresent();
+		turnOffToggleGuard();
 
 		// close by sending enter key
 		getAuraUITestingUtil().pressEnter(trigger);
-		turnOffToggleGuard();
 		waitForToolTipAbsent();
+		turnOffToggleGuard();
 
 		// open by sending enter key
 		getAuraUITestingUtil().pressEnter(trigger);

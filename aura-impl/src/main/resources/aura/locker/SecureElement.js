@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+/*jslint sub: true*/
+
 function SecureElement(el, key) {
 	"use strict";
 	
@@ -24,7 +26,8 @@ function SecureElement(el, key) {
 	function runIfRunnable(st) {
 		var isRunnable = st.$run;
 		if (isRunnable) {
-			// special case for SecureScriptElement to execute without insertion.
+			// special case for SecureScriptElement to execute without
+			// insertion.
 			st.$run();
 		}
 		return isRunnable;
@@ -39,6 +42,9 @@ function SecureElement(el, key) {
 			
 		case "IFRAME":
 			return SecureIFrameElement(el, key);
+
+	case "SCRIPT":
+		return SecureScriptElement(key, el);
 	}
 
 	// SecureElement is it then!
@@ -51,7 +57,9 @@ function SecureElement(el, key) {
 
 		appendChild : {
 			value : function(child) {
-				$A.lockerService.util.verifyAccess(o, child, { verifyNotOpaque: true });
+				$A.lockerService.util.verifyAccess(o, child, {
+					verifyNotOpaque : true
+				});
 
 				if (!runIfRunnable(child)) {
 					el.appendChild(getLockerSecret(child, "ref"));
@@ -60,27 +68,38 @@ function SecureElement(el, key) {
 				return child;
 			}
 		},
-
+		
 		replaceChild : {
 			value : function(newChild, oldChild) {
-				$A.lockerService.util.verifyAccess(o, newChild, { verifyNotOpaque: true });
-				$A.lockerService.util.verifyAccess(o, oldChild, { verifyNotOpaque: true });
+				$A.lockerService.util.verifyAccess(o, newChild, {
+					verifyNotOpaque : true
+				});
+				$A.lockerService.util.verifyAccess(o, oldChild, {
+					verifyNotOpaque : true
+				});
 
 				if (!runIfRunnable(newChild)) {
 					el.replaceChild(getLockerSecret(newChild, "ref"), getLockerSecret(oldChild, "ref"));
 				}
-				
+
 				return oldChild;
 			}
 		},
-		
+
 		insertBefore : {
 			value : function(newNode, referenceNode) {
-				$A.lockerService.util.verifyAccess(o, newNode, { verifyNotOpaque: true });
-				$A.lockerService.util.verifyAccess(o, referenceNode, { verifyNotOpaque: true });
+				$A.lockerService.util.verifyAccess(o, newNode, {
+					verifyNotOpaque : true
+				});
+
+				if (referenceNode) {
+					$A.lockerService.util.verifyAccess(o, referenceNode, {
+						verifyNotOpaque : true
+					});
+				}
 
 				if (!runIfRunnable(newNode)) {
-					el.insertBefore(getLockerSecret(newNode, "ref"), getLockerSecret(referenceNode, "ref"));
+					el.insertBefore(getLockerSecret(newNode, "ref"), referenceNode ? getLockerSecret(referenceNode, "ref") : null);
 				}
 				
 				return newNode;
@@ -89,10 +108,12 @@ function SecureElement(el, key) {
 	});
 
 	Object.defineProperties(o, {
-		compareDocumentPosition: SecureObject.createFilteredMethod(o, el, "compareDocumentPosition"),
+        compareDocumentPosition: SecureObject.createFilteredMethod(o, el, "compareDocumentPosition"),
 
-		ownerDocument: SecureObject.createFilteredProperty(o, el, "ownerDocument"),
-		parentNode: SecureObject.createFilteredProperty(o, el, "parentNode", { filterOpaque: true }),
+		ownerDocument : SecureObject.createFilteredProperty(o, el, "ownerDocument"),
+		parentNode : SecureObject.createFilteredProperty(o, el, "parentNode", {
+			filterOpaque : true
+		}),
 
         nodeName: SecureObject.createFilteredProperty(o, el, "nodeName"),
         nodeType: SecureObject.createFilteredProperty(o, el, "nodeType"),
@@ -100,76 +121,90 @@ function SecureElement(el, key) {
         removeChild: SecureObject.createFilteredMethod(o, el, "removeChild", { 
         	beforeCallback: function(child) {
         		// Verify that the passed in child is not opaque!
-				$A.lockerService.util.verifyAccess(o, child, { verifyNotOpaque: true });
+				$A.lockerService.util.verifyAccess(o, child, {
+					verifyNotOpaque : true
+				});
         	}	
     	}),
 
-        cloneNode: {
-        	value : function(deep) {
-        		// We need to clone only nodes that can be accessed to and prune the rest
-        		var root = el.cloneNode(false);
-        		
-        		function cloneChildren(parent, parentClone) {
-	        		var childNodes = parent.childNodes;
-	        		for (var i = 0; i < childNodes.length; i++) {
-	        			var child = childNodes[i];
-	        			if ($A.lockerService.util.hasAccess(o, child, { verifyNotOpaque: true })) {
-	        				var childClone = child.cloneNode(false);
-	        				parentClone.appendChild(childClone);
-	        				$A.lockerService.trust(o, childClone);
-	            			cloneChildren(child, childClone);
-	        			}
-	        		}
-        		}
-        		
-        		if (deep) {
-        			cloneChildren(el, root);
-        		}
-        		
-        		return SecureElement(root, key);
-        	}
-        },
+		cloneNode : {
+			value : function(deep) {
+				// We need to clone only nodes that can be accessed to and prune
+				// the rest
+				var root = el.cloneNode(false);
 
-        textContent: SecureObject.createFilteredProperty(o, el, "textContent", { 
-        	afterGetCallback: function() { return ""; } 
-        })
+				function cloneChildren(parent, parentClone) {
+					var childNodes = parent.childNodes;
+					for (var i = 0; i < childNodes.length; i++) {
+						var child = childNodes[i];
+						if ($A.lockerService.util.hasAccess(o, child, {
+							verifyNotOpaque : true
+						})) {
+							var childClone = child.cloneNode(false);
+							parentClone.appendChild(childClone);
+							$A.lockerService.trust(o, childClone);
+							cloneChildren(child, childClone);
+						}
+					}
+				}
+
+				if (deep) {
+					cloneChildren(el, root);
+				}
+
+				return SecureElement(root, key);
+			}
+		},
+
+		textContent : SecureObject.createFilteredProperty(o, el, "textContent", {
+			afterGetCallback : function() {
+				return "";
+			}
+		})
 	});
 	
 	// Conditionally add things that not all Node types support
-	SecureObject.addPropertyIfSupported(o, el, "attributes", { 
-		writable: false,
-		afterGetCallback: function(attributes) {
+	SecureObject.addPropertyIfSupported(o, el, "attributes", {
+		writable : false,
+		afterGetCallback : function(attributes) {
 			// Secure attributes
-			var secureAttributes = [];			
+			var secureAttributes = [];
 			for (var i = 0; i < attributes.length; i++) {
 				var attribute = attributes[i];
 				secureAttributes.push({
-					name: attribute.name,
-					value: SecureObject.filterEverything(o, attribute.value)
+					name : attribute.name,
+					value : SecureObject.filterEverything(o, attribute.value)
 				});
 			}
 
 			return secureAttributes;
 		}
 	});
-	
-	["childNodes", "children", "firstChild", "lastChild", "getAttribute", "setAttribute", "removeAttribute"].forEach(function(name) {
-		SecureObject.addPropertyIfSupported(o, el, name, { filterOpaque: true });
+
+	[ "childNodes", "children", "firstChild", "lastChild", "getAttribute", "setAttribute", "removeAttribute", "getAttributeNS", "setAttributeNS",
+			"removeAttributeNS" ].forEach(function(name) {
+		SecureObject.addPropertyIfSupported(o, el, name, {
+			filterOpaque : true
+		});
 	});
 
-	["getElementsByClassName", "getElementsByTagName", "getBoundingClientRect", "getClientRects", "blur", "click", "focus"].forEach(function(name) {
-		SecureObject.addMethodIfSupported(o, el, name, { filterOpaque: true });
+	[ "getElementsByClassName", "getElementsByTagName", "getElementsByTagNameNS", "querySelector", "querySelectorAll", "getBoundingClientRect", "getClientRects", "blur", "click", "focus" ]
+			.forEach(function(name) {
+				SecureObject.addMethodIfSupported(o, el, name, {
+					filterOpaque : true
+				});
 	});
 
 	SecureObject.addPropertyIfSupported(o, el, "innerHTML", { 
-    	afterGetCallback: function() { return ""; },
+		afterGetCallback : function() {
+			return "";
+		},
 		beforeSetCallback: function(value) {				
 			// Do not allow innerHTML on shared elements (body/head)
 			if (isSharedElement(el)) {
 	            throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
 			}
 			
-			/*jslint sub: true */
 			return DOMPurify["sanitize"](value);
 		},
 		afterSetCallback: function() {
@@ -179,12 +214,12 @@ function SecureElement(el, key) {
 					$A.lockerService.trust(o, node);
 				}
 
-        		for (var i = 0; i < children.length; i++) {
-        			var child = children[i];
-        			trust(child, child.childNodes);
-        		}
+				for (var i = 0; i < children.length; i++) {
+					var child = children[i];
+					trust(child, child.childNodes);
+				}
 			}
-			
+
 			trust(undefined, el.childNodes);
 		} 
 	});
@@ -207,19 +242,19 @@ SecureElement.addSecureProperties = function(se, raw) {
 	[
 		// Standard Element interface represents an object of a Document.
 		// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
-		'childElementCount', 'classList', 'className', 'id', 'tagName',
-		// Note: ignoring 'firstElementChild', 'lastElementChild', 'namespaceURI',
-		//      'nextElementSibling' and 'previousElementSibling' from the list above.
+	'childElementCount', 'classList', 'className', 'id', 'tagName', 'namespaceURI',
+	// Note: ignoring 'firstElementChild', 'lastElementChild',
+	// 'nextElementSibling' and 'previousElementSibling' from the list
+	// above.
 
 		// Standard HTMLElement interface represents any HTML element
 		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
-		'accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable',
-		'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang', 'spellcheck',
-		'style', 'tabIndex', 'title',
+	'accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable', 'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang',
+			'spellcheck', 'style', 'tabIndex', 'title', 'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth', 'clientWidth',
+			'clientHeight', 'clientLeft', 'clientTop', 'nodeValue'
 		
-		'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth', 'nodeValue'
-		
-		// DCHASMAN TODO This list needs to be revisted as it is missing a ton of valid attributes!
+	// DCHASMAN TODO This list needs to be revisted as it is missing a ton of
+	// valid attributes!
 	].forEach(function (name) {
 		SecureObject.addPropertyIfSupported(se, raw, name);
 	});
@@ -229,11 +264,9 @@ SecureElement.addSecureGlobalEventHandlers = function(se, raw, key) {
 	[
 		// Standard Global Event handlers
 		// https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers
-		"onabort", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "onerror",
-		"onfocus", "oninput", "onkeydown", "onkeypress", "onkeyup", "onload", 
-		"onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", 
-		"onreset", "onresize", "onscroll", "onselect", "onsubmit"	
-	].forEach(function (name) {
+	"onabort", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "onerror", "onfocus", "oninput", "onkeydown", "onkeypress",
+			"onkeyup", "onload", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onreset", "onresize", "onscroll", "onselect",
+			"onsubmit" ].forEach(function(name) {
 		Object.defineProperty(se, name, {
 			set: function(callback) {
 				raw[name] = function(e) {
@@ -249,7 +282,8 @@ SecureElement.addEventTargetMethods = function(se, raw, key) {
 		addEventListener : SecureElement.createAddEventListenerDescriptor(se, raw, key),
 		dispatchEvent : SecureObject.createFilteredMethod(se, raw, "dispatchEvent"),
 		
-		// removeEventListener() is special in that we do not want to unfilter/unwrap the listener argument or it will not match what 
+		// removeEventListener() is special in that we do not want to
+		// unfilter/unwrap the listener argument or it will not match what
 		// was actually wired up originally
 		removeEventListener : {
 			value: function(type, listener, options) {
@@ -264,24 +298,27 @@ SecureElement.createAddEventListenerDescriptor = function(st, el, key) {
 	return {
 		value : function(event, callback, useCapture) {
 			if (!callback) {
-				return; // by spec, missing callback argument does not throw, just ignores it.
+				return; // by spec, missing callback argument does not throw,
+				// just ignores it.
 			}
 
 			var sCallback = getLockerSecret(callback, "sCallback");
 			if (!sCallback) {
 				sCallback = function(e) {
-					$A.lockerService.util.verifyAccess(st, callback, { verifyNotOpaque: true });
-					
-					var se = SecureDOMEvent(e, key);
-					callback.call(st, se);
-				};
-	
-				// Back reference for removeEventListener() support
-				setLockerSecret(callback, "sCallback", sCallback);
-				
+					$A.lockerService.util.verifyAccess(st, callback, {
+						verifyNotOpaque : true
+					});
+
+				var se = SecureDOMEvent(e, key);
+				callback.call(st, se);
+			};
+
+			// Back reference for removeEventListener() support
+			setLockerSecret(callback, "sCallback", sCallback);
+			
 				$A.lockerService.trust(st, callback);
 			}
-			
+
 			el.addEventListener(event, sCallback, useCapture);
 		}
 	};
@@ -290,7 +327,8 @@ SecureElement.createAddEventListenerDescriptor = function(st, el, key) {
 SecureElement.createAddEventListener = function(st, el, key) {
 	return function(event, callback, useCapture) {
 		if (!callback) {
-			return; // by spec, missing callback argument does not throw, just ignores it.
+			return; // by spec, missing callback argument does not throw, just
+			// ignores it.
 		}
 
 		var sCallback = function(e) {
@@ -308,9 +346,14 @@ SecureElement.addElementSpecificProperties = function(se, el) {
 		var whitelist = SecureElement.elementSpecificAttributeWhitelists[tagName];
 		if (whitelist) {
 			whitelist.forEach(function(name) {
-				SecureObject.addPropertyIfSupported(se, el, name);
+				SecureObject.addPropertyIfSupported(se, el, $A.util.hyphensToCamelCase(name));
 			});
 		}
+
+		// Special handling for SVG elements
+		if (el.namespaceURI === "http://www.w3.org/2000/svg") {
+			SecureObject.addMethodIfSupported(se, el, "getBBox");
+	}
 	}
 };
 
@@ -332,54 +375,56 @@ SecureElement.elementSpecificAttributeWhitelists = {
 	"AUDIO": ["autoplay", "buffered", "controls", "loop", "muted", "played", "preload", "src", "volume"],
 	"BASE": ["href", "target"],
 	"BDO": ["dir"],
-	"BUTTON": ["autofocus", "disabled", "form", "formAction", "formEnctype", "formMethod", "formNoValidate", "formTarget", "name", "type"],
+	"BUTTON" : [ "autofocus", "disabled", "form", "formaction", "formenctype", "formmethod", "formnovalidate", "formtarget", "name", "type" ],
 	"CANVAS": ["height", "width"],
 	"COL": ["span"],
 	"COLGROUP": ["span", "width"],
 	"DATA": ["value"],
-	"DEL": ["cite", "dateTime"],
+	"DEL" : [ "cite", "datetime" ],
 	"DETAILS": ["open"],
 	"EMBED": ["height", "src", "type", "width"],
 	"FIELDSET": ["disabled", "form", "name"],
-	"FORM": ["acceptCharset", "action", "autocomplete", "enctype", "method", "name", "noValidate", "target"],
-	"IMG": ["alt", "crossOrigin", "height", "isMap", "longDesc", "sizes", "src", "srcset", "width", "useMap"],
-	"INPUT": ["type", "accept", "autocomplete", "autofocus", "autosave", "checked", "disabled", "form", "formAction",
-	          "formEnctype", "formMethod", "formNoValidate", "formTarget", "height", "inputmode", "list", "max", "maxLength",
-	          "min", "minLength", "multiple", "name", "pattern", "placeholder", "readOnly", "required", "selectionDirection",
-	          "size", "src", "step", "value", "width"],
-	"INS": ["cite", "dateTime"],
-	"LABEL": ["accessKey", "htmlFor", "form"],
-	"LI": ["value"],
+	"FORM" : [ "acceptCharset", "action", "autocomplete", "enctype", "method", "name", "novalidate", "target" ],
+	"IMG" : [ "alt", "crossorigin", "height", "ismap", "longdesc", "sizesHTML5", "src", "srcsetHTML5", "width", "usemap" ],
+	"INPUT" : [ "type", "accept", "autocomplete", "autofocus", "autosave", "checked", "disabled", "form", "formaction", "formenctype", "formmethod",
+			"formnovalidate", "formtarget", "height", "inputmode", "list", "max", "maxlength", "min", "minlength", "multiple", "name", "pattern",
+			"placeholder", "readonly", "required", "selectionDirection", "size", "src", "step", "tabindex", "value", "width" ],
+	"INS" : [ "cite", "datetime" ],
+	"LABEL" : [ "accesskey", "for", "form" ],
+	"LI" : [ "value" ],
+	"LINK" : [ "crossorigin", "href", "hreflang", "media", "rel", "sizes", "title", "type" ],
+	"MAP" : [ "name" ],
+	"DEL": ["cite", "dateTime"],
 	"LINK": ["crossOrigin", "href", "hreflang", "media", "rel", "sizes", "title", "type"],
-	"MAP": ["name"],
 
-	// DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values for http-equiv/httpEquiv	
+	// DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values
+	// for http-equiv/httpEquiv
 	"META": ["content", "name"],
 	
 	"METER": ["value", "min", "max", "low", "high", "optimum", "form"],
-	"OBJECT": ["data", "form", "height", "type", "typeMustMatch", "useMap", "width"],
+	"OBJECT" : [ "data", "form", "height", "height", "type", "typemustmatch", "usemap", "width" ],
 	"OL": ["reversed", "start", "type"],
 	"OPTGROUP": ["disabled", "label"],
 	"OPTION": ["disabled", "label", "selected", "value"],
-	"OUTPUT": ["htmlFor", "form", "name"],
+	"OUTPUT" : [ "for", "form", "name" ],
 	"PARAM": ["name", "value"],
 	"PROGRESS": ["max", "value"],
 	"Q": ["cite"],
 	"SELECT": ["autofocus", "disabled", "form", "multiple", "name", "required", "size"],
 	"SOURCE": ["src", "type"],
-	"TD": ["colSpan", "headers", "rowSpan"],
+	"TD" : [ "colspan", "headers", "rowspan" ],
 	"TEMPLATE": ["content"],
-	"TEXTAREA": ["autocomplete", "autofocus", "cols", "disabled", "form", "maxLength", "minLength", "name",
-	             "placeholder", "readOnly", "required", "rows", "selectionDirection", "selectionEnd", "selectionStart",
-	             "wrap"],
-	"TH": ["colSpan", "headers", "rowSpan", "scope"],
-	"TIME": ["dateTime"],
+	"TEXTAREA" : [ "autocomplete", "autofocus", "cols", "disabled", "form", "maxlength", "minlength", "name", "placeholder", "readonly", "required", "rows",
+			"selectionDirection", "selectionEnd", "selectionStart", "wrap" ],
+	"TH" : [ "colspan", "headers", "rowspan", "scope" ],
+	"TIME" : [ "datetime" ],
 	"TRACK": ["default", "kind", "label", "src", "srclang"],
-	"VIDEO": ["autoplay", "buffered", "controls", "crossOrigin", "height", "loop", "muted", "played", "preload",
-	          "poster", "src", "width"]
+	"VIDEO" : [ "autoplay", "buffered", "controls", "crossorigin", "height", "loop", "muted", "played", "preload", "poster", "src", "width" ]
 };
 
 SecureElement.elementSpecificMethodWhitelists = {
+	"AUDIO" : [ "addTextTrack", "canPlayType", "fastSeek", "getStartDate", "load", "play", "pause" ],
 	"CANVAS": ["getContext", "toDataURL", "toBlob"],
-	"SVG": ["createSVGRect"]
+	"SVG" : [ "createSVGRect" ],
+	"VIDEO" : [ "addTextTrack", "canPlayType", "load", "play", "pause" ]
 };

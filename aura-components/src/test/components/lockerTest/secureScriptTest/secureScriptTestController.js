@@ -17,14 +17,15 @@
         
         var script =  document.createElement("script");
 
-        testUtils.assertUndefined(script.getAttribute("data-foo"), "Unexpected unset attribute value");        
+        testUtils.assertEquals(null, script.getAttribute("data-foo"), "Unexpected unset attribute value");
+            
         script.setAttribute("data-foo", "bar");
         testUtils.assertEquals("bar", script.getAttribute("data-foo"), "Unexpected attribute value");        
 
-        script.setAttribute("data-foo", null);
-        testUtils.assertEquals(null, script.getAttribute("data-foo"), "Unexpected attribute value, should be null");        
+        script.setAttribute("data-foo", "");
+        testUtils.assertEquals("", script.getAttribute("data-foo"), "Unexpected attribute value, should be null");        
 
-        script.setAttribute("data-foo", undefined);
-        testUtils.assertUndefined(script.getAttribute("data-foo"), "Unexpected attribute value, should be undefined");        
+        script.removeAttribute("data-foo");
+        testUtils.assertEquals(null, script.getAttribute("data-foo"), "Unexpected attribute value, should be undefined");        
     }
 })

@@ -98,6 +98,7 @@ function SecureDocument(doc, key) {
         getElementsByClassName: SecureObject.createFilteredMethod(o, doc, "getElementsByClassName", { filterOpaque: true }),
         getElementsByName: SecureObject.createFilteredMethod(o, doc, "getElementsByName", { filterOpaque: true }),
         getElementsByTagName: SecureObject.createFilteredMethod(o, doc, "getElementsByTagName", { filterOpaque: true }),
+        getElementsByTagNameNS: SecureObject.createFilteredMethod(o, doc, "getElementsByTagNameNS", { filterOpaque: true }),
 
         querySelector: SecureObject.createFilteredMethod(o, doc, "querySelector", { filterOpaque: true }),
         querySelectorAll: SecureObject.createFilteredMethod(o, doc, "querySelectorAll", { filterOpaque: true }),

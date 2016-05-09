@@ -76,6 +76,18 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 		}
 	});
 
+	[ "outerHeight", "outerWidth" ].forEach(function(name) {
+		SecureObject.addPropertyIfSupported(o, win, name, {
+			filterOpaque : true
+		});
+	});
+	
+	[ "getComputedStyle", "scroll", "scrollBy", "scrollTo" ].forEach(function(name) {
+		SecureObject.addMethodIfSupported(o, win, name, {
+			filterOpaque : true
+		});
+	});	
+	
 	SecureElement.addSecureGlobalEventHandlers(o, win, key);
 	SecureElement.addEventTargetMethods(o, win, key);
 	
@@ -98,7 +110,7 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 	});
 
 	hostedDefinedGlobals.forEach(function(name) {
-		if (!o[name]) {
+		if (!(name in o) && (name in win)) {
 			// These are direct passthrough's and should never be wrapped in a SecureObject
 			var value = win[name];
 			Object.defineProperty(o, name, {

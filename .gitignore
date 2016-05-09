@@ -4,6 +4,7 @@ target
 .project
 .classpath
 .mvn
+.mvnrepo
 release.properties
 pom.xml.releaseBackup
 *.log

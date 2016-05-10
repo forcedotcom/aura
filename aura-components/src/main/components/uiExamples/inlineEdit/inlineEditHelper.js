@@ -45,12 +45,17 @@
 		
 		for (var i = 0; i < 10; i++) {
 			items.push({
-				id : i,
-				name : "Name" + i,
-				grade : i,
-				date : "2016-3-" + (i + 1),
-				status : {},
-				errors : {}
+				data : {
+					id : i,
+					name : "Name" + i,
+					grade : i,
+					date : "2016-3-" + (i + 1)
+				},
+				status : { 
+					name : {
+						disabled : (i % 2 == 0)
+					}
+				},
 			});
 		}
 		

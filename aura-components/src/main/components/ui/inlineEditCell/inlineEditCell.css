@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-.THIS .content {
+.THIS span:first-child {
 	flex-grow: 1;
-	min-width: 2rem;
 } 
  
 .THIS.cellContainer {
@@ -27,6 +25,10 @@
 
 .THIS.cellContainer.edited {
 	background-color: #faffbd;
+}
+
+.THIS.cellContainer.errors {
+	border: 1px solid red;
 }
 
 .THIS .triggerContainer {
@@ -46,9 +48,13 @@
     font-weight: 400;
     line-height: 1.75em;
     max-height: calc(1.875rem - 2px);
-    min-height: 0;
-    height: 21px;
-	width: 16px;
+    min-height: 21px;
+	width: 100%;
+	text-align:left;
+}
+
+.THIS .trigger.disabled {
+	background-color: black;
 }
 
 .THIS.blue {

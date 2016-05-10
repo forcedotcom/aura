@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 ({
-	init : function(cmp) {
+	init : function(cmp, evt, helper) {
 		var columns = cmp.get("v.columns");
 		var headers = cmp.get("v.headerColumns");
 		
-		cmp.set("v.stale", {});
+		for (var i = 0; i < columns.length; i++) {
+			helper.initializeCellStates(columns[i]);
+		}
+		
+		cmp.set("v.editedItems", {});
 		
 		cmp.find("grid").set("v.columns", columns);
 		cmp.find("grid").set("v.headerColumns", headers);
@@ -36,8 +40,7 @@
 	
 	save : function() {
 		// Fire save event
-		//console.log("The following objects have been modified: ");
-		//console.log(cmp.get("v.stale"));
+		// TODO: Implement
 	},
 	
 	cancel : function(cmp, evt, helper) {
@@ -83,13 +86,23 @@
 		var items = cmp.get("v.items");
 		var item = items[payload.index];
 		
+		// TODO: Move into preprocessing logic when items are initially set
+		item.status = item.status || {};
+		
 		// Save copy old item for reset
-		helper.cacheStaleItem(cmp, item, payload.index);
+		helper.cacheEditedItem(cmp, item, payload.index);
 		
 		// Update UI
 		// TODO: Better status passing from container to cell
-		item[payload.key] = payload.value;
-		item.status[payload.key] = true;
+		item.data[payload.key] = payload.value;
+		if (!item.status[payload.key]) {
+			item.status[payload.key] = {};
+		}
+		item.status[payload.key].edited = true;
+
+		if ($A.util.isUndefinedOrNull(payload.value)) {
+			item.status[payload.key].hasErrors = true;
+		}
 		
 		cmp.set("v.items", items);
 		cmp._panelCmp.hide();

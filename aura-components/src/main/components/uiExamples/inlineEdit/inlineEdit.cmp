@@ -35,22 +35,30 @@
 			</aura:set>
 			
 			<aura:set attribute="columns">
-				<ui:inlineEditCell name="id" edited="{!item.status.id}">
-					<ui:outputText value="{!item.id}"/>
+				<ui:inlineEditCell name="id" isPsuedoInput="true">
+					<ui:outputText value="{!item.data.id}"/>
 				</ui:inlineEditCell>
-				<ui:inlineEditCell name="name" edited="{!item.status.name}">
-					<ui:outputText value="{!item.name}"/>
+				<ui:inlineEditCell name="name">
+					<ui:outputText value="{!item.data.name}"/>
 				</ui:inlineEditCell>
-				<ui:inlineEditCell name="grade" edited="{!item.status.grade}">
-					<ui:outputText value="{!item.grade}"/>
+				<ui:inlineEditCell name="grade">
+					<ui:outputText value="{!item.data.grade}"/>
 				</ui:inlineEditCell>
-				<ui:inlineEditCell name="date" edited="{!item.status.date}">
-					<ui:outputDate value="{!item.date}"/>
+				<ui:inlineEditCell name="date">
+					<ui:outputDate value="{!item.data.date}"/>
 				</ui:inlineEditCell>
 				<div>
 					<span>.</span>
 				</div>
 			</aura:set>
 		</ui:inlineEditGrid>
+		
+		<div class="manager">
+	        <ui:panelManager2 aura:id="pm">
+	            <aura:set attribute="registeredPanels">
+	                    <ui:panel alias="panel"/>
+	            </aura:set>
+	        </ui:panelManager2>
+	    </div>
 	</div>
 </aura:component>

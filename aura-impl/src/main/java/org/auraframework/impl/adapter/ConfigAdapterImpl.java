@@ -732,7 +732,12 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return true;
     }
 
-    protected boolean isSafeEvalWorkerURI(String uri) {
+	@Override
+	public boolean requireLocker(DefDescriptor<?> descriptor) {
+		return true;
+	}
+	
+	protected boolean isSafeEvalWorkerURI(String uri) {
         return uri.endsWith("/lockerservice/safeEval.html");
     }
 }

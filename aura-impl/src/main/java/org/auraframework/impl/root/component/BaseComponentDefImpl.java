@@ -16,10 +16,19 @@
 
 package org.auraframework.impl.root.component;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.builder.BaseComponentDefBuilder;
@@ -74,18 +83,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 		RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
@@ -1101,6 +1102,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             	if (!requireLocker) {
     	            DefDescriptor<InterfaceDef> requireLockerDescr = Aura.getDefinitionService().getDefDescriptor("aura:requireLocker", InterfaceDef.class);
     	        	requireLocker = isInstanceOf(requireLockerDescr);
+            	} else {
+	        		requireLocker = configAdapter.requireLocker(descriptor);
             	}
             }
     	}

@@ -1,0 +1,18 @@
+<aura:component>
+    <aura:attribute name="stopper" type="Boolean" default="false" />
+    <aura:attribute name="randomActions" type="Boolean" default="true" />
+    <aura:attribute name="randomTiming" type="Boolean" default="true" />
+
+    <aura:import library="auraStorageTest:iframeTestLib" property="lib" />
+    <aura:import library="auraStorageTest:manualTestEventLib" property="eventLib" />
+
+    <aura:method name="start" action="c.start"/>
+    <aura:method name="stop" action="c.stop"/>
+
+    <div>
+        This component is used by auraStorageTest:manualTester.app to manually stress test Aura's persistent storage.<br/>
+        Load and run that app rather than use this component directly.
+    </div>
+
+    <div aura:id="iframeContainer" />
+</aura:component>

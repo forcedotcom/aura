@@ -77,7 +77,7 @@ function iframeTest(storageContents) {
             return new Promise(function(resolve, reject) {
                 function checkIframeLoaded() {
                     var iframe = that.getIframe();
-                    if ($A.test.isComplete()) {
+                    if ($A.test && $A.test.isComplete()) {
                         reject(new Error("Test timed out"));
                     }
 
@@ -201,7 +201,7 @@ function iframeTest(storageContents) {
             var iframeCmp = this.getIframeRootCmp();
             return new Promise(function(resolve, reject) {
                 function checkStatus() {
-                    if ($A.test.isComplete()) {
+                    if ($A.test && $A.test.isComplete()) {
                         reject(new Error("Test timed out"));
                     }
 

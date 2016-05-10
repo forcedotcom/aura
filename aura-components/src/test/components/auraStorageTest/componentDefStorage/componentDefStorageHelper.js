@@ -3,7 +3,7 @@
 
     restoreLog: function(cmp) {
         try {
-            var log = window.localStorage[this.LOCAL_STORAGE_KEY];
+            var log = window.localStorage.getItem(this.LOCAL_STORAGE_KEY);
             if (log) {
                 this.log(cmp, log);
                 this.log(cmp, "\nRestored Log");
@@ -15,7 +15,7 @@
         try {
             var now = new Date().toJSON();
             var log = cmp.get("v.log") + "== " + now + " ==\n";
-            window.localStorage[this.LOCAL_STORAGE_KEY] = log;
+            window.localStorage.setItem(this.LOCAL_STORAGE_KEY, log);
             this.log(cmp, "\nSaved Log");
         } catch (e) { /* noop */ }
     },
@@ -95,7 +95,7 @@
     },
 
     reset: function(cmp) {
-        delete window.localStorage[this.LOCAL_STORAGE_KEY];
+        window.localStorage.removeItem(this.LOCAL_STORAGE_KEY);
         return this.clearActionAndDefStorage(cmp);
     }
 })

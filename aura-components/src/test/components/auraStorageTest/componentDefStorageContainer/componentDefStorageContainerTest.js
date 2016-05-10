@@ -83,16 +83,7 @@
             },
             function fetchCmpsUntilEvictTargetCmp(cmp) {
                 var complete = false;
-                this.fetchCmpsUntilEviction(cmp, "ui:scroller")
-                    .then(function() {
-                        complete = true;
-                    },
-                    function(e) {
-                        $A.test.fail("Error while adding defs to evict ui:scroller. " + e);
-                    }
-                );
-                $A.test.addWaitForWithFailureMessage(true, function() { return complete; },
-                        "ui:scroller never evicted from storage");
+                return this.fetchCmpsUntilEviction(cmp, "ui:scroller");
             },
             function reloadPage(cmp) {
                 // Reload page to clear anything saved in javascript memory
@@ -138,17 +129,7 @@
                 return cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
             },
             function fetchCmpsUntilEvictTargetCmp(cmp) {
-                var complete = false;
-                this.fetchCmpsUntilEviction(cmp, "ui:scroller")
-                    .then(function() {
-                        complete = true;
-                    },
-                    function(e) {
-                        $A.test.fail("Error while adding defs to evict ui:scroller. " + e);
-                    }
-                );
-                $A.test.addWaitForWithFailureMessage(true, function() { return complete; },
-                        "ui:scroller never evicted from storage");
+                return this.fetchCmpsUntilEviction(cmp, "ui:scroller");
             },
             function verifyTargetCmpNotInContext(cmp) {
                 cmp.helper.lib.iframeTest.verifyDefNotInLoaded("ui:scroller");

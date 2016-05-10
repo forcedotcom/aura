@@ -1,0 +1,13 @@
+<!-- A component used by the persistent storage manual test app with lots of dependencies -->
+<aura:component>
+    <aura:import library="ui:scrollerLib" property="lib1" />
+    <aura:import library="ui:panelPositioningLib" property="lib2" />
+    <aura:import library="ui:inputNumberLibrary" property="lib3" />
+    <aura:import library="test:test_Library" property="lib4" />
+    <aura:import library="ui:stackManagerLib" property="lib5" />
+    <aura:import library="ui:focusManagerLib" property="lib6" />
+    <aura:import library="ui:dragAndDropLib" property="lib7" />
+    <aura:import library="ui:crossTabLib" property="lib8" />
+    <aura:import library="ui:contentTypeLibrary" property="lib9" />
+    <aura:import library="ui:containerManagerLib" property="lib10" />
+</aura:component>

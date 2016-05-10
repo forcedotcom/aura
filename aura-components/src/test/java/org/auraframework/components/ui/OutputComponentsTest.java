@@ -46,35 +46,6 @@ public class OutputComponentsTest extends AuraTestCase {
         super(name);
     }
 
-    /**
-     * Verify that all ui:output* components have a required "value" attribute.
-     */
-    public void testValueRequired() throws Exception {
-        List<String> failures = Lists.newLinkedList();
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        for (ComponentDef def : getUiOutputComponents()) {
-            String name = def.getName();
-            AttributeDef value = def.getAttributeDef("value");
-            if (value == null || !value.isRequired()) {
-                failures.add(name);
-            }
-        }
-        if (!failures.isEmpty()) {
-            fail("The following ui:output* components should have a required 'value' attributef: " + failures);
-        }
-    }
-
-    private Set<ComponentDef> getUiOutputComponents() throws Exception {
-        DescriptorFilter matcher = new DescriptorFilter("markup://ui:output*", DefType.COMPONENT);
-        Set<ComponentDef> ret = Sets.newHashSet();
-        for (DefDescriptor<?> def : definitionService.find(matcher)) {
-            if (def.getName().startsWith("output")) {
-                ret.add((ComponentDef) def.getDef());
-            }
-        }
-        return ret;
-    }
-
     private ComponentDef getUiOutputComponent() throws Exception {
         ComponentDef def = definitionService.getDefinition("markup://ui:output", ComponentDef.class);
         return def;

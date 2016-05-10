@@ -78,6 +78,12 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 
 	SecureElement.addSecureGlobalEventHandlers(o, win, key);
 	SecureElement.addEventTargetMethods(o, win, key);
+	
+    // Salesforce API entry points (first phase) - W-3046191 is tracking adding $A.lockerService.publish() API enhancement where we will move these 
+    // to their respective javascript/container architectures
+    ["sforce", "Sfdc"].forEach(function(name) {
+		SecureObject.addPropertyIfSupported(o, win, name);
+	});
 
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", win);

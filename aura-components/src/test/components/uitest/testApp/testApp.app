@@ -58,12 +58,6 @@
     your Number value is: <ui:outputText aura:id="outNumber" value=""/> <br/>
     <br/>
 
-    <div>Input Option</div>
-    check Option: <ui:inputOption aura:id="inOption" value="{!m.option}"/> <br/>
-    <ui:button buttonTitle="Option" label="submit" press="{!c.submit}"/> <br/>
-    your Option value is: <ui:outputText aura:id="outOption" value=""/> <br/>
-    <br/>
-
     <div>Input Percent</div>
     enter Percent: <ui:inputPercent aura:id="inPercent" value="{!m.percent}"/> <br/>
     <ui:button buttonTitle="Percent" label="submit" press="{!c.submit}"/> <br/>

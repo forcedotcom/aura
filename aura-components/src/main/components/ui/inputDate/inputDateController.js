@@ -25,15 +25,21 @@
         _helper.displayDatePicker(component);
     },
 
-    doInit: function(component) {
+    doInit: function(component, event, helper) {
     	// only add the placeholder when there is no date picker opener.
-        if ($A.get("$Browser.formFactor") === "DESKTOP" && !component.get("v.displayDatePicker")) {
-            var concreteCmp = component.getConcreteComponent();
-            var format = concreteCmp.get("v.format");
-            if (!format) {
-                format = $A.get("$Locale.dateFormat");
+        if ($A.get("$Browser.formFactor") === "DESKTOP") {
+            if (!component.get("v.displayDatePicker")) {
+                var concreteCmp = component.getConcreteComponent();
+                var format = concreteCmp.get("v.format");
+                if (!format) {
+                    format = $A.get("$Locale.dateFormat");
+                }
+                component.set("v.placeholder", format);
             }
-            component.set("v.placeholder", format);
+            if (component.get("v.useManager")) {
+                helper.checkManagerExists(component);
+                component.set("v.loadDatePicker", false);
+            }
         }
     },
 
@@ -54,5 +60,19 @@
     // override ui:handlesDateSelected
     onDateSelected: function(component, event, helper) {
         helper.setValue(component, event);
+    },
+
+    // override ui:hasManager
+    registerManager: function(component, event) {
+        var sourceComponentId = event.getParam('sourceComponentId') || event.getParam("arguments").sourceComponentId;
+        if ($A.util.isUndefinedOrNull(sourceComponentId)) {
+            return;
+        }
+
+        var sourceComponent = $A.componentService.get(sourceComponentId);
+        if (sourceComponent && sourceComponent.isInstanceOf("ui:datePickerManager")) {
+            component.set("v.managerExists", true);
+        }
     }
+
 })// eslint-disable-line semi

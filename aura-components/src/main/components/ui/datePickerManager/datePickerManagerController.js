@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 ({
+	handleRegistration: function(cmp, event) {
+		var sourceComponentId = event.getParam('sourceComponentId');
+		if ($A.util.isUndefinedOrNull(sourceComponentId)) {
+			return;
+		}
+
+		var sourceComponent = $A.componentService.get(sourceComponentId);
+		if (sourceComponent && sourceComponent.isInstanceOf("ui:hasManager")) {
+			sourceComponent.registerManager(cmp.getGlobalId());
+		}
+	},
+
 	handleShowDatePicker: function (cmp, evt) {
 		if (!cmp.get("v.loadDatePicker")) {
 			cmp.set("v.loadDatePicker", true);

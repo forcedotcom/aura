@@ -15,13 +15,6 @@
  */
 ({
     displayDatePicker: function(component) {
-        if (!component.get("v.useManager")){
-            var datePicker = component.find("datePicker");
-            if (!datePicker || datePicker.get("v.visible") === true) {
-                return;
-            }
-        }
-
         var langLocale = component.get("v.langLocale");
         langLocale = !$A.util.isUndefinedOrNull(langLocale) ? langLocale : $A.get("$Locale.langLocale");
         var currentDate = this.getDateTime(component, langLocale);
@@ -226,11 +219,18 @@
     },
 
     popUpDatePicker: function(component, date) {
-        if (component.get("v.useManager")) {
+        var useManager = component.get("v.useManager"),
+            managerExists = component.get("v.managerExists");
+
+        if (useManager && managerExists) {
             this.openDatepickerWithManager(component, date);
         } else {
+            // if useManager was true but there is no manager, then set loadDatePicker back to true
+            if (useManager && !managerExists) {
+                this.loadDatePicker(component);
+            }
             var datePicker = component.find("datePicker");
-            if (datePicker) {
+            if (datePicker && datePicker.get("v.visible") === false) {
                 datePicker.set("v.value", this.getUTCDateString(date));
                 datePicker.set("v.hours", date.getUTCHours());
                 datePicker.set("v.minutes", date.getUTCMinutes());
@@ -242,8 +242,37 @@
         }
     },
 
+    loadDatePicker: function(component) {
+        if (!component.get("v.loadDatePicker")) {
+            component.set("v.loadDatePicker", true);
+
+            //datepicker has been loaded now, find it again and set it's reference element
+            this.initializeDatePicker(component);
+        }
+    },
+
+    initializeDatePicker: function (component) {
+        var datePicker = component.find("datePicker");
+        if (datePicker) {
+            datePicker.set("v.referenceElement", component.find("inputDate").getElement());
+            if (this.isDesktopMode(component)) {
+                datePicker.set("v.hasTime", false);
+                datePicker.set("v.showToday", false);
+            } else {
+                datePicker.set("v.hasTime", true);
+                datePicker.set("v.showToday", true);
+            }
+        }
+    },
+
+    checkManagerExists: function(component) {
+        $A.getEvt('markup://ui:registerDatePickerManager').setParams({
+            sourceComponentId : component.getGlobalId()
+        }).fire();
+    },
+
     openDatepickerWithManager: function(component, currentDate) {
-        $A.get('e.ui:showDatePicker').setParams({
+        $A.getEvt('markup://ui:showDatePicker').setParams({
             element  	: component.find("inputDate").getElement(),
             value      	: currentDate ? this.getUTCDateString(currentDate) : currentDate,
             sourceComponentId : component.getGlobalId()

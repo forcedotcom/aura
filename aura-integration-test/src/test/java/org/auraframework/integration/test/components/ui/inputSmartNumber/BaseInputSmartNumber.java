@@ -61,7 +61,6 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
     public void testInvalidInputs() throws Exception {
         open(URL);
         WebElement inputElm = findDomElement(By.cssSelector(INPUT_SEL));
-        WebElement submitBtnElm = findDomElement(By.cssSelector(SUBMIT_SEL));
         String someInvalidInputs = "acde:;`~!@#$%_{([])}^&|\"'*/";
 
         // do not include "+- " here because 1 + or - is allowed to indicate pos/neg num
@@ -69,18 +68,14 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
         inputElm.sendKeys(someInvalidInputs + "12");
         waitForInputBoxTextPresent(inputElm, "12");
 
-        submitBtnElm.click(); // used to fire blur event
-        inputElm.clear();     // clear() doesn't work when input has focus
-
         // invalid chars after some numbers, including "+- "
-        inputElm.sendKeys("12" + someInvalidInputs + "+- ");
-        waitForInputBoxTextPresent(inputElm, "12");
-
-        submitBtnElm.click(); // used to fire blur event
-        inputElm.clear();     // clear() doesn't work when input has focus
+        clearInput(inputElm);
+        inputElm.sendKeys("34" + someInvalidInputs + "+- ");
+        waitForInputBoxTextPresent(inputElm, "34");
 
         // invalid chars after decimal marker, including "," now since thousand marker is
         // not allowed after decimal marker(.)
+        clearInput(inputElm);
         inputElm.sendKeys("1.2" + someInvalidInputs + "+- ,");
         waitForInputBoxTextPresent(inputElm, "1.2");
     }
@@ -112,8 +107,11 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
 
     /**
      * Test change event is only fired when input value is changed
+     * Excluding IE because IE fires extra change event and changes component's value
+     * when the test component attaches a change handler to the input component.
      * @throws Exception
      */
+    @ExcludeBrowsers(BrowserType.IE11)
     public void testChangeEvent() throws Exception {
         open(URL);
         WebElement inputElm = findDomElement(By.cssSelector(INPUT_SEL));
@@ -151,14 +149,33 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
             }
         }, "Expected input element's value: " + expectedValue + ", but actual: " + inputElm.getAttribute("value"));
     }
+    
+    /**
+     * A much stabler way to clear the input than inputElm.clear();
+     */
+    protected void clearInput(WebElement inputElm) throws Exception {
+        getAuraUITestingUtil().getEval("document.getElementsByTagName('input')[0].value = '';");
+        waitForInputBoxTextPresent(inputElm, "");
+    }
 
+    protected void verifyEventsFired(String eventsSel, String ... events) throws Exception {
+        verifyEvents(eventsSel, true, events);
+    }
+
+    protected void verifyEventsNotFired(String eventsSel, String ... events) throws Exception {
+        verifyEvents(eventsSel, false, events);
+    }
+    
     /**
      * Verify what events are fired
      */
     private void verifyEvents(String eventsSel, Boolean expectEvents, String ... events)
             throws Exception {
+        By eventListSel = By.cssSelector(eventsSel);
+        waitForElementAppear("Event list should be cleared", eventListSel);
+
         // get the actual events and lowercase their names just in case
-        List<WebElement> eventListElm = findDomElements(By.cssSelector(eventsSel));
+        List<WebElement> eventListElm = findDomElements(eventListSel);
         Set<String> eventsFired = new HashSet<String>();
         for (WebElement eventFired : eventListElm) {
             eventsFired.add(eventFired.getText().toLowerCase());
@@ -174,13 +191,5 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
                 assertFalse("Unexpected event fired: " + event, eventsFired.contains(event));
             }
         }
-    }
-
-    protected void verifyEventsFired(String eventsSel, String ... events) throws Exception {
-        verifyEvents(eventsSel, true, events);
-    }
-
-    protected void verifyEventsNotFired(String eventsSel, String ... events) throws Exception {
-        verifyEvents(eventsSel, false, events);
     }
 }

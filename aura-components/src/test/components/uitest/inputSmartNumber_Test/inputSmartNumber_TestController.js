@@ -43,8 +43,6 @@
             supportedEvts.forEach(function (evt) {
                 inputCmp.addHandler(evt, cmp, "c.updateEventList");
             });
-
-            window.cmp = inputCmp;
         }
     },
     toggleDisabled: function (cmp) {

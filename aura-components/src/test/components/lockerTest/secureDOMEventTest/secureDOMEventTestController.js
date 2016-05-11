@@ -1,4 +1,8 @@
 ({
+    onclick: function(cmp) {
+        cmp.set("v.buttonClickedFlag", true);
+    },
+
     testClickEvent: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
         var domEvent;
@@ -13,13 +17,13 @@
         // Verify non-wrapped method is still accessible
         testUtils.assertEquals("number", typeof domEvent.timeStamp);
     },
-    
+
     testEventViewThrowsError: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
         var domEvent;
         var element = cmp.find("title").getElement();
         element.addEventListener("click", function(e) {
-        	domEvent = e;
+            domEvent = e;
         });
         element.click(); 
         try {
@@ -28,5 +32,12 @@
         } catch (e) {
             testUtils.assertStartsWith("Access denied for insecure", e.message, "Unexpected error accessing event.view");
         }
+    },
+
+    testMarkupDefinedClickHandler: function(cmp, event, helper) {
+        var testUtils = cmp.get("v.testUtils");
+        var button = cmp.find("button");
+        button.getElement().click();
+        testUtils.assertTrue(cmp.get("v.buttonClickedFlag"), "Click handler never called after clicking button");
     }
 })

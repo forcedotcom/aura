@@ -21,5 +21,11 @@
         test: function(cmp) {
             cmp.testEventViewThrowsError();
         }
+    },
+
+    testMarkupDefinedClickHandler: {
+        test: function(cmp) {
+            cmp.testMarkupDefinedClickHandler();
+        }
     }
 })

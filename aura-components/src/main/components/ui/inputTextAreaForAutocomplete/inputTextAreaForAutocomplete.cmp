@@ -21,6 +21,7 @@
 
 	<aura:attribute name="ariaExpanded" type="String" default="false" description="Whether the autocomplete list is expanded"/>
     <aura:attribute name="ariaActiveDescendant" type="String" default="" description="The ID of the active descendant option"/>
+    <aura:attribute name="inputTitle" type="String" description="The text displayed in a tooltip when the mouse pointer hovers over the input."/>
 
     <textarea aura:id="textAreaElem"
         id="{!v.domId}"
@@ -29,6 +30,7 @@
         rows="{!v.rows}"
         disabled="{!v.disabled}"
         readonly="{!v.readonly}"
+        title="{!v.inputTitle}"
         placeholder="{!v.placeholder}"
         role="combobox"
         aria-autocomplete="list"

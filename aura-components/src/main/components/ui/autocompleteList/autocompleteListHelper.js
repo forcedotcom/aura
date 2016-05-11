@@ -47,6 +47,33 @@
         }
     },
 
+    fireDataProvideEvent: function(component, options, index) {
+        // fire dataProvide event
+        var dataProviders = component.get("v.dataProvider");
+        if (!index) {
+            index = 0;
+        }
+        var provideEvent = dataProviders[index].get("e.provide");
+        provideEvent.setParams({
+            parameters: options
+        });
+        provideEvent.fire();
+    },
+
+    fireAbortEvent: function(component, options, index) {
+        // fire abort event
+        var dataProviders = component.get("v.dataProvider");
+        if (!index) {
+            index = 0;
+        }
+        var abortEvent = dataProviders[index].get("e.abort");
+        abortEvent.setParams({
+            parameters: options
+        });
+        abortEvent.fire();
+    },
+
+
     getEventSourceOptionComponent: function (component, event) {
         //option could be a compound component so look for the right option
         var element = event.target || event.srcElement;
@@ -85,13 +112,6 @@
                     }
                 } else {
                     clickEndEvent = event;
-                }
-
-                var startX = component._onStartX, startY = component._onStartY;
-                var endX = clickEndEvent.clientX, endY = clickEndEvent.clientY;
-
-                if (Math.abs(endX - startX) > 0 || Math.abs(endY - startY) > 0) {
-                    return;
                 }
 
                 var listElems = component.getElements();
@@ -218,8 +238,9 @@
         }
 
         //create section for autocomplete header
-        var header = this.getHeader(component);
-        if (header && component.get("v.showListHeader")) {
+        var header = this.getHeader(component),
+            unselectable = (header && header.isInstanceOf('ui:autocompleteListSelectable') && !header.get("v.selectable"));
+        if (header && component.get("v.showListHeader") && !unselectable ) {
             var headerSection = this._createBasicKeyboardTraversalSection();
             headerSection.deselect = function () {
                 component.set("v.headerSelected", false);
@@ -238,8 +259,9 @@
         }
 
         //create section for autocomplete footer
-        var footer = this.getFooter(component);
-        if (footer && component.get("v.showListFooter")) {
+        var footer = this.getFooter(component),
+            unselectable = (footer && footer.isInstanceOf('ui:autocompleteListSelectable') && !footer.get("v.selectable"));
+        if (footer && component.get("v.showListFooter") && !unselectable) {
             var footerSection = this._createBasicKeyboardTraversalSection();
             footerSection.deselect = function () {
                 component.set("v.footerSelected", false);
@@ -482,8 +504,13 @@
 
     matchFuncDone: function (component, items) {
         items = items || component.get('v.items');
-        this.fireMatchDoneEvent(component, items);
         this.toggleListVisibility(component, items);
+
+        // If a loading indicator delay was set, clear it
+        if (component._loadingTimer) {
+            clearTimeout(component._loadingTimer);
+            component._loadingTimer = null;
+        }
         this.showLoading(component, false);
 
         // Finally we update the v.items so iteration can 
@@ -496,6 +523,7 @@
         for (var i = 0; i < itemCmps.length; i++) {
             $A.util.toggleClass(itemCmps[i], "force");
         }
+        this.fireMatchDoneEvent(component, items);
     },
 
     matchText: function (component, items) {

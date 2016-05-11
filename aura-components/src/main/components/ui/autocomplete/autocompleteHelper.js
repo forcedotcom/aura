@@ -37,11 +37,22 @@
             listCmp.fetchData(options, index);
         }
     },
+
+    abortFetchData: function(component, event) {
+        // Abort any pending input events if a data request is being canceled
+        component._delay(function() { }, 0);
+        var listCmp = this.getListComponent(component);
+        if (listCmp) {
+            var options = event.getParam("parameters");
+            var index = event.getParam("index");
+            if (!index) {
+                index = 0;
+            }
+            listCmp.abortFetchData(options, index);
+        }
+    },
     
     fireInputChangeEvent: function(component) {
-    	// Hide the list if it is already visible
-        this.hideList(component);
-             
         //handling case when there is another element like label in the markup
         var value = component.getDef().getHelper().getInputElement(component).value;
         var inputChangeEvt = component.get("e.inputChange");

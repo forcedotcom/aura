@@ -188,7 +188,7 @@
 		        	this._changeInputHeaderFooter(cmp, "h");
 		        	this._goToHeaderOrFooter(cmp, "header", this.TAB_KEY);
 		        }, function (cmp) {
-					this._validateSelectEventFired(cmp,"");
+					this._validateSelectEventFired(cmp,"header");
 				}]
 	},
 	
@@ -197,7 +197,7 @@
 		        	this._changeInputHeaderFooter(cmp, "h");
 		        	this._goToHeaderOrFooter(cmp, "footer", this.TAB_KEY);
 		        }, function (cmp) {
-					this._validateSelectEventFired(cmp,"");
+					this._validateSelectEventFired(cmp,"footer");
 				}]
 	},
 	

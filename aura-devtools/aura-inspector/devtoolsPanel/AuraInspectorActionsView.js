@@ -115,6 +115,11 @@ function AuraInspectorActionsView(devtoolsPanel) {
         devtoolsPanel.subscribe("AuraInspector:EnqueueNextResponseForAction", AuraInspectorActionsView_OnEnqueueNextResponseForAction.bind(this));
         devtoolsPanel.subscribe("AuraInspector:EnqueueNextErrorForAction", AuraInspectorActionsView_OnEnqueueNextErrorForAction.bind(this));
 
+        devtoolsPanel.subscribe("AuraInspector:DropActionInChaosRun", AuraInspectorActionsView_OnDropActionInChaosRun.bind(this));
+        devtoolsPanel.subscribe("AuraInspector:EnqueueNextDropForChaosReplay", AuraInspectorActionsView_OnEnqueueNextDropForChaosReplay.bind(this));
+        
+        
+
 
         // Attach event handlers
         var div_actionsToWatch = tabBody.querySelector("#actionsToWatch-list");
@@ -169,6 +174,16 @@ function AuraInspectorActionsView(devtoolsPanel) {
         upsertCard(action);
     }
 
+    /*
+        event handler for "AuraInspector:OnActionStateChange"
+        {
+            "id": actionWatchedId,
+            "idtoWatch": actionWatched.idtoWatch,
+            "state": "RESPONSEMODIFIED", "RUNNING", "NEW", "ERROR", "INCOMPLETE" or "SUCCESS"
+            "sentTime": performance.now(),
+            "byChaosRun": true if by replaying chaos run
+        }
+    */
     function AuraInspectorActionsView_OnActionStateChange(data) {
         //for action card on the right side, we successfully modify the response, now move the action card from Watch List to Processed
         if(data && data.state && data.state === "RESPONSEMODIFIED") {
@@ -257,7 +272,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
             card.parentNode.removeChild(card);
             //the action we just dropped/modified is a new action, let's update the card with new actionId
             //this only move the card from Watch List to Processed
-            //at the point we don't have the result/parameter now as the action hasn'ts come back from server yet.
+            //at the point we don't have the result/parameter now as the action hasn't come back from server yet.
             //if we would like to update that, would need to delay this logic
             card.setAttribute("actionId", action.id);
             card.setAttribute("returnError", action.error);
@@ -274,28 +289,34 @@ function AuraInspectorActionsView(devtoolsPanel) {
             if(!isAllowed(action)) {
                 return;
             }
-            card = document.getElementById("action_card_" + action.id);
-            if(card) {
-                card.setAttribute("state", action.state);
-                card.setAttribute("returnValue", action.returnValue);
-                card.setAttribute("fromStorage", action.fromStorage);
-                card.setAttribute("storageKey", action.storageKey);
-                card.setAttribute("returnError", action.error);
-                //let's give user some idea if the action result was modified, and if so, in which way
-                //responseModified_modify, responseModified_drop or responseModified_error
-                card.setAttribute("howDidWeModifyResponse", action.howDidWeModifyResponse);
-                if(action.howDidWeModifyResponse != undefined) {
-                    card.classList.add(action.howDidWeModifyResponse);
-                }
-                if(action.stats) {
-                    card.setAttribute("stats", JSON.stringify(action.stats));
-                }
-                card.parentNode.removeChild(card);
-            } else {
+            if(action.state === "NEW") {
                 card = createActionCard(action.id, false);
+            }
+            else {
+                card = document.getElementById("action_card_" + action.id);
+                if(card) {
+                    card.setAttribute("state", action.state);
+                    card.setAttribute("returnValue", action.returnValue);
+                    card.setAttribute("fromStorage", action.fromStorage);
+                    card.setAttribute("storageKey", action.storageKey);
+                    card.setAttribute("returnError", action.error);
+                    //let's give user some idea if the action result was modified, and if so, in which way
+                    //responseModified_modify, responseModified_drop or responseModified_error
+                    card.setAttribute("howDidWeModifyResponse", action.howDidWeModifyResponse);
+                    if(action.howDidWeModifyResponse != undefined) {
+                        card.classList.add(action.howDidWeModifyResponse);
+                    }
+                    if(action.stats) {
+                        card.setAttribute("stats", JSON.stringify(action.stats));
+                    }
+                    card.parentNode.removeChild(card);
+                } else {
+                    console.err("cannot find previously created actionCard for action#"+action.id, action);
+                } 
             }
         }
 
+        //console.log("move actionCard state:"+action.state+" actionId:"+action.id, action);
         switch(action.state) {
             case "RUNNING":
                 _running.appendChild(card);
@@ -496,8 +517,80 @@ function AuraInspectorActionsView(devtoolsPanel) {
                 //call AuraInspectorInjectedScript.AddActionToWatch
                 devtoolsPanel.publish("AuraInspector:OnActionToWatchEnqueue", dataToPublish);
             }
-
         }
+    }
+
+    /********************************* functions for Chaos Tab start *******************************/
+
+    /*
+        event handler for AuraInspector:DropActionInChaosRun
+        called by onDecode in AuraInspectionInjectedScript
+    */
+    function AuraInspectorActionsView_OnDropActionInChaosRun(data) {
+        if(data && data.id) {
+            if(!actions.has(data.id)) {
+                console.err("Chaos run just request to drop an action that's not in action list of Action View", data, actions);
+            }
+            //we need tell Chaos Tab to draw a chaos card with action name
+            var action = actions.get(data.id);
+            //call AuraDevToolService.RecordDroppedAction in AuraInspectionInjectedScript.js
+            devtoolsPanel.publish("AuraInspector:OnSomeActionGetDropped", action); 
+        }
+    }
+
+    /*
+        event handler for "AuraInspector:EnqueueNextDropForChaosReplay".
+        called by scheduleActionOperationForNextStep in AuraInspectorInjectedScript
+        actionObj: { 'actionName': string,
+            'actionOperation': string //"Drop",
+            'actionId': string //we need this to move action from watch list to processed
+            'actionParameter': string //"{..}"
+            'actionIsStorable': boolean
+            'actionStorageKey': string
+            'actionIsAbortable': boolean
+            'actionIsBackground': boolean
+            'nextResponse': undefined 
+        }
+    */
+    function AuraInspectorActionsView_OnEnqueueNextDropForChaosReplay(actionObj) {
+        if(actionObj && actionObj.actionName) {
+            var actionCard = createActionCardWithFullActionInfo(actionObj);
+            if(!_toWatch) {
+                    var command = "console.log('_toWatch missing');";
+                    chrome.devtools.inspectedWindow.eval(command);
+            }
+            _toWatch.appendChild(actionCard);  
+
+            actionObj["byChaosRun"] = true;
+            //call AuraInspectorInjectedScript.AddActionToWatch
+            devtoolsPanel.publish("AuraInspector:OnActionToWatchEnqueue", actionObj);
+        }
+    }
+
+    function createActionCardWithFullActionInfo(action) {
+        if(action && action.actionName && action.actionParameter && action.actionId) {
+            var actionState = "BYCHAOSRUN"; 
+            var card = document.createElement("aurainspector-actionCard");
+            card.id = "action_card_" + action.actionId;
+            card.className = "action-card action-card-state-" + actionState;
+            card.setAttribute("actionId", action.actionId);
+            card.setAttribute("name", action.actionName);
+            card.setAttribute("parameters", action.actionParameter);
+            card.setAttribute("state", actionState);
+            card.setAttribute("isStorable", action.actionIsStorable+"");
+            card.setAttribute("isRefresh", "false");
+            card.setAttribute("isAbortable", action.actionIsAbortable+"");
+            card.setAttribute("isBackground", action.actionIsBackground+"");
+            card.setAttribute("returnValue", {});
+            card.setAttribute("isFromStorage", "false");
+            card.setAttribute("storageKey", action.actionStorageKey);
+            card.setAttribute("dropOrModify", "dropAction");
+
+            card.setAttribute("toWatch", true);
+
+            card.setAttribute("byChaosRun", true);
+        }
+        return card;
     }
 
 }

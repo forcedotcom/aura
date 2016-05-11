@@ -740,7 +740,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         DefDescriptor<? extends RootDefinition> descriptor = def.getDescriptor();
         String prefix = descriptor.getPrefix();
         if (prefix != null && prefix.toLowerCase().equals("layout")) {
-        	return true;
+        	return false;
         }
         
         boolean requireLocker = !isInternalNamespace(def.getDescriptor().getNamespace());

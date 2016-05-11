@@ -38,21 +38,6 @@
         }]
     },
 
-    testInputNumberShortcutK: {
-        attributes: {testInputCmp: "inputNumber"},
-        test: [function(cmp) {
-            var elem = this.getInputElement(cmp);
-            elem.value = "1k";
-            $A.test.fireDomEvent(elem, 'input');
-            $A.test.fireDomEvent(elem, 'blur');
-        }, function(cmp) {
-            var elem = this.getInputElement(cmp);
-            debugger;
-        }, function(cmp) {
-            debugger;
-        }]
-    },
-
     /**********************
      * InputCurrency Tests
      **********************/

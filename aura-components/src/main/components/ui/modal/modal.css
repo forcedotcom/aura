@@ -15,7 +15,7 @@
  */
 
 /* should be able to remove this next rule after ie11 support is dropped */
-.THIS.desktop {
+.THIS.DESKTOP {
     position: fixed;
 }
 

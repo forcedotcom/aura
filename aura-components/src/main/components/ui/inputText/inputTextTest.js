@@ -24,6 +24,36 @@
         } , function(component) {
             $A.test.assertEquals('', component.getElement().value, "input text value is not cleared.");
         }]
+    },
+
+    testInputGetElementWithLabel: {
+        attributes : {label: "text label"},
+        test: [ function(component) {
+            var inputCmp = component.getSuper(),
+                helper = component.getDef().getHelper();
+            var inputElement = helper.getInputElement(inputCmp);
+            $A.test.assertEquals("input", inputElement.tagName.toLowerCase(), "should find the correct input element");
+        }]
+    },
+
+    testInputGetElementWithoutLabel: {
+        test: [ function(component) {
+            var inputCmp = component.getSuper(),
+                helper = component.getDef().getHelper();
+            var inputElement = helper.getInputElement(inputCmp);
+            $A.test.assertEquals("input", inputElement.tagName.toLowerCase(), "should find the correct input element");
+        }]
+    },
+
+    testInputGetElementLabelDestroyed: {
+        attributes : {label: "text label"},
+        test: [ function(component) {
+            var inputCmp = component.getSuper(),
+                helper = component.getDef().getHelper();
+            inputCmp.find("inputLabel").destroy();
+            var inputElement = helper.getInputElement(inputCmp);
+            $A.test.assertEquals("input", inputElement.tagName.toLowerCase(), "should find the correct input element");
+        }]
     }
 /*eslint-disable semi*/
 })

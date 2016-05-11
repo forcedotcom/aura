@@ -1072,12 +1072,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     	if (minify) {
     		js = javascriptClass.getMinifiedCode();
     	}
+    	
     	if (js == null) {
     		js = javascriptClass.getCode();
     	}
+    	
     	if (isLockerRequired()) {
     		js = convertToLocker(js);
     	}
+    	
     	return js;
     }
     
@@ -1095,17 +1098,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     	ConfigAdapter configAdapter = Aura.getConfigAdapter();
     	if (configAdapter.isLockerServiceEnabled()) {
-            // We always run layout:// in system mode
-            String prefix = descriptor.getPrefix();
-            if (prefix == null || !prefix.toLowerCase().equals("layout")) {
-    			requireLocker = !configAdapter.isInternalNamespace(descriptor.getNamespace());
-            	if (!requireLocker) {
-    	            DefDescriptor<InterfaceDef> requireLockerDescr = Aura.getDefinitionService().getDefDescriptor("aura:requireLocker", InterfaceDef.class);
-    	        	requireLocker = isInstanceOf(requireLockerDescr);
-            	} else {
-	        		requireLocker = configAdapter.requireLocker(descriptor);
-            	}
-            }
+    		requireLocker = configAdapter.requireLocker(this);
     	}
 
     	return requireLocker;

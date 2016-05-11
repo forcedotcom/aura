@@ -47,6 +47,8 @@ import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
@@ -733,8 +735,25 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
 	@Override
-	public boolean requireLocker(DefDescriptor<?> descriptor) {
-		return true;
+	public boolean requireLocker(RootDefinition def) {
+		// DCHASMAN TODO Remove layout:// awareness (refactored to SFDCConfigAdapterImpl): Always run layout:// in system mode
+        DefDescriptor<? extends RootDefinition> descriptor = def.getDescriptor();
+        String prefix = descriptor.getPrefix();
+        if (prefix != null && prefix.toLowerCase().equals("layout")) {
+        	return true;
+        }
+        
+        boolean requireLocker = !isInternalNamespace(def.getDescriptor().getNamespace());
+		if (!requireLocker) {
+            DefDescriptor<InterfaceDef> requireLockerDescr = Aura.getDefinitionService().getDefDescriptor("aura:requireLocker", InterfaceDef.class);
+        	try {
+				requireLocker = def.isInstanceOf(requireLockerDescr);
+			} catch (QuickFixException e) {
+				throw new AuraRuntimeException(e);
+			}
+    	} 
+        
+		return requireLocker;
 	}
 	
 	protected boolean isSafeEvalWorkerURI(String uri) {

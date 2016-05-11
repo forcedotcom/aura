@@ -50,6 +50,12 @@
         }
     },
 
+    testObjectExposedOnWindow: {
+        test: function(cmp) {
+            cmp.testObjectExposedOnWindow();
+        }
+    },
+
     testWhitelistedGlobalAttributeExposedOnWindow: {
         test: function(cmp) {
             cmp.testWhitelistedGlobalAttributeExposedOnWindow();

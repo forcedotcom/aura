@@ -36,11 +36,14 @@
         testUtils.assertStartsWith("SecureNavigator", window.navigator.toString(), "Expected navigator to return SecureNavigator");
     },
 
-    testObject: function(cmp) {
+    testObjectExposedOnWindow: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
 
         testUtils.assertDefined(Object, "Object is not exposed");
-        console.log(Object);
+        testUtils.assertDefined(window.Object, "window.Object is not exposed");
+
+        testUtils.assertTrue(window.Object === Object,
+                "window.Object and Object should reference to same thing.");
 
     },
 
@@ -60,6 +63,6 @@
         testUtils.assertDefined(alert, "alert() not exposed");
         testUtils.assertDefined(window.alert, "window.alert() not exposed");
 
-        testUtils.assertTrue(window.alert === alert, "window.alert() !=== alert()");
+        testUtils.assertTrue(window.alert === alert, "window.alert and alert should reference to same thing.");
     }
 })

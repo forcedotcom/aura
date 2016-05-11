@@ -52,7 +52,6 @@
     testRemoveEventListener: function(cmp, event) {
         var testUtils = cmp.get("v.testUtils");
         var counter = 0;
-
         var element = cmp.find("title").getElement();
         var testWithUseCapture = event.getParam("arguments").testWithUseCapture;
         var useCapture = undefined;

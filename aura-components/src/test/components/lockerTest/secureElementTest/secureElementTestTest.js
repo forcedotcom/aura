@@ -115,5 +115,24 @@
         test: function(cmp) {
             cmp.testRemoveEventListener(true);
         }
+    },
+
+    /**
+     * The actual test code is in renderer where users can have SecureObject references.
+     */
+    testCallAppendChildWithOpaqueReference: {
+        attributes:{"testInRenderer": "testCallAppendChildWithOpaqueReference"},
+        test: function(cmp) {
+            var actual = cmp.get("v.text");
+            $A.test.assertStartsWith("Error: Access denied", actual);
+        }
+    },
+
+    testCallRemoveChildWithOpaqueReference: {
+        attributes:{"testInRenderer": "testCallRemoveChildWithOpaqueReference"},
+        test: function(cmp) {
+            var actual = cmp.get("v.text");
+            $A.test.assertStartsWith("Error: Access denied", actual);
+        }
     }
 })

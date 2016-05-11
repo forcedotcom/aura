@@ -22,6 +22,7 @@
  * @export
  */
 Aura.Event.Event = function(config) {
+    // source is only used to calculate the path, not determine access
     this.source = config["component"] || $A.getContext().getCurrentAccess() || $A.getRoot();
     this.eventDef = config["eventDef"];
     this.eventDispatcher = config["eventDispatcher"];
@@ -223,10 +224,6 @@ Aura.Event.Event.prototype.getParams = function(){
     return this.params;
 };
 
-//#if {"modes" : ["STATS"]}
-Aura.Event.Event.prototype.statsIndex = [];
-//#end
-
 
 /**
  * Convenience function to determine which kind of event execution should be used
@@ -285,9 +282,9 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
     var isSystemError = this.eventDef.getDescriptor().toString() === "markup://aura:systemError";
     var isComponentEventType = this.getEventExecutionType() == "COMPONENT";
 
-    while(!this.paused && !res["done"]) {
-        res = handlerIterator["next"]();
-        value = res["value"];
+    while(!this.paused && !res.done) {
+        res = handlerIterator.next();
+        value = res.value;
         if(value && value.handler) {
 
             // LEGACY BEHAVIOR
@@ -359,16 +356,9 @@ Aura.Event.Event.prototype.fire = function(params) {
     if (params) {
         this.setParams(params);
     }
-    //#if {"modes" : ["STATS"]}
-    var startTime = (new Date()).getTime();
-    //#end
 
     $A.run(function() {
         self.fired = true;
         self.executeHandlers();
     }, this.eventDef.getDescriptor().getQualifiedName()/*name for the stack*/);
-
-    //#if {"modes" : ["STATS"]}
-        Aura.Event.Event.prototype.statsIndex.push({'event': this, 'startTime': startTime, 'endTime': (new Date()).getTime()});
-    //#end
 };

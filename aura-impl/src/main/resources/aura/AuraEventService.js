@@ -112,11 +112,11 @@ AuraEventService.prototype.getEventPhaseCmpIterator = (function() {
         var bubbleCollection = [];
         var res = null;
         do {
-            res = cmpHierarchyIterator["next"]();
-            if(res["value"]) {
-                bubbleCollection.push.apply(bubbleCollection, res["value"]);
+            res = cmpHierarchyIterator.next();
+            if(res.value) {
+                bubbleCollection.push.apply(bubbleCollection, res.value);
             }
-        } while(!res["done"]);
+        } while(!res.done);
 
         var queue = bubbleCollection.slice().reverse().concat(bubbleCollection);
         var queueIndex = 0;
@@ -125,7 +125,7 @@ AuraEventService.prototype.getEventPhaseCmpIterator = (function() {
         var currentValue;
         var done = false;
 
-        this["next"] = function() {
+        this.next = function() {
             while(!done) {
 
                 if(queueIndex < queue.length) {
@@ -146,23 +146,23 @@ AuraEventService.prototype.getEventPhaseCmpIterator = (function() {
             }
             
             return {
-                "value": currentValue,
-                "done": done
+                value: currentValue,
+                done: done
             };
         };
 
-        this["return"] = function(value) {
+        this.return = function(value) {
             if(!done) {
                 done = true;
                 currentHandler = value; 
             }
             return {
-                "value": currentHandler,
-                "done": done
+                value: currentHandler,
+                done: done
             };
         };
 
-        this["throw"] = function(e) {
+        this.throw = function(e) {
             if(!done) {
                 done = true;
             }
@@ -227,18 +227,18 @@ AuraEventService.prototype.getPhasedEventHandlerIterator = (function() {
         // of handlers on that component for the given event
         function moveCmpCursor() {
             currentHandlersIndex = 0;
-            var res = eventPhaseCmpIterator["next"]();
-            if(res["done"]) {
+            var res = eventPhaseCmpIterator.next();
+            if(res.done) {
                 currentHandlers = currentLocation = null;
             }
             else {
-                currentLocation = res["value"];
+                currentLocation = res.value;
                 currentHandlers = handlerSupplierFn(currentLocation.cmp, evt, currentLocation.phase); // an array
                 currentHandlersIndex = 0;
             }
         }
 
-        this["next"] = function() {
+        this.next = function() {
             while(!done) {
                 if(!currentLocation) {
                     // no more components to walk
@@ -262,7 +262,7 @@ AuraEventService.prototype.getPhasedEventHandlerIterator = (function() {
                         // when stopPropagation() is called, the iterator's return value
                         // is a special object that includes the last cmp and last phase
                         // but no handler
-                        return this["return"]({
+                        return this.return({
                             cmp: currentValue.cmp,
                             phase: currentValue.phase
                         });
@@ -275,23 +275,23 @@ AuraEventService.prototype.getPhasedEventHandlerIterator = (function() {
             }
             
             return {
-                "value": currentValue,
-                "done": done
+                value: currentValue,
+                done: done
             };
         };
 
-        this["return"] = function(value) {
+        this.return = function(value) {
             if(!done) {
                 done = true;
                 currentValue = value; 
             }
             return {
-                "value": currentValue,
-                "done": done
+                value: currentValue,
+                done: done
             };
         };
 
-        this["throw"] = function(e) {
+        this.throw = function(e) {
             if(!done) {
                 done = true;
             }
@@ -453,7 +453,7 @@ AuraEventService.prototype.getNonBubblingComponentEventHandlerIterator = (functi
             }
         }
 
-        this["next"] = function() {
+        this.next = function() {
             while(!done) {
                 if(!handlers) {
                     // handlers is undefined completely, we're all done
@@ -476,23 +476,23 @@ AuraEventService.prototype.getNonBubblingComponentEventHandlerIterator = (functi
             }
 
             return {
-                "value": currentValue,
-                "done": done
+                value: currentValue,
+                done: done
             };
         };
 
-        this["return"] = function(value) {
+        this.return = function(value) {
             if(!done) {
                 done = true;
                 currentValue = value; 
             }
             return {
-                "value": currentValue,
-                "done": done
+                value: currentValue,
+                done: done
             };
         };
 
-        this["throw"] = function(e) {
+        this.throw = function(e) {
             if(!done) {
                 done = true;
             }
@@ -547,7 +547,7 @@ AuraEventService.prototype.getValueHandlerIterator = (function() {
         }
 
 
-        this["next"] = function() {
+        this.next = function() {
             while(!done) {
                 if(queueIndex < queue.length) {
                     // have more handlers to iterate
@@ -562,23 +562,23 @@ AuraEventService.prototype.getValueHandlerIterator = (function() {
             }
 
             return {
-                "value": currentValue,
-                "done": done
+                value: currentValue,
+                done: done
             };
         };
 
-        this["return"] = function(value) {
+        this.return = function(value) {
             if(!done) {
                 done = true;
                 currentValue = value; 
             }
             return {
-                "value": currentValue,
-                "done": done
+                value: currentValue,
+                done: done
             };
         };
 
-        this["throw"] = function(e) {
+        this.throw = function(e) {
             if(!done) {
                 done = true;
             }
@@ -633,14 +633,14 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
     function hasId(cmpGen, id) {
         var res = null;
         do {
-            res = cmpGen["next"]();
-            // res["value"] is an array of the component hierarchy for a single
+            res = cmpGen.next();
+            // res.value is an array of the component hierarchy for a single
             // concrete component; we only need to check the first element in 
             // the array since all the elements in the array will share the same globalId
-            if(res["value"] && id === res["value"][0].getGlobalId()) {
+            if(res.value && id === res.value[0].getGlobalId()) {
                 return true;
             }
-        } while(!res["done"]);
+        } while(!res.done);
 
         return false;
     }
@@ -704,7 +704,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
             }
         }
 
-        this["next"] = function() {
+        this.next = function() {
             while(!done) {
 
                 if(!queue) {
@@ -722,23 +722,23 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
             }
             
             return {
-                "value": currentValue,
-                "done": done
+                value: currentValue,
+                done: done
             };
         };
 
-        this["return"] = function(value) {
+        this.return = function(value) {
             if(!done) {
                 done = true;
                 currentHandler = value; 
             }
             return {
-                "value": currentHandler,
-                "done": done
+                value: currentHandler,
+                done: done
             };
         };
 
-        this["throw"] = function(e) {
+        this.throw = function(e) {
             if(!done) {
                 done = true;
             }
@@ -756,14 +756,14 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
         var currentValue = null; // HandlerIteratorResult
         var done = false;
 
-        this["next"] = function() {
+        this.next = function() {
             while(!done) {
 
                 if(currentPhase === AuraEventService.Phase.CAPTURE || currentPhase === AuraEventService.Phase.BUBBLE) {
-                    var phaseRes = phasedEventHandlerIterator["next"](); // { value: HandlerIteratorResult, done: Boolean }
-                    if(!phaseRes["done"]) {
+                    var phaseRes = phasedEventHandlerIterator.next(); // { value: HandlerIteratorResult, done: Boolean }
+                    if(!phaseRes.done) {
                         // When the PhasedEventHandlerIterator is NOT done, then eventStopPropagation has not been invoked
-                        currentValue = phaseRes["value"];
+                        currentValue = phaseRes.value;
                         currentPhase = currentValue.phase;
                         break;
                     }
@@ -775,25 +775,25 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
                     }
                     else {
                         // Move directly to the "default" phase
-                        // stopPropagation() may have been invoked, so let's check the phaseRes["value"]
+                        // stopPropagation() may have been invoked, so let's check the phaseRes.value
                         // for a defined value which would indicate if the iterator was stopped preemptively.
                         // PhasedEventHandlerIterator will terminate with a defined value if stopPropagation()
                         // was called. 
                         currentPhase = AuraEventService.Phase.DEFAULT;
-                        if(evt.eventStopPropagation && phaseRes["value"]) {
+                        if(evt.eventStopPropagation && phaseRes.value) {
                             // stopPropagation() was called, so we need to establish the broadcast root
                             // to scope the default event handlers
-                            bcastRootId = phaseRes["value"].cmp.getConcreteComponent().getGlobalId(); // (evt.getSource() && evt.getSource().getGlobalId()) ?
+                            bcastRootId = phaseRes.value.cmp.getConcreteComponent().getGlobalId(); // (evt.getSource() && evt.getSource().getGlobalId()) ?
                         }
 
                         defaultEventHandlerIterator = new AppEventDefaultPhaseHandlerIterator(evt, bcastRootId);
                     }
                 }
                 else {
-                    var defaultRes = defaultEventHandlerIterator["next"]();
+                    var defaultRes = defaultEventHandlerIterator.next();
 
-                    if(!defaultRes["done"]) {
-                        currentValue = defaultRes["value"];
+                    if(!defaultRes.done) {
+                        currentValue = defaultRes.value;
                         break;
                     }
 
@@ -803,23 +803,23 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
             }
             
             return {
-                "value": currentValue,
-                "done": done
+                value: currentValue,
+                done: done
             };
         };
 
-        this["return"] = function(value) {
+        this.return = function(value) {
             if(!done) {
                 done = true;
                 currentValue = value; 
             }
             return {
-                "value": currentValue,
-                "done": done
+                value: currentValue,
+                done: done
             };
         };
 
-        this["throw"] = function(e) {
+        this.throw = function(e) {
             if(!done) {
                 done = true;
             }

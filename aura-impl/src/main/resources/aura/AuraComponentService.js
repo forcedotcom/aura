@@ -179,7 +179,7 @@ AuraComponentService.prototype.getComponentValueProviderHierarchy = (function() 
         var done = !cmp;
         var current = cmp;
 
-        this["next"] = function() {
+        this.next = function() {
 
             if(!current || !current.isValid()) {
                 done = true;
@@ -199,7 +199,7 @@ AuraComponentService.prototype.getComponentValueProviderHierarchy = (function() 
 
             // store the current value before calculating the next one
             var result = {
-                "value": value
+                value: value
             };
 
             if(!done) {
@@ -220,23 +220,23 @@ AuraComponentService.prototype.getComponentValueProviderHierarchy = (function() 
                 } while (current);
             }
 
-            result["done"] = done;
+            result.done = done;
 
             return result;
         };
 
-        this["return"] = function(value) {
+        this.return = function(value) {
             if(!done) {
                 done = true;
                 current = value; 
             }
             return {
-                "value": current,
-                "done": done
+                value: current,
+                done: done
             };
         };
 
-        this["throw"] = function(e) {
+        this.throw = function(e) {
             if(!done) {
                 done = true;
             }

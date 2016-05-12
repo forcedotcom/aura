@@ -101,10 +101,10 @@ SecureObject.filterEverything = function (st, raw) {
 				swallowed = hasAccess || raw === document.body || raw === document.head ? SecureElement(raw, key) : SecureObject(raw, key);
 				mutated = true;
 			} else if (raw instanceof Aura.Event.Event) {
-				swallowed = hasAccess ? SecureAuraEvent(raw, key) : SecureObject(raw, key);
+				swallowed = SecureAuraEvent(raw, key);
 				mutated = true;
 			} else if (raw instanceof Event) {
-				swallowed = hasAccess ? SecureDOMEvent(raw, key) : SecureObject(raw, key);
+				swallowed = SecureDOMEvent(raw, key);
 				mutated = true;
 			} else if ($A.lockerService.util.isKeyed(raw)) {
 				swallowed = SecureObject(raw, key);

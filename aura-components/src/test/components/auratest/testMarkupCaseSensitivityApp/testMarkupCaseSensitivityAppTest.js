@@ -100,12 +100,10 @@
     		//Verify getting appCache:withpreload with wrong case will error out
     		$A.createComponent("appCache:WITHPRELOAD",
                     {},
-                    function(newCmp) {
-                    	$A.test.assertEquals("markup://aura:text",
-                    			newCmp.getDef().getDescriptor().getQualifiedName(),
-                    			"Getting component that's not loaded as dependency should return aura:text");
+                    function(newCmp,status,message) {
+                    	$A.test.assertEquals(null,newCmp,"Getting wrong case component should return fail");
                     	var expectedErrorMsg = "org.auraframework.throwable.quickfix.DefinitionNotFoundException: No COMPONENT named markup://appCache:WITHPRELOAD found";
-                    	$A.test.assertTrue(newCmp.toString().indexOf(expectedErrorMsg) >=0 );
+                    	$A.test.assertTrue(message.indexOf(expectedErrorMsg) >=0 );
                     	WITHPRELOADCreated = true;
                     }
             );

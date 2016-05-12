@@ -66,19 +66,19 @@
             $A.test.assertEquals("secureDocumentTest", document.title);
         }
     },
-    
+
     testQuerySelectorAllReturnsSecureNodeList: {
         test: function(cmp) {
             cmp.testQuerySelectorAllReturnsSecureNodeList();
         }
     },
-    
+
     testDocumentBodyConstructorNotExposed: {
         test: function(cmp) {
             cmp.testDocumentBodyConstructorNotExposed();
         }
     },
-    
+
     /**
      * Prevent malicious users from passing in a carefully designed object to SecureDocument.createElement() that may
      * break out of the Locker.
@@ -86,6 +86,18 @@
     testCreateElementCoersionExploit: {
         test: function(cmp) {
             cmp.testCreateElementCoersionExploit();
+        }
+    },
+
+    testCreateElementNSForSVGElement: {
+        test: function(cmp) {
+            cmp.testCreateElementNSForSVGElement();
+        }
+    },
+
+    testGetElementsByTagNameForScriptTag: {
+        test: function(cmp) {
+            cmp.testGetElementsByTagNameForScriptTag();
         }
     }
 })

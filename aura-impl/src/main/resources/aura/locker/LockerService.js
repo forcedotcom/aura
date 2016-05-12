@@ -316,14 +316,10 @@ function LockerService() {
 				});
 			}
 
-			try {
-				locker = {
-					"$envRec": envRec,
-					"$result": window['$$safe-eval$$'](code, optionalSourceURL, envRec, lockerShadows)
-				};
-			} catch (x) {
-				throw new Error("Unable to create locker IIFE: " + x);
-			}
+			locker = {
+				"$envRec": envRec,
+				"$result": window['$$safe-eval$$'](code, optionalSourceURL, envRec, lockerShadows)
+			};
 
 			Object.freeze(locker);
 			lockers.push(locker);

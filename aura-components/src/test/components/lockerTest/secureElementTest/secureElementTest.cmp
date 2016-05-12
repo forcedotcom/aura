@@ -40,7 +40,9 @@
     <aura:method name="testInnerHTMLSupportsUseTagForSvgElement" action="{!c.testInnerHTMLSupportsUseTagForSvgElement}"/>
     <aura:method name="testTextContent" action="{!c.testTextContent}"/>
     <aura:method name="testInnerText" action="{!c.testInnerText}"/>
-
+    <aura:method name="testAddEventListenerMultipleCalls" action="{!c.testAddEventListenerMultipleCalls}">
+    </aura:method>
+    
     <aura:method name="getDiv" action="{!c.getDiv}"/>
 
     <lockerTest:facet/>

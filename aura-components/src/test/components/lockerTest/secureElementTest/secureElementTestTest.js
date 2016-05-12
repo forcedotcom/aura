@@ -409,5 +409,11 @@
         test: function(cmp) {
             cmp.testInnerText();
         }
+    },
+    
+    testAddEventListenerMultipleCalls: {
+        test: function(cmp) {
+            cmp.testAddEventListenerMultipleCalls();
+        }
     }
 })

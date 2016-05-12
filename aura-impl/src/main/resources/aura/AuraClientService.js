@@ -577,7 +577,7 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
 
             if (toStore) {
                 if (this.persistedActionFilter) {
-                    this.persistedActionFilter[key] = undefined;
+                    this.persistedActionFilter[key] = true;
                 }
                 storage.put(key, toStore).then(
                     function() {},
@@ -3026,7 +3026,7 @@ AuraClientService.prototype.populatePersistedActionsFilter = function() {
         .then(function(all) {
             if (all) {
                 for (var i in all) {
-                    acs.persistedActionFilter[all[i]["key"]] = undefined;
+                    acs.persistedActionFilter[all[i]["key"]] = true;
                 }
                 $A.log("AuraClientSevice: restored " + all.length + " actions");
             }

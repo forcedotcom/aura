@@ -54,9 +54,9 @@
     clearActionAndDefStorage: function(cmp, evt, helper) {
         helper.setStatus(cmp, "Clearing Action and Def Storage");
         helper.clearActionAndDefStorage(cmp)
-        .then(function() {
-                helper.setStatus(cmp, "Cleared Action and Def Storage");
-        })
+            .then(function() {
+                    helper.setStatus(cmp, "Cleared Action and Def Storage");
+            })
             ["catch"](function(e) {
                 helper.setStatus(cmp, "Error: " + e);
             })
@@ -65,7 +65,7 @@
     clearCachesAndLog: function(cmp, evt, helper) {
         helper.setStatus(cmp, "Clearing Caches and Logs");
         helper.reset(cmp)
-        .then(function() {
+            .then(function() {
                 helper.setStatus(cmp, "Cleared Caches and Logs");
             })
             ["catch"](function(e) {
@@ -80,16 +80,16 @@
     verifyDefsRestored: function(cmp, evt, helper) {
         helper.setStatus(cmp, "Verifying Defs Restored");
         $A.storageService.getStorage('ComponentDefStorage').getAll()
-        .then(function(items) {
-            if (items.length > 0) {
-                helper.setStatus(cmp, "Verified Defs Restored");
-            } else {
-                helper.setStatus(cmp, "Defs Not Restored");
-            }
-        })
-        ["catch"](function(error) {
-            helper.setStatus(cmp, "Error: " + error.toString());
-        });
+            .then(function(items) {
+                if (items.length > 0) {
+                    helper.setStatus(cmp, "Verified Defs Restored");
+                } else {
+                    helper.setStatus(cmp, "Defs Not Restored");
+                }
+            })
+            ["catch"](function(error) {
+                helper.setStatus(cmp, "Error: " + error.toString());
+            });
     },
 
     /** Handle auraStorage:modified */

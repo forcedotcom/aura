@@ -15,16 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.impl.java.controller.ServerStorableActionController" render="client">
+<aura:application template="auraStorageTest:actionsStorageTemplate" controller="java://org.auraframework.impl.java.controller.ServerStorableActionController" render="client">
     <aura:attribute type="String" name="responseOrder" default=""/>
-    <aura:attribute name="defaultExpiration" type="Integer" default="60"/>
-    <aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="60"/>
-
-    <auraStorage:init name="actions" secure="true" debugLoggingEnabled="true" defaultExpiration="{!v.defaultExpiration}"
-                      defaultAutoRefreshInterval="{!v.defaultAutoRefreshInterval}"/>
 
     <ui:button press="{!c.handleClick}" aura:id="button" label="Get a stored action from the server"/>
     <test:cmpWithServerAction aura:id="test_cmpWithServerAction"/>
 
     <div aura:id="facet"></div>
-</aura:component>
+</aura:application>

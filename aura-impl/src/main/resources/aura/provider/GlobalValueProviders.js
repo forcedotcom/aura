@@ -212,10 +212,10 @@ GlobalValueProviders.prototype.loadFromStorage = function(callback) {
                         if (item) {
                             // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
                             that.merge(item.value, true);
-                        }
 
-                        // loading from persistence was successful
-                        that.LOADED_FROM_PERSISTENT_STORAGE = true;
+                            // some GVP values were loaded from storage
+                            that.LOADED_FROM_PERSISTENT_STORAGE = true;
+                        }
 
                         callback(!!item);
                     });

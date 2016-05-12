@@ -45,30 +45,88 @@
 
     logComponentDefStorage: function(cmp) {
         var that = this;
-        $A.storageService.getStorage("ComponentDefStorage").getAll()
-        .then(function(items) {
-            var keys  = [];
-            for (var i = 0; i < items.length; i++) {
-                keys.push(items[i]["key"]);
+        // def store does not exist until a dynamic def is received
+        var defs = $A.storageService.getStorage("ComponentDefStorage");
+        if (!defs) {
+            return;
+        }
+
+        /**
+         * ComponentDefStorage manipulation is done across transactions so first check
+         * for the transaction key. If it's found then loop until it's gone.
+         *
+         * Must match ComponentDefStorage.prototype.TRANSACTION_SENTINEL_KEY;
+         * TODO W-2365447 - eliminate this and its checks when bulk remove + put is added
+         */
+        var TRANSACTION_SENTINEL_KEY = "sentinel_key";
+        var MAX_ITERATIONS = 20;
+        var iterationCount = 0;
+
+        function queryDefStorage() {
+            if (iterationCount > MAX_ITERATIONS) {
+                that.log(cmp, "ComponentDefStorage: exceeded max iterations trying to get contents");
+                return;
             }
+            iterationCount++;
 
-            var content = keys.sort().join(", ");
+            defs.getAll().then(function(items) {
+                items = items || [];
 
-            // only log if the value has changed
-            if (cmp._ComponentDefStorage !== content) {
-                that.log(cmp, "ComponentDefStorage content: " + content);
-                cmp._ComponentDefStorage = content;
-            }
+                // recurse if transaction key is found
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i]["key"] === TRANSACTION_SENTINEL_KEY) {
+                        queryDefStorage();
+                        return;
+                    }
+                }
 
-        });
+                // collect the defs
+                var keys  = [];
+                for (var i = 0; i < items.length; i++) {
+                    keys.push(items[i]["key"]);
+                }
+                var content = keys.sort().join(", ");
+
+                // only log if the value has changed
+                if (cmp._ComponentDefStorage !== content) {
+                    that.log(cmp, "ComponentDefStorage content: " + content);
+                    cmp._ComponentDefStorage = content;
+                }
+            });
+        }
+
+        // and go!
+        queryDefStorage();
     },
 
     clearActionAndDefStorage: function(cmp) {
-        var promises = [
-            $A.storageService.getStorage('ComponentDefStorage').clear(),
-            $A.storageService.getStorage('actions').clear()
-        ];
-        return Promise.all(promises);
+        // def store is not created until a dynamic def is received. if it doesn't exist
+        // in aura storage service then create it, clear it (to clear the underlying persistent
+        // store), then remove it.
+        var def = $A.storageService.getStorage("ComponentDefStorage");
+        var defCreated = false;
+        if (!def) {
+            defCreated = true;
+            def = $A.storageService.initStorage(
+                "ComponentDefStorage",
+                true,      // persistent
+                false,     // secure
+                442368,    // maxSize
+                10886400,  // defaultExpiration
+                0,         // defaultAutoRefreshInterval
+                true,      // debugLoggingEnabled
+                false      // clearStorageOnInit
+            );
+        }
+
+        return Promise.all([$A.storageService.getStorage("actions").clear(), def.clear()])
+            .then(
+                function() {
+                    if (defCreated) {
+                        $A.storageService.deleteStorage("ComponentDefStorage");
+                    }
+                }
+            );
     },
 
     reset: function(cmp) {

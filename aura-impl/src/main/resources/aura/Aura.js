@@ -661,7 +661,7 @@ AuraInstance.prototype.initAsync = function(config) {
                 $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
             }
 
-            // actions depend on defs depend on GVP (labels). so load the, in dependency order and skip
+            // actions depend on defs depend on GVP (labels). so load them in dependency order and skip
             // loading depending items if anything fails to load.
 
             // start by enabling the actions filter if relevant. populatePersistedActionsFilter() populates it,

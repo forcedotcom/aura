@@ -33,9 +33,6 @@
      * Verify that null params don't affect the storage of actions (indirectly via storage key).
      */
     testStorageOfServerActionWithNullParams : {
-        attributes : {
-            defaultAutoRefreshInterval : 0 // refresh every action
-        },
         test : [function(cmp) {
             this.resetCounter(cmp, "testStorageOfServerActionWithNullParams");
         }, function(cmp) {
@@ -48,6 +45,7 @@
             });
             a.setStorable();
             a.setCallback(cmp, function(action) {
+                $A.test.assertFalse(action.isFromStorage(), "Should have fetched the action response from server.");
                 cmp._value.push(action.getReturnValue());
             });
             $A.test.addWaitFor("Message 1 : null was the MVP in 1", function() {
@@ -64,17 +62,12 @@
             });
             a.setStorable();
             a.setCallback(cmp, function(action) {
+                $A.test.assertTrue(action.isFromStorage(), "Should have cached the action response.");
                 cmp._value.push(action.getReturnValue());
             });
             // check stored value
             $A.test.addWaitFor("Message 1 : null was the MVP in 1", function() {
                 return cmp._value[0];
-            });
-            // check refresh value
-            $A.test.addWaitFor("Message 2 : null was the MVP in 1", function() {
-                return cmp._value[1];
-            }, function() {
-                $A.test.assertEquals(2, cmp._value.length, "Action callback called too many times");
             });
             $A.enqueueAction(a);
         }]

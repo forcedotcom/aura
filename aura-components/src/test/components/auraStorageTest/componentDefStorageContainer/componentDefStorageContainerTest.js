@@ -71,10 +71,16 @@
                 cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
             },
             function fetchDifferentCmpFromServer(cmp) {
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:block");
+                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:menu");
+            },
+            function verifyDifferentCmpStored(cmp) {
+                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:menu");
             },
             function fetchCmpFromServerToEvictTargetCmp(cmp) {
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:menu");
+                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:pillContainer");
+            },
+            function fetchCmpFromServerToEvictTargetCmpInStorage(cmp) {
+                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:pillContainer");
             },
             function verifyTargetCmpEvicted(cmp) {
                 // Ideally we would keep adding defs until the original got evicted instead of just waiting here (W-2979502)
@@ -105,6 +111,9 @@
      * though).
      */
     testEvictedDefsAreRefetchedWithoutReload: {
+        // tbliss: lots of potential races here between storage, actions, and evictions. passes for me locally consistently
+        // but mark it as a flapper to monitor on autobuilds for a bit.
+        labels : ["flapper"],
         test: [
             function loadIframe(cmp) {
                 cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/componentDefStorage.app?overrideStorage=true", "iframeContainer", "first load");
@@ -124,10 +133,10 @@
                 cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
             },
             function fetchDifferentCmpFromServer(cmp) {
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:block");
+                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:menu");
             },
             function fetchCmpFromServerToEvictTargetCmp(cmp) {
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:menu");
+                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:pillContainer");
             },
             function verifyTargetCmpEvicted(cmp) {
                 // Ideally we would keep adding defs until the original got evicted instead of just waiting here (W-2979502)
@@ -136,14 +145,22 @@
             function verifyTargetCmpNotInContext(cmp) {
                 cmp.helper.lib.iframeTest.verifyDefNotInLoaded("ui:scroller");
             },
+            function verifyStableStateBeforeContinuing(cmp) {
+                // When scroller is evicted, we still do a put on the component that caused the eviction (pillContainer).
+                // Wait for that def to be stored in storage before continuing to try to have a stable state (no conflicting
+                // storage operations).
+                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:pillContainer");
+            },
             function fetchCmpFromServerThatDependsOnTargetCmp(cmp) {
                 // ui:carousel contains ui:scroller. if aura.context.loaded reports that it still has
                 // ui:scroller then the server won't send it, resulting in a broken def graph being persisted
                 // on the client. doing a reload then cmp create would fail.
                 cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:carousel");
-            }, function verifyTargetDependentCmpInStorage(cmp) {
+            },
+            function verifyTargetDependentCmpInStorage(cmp) {
                 cmp.helper.lib.iframeTest.waitForDefInStorage("ui:carousel");
-            }, function verifyTargetCmpInStorage(cmp) {
+            },
+            function verifyTargetCmpInStorage(cmp) {
                 cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
             },
             function reloadPage(cmp) {

@@ -736,13 +736,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
 	@Override
 	public boolean requireLocker(RootDefinition def) {
-		// DCHASMAN TODO Remove layout:// awareness (refactored to SFDCConfigAdapterImpl): Always run layout:// in system mode
-        DefDescriptor<? extends RootDefinition> descriptor = def.getDescriptor();
-        String prefix = descriptor.getPrefix();
-        if (prefix != null && prefix.toLowerCase().equals("layout")) {
-        	return false;
-        }
-        
         boolean requireLocker = !isInternalNamespace(def.getDescriptor().getNamespace());
 		if (!requireLocker) {
             DefDescriptor<InterfaceDef> requireLockerDescr = Aura.getDefinitionService().getDefDescriptor("aura:requireLocker", InterfaceDef.class);

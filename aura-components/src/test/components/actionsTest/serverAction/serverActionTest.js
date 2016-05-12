@@ -1,163 +1,313 @@
 ({
     /**
-     * Verify we can get action not accessable through current component by $A.test.getExternalAction
+     * Verify we can get action not accessible through current component by $A.test.getExternalAction
      * in the test down below, if we do cmp.get("c.getNamedComponent"); it will return nothing and error out
      */
     testGetExternalAction : {
-        test: [function(cmp) {
-            var eAction = $A.test.getExternalAction(cmp, "java://org.auraframework.impl.java.controller.TestController/ACTION$getNamedComponent",
-                    {"componentName":"markup://aura:text", 'attributes':{'value':'valuable'}},
-                    "java://org.auraframework.instance.component",
-                    function(action){
-                        $A.test.assertTrue(action.state === "SUCCESS");
-                    });
-            $A.test.addWaitForWithFailureMessage(true, function() { return $A.test.areActionsComplete([eAction]); },
-                    "external action didn't finish");
-            $A.enqueueAction(eAction);
-        }]
+        test: [
+            function(cmp) {
+                var eAction = $A.test.getExternalAction(cmp, "java://org.auraframework.impl.java.controller.TestController/ACTION$getNamedComponent",
+                        {"componentName":"markup://aura:text", 'attributes':{'value':'valuable'}},
+                        "java://org.auraframework.instance.component",
+                        function(action){
+                            $A.test.assertTrue(action.state === "SUCCESS");
+                        });
+                $A.test.addWaitForWithFailureMessage(true, function() { return $A.test.areActionsComplete([eAction]); },
+                        "external action didn't finish");
+                $A.enqueueAction(eAction);
+            }
+        ]
     },
 
-	testModifyResponseFromServer : {
-		test: [
-		       function(cmp) {
-		    	   //let's tap into transit and modify the response
-		    	   var decode_done = false;
-		    	   var cb_handle;
-			       var modifyResponse = function (oldResponse) {
-			        	var response = oldResponse["response"];
-			        	if( response.indexOf("testModifyResponseFromServer") >= 0 && response.indexOf("recordObjCounter") >= 0) {
-				        	var newResponse = {};
-				    		//copy everything from oldResponse
-				    		var responseText = oldResponse["responseText"];
-				    		var status = oldResponse["status"];
-				    		newResponse["status"] = status;
-				    		newResponse["response"] = response;
-				    		newResponse["responseText"] = responseText;
-				    		//change recordObjCounter to 10
-				    		var idx = response.indexOf("Counter");
-				    		var idxNumberStart = idx;// Counter":1
-				    		var idxNumberEnd = response.indexOf(",", idx);
-				    		var numberStr = response.substring(idxNumberStart, idxNumberEnd);
-			    			newResponse["response"] = newResponse["response"].replace(numberStr, "Counter\": 10");
-			    			newResponse["responseText"] = newResponse["responseText"].replace(numberStr, "Counter\": 10");
-			    			decode_done = true;
-			    			$A.test.removePreDecodeCallback(cb_handle);
+    testModifyResponseFromServer : {
+        test: [
+            function(cmp) {
+                //let's tap into transit and modify the response
+                var decode_done = false;
+                var cb_handle;
+                var modifyResponse = function (oldResponse) {
+                    var response = oldResponse["response"];
+                    if (response.indexOf("testModifyResponseFromServer") >= 0 && response.indexOf("recordObjCounter") >= 0) {
+                        var newResponse = {};
+                        //copy everything from oldResponse
+                        var responseText = oldResponse["responseText"];
+                        var status = oldResponse["status"];
+                        newResponse["status"] = status;
+                        newResponse["response"] = response;
+                        newResponse["responseText"] = responseText;
+                        //change recordObjCounter to 10
+                        var idx = response.indexOf("Counter");
+                        var idxNumberStart = idx;// Counter":1
+                        var idxNumberEnd = response.indexOf(",", idx);
+                        var numberStr = response.substring(idxNumberStart, idxNumberEnd);
+                        newResponse["response"] = newResponse["response"].replace(numberStr, "Counter\": 10");
+                        newResponse["responseText"] = newResponse["responseText"].replace(numberStr, "Counter\": 10");
+                        decode_done = true;
+                        $A.test.removePreDecodeCallback(cb_handle);
 
-			    			//new feed decode with the new response
-				    		return newResponse;
-			    		} else {
-			    			return oldResponse;
-			    		}
+                        //new feed decode with the new response
+                        return newResponse;
+                    } else {
+                        return oldResponse;
+                    }
 
-			    	};
+                };
 
-			    	cb_handle = $A.test.addPreDecodeCallback(modifyResponse);
+                cb_handle = $A.test.addPreDecodeCallback(modifyResponse);
 
-		            $A.test.addWaitFor(true, function() { return decode_done; });
+                $A.test.addWaitFor(true, function() { return decode_done; });
 
-		    	   //now enqueue the Action
-		    	   var action = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:1});
-				   $A.enqueueAction(action);
-				   $A.test.addWaitForWithFailureMessage(true,
-						   function(){ return $A.test.areActionsComplete([action])},
-						   "fail waiting for server action to finish",
-						   function() {
-							   $A.test.assertEquals(10, action.getReturnValue().Counter, "fail to modify return Value in response");
-						   });
-		       }
-		]
-	},
+                //now enqueue the Action
+                var action = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:1});
+                $A.enqueueAction(action);
+                $A.test.addWaitForWithFailureMessage(true,
+                    function(){ return $A.test.areActionsComplete([action])},
+                    "fail waiting for server action to finish",
+                    function() {
+                        $A.test.assertEquals(10, action.getReturnValue().Counter, "fail to modify return Value in response");
+                    });
+           }
+        ]
+    },
 
-	testServerActionWithStoredResponseGetStorageFirst : {
-		test: [
-		function primeActionStorage(cmp) {
-			var action = cmp.get("c.executeInForeground");
-			action.setStorable();
-			$A.enqueueAction(action);
-			$A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
-		},
-		function runRefreshAction(cmp) {
-			cmp._callbackDone = false;
 
-			var action = cmp.get("c.executeInForeground");
-            action.setCallback(this, function(a) {
-                cmp._callbackDone = true;
-            }, "SUCCESS");
-            action.setStorable({
-                "refresh": 0
-            });
+    /**
+     * Verifies if a storable action (with no params) has a cached response then the correct cached
+     * response value is given to the callback.
+     */
+    testStorableActionNoParams: {
+        test: [
+            function primeActionStorage(cmp) {
+                var action = cmp.get("c.executeInForeground");
+                action.setStorable();
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
+            },
+            function runRefreshAction(cmp) {
+                var callbackDone = false;
 
-            //set up watch
-            var cb_handle; var watch_done = false;
-            // watch for the action we gonna enqueue
-            var preSendCallback = function(actions, actionToWatch) {
-                if (actionToWatch) {
-                    $A.test.assertTrue(cmp._callbackDone,
-                            "we should fetch response from storage first, before sending the action to server")
-                    watch_done = true;
-                }
-            };
-            cb_handle = $A.test.addPreSendCallback(action, preSendCallback);
-            $A.test.addWaitFor(true, function() { return watch_done; });
+                var action = cmp.get("c.executeInForeground");
+                action.setStorable();
+                action.setCallback(this, function(a) {
+                    callbackDone = true;
+                    $A.test.assertTrue(a.isFromStorage(), "Action should have reported it was from storage");
+                    $A.test.assertNull(a.getReturnValue(), "Cached response value is incorrect");
+                }, "SUCCESS");
 
-            //now enqueue the action
-            $A.enqueueAction(action);
-        }
+                $A.enqueueAction(action);
+                $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function(){ return callbackDone; },
+                    "action callback not invoked"
+                );
+            }
+        ]
+    },
+
+    /**
+     * Verifies if a storable action (with a null parameter) has a cached response then the correct cached
+     * response value is given to the callback.
+     */
+    testStorableActionNullParamValue: {
+        test: [
+            function primeActionStorage(cmp) {
+                var action = cmp.get("c.executeInForegroundWithStringReturn");
+                action.setParams({s:null});
+                action.setStorable();
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
+            },
+            function runRefreshAction(cmp) {
+                var callbackDone = false;
+
+                var action = cmp.get("c.executeInForegroundWithStringReturn");
+                action.setParams({s:null});
+                action.setStorable();
+
+                action.setCallback(this, function(a) {
+                    callbackDone = true;
+                    $A.test.assertTrue(a.isFromStorage(), "Action should have reported it was from storage");
+                    $A.test.assertNull(a.getReturnValue(), "Cached response value is incorrect");
+                }, "SUCCESS");
+
+
+                $A.enqueueAction(action);
+                $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function(){ return callbackDone; },
+                    "action callback not invoked"
+                );
+            }
+        ]
+    },
+
+
+    /**
+     * Verifies if a storable action (with a basic param) has a cached response then the correct cached
+     * response value is given to the callback.
+     */
+    testStorableActionWithSimpleParamValue : {
+        test: [
+            function primeActionStorage(cmp) {
+                cmp._expected = 1;
+                var action = cmp.get("c.executeInForegroundWithReturn");
+                action.setParams({i:cmp._expected});
+                action.setStorable();
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
+            },
+            function verifyActionStorage(cmp) {
+                var callbackDone = false;
+
+                var action = cmp.get("c.executeInForegroundWithReturn");
+                action.setParams({i:cmp._expected});
+                action.setStorable();
+
+                action.setCallback(this, function(a) {
+                    debugger;
+                    callbackDone = true;
+                    $A.test.assertTrue(a.isFromStorage(), "Action should have reported it was from storage");
+                    $A.test.assertEquals(cmp._expected, a.getReturnValue().Counter, "Return value from storage was incorrect");
+                }, "SUCCESS");
+
+                $A.enqueueAction(action);
+                $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function(){ return callbackDone; },
+                    "action callback not invoked"
+                );
+            }
+        ]
+    },
+
+    /**
+     * Verifies that if a storable action has a cached response then the callback is invoked
+     * before the XHR leaves the client.
+     */
+    testServerActionWithStoredResponseGetStorageFirst : {
+        test: [
+            function primeActionStorage(cmp) {
+                var action = cmp.get("c.executeInForeground");
+                action.setStorable();
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
+            },
+            function runRefreshAction(cmp) {
+                var callbackDone = false;
+
+                var action = cmp.get("c.executeInForeground");
+                action.setCallback(this, function(a) {
+                    callbackDone = true;
+                }, "SUCCESS");
+                action.setStorable({
+                    "refresh": 0
+                });
+
+                //set up watch
+                var watch_done = false;
+                // watch for the action we gonna enqueue
+                var preSendCallback = function(actions, actionToWatch) {
+                    if (actionToWatch) {
+                        $A.test.assertTrue(callbackDone,
+                                "we should fetch response from storage first, before sending the action to server")
+                        watch_done = true;
+                    }
+                };
+                $A.test.addPreSendCallback(action, preSendCallback);
+                $A.test.addWaitFor(true, function() { return watch_done; });
+
+                //now enqueue the action
+                $A.enqueueAction(action);
+            }
+        ]
+    },
+
+    /**
+     * Verifies that the calling component does not influence cache hits for storable actions.
+     */
+    testStorableActionCacheIndependentOfComponent: {
+        test: [
+            function primeActionStorage(cmp) {
+                var action = cmp.get("c.executeInForeground");
+                action.setStorable();
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
+            },
+            function invokeActionIndependentOfComponet(cmp) {
+                var callbackDone = false;
+                var action = $A.test.getExternalAction(cmp,
+                        "java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground",
+                        {},
+                        'java://java.lang.String',
+                        function(result) {
+                            callbackDone = true;
+                            $A.test.assertTrue(result.isFromStorage(), "Action response should've been from storage");
+                        });
+                action.setStorable();
+                $A.enqueueAction(action);
+                $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function(){ return callbackDone; },
+                    "action callback not invoked"
+                );
+            },
         ]
     },
 
     testIncompleteActionRefreshDoesNotInvokeCallback: {
         test: [
-        function primeActionStorage(cmp) {
-            var action = cmp.get("c.executeInForeground");
-            action.setStorable();
-            $A.enqueueAction(action);
-            $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
-        },
-        function runRefreshActionAndVerifyNoIncompleteCallback(cmp) {
-            // Disconnect from server to force INCOMPLETE state on action
-            $A.test.setServerReachable(false);
-            $A.test.addCleanup(function() { $A.test.setServerReachable(true)});
-            var action = cmp.get("c.executeInForeground");
-            action.setCallback(this, function(a) {
-                $A.test.fail("INCOMPLETE callback should not be called on refresh actions");
-            }, "INCOMPLETE");
-            action.setStorable({
-                "refresh": 0
-            });
-            $A.enqueueAction(action);
-            $A.test.addWaitFor(true, function(){
-                return $A.test.areActionsComplete([action]) && !$A.test.isActionPending();
-            });
-        }]
+            function primeActionStorage(cmp) {
+                var action = cmp.get("c.executeInForeground");
+                action.setStorable();
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
+            },
+            function runRefreshActionAndVerifyNoIncompleteCallback(cmp) {
+                // Disconnect from server to force INCOMPLETE state on action
+                $A.test.setServerReachable(false);
+                $A.test.addCleanup(function() { $A.test.setServerReachable(true)});
+                var action = cmp.get("c.executeInForeground");
+                action.setCallback(this, function(a) {
+                    $A.test.fail("INCOMPLETE callback should not be called on refresh actions");
+                }, "INCOMPLETE");
+                action.setStorable({
+                    "refresh": 0
+                });
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true, function(){
+                    return $A.test.areActionsComplete([action]) && !$A.test.isActionPending();
+                });
+            }
+        ]
     },
 
     testStoredActionInvokesCallbackWhenOffline: {
         test: [
-        function primeActionStorage(cmp) {
-            var action = cmp.get("c.executeInForeground");
-            action.setStorable();
-            $A.enqueueAction(action);
-            $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
-        },
-        function runRefreshActionAndVerifyNoIncompleteCallback(cmp) {
-            var callbackCalled = false;
-            $A.test.setServerReachable(false);
-            $A.test.addCleanup(function() { $A.test.setServerReachable(true)});
-            var action = cmp.get("c.executeInForeground");
-            action.setCallback(this, function(a) {
-                callbackCalled = true;
-            }, "SUCCESS");
-            action.setStorable({
-                "refresh": 0
-            });
-            $A.enqueueAction(action);
-            $A.test.addWaitFor(true, function(){
-                return $A.test.areActionsComplete([action]);
-            }, function() {
-                $A.test.assertTrue(callbackCalled, "SUCCESS callback never called for stored action when offline");
-            });
-        }]
+            function primeActionStorage(cmp) {
+                var action = cmp.get("c.executeInForeground");
+                action.setStorable();
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
+            },
+            function runRefreshActionAndVerifyNoIncompleteCallback(cmp) {
+                var callbackCalled = false;
+                $A.test.setServerReachable(false);
+                $A.test.addCleanup(function() { $A.test.setServerReachable(true)});
+                var action = cmp.get("c.executeInForeground");
+                action.setCallback(this, function(a) {
+                    callbackCalled = true;
+                }, "SUCCESS");
+                action.setStorable({
+                    "refresh": 0
+                });
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true, function(){
+                    return $A.test.areActionsComplete([action]);
+                }, function() {
+                    $A.test.assertTrue(callbackCalled, "SUCCESS callback never called for stored action when offline");
+                });
+            }
+        ]
     },
 
     /**
@@ -279,7 +429,8 @@
     },
 
     testServerActionSendsError : {
-        test : [ function(cmp) {
+        test : [
+            function(cmp) {
                 var a = $A.test.getAction(cmp, "c.errorInForeground", null,
                       function(action) {
                           cmp.set("v.errorMessage", action.error[0].message);
@@ -288,11 +439,45 @@
                 $A.test.addWaitFor(true, function() {
                         return !!cmp.get("v.errorMessage");
                     });
-            }, function(cmp) {
+            },
+            function(cmp) {
                  var message = cmp.get("v.errorMessage");
                  $A.test.assertTrue(message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
                      "Wrong message received from server: " + message);
-            }]
+            }
+        ]
+    },
+
+    testErrorServerActionNotStored: {
+        test : [
+            function(cmp) {
+                var a = $A.test.getAction(cmp, "c.errorInForeground", null,
+                      function(action) {
+                          cmp.set("v.errorMessage", action.error[0].message);
+                      });
+                a.setStorable();
+                $A.enqueueAction(a);
+                $A.test.addWaitFor(true, function() {
+                        return !!cmp.get("v.errorMessage");
+                    });
+            },
+            function(cmp) {
+                var callbackDone = false;
+                var a = $A.test.getAction(cmp, "c.errorInForeground", null,
+                        function(action) {
+                        callbackDone = true;
+                            $A.test.assertFalse(action.isFromStorage(), "Errored storable actions should not be stored");
+                        });
+                a.setStorable();
+                $A.enqueueAction(a);
+
+                $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function(){ return callbackDone; },
+                        "action callback not invoked"
+                    );
+            }
+        ]
     },
 
     /**
@@ -392,84 +577,88 @@
      * 3. The server action is enqueued and ran successfully.
      */
     testStorableRetry: {
-        test : [ function(cmp) {
-            // prime storage
-            var a = $A.test.getAction(cmp, "c.executeInForeground", undefined);
-            a.setStorable();
-            $A.enqueueAction(a);
-            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
-        }, function(cmp) {
-            var warningMsg = "Finishing cached action failed. Trying to refetch from server";
-            var errorThrown = false;
-            var that = this;
+        test : [
+            function(cmp) {
+                // prime storage
+                var a = $A.test.getAction(cmp, "c.executeInForeground", undefined);
+                a.setStorable();
+                $A.enqueueAction(a);
+                $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
+            }, function(cmp) {
+                var warningMsg = "Finishing cached action failed. Trying to refetch from server";
+                var errorThrown = false;
+                var that = this;
 
-            // Actions from storage will log a warning instead of displaying error box
-            $A.test.expectAuraWarning(warningMsg);
-            var a = $A.test.getAction(cmp, "c.executeInForeground", undefined, function(a) {
-                if (!errorThrown) {
-                    // First callback is action from storage
-                    $A.test.assertTrue(a.isFromStorage(), "First action callback should be from storage");
-                    errorThrown = true;
-                    throw new Error("Action callback error from test");
-                } else {
-                    // Second callback is retry action from server. Error from stored action should not be present.
-                    $A.test.assertFalse(a.isFromStorage(), "Second action callback should be from server");
-                    $A.test.assertFalse(that.isAuraErrorDivVisible(), "Unexpected error showed up");
-                }
-            });
-            a.setStorable();
-            $A.enqueueAction(a);
-            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
-        }]
+                // Actions from storage will log a warning instead of displaying error box
+                $A.test.expectAuraWarning(warningMsg);
+                var a = $A.test.getAction(cmp, "c.executeInForeground", undefined, function(a) {
+                    if (!errorThrown) {
+                        // First callback is action from storage
+                        $A.test.assertTrue(a.isFromStorage(), "First action callback should be from storage");
+                        errorThrown = true;
+                        throw new Error("Action callback error from test");
+                    } else {
+                        // Second callback is retry action from server. Error from stored action should not be present.
+                        $A.test.assertFalse(a.isFromStorage(), "Second action callback should be from server");
+                        $A.test.assertFalse(that.isAuraErrorDivVisible(), "Unexpected error showed up");
+                    }
+                });
+                a.setStorable();
+                $A.enqueueAction(a);
+                $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
+            }
+        ]
     },
 
     /**
      * Verify when a retry action from the server fails the error is properly displayed to the user.
      */
     testStorableRetry_errorOnRetry: {
-        test : [ function(cmp) {
-            // prime storage
-            var a = $A.test.getAction(cmp, "c.executeInForeground", undefined);
-            a.setStorable();
-            $A.enqueueAction(a);
-            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
-        }, function(cmp) {
-            var errorMsg = "Action callback error from test",
-                warningMsg = "Finishing cached action failed. Trying to refetch from server",
-                thrownErrorMsg = "Thrown by test",
-                that = this;
+        test : [
+            function(cmp) {
+                // prime storage
+                var a = $A.test.getAction(cmp, "c.executeInForeground", undefined);
+                a.setStorable();
+                $A.enqueueAction(a);
+                $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
+            }, function(cmp) {
+                var errorMsg = "Action callback error from test",
+                    warningMsg = "Finishing cached action failed. Trying to refetch from server",
+                    thrownErrorMsg = "Thrown by test",
+                    that = this;
 
-            // Actions from storage log a warning instead of displaying error box
-            $A.test.expectAuraWarning(warningMsg);
-            // Expect 3 errors in the test. 2 from our $A.error calls in the action callback below, and 1 for the
-            // error thrown in the callback of the retry action. We only see the error once because the first
-            // error thrown on the action from storage is intentionally swallowed.
-            $A.test.expectAuraError(errorMsg);
-            $A.test.expectAuraError(errorMsg);
-            $A.test.expectAuraError(thrownErrorMsg);
-            var a = $A.test.getAction(cmp, "c.executeInForeground", undefined, function(a) {
-                $A.error(errorMsg);
-                if (a.isFromStorage()) {
-                    // Verify no error message displayed on action from storage
-                    $A.test.assertFalse(that.isAuraErrorDivVisible());
-                } else {
-                    // Verify error message displayed from retry action
-                    $A.test.assertTrue(that.isAuraErrorDivVisible(), "Error div should have been visible");
-                    var error = $A.test.getAuraErrorMessage();
-                    $A.test.assertTrue(error.indexOf(errorMsg) !== -1), "Error div didn't contain expected text (" + errorMsg + "), was actually (" + error + ")";
-                }
-                throw new Error(thrownErrorMsg);
-            });
-            a.setStorable();
-            $A.enqueueAction(a);
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() {
+                // Actions from storage log a warning instead of displaying error box
+                $A.test.expectAuraWarning(warningMsg);
+                // Expect 3 errors in the test. 2 from our $A.error calls in the action callback below, and 1 for the
+                // error thrown in the callback of the retry action. We only see the error once because the first
+                // error thrown on the action from storage is intentionally swallowed.
+                $A.test.expectAuraError(errorMsg);
+                $A.test.expectAuraError(errorMsg);
+                $A.test.expectAuraError(thrownErrorMsg);
+                var a = $A.test.getAction(cmp, "c.executeInForeground", undefined, function(a) {
+                    $A.error(errorMsg);
+                    if (a.isFromStorage()) {
+                        // Verify no error message displayed on action from storage
+                        $A.test.assertFalse(that.isAuraErrorDivVisible());
+                    } else {
+                        // Verify error message displayed from retry action
+                        $A.test.assertTrue(that.isAuraErrorDivVisible(), "Error div should have been visible");
                         var error = $A.test.getAuraErrorMessage();
-                        return error.indexOf(thrownErrorMsg) !== -1;
-                    },
-                    "Error div never displayed error thrown from retry action callback"
-            );
-        }]
+                        $A.test.assertTrue(error.indexOf(errorMsg) !== -1), "Error div didn't contain expected text (" + errorMsg + "), was actually (" + error + ")";
+                    }
+                    throw new Error(thrownErrorMsg);
+                });
+                a.setStorable();
+                $A.enqueueAction(a);
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() {
+                            var error = $A.test.getAuraErrorMessage();
+                            return error.indexOf(thrownErrorMsg) !== -1;
+                        },
+                        "Error div never displayed error thrown from retry action callback"
+                );
+            }
+        ]
     },
 
     isAuraErrorDivVisible: function() {
@@ -482,42 +671,44 @@
      * enqueue two actions with same signature, go offline, verify both of them return with INCOMPLETE
      */
     testConcurrentServerActionsBothIncomplete : {
-        test : [ function doTest(cmp) {
-            //create two actions with same signature
-            //also set current transcationId to be the same as first abortable action
-            var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
-            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
-            a1.setStorable();
-            a2.setStorable();
-            //do some sanity check callbacks
-            a1.setCallback(cmp, function(action) {
-                $A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
-            });
-            a2.setCallback(cmp, function(action) {
-                $A.test.assertTrue(action.isFromStorage() === false, "2st action should get response from 1st action");
-            });
-            //let's cut the server so we don't get any response
-            $A.test.setServerReachable(false);
-            //make sure both actions get schedule to send in a same XHR box
-            $A.run(
-                    function() {
-                        $A.enqueueAction(a1);
-                        $A.enqueueAction(a2);
-                    }
-            );
-            //need to make sure both actions return as INCOMPLETE
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() { return (a1.state==="INCOMPLETE")},
-                    "fail waiting for action 1 return with state=INCOMPLETE"
-            );
+        test : [
+            function doTest(cmp) {
+                //create two actions with same signature
+                //also set current transcationId to be the same as first abortable action
+                var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
+                var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
+                a1.setStorable();
+                a2.setStorable();
+                //do some sanity check callbacks
+                a1.setCallback(cmp, function(action) {
+                    $A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
+                });
+                a2.setCallback(cmp, function(action) {
+                    $A.test.assertTrue(action.isFromStorage() === false, "2st action should get response from 1st action");
+                });
+                //let's cut the server so we don't get any response
+                $A.test.setServerReachable(false);
+                //make sure both actions get schedule to send in a same XHR box
+                $A.run(
+                        function() {
+                            $A.enqueueAction(a1);
+                            $A.enqueueAction(a2);
+                        }
+                );
+                //need to make sure both actions return as INCOMPLETE
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return (a1.state==="INCOMPLETE")},
+                        "fail waiting for action 1 return with state=INCOMPLETE"
+                );
 
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() { return (a2.state==="INCOMPLETE"); },
-                    "fail waiting for action 2 return with state=INCOMPLETE"
-            );
-        }, function reconnectTheServer(cmp) {
-            $A.test.setServerReachable(true);
-        }]
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return (a2.state==="INCOMPLETE"); },
+                        "fail waiting for action 2 return with state=INCOMPLETE"
+                );
+            }, function reconnectTheServer(cmp) {
+                $A.test.setServerReachable(true);
+            }
+        ]
     },
 
 
@@ -525,45 +716,46 @@
      * two concurrent background actions, 2nd action get copy of 1st's response
      */
     testConcurrentBackgroundServerActionsBothStorable : {
-        test : [ function(cmp) {
-            var a1Return = undefined, a2Return = undefined;
-            var recordObjCounterFromA1 = undefined;
-            //create two actions with same signature
-            var a1 = $A.test.getAction(cmp, "c.executeInBackgroundWithReturn", {i:1});
-            var a2 = $A.test.getAction(cmp, "c.executeInBackgroundWithReturn", {i:1});
-            a1.setStorable();
-            a2.setStorable();
-            //we check response in callbacks
-            a1.setCallback(cmp, function(action) {
-                $A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
-                a1Return = action.getReturnValue();
-                $A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
-                recordObjCounterFromA1 = a1Return.recordObjCounter;
-                $A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
-            });
-            a2.setCallback(cmp, function(action) {
-                $A.test.assertFalse(action.isFromStorage(), "2nd action should get response from 1st, but not from storage");
-                a2Return = action.getReturnValue();
-                $A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
-                $A.test.assertEquals(recordObjCounterFromA1, a2Return.recordObjCounter, "2nd action should get a copy response from 1st action");
-            });
-            //make sure both ations get schedule to send in a same XHR box
-            $A.run ( function() {
-                $A.enqueueAction(a1);
-                $A.enqueueAction(a2);
-                }
-            );
+        test : [
+            function(cmp) {
+                var a1Return = undefined, a2Return = undefined;
+                var recordObjCounterFromA1 = undefined;
+                //create two actions with same signature
+                var a1 = $A.test.getAction(cmp, "c.executeInBackgroundWithReturn", {i:1});
+                var a2 = $A.test.getAction(cmp, "c.executeInBackgroundWithReturn", {i:1});
+                a1.setStorable();
+                a2.setStorable();
+                //we check response in callbacks
+                a1.setCallback(cmp, function(action) {
+                    $A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
+                    a1Return = action.getReturnValue();
+                    $A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
+                    recordObjCounterFromA1 = a1Return.recordObjCounter;
+                    $A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
+                });
+                a2.setCallback(cmp, function(action) {
+                    $A.test.assertFalse(action.isFromStorage(), "2nd action should get response from 1st, but not from storage");
+                    a2Return = action.getReturnValue();
+                    $A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
+                    $A.test.assertEquals(recordObjCounterFromA1, a2Return.recordObjCounter, "2nd action should get a copy response from 1st action");
+                });
+                //make sure both ations get schedule to send in a same XHR box
+                $A.run ( function() {
+                    $A.enqueueAction(a1);
+                    $A.enqueueAction(a2);
+                    }
+                );
 
-            //just need to make sure both actions get some return
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() { return (a1Return!==undefined); },
-                    "fail waiting for action1 returns something"
-            );
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() { return (a2Return!==undefined); },
-                    "fail waiting for action2 returns something"
-            );
-        }
+                //just need to make sure both actions get some return
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return (a1Return!==undefined); },
+                        "fail waiting for action1 returns something"
+                );
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return (a2Return!==undefined); },
+                        "fail waiting for action2 returns something"
+                );
+            }
         ]
     },
 
@@ -573,39 +765,40 @@
      * 2nd will copy the error response from 1st one.
      */
     testConcurrentServerActionsBothStorable1stActionErrorOut : {
-        test : [ function(cmp) {
-            //create two actions with same signature
-            var a1 = $A.test.getAction(cmp, "c.errorInForeground", null);
-            var a2 = $A.test.getAction(cmp, "c.errorInForeground", null);
-            a1.setStorable();
-            a2.setStorable();
-            //we check response in callbacks
-            a1.setCallback(cmp, function(action) {
-                $A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
-                $A.test.assertEquals("ERROR", action.state, "we expect 1st action to error out on server");
-                $A.test.assertTrue(action.error[0].message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
-                        "expect error message from 1st action");
-            });
-            a2.setCallback(cmp, function(action) {
-                $A.test.assertFalse(action.isFromStorage(), "2st action should get response from 1st action");
-                $A.test.assertEquals("ERROR", action.state, "we expect 2nd action to get error response like 1st action");
-                $A.test.assertTrue(action.error[0].message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
-                        "expect error message from 2nd action");
-            });
-            //make sure both ations get schedule to send in a same XHR box
-            $A.run(
-                    function() {
-                        $A.enqueueAction(a1);
-                        $A.enqueueAction(a2);
-                    }
-            );
-            //just need to make sure both actions get some return
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() { return (a1.state==="ERROR")&&(a2.state==="ERROR"); },
-                    "fail waiting for both action return ERROR"
-            );
-
-        }]
+        test : [
+            function(cmp) {
+                //create two actions with same signature
+                var a1 = $A.test.getAction(cmp, "c.errorInForeground", null);
+                var a2 = $A.test.getAction(cmp, "c.errorInForeground", null);
+                a1.setStorable();
+                a2.setStorable();
+                //we check response in callbacks
+                a1.setCallback(cmp, function(action) {
+                    $A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
+                    $A.test.assertEquals("ERROR", action.state, "we expect 1st action to error out on server");
+                    $A.test.assertTrue(action.error[0].message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
+                            "expect error message from 1st action");
+                });
+                a2.setCallback(cmp, function(action) {
+                    $A.test.assertFalse(action.isFromStorage(), "2st action should get response from 1st action");
+                    $A.test.assertEquals("ERROR", action.state, "we expect 2nd action to get error response like 1st action");
+                    $A.test.assertTrue(action.error[0].message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
+                            "expect error message from 2nd action");
+                });
+                //make sure both ations get schedule to send in a same XHR box
+                $A.run(
+                        function() {
+                            $A.enqueueAction(a1);
+                            $A.enqueueAction(a2);
+                        }
+                );
+                //just need to make sure both actions get some return
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return (a1.state==="ERROR")&&(a2.state==="ERROR"); },
+                        "fail waiting for both action return ERROR"
+                );
+            }
+        ]
     },
 
     /*
@@ -614,45 +807,46 @@
      * only the first action get to send to the server. second one get response from the 1st one
      */
     testConcurrentServerActionsBothStorable : {
-        test : [ function(cmp) {
-            var a1Return = undefined, a2Return = undefined;
-            var recordObjCounterFromA1 = undefined;
-            //create two actions with same signature
-            var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
-            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
-            a1.setStorable();
-            a2.setStorable();
-            //we check response in callbacks
-            a1.setCallback(cmp, function(action) {
-                $A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
-                a1Return = action.getReturnValue();
-                $A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
-                recordObjCounterFromA1 = a1Return.recordObjCounter;
-                $A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
-            });
-            a2.setCallback(cmp, function(action) {
-                $A.test.assertFalse(action.isFromStorage(), "2nd action should get response from 1st, but not from storage");
-                a2Return = action.getReturnValue();
-                $A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
-                $A.test.assertEquals(recordObjCounterFromA1, a2Return.recordObjCounter, "2nd action should get a copy response from 1st action");
-            });
-            //make sure both ations get schedule to send in a same XHR box
-            $A.run(
-                    function() {
-                        $A.enqueueAction(a1);
-                        $A.enqueueAction(a2);
-                    }
-            );
-            //just need to make sure both actions get some return
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() { return (a1Return!==undefined); },
-                    "fail waiting for action 1 returns something"
-            );
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() { return (a2Return!==undefined); },
-                    "fail waiting for action 2 returns something"
-            );
-        }
+        test : [
+            function(cmp) {
+                var a1Return = undefined, a2Return = undefined;
+                var recordObjCounterFromA1 = undefined;
+                //create two actions with same signature
+                var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+                var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+                a1.setStorable();
+                a2.setStorable();
+                //we check response in callbacks
+                a1.setCallback(cmp, function(action) {
+                    $A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
+                    a1Return = action.getReturnValue();
+                    $A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
+                    recordObjCounterFromA1 = a1Return.recordObjCounter;
+                    $A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
+                });
+                a2.setCallback(cmp, function(action) {
+                    $A.test.assertFalse(action.isFromStorage(), "2nd action should get response from 1st, but not from storage");
+                    a2Return = action.getReturnValue();
+                    $A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
+                    $A.test.assertEquals(recordObjCounterFromA1, a2Return.recordObjCounter, "2nd action should get a copy response from 1st action");
+                });
+                //make sure both ations get schedule to send in a same XHR box
+                $A.run(
+                        function() {
+                            $A.enqueueAction(a1);
+                            $A.enqueueAction(a2);
+                        }
+                );
+                //just need to make sure both actions get some return
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return (a1Return!==undefined); },
+                        "fail waiting for action 1 returns something"
+                );
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return (a2Return!==undefined); },
+                        "fail waiting for action 2 returns something"
+                );
+            }
         ]
     },
 
@@ -666,46 +860,49 @@
      */
     testConcurrentServerActionsBothStorableWithResponseStored : {
         labels : [ "threadHostile" ],
-        test : [ function primeActionStorage(cmp) {
-            var a0 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
-            a0.setStorable();
-            cmp._storageKey = a0.getStorageKey();
-            $A.enqueueAction(a0);
-            $A.test.addWaitForWithFailureMessage(true, function(){
-                return $A.test.areActionsComplete([a0]) && !$A.test.isActionPending();
-            }, "a0 doesn't finish",
-            function() {
-                cmp._counter = a0.getReturnValue().recordObjCounter;
-            });
-        }, function enqueueTwoActionWithSameSignature(cmp) {
-            var recordObjCounterFromA1 = undefined;
-            //create two actions with same signature
-            var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
-            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
-            a1.setStorable();
-            a2.setStorable();
-            a1.setStorable({  "refresh": 0 });
-            a2.setStorable({  "refresh": 0 });
+        test : [
+            function primeActionStorage(cmp) {
+                var a0 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+                a0.setStorable();
+                cmp._storageKey = a0.getStorageKey();
+                $A.enqueueAction(a0);
+                $A.test.addWaitForWithFailureMessage(true, function(){
+                    return $A.test.areActionsComplete([a0]) && !$A.test.isActionPending();
+                }, "a0 doesn't finish",
+                function() {
+                    cmp._counter = a0.getReturnValue().recordObjCounter;
+                });
+            },
+            function enqueueTwoActionWithSameSignature(cmp) {
+                var recordObjCounterFromA1 = undefined;
+                //create two actions with same signature
+                var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+                var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+                a1.setStorable();
+                a2.setStorable();
+                a1.setStorable({  "refresh": 0 });
+                a2.setStorable({  "refresh": 0 });
 
-            //both ations get schedule to send in a same XHR box
-            $A.enqueueAction(a1);
-            $A.enqueueAction(a2);
+                //both ations get schedule to send in a same XHR box
+                $A.enqueueAction(a1);
+                $A.enqueueAction(a2);
 
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() { return $A.test.areActionsComplete([a1, a2]) },
-                    "fail waiting for action1 and 2 to finish",
-                    function() {
-                        $A.test.assertTrue(a1.isFromStorage(), "1st action should get response from storage");
-                        $A.test.assertTrue(a2.isFromStorage(), "2st action should get response from storage");
-                    }
-            );
-        }, function bothRefreshActionsGoToServer(cmp) {
-            $A.test.addWaitForWithFailureMessage(true, function() {
-                var res = $A.storageService.getStorage("actions").get(cmp._storageKey).then(
-                        function(item) { cmp._newCounter = item.value.returnValue.recordObjCounter; });
-                return cmp._newCounter&&(cmp._newCounter == cmp._counter+2);
-            }, "fail to update stored response");
-        }
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return $A.test.areActionsComplete([a1, a2]) },
+                        "fail waiting for action1 and 2 to finish",
+                        function() {
+                            $A.test.assertTrue(a1.isFromStorage(), "1st action should get response from storage");
+                            $A.test.assertTrue(a2.isFromStorage(), "2st action should get response from storage");
+                        }
+                );
+            },
+            function bothRefreshActionsGoToServer(cmp) {
+                $A.test.addWaitForWithFailureMessage(true, function() {
+                    var res = $A.storageService.getStorage("actions").get(cmp._storageKey).then(
+                            function(item) { cmp._newCounter = item.value.returnValue.recordObjCounter; });
+                    return cmp._newCounter&&(cmp._newCounter == cmp._counter+2);
+                }, "fail to update stored response");
+            }
         ]
     },
 
@@ -715,44 +912,45 @@
      * both actions get to send to the server
      */
     testConcurrentServerActions1stNonstorable : {
-        test : [ function(cmp) {
-            var a1Return = undefined, a2Return = undefined;
-            var recordObjCounterFromA1 = undefined;
-            //create two actions with same signature
-            var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
-            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
-            a2.setStorable();
-            //we check response in callbacks
-            a1.setCallback(cmp, function(action) {
-                $A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
-                a1Return = action.getReturnValue();
-                $A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
-                recordObjCounterFromA1 = a1Return.recordObjCounter;
-                $A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
-            });
-            a2.setCallback(cmp, function(action) {
-                $A.test.assertFalse(action.isFromStorage(), "2nd action should get response from server, as 1st isn't storable");
-                a2Return = action.getReturnValue();
-                $A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
-                $A.test.assertTrue(a2Return.recordObjCounter > recordObjCounterFromA1, "2nd action should get response from server, after 1st");
-            });
-            //make sure both ations get schedule to send in a same XHR box
-            $A.run(
-                    function() {
-                        $A.enqueueAction(a1);
-                        $A.enqueueAction(a2);
-                    }
-            );
-            //just need to make sure both actions get some return
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() { return (a1Return!==undefined); },
-                    "fail waiting for action 1 returns something"
-            );
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() { return (a2Return!==undefined); },
-                    "fail waiting for action 2 returns something"
-            );
-        }
+        test : [
+            function(cmp) {
+                var a1Return = undefined, a2Return = undefined;
+                var recordObjCounterFromA1 = undefined;
+                //create two actions with same signature
+                var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+                var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+                a2.setStorable();
+                //we check response in callbacks
+                a1.setCallback(cmp, function(action) {
+                    $A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
+                    a1Return = action.getReturnValue();
+                    $A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
+                    recordObjCounterFromA1 = a1Return.recordObjCounter;
+                    $A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
+                });
+                a2.setCallback(cmp, function(action) {
+                    $A.test.assertFalse(action.isFromStorage(), "2nd action should get response from server, as 1st isn't storable");
+                    a2Return = action.getReturnValue();
+                    $A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
+                    $A.test.assertTrue(a2Return.recordObjCounter > recordObjCounterFromA1, "2nd action should get response from server, after 1st");
+                });
+                //make sure both ations get schedule to send in a same XHR box
+                $A.run(
+                        function() {
+                            $A.enqueueAction(a1);
+                            $A.enqueueAction(a2);
+                        }
+                );
+                //just need to make sure both actions get some return
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return (a1Return!==undefined); },
+                        "fail waiting for action 1 returns something"
+                );
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return (a2Return!==undefined); },
+                        "fail waiting for action 2 returns something"
+                );
+            }
         ]
     },
 
@@ -762,44 +960,45 @@
      * both action get the send to server
      */
     testConcurrentServerActions2ndNonstorable : {
-        test : [ function(cmp) {
-            var a1Return = undefined, a2Return = undefined;
-            var recordObjCounterFromA1 = undefined;
-            //create two actions with same signature
-            var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
-            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
-            a2.setStorable();
-            //we check response in callbacks
-            a1.setCallback(cmp, function(action) {
-                $A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
-                a1Return = action.getReturnValue();
-                $A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
-                recordObjCounterFromA1 = a1Return.recordObjCounter;
-                $A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
-            });
-            a2.setCallback(cmp, function(action) {
-                $A.test.assertFalse(action.isFromStorage(), "2nd action should send to server");
-                a2Return = action.getReturnValue();
-                $A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
-                $A.test.assertTrue(a2Return.recordObjCounter > recordObjCounterFromA1, "2nd action should send to server, after 1st");
-            });
-            //make sure both ations get schedule to send in a same XHR box
-            $A.run(
-                    function() {
-                        $A.enqueueAction(a1);
-                        $A.enqueueAction(a2);
-                    }
-            );
-            //just need to make sure both actions get some return
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() { return (a1Return!==undefined); },
-                    "fail waiting for action1 returns something"
-            );
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() { return (a2Return!==undefined); },
-                    "fail waiting for action2 returns something"
-            );
-        }
+        test : [
+            function(cmp) {
+                var a1Return = undefined, a2Return = undefined;
+                var recordObjCounterFromA1 = undefined;
+                //create two actions with same signature
+                var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+                var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+                a2.setStorable();
+                //we check response in callbacks
+                a1.setCallback(cmp, function(action) {
+                    $A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
+                    a1Return = action.getReturnValue();
+                    $A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
+                    recordObjCounterFromA1 = a1Return.recordObjCounter;
+                    $A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
+                });
+                a2.setCallback(cmp, function(action) {
+                    $A.test.assertFalse(action.isFromStorage(), "2nd action should send to server");
+                    a2Return = action.getReturnValue();
+                    $A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
+                    $A.test.assertTrue(a2Return.recordObjCounter > recordObjCounterFromA1, "2nd action should send to server, after 1st");
+                });
+                //make sure both ations get schedule to send in a same XHR box
+                $A.run(
+                        function() {
+                            $A.enqueueAction(a1);
+                            $A.enqueueAction(a2);
+                        }
+                );
+                //just need to make sure both actions get some return
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return (a1Return!==undefined); },
+                        "fail waiting for action1 returns something"
+                );
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return (a2Return!==undefined); },
+                        "fail waiting for action2 returns something"
+                );
+            }
         ]
     }
 })

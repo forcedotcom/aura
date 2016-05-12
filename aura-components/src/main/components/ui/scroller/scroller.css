@@ -23,8 +23,15 @@
 
     /* workaround for safari bug where scrollbars are obscured by contents 
      when context are in a new stacking context */
-    transform: translateZ(0);
+
 }
+
+@if (!ie11) {
+    .THIS {
+        transform: translateZ(0);
+    }   
+}
+
 .THIS > * {
     box-sizing: border-box;
 }

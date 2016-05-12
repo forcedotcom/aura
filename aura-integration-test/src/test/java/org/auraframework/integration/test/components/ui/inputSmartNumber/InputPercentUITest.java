@@ -15,9 +15,21 @@
  */
 package org.auraframework.integration.test.components.ui.inputSmartNumber;
 
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
+
 public class InputPercentUITest extends BaseInputSmartNumber {
 
     public InputPercentUITest() {
         super("/uitest/inputSmartNumber_Test.app?testInputCmp=inputPercent");
+    }
+    
+    /*
+     * Excluding IE because IE fires extra change event and changes component's value
+     * when the test component attaches a change handler to the input component.
+     */
+    @Override
+    @ExcludeBrowsers({BrowserType.IE8, BrowserType.IE9, BrowserType.IE10, BrowserType.IE11})
+    public void testChangeEvent() throws Exception {
+        super.testChangeEvent();
     }
 }

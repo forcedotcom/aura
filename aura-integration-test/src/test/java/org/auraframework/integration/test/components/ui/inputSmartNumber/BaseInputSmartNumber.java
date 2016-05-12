@@ -107,11 +107,7 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
 
     /**
      * Test change event is only fired when input value is changed
-     * Excluding IE because IE fires extra change event and changes component's value
-     * when the test component attaches a change handler to the input component.
-     * @throws Exception
      */
-    @ExcludeBrowsers(BrowserType.IE11)
     public void testChangeEvent() throws Exception {
         open(URL);
         WebElement inputElm = findDomElement(By.cssSelector(INPUT_SEL));

@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 ({
-    /** IE & FIREFOX are excluded:The tests try to send out a request to other domains http://invalid.salesforce.com,
+    /**
+     * IE & FIREFOX are excluded: the tests try to send out a request to other domains http://invalid.salesforce.com,
      * IE and Firefox block it by default
      */
     browsers:["GOOGLECHROME","SAFARI"],
 
     /**
-     * Sets up the test, caching the component, setting the action storages expire time and creating an action for
-     * testing.
+     * Sets up the test:
+     * - cache the cmp on the test to avoid passing it everywhere
+     * - create an action, and cache the action on the test to avoid passing it everywhere
+     * - cache various constants on the test for convenience
      */
-    setUp: function(component) {
+    setUp: function(cmp) {
         // must match AuraStorage.KEY_DELIMITER
-        component.DELIMITER = ":";
+        cmp.DELIMITER = ":";
 
-        // Store a reference to the component to facilitate the use of the test's helpers.
-        this._component = component;
-        this._expiryTime = 10000;
-        this._action = component.get("c.getString");
+        this._action = cmp.get("c.getString");
         this._action.setParams({
             param: "TEST_STRING"
         });
@@ -40,218 +40,283 @@
     },
 
     /**
-     * We don't increase RequestCount if the action is from storage
+     * Verifies the request count isn't incremented when an action is served from cache.
      */
     testSentRequestCount: {
-    	 test : [function(component) {
-    		 var startCount = $A.test.getSentRequestCount();
-    		 var callback = function() {
-    			 $A.test.assertEquals(startCount+1, $A.test.getSentRequestCount(),
-    					 "we don't expect SentRequestCount to increase when action response is from storage");
-    		 }
-             this.prepareAction();
-             $A.test.addWaitForWithFailureMessage(startCount+1,
-            		 function() { return $A.test.getSentRequestCount(); },
-            		 "expect 1 extra sent request",
-            		 function() {
-            			 this.prepareAction(callback);
-            		 }
-            );
-         }
-    	 ]
+         test : [
+             function fireUnstoredAction(cmp) {
+                 cmp.count = $A.test.getSentRequestCount();
+                 this.fireAndWaitForAction();
+             },
+             function verifyRequestCountIncremented(cmp) {
+                 $A.test.assertEquals(cmp.count+1, $A.test.getSentRequestCount(), "getSentRequestCount() never incremented");
+             },
+             function fireStoredAction(cmp) {
+                 this.fireAndWaitForAction();
+             },
+             function verifyRequestCountNotIncremented(cmp) {
+                 $A.test.assertEquals(cmp.count+1, $A.test.getSentRequestCount(), "getSentRequestCount() should not increment for action in storage");
+             }
+         ]
     },
 
     /**
-     * Tests to ensure the isInStorage method returns true when an action is being stored.
+     * Verifies AuraClientService#isInStorage returns true when an action is added to storage.
      */
     testIsInStorage: {
-        test : [function(component) {
-            this.prepareAction();
-        }, function(component) {
-            var cacheChecked = false;
+        test : [
+            function verifyActionNotInStorage(cmp) {
+                this.verifyActionNotInStorage(cmp);
+            },
+            function sendAction(cmp) {
+                this.fireAndWaitForAction();
+            },
+            function verifyActionIsInStorage(cmp) {
+                this.waitForActionInStorage(cmp);
+            },
+            function verifyUnrelatedActionNotInStorage(cmp) {
+                var asyncComplete = false;
+                $A.clientService.isActionInStorage("nonexistent", {param: "none"}, function(isInStorage) {
+                    $A.test.assertFalse(isInStorage, "Non-existent action should not be found in storage.");
+                    asyncComplete = true;
+                });
 
-            // this._action has been sent and received and should be in storage:
-            $A.clientService.isActionInStorage(this._actionDescriptor, this._actionParams, function(isInStorage) {
-                $A.test.assertTrue(isInStorage, "Action should be found in storage.");
-                cacheChecked = true;
-            });
-
-            $A.test.addWaitFor(true, function() {
-                return cacheChecked;
-            });
-        }, function(component) {
-            var cacheChecked = false;
-
-            // The unknown action should not be in storage, ensure isInStorage returns false for it:
-            $A.clientService.isActionInStorage("nonexistent", {param: "none"}, function(isInStorage) {
-                $A.test.assertFalse(isInStorage, "Non-existent action should not be found in storage.");
-                cacheChecked = true;
-            });
-
-            $A.test.addWaitFor(true, function() {
-                return cacheChecked;
-            });
-        }]
+                $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function() { return asyncComplete; },
+                    "isActionInStorage callback never invoked"
+                );
+            }
+        ]
     },
 
     /**
-     * Tests to ensure that the errorHandler parameter passed into an action's storableConfig will be invoked
-     * when there is an error being added to storage.
+     * Verifies that Action#setStorable()'s errorHandler parameter is invoked when storage fails to store the action response.
      */
     testErrorHandlerHook: {
-        test : [function(component) {
-            var errorHandled = null;
-            var action = component.get("c.getString");
-            this._actionParams = action.getParams();
-            //actionStorage.app set maxSize to 10, that will give us 10240 bytes, tooLarge has size 40414 after this
-            var tooLarge = new Array(10000).join("!");
-
-            action.setParams({ param: tooLarge });
-
-            action.setStorable({
-                errorHandler: function(error) {
-                    errorHandled = error;
-                }
-            });
-
-            $A.run(function() {
-                $A.enqueueAction(action);
-            });
-
-            $A.test.addWaitForWithFailureMessage(
-                true,
-                function() { return errorHandled!=null; },
-                "error handler didn't get called",
-                function() {
-                    $A.test.assertTrue(
-                        errorHandled.message.indexOf("AuraStorage.put() cannot store") === 0,
-                        "Should have returned error indicating cannot store");
-                    $A.test.assertTrue(
-                            errorHandled.message.indexOf("over the max size") > -1,
-                            "Should have returned error referencing over max size");
-                }
-            );
-         },
-        function(component) {
-            var actionIsInStorage = null;//init actionIsInStorage to null, make sure it's not at the end of the test
-            $A.clientService.isActionInStorage(this._actionDescriptor,this._actionParams,
-                    function(isInStorage) {//this call back could be async, depends on the storage
-                    actionIsInStorage = isInStorage;
-                    $A.test.assertFalse(isInStorage, "Action with error should not be found in storage");
+        test : [
+            function verifyErrorHandlerInvoked(cmp) {
+                // to simulate a storage rejection which will trigger the error callback we
+                // hook the size estimator and, if it's our magic payload, return a size much
+                // larger than the actions store's max size.
+                var payload = new Array(100).join("!");
+                var original = $A.util.estimateSize;
+                $A.test.overrideFunction($A.util, "estimateSize",
+                    function(value) {
+                        if (value && value.returnValue && value.returnValue === payload) {
+                            // actionStorage.app's template sets action max size to 4096
+                            // so reply with a size much larger
+                            return 4069*10000;
+                        }
+                        return original.call($A.util, value);
                     }
-            );
+                );
 
-            //because the isActionInStorage's callback could be async, we need to make sure it did get called before test end
-            $A.test.addWaitForWithFailureMessage(true,
-                function() { return actionIsInStorage!=null; },
-                "callback of isActionInStorage did not get run"
-            );
-        }]
+                var errorHandled = null;
+                var action = cmp.get("c.getString");
+                action.setParams({ param: payload });
+
+                action.setStorable({
+                    errorHandler: function(error) {
+                        errorHandled = error;
+                    }
+                });
+
+                $A.enqueueAction(action);
+
+                $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function() { return errorHandled !== null; },
+                    "error handler didn't get called",
+                    function() {
+                        $A.test.assertTrue(
+                            errorHandled.message.indexOf("AuraStorage.put() cannot store") === 0,
+                            "Should have returned error indicating cannot store"
+                        );
+                        $A.test.assertTrue(
+                                errorHandled.message.indexOf("over the max size") > -1,
+                                "Should have returned error referencing over max size"
+                        );
+                    }
+                );
+            },
+            function verifyActionResponseNotInStorage(cmp) {
+                this.verifyActionNotInStorage(cmp);
+            }
+        ]
     },
 
     /**
-     * Tests to ensure that invalidating an action correctly removes it from storage:
+     * Verifies that AuraClientService#invalidateAction removes an action response from storage.
      */
     testInvalidate: {
-        test : [function(component) {
-            this.prepareAction();
-        }, function(component) {
-            var isInvalidated = false;
-
-            // Invalidate the action:
-            $A.clientService.invalidateAction(this._actionDescriptor, this._actionParams);
-
-            // Keep checking to see if the action is in storage, set isInvalidated to true as soon as we find its no
-            // longer present:
-            function check() {
-                $A.clientService.isActionInStorage(this._actionDescriptor, this._actionParams, function(isInStorage) {
-                    if (isInStorage) {
-                        check(); // not present yet, try again:
-                    } else {
+        test : [
+            function sendAction(cmp) {
+                this.fireAndWaitForAction();
+            },
+            function verifyActionIsInStorage(cmp) {
+                this.waitForActionInStorage(cmp);
+            },
+            function invalidateAction(cmp) {
+                var isInvalidated = false;
+                $A.clientService.invalidateAction(this._actionDescriptor, this._actionParams,
+                    function success() {
                         isInvalidated = true;
+                    },
+                    function failure(e) {
+                        $A.test.fail("invalidateAction threw an error: " + e);
                     }
-                });
+                );
+                $A.test.addWaitFor(true,
+                    function() {
+                        return isInvalidated;
+                    }
+                );
+            },
+            function verifyActionIsNotInStorage(cmp) {
+                this.verifyActionNotInStorage(cmp);
             }
-
-            // start recursing:
-            check();
-
-            // Wait for the action to be removed from cache:
-            $A.test.addWaitFor(true, function() {
-                return isInvalidated;
-            });
-        }]
+        ]
     },
 
     /**
-     * Tests to ensure that revalidate property sets the expiry time of cached actions:
+     * Verifies that AuraClientService#revalidateAction extends the expiration date of a stored action response.
+     *
+     * NOTE: this test makes assumptions about storable actions mechanics: it directly uses an aura storage service
+     * adapter and assumes a specific format.
      */
     testRevalidate: {
-        test : [function(component) {
-            this.prepareAction();
-        }, function(component) {
-            var expiryTime = this._expiryTime,
-                expiryChecked = false;
+        test : [
+            function sendAction(cmp) {
+                this.fireAndWaitForAction();
+            },
+            function captureExpirationTime(cmp) {
+                var asyncComplete = false;
+                var adapter = this._action.getStorage().adapter;
+                adapter.getItem(cmp.DELIMITER + this._action.getStorageKey())
+                    .then(
+                        function(item) {
+                            asyncComplete = true;
+                            cmp._expiryTime = item.expires;
+                            $A.test.assertNotUndefinedOrNull(cmp._expiryTime, "stored expiry time should not be null/undefined");
+                        },
+                        function(e) {
+                            $A.test.fail("getItem() rejected: " + e);
+                        }
+                    );
 
-            // The action is in cache assert that the difference between the time it expires and the time it was added
-            // is the expiry time:
-            var adapter = this._action.getStorage().adapter;
-
-            adapter.getItem(component.DELIMITER + this._action.getStorageKey())
-                .then(function(item) {
-                    $A.test.assertEquals(expiryTime, item.expires - item.created, "Expiry time not set properly.");
-                    expiryChecked = true;
+                $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function() {
+                        return asyncComplete;
+                    },
+                    "adapter#getItem promise never resolved"
+                );
+            },
+            function revalidateAction(cmp) {
+                var asyncComplete = false;
+                $A.clientService.revalidateAction(this._actionDescriptor, this._actionParams, function(wasRevalidated) {
+                    $A.test.assertTrue(wasRevalidated, "revalidateAction() should have specified that the action was found and revalidated");
+                    asyncComplete = true;
                 });
 
-            $A.test.addWaitFor(true, function() { return expiryChecked; });
-        }, function(component) {
-            var expiryTime = this._expiryTime,
-                action = this._action,
-                expiryChecked = false;
+                $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function() {
+                        return asyncComplete;
+                    },
+                    "revalidateAction never invoked callback"
+                );
+            },
+            function verifyExpirationTimeExtended(cmp) {
+                var asyncComplete = false;
+                var adapter = this._action.getStorage().adapter;
+                adapter.getItem(cmp.DELIMITER + this._action.getStorageKey())
+                    .then(
+                        function(item) {
+                            asyncComplete = true;
+                            $A.test.assertTrue(item.expires > cmp._expiryTime, "stored expires time should be extended by revalidateAction");
+                        },
+                        function(e) {
+                            $A.test.fail("getItem() rejected: " + e);
+                        }
+                    );
 
-            // Revalidate the action and when complete, get the time it expires and ensure that it is expiryTime
-            // millis after the revalidation time.
-            $A.clientService.revalidateAction(this._actionDescriptor, this._actionParams, function() {
-                var revalidateTime = new Date().getTime();
-
-                var adapter = action.getStorage().adapter;
-                adapter.getItem(component.DELIMITER + action.getStorageKey())
-                    .then(function(item) {
-
-                        $A.test.assertTrue(
-                            item.expires - revalidateTime - expiryTime <= 1,
-                            "Revalidate time mismatch. Expected: ~" + expiryTime + ", received: " + (item.expires - revalidateTime)
-                        );
-
-                        expiryChecked = true;
-                    });
-            });
-
-            $A.test.addWaitFor(true, function() {
-                return expiryChecked;
-            });
-        }]
+                $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function() {
+                        return asyncComplete;
+                    },
+                    "adapter#getItem promise never resolved"
+                );
+            }
+        ]
     },
 
     /**
      * Fires this._action and waits for the server's response.
+     * @param {Function=} callback an optional callback invoked when the action response is received.
      */
-    prepareAction: function(callback) {
-        var actionReceived = false,
-            action = this._action;
-        action.setCallback(this._component, function() {
+    fireAndWaitForAction: function(callback) {
+        var actionReceived = false;
+        var action = this._action;
+
+        action.setCallback(this._cmp, function() {
             actionReceived = true;
-            if(callback && callback instanceof Function) {
-            	callback();
+            if (callback && callback instanceof Function) {
+                callback();
             }
         });
 
-        $A.run(function() {
-            $A.enqueueAction(action);
+        $A.enqueueAction(action);
+
+        $A.test.addWaitForWithFailureMessage(
+            true,
+            function() {
+                return actionReceived;
+            },
+            "action callback never invoked"
+        );
+    },
+
+    /**
+     * Verifies that this._action is in storage by repeatedly querying AuraClientService#isActionInStorage
+     * until it returns true or the test times out.
+     */
+    waitForActionInStorage: function(cmp) {
+        // action storage is async. loop until the item appears in storage or test times out.
+        var that = this;
+        var inStorage = undefined;
+        $A.test.addWaitForWithFailureMessage(
+            true,
+            function() {
+                $A.clientService.isActionInStorage(that._actionDescriptor, that._actionParams, function(isInStorage) {
+                    inStorage = isInStorage;
+                });
+                return inStorage;
+            },
+            "isActionInStorage never returned true"
+        );
+    },
+
+    /**
+     * Verifies that this._action is not in storage by querying AuraClientService#isActionInStorage one time.
+     * Sets up a test-stage wait due to the async nature of said API.
+     */
+    verifyActionNotInStorage: function(cmp) {
+        var asyncComplete = false;
+        $A.clientService.isActionInStorage(this._actionDescriptor, this._actionParams, function(isInStorage) {
+            $A.test.assertFalse(isInStorage, "action should not be found in storage");
+            asyncComplete = true;
         });
 
-        $A.test.addWaitFor(true, function() {
-            return actionReceived;
-        });
+        $A.test.addWaitForWithFailureMessage(
+            true,
+            function() {
+                return asyncComplete;
+            },
+            "isActionInStorage never invoked callback"
+        );
     }
+
 })

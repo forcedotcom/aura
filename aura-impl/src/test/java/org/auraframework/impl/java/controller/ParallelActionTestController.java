@@ -29,10 +29,10 @@ import org.auraframework.util.json.JsonSerializable;
 public class ParallelActionTestController {
 
 	private static int recordObjCounter = 0;
-	
+
 	@AuraEnabled
 	public static void executeInForeground() {
-		
+
 	}
 
     @AuraEnabled
@@ -46,19 +46,24 @@ public class ParallelActionTestController {
 	@AuraEnabled
 	@BackgroundAction
 	public static void executeInBackground() {
-		
+
 	}
-	
+
 	@AuraEnabled
 	public static Record executeInForegroundWithReturn(@Key("i")int i) {
 		return new Record(i);
 	}
-	
+
 	@AuraEnabled
 	@BackgroundAction
 	public static Record executeInBackgroundWithReturn(@Key("i")int i) {
 		return new Record(i);
 	}
+
+    @AuraEnabled
+    public static String executeInForegroundWithStringReturn(@Key("s")String s) {
+        return s;
+    }
 
     @AuraEnabled
     public static void throwsClientOutOfSyncException() {

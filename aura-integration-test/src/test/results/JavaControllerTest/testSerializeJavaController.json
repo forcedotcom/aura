@@ -88,6 +88,26 @@
       {
         "s":9,
         "v":{
+          "name":"executeInForegroundWithStringReturn",
+          "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForegroundWithStringReturn",
+          "actionType":"SERVER",
+          "returnType":"java://java.lang.String",
+          "background":false,
+          "caboose":false,
+          "params":[
+            {
+              "s":10,
+              "v":{
+                "name":"s",
+                "type":"java://java.lang.String"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "s":11,
+        "v":{
           "name":"throwsClientOutOfSyncException",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$throwsClientOutOfSyncException",
           "actionType":"SERVER",

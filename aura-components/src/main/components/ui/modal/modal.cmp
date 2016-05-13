@@ -44,7 +44,7 @@
 
     <aura:dependency resource="markup://aura:unescapedHtml"  type="COMPONENT"/>
 
-    <div aura:flavorable="true" class="{!join(v.class, $Browser.formFactor)}">
+    <div aura:flavorable="true" class="{!join(' ', v.class, $Browser.formFactor)}">
         <div aura:id='modal-glass' class="{!join(' ', 'modal-glass hidden', token('uiModal.backdrop'))}"  tabindex="-1"></div>
         
         <div aura:id='panel'

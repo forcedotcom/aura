@@ -286,14 +286,16 @@ public class IntegrationImpl implements Integration {
             StringBuilder sb = new StringBuilder();
             templateUtil.writeHtmlStyles(servletUtilAdapter.getStyles(context), sb);
             attributes.put("auraStyleTags", sb.toString());
+
             sb.setLength(0);
-            templateUtil.writeHtmlScripts(servletUtilAdapter.getScripts(context, false, null), sb);
+            templateUtil.writeInlineHtmlScripts(context, servletUtilAdapter.getScripts(context, false, null), sb);
+            attributes.put("auraScriptTags", sb.toString());
+
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
                 attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
             }
 
-            attributes.put("auraScriptTags", sb.toString());
             Map<String, Object> auraInit = Maps.newHashMap();
 
             Application instance = instanceService.getInstance(appDef, null);

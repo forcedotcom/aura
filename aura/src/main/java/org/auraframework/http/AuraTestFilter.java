@@ -430,14 +430,27 @@ public class AuraTestFilter implements Filter {
 
     private String buildJsTestScriptTag(DefDescriptor<?> targetDescriptor, String testName, int timeout, String original) {
         String tag = "";
+        String defer;
 
         // Inject test framework script tag if it isn't on page already. Unlikely, but framework may not
         // be loaded if the target is server-rendered, or if the target is designed that way (e.g.
         // custom template).
         String testUrl = Aura.getConfigAdapter().getAuraJSURL(); // Dependent on mode being a test mode
         if (original == null
-                || !original.matches(String.format("(?is).*<script\\s*src\\s*=\\s*['\"]%s['\"]\\s*>.*", testUrl))) {
+                || !original.matches(String.format("(?is).*<script\\s*src\\s*=\\s*['\"]%s['\"][^>]*>.*", testUrl))) {
             tag = String.format("\n<script src='%s'></script>", testUrl);
+        }
+
+        switch (Aura.getContextService().getCurrentContext().getClient().getType()) {
+        case IE9:
+        case IE8:
+        case IE7:
+        case IE6:
+            defer = "";
+            break;
+        default:
+            defer = " defer";
+            break;
         }
 
         // Inject tag to load and execute test.
@@ -445,7 +458,7 @@ public class AuraTestFilter implements Filter {
                 targetDescriptor.getNamespace(), targetDescriptor.getName(),
                 targetDescriptor.getDefType() == DefType.APPLICATION ? "app" : "cmp", testName, timeout,
                 System.nanoTime());
-        tag = tag + String.format("\n<script src='%s'></script>\n", suiteSrcUrl);
+        tag = tag + String.format("\n<script src='%s'%s></script>\n", suiteSrcUrl, defer);
         return tag;
     }
 

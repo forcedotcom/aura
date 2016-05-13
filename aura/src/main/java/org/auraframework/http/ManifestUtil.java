@@ -48,7 +48,7 @@ public class ManifestUtil {
     /**
      * How many requests we accept before guessing that there is a loop.
      */
-    private static final int MAX_MANIFEST_COUNT = 8;
+    private static final int MAX_MANIFEST_COUNT = 16;
 
     /**
      * The time allowed before we reset the count.

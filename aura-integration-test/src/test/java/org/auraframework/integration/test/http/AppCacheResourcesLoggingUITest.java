@@ -134,6 +134,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
+    //@Ignore("W-2944620")
     // TODO(W-2944620): Adding safeEval.html to manifest causing unnecessary manifest requests
     public void _testNoChanges() throws Exception {
         AppDescription app = new AppDescription();
@@ -171,7 +172,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
         expectedChange.add(new Request(getUrl(app), null, 302)); // hard refresh
-        expectedChange.add(new Request("/auraResource", "js", 200));
+        expectedChange.add(new Request(2, "/auraResource", "js", 200)); // JS
         switch (getBrowserType()) {
         case GOOGLECHROME:
             expectedChange.add(new Request(3, "/auraResource", "manifest", 200));
@@ -247,7 +248,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         String cookieName = getManifestCookieName(app);
         Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
         String timeVal = cookie.getValue().split(":")[1];
-        updateCookie(cookieName, "8:" + timeVal, expiry, "/");
+        updateCookie(cookieName, "16:" + timeVal, expiry, "/");
         logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
 
@@ -273,9 +274,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
 
     /**
      * Opening cached app after namespace style change will trigger cache update.
-     * TODO(W-2955424) : un-comment the last 4 lines, and update what we should be expecting.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @ThreadHostileTest("changing component")
     @Flapper
     @Test
     public void testComponentCssChange() throws Exception {
@@ -287,8 +288,8 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
 
         Request sGif = new Request("/auraFW/resources/qa/images/s.gif", null, 200);
         List<Request> expectedInitialRequests = Lists.newArrayList(getExpectedInitialRequests(app));
-		expectedInitialRequests.add(sGif);
-		assertRequests(expectedInitialRequests, logs);
+        expectedInitialRequests.add(sGif);
+        assertRequests(expectedInitialRequests, logs);
 
         assertAppCacheStatus(Status.IDLE);
 
@@ -300,7 +301,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
 
         List<Request> expectedChangeRequests = Lists.newArrayList(getExpectedChangeRequests(app));
         expectedChangeRequests.add(sGif);
-		assertRequests(expectedChangeRequests, logs);
+        assertRequests(expectedChangeRequests, logs);
 
         assertAppCacheStatus(Status.IDLE);
     }
@@ -310,6 +311,8 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      * TODO(W-2955424) : un-comment the last 4 lines, and update what we should be expecting.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @ThreadHostileTest("changing component")
+    @Flapper
     @Test
     public void testComponentJsChange() throws Exception {
         AppDescription app = new AppDescription();
@@ -670,6 +673,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         for(LoggingEvent le : loggingEvents) {
             message = le.getMessage().toString();
             if(message.contains("requestMethod: GET")) {
+                //System.out.println("MESSAGE: "+message);
                 Request toAdd;
                 String auraRequestURI="";
                 String auraRequestQuery="";

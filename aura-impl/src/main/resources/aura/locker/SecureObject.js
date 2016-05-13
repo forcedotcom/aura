@@ -43,8 +43,29 @@ SecureObject.isDOMElementOrNode = function(el) {
 		(typeof el.nodeType === "number" && typeof el.nodeName === "string"));
 };
 
+var rawToSecureObjectCache = typeof WeakMap !== "undefined" ? new WeakMap() : {
+	/* WeakMap dummy polyfill */
+	"get": function () { 
+		return undefined; 
+	},
+	"set": function () {}
+};
+
+SecureObject.addToCache = function(raw, so) {
+	rawToSecureObjectCache.set(raw, so);
+};
+
+SecureObject.getCached = function(raw) {
+	return rawToSecureObjectCache.get(raw);
+};
+
 SecureObject.filterEverything = function (st, raw, options) {
 	"use strict";
+	
+	var cached = SecureObject.getCached(raw);
+	if (cached) {
+		return cached;
+	}
 
 	var t = typeof raw;
 	var swallowed;
@@ -133,7 +154,13 @@ SecureObject.filterEverything = function (st, raw, options) {
 			}
 		}
 	}
-	return mutated ? swallowed : raw;
+	
+	if (mutated) {
+		SecureObject.addToCache(raw, swallowed);
+		return swallowed;
+	} else {
+		return raw;
+	}
 };
 
 SecureObject.unfilterEverything = function(st, value) {
@@ -144,6 +171,7 @@ SecureObject.unfilterEverything = function(st, value) {
 		// ignoring falsy, nully references, non-objects and non-functions
 		return value;
 	}
+	
 	var raw = getLockerSecret(value, "ref");
 	if (raw) {
 		// returning the raw value stored in the secure reference, which means

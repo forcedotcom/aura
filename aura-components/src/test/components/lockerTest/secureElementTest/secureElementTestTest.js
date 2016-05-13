@@ -427,5 +427,11 @@
         test: function(cmp) {
             cmp.testScalarExpression();
         }
+    },
+    
+    testElementCache: {
+        test: function(cmp) {
+            cmp.testElementCache();
+        }
     }
 })

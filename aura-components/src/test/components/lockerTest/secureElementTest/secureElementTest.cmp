@@ -45,10 +45,14 @@
     <aura:method name="testSvgGetBBox" action="{!c.testSvgGetBBox}"/>r
     <aura:method name="testScalarExpression" action="{!c.testScalarExpression}"/>
 
+    <aura:method name="testElementCache" action="{!c.testElementCache}"/>
+    
     <aura:method name="getDiv" action="{!c.getDiv}"/>
 
     <lockerTest:facet/>
+    
     <div aura:id="title">SecureElement test</div>
+
     <input type="text" aura:id="input" value="input" />
     <textarea aura:id="textarea" value="textarea" />
     <button aura:id="button" value="button" >button</button>
@@ -68,4 +72,7 @@
     </table>
     
   	<div aura:id="scalarExpression">{!v.scalarExpression}</div>
+    
+  	<div aura:id="cacheTestA" id="cacheTestA"></div>
+  	<div aura:id="cacheTestB" id="cacheTestB"></div>
 </aura:component>

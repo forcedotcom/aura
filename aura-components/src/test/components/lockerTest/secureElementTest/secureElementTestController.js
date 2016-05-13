@@ -71,7 +71,7 @@
 
         testUtils.assertEquals(1, counter);
     },
-    
+
     testInnerHTMLSupportsUseTagForSvgElement: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
 
@@ -129,5 +129,34 @@
         
         // each handler above should have been invoked once only
         testUtils.assertEquals(1.3, counter);
+    },
+
+    testSvgGetBBox: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var expected = {
+                "x": 20,
+                "y": 30,
+                "height": 40,
+                "width": 50
+        };
+
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.width = 400;
+        svg.height = 400;
+        document.body.appendChild(svg);
+
+        var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttributeNS(null, 'x', '20');
+        rect.setAttributeNS(null, 'y', '30');
+        rect.setAttributeNS(null, 'height', '40');
+        rect.setAttributeNS(null, 'width', '50');
+        rect.setAttributeNS(null, 'fill', 'blue');
+        svg.appendChild(rect);
+
+        var bbox = rect.getBBox();
+        testUtils.assertEquals("[object SVGRect]", bbox.toString());
+        for (var prop in expected) {
+            testUtils.assertEquals(expected[prop], bbox[prop], "Unexpected attribute value returned from getBBox() for <" + prop + ">");
+        }
     }
 })

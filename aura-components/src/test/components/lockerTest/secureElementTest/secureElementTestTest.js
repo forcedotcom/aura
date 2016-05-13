@@ -410,10 +410,16 @@
             cmp.testInnerText();
         }
     },
-    
+
     testAddEventListenerMultipleCalls: {
         test: function(cmp) {
             cmp.testAddEventListenerMultipleCalls();
+        }
+    },
+
+    testSvgGetBBox: {
+        test: function(cmp) {
+            cmp.testSvgGetBBox();
         }
     }
 })

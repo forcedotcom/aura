@@ -159,7 +159,7 @@ public class AuraServlet extends AuraBaseServlet {
             // Make sure we were handed an absolute path, if not, we simply dump the
             // path and redirect to root.
             //
-            if (path.charAt(0) == '/') {
+            if (path != null && path.length() > 0 && path.charAt(0) == '/') {
                 // if nocache has https specified, or the request is secure,
                 // modify sb if it's http
                 if (((scheme != null && scheme.equals(secureUriScheme)) || request.isSecure()) && dIndex == 0) {

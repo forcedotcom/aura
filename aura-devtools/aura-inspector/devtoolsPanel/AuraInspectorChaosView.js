@@ -302,6 +302,10 @@ function AuraInspectorChaosView(devtoolsPanel) {
             card.setAttribute("locatorParent", locator.parent);
             card.setAttribute("locatorContext", locator.context);
         }
+        //some element has no textContent, nor locator, let's print out cssPath in this case
+        if(textContent.length === 0 && !locator){
+            card.setAttribute("textContent", cssPath);
+        }
         return card;
     }
 

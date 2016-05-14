@@ -216,6 +216,41 @@ function iframeTest() {
             var cmpDescriptor = "COMPONENT@markup://"+desc;
             msg = msg || "Def " + desc + " should not have been in Aura.context.loaded";
             $A.test.assertUndefined(loaded[cmpDescriptor], msg);
+        },
+
+        /**
+         * Global value providers (GVP) are stored in the actions storage. On bootstrap we only load component defs from
+         * storage if we find GVPs in storage. Thus, it may be necessary to wait for GVPs to be stored before reloading
+         * if we are counting on defs being restored from storage on load.
+         */
+        waitForGvpsInStorage: function() {
+            var iframe = this.getIframe();
+            var that = this;
+            var found = false;
+            var gvpStorageKey = "globalValueProviders";
+
+            function checkGvpsInStorage() {
+                // short-circuit once the test times out
+                if ($A.test.isComplete()) {
+                    return;
+                }
+
+                iframe.$A.storageService.getStorage("actions").get(gvpStorageKey)
+                    .then(function (item) {
+                        if (item) {
+                            found = true;
+                            return;
+                        }
+                        checkGvpsInStorage();
+                });
+            }
+
+            checkGvpsInStorage();
+
+            $A.test.addWaitForWithFailureMessage(true,
+                function() { return found; },
+                "GVPs never persisted to actions store"
+            );
         }
     }
 }

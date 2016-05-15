@@ -242,10 +242,12 @@
 
     //Keep a list of element class we know gonna make the element clickable
     var clicableClassList = [
+        'a:link',
         'actionCardAnchor',
         'cuf-feedItemActionTrigger',
         'forceActionLink',
         'forceEntityIcon',//left navigation
+        'forceIcon',
         'header-label',
         'likeIconAnchor',
         //'inputTextArea',
@@ -399,11 +401,7 @@
 
         //event handler for AuraInspector:stopAllChaosRun, called by AuraInspectorChaosView.stopAllChaosRun
         "AuraDevToolService.StopAllChaosRun": function(data) {
-            //clean up
-            actionDropPercentage = 0; 
-            currentChaosRun = {};
-            currentChaosRunSteps = [];
-            sessionStorage.removeItem("chaosRunToReplay");
+
             //and stop all intervals
             clearInterval(intervalFunctionRef_elementInNextStepReady);
             intervalFunctionRef_elementInNextStepReady = undefined;
@@ -412,6 +410,14 @@
             intervalFunctionRef_anyAuraRenderedElementPresent = undefined;
             count_waitAnyAuraRenderedElementPresent = 0;
 
+            //clean up
+            actionDropPercentage = 0; 
+            removeActionFromWatchListAfterChaosRunStop();
+            currentChaosRun = {};
+            currentChaosRunSteps = [];
+            sessionStorage.removeItem("chaosRunToReplay");
+
+            //remove little green circle
             removeCircleElement();
 
             console.warn("All ongoing ChaosRun, including replaying will be Stopped");
@@ -498,20 +504,35 @@
                 sessionStorage.setItem("chaosRunToReplay", JSON.stringify(chaosRunToReplay));
 
                 if(chaosRunToReplay.currentChaosRunTimeMachine && chaosRunToReplay.currentChaosRunTimeMachine.startUrl) {
-                    var message = "Time Machine Start\n Page is going to refresh with this url in 3s\n"+chaosRunToReplay.currentChaosRunTimeMachine.startUrl;
-                    //console.log(message);   
-                    //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
-                    $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
-                    setTimeout(function()
-                    {
-                        var newLocation = JSON.parse(sessionStorage.getItem("chaosRunToReplay")).currentChaosRunTimeMachine.startUrl; 
-                        if(newLocation.indexOf("#") > 0) {//stupid # stop it from reloading
-                            window.location = newLocation;
-                            window.location.reload();
-                        } else {
-                            window.location = newLocation;
+                    //clear up all aura storage
+                    clearAllAuraStorages().then(
+                        function(successMsg) { 
+                            //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
+                            $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': successMsg});
+                            setTimeout(function()
+                            {
+                                var message = "Time Machine Start\n Page is going to refresh with this url in 3s\n"+chaosRunToReplay.currentChaosRunTimeMachine.startUrl;
+                                $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
+                            }, 1000);
+                            //refresh the page with url
+                            setTimeout(function()
+                            {
+                                var newLocation = JSON.parse(sessionStorage.getItem("chaosRunToReplay")).currentChaosRunTimeMachine.startUrl; 
+                                if(newLocation.indexOf("#") > 0) {//stupid # stop it from reloading
+                                    window.location = newLocation;
+                                    window.location.reload();
+                                } else {
+                                    window.location = newLocation;
+                                }
+                            }, 3000);
+                        },
+                        function(error) { 
+                            console.warn(error); 
+                            $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': "We run into problem trying to clear up aura storages"});
                         }
-                    }, 3000);
+                    );
+
+                    
                 } else {
                     console.warn("replay chaos run from sessionStorage, there is no timeMachine", chaosRunToReplay);
                 }
@@ -578,6 +599,18 @@
     */
 
     /****************************************** functions for replay a chaos run *************************************/
+    //this happen when we decide to stop all the chaos run. if there are action added to watch list, we should clear up those too
+    function removeActionFromWatchListAfterChaosRunStop() {
+        if( actionsToWatch && Object.getOwnPropertyNames(actionsToWatch).length > 0) {
+            for(key in actionsToWatch) {
+                var actionToWatch = actionsToWatch[key];
+                if(actionToWatch.byChaosRun) {
+                    console.warn("we have to remove action from watch list because just stop the chaos run", actionToWatch);
+                    delete actionToWatch[key];
+                }
+            }
+        }
+    }
 
     function scheduleActionOperationForNextStep() {
         var nextStepIndex = chaosRunToReplay.indexOfStep + 1;
@@ -889,6 +922,30 @@
     /****************************************************************
     ****************** Utility Functions Starts **********************
     ****************************************************************/
+
+    function clearAllAuraStorages() {
+        return new Promise(function(resolve, reject) {
+            //clear up all storage
+            var storages = $A.storageService.getStorages();
+            var storagesSize = Object.getOwnPropertyNames(storages).length;
+            var count = 0;
+            for(var storageName in storages) {
+                var storage = storages[storageName];
+                storage.clear().
+                then( 
+                    function() { 
+                        count = count + 1;   
+                        if(count === storagesSize) {
+                            resolve("we clear all aura storages, yay!");
+                        }
+                    },
+                    function(e) {
+                        reject(e);
+                    }
+                );
+            }
+        });
+    }
 
     function getElementAttributesStartWithDataDash(element) {
         var resObj = {}; var attr;

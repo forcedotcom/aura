@@ -18,11 +18,11 @@
 
 function SecureElement(el, key) {
 	"use strict";
-	
+
 	function isSharedElement(element) {
 		return element === document.body || element === document.head;
 	}
-	
+
 	function runIfRunnable(st) {
 		var isRunnable = st.$run;
 		if (isRunnable) {
@@ -37,11 +37,11 @@ function SecureElement(el, key) {
 	// some polymorphic behavior to SecureElement depending on the tagName
 	var tagName = el.tagName && el.tagName.toUpperCase();
 	switch (tagName) {
-		case "FRAME":
-            throw new $A.auraError("The deprecated FRAME element is not supported in LockerService!");
-			
-		case "IFRAME":
-			return SecureIFrameElement(el, key);
+	case "FRAME":
+		throw new $A.auraError("The deprecated FRAME element is not supported in LockerService!");
+
+	case "IFRAME":
+		return SecureIFrameElement(el, key);
 
 	case "SCRIPT":
 		return SecureScriptElement(key, el);
@@ -68,7 +68,7 @@ function SecureElement(el, key) {
 				return child;
 			}
 		},
-		
+
 		replaceChild : {
 			value : function(newChild, oldChild) {
 				$A.lockerService.util.verifyAccess(o, newChild, {
@@ -101,31 +101,21 @@ function SecureElement(el, key) {
 				if (!runIfRunnable(newNode)) {
 					el.insertBefore(getLockerSecret(newNode, "ref"), referenceNode ? getLockerSecret(referenceNode, "ref") : null);
 				}
-				
+
 				return newNode;
 			}
 		}
 	});
 
 	Object.defineProperties(o, {
-        compareDocumentPosition: SecureObject.createFilteredMethod(o, el, "compareDocumentPosition"),
-
-		ownerDocument : SecureObject.createFilteredProperty(o, el, "ownerDocument"),
-		parentNode : SecureObject.createFilteredProperty(o, el, "parentNode", {
-			filterOpaque : true
-		}),
-
-        nodeName: SecureObject.createFilteredProperty(o, el, "nodeName"),
-        nodeType: SecureObject.createFilteredProperty(o, el, "nodeType"),
-
-        removeChild: SecureObject.createFilteredMethod(o, el, "removeChild", { 
-        	beforeCallback: function(child) {
-        		// Verify that the passed in child is not opaque!
+		removeChild : SecureObject.createFilteredMethod(o, el, "removeChild", {
+			beforeCallback : function(child) {
+				// Verify that the passed in child is not opaque!
 				$A.lockerService.util.verifyAccess(o, child, {
 					verifyNotOpaque : true
 				});
-        	}	
-    	}),
+			}
+		}),
 
 		cloneNode : {
 			value : function(deep) {
@@ -158,11 +148,11 @@ function SecureElement(el, key) {
 
 		textContent : SecureObject.createFilteredProperty(o, el, "textContent", {
 			afterGetCallback : function() {
-				return "";
+				return getLockerSecret(o.cloneNode(true), "ref").textContent;
 			}
 		})
 	});
-	
+
 	// Conditionally add things that not all Node types support
 	SecureObject.addPropertyIfSupported(o, el, "attributes", {
 		writable : false,
@@ -181,33 +171,44 @@ function SecureElement(el, key) {
 		}
 	});
 
-	[ "childNodes", "children", "firstChild", "lastChild", "getAttribute", "setAttribute", "removeAttribute", "getAttributeNS", "setAttributeNS",
-			"removeAttributeNS" ].forEach(function(name) {
+	SecureObject.addPropertyIfSupported(o, el, "innerText", {
+		afterGetCallback : function() {
+			return getLockerSecret(o.cloneNode(true), "ref").innerText;
+		}
+	});
+
+	[ "childNodes", "children", "firstChild", "lastChild", "getAttribute", "nodeName", "nodeType", "parentNode", "parentElement", "ownerDocument",
+			"setAttribute", "removeAttribute", "getAttributeNS", "setAttributeNS", "removeAttributeNS" ].forEach(function(name) {
 		SecureObject.addPropertyIfSupported(o, el, name, {
 			filterOpaque : true
 		});
 	});
 
-	[ "getElementsByClassName", "getElementsByTagName", "getElementsByTagNameNS", "querySelector", "querySelectorAll", "getBoundingClientRect", "getClientRects", "blur", "click", "focus" ]
-			.forEach(function(name) {
+	[ "compareDocumentPosition", "getElementsByClassName", "getElementsByTagName", "getElementsByTagNameNS", "querySelector", "querySelectorAll",
+			"getBoundingClientRect", "getClientRects", "blur", "click", "focus" ].forEach(function(name) {
 				SecureObject.addMethodIfSupported(o, el, name, {
 					filterOpaque : true
 				});
-	});
+			});
 
-	SecureObject.addPropertyIfSupported(o, el, "innerHTML", { 
+	SecureObject.addPropertyIfSupported(o, el, "innerHTML", {
 		afterGetCallback : function() {
-			return "";
+			return getLockerSecret(o.cloneNode(true), "ref").innerHTML;
 		},
-		beforeSetCallback: function(value) {				
+		beforeSetCallback : function(value) {
 			// Do not allow innerHTML on shared elements (body/head)
 			if (isSharedElement(el)) {
-	            throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
+				throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
 			}
+
+			// Allow SVG <use> element 
+			var config = {
+				ADD_TAGS : [ "use" ]
+			};
 			
-			return DOMPurify["sanitize"](value);
+			return DOMPurify["sanitize"](value, config);
 		},
-		afterSetCallback: function() {
+		afterSetCallback : function() {
 			// $A.lockerServer.trust() all of the new nodes!
 			function trust(node, children) {
 				if (node) {
@@ -221,9 +222,9 @@ function SecureElement(el, key) {
 			}
 
 			trust(undefined, el.childNodes);
-		} 
+		}
 	});
-	
+
 	// applying standard secure element properties
 	SecureElement.addSecureProperties(o, el);
 	SecureElement.addSecureGlobalEventHandlers(o, el, key);
@@ -231,7 +232,7 @@ function SecureElement(el, key) {
 
 	SecureElement.addElementSpecificProperties(o, el);
 	SecureElement.addElementSpecificMethods(o, el);
-	
+
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", el);
 
@@ -240,35 +241,35 @@ function SecureElement(el, key) {
 
 SecureElement.addSecureProperties = function(se, raw) {
 	[
-		// Standard Element interface represents an object of a Document.
-		// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
+	// Standard Element interface represents an object of a Document.
+	// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
 	'childElementCount', 'classList', 'className', 'id', 'tagName', 'namespaceURI',
 	// Note: ignoring 'firstElementChild', 'lastElementChild',
 	// 'nextElementSibling' and 'previousElementSibling' from the list
 	// above.
 
-		// Standard HTMLElement interface represents any HTML element
-		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
+	// Standard HTMLElement interface represents any HTML element
+	// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
 	'accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable', 'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang',
 			'spellcheck', 'style', 'tabIndex', 'title', 'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth', 'clientWidth',
 			'clientHeight', 'clientLeft', 'clientTop', 'nodeValue'
-		
+
 	// DCHASMAN TODO This list needs to be revisted as it is missing a ton of
 	// valid attributes!
-	].forEach(function (name) {
+	].forEach(function(name) {
 		SecureObject.addPropertyIfSupported(se, raw, name);
 	});
 };
 
 SecureElement.addSecureGlobalEventHandlers = function(se, raw, key) {
 	[
-		// Standard Global Event handlers
-		// https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers
+	// Standard Global Event handlers
+	// https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers
 	"onabort", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "onerror", "onfocus", "oninput", "onkeydown", "onkeypress",
 			"onkeyup", "onload", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onreset", "onresize", "onscroll", "onselect",
 			"onsubmit" ].forEach(function(name) {
 		Object.defineProperty(se, name, {
-			set: function(callback) {
+			set : function(callback) {
 				raw[name] = function(e) {
 					callback.call(se, SecureDOMEvent(e, key));
 				};
@@ -281,12 +282,12 @@ SecureElement.addEventTargetMethods = function(se, raw, key) {
 	Object.defineProperties(se, {
 		addEventListener : SecureElement.createAddEventListenerDescriptor(se, raw, key),
 		dispatchEvent : SecureObject.createFilteredMethod(se, raw, "dispatchEvent"),
-		
+
 		// removeEventListener() is special in that we do not want to
 		// unfilter/unwrap the listener argument or it will not match what
 		// was actually wired up originally
 		removeEventListener : {
-			value: function(type, listener, options) {
+			value : function(type, listener, options) {
 				var sCallback = getLockerSecret(listener, "sCallback");
 				raw.removeEventListener(type, sCallback, options);
 			}
@@ -309,13 +310,13 @@ SecureElement.createAddEventListenerDescriptor = function(st, el, key) {
 						verifyNotOpaque : true
 					});
 
-				var se = SecureDOMEvent(e, key);
-				callback.call(st, se);
-			};
+					var se = SecureDOMEvent(e, key);
+					callback.call(st, se);
+				};
 
-			// Back reference for removeEventListener() support
-			setLockerSecret(callback, "sCallback", sCallback);
-			
+				// Back reference for removeEventListener() support
+				setLockerSecret(callback, "sCallback", sCallback);
+
 				$A.lockerService.trust(st, callback);
 			}
 
@@ -353,7 +354,7 @@ SecureElement.addElementSpecificProperties = function(se, el) {
 		// Special handling for SVG elements
 		if (el.namespaceURI === "http://www.w3.org/2000/svg") {
 			SecureObject.addMethodIfSupported(se, el, "getBBox");
-	}
+		}
 	}
 };
 
@@ -370,20 +371,20 @@ SecureElement.addElementSpecificMethods = function(se, el) {
 };
 
 SecureElement.elementSpecificAttributeWhitelists = {
-	"A": ["hash", "host", "hostname", "href", "origin", "pathname", "port", "protocol", "search"],
-	"AREA": ["alt", "coords", "download", "href", "hreflang", "media", "rel", "shape", "target", "type"],
-	"AUDIO": ["autoplay", "buffered", "controls", "loop", "muted", "played", "preload", "src", "volume"],
-	"BASE": ["href", "target"],
-	"BDO": ["dir"],
+	"A" : [ "hash", "host", "hostname", "href", "origin", "pathname", "port", "protocol", "search" ],
+	"AREA" : [ "alt", "coords", "download", "href", "hreflang", "media", "rel", "shape", "target", "type" ],
+	"AUDIO" : [ "autoplay", "buffered", "controls", "loop", "muted", "played", "preload", "src", "volume" ],
+	"BASE" : [ "href", "target" ],
+	"BDO" : [ "dir" ],
 	"BUTTON" : [ "autofocus", "disabled", "form", "formaction", "formenctype", "formmethod", "formnovalidate", "formtarget", "name", "type" ],
-	"CANVAS": ["height", "width"],
-	"COL": ["span"],
-	"COLGROUP": ["span", "width"],
-	"DATA": ["value"],
+	"CANVAS" : [ "height", "width" ],
+	"COL" : [ "span" ],
+	"COLGROUP" : [ "span", "width" ],
+	"DATA" : [ "value" ],
 	"DEL" : [ "cite", "datetime" ],
-	"DETAILS": ["open"],
-	"EMBED": ["height", "src", "type", "width"],
-	"FIELDSET": ["disabled", "form", "name"],
+	"DETAILS" : [ "open" ],
+	"EMBED" : [ "height", "src", "type", "width" ],
+	"FIELDSET" : [ "disabled", "form", "name" ],
 	"FORM" : [ "acceptCharset", "action", "autocomplete", "enctype", "method", "name", "novalidate", "target" ],
 	"IMG" : [ "alt", "crossorigin", "height", "ismap", "longdesc", "sizesHTML5", "src", "srcsetHTML5", "width", "usemap" ],
 	"INPUT" : [ "type", "accept", "autocomplete", "autofocus", "autosave", "checked", "disabled", "form", "formaction", "formenctype", "formmethod",
@@ -394,37 +395,35 @@ SecureElement.elementSpecificAttributeWhitelists = {
 	"LI" : [ "value" ],
 	"LINK" : [ "crossorigin", "href", "hreflang", "media", "rel", "sizes", "title", "type" ],
 	"MAP" : [ "name" ],
-	"DEL": ["cite", "dateTime"],
-	"LINK": ["crossOrigin", "href", "hreflang", "media", "rel", "sizes", "title", "type"],
 
 	// DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values
 	// for http-equiv/httpEquiv
-	"META": ["content", "name"],
-	
-	"METER": ["value", "min", "max", "low", "high", "optimum", "form"],
+	"META" : [ "content", "name" ],
+
+	"METER" : [ "value", "min", "max", "low", "high", "optimum", "form" ],
 	"OBJECT" : [ "data", "form", "height", "height", "type", "typemustmatch", "usemap", "width" ],
-	"OL": ["reversed", "start", "type"],
-	"OPTGROUP": ["disabled", "label"],
-	"OPTION": ["disabled", "label", "selected", "value"],
+	"OL" : [ "reversed", "start", "type" ],
+	"OPTGROUP" : [ "disabled", "label" ],
+	"OPTION" : [ "disabled", "label", "selected", "value" ],
 	"OUTPUT" : [ "for", "form", "name" ],
-	"PARAM": ["name", "value"],
-	"PROGRESS": ["max", "value"],
-	"Q": ["cite"],
-	"SELECT": ["autofocus", "disabled", "form", "multiple", "name", "required", "size"],
-	"SOURCE": ["src", "type"],
+	"PARAM" : [ "name", "value" ],
+	"PROGRESS" : [ "max", "value" ],
+	"Q" : [ "cite" ],
+	"SELECT" : [ "autofocus", "disabled", "form", "multiple", "name", "required", "size" ],
+	"SOURCE" : [ "src", "type" ],
 	"TD" : [ "colspan", "headers", "rowspan" ],
-	"TEMPLATE": ["content"],
+	"TEMPLATE" : [ "content" ],
 	"TEXTAREA" : [ "autocomplete", "autofocus", "cols", "disabled", "form", "maxlength", "minlength", "name", "placeholder", "readonly", "required", "rows",
 			"selectionDirection", "selectionEnd", "selectionStart", "wrap" ],
 	"TH" : [ "colspan", "headers", "rowspan", "scope" ],
 	"TIME" : [ "datetime" ],
-	"TRACK": ["default", "kind", "label", "src", "srclang"],
+	"TRACK" : [ "default", "kind", "label", "src", "srclang" ],
 	"VIDEO" : [ "autoplay", "buffered", "controls", "crossorigin", "height", "loop", "muted", "played", "preload", "poster", "src", "width" ]
 };
 
 SecureElement.elementSpecificMethodWhitelists = {
 	"AUDIO" : [ "addTextTrack", "canPlayType", "fastSeek", "getStartDate", "load", "play", "pause" ],
-	"CANVAS": ["getContext", "toDataURL", "toBlob"],
+	"CANVAS" : [ "getContext", "toDataURL", "toBlob" ],
 	"SVG" : [ "createSVGRect" ],
 	"VIDEO" : [ "addTextTrack", "canPlayType", "load", "play", "pause" ]
 };

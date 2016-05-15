@@ -57,6 +57,194 @@
         }
     },
 
+    testGetMaxSize: {
+        test:function(cmp) {
+            cmp.helper.lib.storageTest.testGetMaxSize(this.storage, 4);
+        }
+    },
+
+    testNullKey: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testNullKey(cmp, this.storage);
+        }
+    },
+
+    testUndefinedKey: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testUndefinedKey(cmp, this.storage);
+        }
+    },
+
+    testEmptyStringKey: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testEmptyStringKey(cmp, this.storage);
+        }
+    },
+
+    testGetNullValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
+        }
+    },
+
+    testGetUndefinedValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetUndefinedValue(cmp, this.storage);
+        }
+    },
+
+    testGetBooleanTrueValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetBooleanTrueValue(cmp, this.storage);
+        }
+    },
+
+    testGetZeroValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetZeroValue(cmp, this.storage);
+        }
+    },
+
+    testGetSimpleStringValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetSimpleStringValue(cmp, this.storage);
+        }
+    },
+
+    testGetEmptyObjectValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetEmptyObjectValue(cmp, this.storage);
+        }
+    },
+
+    testGetBasicObjectValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetBasicObjectValue(cmp, this.storage);
+        }
+    },
+
+    testGetEmptyArrayValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetEmptyArrayValue(cmp, this.storage);
+        }
+    },
+
+    testGetBasicArrayValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetBasicArrayValue(cmp, this.storage);
+        }
+    },
+
+    testGetBigArrayValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetBigArrayValue(cmp, this.storage);
+        }
+    },
+
+    testGetMultiByteStringValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetMultiByteStringValue(cmp, this.storage);
+        }
+    },
+
+    testGetFunctionValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetFunctionValue(cmp, this.storage);
+        }
+    },
+
+    testGetErrorValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetErrorValue(cmp, this.storage);
+        }
+    },
+
+    testCacheMiss: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
+        }
+    },
+
+    testSetItemUnderMaxSize : {
+        test : [function(cmp) {
+            cmp.helper.lib.storageTest.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
+        }]
+    },
+
+    testSetItemOverMaxSize : {
+        test : [function(cmp) {
+            cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "cannot store an item over the maxSize");
+        },
+        function(cmp) {
+            cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage2(cmp, this.storage);
+        }]
+    },
+
+    testGetAll: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetAll(cmp, this.storage);
+        }
+    },
+
+    testReplaceExistingWithEntryTooLarge: {
+        test: [
+        function putItemThenReplaceWithEntryTooLarge(cmp) {
+            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage1(cmp, this.storage);
+        },
+        function getItem(cmp) {
+            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage2(cmp, this.storage);
+        }]
+    },
+
+    testStorageInfo: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testStorageInfo(this.storage, false, true);
+        }
+    },
+
+    testCyclicObjectFails: {
+        test: function(cmp){
+            cmp.helper.lib.storageTest.testCyclicObjectFails(cmp, this.storage);
+        }
+    },
+
+    testModifyObject: {
+        test:function(cmp){
+            cmp.helper.lib.storageTest.testModifyObject(cmp, this.storage);
+        }
+    },
+
+    testUpdate: {
+        test:function(cmp){
+            cmp.helper.lib.storageTest.testUpdate(cmp, this.storage);
+        }
+    },
+
+    testOverflow: {
+        test:function(cmp) {
+            // Due to differences in size calculation between adapters, pass in a storage with the correct size to
+            // fill up the storage after 5 entries of a 512 character string.
+            cmp._storage = $A.storageService.initStorage("memory-testOverflow",
+                    false, true, 5000, 2000, 3000, true, true);
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("memory-testOverflow"); });
+
+            cmp.helper.lib.storageTest.testOverflow(cmp, cmp._storage);
+        }
+    },
+
+    testClear: {
+        test:[function(cmp){
+            cmp.helper.lib.storageTest.testClear_stage1(cmp, this.storage);
+        },
+        function(cmp){
+            cmp.helper.lib.storageTest.testClear_stage2(cmp, this.storage);
+        }]
+    },
+
+    /**
+     * Tests that verify behavior specific to CryptoAdapter.
+     */
+
     testSizeOneObject : {
         test : function(cmp) {
             var that = this;
@@ -315,190 +503,6 @@
 
             $A.test.addWaitFor(true, function(){ return completed; });
         }
-    },
-
-    testGetMaxSize: {
-        test:function(cmp) {
-            cmp.helper.lib.storageTest.testGetMaxSize(this.storage, 4);
-        }
-    },
-
-    testNullKey: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testNullKey(cmp, this.storage);
-        }
-    },
-
-    testUndefinedKey: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testUndefinedKey(cmp, this.storage);
-        }
-    },
-
-    testEmptyStringKey: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testEmptyStringKey(cmp, this.storage);
-        }
-    },
-
-    testGetNullValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
-        }
-    },
-
-    testGetUndefinedValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetUndefinedValue(cmp, this.storage);
-        }
-    },
-
-    testGetBooleanTrueValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetBooleanTrueValue(cmp, this.storage);
-        }
-    },
-
-    testGetZeroValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetZeroValue(cmp, this.storage);
-        }
-    },
-
-    testGetSimpleStringValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetSimpleStringValue(cmp, this.storage);
-        }
-    },
-
-    testGetEmptyObjectValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetEmptyObjectValue(cmp, this.storage);
-        }
-    },
-
-    testGetBasicObjectValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetBasicObjectValue(cmp, this.storage);
-        }
-    },
-
-    testGetEmptyArrayValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetEmptyArrayValue(cmp, this.storage);
-        }
-    },
-
-    testGetBasicArrayValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetBasicArrayValue(cmp, this.storage);
-        }
-    },
-
-    testGetBigArrayValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetBigArrayValue(cmp, this.storage);
-        }
-    },
-
-    testGetMultiByteStringValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetMultiByteStringValue(cmp, this.storage);
-        }
-    },
-
-    testGetFunctionValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetFunctionValue(cmp, this.storage);
-        }
-    },
-
-    testGetErrorValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetErrorValue(cmp, this.storage);
-        }
-    },
-
-    testCacheMiss: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
-        }
-    },
-
-    testSetItemUnderMaxSize : {
-        test : [function(cmp) {
-            cmp.helper.lib.storageTest.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
-        }]
-    },
-
-    testSetItemOverMaxSize : {
-        test : [function(cmp) {
-            cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "cannot store an item over the maxSize");
-        },
-        function(cmp) {
-            cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage2(cmp, this.storage);
-        }]
-    },
-
-    testReplaceExistingWithEntryTooLarge: {
-        test: [
-        function putItemThenReplaceWithEntryTooLarge(cmp) {
-            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage1(cmp, this.storage);
-        },
-        function getItem(cmp) {
-            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage2(cmp, this.storage);
-        }]
-    },
-
-    testGetAll: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetAll(cmp, this.storage);
-        }
-    },
-
-    testStorageInfo: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testStorageInfo(this.storage, false, true);
-        }
-    },
-
-    testCyclicObjectFails: {
-        test: function(cmp){
-            cmp.helper.lib.storageTest.testCyclicObjectFails(cmp, this.storage);
-        }
-    },
-
-    testModifyObject: {
-        test:function(cmp){
-            cmp.helper.lib.storageTest.testModifyObject(cmp, this.storage);
-        }
-    },
-
-    testUpdate: {
-        test:function(cmp){
-            cmp.helper.lib.storageTest.testUpdate(cmp, this.storage);
-        }
-    },
-
-    testOverflow: {
-        test:function(cmp) {
-            // Due to differences in size calculation between adapters, pass in a storage with the correct size to
-            // fill up the storage after 5 entries of a 512 character string.
-            cmp._storage = $A.storageService.initStorage("memory-testOverflow",
-                    false, true, 5000, 2000, 3000, true, true);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("memory-testOverflow"); });
-
-            cmp.helper.lib.storageTest.testOverflow(cmp, cmp._storage);
-        }
-    },
-
-    testClear: {
-        test:[function(cmp){
-            cmp.helper.lib.storageTest.testClear_stage1(cmp, this.storage);
-        },
-        function(cmp){
-            cmp.helper.lib.storageTest.testClear_stage2(cmp, this.storage);
-        }]
     },
 
     /**

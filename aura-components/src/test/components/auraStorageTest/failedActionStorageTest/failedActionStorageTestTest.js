@@ -60,7 +60,7 @@
             }, function callServerActionAgainAndVerifyServerCounterIncremented(cmp) {
                 // when the action hits the server a second time the counter will return 1
                 var a = cmp.get("c.string");
-                a.setParams({testName: "testStorableAction", param1: 11});
+                a.setParams({testName: "testStorableAction", param1: 1});
                 a.setStorable();
                 $A.enqueueAction(a);
 

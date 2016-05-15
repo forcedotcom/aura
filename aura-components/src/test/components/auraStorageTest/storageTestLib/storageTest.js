@@ -15,7 +15,7 @@
  */
 
 function storageTest () {
-    function dieDie(cmp, thing) {
+    function failTest(cmp, thing) {
         var string;
         if (typeof thing === "string") {
             string = thing;
@@ -48,7 +48,7 @@ function storageTest () {
 
     function runUnsureKey(cmp, storage, key) {
         var completed = false;
-        var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
+        var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
         append(cmp, "put("+key+",value);");
         storage.put(key, "value")
             .then(function() {
@@ -68,13 +68,13 @@ function storageTest () {
                 append(cmp,"value="+item);
                 completed = true;
                 $A.test.assertUndefinedOrNull(item, "remove failed");
-            })['catch'](die);
+            })['catch'](failTest);
         $A.test.addWaitFor(true, function() { return completed; });
     }
 
     function runFullCycle(cmp, storage, key, value) {
         var completed = false;
-        var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
+        var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
         append(cmp, "put("+key+","+value+");");
         storage.put(key, value)
             .then(function() {
@@ -109,7 +109,7 @@ function storageTest () {
                 append(cmp, "value="+item);
                 completed = true;
                 $A.test.assertUndefinedOrNull(item, "remove failed");
-            })['catch'](die);
+            })['catch'](failTest);
 
         $A.test.addWaitFor(true, function() { return completed; });
     }
@@ -202,29 +202,6 @@ function storageTest () {
             runFullCycle(cmp, storage, "testValues_Error", new Error("hello, error"));
         },
 
-        /**
-         * Tests storing an item of value error fails.
-         */
-        testPutErrorValueFails: function(cmp, storage, putFails) {
-            var completed = false;
-            storage.put("testErrorValue", new Error("hello, error"))
-                .then(function() {
-                    completed = true;
-                    $A.test.fail("Expected put() to fail but it succeeded");
-                }, function(e) {
-                    append(cmp, e.message);
-                })
-                .then(function() { return storage.get("testErrorValue"); })
-                .then(
-                    function(item){
-                        $A.test.assertUndefined(item, "Expected undefined because put() failed");
-                        completed = true;
-                    },
-                    function(err) { dieDie(cmp, err); }
-                );
-            $A.test.addWaitFor(true, function(){ return completed; });
-        },
-
         testCacheMiss: function(cmp, storage) {
             var completed = false;
             storage.get("iDontExist")
@@ -232,7 +209,7 @@ function storageTest () {
                     $A.test.assertUndefined(item, "Expected to receive undefined on cache miss");
                     completed = true;
                 },
-                function(err) { dieDie(cmp, err); });
+                function(err) { failTest(cmp, err); });
             $A.test.addWaitFor(true, function(){ return completed; });
         },
 
@@ -245,7 +222,7 @@ function storageTest () {
                 .then(
                     function() { completed = true; },
                     function(error) {
-                        dieDie(cmp, "Promise to put item under max size should not reject");
+                        failTest(cmp, "Promise to put item under max size should not reject");
                     }
                 );
 
@@ -263,7 +240,7 @@ function storageTest () {
             var completed = false;
             storage.put(key, { "value" : { "BigMac" : new Array(sizeTooBig).join("x") } })
                 .then(
-                    function() { dieDie(cmp, "Promise to put item too large should not be resolved"); },
+                    function() { failTest(cmp, "Promise to put item too large should not be resolved"); },
                     function(error) {
                         completed = true;
                         result = error.toString();
@@ -279,13 +256,13 @@ function storageTest () {
         },
 
         testSetItemOverMaxSize_stage2: function(cmp, storage) {
-            var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
             var completed = false;
             storage.get("overSize")
                 .then(function (item) {
                     completed = true;
                     $A.test.assertUndefinedOrNull(item, "Value too large should not be stored.");
-                })['catch'](die);
+                })['catch'](failTest);
 
             $A.test.addWaitFor(true, function() { return completed; });
         },
@@ -315,7 +292,7 @@ function storageTest () {
                  })
              .then(
                  function() { completed = true; },
-                 function(err) { dieDie(cmp, err); }
+                 function(err) { failTest(cmp, err); }
              );
 
             $A.test.addWaitFor(true, function() { return completed; });
@@ -340,7 +317,7 @@ function storageTest () {
                          $A.test.assertTrue(result.toString().indexOf(expected) > -1, "Did not receive expected error. Expected error "
                                  + "to contain <" + expected +">, but got <" + result + ">");
                      })
-                 .then(function() { completed = true; }, function(err) { dieDie(cmp, err); });
+                 .then(function() { completed = true; }, function(err) { failTest(cmp, err); });
 
             $A.test.addWaitFor(true, function() { return completed; });
         },
@@ -350,7 +327,7 @@ function storageTest () {
 
             storage.get("testReplaceExistingWithEntryTooLarge")
                 .then(function(item) { $A.test.assertUndefined(item, "Entry should be empty after attemping to put item too large"); })
-                .then(function(){ completed = true;}, function(err) { dieDie(cmp, err)});
+                .then(function(){ completed = true;}, function(err) { failTest(cmp, err)});
 
             $A.test.addWaitFor(true, function() { return completed; });
         },
@@ -382,13 +359,13 @@ function storageTest () {
                         $A.test.assertUndefined(item, "Expected to receive undefined on twisted object");
                         completed = true;
                     },
-                    function(err) { dieDie(cmp, err); }
+                    function(err) { failTest(cmp, err); }
                 );
             $A.test.addWaitFor(true, function(){ return completed; });
         },
 
         testModifyObject: function(cmp, storage) {
-            var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
             var completed = false;
             var stuff = { "changeling": 2 };
             storage.put("testModifyObject", stuff)
@@ -399,12 +376,12 @@ function storageTest () {
                     $A.test.assertEquals(2, item.value["changeling"],
                         "testModifyObject: Object changed while stored");
                     completed = true;
-                })['catch'](die);
+                })['catch'](failTest);
             $A.test.addWaitFor(true, function() { return completed; });
         },
 
         testUpdate: function(cmp, storage) {
-            var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
             var completed = false;
 
             storage.put("testUpdate", "ORIGINAL")
@@ -417,7 +394,7 @@ function storageTest () {
                     return storage.remove("testUpdate");
                 }).then(function() {
                     completed = true;
-                })['catch'](die);
+                })['catch'](failTest);
             $A.test.addWaitFor(true, function() { return completed; });
         },
 
@@ -427,7 +404,7 @@ function storageTest () {
          * so max size is not exceeded.
          */
         testOverflow: function(cmp, storage) {
-            var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
             var completed = false;
             var chunk = new Array(512).join("x");
             var keyLength = 14;
@@ -458,13 +435,13 @@ function storageTest () {
                 $A.test.assertTrue(size < storageMax, "Size of storage is over the max size- items not properly evicted"
                         + " on overflow.");
             })
-            ['catch'](die);
+            ['catch'](failTest);
 
             $A.test.addWaitFor(true, function() { return completed; });
         },
 
         testClear_stage1: function(cmp, storage) {
-            var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
             var completed = false;
 
             storage.clear()
@@ -478,13 +455,13 @@ function storageTest () {
                             "testClear: Expected size of 0, but got " + size);
                         append(cmp, "complete");
                         completed = true;
-                })['catch'](die);
+                })['catch'](failTest);
 
             $A.test.addWaitFor(true, function() { return completed; });
         },
 
         testClear_stage2: function(cmp, storage) {
-            var die = function(error) { completed=true; dieDie(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
             var completed = false;
 
             storage.put("key1" , new Array(1024).join("x"))
@@ -503,7 +480,7 @@ function storageTest () {
                     append(cmp, "size = "+size);
                     $A.test.assertTrue(size >= 0 && size <= 0.1, "testClear: Expected size of 0, but got " + size);
                     completed = true;
-                })['catch'](die);
+                })['catch'](failTest);
             $A.test.addWaitFor(true, function() { return completed; });
         },
 
@@ -546,5 +523,7 @@ function storageTest () {
                 "size": resultingSize
             };
         },
+
+        failTest: failTest
     };
 }

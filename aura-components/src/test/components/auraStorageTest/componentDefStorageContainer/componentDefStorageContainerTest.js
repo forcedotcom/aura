@@ -30,9 +30,10 @@
                 cmp.helper.lib.iframeTest.waitForDefInStorage("ui:resizeObserver");
                 cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scrollerLib");
                 cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scopedScroll");
+                cmp.helper.lib.iframeTest.waitForGvpsInStorage();
             },
             function reloadIframe(cmp) {
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload")
+                cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload");
             },
             function createTargetCmpAndVerify(cmp) {
                 // avoid any server trip to prove that ui:scroller is on the client
@@ -162,6 +163,10 @@
             },
             function verifyTargetCmpInStorage(cmp) {
                 cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
+            },
+            function waitForGvpsStored(cmp) {
+                // must wait for gvps to be stored otherwise we may not load defs from storage on boot after reload
+                cmp.helper.lib.iframeTest.waitForGvpsInStorage();
             },
             function reloadPage(cmp) {
                 // Reload page to clear anything saved in javascript memory

@@ -34,8 +34,7 @@
     <br/>
     <ui:outputText class='Icon_only' value='{!v.iconOnlyButtonPressedMessage}'/>
     <br/>
-    <ui:button class="testDomEventBtn" label="testDomEvent" press="{!c.checkDomEventSet}"/>
-
+    <ui:button aura:id="testDomEventBtn" label="testDomEvent" press="{!c.checkDomEventSet}"/>
     <br/><br/>
 
     <ui:outputText value="Mouseover : "/>

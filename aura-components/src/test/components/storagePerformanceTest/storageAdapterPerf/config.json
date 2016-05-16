@@ -11,7 +11,7 @@
     { "Aura.coql.afterRender.added" : 5 },
     { "Network.numRequests" : 20 }
   ],
-  "options" : { "metricsMode" : "foo", "timeline": "disable", "timeout" : 120 },
+  "options" : { "metricsMode" : "foo", "timeline": "disable", "timeout" : 120,"skipDiff":true},
   "customOptions" : [
         {
           "crypto-4kb-50" : {

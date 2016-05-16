@@ -11,5 +11,5 @@
     { "Aura.coql.afterRender.added" : 5 },
     { "Network.numRequests" : 20 } 
   ],
-  "options" : { "metricsMode" : "foo" }
+  "options" : { "metricsMode" : "foo", "skipDiff":true }
 }

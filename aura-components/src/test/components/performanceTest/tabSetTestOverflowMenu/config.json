@@ -57,5 +57,5 @@
             "Tracing.Memory.nodes": 10
         }	
         ],
-  "options" : {}
+  "options" : { "skipDiff":true }
 }

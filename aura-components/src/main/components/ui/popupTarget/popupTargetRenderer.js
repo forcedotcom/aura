@@ -19,9 +19,7 @@
     	
         helper.setAriaAttributes(component);
         
-        ret = this.superAfterRender();
-        
-        helper.position(component);
+        ret = this.superAfterRender();        
 
         return ret;
     },
@@ -37,7 +35,12 @@
 
         helper.onVisibleChange(component);
         helper.setAriaAttributes(component);
-        helper.position(component);
+
+        if(component.get('v.visible')) {
+            helper.position(component);
+        } else {
+            helper.unposition(component);
+        }
         
         return ret;
     },
@@ -48,7 +51,7 @@
     		// also, using undefined instead of delete as delete is really slow and undefined suffices in this scenario
     		component._localElementCache = undefined;
     	}
-    	
+    	helper.unposition(component);
         helper.removeDismissEvents(component);
         this.superUnrender();
     }

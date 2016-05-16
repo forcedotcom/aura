@@ -51,8 +51,8 @@
 	            $A.test.assertEquals(actionMenuParentElement, bodyElement,"Menu Item List should be attached to body");
 	    		
 	            //Make sure horizontal alignment of menuItem is correct with reference to triggerElement
-	            var actionMenuLeftPostionValue = Math.round(actionMenu.getElement().getBoundingClientRect().left);
-	            var triggerLeftPositonValue = Math.round(menuLabel.getElement().getBoundingClientRect().left);
+	            var actionMenuLeftPostionValue = Math.floor(actionMenu.getElement().getBoundingClientRect().left);
+	            var triggerLeftPositonValue = Math.floor(menuLabel.getElement().getBoundingClientRect().left);
 	            $A.test.assertEquals(actionMenuLeftPostionValue, triggerLeftPositonValue,"Menu Item is not alligned properly wrt to trigger it should be at left:"+triggerLeftPositonValue);
 	    		
 	            var disableAttrValue = cmp.find(item1).get("v.disabled");

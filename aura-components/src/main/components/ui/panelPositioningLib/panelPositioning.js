@@ -272,6 +272,7 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
 
 
             constraints = constraints.concat(constraintList);
+            reposition();
 
 
     		return (function() {

@@ -199,7 +199,10 @@
 
                 cellCmp.set("v.class", className);
                 cellCmp.set("v.label", d.getDate());
-                cellCmp.set("v.value", d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate());
+                var dateStr = d.getFullYear() + "-" +
+                    ('0' + (d.getMonth() + 1)).slice(-2) + "-" +
+                    ('0' + d.getDate()).slice(-2);
+                cellCmp.set("v.value", dateStr);
 
                 var _setFocus = component.get("v._setFocus");
                 if (this.dateEquals(d, date) && _setFocus === true) {

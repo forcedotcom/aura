@@ -42,7 +42,7 @@ semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
                 <p><ui:tooltip class="magic" tooltipBody="Click here for more info"><a href="http://www.google.com">Click me!</a></ui:tooltip></p>
                 <form>
                     <p>
-                        <ui:tooltip fadeOutDuration="500" triggerClass="my-trigger-class" tooltipBody="Please?">
+                        <ui:tooltip fadeOutDuration="500" triggerClass="my-trigger-class" tooltipBody="upercalifragilisticespalidocious. floccinaucinihilipilificationfloccinaucinihilipilificationfloccinaucinihilipilificationfloccinaucinihilipilification?">
                             <span>Fade out only</span>
                         </ui:tooltip>
                     </p>
@@ -67,7 +67,7 @@ semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
         <div class="section custom">
             <h2>But I want to do things my own way</h2>
             <p>
-                <ui:tooltip advanced="true" trigger="none" aura:id="theTip" tooltipBody="You have to use the advanced mode in this case. Also it is very, very large and could never fit on screen in some cases. Wow, this is a lot of text! It just goes on and on and on. It is a whole entire paragraph.">?
+                <ui:tooltip advanced="true" trigger="none" aura:id="theTip" tooltipBody="You have to use the advanced mode in this case. Also it is very, very large and could never fit on screen in some cases. Wow, this is a lot of text! It just goes on and on and on. It is a whole entire paragraph. Supercalifragilisticespalidocious. floccinaucinihilipilificationfloccinaucinihilipilificationfloccinaucinihilipilificationfloccinaucinihilipilification.">?
                 </ui:tooltip>Click the button
                  <ui:button label="click me" press="{!c.handleClick}"></ui:button>
             </p>

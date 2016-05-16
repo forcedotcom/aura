@@ -154,10 +154,10 @@ AuraEventService.prototype.getEventPhaseCmpIterator = (function() {
         this.return = function(value) {
             if(!done) {
                 done = true;
-                currentHandler = value; 
+                currentValue = value; 
             }
             return {
-                value: currentHandler,
+                value: currentValue,
                 done: done
             };
         };
@@ -220,9 +220,6 @@ AuraEventService.prototype.getPhasedEventHandlerIterator = (function() {
         var currentHandlers = null;
         var currentHandlersIndex = 0;
 
-        // move to the first location
-        moveCmpCursor();
-
         // moves the cursor to the next component and retrieves the tuple
         // of handlers on that component for the given event
         function moveCmpCursor() {
@@ -237,6 +234,9 @@ AuraEventService.prototype.getPhasedEventHandlerIterator = (function() {
                 currentHandlersIndex = 0;
             }
         }
+
+        // move to the first location
+        moveCmpCursor();
 
         this.next = function() {
             while(!done) {
@@ -354,7 +354,7 @@ AuraEventService.prototype.getComponentEventHandlers = function(cmp, evt, phase)
 
                 if (cmpHandlerDefs) {
                     // Each handler definition
-                    for (i = 0; i < cmpHandlerDefs.length && !includedHandlers; i++) {
+                    for (var i = 0; i < cmpHandlerDefs.length && !includedHandlers; i++) {
                         // Check for inheritance event def structure
                         for (var evtDef = evt.getDef(); evtDef; evtDef = evtDef.getSuperDef()) {
                             var hDef = cmpHandlerDefs[i]["eventDef"];
@@ -438,7 +438,6 @@ AuraEventService.prototype.getNonBubblingComponentEventHandlerIterator = (functi
         var cmp = evt.getSource();
         var currentCmp = cmp;
         var handlerIndex = 0;
-        var handlers = getHandlers();
         
         function getHandlers() {
             while(cmp) {
@@ -452,6 +451,8 @@ AuraEventService.prototype.getNonBubblingComponentEventHandlerIterator = (functi
                 }
             }
         }
+
+        var handlers = getHandlers();
 
         this.next = function() {
             while(!done) {
@@ -651,6 +652,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
 
         var queue = null;
         var queueIndex = 0;
+        var currentValue;
 
         // this is lazy in that it's called on the first "next()" call
         // but once called it builds a queue of the entire result set
@@ -730,10 +732,10 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
         this.return = function(value) {
             if(!done) {
                 done = true;
-                currentHandler = value; 
+                currentValue = value; 
             }
             return {
-                value: currentHandler,
+                value: currentValue,
                 done: done
             };
         };

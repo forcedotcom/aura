@@ -85,7 +85,7 @@ Aura.Event.Event.prototype.getPhase = function(){
  * @export
  */
 Aura.Event.Event.prototype.stopPropagation = function() {
-    $A.assert(this.getPhase() != "default", "stopPropagation() is not supported in the 'default' phase");
+    $A.assert(this.getPhase() !== "default", "stopPropagation() is not supported in the 'default' phase");
     this.eventStopPropagation = true;
 };
 
@@ -97,7 +97,7 @@ Aura.Event.Event.prototype.stopPropagation = function() {
  * @export
  */
 Aura.Event.Event.prototype.preventDefault = function() {
-    $A.assert(this.getPhase() != "default", "preventDefault() is not supported in the 'default' phase");
+    $A.assert(this.getPhase() !== "default", "preventDefault() is not supported in the 'default' phase");
     this.defaultPrevented = true;
 };
 
@@ -111,7 +111,7 @@ Aura.Event.Event.prototype.preventDefault = function() {
  * @export
  */
 Aura.Event.Event.prototype.pause = function() {
-    $A.assert(this.getPhase() != "default", "pause() is not supported in the 'default' phase");
+    $A.assert(this.getPhase() !== "default", "pause() is not supported in the 'default' phase");
     if(!this.paused) {
         this.paused = true;
     }
@@ -130,7 +130,7 @@ Aura.Event.Event.prototype.pause = function() {
  * @export
  */
 Aura.Event.Event.prototype.resume = function() {
-    $A.assert(this.getPhase() != "default", "resume() is not supported in the 'default' phase");
+    $A.assert(this.getPhase() !== "default", "resume() is not supported in the 'default' phase");
     if(this.paused) {
         this.paused = false;
         // JBA: should this queue a microtask/task or start from this activation frame?
@@ -232,7 +232,7 @@ Aura.Event.Event.prototype.getParams = function(){
  * @private
  */
 Aura.Event.Event.prototype.getEventExecutionType = function () {
-    if(this.eventDef.getDescriptor().getQualifiedName() == "markup://aura:methodCall") {
+    if(this.eventDef.getDescriptor().getQualifiedName() === "markup://aura:methodCall") {
         return "VALUE";
     }
     else if(this.eventName) {
@@ -247,7 +247,7 @@ Aura.Event.Event.prototype.getEventExecutionType = function () {
             var handlers = this.eventDispatcher[qname];
 
             if (handlers) {
-                return def.getEventType() == "VALUE" ?
+                return def.getEventType() === "VALUE" ?
                     "VALUE" : 
                     "APPLICATION";
             }
@@ -280,7 +280,7 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
     var value;
 
     var isSystemError = this.eventDef.getDescriptor().toString() === "markup://aura:systemError";
-    var isComponentEventType = this.getEventExecutionType() == "COMPONENT";
+    var isComponentEventType = this.getEventExecutionType() === "COMPONENT";
 
     while(!this.paused && !res.done) {
         res = handlerIterator.next();
@@ -290,7 +290,7 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
             // LEGACY BEHAVIOR
             // COMPONENT events automatically stopPropagation if something is destroyed during BUBBLING
             // or CAPTURING
-            if(isComponentEventType && !value.cmp.isValid() && this.phase != "default") {
+            if(isComponentEventType && !value.cmp.isValid() && this.phase !== "default") {
                 this.stopPropagation();
             }
 
@@ -335,7 +335,7 @@ Aura.Event.Event.prototype.getHandlerIterator = function() {
         case "APPLICATION":
             return $A.eventService.getAppEventHandlerIterator(this);
         default:
-            throw new AuraError("Invalid event type");
+            throw new Aura.Errors.AuraError("Invalid event type");
     }
 };
 

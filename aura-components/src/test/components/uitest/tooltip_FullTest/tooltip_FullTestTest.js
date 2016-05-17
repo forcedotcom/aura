@@ -405,13 +405,14 @@
 	 */
 	testTooltipBody: {
 		test: function(component) {
-			var triggers = ['bodyNormallabel', 'bodyManylabel', 'bodyHTMLlabel', 'bodyEmptylabel'];
-			var tooltips = ['bodyNormal', 'bodyMany', 'bodyHTML', 'bodyEmpty'];
+			var triggers = ['bodyNormallabel', 'bodyManylabel', 'bodyHTMLlabel', 'bodyEmptylabel', 'bodyLongWordlabel'];
+			var tooltips = ['bodyNormal', 'bodyMany', 'bodyHTML', 'bodyEmpty', 'bodyLongWord'];
 			var expectedBodies = {
-								  "bodyNormal" : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \")",
-			                      "bodyMany"   : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \") This info here is just to add some more text to the tooltip. Just adding more and more! It's like theres no end to this right? Wrong! All you need is patience. Man! I have to move this test further down the screen just because this tooltip has so many characters! Its just growing and growing. I don't know if the text will overflow. It doesn't look like it will. This was pretty well written so its all been handled very well! Don't you worry, we've got your back!",
-			                      "bodyHTML"   : "<h1>Hello</h1>",
-			                      "bodyEmpty"  : ""
+								  "bodyNormal"  : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \")",
+			                      "bodyMany"    : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \") This info here is just to add some more text to the tooltip. Just adding more and more! It's like theres no end to this right? Wrong! All you need is patience. Man! I have to move this test further down the screen just because this tooltip has so many characters! Its just growing and growing. I don't know if the text will overflow. It doesn't look like it will. This was pretty well written so its all been handled very well! Don't you worry, we've got your back!",
+			                      "bodyHTML"    : "<h1>Hello</h1>",
+			                      "bodyEmpty"   : "",
+			                      "bodyLongWord": "SupercalifragilisticexpialidociousEventhoughthesoundofitissomethingquiteatrociousIfyousayitloudenoughyoullalwayssoundprecociousSupercalifragilisticexpialidocious"
 			                   	  };
 			var tooltipElem = "";
 			var wrapper = "";
@@ -521,10 +522,11 @@
 		var trigger = cmp.find("changeTextBtn").getElement();
 		var tt = "dynamicBody";
 		var tooltip = $A.test.getElementByClass(tt)[0];
-		var tooltipBodies = {	"basic" :            "hey",
-		                     	"specialChars" :     "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \")",
+		var tooltipBodies = {	"basic"            : "hey",
+		                     	"specialChars"     : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \")",
 		                     	"specialCharsLong" : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \") This info here is just to add some more text to the tooltip. Just adding more and more! It's like theres no end to this right? Wrong! All you need is patience. Man! I have to move this test further down the screen just because this tooltip has so many characters! Its just growing and growing. I don't know if the text will overflow. It doesn't look like it will. This was pretty well written so its all been handled very well! Don't you worry, we've got your back!",
-		                     	"htmlText" :         "<h1>Hello</h1>"
+		                     	"htmlText"         : "<h1>Hello</h1>",
+		                     	"longWord"         : "SupercalifragilisticexpialidociousEventhoughthesoundofitissomethingquiteatrociousIfyousayitloudenoughyoullalwayssoundprecociousSupercalifragilisticexpialidocious"
 							 };
 	
 		cmp.find(tt).set("v.tooltipBody", tooltipBodies[testCase]);

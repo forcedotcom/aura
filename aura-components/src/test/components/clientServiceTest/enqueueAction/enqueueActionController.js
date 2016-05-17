@@ -31,6 +31,9 @@
         if (path && path.length) {
             var first = path.shift();
             var child = cmp.find(first);
+            if($A.util.isArray(child)) {
+                child = child[0];
+            }
             child.runAction(path, parent, commands, label, options);
             return;
         }

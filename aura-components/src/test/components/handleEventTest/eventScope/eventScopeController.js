@@ -16,23 +16,14 @@
 //  Controller also used by handleEventTest:handlesEventsABApp, handleEventTest:multipleHandlersForEvent
 ({
     handleA : function(cmp, evt){
-        var src = evt.getSource();
-        if (src == undefined)
-            src = cmp;
-        src.find("events").getElement().innerHTML += "A";
+        cmp.find("events").getElement().innerHTML += "A";
     },
 
     handleB : function(cmp, evt){
-        var src = evt.getSource();
-        if (src == undefined)
-            src = cmp;
-        src.find("events").getElement().innerHTML += "B";
+        cmp.find("events").getElement().innerHTML += "B";
     },
 
     handleC : function(cmp, evt){
-        var src = evt.getSource();
-        if (src == undefined)
-            src = cmp;
-        src.find("events").getElement().innerHTML += "C";
+        cmp.find("events").getElement().innerHTML += "C";
     }
 })

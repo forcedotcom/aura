@@ -42,6 +42,8 @@
         var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
         _helper.setEventHandlersOnChildren(component);
 
-        event.stopPropagation();
+        if(event.getPhase() !== "default") {
+            event.stopPropagation();
+        }
     }
 });// eslint-disable-line semi

@@ -20,13 +20,12 @@
     testComponent:{
         test:function(cmp){
             cmp.find("Charlie").getEvent("A").fire();
-            aura.test.assertEquals("", $A.test.getText(cmp.find("events").getElement()));
+            aura.test.assertEquals("B", $A.test.getText(cmp.find("events").getElement()));
             aura.test.assertEquals("", $A.test.getText(cmp.find("Martin").find("events").getElement()));
             aura.test.assertEquals("", $A.test.getText(cmp.find("Brooke").find("events").getElement()));
             aura.test.assertEquals("", $A.test.getText(cmp.find("Bob").find("events").getElement()));
             aura.test.assertEquals("", $A.test.getText(cmp.find("Max").find("events").getElement()));
-            var text = $A.test.getText(cmp.find("Charlie").find("events").getElement());
-            aura.test.assertTrue(text=="AB" || text=="BA");
+            aura.test.assertEquals("A", $A.test.getText(cmp.find("Charlie").find("events").getElement()));
         }
     },
 

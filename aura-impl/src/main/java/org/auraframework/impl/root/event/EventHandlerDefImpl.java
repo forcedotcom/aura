@@ -15,17 +15,8 @@
  */
 package org.auraframework.impl.root.event;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
 import org.auraframework.Aura;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.EventHandlerDef;
-import org.auraframework.def.EventType;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.*;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -33,6 +24,10 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Definition of an event handler.
@@ -46,6 +41,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
     private final PropertyReference action;
     private final PropertyReference value;
     private final String name;
+    private final String phase;
 
     protected EventHandlerDefImpl(Builder builder) {
         super(builder);
@@ -53,6 +49,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
         this.action = builder.action;
         this.value = builder.value;
         this.name = builder.name;
+        this.phase = builder.phase;
     }
 
     @Override
@@ -124,6 +121,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
             json.writeMapEntry("action", action);
             json.writeMapEntry("value", value);
             json.writeMapEntry("name", name);
+            json.writeMapEntry("phase", phase);
             json.writeMapEnd();
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
@@ -139,6 +137,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
         private PropertyReference action;
         private String name;
+        private String phase;
         private PropertyReference value;
 
         @Override
@@ -163,6 +162,11 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
 
         public Builder setName(String name) {
             this.name = name;
+            return this;
+        }
+
+        public Builder setPhase(String phase) {
+            this.phase = phase;
             return this;
         }
     }

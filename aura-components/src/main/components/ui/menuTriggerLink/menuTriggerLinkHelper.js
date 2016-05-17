@@ -23,11 +23,11 @@
         var htmlAttr   = html.get('v.HTMLAttributes');
         var dispatcher = cmp.getConcreteComponent().getEventDispatcher();
 
-        if (dispatcher.focus && dispatcher.focus.length) {
+        if (dispatcher.focus && dispatcher.focus["bubble"] && dispatcher.focus["bubble"].length) {
             htmlAttr.onfocus = cmp.getReference('c.onfocus');
         }
 
-        if (dispatcher.blur && dispatcher.blur.length) {
+        if (dispatcher.blur && dispatcher.blur["bubble"] && dispatcher.blur["bubble"].length) {
             htmlAttr.onblur = cmp.getReference('c.onblur');
         }
     },

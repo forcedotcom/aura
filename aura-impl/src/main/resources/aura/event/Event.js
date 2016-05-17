@@ -22,14 +22,19 @@
  * @export
  */
 Aura.Event.Event = function(config) {
-    this.source = config["component"];
+    // source is only used to calculate the path, not determine access
+    this.source = config["component"] || $A.getContext().getCurrentAccess() || $A.getRoot();
     this.eventDef = config["eventDef"];
     this.eventDispatcher = config["eventDispatcher"];
     this.eventName = config["name"];
     this.params = {};
     this.fired = false;
     this.eventStopPropagation = false;
+    this.defaultPrevented = false;
+    this.paused = false;
     this.componentEvent = false;
+    this.phase = undefined;
+    this.eventHandlerIterator = null;
 
     // propagating locker key when possible
     var key = this.source && getLockerSecret(this.source, "key");
@@ -60,13 +65,77 @@ Aura.Event.Event.prototype.getDef = function(){
 };
 
 /**
- * Sets wether the event can bubble or not
- * @param {Boolean} bubble The param wether this event should bubble or not
- * The default is false
+ * Gets the current phase of this event.
+ * Returns undefined if the event has not yet been fired.
+ * Possible return values for APPLICATION and COMPONENT events 
+ * are "capture", "bubble", and "default" once fired.
+ * VALUE events return "default" once fired.
+ * 
+ * @platform
+ * @export
+ */
+Aura.Event.Event.prototype.getPhase = function(){
+    return this.phase;
+};
+
+/**
+ * Sets whether the event can bubble or not. This will throw 
+ * an error if called in the "default" phase.
+ * The default is false.
  * @export
  */
 Aura.Event.Event.prototype.stopPropagation = function() {
+    $A.assert(this.getPhase() !== "default", "stopPropagation() is not supported in the 'default' phase");
     this.eventStopPropagation = true;
+};
+
+/**
+ * Prevents the default phase execution for this event. This will throw 
+ * an error if called in the "default" phase.
+ * The default is true.
+ * @platform
+ * @export
+ */
+Aura.Event.Event.prototype.preventDefault = function() {
+    $A.assert(this.getPhase() !== "default", "preventDefault() is not supported in the 'default' phase");
+    this.defaultPrevented = true;
+};
+
+/**
+ * Pauses this event such that event handlers will not be processed until
+ * Event.resume() is called. The handling process will pause in the current
+ * position of the event handler processing sequence. If the event is already
+ * paused, calling this does nothing. This will throw an error
+ * if called in the "default" phase.
+ * @platform
+ * @export
+ */
+Aura.Event.Event.prototype.pause = function() {
+    $A.assert(this.getPhase() !== "default", "pause() is not supported in the 'default' phase");
+    if(!this.paused) {
+        this.paused = true;
+    }
+    return this;
+};
+
+/**
+ * Resumes event handling for this event from the same position in the event
+ * handler processing sequence from which it was previously paused. 
+ * If the event is not paused, calling this does nothing. This will throw an error
+ * if called in the "default" phase.
+ * This API does not define whether or not any remaining event handlers will
+ * execute in th current call stack or be deferred and executed in a new call stack,
+ * therefore the exact timing behavior is not dependable.
+ * @platform
+ * @export
+ */
+Aura.Event.Event.prototype.resume = function() {
+    $A.assert(this.getPhase() !== "default", "resume() is not supported in the 'default' phase");
+    if(this.paused) {
+        this.paused = false;
+        // JBA: should this queue a microtask/task or start from this activation frame?
+        this.executeHandlers();
+    }
 };
 
 /**
@@ -155,75 +224,123 @@ Aura.Event.Event.prototype.getParams = function(){
     return this.params;
 };
 
-//#if {"modes" : ["STATS"]}
-Aura.Event.Event.prototype.statsIndex = [];
-//#end
 
-Aura.Event.Event.prototype.dispatchNonComponentEventHandlers = function () {
-    if (this.eventDispatcher) {
+/**
+ * Convenience function to determine which kind of event execution should be used
+ * for this event. This is NOT PUBLIC! It's NOT an API and can change at any point.
+ * @return {String} One of: "VALUE", "COMPONENT", "LEGACY_COMPONENT", "APPLICATION"
+ * @private
+ */
+Aura.Event.Event.prototype.getEventExecutionType = function () {
+    if(this.eventDef.getDescriptor().getQualifiedName() === "markup://aura:methodCall") {
+        return "VALUE";
+    }
+    else if(this.eventName) {
+        return this.componentEvent ? 
+            "LEGACY_COMPONENT" :
+            "COMPONENT";
+    }
+    else {
         var def = this.eventDef;
         while (def) {
             var qname = def.getDescriptor().getQualifiedName();
             var handlers = this.eventDispatcher[qname];
 
             if (handlers) {
-                if ($A.util.isArray(handlers)) {
-                    //Value handlers on components use arrays, not objects
-                    for (var k = 0; k < handlers.length; k++) {
-                        handlers[k](this);
-                    }
-                } else {
-                    for (var key in handlers) {
-                        var cmpHandlers = handlers[key];
-                        for (var j = 0; j < cmpHandlers.length; j++) {
-                            var handler = cmpHandlers[j];
-                            if (handler) {
-                                try {
-                                    handler(this);
-                                } catch (e) {
-                                    if (this.eventDef.getDescriptor().toString() === "markup://aura:systemError") {
-                                        // if a systemError event handler failed, we don't want it to repeatedly failed
-                                        // because the event is fired in error handling framework.
-                                        cmpHandlers[j] = null;
-                                        $A.warning("aura:systemError event handler failed", e);
-                                        $A.logger.reportError(e);
-                                    } else {
-                                        throw e;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                return def.getEventType() === "VALUE" ?
+                    "VALUE" : 
+                    "APPLICATION";
             }
             def = def.getSuperDef();
+        }
+
+        // we didn't find any handlers to begin with; just assume "APPLICATION"
+        return "APPLICATION";
+    }
+};
+
+/**
+ * Executes the event handlers for this event.
+ * @private
+ */
+Aura.Event.Event.prototype.executeHandlers = function() {
+    if(!this.eventHandlerIterator) {
+        this.eventHandlerIterator = this.getHandlerIterator();
+    }
+    this.executeHandlerIterator(this.eventHandlerIterator);
+};
+
+/**
+ * Executes the handlers returned by handlerIterator.
+ * @param {Iterator} handlerIterator
+ * @private
+ */
+Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
+    var res = {};
+    var value;
+
+    var isSystemError = this.eventDef.getDescriptor().toString() === "markup://aura:systemError";
+    var isComponentEventType = this.getEventExecutionType() === "COMPONENT";
+
+    while(!this.paused && !res.done) {
+        res = handlerIterator.next();
+        value = res.value;
+        if(value && value.handler) {
+
+            // LEGACY BEHAVIOR
+            // COMPONENT events automatically stopPropagation if something is destroyed during BUBBLING
+            // or CAPTURING
+            if(isComponentEventType && !value.cmp.isValid() && this.phase !== "default") {
+                this.stopPropagation();
+            }
+
+            // update our phase
+            this.phase = value.phase;
+            
+            if(isSystemError) {
+                // Special case... only wrap in try-catch for this type of event
+                try {
+                    value.handler(this);
+                } catch (e) {
+                    // if a systemError event handler failed, we don't want it to repeatedly fail
+                    // because the event is fired in error handling framework.
+
+                    // TODO: unregister this particular event handler here!
+                    // cmpHandlers[j] = null;
+                    $A.warning("aura:systemError event handler failed", e);
+                    $A.logger.reportError(e);
+                }
+            }
+            else {
+                value.handler(this);
+            }
         }
     }
 };
 
-Aura.Event.Event.prototype.dispatchComponentEventHandlers = function () {
-    var cmp = this.source;
-    while (cmp && cmp.getDef().getEventDef(this.eventName)) {
-        var dispatcher = cmp.getEventDispatcher();
-        if (dispatcher) {
-            var handlers = dispatcher[this.eventName];
-            if (handlers) {
-                for (var i = 0; i < handlers.length; i++) {
-                    handlers[i](this);
-                    // A handler might have destroyed the component and we need to stop walking the super chain
-                    if(!cmp.isValid()){
-                        break;
-                    }
-                }
-            }
-        }
-        cmp = cmp.getSuper();
+/**
+ * Returns an iterator over the handlers for this event.
+ * @private
+ */
+Aura.Event.Event.prototype.getHandlerIterator = function() {
+    var eventExecutionType = this.getEventExecutionType();
+
+    switch(eventExecutionType) {
+        case "VALUE":
+            return $A.eventService.getValueHandlerIterator(this);
+        case "LEGACY_COMPONENT":
+            return $A.eventService.getNonBubblingComponentEventHandlerIterator(this);
+        case "COMPONENT":
+            return $A.eventService.getComponentEventHandlerIterator(this);
+        case "APPLICATION":
+            return $A.eventService.getAppEventHandlerIterator(this);
+        default:
+            throw new Aura.Errors.AuraError("Invalid event type");
     }
 };
 
 /**
  * Fires the Event. Checks if the Event has already been fired before firing.
- * Returns null if a handler has destroyed the component.
  * Maps the component handlers to the event dispatcher.
  * @param {Object} params Optional A set of parameters for the Event. Any previous parameters of the same name will be overwritten.
  * @platform
@@ -239,26 +356,9 @@ Aura.Event.Event.prototype.fire = function(params) {
     if (params) {
         this.setParams(params);
     }
-    //#if {"modes" : ["STATS"]}
-    var startTime = (new Date()).getTime();
-    //#end
 
     $A.run(function() {
         self.fired = true;
-        // if it has an eventName it is not a method or application event
-        if (self.eventName) {
-            // for legacy reasons, if the event is set as component level event, dispatch it alone (not bubbling)
-            if (self.componentEvent) {
-                self.dispatchComponentEventHandlers();
-            } else {
-                $A.eventService.bubbleEvent(self);
-            }
-        } else {
-            self.dispatchNonComponentEventHandlers();
-        }
+        self.executeHandlers();
     }, this.eventDef.getDescriptor().getQualifiedName()/*name for the stack*/);
-
-    //#if {"modes" : ["STATS"]}
-        Aura.Event.Event.prototype.statsIndex.push({'event': this, 'startTime': startTime, 'endTime': (new Date()).getTime()});
-    //#end
 };

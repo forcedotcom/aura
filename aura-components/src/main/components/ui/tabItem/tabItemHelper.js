@@ -25,7 +25,7 @@
         var dispatcher = cmp.getConcreteComponent().getEventDispatcher();
 
         for (var e in this.EVENT_DISPATCH) {
-            if (dispatcher[e] && dispatcher[e].length) {
+            if (dispatcher[e] && dispatcher[e]["bubble"] && dispatcher[e]["bubble"].length) {
                 var events = this.EVENT_DISPATCH[e];
                 for (var i in events) {
                     htmlAttr[events[i]] = cmp.getReference('c.' + e);

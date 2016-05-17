@@ -26,6 +26,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handle Event in Root", //
             "handleSuper Event in Root" ];
 
@@ -39,6 +40,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Extended", //
+            "handle CAPTURE Extended in Root", //
             "handle Extended in Root", //
             "handleSuper Extended in Root" ];
 
@@ -72,6 +74,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handleGrandchild Event in Inner", //
             "handleChild Event in Inner", //
             "handle Event in Inner", //
@@ -88,6 +91,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handleChild Event in Inner", //
             "handle Event in Inner", //
             "handle Event in Root", //
@@ -103,6 +107,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Extended", //
+            "handle CAPTURE Extended in Root", //
             "handle Extended in Inner", //
             "handle Extended in Root", //
             "handleSuper Extended in Root" ];
@@ -117,6 +122,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handleGrandchild Event in ContainerContent", //
             "handleChild Event in ContainerContent", //
             "handle Event in ContainerContent", //
@@ -134,6 +140,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Extended", //
+            "handle CAPTURE Extended in Root", //
             "handleChild Extended in ContainerContent", //
             "handle Extended in ContainerContent", //
             "handleContainer Extended in Container", //
@@ -150,6 +157,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handleChild Event in Provided", //
             "handle Event in Provided", //
             "handle Event in Root", //
@@ -161,7 +169,7 @@
         }
     },
 
-    testClientCreatedBubblingDoesntIncludeRoot : {
+    testClientCreatedBubblingIncludesRoot : {
         test : [ function(cmp) {
             var that = this;
             cmp._target = undefined;
@@ -180,9 +188,12 @@
         }, function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handleGrandchild Event in Client", //
             "handleChild Event in Client", //
-            "handle Event in Client" ];
+            "handle Event in Client",
+            "handle Event in Root",
+            "handleSuper Event in Root" ];
 
             cmp.find("logPanel").clear();
             cmp._target.find("emitter").fireEvent();
@@ -210,8 +221,11 @@
         }, function(cmp) {
             var expected = [ //
             "fire Extended", //
+            "handle CAPTURE Extended in Root", //
             "handleChild Extended in ProvidedClient", //
-            "handle Extended in ProvidedClient" ];
+            "handle Extended in ProvidedClient",
+            "handle Extended in Root",
+            "handleSuper Extended in Root" ];
 
             cmp.find("logPanel").clear();
             cmp._target.find("emitterExtended").fireEvent();
@@ -223,6 +237,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handleGrandchild Event in ContainerContent", //
             "handleChild Event in ContainerContent", //
             "handle Event in ContainerContent", //
@@ -245,6 +260,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handleGrandchild Event in ContainerContent", //
             "handleChild Event in ContainerContent", //
             "handle Event in ContainerContent", //
@@ -266,6 +282,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handleGrandchild Event in ContainerContent", //
             "handleChild Event in ContainerContent", //
             "stopChild Event" ];
@@ -285,6 +302,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handleGrandchild Event in ContainerContent", //
             "stopGrandchild Event" ];
 
@@ -303,6 +321,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "destroy Inner" ];
 
             var toDestroy = cmp.find("inner");
@@ -321,6 +340,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "destroy InnerSuper" ];
 
             var toDestroy = cmp.find("inner").getSuper();
@@ -339,6 +359,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handleGrandchild Event in Inner", //
             "destroy InnerSuperSuper" ];
 
@@ -358,6 +379,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handleGrandchild Event in ContainerContent", //
             "handleChild Event in ContainerContent", //
             "handle Event in ContainerContent", //
@@ -379,6 +401,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handle Event in NoSuperHandlers", //
             "handle Event in Root", //
             "handleSuper Event in Root" ];
@@ -393,6 +416,7 @@
         test : function(cmp) {
             var expected = [ //
             "fire Event", //
+            "handle CAPTURE Event in Root", //
             "handleAdded1 Event", //
             "handleAdded2 Event", //
             "handleAdded3 Event", //
@@ -455,6 +479,7 @@
         test: function(cmp) {
             var expected = [
                 "fire Passthrough", 
+                "handle CAPTURE Passthrough in Root", //
                 "handle Passthrough in Root", 
                 "handleSuper Passthrough in Root"
             ];

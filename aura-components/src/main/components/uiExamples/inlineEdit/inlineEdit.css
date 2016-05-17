@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-.THIS .inline-edit-example {
+.THIS .uiInlineEdit {
 	width: 100%;
 	margin: 0.5rem;
 }
 
-.THIS .inline-edit-example table {
+.THIS .inline-edit-example {
 	border-bottom: 1px solid #d8dde6;
 	width: 90%;
 	font-size: 0.75rem;
@@ -61,7 +61,7 @@
 }
 
 .THIS .inline-edit-example tr td .content,
-.THIS .inline-edit-example .panel-content input {
+.THIS .panel-content input {
 	background-color: white;
     color: #16325c;
     display: inline-block;
@@ -73,12 +73,12 @@
     height: 21px;
 }
 
-.THIS .inline-edit-example .footer {
+.THIS .footer {
 	text-align: center;
 	vertical-align: middle;
 }
 
-.THIS .inline-edit-example button {
+.THIS button {
 	background: white;
 	box-shadow: none;
     color: #16325c;

@@ -30,6 +30,16 @@
 		}]
 	 },
 	 
+	 /**
+	  * Test append functionality
+	  */
+	 testAppendItems : {
+		 test : function(cmp) {
+			 this.triggerAppend(cmp);
+			 this.waitForRows(11);
+		 }
+	 },
+	 
 	 triggerEditOnCell : function(cmp, rowIndex, colIndex) {
 		 var tbody = document.getElementsByTagName("tbody")[0];
 		 var trs = this.getOnlyTrs(tbody.children);		 
@@ -47,5 +57,18 @@
 			 }
 		 }
 		 return elementArray;
+	 },
+	 
+	 waitForRows : function(rowCount) {
+		 var that = this;
+		 $A.test.addWaitForWithFailureMessage(rowCount, function() {
+			 var tbody = document.getElementsByTagName("tbody")[0];
+			 var trs = that.getOnlyTrs(tbody.children);
+			 return trs.length;
+		 }, "Number of rows expected is incorrect.");
+	 },
+	 
+	 triggerAppend : function(cmp) {
+		 cmp.find("appendButton").get("e.press").fire();
 	 }
  })

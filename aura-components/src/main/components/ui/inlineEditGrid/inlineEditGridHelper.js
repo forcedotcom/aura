@@ -16,13 +16,12 @@
 ({
 	cellStatuses : ['edited', 'disabled', 'hasErrors'],
 	
-	initializeCellStates : function(cellComponentDef) {
+	initializeCellStates : function(cellComponentDef, itemVar) {
 		var values = cellComponentDef.attributes.values;
 		
 		// May need some sort of interface to make sure we have these values?
 		if (values.name) {
 			var name = values.name.value;
-			var itemVar = "item";
 			
 			for (var i = 0; i < this.cellStatuses.length; i++) {
 				var status = this.cellStatuses[i];
@@ -91,6 +90,7 @@
 		//}
 	},
 	
+	/* TODO: caching and reset functionality is being moved to data manager */
 	cacheEditedItem : function(cmp, item, index) {
 		var editedItems = cmp.get("v.editedItems");
 
@@ -128,5 +128,10 @@
 		
 		cmp.set("v.items", items);
 		cmp.set("v.editedItems", {});
+	},
+	
+	/* UTILITY FUNCTIONS */
+	bubbleEvent : function(cmp, evt, eventName) {
+		cmp.getEvent(eventName).setParams(evt.getParams()).fire();
 	}
 })// eslint-disable-line semi

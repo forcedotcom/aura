@@ -629,12 +629,29 @@ button.toggle:focus {
   border-right:1px solid #d8dde6;
   z-index: 1;
 }
-.new_chaos_run, .old_chaos_run, .replaying_status .newrun_status{
+.chaos_run_options span, .chaos_run_result span {
+  margin: .5rem;
+  display: block;
+  /*.slds-text-body--small {*/
+    font-size: 1.25rem;
+    color: #54698d;
+  /*}*/
+}
+.chaos_run_options label, .chaos_run_result label {
+  margin: .5rem;
+  /*.slds-text-body--small {*/
+    font-size: 0.75rem;
+    color: #54698d;
+  /*}*/
+}
+
+.new_chaos_run, .old_chaos_run, .replaying_status, .newrun_status, .load_chaos_run_from_file{
   border: 1px solid #e0e5ee;
   border-radius: 4px;
   padding: .5rem;
   margin: 1rem;
 }
+
 .chaos_run_result {
   border-bottom: 1px solid #d8dde6;
   padding-bottom: .5rem;

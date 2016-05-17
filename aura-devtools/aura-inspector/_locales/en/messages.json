@@ -386,6 +386,46 @@
 	"componentview_handlers": {
 		"message": "Handlers",
 		"description": "Shows the events on the component that are being listened to and what function would be executed when the handler is hit."
+	},
+	"chaosview_samplingInterval_in_second": {
+		"message": "Sampling Interval In Second",
+		"description": "how many seconds between two clicking"
+	},
+	"chaosview_drop_action_by_percentage": {
+		"message": "Drop Action By Percentage",
+		"description": "drop action randomly, by some percentage"
+	},
+	"chaosview_buton_stop_all_runs": {
+		"message": "Panic Button : Stop Chaos Run",
+		"description": "push this to force all chaos run to stop"
+	},
+	"chaosview_new_chaos_run": {
+		"message": "New Chaos Run",
+		"description": "area for buttons on start/stop/save a new chaos run"
+	},
+	"chaosview_button_start": {
+		"message": "Start A New Chaos Run",
+		"description": "push this to start a new chaos run"
+	},
+	"chaosview_button_stop": {
+		"message": "Stop the Run",
+		"description": "push this to stop the new chaos run"
+	},
+	"chaosview_button_save": {
+		"message": "Save the Run",
+		"description": "push this to save the new chaos run"
+	},
+	"chaosview_old_chaos_run": {
+		"message": "Old Chaos Run",
+		"description": "area for buttons on replaying existing chaos run"
+	},
+	"chaosview_button_replay": {
+		"message": "Replay the Chaos Run",
+		"description": "push this to replay the saved chaos run"
+	},
+	"chaosview_chaos_run_result": {
+		"message": " Chaos Run Result",
+		"description": "area for chaos run status update"
 	}
 	/*,
 	"": {

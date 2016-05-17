@@ -1,5 +1,22 @@
 /* Listens for actions and shows them in the actions tab */
 function AuraInspectorChaosView(devtoolsPanel) {
+
+    var labels = {
+        "samplingIntervalInSecond": chrome.i18n.getMessage("chaosview_samplingInterval_in_second"),
+        "dropActionByPercentage": chrome.i18n.getMessage("chaosview_drop_action_by_percentage"),
+        "stopAllRuns": chrome.i18n.getMessage("chaosview_buton_stop_all_runs"),
+        "newChaosRun": chrome.i18n.getMessage("chaosview_new_chaos_run"),
+        "buttonStart": chrome.i18n.getMessage("chaosview_button_start"),
+        "buttonStop": chrome.i18n.getMessage("chaosview_button_stop"),
+        "buttonSave": chrome.i18n.getMessage("chaosview_button_save"),
+        "oldChaosRun": chrome.i18n.getMessage("chaosview_old_chaos_run"),
+        "buttonReplay": chrome.i18n.getMessage("chaosview_button_replay"),
+        "chaosRunResult": chrome.i18n.getMessage("chaosview_chaos_run_result"),
+
+        
+    };
+
+
     //search 'MAGIC WARNING' in this file
     var InTheMiddleOfAChaosRun = false;
 	var _chaosCardList;
@@ -7,38 +24,40 @@ function AuraInspectorChaosView(devtoolsPanel) {
 	var markup = `
 		<div class="chaos_tab">
 			<div class="chaos_run_options">
-				<label class="label">Chaos Run Options</label>
+				<span class="description">Chaos Run Options</span>
 				<menu type="toolbar">
-		            <li>
-		            	samplingInterval(second): <input id="samplingInterval" type="number" size="2" maxsize="2" placeholder="4"/>
+                    <li>
+                        <label class="description"> ${labels.samplingIntervalInSecond} </label>
+		            	<input id="samplingInterval" type="number" size="2" maxsize="2" placeholder="4"/>
 		            </li>
                     <li class="divider"></li>
                     <li>
-                        dropActionBy(percent) <input id="actionDropPercentage" type="number" size="2" maxsize="3" placeholder="0"/>
+                         <label class="description"> ${labels.dropActionByPercentage} </label>
+                         <input id="actionDropPercentage" type="number" size="2" maxsize="3" placeholder="0"/>
                     </li>
                     <li class="divider"></li>
-                    <button id="stop_all_chaos_run" class="stop_all_chaos_run text-button">Panic: Stop All the runs</button>
+                    <button id="stop_all_chaos_run" class="stop_all_chaos_run text-button"> ${labels.stopAllRuns} </button>
 	        	</menu>
                 <div class="new_chaos_run">
-                    <label class="label">Start A New Chaos Run</label>
-    	        	<button id="start_chaos_run" class="start_chaos_run text-button">Start</button>
-    			    <button id="stop_chaos_run" class="stop_chaos_run text-button hidden">Stop</button>
-                    <button id="save_chaos_run" class="save_chaos_run text-button hidden">Save the run</button>
+                    <span class="description">${labels.newChaosRun}</span>
+    	        	<button id="start_chaos_run" class="start_chaos_run text-button">${labels.buttonStart}</button>
+    			    <button id="stop_chaos_run" class="stop_chaos_run text-button hidden">${labels.buttonStop}</button>
+                    <button id="save_chaos_run" class="save_chaos_run text-button hidden">${labels.buttonSave}</button>
                     <div class="newrun_status hidden" id="newrun_status">
                     </div>
                 </div>
                 <div class="old_chaos_run">
-                    <label class="label">Replay Some Existing Chaos Run</label>
+                    <span class="description">${labels.oldChaosRun}</span>
                     <div class="load_chaos_run_from_file">
                         <input type="file" id="choose_chaos_run_file" name="files[]"/>
                     </div>
-                    <button id="replay_chaos_run" class="replay_chaos_run text-button hidden">Replay the run</button>
+                    <button id="replay_chaos_run" class="replay_chaos_run text-button hidden">${labels.buttonReplay}</button>
                     <div class="replaying_status hidden" id="replaying_status">
                     </div>
                 </div>
 	        </div>
 			<div class="chaos_run_result">
-				<label class="label">Run Result</label>
+				<span class="description">${labels.chaosRunResult}</span>
 				<section id="chaos_actions_list">
 	            </section>
 			</div>

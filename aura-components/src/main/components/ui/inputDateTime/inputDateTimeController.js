@@ -25,7 +25,6 @@
     },
 
     doInit: function(component, event, helper) {
-        var datePicker = component.find("datePicker");
     	// only add the placeholder when there is no date picker opener.
         if (helper.isDesktopMode(component)) {
             helper.updateTimeFormat(component);
@@ -42,14 +41,10 @@
                     component.set("v.timePlaceholder", timeFormat);
                 }
             }
-            // datepicker can be undefined if it's managed by ui:datepickerManager
-            if (!$A.util.isUndefinedOrNull(datePicker)) {
-                datePicker.set("v.hasTime", false);
-                datePicker.set("v.showToday", false);
+            if (component.get("v.useManager")) {
+                helper.checkManagerExists(component);
+                component.set("v.loadDatePicker", false);
             }
-        } else {
-            datePicker.set("v.hasTime", true);
-            datePicker.set("v.showToday", true);
         }
     },
 
@@ -83,6 +78,19 @@
         var dateValue = event.getParam("arguments").value;
         if (dateValue) {
             helper.setDateValue(component, dateValue);
+        }
+    },
+
+    // override ui:hasManager
+    registerManager: function(component, event) {
+        var sourceComponentId = event.getParam('sourceComponentId') || event.getParam("arguments").sourceComponentId;
+        if ($A.util.isUndefinedOrNull(sourceComponentId)) {
+            return;
+        }
+
+        var sourceComponent = $A.componentService.get(sourceComponentId);
+        if (sourceComponent && sourceComponent.isInstanceOf("ui:datePickerManager")) {
+            component.set("v.managerExists", true);
         }
     },
 

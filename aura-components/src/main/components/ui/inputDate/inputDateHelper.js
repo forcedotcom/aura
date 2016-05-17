@@ -43,11 +43,17 @@
     },
 
     displayDatePicker: function(component) {
-        if (component.get("v.useManager")) {
+        var useManager = component.get("v.useManager"),
+            managerExists = component.get("v.managerExists");
+        if (useManager && managerExists) {
             this.openDatepickerWithManager(component);
         } else {
-            var concCmp = component.getConcreteComponent();
-            var datePicker = concCmp.find("datePicker");
+            // if useManager was true but there is no manager, then set loadDatePicker back to true
+            if (useManager && !managerExists) {
+                this.loadDatePicker(component);
+            }
+
+            var datePicker = component.find("datePicker");
             if (datePicker && datePicker.get("v.visible") === false) {
                 var currentDate = this.getDateValueForDatePicker(component);
 
@@ -152,10 +158,32 @@
     	}
     },
 
+    loadDatePicker: function(component) {
+        if (!component.get("v.loadDatePicker")) {
+            component.set("v.loadDatePicker", true);
+
+            //datepicker has been loaded now, find it again and set it's reference element
+            this.initializeDatePicker(component);
+        }
+    },
+
+    initializeDatePicker: function (component) {
+        var datePicker = component.find("datePicker");
+        if (datePicker) {
+            datePicker.set("v.referenceElement", component.find("inputText").getElement());
+        }
+    },
+
+    checkManagerExists: function(component) {
+        $A.getEvt('markup://ui:registerDatePickerManager').setParams({
+            sourceComponentId : component.getGlobalId()
+        }).fire();
+    },
+
     openDatepickerWithManager: function(component) {
         var currentDate = this.getDateValueForDatePicker(component);
 
-        $A.get('e.ui:showDatePicker').setParams({
+        $A.getEvt('markup://ui:showDatePicker').setParams({
             element  	: this.getInputElement(component),
             value      	: currentDate ? this.getDateString(currentDate) : currentDate,
             sourceComponentId : component.getGlobalId()

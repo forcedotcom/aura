@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateTimeComponent, ui:handlesDateSelected" extensible="true" defaultFlavor="default, input, datetime"
+<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateTimeComponent, ui:handlesDateSelected, ui:hasManager" extensible="true" defaultFlavor="default, input, datetime"
                 provider="js://ui.inputDateTime" controller="java://org.auraframework.impl.controller.TimeZoneInfoController"
                 description="An input field for entering a date and time.">
 
@@ -23,9 +23,9 @@
     <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time."/>
     <aura:attribute name="placeholder" type="String" description="The text that is displayed for date input by default. Set during init based on the 'format' value."/>
     <aura:attribute name="timePlaceholder" type="String" description="The text that is displayed for time input by default. Set during init based on the 'format' value."/>
+    <aura:attribute name="loadDatePicker" type="Boolean" default="true" description="Set to true to load the date picker. The default is true."/>
 
     <aura:dependency resource="markup://ui:inputDateTimeHtml" type="COMPONENT"/>
-    <aura:dependency resource="markup://ui:showDatePicker" type="EVENT"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:registerEvent name="openPicker" type="ui:openPicker" description="The event fired when the date picker is opened."/>
@@ -42,7 +42,7 @@
                     </a>
                 </aura:if>
             </div>
-            <aura:if isTrue="{!!v.useManager}">
+            <aura:if isTrue="{!v.loadDatePicker}">
                 <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
             </aura:if>
             <div class="dateTime-inputTime form-element form-element__control">
@@ -74,7 +74,9 @@
             <a aura:id="clear" class="clearIcon hide" onclick="{!c.clearValue}">
                 <span class="assistiveText">Clear Button</span>
             </a>
-            <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
+            <aura:if isTrue="{!v.loadDatePicker}">
+                <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
+            </aura:if>
         </aura:set>
     </aura:if>
 </aura:component>

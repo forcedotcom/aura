@@ -18,15 +18,21 @@
         $A.storageService.CryptoAdapter.setKey("invalid");
     },
 
-    testFallbackModeReported: {
-        test:[function(cmp){
-            // do a get so next test stage is run after adapter finishes initializing
-            cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
-        },
-        function(cmp){
-            $A.test.assertFalse(this.storage.isPersistent(), "CryptoAdapter should be in fallback mode so not persistent");
-        }]
+    createStorage: function(name, maxSize, defaultExpiration, defaultAutoRefreshInterval) {
+        return $A.storageService.initStorage(
+                name,
+                true,   // secure
+                true,   // persistent
+                maxSize,
+                defaultExpiration,
+                defaultAutoRefreshInterval,
+                true,   // debug logging
+                true);  // clear on init
     },
+
+    /**
+     * Test cases common to all adapters. Implementations in storageTest.js
+     */
 
     testSizeInitial: {
         test: function(cmp) {
@@ -148,6 +154,12 @@
         }
     },
 
+    testSetItemUnderMaxSize : {
+        test : [function(cmp) {
+            cmp.helper.lib.storageTest.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
+        }]
+    },
+    
     testSetItemOverMaxSize : {
         test : [function(cmp) {
             cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "Item larger than size limit");
@@ -157,6 +169,12 @@
         }]
     },
 
+    testGetAll: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetAll(cmp, this.storage);
+        }
+    },
+
     testReplaceExistingWithEntryTooLarge: {
         test: [
         function putItemThenReplaceWithEntryTooLarge(cmp) {
@@ -164,6 +182,16 @@
         },
         function getItem(cmp) {
             cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage2(cmp, this.storage);
+        }]
+    },
+
+    testStorageInfo: {
+        test:[function(cmp){
+            // do a get so next test stage is run after adapter finishes initializing
+            cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
+        },
+        function(cmp){
+            cmp.helper.lib.storageTest.testStorageInfo(this.storage, false, true);
         }]
     },
 
@@ -185,39 +213,6 @@
         }
     },
 
-    testValueTooLarge: {
-        test:[ function(cmp) {
-                var completed = false;
-                var storage = $A.storageService.getStorage("crypto-store");
-                storage.remove("valueTooLarge")
-                    .then(function () {
-                        return storage.put("valueTooLarge", new Array(32768).join("x"));
-                    }).then(function() {
-                        $A.test.fail("Successfully stored value that is too large");
-                        completed = true;
-                    }, function() {
-                        completed = true;
-                    });
-                    $A.test.addWaitFor(true, function() { return completed; });
-            }, function(cmp) {
-                var storage = $A.storageService.getStorage("crypto-store");
-                var die = function(error) { completed=true; cmp.helper.lib.storageTest.dieDieDie(cmp, error); }.bind(this);
-                var completed = false;
-                storage.get("valueTooLarge")
-                    .then(function (item) {
-                        completed = true;
-                        $A.test.assertUndefinedOrNull(item, "value too large should not be stored.");
-                    })['catch'](die);
-                $A.test.addWaitFor(true, function() { return completed; });
-            }]
-    },
-
-    testGetAll: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetAll(cmp, this.storage);
-        }
-    },
-
     testOverflow: {
         test: function(cmp) {
             var storage = this.createStorage("crypto-store-overflow", 5000, 2000, 3000);
@@ -235,25 +230,72 @@
         }]
     },
 
-    testStorageInfo: {
+    /**
+     * Tests that verify behavior specific to CryptoAdapter in fallback mode.
+     */
+
+    testFallbackModeReported: {
         test:[function(cmp){
             // do a get so next test stage is run after adapter finishes initializing
             cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
         },
         function(cmp){
-            cmp.helper.lib.storageTest.testStorageInfo(this.storage, false, true);
+            $A.test.assertFalse(this.storage.isPersistent(), "CryptoAdapter should be in fallback mode so not persistent");
         }]
     },
 
-    createStorage: function(name, maxSize, defaultExpiration, defaultAutoRefreshInterval) {
-        return $A.storageService.initStorage(
-                name,
-                true,   // secure
-                true,   // persistent
-                maxSize,
-                defaultExpiration,
-                defaultAutoRefreshInterval,
-                true,   // debug logging
-                true);  // clear on init
+    testValueTooLarge: {
+        test:[ function(cmp) {
+                var completed = false;
+                var storage = $A.storageService.getStorage("crypto-store");
+                storage.remove("valueTooLarge")
+                    .then(function () {
+                        return storage.put("valueTooLarge", new Array(32768).join("x"));
+                    }).then(function() {
+                        $A.test.fail("Successfully stored value that is too large");
+                        completed = true;
+                    }, function() {
+                        completed = true;
+                    });
+                    $A.test.addWaitFor(true, function() { return completed; });
+            }, function(cmp) {
+                var storage = $A.storageService.getStorage("crypto-store");
+                var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error);(cmp, error); }.bind(this);
+                var completed = false;
+                storage.get("valueTooLarge")
+                    .then(function (item) {
+                        completed = true;
+                        $A.test.assertUndefinedOrNull(item, "value too large should not be stored.");
+                    })['catch'](failTest);
+                $A.test.addWaitFor(true, function() { return completed; });
+            }]
+    },
+
+    /**
+     * TODO: when we store an Error object it stores without issue but when we retrieve it there is no value.
+     */
+    testPutErrorValueFails: {
+        test: function(cmp) {
+            var that = this;
+            var completed = false;
+            var failTest = function(cmp, error) { cmp._storageLib.failTest(cmp, error); }
+            this.storage.put("testErrorValue", new Error("hello, error"))
+                .then(function() {
+                    completed = true;
+                }, function(e) {
+                    cmp._storageLib.appendLine(cmp, e.message);
+                })
+                .then(function() { return that.storage.get("testErrorValue"); })
+                .then(
+                    function(item){
+                        $A.test.assertDefined(item, "Could not retrieve Error object");
+                        // TODO: ideally this would have the error object, or fail earlier and let the user know
+                        // we can't store it
+                        completed = true;
+                    },
+                    function(err) { failTest(cmp, err); }
+                );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        }
     }
 })

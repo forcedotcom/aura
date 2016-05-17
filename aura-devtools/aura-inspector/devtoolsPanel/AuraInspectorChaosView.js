@@ -13,58 +13,61 @@ function AuraInspectorChaosView(devtoolsPanel) {
         "buttonReplay": chrome.i18n.getMessage("chaosview_button_replay"),
         "chaosRunResult": chrome.i18n.getMessage("chaosview_chaos_run_result"),
 
-        
+
     };
 
 
     //search 'MAGIC WARNING' in this file
     var InTheMiddleOfAChaosRun = false;
-	var _chaosCardList;
-    
-	var markup = `
+    var _chaosCardList;
+
+    var markup = `
 		<div class="chaos_tab">
 			<div class="chaos_run_options">
-				<span class="description">Chaos Run Options</span>
-				<menu type="toolbar">
-                    <li>
-                        <label class="description"> ${labels.samplingIntervalInSecond} </label>
-		            	<input id="samplingInterval" type="number" size="2" maxsize="2" placeholder="4"/>
-		            </li>
-                    <li class="divider"></li>
-                    <li>
-                         <label class="description"> ${labels.dropActionByPercentage} </label>
-                         <input id="actionDropPercentage" type="number" size="2" maxsize="3" placeholder="0"/>
-                    </li>
-                    <li class="divider"></li>
-                    <button id="stop_all_chaos_run" class="stop_all_chaos_run text-button"> ${labels.stopAllRuns} </button>
-	        	</menu>
-                <div class="new_chaos_run">
-                    <span class="description">${labels.newChaosRun}</span>
-    	        	<button id="start_chaos_run" class="start_chaos_run text-button">${labels.buttonStart}</button>
-    			    <button id="stop_chaos_run" class="stop_chaos_run text-button hidden">${labels.buttonStop}</button>
-                    <button id="save_chaos_run" class="save_chaos_run text-button hidden">${labels.buttonSave}</button>
-                    <div class="newrun_status hidden" id="newrun_status">
-                    </div>
-                </div>
-                <div class="old_chaos_run">
-                    <span class="description">${labels.oldChaosRun}</span>
-                    <div class="load_chaos_run_from_file">
-                        <input type="file" id="choose_chaos_run_file" name="files[]"/>
-                    </div>
-                    <button id="replay_chaos_run" class="replay_chaos_run text-button hidden">${labels.buttonReplay}</button>
-                    <div class="replaying_status hidden" id="replaying_status">
-                    </div>
-                </div>
-	        </div>
-			<div class="chaos_run_result">
-				<span class="description">${labels.chaosRunResult}</span>
-				<section id="chaos_actions_list">
-	            </section>
-			</div>
+        <section class="new_chaos_run">
+          <h1 class="">${labels.newChaosRun}</h1>
+          <div class="p-around--x-small m-horizontal--x-small">
+            <div>
+              <label class="label"> ${labels.samplingIntervalInSecond} </label>
+            	<input id="samplingInterval" type="number" size="2" maxsize="2" placeholder="4" min="0"/>
+            </div>
+            <div>
+             <label class="label m-top--x-small"> ${labels.dropActionByPercentage} </label>
+             <input id="actionDropPercentage" type="number" size="2" maxsize="3" placeholder="0" min="0" max="100"/>
+            </div>
+            <div class="m-top--x-small">
+              <button id="start_chaos_run" class="start_chaos_run text-button">${labels.buttonStart}</button>
+              <button id="stop_chaos_run" class="stop_chaos_run text-button hidden">${labels.buttonStop}</button>
+              <button id="save_chaos_run" class="save_chaos_run text-button hidden">${labels.buttonSave}</button>
+            </div>
+            <div class="newrun_status hidden label m-top--x-small" id="newrun_status"></div>
+          </div>
+        </section>
+        <section class="old_chaos_run">
+          <h1 class="">${labels.oldChaosRun}</h1>
+          <div class="p-around--x-small m-horizontal--x-small">
+            <div class="load_chaos_run_from_file">
+              <input type="file" id="choose_chaos_run_file" name="files[]"/>
+            </div>
+            <div class="m-top--x-small">
+              <button id="replay_chaos_run" class="replay_chaos_run text-button hidden">${labels.buttonReplay}</button>
+            </div>
+            <div class="replaying_status hidden label m-top--x-small" id="replaying_status"></div>
+          </div>
+        </section>
+      </div>
+			<section class="chaos_run_result dark">
+				<h1 class="">${labels.chaosRunResult}
+          <button id="stop_all_chaos_run" class="stop_all_chaos_run button--brand"> ${labels.stopAllRuns} </button>
+        </h1>
+
+				<div id="chaos_actions_list">
+        </div>
+			</section>
 		</div>
 	`;
 
-	this.init = function(tabBody) {
+    this.init = function(tabBody) {
         tabBody.innerHTML = markup;
 
         _chaosCardList = tabBody.querySelector("#chaos_actions_list");
@@ -73,36 +76,35 @@ function AuraInspectorChaosView(devtoolsPanel) {
         tabBody.querySelector("#start_chaos_run").addEventListener("click", startChaosRun.bind(this));
         tabBody.querySelector("#stop_chaos_run").addEventListener("click", stopChaosRun.bind(this));
         tabBody.querySelector("#save_chaos_run").addEventListener("click", saveChaosRun.bind(this));
-        
+
         tabBody.querySelector("#replay_chaos_run").addEventListener("click", replayChaosRun.bind(this));
         tabBody.querySelector("#stop_all_chaos_run").addEventListener("click", stopAllChaosRun.bind(this));
         tabBody.querySelector('#choose_chaos_run_file').addEventListener('change', handleFileSelect.bind(this), false);
 
 
         // Start listening for events to draw
-        devtoolsPanel.subscribe("AuraInspector:OnPanelConnect", AuraInspectorChaosView_OnBootstrap.bind(this));    
-        devtoolsPanel.subscribe("AuraInspector:OnReplayChaosRunFinished", AuraInspectorChaosView_OnReplayChaosRunFinished.bind(this));   
+        devtoolsPanel.subscribe("AuraInspector:OnPanelConnect", AuraInspectorChaosView_OnBootstrap.bind(this));
+        devtoolsPanel.subscribe("AuraInspector:OnReplayChaosRunFinished", AuraInspectorChaosView_OnReplayChaosRunFinished.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnClickSomeElement", AuraInspectorChaosView_OnClickSomeElement.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnRecordActionDropForChaosRun", AuraInspectorChaosView_OnRecordActionDropForChaosRun.bind(this));
-		devtoolsPanel.subscribe("AuraInspector:OnChaosRunSaved", AuraInspectorChaosView_OnChaosRunSaved.bind(this));
+        devtoolsPanel.subscribe("AuraInspector:OnChaosRunSaved", AuraInspectorChaosView_OnChaosRunSaved.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnChaosRunLoaded", AuraInspectorChaosView_OnChaosRunLoaded.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnStopNewChaosRunWithError", stopChaosRun.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnReplayChaosRunNewStatus", AuraInspectorChaosView_OnReplayChaosRunNewStatus.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnCreateChaosCard", AuraInspectorChaosView_OnCreateChaosCard.bind(this));
-        
-       
+
+
     };
 
-    this.render = function() {
-    };
+    this.render = function() {};
 
     this.refresh = function() {
         removeAllCards();
-        document.querySelector("#stop_chaos_run").classList.add("hidden"); 
-        document.querySelector("#start_chaos_run").classList.remove("hidden");  
-        document.querySelector("#save_chaos_run").classList.add("hidden");  
-        document.querySelector("#replay_chaos_run").classList.add("hidden");  
-        document.querySelector("#stop_all_chaos_run").classList.remove("hidden"); 
+        document.querySelector("#stop_chaos_run").classList.add("hidden");
+        document.querySelector("#start_chaos_run").classList.remove("hidden");
+        document.querySelector("#save_chaos_run").classList.add("hidden");
+        document.querySelector("#replay_chaos_run").classList.add("hidden");
+        document.querySelector("#stop_all_chaos_run").classList.remove("hidden");
         document.querySelector("#replaying_status").classList.add("hidden");
         console.log("chaosView.refresh");
     };
@@ -112,7 +114,7 @@ function AuraInspectorChaosView(devtoolsPanel) {
         status : {'message': string}
     */
     function AuraInspectorChaosView_OnReplayChaosRunNewStatus(status) {
-        if(status && status.message) {
+        if (status && status.message) {
             var div_replaying_status = document.querySelector("#replaying_status");
             div_replaying_status.classList.remove("hidden");
             div_replaying_status.textContent = status.message;
@@ -121,23 +123,23 @@ function AuraInspectorChaosView(devtoolsPanel) {
 
     function removeAllCards() {
         var cards = _chaosCardList.querySelectorAll("aurainspector-chaosCard");
-        if(cards) {
-            for(var c=0,length=cards.length;c<length;c++) {
+        if (cards) {
+            for (var c = 0, length = cards.length; c < length; c++) {
                 cards[c].parentNode.removeChild(cards[c]);
             }
         }
     }
 
     /*
-        called by AuraInspectorInjectedScript.clickElement, when we finish clicking all elements, 
+        called by AuraInspectorInjectedScript.clickElement, when we finish clicking all elements,
         or has to stop because of some error
         runResult = {} or {'error': someErrorMessage}
     */
     function AuraInspectorChaosView_OnReplayChaosRunFinished(runResult) {
         InTheMiddleOfAChaosRun = false;
 
-        var finishMessage = "Chaos Run Finished with ";
-        if(runResult && runResult.error) {
+        var finishMessage = "Chaos run finished: ";
+        if (runResult && runResult.error) {
             finishMessage = finishMessage + runResult.error;
         } else {
             finishMessage = finishMessage + "SUCCESS !"
@@ -158,34 +160,33 @@ function AuraInspectorChaosView(devtoolsPanel) {
     */
     function AuraInspectorChaosView_OnBootstrap() {
 
-            console.log("chaosView.AuraInspectorChaosView_OnBootstrap, InTheMiddleOfAChaosRun?"+InTheMiddleOfAChaosRun);
-            
-            //MAGIC WARNING
-            //this AuraInspectorChaosView_OnBootstrap will be called twice everytime we load or refresh
-            //because AuraInspector:OnPanelConnect is published twice, hence the 'InTheMiddleOfAChaosRun' magic
-            //once by AuraInspector_OnAuraInitialized, once by this.init in devtoolsPanel.js, not sure why yet
-            if(InTheMiddleOfAChaosRun === true)
-            {
-                removeAllCards();
-                devtoolsPanel.publish("AuraInspector:OnContinueChaosRun", {});
-                InTheMiddleOfAChaosRun = false;
+        console.log("chaosView.AuraInspectorChaosView_OnBootstrap, InTheMiddleOfAChaosRun?" + InTheMiddleOfAChaosRun);
 
-                document.querySelector("#stop_chaos_run").classList.add("hidden"); 
-                document.querySelector("#start_chaos_run").classList.add("hidden");  
-                document.querySelector("#save_chaos_run").classList.add("hidden");  
-                
-                document.querySelector("#replay_chaos_run").classList.add("hidden");
-                document.querySelector("#replaying_status").classList.remove("hidden"); 
-            } else {
-                document.querySelector("#stop_chaos_run").classList.add("hidden"); 
-                document.querySelector("#start_chaos_run").classList.remove("hidden");  
-                document.querySelector("#save_chaos_run").classList.add("hidden");  
-                
-                document.querySelector("#replay_chaos_run").classList.remove("hidden");
-                document.querySelector("#replaying_status").classList.add("hidden");
-            }
+        //MAGIC WARNING
+        //this AuraInspectorChaosView_OnBootstrap will be called twice everytime we load or refresh
+        //because AuraInspector:OnPanelConnect is published twice, hence the 'InTheMiddleOfAChaosRun' magic
+        //once by AuraInspector_OnAuraInitialized, once by this.init in devtoolsPanel.js, not sure why yet
+        if (InTheMiddleOfAChaosRun === true) {
+            removeAllCards();
+            devtoolsPanel.publish("AuraInspector:OnContinueChaosRun", {});
+            InTheMiddleOfAChaosRun = false;
 
-            document.querySelector("#stop_all_chaos_run").classList.remove("hidden"); 
+            document.querySelector("#stop_chaos_run").classList.add("hidden");
+            document.querySelector("#start_chaos_run").classList.add("hidden");
+            document.querySelector("#save_chaos_run").classList.add("hidden");
+
+            document.querySelector("#replay_chaos_run").classList.add("hidden");
+            document.querySelector("#replaying_status").classList.remove("hidden");
+        } else {
+            document.querySelector("#stop_chaos_run").classList.add("hidden");
+            document.querySelector("#start_chaos_run").classList.remove("hidden");
+            document.querySelector("#save_chaos_run").classList.add("hidden");
+
+            document.querySelector("#replay_chaos_run").classList.remove("hidden");
+            document.querySelector("#replaying_status").classList.add("hidden");
+        }
+
+        document.querySelector("#stop_all_chaos_run").classList.remove("hidden");
     }
 
 
@@ -193,20 +194,20 @@ function AuraInspectorChaosView(devtoolsPanel) {
     	event handler for "AuraInspectorChaosView:OnChaosRunSaved"
     */
     function AuraInspectorChaosView_OnChaosRunSaved() {
-    	removeAllCards();
+        removeAllCards();
     }
 
     /*
-        event handler for "AuraInspectorChaosView:OnChaosRunLoaded", 
+        event handler for "AuraInspectorChaosView:OnChaosRunLoaded",
         called by AuraInspectorInjectedScript."AuraDevToolService.LoadChaosRun"
         data = {
-            'currentChaosRunSteps': a list of 
+            'currentChaosRunSteps': a list of
                 {
                 //if it's a click operation
                 'textContent': string,
                 'locator': undefined or
                     {
-                        "id":"888:1;0", 
+                        "id":"888:1;0",
                         "root":"tabItemAnchor",
                         "parent":"pathAssistant",
                         "selector":"AtabHeader",
@@ -229,27 +230,27 @@ function AuraInspectorChaosView(devtoolsPanel) {
     */
     function AuraInspectorChaosView_OnChaosRunLoaded(data) {
         //fill _chaosCardList with chaos run
-        if(data.currentChaosRunTimeMachine) {
+        if (data.currentChaosRunTimeMachine) {
             //TODO
         }
-        if(data.currentChaosRunSteps && data.currentChaosRunSteps.length) {
-            console.log("load chaos run:", data);
+        if (data.currentChaosRunSteps && data.currentChaosRunSteps.length) {
+            console.log("Load chaos run: ", data);
             var chaosCard, selector;
-            for(var idx in data.currentChaosRunSteps) {
+            for (var idx in data.currentChaosRunSteps) {
                 step = data.currentChaosRunSteps[idx];
-                if(step.hasOwnProperty('cssPath')) {
+                if (step.hasOwnProperty('cssPath')) {
                     chaosCard = createChaosCard(step.textContent, step.cssPath, step.locator);
                 } else if (step.hasOwnProperty('actionName')) {
                     var aname = step.actionName;
-                    if(aname.indexOf("ACTION$") >= 0) {
-                        aname = aname.substr(aname.indexOf("ACTION$")+7, aname.length-1);
+                    if (aname.indexOf("ACTION$") >= 0) {
+                        aname = aname.substr(aname.indexOf("ACTION$") + 7, aname.length - 1);
                     }
-                    chaosCard = createChaosCard(step.actionOperation+" action:"+aname);
-                }    
-                if(chaosCard) {
+                    chaosCard = createChaosCard(step.actionOperation + " action: " + aname);
+                }
+                if (chaosCard) {
                     _chaosCardList.appendChild(chaosCard);
                 } else {
-                    console.error("cannot load step#"+idx+" of chaos run", ata.currentChaosRunSteps);
+                    console.error("Cannot load step " + idx + " of chaos run", ata.currentChaosRunSteps);
                 }
             }
         }
@@ -260,7 +261,7 @@ function AuraInspectorChaosView(devtoolsPanel) {
 	    data = {
                 'textContent': string,
                 "locator":undefined or {
-                    "id":"888:1;0", 
+                    "id":"888:1;0",
                     "root":"tabItemAnchor",
                     "parent":"pathAssistant",
                     "selector":"AtabHeader",
@@ -270,14 +271,14 @@ function AuraInspectorChaosView(devtoolsPanel) {
 	    }
     */
     function AuraInspectorChaosView_OnClickSomeElement(step) {
-    	var textContent = step.textContent;
-    	var cssPath = step.cssPath;
+        var textContent = step.textContent;
+        var cssPath = step.cssPath;
         var locator = step.locator;
-    	//highlight element we gonna click with a ...green circle
+        //highlight element we gonna click with a ...green circle
 
-    	//create a new chaosCard
-    	var chaosCard = createChaosCard(textContent, cssPath, locator);
-    	_chaosCardList.appendChild(chaosCard);
+        //create a new chaosCard
+        var chaosCard = createChaosCard(textContent, cssPath, locator);
+        _chaosCardList.appendChild(chaosCard);
     }
 
     /*
@@ -287,83 +288,83 @@ function AuraInspectorChaosView(devtoolsPanel) {
     function AuraInspectorChaosView_OnCreateChaosCard(msgObj) {
         var chaosCard = createChaosCard(msgObj.message, undefined);
         _chaosCardList.appendChild(chaosCard);
-           
+
     }
 
     /*
-        event handler for AuraInspector:OnRecordActionDropForChaosRun, 
+        event handler for AuraInspector:OnRecordActionDropForChaosRun,
         called from "AuraDevToolService.RecordDroppedAction" in AuraInspectionInjectedScript
         {'id': string like "969;a", 'defName': string}
     */
     function AuraInspectorChaosView_OnRecordActionDropForChaosRun(action) {
-        if(action && action.id && action.defName) {
+        if (action && action.id && action.defName) {
             var aname = action.defName;
-            if(aname.indexOf("ACTION$") >= 0) {
-                aname = aname.substr(aname.indexOf("ACTION$")+7, aname.length-1);
+            if (aname.indexOf("ACTION$") >= 0) {
+                aname = aname.substr(aname.indexOf("ACTION$") + 7, aname.length - 1);
             }
             //create a new chaosCard
-            var chaosCard = createChaosCard("We just randomly drop action# "+action.id+" "+aname, "", undefined);
+            var chaosCard = createChaosCard("We just randomly drop action " + action.id + " " + aname, "", undefined);
             _chaosCardList.appendChild(chaosCard);
-        }       
+        }
     }
 
     //create a chaos card, only textContent is necessary. for click step, cssPath is a must, for action step, nah
     function createChaosCard(textContent, cssPath, locator) {
-    	var card = document.createElement("aurainspector-chaosCard");
+        var card = document.createElement("aurainspector-chaosCard");
         //card.id = "chaos_card_" + action.id;
-        card.className = "chaos_card";
+        card.className = "card m-horizontal--x-small m-top--x-small p-around--x-small";
         card.setAttribute("textContent", textContent);
-        if(cssPath) { 
+        if (cssPath) {
             card.setAttribute("cssPath", cssPath);
         }
-        if(locator && locator.root && locator.parent) {
+        if (locator && locator.root && locator.parent) {
             card.setAttribute("locatorRoot", locator.root);
             card.setAttribute("locatorParent", locator.parent);
             card.setAttribute("locatorContext", locator.context);
         }
         //some element has no textContent, nor locator, let's print out cssPath in this case
-        if(textContent.length === 0 && !locator){
+        if (textContent.length === 0 && !locator) {
             card.setAttribute("textContent", cssPath);
         }
         return card;
     }
 
     function startChaosRun(event) {
-    	//hide Start button, display Stop button
-        document.querySelector("#stop_chaos_run").classList.remove("hidden"); 
-        document.querySelector("#start_chaos_run").classList.add("hidden");  
+        //hide Start button, display Stop button
+        document.querySelector("#stop_chaos_run").classList.remove("hidden");
+        document.querySelector("#start_chaos_run").classList.add("hidden");
         document.querySelector("#save_chaos_run").classList.add("hidden");
         document.querySelector("#newrun_status").classList.remove("hidden");
 
         document.querySelector("#stop_all_chaos_run").classList.remove("hidden");
-        document.querySelector("#replay_chaos_run").classList.add("hidden");    
+        document.querySelector("#replay_chaos_run").classList.add("hidden");
         document.querySelector("#replaying_status").classList.add("hidden");
 
         //clear up all cards
-        removeAllCards();       
+        removeAllCards();
 
-    	// Collect run parameter
-    	var samplingInterval = document.querySelector("#samplingInterval").value;//4000;
+        // Collect run parameter
+        var samplingInterval = document.querySelector("#samplingInterval").value; //4000;
         samplingInterval = samplingInterval * 1000;
-        if(samplingInterval<=0) {
+        if (samplingInterval <= 0) {
             samplingInterval = 4000;
-            var msg = "invalid input: samplingInterval must be a number between bigger than 0, gonna use the default value:4000(ms) instead";
+            var msg = "Invalid input: samplingInterval must be a number between bigger than 0, gonna use the default value:4000(ms) instead";
             console.warn(msg);
             document.querySelector("#newrun_status").textContent = msg;
         }
-        
-        var actionDropPercentage = document.querySelector("#actionDropPercentage").value * 1;//5
-        if(actionDropPercentage<0 || actionDropPercentage>=100) {
-            var msg = "invalid input: percentage to drop action must be a number between 0 and 100, gonna use the default value:5 instead";
+
+        var actionDropPercentage = document.querySelector("#actionDropPercentage").value * 1; //5
+        if (actionDropPercentage < 0 || actionDropPercentage >= 100) {
+            var msg = "Invalid input: percentage to drop action must be a number between 0 and 100, gonna use the default value:5 instead";
             console.warn(msg);
             document.querySelector("#newrun_status").textContent = msg;
             actionDropPercentage = 5;
         } else {
-            document.querySelector("#newrun_status").textContent = 
-            "New Chaos Run start with samplingInterval="+samplingInterval+"(ms), actionDropPercentage="+actionDropPercentage;
+            document.querySelector("#newrun_status").textContent =
+                "New chaos run start with samplingInterval=" + samplingInterval + "(ms), actionDropPercentage=" + actionDropPercentage;
         }
 
-    	var dataToPublish = {
+        var dataToPublish = {
             'samplingInterval': samplingInterval, //in ms
             'actionDropPercentage': actionDropPercentage //0~100
         };
@@ -376,17 +377,17 @@ function AuraInspectorChaosView(devtoolsPanel) {
         this is also the event handler for "AuraInspector:OnStopNewChaosRunWithError"
     */
     function stopChaosRun(runResult) {
-    	//hide Stop button, display Start button
-        document.querySelector("#start_chaos_run").classList.remove("hidden"); 
-        document.querySelector("#stop_chaos_run").classList.add("hidden"); 
-        document.querySelector("#save_chaos_run").classList.remove("hidden");  
+        //hide Stop button, display Start button
+        document.querySelector("#start_chaos_run").classList.remove("hidden");
+        document.querySelector("#stop_chaos_run").classList.add("hidden");
+        document.querySelector("#save_chaos_run").classList.remove("hidden");
 
-    	//call AuraInspectorInjectedScript.StopChaosRun
+        //call AuraInspectorInjectedScript.StopChaosRun
         devtoolsPanel.publish("AuraInspector:OnStopChaosRun", {});
 
         //create a chaosCard to the end of the run
-        var finishMessage = "New Chaos Run Stopped with ";
-        if(runResult && runResult.error) {
+        var finishMessage = "New chaos run stopped: ";
+        if (runResult && runResult.error) {
             finishMessage = finishMessage + runResult.error;
         } else {
             finishMessage = finishMessage + "SUCCESS !"
@@ -396,14 +397,14 @@ function AuraInspectorChaosView(devtoolsPanel) {
         _chaosCardList.appendChild(chaosCard);
     }
 
-    //Panic button has been pushed ! We will stop all on-going runs, replay or not, clean up all chaosCards. 
+    //Panic button has been pushed ! We will stop all on-going runs, replay or not, clean up all chaosCards.
     function stopAllChaosRun(event) {
         //clear up all cards
         removeAllCards();
 
         //if(InTheMiddleOfAChaosRun === true) {
         //    InTheMiddleOfAChaosRun = false;
-            document.querySelector("#replaying_status").textContent = "Someone just push the Panic Button, replay has been stopped";
+        document.querySelector("#replaying_status").textContent = "Someone just pushed the Panic Button, replay stopped";
         //}
 
         //call AuraInspectorInjectedScript.StopAllChaosRun to stop all intervals, and clear up localStorage
@@ -411,47 +412,52 @@ function AuraInspectorChaosView(devtoolsPanel) {
     }
 
     function saveChaosRun(event) {
-        document.querySelector("#stop_chaos_run").classList.add("hidden"); 
-        document.querySelector("#start_chaos_run").classList.remove("hidden"); 
+        document.querySelector("#stop_chaos_run").classList.add("hidden");
+        document.querySelector("#start_chaos_run").classList.remove("hidden");
 
         // Collect run parameter
-        var samplingInterval = document.querySelector("#samplingInterval").value;//4000;
-        if(!samplingInterval) {
-            samplingInterval = 4;//default
+        var samplingInterval = document.querySelector("#samplingInterval").value; //4000;
+        if (!samplingInterval) {
+            samplingInterval = 4; //default
         }
-        var actionDropPercentage = document.querySelector("#actionDropPercentage").value;//5
-        if(actionDropPercentage<0 || actionDropPercentage>=100) {
-            actionDropPercentage = 5;//default
+        var actionDropPercentage = document.querySelector("#actionDropPercentage").value; //5
+        if (actionDropPercentage < 0 || actionDropPercentage >= 100) {
+            actionDropPercentage = 5; //default
         }
-        document.querySelector("#newrun_status").classList.textContent = 
-        "chaos run saved with samplingInterval="+samplingInterval+"(ms), actionDropPercentage="+actionDropPercentage;
+        document.querySelector("#newrun_status").classList.textContent =
+            "Chaos run saved with samplingInterval=" + samplingInterval + "(ms), actionDropPercentage=" + actionDropPercentage;
         samplingInterval = samplingInterval * 1000;
         //call AuraInspectorInjectedScript.SaveChaosRun
-        devtoolsPanel.publish("AuraInspector:OnSaveChaosRun", {'samplingInterval': samplingInterval, 'actionDropPercentage':actionDropPercentage});
+        devtoolsPanel.publish("AuraInspector:OnSaveChaosRun", {
+            'samplingInterval': samplingInterval,
+            'actionDropPercentage': actionDropPercentage
+        });
     }
 
     //event handler for clicking choose_chaos_run_file
     function handleFileSelect(evt) {
-        var files = evt.target.files; 
+        var files = evt.target.files;
         var fileReader = new FileReader();
-        fileReader.onload = function(){
-          removeAllCards();
-          var text = fileReader.result;
-          //console.log(fileReader.result);
+        fileReader.onload = function() {
+            removeAllCards();
+            var text = fileReader.result;
+            //console.log(fileReader.result);
 
-          //call AuraInspectorInjectedScript.LoadChaosRun
-          devtoolsPanel.publish("AuraInspector:OnLoadChaosRun", {'chaosRunFromFile': fileReader.result});
+            //call AuraInspectorInjectedScript.LoadChaosRun
+            devtoolsPanel.publish("AuraInspector:OnLoadChaosRun", {
+                'chaosRunFromFile': fileReader.result
+            });
         };
         fileReader.readAsText(files[0]);
 
-        document.querySelector("#replay_chaos_run").classList.remove("hidden");  
+        document.querySelector("#replay_chaos_run").classList.remove("hidden");
 
         document.querySelector("#stop_all_chaos_run").classList.add("hidden");
 
-        document.querySelector("#stop_chaos_run").classList.add("hidden"); 
-        document.querySelector("#start_chaos_run").classList.add("hidden");  
-        document.querySelector("#save_chaos_run").classList.add("hidden");   
-        
+        document.querySelector("#stop_chaos_run").classList.add("hidden");
+        document.querySelector("#start_chaos_run").classList.add("hidden");
+        document.querySelector("#save_chaos_run").classList.add("hidden");
+
     }
 
     function replayChaosRun(event) {
@@ -461,11 +467,11 @@ function AuraInspectorChaosView(devtoolsPanel) {
         // Collect run parameter
         var samplingInterval = document.querySelector("#samplingInterval").value;
         samplingInterval = samplingInterval * 1000;
-        if(!samplingInterval) {
+        if (!samplingInterval) {
             samplingInterval = 4000;
         }
-       
-        // Dispatch 
+
+        // Dispatch
         var dataToPublish = {
             'samplingInterval': samplingInterval //in ms
         };

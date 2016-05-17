@@ -69,13 +69,13 @@ function AuraInspectorActionsView(devtoolsPanel) {
         </menu>
         <div class="actions-tab">
             <div id="actionsToWatch-list" class="actionsToWatch-list">
-                <section>
+                <section class="dark">
                     <h1>${labels.pendingoverrides}</h1>
                     <div id="actionsToWatch-pending" class="drop-zone">
                         <span class="description">${labels.pendingoverrides_desc}</span>
                     </div>
                 </section>
-                <section id="actionsToWatch-completed">
+                <section id="actionsToWatch-completed" class="dark">
                     <h1>${labels.processedoverrides}</h1>
                 </section>
             </div>
@@ -117,8 +117,8 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
         devtoolsPanel.subscribe("AuraInspector:DropActionInChaosRun", AuraInspectorActionsView_OnDropActionInChaosRun.bind(this));
         devtoolsPanel.subscribe("AuraInspector:EnqueueNextDropForChaosReplay", AuraInspectorActionsView_OnEnqueueNextDropForChaosReplay.bind(this));
-        
-        
+
+
 
 
         // Attach event handlers
@@ -312,7 +312,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
                     card.parentNode.removeChild(card);
                 } else {
                     console.err("cannot find previously created actionCard for action#"+action.id, action);
-                } 
+                }
             }
         }
 
@@ -434,7 +434,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
                 var command = "console.log('_toWatch missing');";
                 chrome.devtools.inspectedWindow.eval(command);
         }
-        _toWatch.appendChild(actionCard);        
+        _toWatch.appendChild(actionCard);
     }
 
     //handler for AuraInspector:RemoveActionFromWatchList from actionCard.removeActionCard
@@ -451,7 +451,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
             //make actionCard on the leftside draggable again
             var card = document.getElementById(actionInfoObj.actionId);
             if(card) {
-                card.setAttribute("draggable","true");  
+                card.setAttribute("draggable","true");
                 card.classList.remove("dropped");
                 card.classList.add("draggable");
             } else {
@@ -460,16 +460,16 @@ function AuraInspectorActionsView(devtoolsPanel) {
         } else {
             console.log("AuraInspectorActionsView_OnRemoveActionFromWatchList, bad actionInfo:", actionInfo);
         }
-              
+
     }
 
     //handler for AuraInspector:EnqueueNextResponseForAction from actionCard.saveNextResponse
-    //actionInfo = JSON.stringify ... { 
-                            //'actionName': string, 
+    //actionInfo = JSON.stringify ... {
+                            //'actionName': string,
                             //'actionParameter': obj
                             //'actionId': string, like "713;a"
                             //'nextResponse': { key: newValue }
-                            //'nextError' : { "message":bla, "stack":bla } 
+                            //'nextError' : { "message":bla, "stack":bla }
                             //}};
     //then call AuraInspectorInjectedScript.AddActionToWatch
     function AuraInspectorActionsView_OnEnqueueNextResponseForAction(actionInfo) {
@@ -482,7 +482,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
             actionInfoObj.actionStorageKey = action.storageKey;
             //call AuraInspectorInjectedScript.AddActionToWatch
             devtoolsPanel.publish("AuraInspector:OnActionToWatchEnqueue", actionInfoObj);
-        }        
+        }
     }
 
     function AuraInspectorActionsView_OnEnqueueNextErrorForAction(actionInfo) {
@@ -492,7 +492,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
             var action = actions.get(actionInfoObj.actionId);
             //call AuraInspectorInjectedScript.AddActionToWatch
             devtoolsPanel.publish("AuraInspector:OnActionToWatchEnqueue", actionInfoObj);
-        }  
+        }
     }
 
     function drop (event) {
@@ -534,7 +534,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
             //we need tell Chaos Tab to draw a chaos card with action name
             var action = actions.get(data.id);
             //call AuraDevToolService.RecordDroppedAction in AuraInspectionInjectedScript.js
-            devtoolsPanel.publish("AuraInspector:OnSomeActionGetDropped", action); 
+            devtoolsPanel.publish("AuraInspector:OnSomeActionGetDropped", action);
         }
     }
 
@@ -549,7 +549,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
             'actionStorageKey': string
             'actionIsAbortable': boolean
             'actionIsBackground': boolean
-            'nextResponse': undefined 
+            'nextResponse': undefined
         }
     */
     function AuraInspectorActionsView_OnEnqueueNextDropForChaosReplay(actionObj) {
@@ -559,7 +559,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
                     var command = "console.log('_toWatch missing');";
                     chrome.devtools.inspectedWindow.eval(command);
             }
-            _toWatch.appendChild(actionCard);  
+            _toWatch.appendChild(actionCard);
 
             actionObj["byChaosRun"] = true;
             //call AuraInspectorInjectedScript.AddActionToWatch
@@ -569,7 +569,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
     function createActionCardWithFullActionInfo(action) {
         if(action && action.actionName && action.actionParameter && action.actionId) {
-            var actionState = "BYCHAOSRUN"; 
+            var actionState = "BYCHAOSRUN";
             var card = document.createElement("aurainspector-actionCard");
             card.id = "action_card_" + action.actionId;
             card.className = "action-card action-card-state-" + actionState;

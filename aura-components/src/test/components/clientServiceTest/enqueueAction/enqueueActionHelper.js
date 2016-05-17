@@ -83,10 +83,23 @@
 
     addChildren : function (cmp, children, base, levels) {
         cmp.set("v.children", children);
-        cmp.index(children[0].getLocalId(), children[0].getGlobalId())
-        cmp.index(children[1].getLocalId(), children[1].getGlobalId())
+        
+        this.reindex(cmp, children[0]);
+        this.reindex(cmp, children[1]);
+
         this.buildHierarchyInternal(children[0], base, levels-1);
         this.buildHierarchyInternal(children[1], base, levels-1);
+    },
+
+    reindex: function(cmp, child) {
+        var valueProvider = child.getAttributeValueProvider();
+        while(valueProvider instanceof PassthroughValue){
+            valueProvider = valueProvider.getComponent();
+        }
+        if(valueProvider) {
+            valueProvider.deIndex(child.getLocalId(), child.getGlobalId());
+        }
+        cmp.index(child.getLocalId(), child.getGlobalId());
     },
 
     buildHierarchyInternal : function (cmp, base, levels) {

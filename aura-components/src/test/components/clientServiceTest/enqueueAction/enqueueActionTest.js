@@ -509,6 +509,9 @@
             $A.test.addWaitFor(false, function() { return $A.test.isActionQueued(); })
         }, function(cmp) {
             var old = cmp.find("child1");
+            if($A.util.isArray(old)) {
+              old = old[0];
+            }
             cmp.helper.deleteChild(cmp, "child1");
             // Make sure that the component is gone before we release.
             $A.test.addWaitFor(false, function() { return old.isValid(); })
@@ -553,6 +556,9 @@
                 [ "abortable" ]);
         }, function(cmp) {
             var old = cmp.find("child1");
+            if($A.util.isArray(old)) {
+              old = old[0];
+            }
             cmp.helper.deleteChild(cmp, "child1");
             // Make sure that the component is gone before we release.
             $A.test.addWaitFor(false, function() { return old.isValid(); });

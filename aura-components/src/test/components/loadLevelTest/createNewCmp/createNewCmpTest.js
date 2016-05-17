@@ -823,8 +823,9 @@
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
                 var body = cmp.get('v.body');
                 $A.test.assertEquals(1,body.length);
-                var newCmp = body[0].find("userLocalId");
+                var newCmp = cmp.find("userLocalId");
                 $A.test.assertDefined(newCmp);
+                $A.test.assertEquals(body[0], newCmp);
                 $A.test.assertEquals("markup://loadLevelTest:serverComponent",newCmp.getDef().getDescriptor().getQualifiedName());
                 $A.test.assertTrue($A.test.getTextByComponent(newCmp).indexOf('creatingComponentWithServerDependecies')!=-1,
                         "Failed to set model value for local component.");

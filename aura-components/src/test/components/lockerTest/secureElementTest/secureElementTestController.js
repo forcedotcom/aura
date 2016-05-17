@@ -69,5 +69,37 @@
         testUtils.clickOrTouch(element);
 
         testUtils.assertEquals(1, counter);
+    },
+
+    testInnerHTMLSupportsUseTagForSvgElement: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.innerHTML = '<defs> <text id="text" x="50" y="50">SVG</text> </defs>' +
+                        '<use xlink:href="#text"></use>';
+
+        var elements = svg.getElementsByTagName('use');
+        testUtils.assertEquals(1, elements.length);
+        testUtils.assertEquals('#text', elements[0].getAttribute('xlink:href'));
+    },
+    
+    testTextContent: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+	    var element = document.createElement("div");
+		element.textContent = "text content";
+        testUtils.assertEquals("text content", element.textContent);
+    },
+    
+    testInnerText: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+	    var element = document.createElement("div");
+	    	    
+	    // Node.innerText is not supported on all browsers
+	    if ("innerText" in element) {
+			element.testInnerText = "innerText content";
+	        testUtils.assertEquals("innerText content", element.testInnerText);
+        }
     }
 })

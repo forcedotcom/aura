@@ -37,6 +37,9 @@
     <aura:method name="testRemoveEventListener" action="{!c.testRemoveEventListener}">
         <aura:attribute name="testWithUseCapture" type="Boolean"/>
     </aura:method>
+    <aura:method name="testInnerHTMLSupportsUseTagForSvgElement" action="{!c.testInnerHTMLSupportsUseTagForSvgElement}"/>
+    <aura:method name="testTextContent" action="{!c.testTextContent}"/>
+    <aura:method name="testInnerText" action="{!c.testInnerText}"/>
 
     <aura:method name="getDiv" action="{!c.getDiv}"/>
 

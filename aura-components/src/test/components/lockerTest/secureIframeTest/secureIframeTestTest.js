@@ -5,7 +5,7 @@
      */
 
     // LockerService not supported on older IE
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+    browsers: ["-IE8", "-IE9", "-IE10"],
 
     // TODO(tbliss): make these lists on SecureIFrameElement accessible here for maintainability
     AttributesWhitelist: ['contentWindow', 'height', 'name', 'src', 'width'],

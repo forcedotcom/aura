@@ -29,19 +29,6 @@
     customBody : function (cmp) {
         return cmp.get('v.body').length > 0;
     },
-    findAllCustomBody : function (body) {
-        return body.reduce(function (prev, cmp) {
-            if (cmp.meta.name === 'aura$text') { return prev; }
-            if (cmp.meta.name === 'aura$html') {
-                return prev.concat(this.findAllCustomBody(cmp.get('v.body')));
-            }
-            if (cmp.getSuper() && cmp.getSuper().meta.name === 'ui$inputFileInnerContent') {
-                prev.push(cmp);
-                return prev;
-            }
-            return prev;
-        }.bind(this),[]);
-    },
     findAllHelperCmps : function (body) {
         return body.reduce(function (prev, cmp) {
             if (cmp.meta.name === 'aura$text') { return prev; }
@@ -58,31 +45,37 @@
     isValidHelperCmp : function (cmp) {
         var VALID_NAMES_MAP = {
             'ui$inputFileDroppableZone': true,
-            'ui$inputFileOpenBrowse'   : true
+            'ui$inputFileOpenBrowse'   : true,
+            'ui$inputFileFilesList'    : true
         };
         return cmp.isValid() && VALID_NAMES_MAP[cmp.meta && cmp.meta.name];
     },
-    storeCustomBodyRefs : function (cmp, customBodyRefs) {
-        cmp.set('v.customBodyList', customBodyRefs);
+    storeHelperCmpRefs : function (cmp, refs) {
+        cmp.set('v.privateHelperCmpRefs', refs);
     },
-    thereIsCustoms : function (cmp) {
-        return cmp.get('v.customBodyList').length > 0;
+    thereIsHelperCmps : function (cmp) {
+        return cmp.get('v.privateHelperCmpRefs').length > 0;
     },
     setCmpContext : function (cmp, cmpRef) {
-        cmpRef.setAttributeValueProvider(cmp);
-        cmpRef.set('v.accept'        , cmp.get('v.accept'));
-        cmpRef.set('v.multiple'      , cmp.get('v.multiple'));
-        cmpRef.set('v.maxSizeAllowed', cmp.get('v.maxSizeAllowed'));
-        cmpRef.set('v.class'         , cmp.get('v.class'));
-        cmpRef.set('v.classOver'     , cmp.get('v.classOver'));
-        cmpRef.set('v.disabled'      , cmp.get('v.disabled'));
+        switch (cmpRef.meta.name) {
+            case 'ui$inputFileDroppableZone':
+            case 'ui$inputFileOpenBrowse' :
+                cmpRef.set('v.accept'        , cmp.get('v.accept'));
+                cmpRef.set('v.multiple'      , cmp.get('v.multiple'));
+                cmpRef.set('v.maxSizeAllowed', cmp.get('v.maxSizeAllowed'));
+                cmpRef.set('v.disabled'      , cmp.get('v.disabled'));
+                break;
+            case 'ui$inputFileFilesList' :
+                cmpRef.set('v.files', cmp.get('v.files'));
+                break;
+        }
+
     },
-    updateBodyCmpContext : function (cmp) {
-        var customList = cmp.get('v.customBodyList');
-        var mappedFiles   = this.getMappedFiles(cmp);
-        customList.forEach(function (custom) {
-            custom.set('v.filesArr',mappedFiles);
-        });
+    updateHelperCmpContext : function (cmp) {
+        var helperCmpRefs = cmp.get('v.privateHelperCmpRefs');
+        helperCmpRefs.forEach(function (cmpHelper) {
+            this.setCmpContext(cmp, cmpHelper);
+        }.bind(this));
     },
     getMappedFiles : function (cmp) {
         var files  = cmp.get('v.files');
@@ -91,7 +84,7 @@
         });
     },
     registerActions : function (cmp) {
-        var customList = cmp.get('v.customBodyList');
+        var customList = cmp.get('v.privateHelperCmpRefs');
         customList.forEach(function (custom) {
             custom.register('reset', cmp.reset);
         });

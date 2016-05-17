@@ -15,14 +15,27 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:inputFileInterface">
+<aura:component extensible="false">
 
+    <!-- Imports -->
     <aura:import library="ui:classNamesLibrary"  property="lib" />
     <aura:import library="ui:contentTypeLibrary" property="ct"  />
 
-    <!-- Private attributes -->
-    <aura:attribute name="dropZoneClassList" type="string" default="" access="private" />
+    <!-- Attributes -->
+    <aura:attribute name="accept"         type="String"  default="*/*"  />
+    <aura:attribute name="multiple"       type="Boolean" default="true" />
+    <aura:attribute name="maxSizeAllowed" type="Integer" />
+    <aura:attribute name="class"          type="String"  />
+    <aura:attribute name="classOver"      type="String"  />
+    <aura:attribute name="disabled"       type="Boolean" default="false"/>
 
+        <!-- Private attributes -->
+        <aura:attribute name="dropZoneClassList" type="string" default="" access="private" />
+
+    <!--Events -->
+    <aura:registerEvent name="change" type="ui:inputFileChangeEvent" />
+
+    <!-- Handlers -->
     <aura:handler name="init" value="{! this}" action="{! c.init }" />
 
     <div class="{! v.dropZoneClassList }"

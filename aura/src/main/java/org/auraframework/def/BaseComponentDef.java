@@ -27,7 +27,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * Common base for ComponentDef and ApplicationDef
  */
-public interface BaseComponentDef extends RootDefinition {
+public interface BaseComponentDef extends RootDefinition, HasJavascriptReferences, JavascriptClassDefinition {
 
     @Override
     DefDescriptor<? extends BaseComponentDef> getDescriptor();
@@ -205,14 +205,6 @@ public interface BaseComponentDef extends RootDefinition {
      * @throws QuickFixException If there is a problem loading a flavor or parent def.
      */
     Set<String> getAllFlavorNames() throws QuickFixException;
-
- 	/**
-     * Gets the client JavaScript code, normally a client class.
-     * @param minify whether to return minified code or not.
-     * @return the client JavaScript code.
-     * @throws QuickFixException
-     */
-    String getCode(boolean minify) throws QuickFixException;
 
 	ControllerDef getRemoteControllerDef() throws QuickFixException;
 	HelperDef getRemoteHelperDef() throws QuickFixException;

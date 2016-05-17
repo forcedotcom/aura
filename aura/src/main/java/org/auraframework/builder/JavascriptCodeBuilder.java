@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+package org.auraframework.builder;
 
+import org.auraframework.def.DependencyDef;
 import org.auraframework.expression.PropertyReference;
 
 /**

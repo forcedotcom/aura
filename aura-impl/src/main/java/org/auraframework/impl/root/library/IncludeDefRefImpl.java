@@ -21,6 +21,7 @@ import java.util.List;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
+import org.auraframework.impl.javascript.BaseJavascriptClass;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -37,7 +38,7 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
     private final List<String> aliases;
     private final String export;
 
-    private JavascriptIncludeClass javascriptClass;
+    private BaseJavascriptClass javascriptClass;
 
     protected IncludeDefRefImpl(Builder builder) {
         super(builder);
@@ -72,7 +73,7 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
     @Override
     public String getCode(boolean minify) throws QuickFixException {
     	String js = null;
-		initializeJavascriptClass();
+		initializeJavascriptClass(false);
     	if (minify) {
     		js = javascriptClass.getMinifiedCode();
     	}
@@ -82,12 +83,12 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
     	return js;
     }
 
-    private void initializeJavascriptClass() throws QuickFixException {
+    private void initializeJavascriptClass(boolean minify) throws QuickFixException {
     	if (javascriptClass == null) {
-            javascriptClass = new JavascriptIncludeClass.Builder().setDefinition(this).build();
+            javascriptClass = new JavascriptIncludeClass.Builder().setDefinition(this).setMinify(minify).build();
     	}
     }
-    
+
     @Override
     public void serialize(Json json) throws IOException {
     	throw new UnsupportedOperationException("IncludeDefRef can't be serialized to JSON");
@@ -121,6 +122,12 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
     }
 
     @Override
+    public void validateReferences(boolean minify) throws QuickFixException {
+    	validateReferences();
+        initializeJavascriptClass(minify);
+    }
+
+	@Override
     public void validateReferences() throws QuickFixException {
         IncludeDef includeDef = descriptor.getDef();
         includeDef.validateDefinition();
@@ -130,7 +137,6 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
                 imported.getDef().validateReferences();
             }
         }
-        initializeJavascriptClass();
     }
 
     @Override

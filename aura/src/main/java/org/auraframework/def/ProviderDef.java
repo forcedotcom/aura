@@ -21,7 +21,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
-public interface ProviderDef extends CodeDefinition {
+public interface ProviderDef extends RemotableDefinition {
     @Override
     DefDescriptor<? extends ProviderDef> getDescriptor();
 

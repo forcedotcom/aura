@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.builder.BaseComponentDefBuilder;
+import org.auraframework.builder.JavascriptCodeBuilder;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ActionDef.ActionType;
 import org.auraframework.def.AttributeDef;
@@ -49,7 +50,6 @@ import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.JavascriptCodeBuilder;
 import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.MethodDef;
 import org.auraframework.def.ModelDef;
@@ -64,6 +64,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.javascript.BaseJavascriptClass;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
@@ -136,7 +137,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     private final int hashCode;
 
-    private JavascriptComponentClass javascriptClass;
+    private BaseJavascriptClass javascriptClass;
 
     private transient Boolean localDeps = null;
 
@@ -352,6 +353,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         mdr.assertAccess(descriptor, definition);
     }
 
+    @Override
+    public void validateReferences(boolean minify) throws QuickFixException {
+    	validateReferences();
+        initializeJavascriptClass(minify);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void validateReferences() throws QuickFixException {
@@ -498,8 +505,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 }
             }
         }
-
-        initializeJavascriptClass();
     }
 
     /**
@@ -1068,7 +1073,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public String getCode(boolean minify) throws QuickFixException {
     	String js = null;
-		initializeJavascriptClass();
+		initializeJavascriptClass(false);
     	if (minify) {
     		js = javascriptClass.getMinifiedCode();
     	}
@@ -1083,13 +1088,13 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     	
     	return js;
     }
-    
-    private void initializeJavascriptClass() throws QuickFixException {
+
+    private void initializeJavascriptClass(boolean minify) throws QuickFixException {
     	if (javascriptClass == null) {
-    		javascriptClass = new JavascriptComponentClass.Builder().setDefinition(this).build();
+    		javascriptClass = new JavascriptComponentClass.Builder().setDefinition(this).setMinify(minify).build();
     	}
     }
-    
+
     /**
      * Return true if the definition is a component that needs to be locked.
      */

@@ -20,18 +20,18 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.auraframework.def.CodeDefinition;
+import org.auraframework.builder.JavascriptCodeBuilder;
+import org.auraframework.def.RemotableDefinition;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
-import org.auraframework.def.JavascriptCodeBuilder;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-public abstract class BaseJavascriptDef<T extends Definition> extends DefinitionImpl<T> implements CodeDefinition, Serializable {
+public abstract class BaseJavascriptDef<T extends Definition> extends DefinitionImpl<T> implements RemotableDefinition, Serializable {
 	private static final long serialVersionUID = -1007404546975926869L;
 
 	private final String code;

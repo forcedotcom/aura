@@ -17,7 +17,7 @@ package org.auraframework.def;
 
 /**
  */
-public interface HelperDef extends CodeDefinition {
+public interface HelperDef extends RemotableDefinition {
     @Override
     DefDescriptor<HelperDef> getDescriptor();
 }

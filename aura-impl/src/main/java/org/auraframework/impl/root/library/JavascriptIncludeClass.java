@@ -58,7 +58,7 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
         	return this;
         }
                 
-	    @Override
+    	@Override
 	    protected boolean hasCode() {
 	    	return hasCode;
 	    }
@@ -94,6 +94,7 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
 	    	return out.toString();
 	    }
 
+        @Override
         public JavascriptIncludeClass build() throws QuickFixException {
         	finish();
             return new JavascriptIncludeClass(this);

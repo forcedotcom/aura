@@ -15,16 +15,17 @@
  */
 package org.auraframework.def;
 
-import java.util.List;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
-public interface LibraryDef extends RootDefinition, HasJavascriptReferences {
+public interface HasJavascriptReferences {
 
-	@Override
-    DefDescriptor<LibraryDef> getDescriptor();
-    
     /**
-     * Gets the list of included JS files.
-     * @return {@link List} of included resources.
+     * Same as validateReferences() in Definition but with extra conditional
+     * processing for JavaScript code. This allows for extra processing to
+     * occur conditionally.
+     *
+     * @throws QuickFixException if there is a problem with a reference
      */
-    List<IncludeDefRef> getIncludes();
+    void validateReferences(boolean minify) throws QuickFixException;
+
 }

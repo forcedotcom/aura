@@ -38,7 +38,7 @@ public abstract class BaseJavascriptClass implements Serializable {
 		code = builder.code;
 		minifiedCode = builder.minifiedCode;
 	}
-	
+
     public String getCode() {
     	return code;
     }
@@ -49,43 +49,55 @@ public abstract class BaseJavascriptClass implements Serializable {
 
     public static abstract class Builder {
 
+    	private boolean minify = true;
     	private String code;
     	private String minifiedCode;
 
-	    /**
-	     * Return true is the class has JS code.
-	     * This is a minimization process to skip extra calls to the compiler.
-	     * @return true if class needs to be compiled.
-	     */
-	    protected abstract boolean hasCode();
-	
+        /**
+         * Turn minfication on/off (on by default).
+         * @param minify true if class needs to be compiled.
+         */
+        public Builder setMinify(boolean minify) {
+            this.minify = minify;
+            return this;
+        }
+
+        public abstract BaseJavascriptClass build() throws QuickFixException;
+
+        /**
+         * Return true is the class has JS code.
+         * Instances should implement it to avoid unecessary extra calls to the compiler.
+         * @return true if class needs to be compiled.
+         */
+        protected abstract boolean hasCode();
+
 	    /**
 	     * Get file location.
-	     * @return the Location for referencing errors 
+	     * @return the Location for referencing errors
 	     */
 	    protected abstract Location getLocation();
 
 	    /**
 	     * Get filename.
-	     * @return the Location for referencing errors 
+	     * @return the Location for referencing errors
 	     */
 	    protected abstract String getFilename();
 
 	    /**
 	     * Generates the JavaScript class.
-	     * @return the JavaScript class. 
+	     * @return the JavaScript class.
 	     * @throws QuickFixException
 	     */
 	    protected abstract String generate() throws QuickFixException;
-	
+
         protected void finish() throws QuickFixException {
         	code = generate();
 
-        	if (hasCode()) {
+        	if (minify && hasCode()) {
 			    try {
 			    	StringWriter sw = new StringWriter();
 			    	List<JavascriptProcessingError> codeErrors = JavascriptWriter.CLOSURE_SIMPLE.compress(code, sw, getFilename());
-			    	validateCodeErrors(codeErrors);			    	
+			    	validateCodeErrors(codeErrors);
 			    	minifiedCode = sw.toString();
 			    } catch (IOException e) {
 			    	// There is no IO in this scenario. The JavascriptWriter API requires
@@ -94,7 +106,7 @@ public abstract class BaseJavascriptClass implements Serializable {
 			    }
 			}
 	    }
-                
+
         private void validateCodeErrors(List<JavascriptProcessingError> codeErrors) throws InvalidDefinitionException {
 	    	if (codeErrors != null && !codeErrors.isEmpty()) {
 	            StringBuilder sb = new StringBuilder();

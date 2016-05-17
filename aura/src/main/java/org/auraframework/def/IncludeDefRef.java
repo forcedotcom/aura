@@ -17,9 +17,7 @@ package org.auraframework.def;
 
 import java.util.List;
 
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-public interface IncludeDefRef extends Definition {
+public interface IncludeDefRef extends Definition, HasJavascriptReferences, JavascriptClassDefinition {
 
     @Override
     public DefDescriptor<IncludeDef> getDescriptor();
@@ -44,12 +42,4 @@ public interface IncludeDefRef extends Definition {
      * @return the export identifier.
      */
 	String getExport();
-
-	/**
-     * Gets the client JavaScript code, normally a client class.
-     * @param minify whether to return minified code or not.
-     * @return the client JavaScript code.
-     * @throws QuickFixException
-     */
-    String getCode(boolean minify) throws QuickFixException;
 }

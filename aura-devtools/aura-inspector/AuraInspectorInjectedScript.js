@@ -505,34 +505,33 @@
 
                 if(chaosRunToReplay.currentChaosRunTimeMachine && chaosRunToReplay.currentChaosRunTimeMachine.startUrl) {
                     //clear up all aura storage
-                    clearAllAuraStorages().then(
-                        function(successMsg) { 
+                    clearAllAuraStorages(
+                        function() {
                             //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
-                            $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': successMsg});
+                            $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': "we have clear all aura storage"});
                             setTimeout(function()
                             {
+                                //let user know we have cleared up all aura storage
                                 var message = "Time Machine Start\n Page is going to refresh with this url in 3s\n"+chaosRunToReplay.currentChaosRunTimeMachine.startUrl;
                                 $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
+                                //refresh page with url
+                                setTimeout(function()
+                                {
+                                    var newLocation = JSON.parse(sessionStorage.getItem("chaosRunToReplay")).currentChaosRunTimeMachine.startUrl; 
+                                    if(newLocation.indexOf("#") > 0) {//stupid # stop it from reloading
+                                        window.location = newLocation;
+                                        window.location.reload();
+                                    } else {
+                                        window.location = newLocation;
+                                    }
+                                }, 3000);
                             }, 1000);
-                            //refresh the page with url
-                            setTimeout(function()
-                            {
-                                var newLocation = JSON.parse(sessionStorage.getItem("chaosRunToReplay")).currentChaosRunTimeMachine.startUrl; 
-                                if(newLocation.indexOf("#") > 0) {//stupid # stop it from reloading
-                                    window.location = newLocation;
-                                    window.location.reload();
-                                } else {
-                                    window.location = newLocation;
-                                }
-                            }, 3000);
                         },
-                        function(error) { 
-                            console.warn(error); 
+                        function(e) { 
+                            console.warn(e); 
                             $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': "We run into problem trying to clear up aura storages"});
                         }
                     );
-
-                    
                 } else {
                     console.warn("replay chaos run from sessionStorage, there is no timeMachine", chaosRunToReplay);
                 }
@@ -923,28 +922,21 @@
     ****************** Utility Functions Starts **********************
     ****************************************************************/
 
-    function clearAllAuraStorages() {
-        return new Promise(function(resolve, reject) {
-            //clear up all storage
-            var storages = $A.storageService.getStorages();
-            var storagesSize = Object.getOwnPropertyNames(storages).length;
-            var count = 0;
-            for(var storageName in storages) {
-                var storage = storages[storageName];
-                storage.clear().
-                then( 
-                    function() { 
-                        count = count + 1;   
-                        if(count === storagesSize) {
-                            resolve("we clear all aura storages, yay!");
-                        }
-                    },
-                    function(e) {
-                        reject(e);
-                    }
-                );
+    function clearAllAuraStorages(resolveFunc, rejectFunc) {
+        var storages = $A.storageService.getStorages();
+        var plst = [];
+        for(var storageName in storages) {
+            var p = storages[storageName].clear();
+            plst.push(p);
+        }
+        Promise.all(plst).then(
+            function() {
+                resolveFunc();
+            },
+            function(e) {
+                rejectFunc(e);
             }
-        });
+        );
     }
 
     function getElementAttributesStartWithDataDash(element) {

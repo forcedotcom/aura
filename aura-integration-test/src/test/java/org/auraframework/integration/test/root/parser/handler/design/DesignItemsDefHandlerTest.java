@@ -21,6 +21,7 @@ import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignItemsDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -32,15 +33,18 @@ public class DesignItemsDefHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testNoItemsSection() throws Exception {
         assertTrue("Section had items or was null", setupDesignItemsDef("").size() == 0);
     }
     
+    @Test
     public void testWithItemsSections() throws Exception {
         
         assertTrue("Expected section to have one items", setupDesignItemsDef(ITEMS).size() == 1);
     }
     
+    @Test
     public void testWithMultipleSectionsOrder() throws Exception {
         StringBuilder sectionsStr = new StringBuilder();
         sectionsStr.append(String.format(ITEMS_NAME, "5"));
@@ -56,6 +60,7 @@ public class DesignItemsDefHandlerTest extends AuraImplTestCase {
         assertEquals("Section name was incorrect, order may not be maintained", "someName", items.next().getName());
     }
 
+    @Test
     public void testMultipleItemsSameName() throws Exception {
         //Both name="" and not specifying a name should result in the same name
         String items = String.format(ITEMS_NAME, "") + ITEMS;

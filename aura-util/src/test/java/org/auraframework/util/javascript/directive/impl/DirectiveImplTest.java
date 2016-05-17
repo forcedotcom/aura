@@ -24,6 +24,7 @@ import org.auraframework.util.javascript.JavascriptValidator;
 import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
  * Tests for DirectiveImpl {@link DirectiveImpl}. DirectiveImpl Expects to
@@ -41,6 +42,7 @@ public class DirectiveImplTest extends UnitTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testDirectiveImpl() throws Exception {
         String s = "{\"modes\": [\"DEVELOPMENT\"], \"thing\": \"stuff\"}";
         TestDirective d = new TestDirective(56, s);
@@ -71,6 +73,7 @@ public class DirectiveImplTest extends UnitTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testCombinationsOfConfigs() throws Exception {
         String[] sample = { "literal", "{\"mode\": [\"MOCK2\"], \"blah\": \"howdy doody\"}",
                 "{\"modes\":, \"blah\": \"howdy doody\"}", "{\"modes\": [], \"blah\": \"howdy doody\"}",
@@ -148,6 +151,7 @@ public class DirectiveImplTest extends UnitTestCase {
     /**
      * Test excluseModes specification in directive.
      */
+    @Test
     public void testExcludeModes() {
         String[] sample = {
                 // 0: Positive case: Simple excludes mode

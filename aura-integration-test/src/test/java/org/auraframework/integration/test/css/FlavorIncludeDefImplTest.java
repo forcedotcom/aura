@@ -29,6 +29,7 @@ import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 import com.google.common.collect.Table;
 
@@ -45,6 +46,7 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
         return parent.getDef().getFlavorIncludeDefs().get(0);
     }
 
+    @Test
     public void testComputeFilterMatches() throws Exception {
         FlavorIncludeDef fi = source("<aura:include source='flavorTestAlt:flavorIncludeDefTestFlavors'/>");
         Table<DefDescriptor<ComponentDef>, String, FlavorOverrideLocation> overrides = fi.computeOverrides();
@@ -65,6 +67,7 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
         assertNull(overrides.get(sample2, "default"));
     }
 
+    @Test
     public void testAppendsDependencies() throws Exception {
         FlavorIncludeDef fi = source("<aura:include source='flavorTestAlt:flavorIncludeDefTestFlavors'/>");
         Set<DefDescriptor<?>> dependencies = new HashSet<>();
@@ -80,6 +83,7 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
         assertTrue(dependencies.contains(sample2Flavor));
     }
 
+    @Test
     public void testErrorsInInvalidSource() throws Exception {
         try {
             source("<aura:include source='foo'/>").validateDefinition();

@@ -21,6 +21,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 public class ResourceSvgTest extends UnitTestCase {
@@ -32,6 +33,7 @@ public class ResourceSvgTest extends UnitTestCase {
 	/**
      * Unit Test, Name is API!.
      */
+    @Test
     public void testName() {
         assertEquals("resources.svg", new ResourceSvg().getName());
     }
@@ -39,6 +41,7 @@ public class ResourceSvgTest extends UnitTestCase {
     /**
      * Unit Test, Format is API!.
      */
+    @Test
     public void testFormat() {
         assertEquals(Format.SVG, new ResourceSvg().getFormat());
     }
@@ -46,6 +49,7 @@ public class ResourceSvgTest extends UnitTestCase {
     /**
      * Verify that we set the correct contentType to response
      */
+    @Test
     public void testSetContentType() {
     	ResourceSvg resourceSvg = new ResourceSvg();
     	ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);

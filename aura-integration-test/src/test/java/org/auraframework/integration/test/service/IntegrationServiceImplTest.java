@@ -35,6 +35,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Ignore;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -73,6 +74,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * @throws Exception
      */
     @Ignore("W-1495981")
+    @Test
     public void testNullsForIntegrationService() throws Exception {
         Integration integration = null;
         assertNotNull("Failed to locate integration service implementation.", service);
@@ -93,6 +95,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * @throws Exception
      */
     @Ignore("W-1495981")
+    @Test
     public void testNullsForCreateIntegration() throws Exception {
         Integration integration = createIntegration();
         Map<String, Object> attributes = Maps.newHashMap();
@@ -120,6 +123,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testSanityCheck() throws Exception {
         assertNotNull("Failed to locate implementation of IntegrationService.", service);
 
@@ -144,6 +148,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * Verify injecting multiple components using a single Integration Object.
      * writeApplication will get skipped during second injection so we won't write html script&style twice
      */
+    @Test
     public void testInjectingMultipleComponents() throws Exception {
         DefDescriptor<ComponentDef> cmp1 = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
@@ -226,6 +231,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * @throws QuickFixException 
      * W-2370679: this test pass, but adding handler function like this doesn't work.
      */
+    @Test
     public void testAttributesAndEvents() throws QuickFixException {
         String attributeMarkup = "<aura:attribute name='strAttr' type='String'/>"
                 + "<aura:attribute name='booleanAttr' type='Boolean'/>";
@@ -255,6 +261,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * Verify that specifying non existing attributes names for initializing
      * will result in AuraRunTime exception.
      */
+    @Test
     public void testNonExistingAttributeValues() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("fooBar", "");
@@ -295,6 +302,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
 	}
 
     @Ignore("W-1505382")
+    @Test
     public void testNonStringAttributeValuesForEvents() throws Exception {
         // Non String attribute for functions
         Map<String, Object> attributes = Maps.newHashMap();
@@ -318,6 +326,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testInjectingNonExistingComponent() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
@@ -334,6 +343,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     /**
      * Verify that only component defs can be injected.
      */
+    @Test
     public void testInjectingApplications() throws Exception {
         String validApp = "test:laxSecurity";
         Map<String, Object> attributes = Maps.newHashMap();
@@ -355,6 +365,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testExceptionDuringComponentInstantiation() throws Exception {
         DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<aura:attribute name='reqAttr' required='true' type='String'/>"));
@@ -373,6 +384,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * Implementing this interface by an application and using that application with Integration service will help
      * trim the preloads size by skipping the default preloads. 
      */
+    @Test
     public void testNoDefaultsPreloadInterfaceIsInGoodState(){
         Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         DefDescriptor<InterfaceDef> noDefaultPreloadsInterfaceDef = definitionService.getDefDescriptor(IntegrationService.NO_DEFAULT_PRELOADS_INTERFACE, 
@@ -387,6 +399,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     /**
      * Test app used for integration should extend aura:integrationServiceApp
      */
+    @Test
     public void testAppDoesntExtendIntegrationApp() throws Exception {
         String appMarkup = "<aura:application></aura:application>";
         DefDescriptor<ApplicationDef> appDesc = getAuraTestingUtil().addSourceAutoCleanup(

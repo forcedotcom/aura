@@ -24,6 +24,7 @@ import org.auraframework.impl.root.library.IncludeDefRefImpl.Builder;
 import org.auraframework.impl.root.library.JavascriptIncludeClass;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
 
@@ -40,6 +41,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         super(name);
     }
 
+    @Test
     public void testValidateDefintionWithoutDescriptor() throws Exception {
         IncludeDefRef def = builder.build();
 
@@ -52,6 +54,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         }
     }
 
+    @Test
     public void testValidateDefintionAliasIsInvalidIdentifier() throws Exception {
         String name = "invalidSource";
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().addSourceAutoCleanup(IncludeDef.class,
@@ -72,6 +75,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         }
     }
 
+    @Test
     public void testValidateDefintionAliasesIsJs() throws Exception {
         String name = "invalidSource";
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().addSourceAutoCleanup(IncludeDef.class,
@@ -92,6 +96,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         }
     }
 
+    @Test
     public void testValidateDefintionExportIsInvalidIdentifier() throws Exception {
         String name = "invalidSource";
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().addSourceAutoCleanup(IncludeDef.class,
@@ -112,6 +117,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         }
     }
 
+    @Test
     public void testValidateDefintionExportIsJs() throws Exception {
         String name = "invalidSource";
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().addSourceAutoCleanup(IncludeDef.class,
@@ -132,6 +138,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         }
     }
 
+    @Test
     public void testInvalidTryToBreakOut() throws Exception {
         String source = "function(){\n}}) alert('watch out')";
 
@@ -155,6 +162,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         }
     }
 
+    @Test
     public void testExtraCurlyBrace() throws Exception {
         String source = "var a=66;\n}";
 
@@ -179,6 +187,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         }
     }
 
+    @Test
     public void testUnClosed() throws Exception {
         // Put the error online to to avoid running into fluctuation in client descriptor length.
         // During hrh course of the test, several "dummy" descriptors are created an not cleaned.
@@ -204,6 +213,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         }
     }
 
+    @Test
     public void testWarningIgnoredForNonStandardJsDoc() throws Exception {
         String source = "function(){return 'x'}\n/*!\n * @version 1\n */";
 

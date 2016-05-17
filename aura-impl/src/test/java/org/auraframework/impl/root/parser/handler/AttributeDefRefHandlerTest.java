@@ -30,6 +30,7 @@ import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
+import org.junit.Test;
 
 public class AttributeDefRefHandlerTest extends AuraImplTestCase {
 
@@ -37,6 +38,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testAttributeDefRefParsing() throws Exception {
         ComponentXMLParser parser = new ComponentXMLParser();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
@@ -47,6 +49,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         assertNotNull(cd);
     }
 
+    @Test
     public void testAttributeDefRefParsingWithChildtag() throws Exception {
         ComponentXMLParser parser = new ComponentXMLParser();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
@@ -57,6 +60,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         assertNotNull(cd);
     }
 
+    @Test
     public void testGetElementWithValueAttribute() throws Exception {
         DefDescriptor<AttributeDef> desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         StringSource<AttributeDef> source = new StringSource<>(desc,
@@ -71,6 +75,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         assertEquals("testing", o);
     }
 
+    @Test
     public void testGetElementWithValueAsChildTag() throws Exception {
         DefDescriptor<AttributeDef> desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         StringSource<AttributeDef> source = new StringSource<>(desc,
@@ -84,6 +89,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         assertEquals("foo", value.getName());
     }
 
+    @Test
     public void testGetElementWithTextBetweenTags() throws Exception {
         DefDescriptor<AttributeDef> desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         StringSource<AttributeDef> source = new StringSource<>(desc,

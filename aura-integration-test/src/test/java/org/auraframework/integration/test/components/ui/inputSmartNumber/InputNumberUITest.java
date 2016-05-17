@@ -15,6 +15,7 @@
  */
 package org.auraframework.integration.test.components.ui.inputSmartNumber;
 
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -26,6 +27,7 @@ public class InputNumberUITest extends BaseInputSmartNumber {
         super("/uitest/inputSmartNumber_Test.app?testInputCmp=inputNumber");
     }
 
+    @Test
     public void testInputNumber() throws Exception {
         open(LOCALIZATION_TEST_URL);
 
@@ -57,6 +59,7 @@ public class InputNumberUITest extends BaseInputSmartNumber {
 
     // TODO: WebDriver doesn't support setting http headers for language. Need
     // to use proxy or preconfigured browser to spoof Locales other than US.
+    @Test
     public void testLocalizedInputNumber() throws Exception {
         open(LOCALIZATION_TEST_URL);
 

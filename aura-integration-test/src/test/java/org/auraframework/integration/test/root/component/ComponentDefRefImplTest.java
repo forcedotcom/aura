@@ -35,6 +35,7 @@ import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
+import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -62,6 +63,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
                 vendor.makeLocation("filename", 5, 5, 0));
     }
 
+    @Test
     public void testComponentDefRef() throws Exception {
         Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new HashMap<>();
 
@@ -73,6 +75,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         assertNotNull(testComponentDefRef);
     }
 
+    @Test
     public void testAppendDependencies() throws Exception {
         Set<DefDescriptor<?>> dependencies = new HashSet<>();
         testComponentDefRef.appendDependencies(dependencies);
@@ -106,6 +109,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         // assertTrue(dependencies.contains(vendor.makeComponentDefDescriptor("aura:text")));
     }
 
+    @Test
     public void testValidateDefinition() throws Exception {
         ComponentDefRef cdr = vendor.makeComponentDefRefWithNulls(null, null, null);
         try {
@@ -116,10 +120,12 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testEquals() {
         assertEquals(vendor.makeComponentDefRef(), vendor.makeComponentDefRef());
     }
 
+    @Test
     public void testNullSetAttribute() {
         ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
         ComponentDefRef built;
@@ -132,12 +138,14 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         assertEquals("{truncate=5}", built.getAttributeValues().toString());
     }
 
+    @Test
     public void testEqualsWithDifferentDescriptor() {
         ComponentDefRef cdr1 = vendor.makeComponentDefRef();
         ComponentDefRef cdr2 = vendor.makeComponentDefRef(vendor.getParentComponentDefDescriptor(), null, null);
         assertFalse("Equals should have returned false because descriptors are different", cdr1.equals(cdr2));
     }
 
+    @Test
     public void testRequiredAttribute() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
@@ -150,6 +158,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         assertNotNull(Aura.getInstanceService().getInstance(definitionService.getDefinition(cmpDesc), atts));
     }
 
+    @Test
     public void testRequiredAttribute_ComponentDef() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
@@ -163,6 +172,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testRequiredAttribute_COMPONENT() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
@@ -177,6 +187,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
     }
 
 
+    @Test
     public void testRequiredAttribute_CmpDesc() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
@@ -189,6 +200,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testRequiredAttribute_CmpDesc_getDef() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
@@ -201,6 +213,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testRequiredInheritedAttribute() throws Exception {
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component extensible='true'><aura:attribute name='req' type='String' required='true'/></aura:component>");
@@ -243,6 +256,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testRequiredInnerAttribute() throws Exception {
         DefDescriptor<ComponentDef> inner = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
@@ -278,21 +292,25 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testEqualsWithDifferentLocations() {
         ComponentDefRef cdr1 = vendor.makeComponentDefRef();
         ComponentDefRef cdr2 = vendor.makeComponentDefRef(null, null, vendor.makeLocation("fakefile", 0, 0, 0));
         assertFalse("Equals should have returned false because locations are different", cdr1.equals(cdr2));
     }
 
+    @Test
     public void testEqualsWithDifferentObjects() {
         assertFalse("Equals should have been false due to different object types",
                 vendor.makeComponentDefRef().equals(vendor.makeEventDef()));
     }
 
+    @Test
     public void testSerialize() throws Exception {
         serializeAndGoldFile(testComponentDefRef);
     }
 
+    @Test
     public void testSerialize2() throws Exception {
         serializeAndGoldFile(vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("test:text"),
                 new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>(),

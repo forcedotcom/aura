@@ -17,22 +17,26 @@ package org.auraframework.impl.root;
 
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Attribute;
+import org.junit.Test;
 
 public class AttributeImplTest extends AuraImplTestCase {
     public AttributeImplTest(String name) {
         super(name);
     }
 
+    @Test
     public void testAttribute() throws Exception {
         Attribute testAttribute = vendor.makeAttribute("testAttribute");
         assertNotNull(testAttribute);
     }
 
+    @Test
     public void testGetName() throws Exception {
         Attribute testAttribute = vendor.makeAttribute("testAttribute");
         assertEquals("testAttribute", testAttribute.getName());
     }
 
+    @Test
     public void testSetAndGetValue() throws Exception {
         String valString = "-1";
         int valInt = -1;
@@ -54,6 +58,7 @@ public class AttributeImplTest extends AuraImplTestCase {
         assertEquals(Integer.valueOf(valInt), testAttribute.getValue());
     }
 
+    @Test
     public void testSerialize() throws Exception {
         Attribute testAttribute = vendor.makeAttribute("testAttribute");
         testAttribute.setValue("hello");

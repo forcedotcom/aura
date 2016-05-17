@@ -18,6 +18,7 @@ package org.auraframework.test.instance;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ActionDelegate;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Maps;
@@ -56,6 +57,7 @@ public class ActionDelegateTest extends UnitTestCase {
         calledMap.put(name, Boolean.TRUE);
     }
 
+    @Test
     public void testCallsFunctions() throws Throwable {
         Map<String,Method> methodMap = Maps.newHashMap();
         Map<String,Boolean> calledMap = Maps.newHashMap();

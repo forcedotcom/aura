@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 public class AuraTextUtilTest extends UnitTestCase {
     /**
@@ -55,12 +56,14 @@ public class AuraTextUtilTest extends UnitTestCase {
             new StringPair("Apple", "apple"), new StringPair("apple", "apple"), new StringPair("1", "1"),
             new StringPair("=", "="), new StringPair(" A", " A"), new StringPair("Ñ", "ñ"), };
 
+    @Test
     public void testInitLowerCase() {
         for (StringPair p : INIT_LOWER_CASE_PAIRS) {
             assertEquals(p.expected, AuraTextUtil.initLowerCase(p.input));
         }
     }
 
+    @Test
     public void testArrayToStringNulls() {
         assertEquals(null, AuraTextUtil.arrayToString(null, ",", 1, true, true));
         try {
@@ -71,11 +74,13 @@ public class AuraTextUtilTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testArrayToStringEmpty() {
         assertEquals("", AuraTextUtil.arrayToString(new String[] {}, ",", 1, false, false));
         assertEquals("[]", AuraTextUtil.arrayToString(new String[] {}, ",", 1, true, false));
     }
 
+    @Test
     public void testArrayToStringSingle() {
         assertEquals("1", AuraTextUtil.arrayToString(new String[] { "1" }, ",", 1, false, false));
         assertEquals("[1]", AuraTextUtil.arrayToString(new String[] { "1" }, ",", 1, true, false));
@@ -83,6 +88,7 @@ public class AuraTextUtilTest extends UnitTestCase {
         assertEquals("[1]", AuraTextUtil.arrayToString(new String[] { "1" }, ",", 1, true, true));
     }
 
+    @Test
     public void testArrayToStringTwoEntry() {
         assertEquals("1,2", AuraTextUtil.arrayToString(new String[] { "1", "2" }, ",", 2, false, false));
         assertEquals("[1,2]", AuraTextUtil.arrayToString(new String[] { "1", "2" }, ",", 2, true, false));
@@ -95,6 +101,7 @@ public class AuraTextUtilTest extends UnitTestCase {
         assertEquals("[1xxx2]", AuraTextUtil.arrayToString(new String[] { "1", "2" }, "xxx", 2, true, true));
     }
 
+    @Test
     public void testArrayToStringTwoEntryLimit() {
         assertEquals("1,2", AuraTextUtil.arrayToString(new String[] { "1", "2", "3" }, ",", 2, false, false));
         assertEquals("[1,2]", AuraTextUtil.arrayToString(new String[] { "1", "2", "3" }, ",", 2, true, false));
@@ -111,14 +118,17 @@ public class AuraTextUtilTest extends UnitTestCase {
         assertEquals("[1xxx2...]", AuraTextUtil.arrayToString(new String[] { "1", "2", "3" }, "xxx", 2, true, true));
     }
 
+    @Test
     public void testArrayToStringTwoEntryHasNull() {
         assertEquals("1,null", AuraTextUtil.arrayToString(new String[] { "1", null }, ",", 2, false, false));
     }
 
+    @Test
     public void testArrayToStringManyEntry() {
         assertEquals("1,2,3,4", AuraTextUtil.arrayToString(new String[] { "1", "2", "3", "4" }, ",", -1, false, false));
     }
 
+    @Test
     public void testIsNullEmptyOrWhitespace() {
         assertEquals(true, AuraTextUtil.isNullEmptyOrWhitespace(null));
         assertEquals(true, AuraTextUtil.isNullEmptyOrWhitespace(""));
@@ -133,6 +143,7 @@ public class AuraTextUtilTest extends UnitTestCase {
         assertEquals(false, AuraTextUtil.isNullEmptyOrWhitespace("\t\n a"));
     }
 
+    @Test
     public void testIsNullOrEmpty() {
         assertEquals(true, AuraTextUtil.isNullOrEmpty(null));
         assertEquals(true, AuraTextUtil.isNullOrEmpty(""));
@@ -146,6 +157,7 @@ public class AuraTextUtilTest extends UnitTestCase {
         assertEquals(false, AuraTextUtil.isNullOrEmpty("\t\n a"));
     }
 
+    @Test
     public void testIsEmptyOrWhitespace() {
         assertEquals(false, AuraTextUtil.isEmptyOrWhitespace(null));
         assertEquals(true, AuraTextUtil.isEmptyOrWhitespace(""));
@@ -170,6 +182,7 @@ public class AuraTextUtilTest extends UnitTestCase {
             new StringPair("\u0000", ""),
             new StringPair("0123456789/!@#$%^&*()-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), };
 
+    @Test
     public void testEscapeForJavascriptString() {
         for (StringPair p : JS_STRING_PAIRS) {
             assertEquals(p.expected, AuraTextUtil.escapeForJavascriptString(p.input));
@@ -185,6 +198,7 @@ public class AuraTextUtilTest extends UnitTestCase {
             new StringPair("\"", "\\\""), new StringPair("\\", "\\\\"), new StringPair("\u0000", ""),
             new StringPair("0123456789/!@#$%^&*()-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), };
 
+    @Test
     public void testEscapeForJSONString() {
         for (StringPair p : JSON_STRING_PAIRS) {
             assertEquals(p.expected, AuraTextUtil.escapeForJSONString(p.input));
@@ -229,12 +243,14 @@ public class AuraTextUtilTest extends UnitTestCase {
             new SplitMatch("a,b ", ",", 2, new String[] { "a", "b " }),
             new SplitMatch("a,b,", ",", 2, new String[] { "a", "b", "" }), };
 
+    @Test
     public void testSplitSimple2() {
         for (SplitMatch sm : splitTests) {
             sm.checkResult(AuraTextUtil.splitSimple(sm.delimiter, sm.input));
         }
     }
 
+    @Test
     public void testSplitSimple3() {
         for (SplitMatch sm : splitTests) {
             sm.checkResult(AuraTextUtil.splitSimple(sm.delimiter, sm.input, sm.expectedSize));
@@ -251,6 +267,7 @@ public class AuraTextUtilTest extends UnitTestCase {
             new SplitMatch("a,b,", ",", 2, new String[] { "a", "b", "" }),
             new SplitMatch("a,b,  ", ",", 2, new String[] { "a", "b", "" }), };
 
+    @Test
     public void testSplitSimpleAndTrim() {
         for (SplitMatch sm : splitTrimTests) {
             sm.checkResult(AuraTextUtil.splitSimpleAndTrim(sm.input, sm.delimiter, sm.expectedSize));
@@ -265,6 +282,7 @@ public class AuraTextUtilTest extends UnitTestCase {
             new SplitMatch("a,b,", ",", 2, new String[] { "a", "b," }),
             new SplitMatch("a,b,", ",", 10, new String[] { "a", "b", "" }), };
 
+    @Test
     public void testSplitSimpleLimit() {
         for (SplitMatch sm : splitLimitTests) {
             sm.checkResult(AuraTextUtil.splitSimpleLimit(sm.input, sm.delimiter, sm.expectedSize));
@@ -280,6 +298,7 @@ public class AuraTextUtilTest extends UnitTestCase {
             new SplitMatch("a,b,   ", ",", 2, new String[] { "a", "b," }),
             new SplitMatch("a,b,   ", ",", 10, new String[] { "a", "b", "" }), };
 
+    @Test
     public void testSplitSimpleLimitTrim() {
         for (SplitMatch sm : splitLimitTrimTests) {
             sm.checkResult(AuraTextUtil.splitSimpleLimitAndTrim(sm.input, sm.delimiter, sm.expectedSize));
@@ -291,6 +310,7 @@ public class AuraTextUtilTest extends UnitTestCase {
             new StringPair("Apple", "Apple"), new StringPair("apple", "Apple"), new StringPair("1", "1"),
             new StringPair("=", "="), new StringPair(" a", " a"), new StringPair("ñ", "Ñ"), };
 
+    @Test
     public void testInitCap() {
         for (StringPair p : INIT_CAP_PAIRS) {
             assertEquals(p.expected, AuraTextUtil.initCap(p.input));
@@ -299,6 +319,7 @@ public class AuraTextUtilTest extends UnitTestCase {
 
     private final static StringPair[] URL_DECODE_PAIRS = new StringPair[] { new StringPair("", ""), };
 
+    @Test
     public void testURLDecodeNull() {
         try {
             AuraTextUtil.urldecode(null);
@@ -306,6 +327,7 @@ public class AuraTextUtilTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testURLDecode() {
         for (StringPair p : URL_DECODE_PAIRS) {
             assertEquals(p.expected, AuraTextUtil.urldecode(p.input));
@@ -314,6 +336,7 @@ public class AuraTextUtilTest extends UnitTestCase {
 
     private final static StringPair[] URL_ENCODE_PAIRS = new StringPair[] { new StringPair("", ""), };
 
+    @Test
     public void testURLEncodeNull() {
         try {
             AuraTextUtil.urlencode(null);
@@ -321,12 +344,14 @@ public class AuraTextUtilTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testURLEncode() {
         for (StringPair p : URL_ENCODE_PAIRS) {
             assertEquals(p.expected, AuraTextUtil.urlencode(p.input));
         }
     }
 
+    @Test
     public void testvalidateAttributeName() {
         assertTrue("Attribute name<name> should be valid ", AuraTextUtil.validateAttributeName("name"));
         assertTrue("Attribute name<_name> should be valid", AuraTextUtil.validateAttributeName("_name"));
@@ -347,18 +372,21 @@ public class AuraTextUtilTest extends UnitTestCase {
             new StringPair("*/", "\\u002A/"),
     };
 
+    @Test
     public void testJSONFunction() {
         for (StringPair p : JSON_FUNCTION_ENCODE_PAIRS) {
             assertEquals(p.expected, AuraTextUtil.escapeForJSONFunction(p.input));
         }
     }
 
+    @Test
     public void testStringsHaveSameContent() {
         assertTrue(AuraTextUtil.stringsHaveSameContent("abc", "abc"));
         assertTrue(AuraTextUtil.stringsHaveSameContent("abc", "cba"));
         assertFalse(AuraTextUtil.stringsHaveSameContent("abc", "def"));
     }
 
+    @Test
     public void testIsValidJsIdentifier() throws Exception {
         assertTrue("variable is a valid js identifier", AuraTextUtil.isValidJsIdentifier("variable"));
         assertTrue("$ is a valid js identifier", AuraTextUtil.isValidJsIdentifier("$"));

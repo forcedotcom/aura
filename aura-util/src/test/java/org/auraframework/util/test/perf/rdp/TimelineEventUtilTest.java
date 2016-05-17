@@ -18,9 +18,11 @@ package org.auraframework.util.test.perf.rdp;
 import java.util.List;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 public final class TimelineEventUtilTest extends UnitTestCase {
 
+    @Test
     public void testGetCategoryMetricNames() {
         List<String> types = TimelineEventUtil.getCategoryMetricNames(TimelineEventUtil.Category.Loading);
         assertEquals(7, types.size());

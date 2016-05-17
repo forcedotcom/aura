@@ -24,6 +24,7 @@ import org.auraframework.test.util.AuraHttpTestCase;
 import com.google.common.collect.Maps;
 
 import org.auraframework.util.json.Json;
+import org.junit.Test;
 
 public final class ValidationHttpTest extends AuraHttpTestCase {
 
@@ -46,6 +47,7 @@ public final class ValidationHttpTest extends AuraHttpTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testLintApp() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("name", "lintTest:basic");

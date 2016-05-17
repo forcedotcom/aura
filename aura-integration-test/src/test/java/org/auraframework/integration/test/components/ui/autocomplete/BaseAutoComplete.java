@@ -20,6 +20,7 @@ import java.util.*;
 import org.auraframework.test.util.*;
 import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.junit.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
@@ -68,6 +69,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     /**
      * Initial load of the autocomplete component. Verify data is loaded and the list is not visible.
      */
+    @Test
     public void testAutoCompleteComponentInitialRender() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -86,6 +88,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
      * not used for Safari
      */
     @ExcludeBrowsers({ BrowserType.SAFARI })
+    @Test
     public void testAutoCompleteWithUpdateOnAttributeSet() throws Exception {
         open(URL);
         String inputAutoComplete = "autoCompleteUpdateOn";
@@ -107,6 +110,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
      * Test to verify blur and focus events works when set in the ui:autocomplete component. Test case: W-2391008
      */
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    @Test
     public void testAutoCompleteWithBlurAndFocusEvent() throws Exception {
         open(URL);
         String inputAutoComplete = "blurFocus";
@@ -129,6 +133,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     /**
      * Matching multiple items verifying list is visible and matched items present.
      */
+    @Test
     public void testAutoCompleteComponentRenderOnMatch() throws Exception {
         doTestMatch(AUTOCOMPLETE_COMPONENT.get("Generic"), "o", null, 10, OptionType.AUTOCOMPLETE_OPTION);
     }
@@ -136,6 +141,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     /**
      * Able to select an item from autocomplete list.
      */
+    @Test
     public void testAutoCompleteSelectOption() throws Exception {
         doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("Generic"), OptionType.AUTOCOMPLETE_OPTION);
     }
@@ -143,6 +149,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     /**
      * Matching single items verifying list is visible and single matched items present.
      */
+    @Test
     public void testAutoCompleteSingleMatch() throws Exception {
         doTestMatch(AUTOCOMPLETE_COMPONENT.get("Generic"), "hello world2", "hello world2", 1,
                 OptionType.AUTOCOMPLETE_OPTION);
@@ -168,6 +175,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     /**
      * Test to check support for keydown event. Test case for W-2227931
      */
+    @Test
     public void testAutoCompleteKeyDownEventSupport() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -186,6 +194,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     // TODO : Bug W-1780786
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.FIREFOX, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
     public void testAutoCompleteTabing() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -209,6 +218,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     // Excluding mobile devices since they dont have arrow key functionality
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
     public void testAutoCompleteArrowKeys() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -230,6 +240,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
      * For a component using a custom template match multiple items and verify list is visible and matched items
      * present.
      */
+    @Test
     public void testAutoCompleteCustomTemplateComponentRenderOnMatch() throws Exception {
         doTestMatch(AUTOCOMPLETE_COMPONENT.get("CustomTemplate"), "o", null, 10,
                 OptionType.AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION);
@@ -238,6 +249,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     /**
      * For a component using a custom template able to select item in list.
      */
+    @Test
     public void testAutoCompleteCustomTemplateComponentSelectOption() throws Exception {
         doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("CustomTemplate"), OptionType.AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION);
     }
@@ -246,6 +258,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
      * For a component extending autocompleteOption able to match multiple items, also verify list is visible and
      * matched items present.
      */
+    @Test
     public void testAutoCompleteCustomOptionComponentRenderOnMatch() throws Exception {
         doTestMatch(AUTOCOMPLETE_COMPONENT.get("OptionExtention"), "o", null, 10, OptionType.AUTOCOMPLETE_CUSTOM_OPTION);
     }
@@ -253,6 +266,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     /**
      * For component extending autocompleteOption able to select item in list.
      */
+    @Test
     public void _testAutoCompleteCustomOptionComponentSelectOption() throws Exception {
         doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("OptionExtention"), OptionType.AUTOCOMPLETE_CUSTOM_OPTION);
     }
@@ -261,6 +275,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
      * For a component extending autocompleteOption able to match single item, also verify list is visible and matched
      * items present.
      */
+    @Test
     public void testAutoCompleteSingleMatchUsingCustomTemplate() throws Exception {
         doTestMatch(AUTOCOMPLETE_COMPONENT.get("CustomTemplate"), "hello world2", "hello world2", 1,
                 OptionType.AUTOCOMPLETE_CUSTOM_TEMPLATE_OPTION);
@@ -279,6 +294,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     /**
      * Test for autocomplete with emptyListContent when there are matches in the list.
      */
+    @Test
     public void testAutoCompleteEmptyListContentOnMatch() throws Exception {
         doTestEmptyListContent(AUTOCOMPLETE_COMPONENT.get("emptyListContent"), "hello world", true, false);
     }
@@ -308,6 +324,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
      * Test for autocomplete with a matchFunc override. The behavior is overridden to show all items no matter what gets
      * typed in the input field. Verifies that all elements are found.
      */
+    @Test
     public void testAutoCompleteMatchFunc() throws Exception {
         Integer autoCompleteCmpNum = AUTOCOMPLETE_COMPONENT.get("matchFunc");
 
@@ -327,6 +344,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
      * Test for autocomplete with a list toggle button. The behavior is overridden to show all items no matter what gets
      * typed in the input field. Verifies that the list visibility can be toggled.
      */
+    @Test
     public void testAutoCompleteToggle() throws Exception {
         Integer autoCompleteCmpNum = AUTOCOMPLETE_COMPONENT.get("toggle");
 

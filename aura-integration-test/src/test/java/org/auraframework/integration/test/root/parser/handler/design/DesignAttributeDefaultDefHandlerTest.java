@@ -27,6 +27,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class DesignAttributeDefaultDefHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testBasicDefault() throws Exception {
         DesignAttributeDef attribute = createComponentAndDesignWithAttributeDefault("<ui:button label=\"test\"/>");
         DesignAttributeDefaultDef defaultDef = attribute.getAttributeDefault();
@@ -47,6 +49,7 @@ public class DesignAttributeDefaultDefHandlerTest extends AuraImplTestCase {
         assertEquals("Expected there to be one component ref in the list", 1, defaultComponents.size());
     }
 
+    @Test
     public void testDefaultWithHTMLTag() throws Exception {
         try {
             createComponentAndDesignWithAttributeDefault("<div/>");
@@ -57,6 +60,7 @@ public class DesignAttributeDefaultDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testDefaultWithAuraSystemTag() throws Exception {
         try {
             createComponentAndDesignWithAttributeDefault("<aura:set/>");

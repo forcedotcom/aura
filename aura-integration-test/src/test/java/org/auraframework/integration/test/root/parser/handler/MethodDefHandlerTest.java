@@ -21,6 +21,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 public class MethodDefHandlerTest extends AuraImplTestCase {
 
@@ -31,11 +32,13 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
     
     
     //sanity test : positive case
+    @Test
     public void testBasicMethod() throws QuickFixException  {
         getSimpleCmpDesc("<aura:method name='myMethod'> </aura:method>");
     }
     
     //method missing name should throw error
+    @Test
     public void testMethodMissingName() throws Exception {
         try {
             DefDescriptor<ComponentDef> desc = getSimpleCmpDesc("<aura:method> </aura:method>");
@@ -47,6 +50,7 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
     }
     
     //two method with same name should throw error
+    @Test
     public void testMethodDuplicate() throws Exception {
         String basicMethod = "<aura:method name='myMethod'> </aura:method>";
         try {
@@ -60,6 +64,7 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
     }
     
     //test method with same name as an event
+    @Test
     public void testMethodDuplicateAsEvent() throws Exception {
         String basicMethod = "<aura:method name='myMethod'> </aura:method>";
         String basicEvent = "<aura:registerEvent name='myMethod' type='aura:operationComplete'/>";
@@ -75,6 +80,7 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
     
     //test method with same name as an attribute, method is defined before attribute : test added for W-2520943
     //the error is actually being throw from handling event tag, but we don't have a eventDefHandlerTest.java 
+    @Test
     public void testMethodDuplicateAsEvent2() throws Exception {
         String basicMethod = "<aura:method name='myMethod'> </aura:method>";
         String basicEvent = "<aura:registerEvent name='myMethod' type='aura:operationComplete'/>";
@@ -89,6 +95,7 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
     }
     
     //test method with same name as an attribute
+    @Test
     public void testMethodDuplicateAsAttrite() throws Exception {
         String basicMethod = "<aura:method name='myMethod'> </aura:method>";
         String basicAttribute = "<aura:attribute name='myMethod' type='String'/>";
@@ -105,6 +112,7 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
     //test method with same name as an attribute, method is defined before attribute : test added for W-2520943
     //one can move this test to AttributeDefHandlerTest, as the error is being throw from handing attribute Tag
     //but they have a different setup there. so i just leave this one here.
+    @Test
     public void testMethodDuplicateAsAttrite2() throws Exception {
         String basicMethod = "<aura:method name='myMethod'> </aura:method>";
         String basicAttribute = "<aura:attribute name='myMethod' type='String'/>";

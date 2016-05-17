@@ -19,6 +19,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
 import org.auraframework.test.util.WebDriverTestCase;
+import org.junit.Test;
 
 public class JsonSerializationUITest extends WebDriverTestCase {
     public JsonSerializationUITest(String name) {
@@ -38,6 +39,7 @@ public class JsonSerializationUITest extends WebDriverTestCase {
         assertEquals("done",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().countDown()"));
     }
     
+    @Test
     public void testJsStringBangMinusMinus() throws Exception {
         DefDescriptor<ComponentDef> cmpdd = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "render='client'", ""));
@@ -59,6 +61,7 @@ public class JsonSerializationUITest extends WebDriverTestCase {
         assertEquals("evildoer",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().replaceStar('*doer')"));
     }
 
+    @Test
     public void testJsStringStarSlash() throws Exception {
         DefDescriptor<ComponentDef> cmpdd = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "render='client'", ""));

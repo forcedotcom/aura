@@ -28,6 +28,7 @@ import org.auraframework.integration.test.logging.AbstractLoggingUITest;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.hamcrest.CoreMatchers;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -44,6 +45,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         super(name, ExceptionAdapterImpl.class);
     }
 
+    @Test
     public void testClientErrorIdMatchesLoggedErrorId() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         // generate an error on the client side
@@ -64,6 +66,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertEquals(clientErrorId, loggedErrorId);
     }
 
+    @Test
     public void testClientErrorFromClientController() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         // generate an error on the client side
@@ -81,6 +84,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
+    @Test
     public void testClientErrorFromActionCallback() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         // generate a client error in a server action callback
@@ -101,6 +105,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
     /**
      * Verify expected logs are sent to server when a client error occurs in a callback function wrapped in $A.getCallback()
      */
+    @Test
     public void testClientErrorFromGetcallbackWrappedFunction() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         // generate a client error in a callback function wrapped in $A.getCallback()
@@ -118,6 +123,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
+    @Test
     public void testClientErrorFromRerender() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         // generate a client error in rerender()
@@ -135,6 +141,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
+    @Test
     public void testClientErrorFromUnrerender() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         // generate a client error in rerender()
@@ -152,6 +159,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
+    @Test
     public void testClientErrorFromContainedCmpClientController() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
@@ -167,6 +175,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
+    @Test
     public void testClientErrorFromContainedCmpActionCallback() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromServerActionCallbackButton"));
@@ -182,6 +191,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
+    @Test
     public void testClientErrorFromGetcallbackWrappedFunctionInContainCmp() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromFunctionWrappedInGetCallbackButton"));
@@ -197,6 +207,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
+    @Test
     public void testClientErrorFromContainedCmpRerender() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromRerenderButton"));
@@ -212,6 +223,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
+    @Test
     public void testClientErrorFromContainedCmpUnrerender() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromUnrenderButton"));
@@ -231,6 +243,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
      * Verify that the client error in error handler gets logged on the server side.
      * On the server side, there should be two error logs, the original error's log and the error handler error's log.
      */
+    @Test
     public void testClientErrorFromCustomErrorHandler() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorInHandler=true", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
@@ -258,6 +271,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
     /**
      * Verify that client side error gets logged even if custom error handler has error.
      */
+    @Test
     public void testClientErrorGetsLoggedWhenCustomErrorHandlerHasError() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorInHandler=true", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));

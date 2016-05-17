@@ -21,6 +21,7 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.junit.Test;
 
 public class AuraComponentServiceImplTest extends AuraImplTestCase {
 
@@ -28,6 +29,7 @@ public class AuraComponentServiceImplTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testGetComponent() throws Exception {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr", "yo");

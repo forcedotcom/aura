@@ -35,6 +35,7 @@ import org.auraframework.test.mock.MockModel;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
 
@@ -63,6 +64,7 @@ public class MockingUtilUITest extends WebDriverTestCase {
         super.tearDown();
     }
 
+    @Test
     public void testMockModelSanity() throws Exception {
         if (!Aura.getContextService().isEstablished()) {
             Aura.getContextService().startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);
@@ -77,6 +79,7 @@ public class MockingUtilUITest extends WebDriverTestCase {
         assertEquals("Modelonetwothree", getText(By.cssSelector("body")));
     }
 
+    @Test
     public void testMockModelString() throws Exception {
         if (!Aura.getContextService().isEstablished()) {
             Aura.getContextService().startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);
@@ -93,6 +96,7 @@ public class MockingUtilUITest extends WebDriverTestCase {
         assertEquals("not a list", getText(By.cssSelector("body")));
     }
 
+    @Test
     public void testMockModelList() throws Exception {
         if (!Aura.getContextService().isEstablished()) {
             Aura.getContextService().startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);
@@ -112,6 +116,7 @@ public class MockingUtilUITest extends WebDriverTestCase {
         assertEquals("overrideXYZ", getText(By.cssSelector("body")));
     }
 
+    @Test
     public void testMockModelChain() throws Exception {
         if (!Aura.getContextService().isEstablished()) {
             Aura.getContextService().startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);
@@ -151,6 +156,7 @@ public class MockingUtilUITest extends WebDriverTestCase {
     }
 
     // Start with a broken component and mock to provide a "working" one.
+    @Test
     public void testMockServerProvider() throws Exception {
         DefDescriptor<ProviderDef> providerDefDescriptor = definitionService.getDefDescriptor(
                 "java://org.auraframework.impl.java.provider.TestComponentConfigProvider", ProviderDef.class);
@@ -180,6 +186,7 @@ public class MockingUtilUITest extends WebDriverTestCase {
         return "not so interesting";
     }
 
+    @Test
     public void testMockServerActionSanity() throws Exception {
         if (!Aura.getContextService().isEstablished()) {
             Aura.getContextService().startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);
@@ -205,6 +212,7 @@ public class MockingUtilUITest extends WebDriverTestCase {
         waitForElementTextPresent(findDomElement(By.cssSelector("div.result")), "not so interesting");
     }
 
+    @Test
     public void testMockServerAction() throws Exception {
         if (!Aura.getContextService().isEstablished()) {
             Aura.getContextService().startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);

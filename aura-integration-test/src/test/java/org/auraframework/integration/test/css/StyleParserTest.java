@@ -57,6 +57,7 @@ public class StyleParserTest extends AuraImplTestCase {
      * 
      * Expected result: Pick up only the style defined in file named exactly as the component but with a .css file type.
      */
+    @Test
     public void testTwoCssFilesForAComponent() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testTwoCSSFiles", StyleDef.class);
         StyleDef style = definitionService.getDefinition(descriptor);
@@ -72,6 +73,7 @@ public class StyleParserTest extends AuraImplTestCase {
      * 
      * Expected result: The parser should throw a StyleParserException.
      */
+    @Test
     public void testCaseSensitivity() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleSelectorCaseSensitivity",
                 StyleDef.class);
@@ -91,6 +93,7 @@ public class StyleParserTest extends AuraImplTestCase {
      * 
      * Expected result: Pick up only the style defined in file.
      */
+    @Test
     public void testValidCss() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testValidCSS", StyleDef.class);
         StyleDef style = definitionService.getDefinition(descriptor);
@@ -106,6 +109,7 @@ public class StyleParserTest extends AuraImplTestCase {
      * 
      * Expected result: The parser should throw a StyleParserException.
      */
+    @Test
     public void testInvalidCss() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testInValidCSS", StyleDef.class);
         try {
@@ -125,6 +129,7 @@ public class StyleParserTest extends AuraImplTestCase {
      * 
      * Expected result: The parser just considers the css file for the parent for validation.
      */
+    @Test
     public void testValidNestedComponents() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleValidParent", StyleDef.class);
         StyleDef style = definitionService.getDefinition(descriptor);
@@ -137,6 +142,7 @@ public class StyleParserTest extends AuraImplTestCase {
      * 
      * Expected result: Css file is valid.
      */
+    @Test
     public void testStyleNamespaceToken() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceToken",
                 StyleDef.class);
@@ -151,6 +157,7 @@ public class StyleParserTest extends AuraImplTestCase {
      * 
      * Expected result: The parser just considers the css file for the parent for validation.
      */
+    @Test
     public void testStyleNamespaceTokenValidCss() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceTokenValidCSS",
                 StyleDef.class);
@@ -165,6 +172,7 @@ public class StyleParserTest extends AuraImplTestCase {
      * 
      * Expected result: The parser will throw exception based on type of error it encounters while parsing the CSS file.
      */
+    @Test
     public void testStyleNamespaceTokenInvalidCSS() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceTokenInvalidCSS",
                 StyleDef.class);
@@ -181,6 +189,7 @@ public class StyleParserTest extends AuraImplTestCase {
      * Tests for browser conditionals in the CSS file. Tests if the rules for client (browser) type "chrome" get
      * rendered.
      */
+    @Test
     public void testStyleNamespaceTrueConditions() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceTrueConditions",
                 StyleDef.class);
@@ -195,6 +204,7 @@ public class StyleParserTest extends AuraImplTestCase {
     /**
      * Tests that media blocks don't trip up the parser
      */
+    @Test
     public void testStyleNamespaceMediaAndConditions() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceMediaAndConditions",
                 StyleDef.class);
@@ -209,6 +219,7 @@ public class StyleParserTest extends AuraImplTestCase {
     /**
      * Tests keyframes
      */
+    @Test
     public void testKeyframes() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceKeyframes",
                 StyleDef.class);
@@ -219,6 +230,7 @@ public class StyleParserTest extends AuraImplTestCase {
     /**
      * Tests font faces
      */
+    @Test
     public void testFontface() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceFontface",
                 StyleDef.class);
@@ -226,6 +238,7 @@ public class StyleParserTest extends AuraImplTestCase {
         goldFileText(style.getCode());
     }
 
+    @Test
     public void testAutoPrefixing() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespacePrefixing",
                 StyleDef.class);
@@ -236,6 +249,7 @@ public class StyleParserTest extends AuraImplTestCase {
     /**
      * Test SVG data uris
      */
+    @Test
     public void testSvgUrl() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceSvgUrl",
                 StyleDef.class);
@@ -246,6 +260,7 @@ public class StyleParserTest extends AuraImplTestCase {
     /**
      * Tests for invalid values as part of browser conditionals.
      */
+    @Test
     public void testStyleNamespaceExceptions() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceInvalidConditions",
                 StyleDef.class);
@@ -263,6 +278,7 @@ public class StyleParserTest extends AuraImplTestCase {
      * 
      * W-1366145
      */
+    @Test
     public void testTemplateCssValid() throws Exception {
         DefDescriptor<StyleDef> templateCssDesc = DefDescriptorImpl.getInstance("templateCss://test.testTemplateCss",
                 StyleDef.class);
@@ -306,6 +322,7 @@ public class StyleParserTest extends AuraImplTestCase {
          */
     }
 
+    @Test
     public void testInvalidCSS() throws Exception {
         try {
             definitionService.getDefinition("auratest.invalidCss", StyleDef.class);
@@ -323,6 +340,7 @@ public class StyleParserTest extends AuraImplTestCase {
     /**
      * Context path should be prepended to any /auraFW url in css url function
      */
+    @Test
     public void testUrlFunctionContextPath() throws Exception {
         if (Aura.getContextService().isEstablished()) {
             Aura.getContextService().endContext();

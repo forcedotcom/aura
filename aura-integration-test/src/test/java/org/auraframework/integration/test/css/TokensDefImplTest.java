@@ -33,6 +33,7 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
+import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -43,6 +44,7 @@ public class TokensDefImplTest extends StyleTestCase {
         super(name);
     }
 
+    @Test
     public void testEmpty() throws QuickFixException {
         TokensDef emptyDef = definitionService.getDefinition(addSeparateTokens("<aura:tokens />"));
         // should parse without error
@@ -52,6 +54,7 @@ public class TokensDefImplTest extends StyleTestCase {
         assertNotNull("Name must be initialized", emptyDef.getName());
     }
 
+    @Test
     public void testEquivalence() throws QuickFixException {
         TokensDef tokens1 = definitionService.getDefinition(addSeparateTokens(tokens().token("color", "red")));
         TokensDef tokens2 = definitionService.getDefinition(addSeparateTokens(tokens().token("color", "red")));
@@ -61,6 +64,7 @@ public class TokensDefImplTest extends StyleTestCase {
         assertFalse("expected tokens1 not to equal null", tokens1.equals(null));
     }
 
+    @Test
     public void testWithBadMarkup() {
         try {
         	definitionService.getDefinition(addSeparateTokens("<aura:tokens><aura:token name='one' value='1' />"));
@@ -73,6 +77,7 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testTokensBadMarkupTokenNesting() {
         try {
         	definitionService.getDefinition(addSeparateTokens("<aura:tokens><aura:token name='one' value='1'>"
@@ -83,6 +88,7 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testUnsupportedAttributes() {
         try {
         	definitionService.getDefinition(addSeparateTokens("<aura:tokens fakeattrib='fakeattribvalue' />"));
@@ -92,39 +98,46 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testHasTokenDeclared() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().token("token1", "token1"));
         assertTrue(definitionService.getDefinition(desc).hasToken("token1"));
     }
 
+    @Test
     public void testHasTokenImported() throws Exception {
         DefDescriptor<TokensDef> imported = addSeparateTokens(tokens().token("imported", "imported"));
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().imported(imported));
         assertTrue(desc.getDef().hasToken("imported"));
     }
 
+    @Test
     public void testHasTokenInherited() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("inherited", "inherited"));
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().parent(parent));
         assertTrue(desc.getDef().hasToken("inherited"));
     }
 
+    @Test
     public void testHasTokenFalse() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().token("token1", "token1"));
         assertFalse(desc.getDef().hasToken("token2"));
     }
 
+    @Test
     public void testGetTokenPresent() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().token("token1", "token1").token("token2", "token2"));
         assertEquals(desc.getDef().getToken("token1").get().toString(), "token1");
     }
 
+    @Test
     public void testGetTokenAbsent() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().token("token1", "token1").token("token2", "token2"));
         assertFalse(desc.getDef().getToken("notthere").isPresent());
     }
 
     /** token is only imported */
+    @Test
     public void testGetTokenImported() throws Exception {
         DefDescriptor<TokensDef> imported = addSeparateTokens(tokens().token("imported", "imported"));
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().imported(imported));
@@ -132,6 +145,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** token is only inherited */
+    @Test
     public void testGetTokenInherited() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("inherited", "inherited"));
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().parent(parent));
@@ -139,6 +153,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** token is overridden by declared token */
+    @Test
     public void testGetTokenDirectlyOverridden() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("inherited", "v1"));
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().parent(parent).token("inherited", "v2"));
@@ -146,6 +161,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** token is overridden through an import */
+    @Test
     public void testGetTokenImportOverridden() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("inherited", "v1"));
         DefDescriptor<TokensDef> imported = addSeparateTokens(tokens().token("inherited", "v2"));
@@ -154,6 +170,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** token is overridden through an import and directly */
+    @Test
     public void testGetTokenDirectlyAndImportOverridden() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("inherited", "v1"));
         DefDescriptor<TokensDef> imported = addSeparateTokens(tokens().token("inherited", "v2"));
@@ -165,6 +182,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** last import should win */
+    @Test
     public void testGetTokenValueMultipleImports() throws Exception {
         DefDescriptor<TokensDef> imported = addSeparateTokens(tokens().token("inherited", "v1"));
         DefDescriptor<TokensDef> imported2 = addSeparateTokens(tokens().token("blah", "blah"));
@@ -179,6 +197,7 @@ public class TokensDefImplTest extends StyleTestCase {
 
     }
 
+    @Test
     public void testGetDeclaredTokenDefs() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens()
                 .token("test1", "test1")
@@ -190,6 +209,7 @@ public class TokensDefImplTest extends StyleTestCase {
         assertTrue(map.get("test1") != null);
     }
 
+    @Test
     public void testGetDeclaredImports() throws Exception {
         DefDescriptor<TokensDef> imported1 = addSeparateTokens(tokens());
         DefDescriptor<TokensDef> imported2 = addSeparateTokens(tokens());
@@ -202,17 +222,20 @@ public class TokensDefImplTest extends StyleTestCase {
         assertEquals("didn't get expected map size", 3, map.size());
     }
 
+    @Test
     public void testGetTokenDefDeclared() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().token("test1", "test1"));
         assertNotNull(desc.getDef().getTokenDef("test1"));
     }
 
+    @Test
     public void testGetTokenDefImported() throws Exception {
         DefDescriptor<TokensDef> imported = addSeparateTokens(tokens().token("imported", "imported"));
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().imported(imported));
         assertNotNull(desc.getDef().getTokenDef("imported"));
     }
 
+    @Test
     public void testGetTokenDefInherited() throws Exception {
         DefDescriptor<TokensDef> inherited = addSeparateTokens(tokens().token("inherited", "inherited"));
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().parent(inherited));
@@ -260,6 +283,7 @@ public class TokensDefImplTest extends StyleTestCase {
         return desc;
     }
 
+    @Test
     public void testGetDeclaredTokenNames() throws Exception {
         Set<String> names = complexSetup().getDef().getDeclaredNames();
         assertEquals("didn't get expected size", 3, names.size());
@@ -268,6 +292,7 @@ public class TokensDefImplTest extends StyleTestCase {
         assertEquals("d2", Iterables.get(names, 2));
     }
 
+    @Test
     public void testGetImportedTokenNames() throws Exception {
         Set<String> names = ImmutableSet.copyOf(complexSetup().getDef().getImportedNames());
         assertEquals("didn't get expected size", 6, names.size());
@@ -279,6 +304,7 @@ public class TokensDefImplTest extends StyleTestCase {
         assertEquals("i1b", Iterables.get(names, 5));
     }
 
+    @Test
     public void testGetInheritedTokenNames() throws Exception {
         Set<String> names = ImmutableSet.copyOf(complexSetup().getDef().getInheritedNames());
         assertEquals("didn't get expected size", 7, names.size());
@@ -292,6 +318,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** imported + declared */
+    @Test
     public void testGetOwnTokenNames() throws Exception {
         Set<String> names = ImmutableSet.copyOf(complexSetup().getDef().getOwnNames());
         assertEquals("didn't get expected size", 9, names.size());
@@ -308,6 +335,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** imported + declared + inherited */
+    @Test
     public void testGetAllTokenNames() throws Exception {
         Set<String> names = ImmutableSet.copyOf(complexSetup().getDef().getAllNames());
         assertEquals("didn't get expected size", 14, names.size());
@@ -330,6 +358,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** intersection of own token names (declared or imported) with inherited token names */
+    @Test
     public void testGetOverriddenTokenNames() throws Exception {
         Set<String> names = complexSetup().getDef().getOverriddenNames();
         assertEquals("didn't get expected size", 2, names.size());
@@ -338,6 +367,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** no errors when extends refers to existent def */
+    @Test
     public void testValidatesGoodExtendsRef() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> child = addSeparateTokens(tokens().parent(parent));
@@ -345,6 +375,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** errors when extends refers to nonexistent def */
+    @Test
     public void testValidatesBadExtendsRef() throws Exception {
         try {
             String src = "<aura:tokens extends=\"test:idontexist\"></aura:tokens>";
@@ -356,6 +387,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** cannot extend itself */
+    @Test
     public void testCantExtendItself() throws Exception {
         DefDescriptor<TokensDef> extendsSelf = addSourceAutoCleanup(TokensDef.class, "");
         StringSource<?> source = (StringSource<?>) getAuraTestingUtil().getSource(extendsSelf);
@@ -371,6 +403,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** circular hierarchies are prevented */
+    @Test
     public void testCircularHierarchy() throws Exception {
         DefDescriptor<TokensDef> circular1 = addSourceAutoCleanup(TokensDef.class, "");
         DefDescriptor<TokensDef> circular2 = addSourceAutoCleanup(TokensDef.class, "");
@@ -394,6 +427,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** error thrown if extending and importing the same def */
+    @Test
     public void testExtendAndImportSameDef() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens());
         try {
@@ -404,6 +438,7 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testCantImportTokensWithExtends() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens("<aura:tokens/>");
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().parent(parent));
@@ -416,6 +451,7 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testCantImportTokensWithProvider() throws Exception {
         DefDescriptor<TokensDef> withProvider = addSeparateTokens(tokens().descriptorProvider(
                 TestTokenDescriptorProvider.REF));
@@ -429,6 +465,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** the cross reference must be inherited or declared */
+    @Test
     public void testInvalidCrossRef() throws Exception {
         try {
             addSeparateTokens("<aura:tokens><aura:token name='one' value='{!notthere}'/></aura:tokens>").getDef();
@@ -439,12 +476,14 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** cross references to declared tokens should not throw an error */
+    @Test
     public void testValidCrossRefDeclared() throws Exception {
     	definitionService.getDefinition(addSeparateTokens(tokens().token("one", "one").token("two", "{!one}")))
     	.validateReferences();
     }
 
     /** cross references to inherited tokens should not throw an error */
+    @Test
     public void testValidCrossRefInherited() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> child = addSeparateTokens(tokens().parent(parent).token("myColor", "{!color}"));
@@ -452,6 +491,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** cross references to imported tokens should not throw an error */
+    @Test
     public void testValidCrossRefImported() throws Exception {
         DefDescriptor<TokensDef> imported = addSeparateTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().imported(imported).token("myColor", "{!color}"));
@@ -459,6 +499,7 @@ public class TokensDefImplTest extends StyleTestCase {
     }
 
     /** test imported tokens cross refs namespace-default token */
+    @Test
     public void testImportCrossRefNamespaceDefault() throws Exception {
         addNsTokens(tokens().token("color", "red"));
 
@@ -475,6 +516,7 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testAppendsExtendsToDeps() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> child = addSeparateTokens(tokens().parent(parent));
@@ -485,6 +527,7 @@ public class TokensDefImplTest extends StyleTestCase {
         assertTrue(dependencies.contains(parent));
     }
 
+    @Test
     public void testAddsImportsToDependencies() throws Exception {
         DefDescriptor<TokensDef> import1 = addSeparateTokens(tokens().token("imported", "imported"));
         DefDescriptor<TokensDef> import2 = addSeparateTokens(tokens().token("imported", "imported"));
@@ -497,15 +540,18 @@ public class TokensDefImplTest extends StyleTestCase {
         assertTrue(dependencies.contains(import2));
     }
 
+    @Test
     public void testGetDescriptorProviderAbsent() throws Exception {
         assertNull(definitionService.getDefinition(addSeparateTokens(tokens())).getDescriptorProvider());
     }
 
+    @Test
     public void testGetDescriptorProviderPresent() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF));
         assertEquals(TestTokenDescriptorProvider.REF, definitionService.getDefinition(desc).getDescriptorProvider().getQualifiedName());
     }
 
+    @Test
     public void testAddsProviderToDeps() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF));
 
@@ -517,16 +563,19 @@ public class TokensDefImplTest extends StyleTestCase {
         assertTrue(dependencies.contains(def));
     }
 
+    @Test
     public void testGetConcreteDescriptorWithProvider() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF));
         assertEquals(TestTokenDescriptorProvider.DESC, definitionService.getDefinition(desc).getConcreteDescriptor().getDescriptorName());
     }
 
+    @Test
     public void testGetConcreteDescriptorWithoutProvider() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().token("color", "red"));
         assertEquals(desc.getDescriptorName(), definitionService.getDefinition(desc).getConcreteDescriptor().getDescriptorName());
     }
 
+    @Test
     public void testErrorsIfProviderHasTokens() throws Exception {
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF).token("color", "red")))
@@ -537,6 +586,7 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testErrorsIfProviderHasImports() throws Exception {
         DefDescriptor<TokensDef> import1 = addSeparateTokens(tokens().token("imported", "imported"));
         try {
@@ -548,6 +598,7 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testErrorsIfProviderHasExtends() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("parent", "parent"));
         try {
@@ -559,6 +610,7 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testErrorsIfProviderIsNsDefault() throws Exception {
         try {
         	definitionService.getDefinition(addNsTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF))).
@@ -569,15 +621,18 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testGetMapProviderAbsent() throws Exception {
         assertNull(definitionService.getDefinition(addSeparateTokens(tokens())).getMapProvider());
     }
 
+    @Test
     public void testGetMapProviderPresent() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().mapProvider(TestTokenMapProvider.REF));
         assertEquals(TestTokenMapProvider.REF, definitionService.getDefinition(desc).getMapProvider().getQualifiedName());
     }
 
+    @Test
     public void testAddsMapProviderToDeps() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().mapProvider(TestTokenMapProvider.REF));
 
@@ -589,6 +644,7 @@ public class TokensDefImplTest extends StyleTestCase {
         assertTrue(dependencies.contains(def));
     }
 
+    @Test
     public void testErrorsIfMapProviderHasTokens() throws Exception {
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().mapProvider(TestTokenMapProvider.REF).token("color", "red")));
@@ -598,6 +654,7 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testErrorsIfMapProviderHasImports() throws Exception {
         DefDescriptor<TokensDef> import1 = addSeparateTokens(tokens().token("imported", "imported"));
         try {
@@ -608,6 +665,7 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testErrorsIfMapProviderHasExtends() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("parent", "parent"));
         try {
@@ -618,6 +676,7 @@ public class TokensDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testErrorsIfMapProviderIsNsDefault() throws Exception {
         try {
         	definitionService.getDefinition(addNsTokens(tokens().mapProvider(TestTokenMapProvider.REF)));

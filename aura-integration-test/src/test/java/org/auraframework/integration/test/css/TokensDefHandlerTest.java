@@ -26,6 +26,7 @@ import org.auraframework.impl.java.provider.TestTokenDescriptorProvider;
 import org.auraframework.impl.java.provider.TestTokenMapProvider;
 import org.auraframework.impl.root.parser.handler.TokensDefHandler;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 /**
  * Unit tests for {@link TokensDefHandler}.
@@ -35,6 +36,7 @@ public class TokensDefHandlerTest extends StyleTestCase {
         super(name);
     }
 
+    @Test
     public void testTokens() throws Exception {
         TokensDef def = definitionService.getDefinition(addSeparateTokens(tokens().token("test1", "1").token("test2", "2")));
 
@@ -45,6 +47,7 @@ public class TokensDefHandlerTest extends StyleTestCase {
         assertEquals("incorrect value for token", "2", tokens.get("test2").getValue());
     }
 
+    @Test
     public void testImports() throws Exception {
         DefDescriptor<TokensDef> import1 = addSeparateTokens(tokens()
                 .token("token1", "1").token("token2", "2").token("token3", "3"));
@@ -64,6 +67,7 @@ public class TokensDefHandlerTest extends StyleTestCase {
         assertEquals(3, imports.size());
     }
 
+    @Test
     public void testImportAfterDeclared() throws Exception {
         DefDescriptor<TokensDef> imp = addSeparateTokens(tokens().token("token1", "1"));
 
@@ -75,6 +79,7 @@ public class TokensDefHandlerTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testInvalidChild() throws Exception {
         try {
         	definitionService.getDefinition(addSeparateTokens("<aura:tokens><aura:foo/></aura:tokens>"));
@@ -84,6 +89,7 @@ public class TokensDefHandlerTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testWithTextBetweenTag() throws Exception {
         try {
         	definitionService.getDefinition(addSeparateTokens("<aura:tokens>Test</aura:tokens>"));
@@ -93,6 +99,7 @@ public class TokensDefHandlerTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testDuplicateTokens() throws Exception {
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().token("test", "1").token("test", "1")));
@@ -102,6 +109,7 @@ public class TokensDefHandlerTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testDuplicateImports() throws Exception {
         DefDescriptor<TokensDef> import1 = addSeparateTokens(tokens().token("token1", "1"));
 
@@ -113,32 +121,38 @@ public class TokensDefHandlerTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testExtends() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> child = addSeparateTokens(tokens().parent(parent));
         assertEquals(definitionService.getDefinition(child).getExtendsDescriptor(), parent);
     }
 
+    @Test
     public void testEmptyExtends() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens("<aura:tokens extends=' '/>");
         assertNull(definitionService.getDefinition(desc).getExtendsDescriptor());
     }
 
+    @Test
     public void testProvider() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF));
         assertEquals(TestTokenDescriptorProvider.REF, definitionService.getDefinition(desc).getDescriptorProvider().getQualifiedName());
     }
 
+    @Test
     public void testEmptyProvider() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().descriptorProvider(""));
         assertNull(definitionService.getDefinition(desc).getDescriptorProvider());
     }
 
+    @Test
     public void testMapProvider() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().mapProvider(TestTokenMapProvider.REF));
         assertEquals(TestTokenMapProvider.REF, definitionService.getDefinition(desc).getMapProvider().getQualifiedName());
     }
 
+    @Test
     public void testEmptyMapProvider() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().mapProvider(""));
         assertNull(definitionService.getDefinition(desc).getMapProvider());

@@ -20,6 +20,7 @@ import java.util.Collection;
 
 import org.auraframework.clientlibrary.Combinable;
 import org.auraframework.impl.AuraImplTestCase;
+import org.junit.Test;
 import org.mockito.Matchers;
 
 import com.google.common.collect.Lists;
@@ -34,6 +35,7 @@ public class ClientLibraryJSFormatAdapterTest extends AuraImplTestCase {
         super(name, false);
     }
     
+    @Test
     public void testCombinedOutput() throws Exception{
         ClientLibraryJSFormatAdapter jsFormatAdapter = new ClientLibraryJSFormatAdapter();
         jsFormatAdapter = spy(jsFormatAdapter);

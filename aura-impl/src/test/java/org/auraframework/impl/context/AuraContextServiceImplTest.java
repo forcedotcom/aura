@@ -28,6 +28,7 @@ import org.auraframework.system.AuraContext.GlobalValue;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
+import org.junit.Test;
 
 public class AuraContextServiceImplTest extends AuraImplTestCase {
 
@@ -35,11 +36,13 @@ public class AuraContextServiceImplTest extends AuraImplTestCase {
         super(name, false);
     }
 
+    @Test
     public void testAuraContextServiceImpl() {
         ContextService contextService = Aura.getContextService();
         assertTrue(contextService instanceof AuraContextServiceImpl);
     }
 
+    @Test
     public void testTestContext() {
         // can only test the test context
         ContextService contextService = Aura.getContextService();
@@ -62,6 +65,7 @@ public class AuraContextServiceImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetAllowedGlobals() {
         final String name = getName();
         final String defaultValue = "some default value";
@@ -82,6 +86,7 @@ public class AuraContextServiceImplTest extends AuraImplTestCase {
         assertEquals(defaultValue, value.getValue());
     }
 
+    @Test
     public void testRegisterGlobalWithInvalidName() {
         try {
             Aura.getContextService().registerGlobal("this wouldn't serialize properly", true, true);
@@ -92,6 +97,7 @@ public class AuraContextServiceImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testRegisterGlobalWithNullName() {
         try {
             Aura.getContextService().registerGlobal(null, true, true);
@@ -102,6 +108,7 @@ public class AuraContextServiceImplTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterGlobalDuplicate() {
         final String name = getName();
         final String initialDefaultValue = "initial";

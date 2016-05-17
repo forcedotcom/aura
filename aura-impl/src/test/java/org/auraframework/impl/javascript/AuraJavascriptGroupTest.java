@@ -26,6 +26,7 @@ import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptProcessingError.Level;
 import org.auraframework.util.javascript.directive.DirectiveParser;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
+import org.junit.Test;
 
 /**
  * Automation for Aura JavascriptGroup.
@@ -49,6 +50,7 @@ public class AuraJavascriptGroupTest extends AuraImplTestCase {
      * @hierarchy Aura.Unit Tests.Javascript Library
      * @userStory a07B0000000FDWP
      */
+    @Test
     public void testJSLintValidationForAuraJavascriptGroup() throws Exception {
         AuraJavascriptGroup js = new AuraJavascriptGroup();
         try {
@@ -68,6 +70,7 @@ public class AuraJavascriptGroupTest extends AuraImplTestCase {
      * @hierarchy Aura.Unit Tests.Javascript Library
      * @userStory a07B0000000FDWP
      */
+    @Test
     public void testCompressionOfAuraJavascriptGroup() throws Exception {
         AuraJavascriptGroup js = new AuraJavascriptGroup();
         Set<JavascriptGeneratorMode> jsModes = js.getJavascriptGeneratorModes();

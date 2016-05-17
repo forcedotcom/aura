@@ -25,6 +25,7 @@ import java.util.TimeZone;
 
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
  * @since: 224
@@ -136,6 +137,7 @@ public class DateServiceTest extends UnitTestCase {
      * Tests for different converters including parsing and formatting
      */
 
+    @Test
     public void testGetDateTimeISO8601Converter() throws Exception {
         DateConverter converter = null;
         converter = DateServiceImpl.get().getDateTimeISO8601Converter();
@@ -155,6 +157,7 @@ public class DateServiceTest extends UnitTestCase {
         goldFileText("Test:testGetDateTimeISO8601Converter\n" + sb.toString());
     }
 
+    @Test
     public void testGetDateISO8601Converter() throws Exception {
         DateConverter converter = null;
         converter = DateServiceImpl.get().getDateISO8601Converter();
@@ -176,6 +179,7 @@ public class DateServiceTest extends UnitTestCase {
 
     }
 
+    @Test
     public void testGetGenericISO8601Converter() throws Exception {
         String text = null;
         DateConverter converter = DateServiceImpl.get().getGenericISO8601Converter();
@@ -218,6 +222,7 @@ public class DateServiceTest extends UnitTestCase {
     }
 
     @UnAdaptableTest("Date format on SFDC handles differently than standalone Aura, need to investigate")
+    @Test
     public void testGetDateStyleConverter_locale_dateStyle() throws Exception {
         DateConverter converter = null;
         String text = null;
@@ -251,6 +256,7 @@ public class DateServiceTest extends UnitTestCase {
     }
     
     @UnAdaptableTest("Date format on SFDC handles differently than standalone Aura, need to investigate")
+    @Test
     public void testGetTimeStyleConverter_locale_timeStyle() throws Exception {
         DateConverter converter = null;
         String text = null;
@@ -284,6 +290,7 @@ public class DateServiceTest extends UnitTestCase {
     }
 
     @UnAdaptableTest("Date format on SFDC handles differently than standalone Aura, need to investigate")
+    @Test
     public void testGetDateTimeStyleConverter_locale_dateStyle_timeStyle() throws Exception {
         DateConverter converter = null;
         String text = null;
@@ -320,6 +327,7 @@ public class DateServiceTest extends UnitTestCase {
     }
 
     @UnAdaptableTest("Date format on SFDC handles differently than standalone Aura, need to investigate")
+    @Test
     public void testGetPatternConverter_locale_pattern() throws Exception {
         DateConverter converter = null;
         String text = null;
@@ -352,6 +360,7 @@ public class DateServiceTest extends UnitTestCase {
         goldFileText("Test:testGetPatternConverter_locale_pattern\n" + sb.toString());
     }
 
+    @Test
     public void testGetStyle() {
         String[] styles = { "full", "long", "medium", "short" };
         int i = -1;
@@ -362,6 +371,7 @@ public class DateServiceTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testDateTimeNoneConverter() {
         try {
             DateServiceImpl.get().getDateTimeStyleConverter(Locale.US, -1, -1);
@@ -385,6 +395,7 @@ public class DateServiceTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testNullDataForConverters() {
         try {
             DateServiceImpl.get().getDateTimeStyleConverter(null, -0, -0);
@@ -405,6 +416,7 @@ public class DateServiceTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testNullDataForFormatAndParse() {
         try {
             DateServiceImpl.get().getDateTimeISO8601Converter().format(null);
@@ -432,6 +444,7 @@ public class DateServiceTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testFormatWithTimeZone() {
         // this is equivalent to 1970-01-01 5pm EST
         long offsetEST = 5 * 60 * 60 * 1000;
@@ -464,6 +477,7 @@ public class DateServiceTest extends UnitTestCase {
         assertEquals("1970-01-01T00:00:00.000-05:00", result);
     }
 
+    @Test
     public void testParseWithTimeZone() {
         // if someone types in 1970-01-01, and they're in GMT - that's date=0L
         String testDate = "1970-01-01";

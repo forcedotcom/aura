@@ -35,6 +35,7 @@ import org.auraframework.system.Client;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
@@ -49,6 +50,7 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
 
     @UnAdaptableTest("core add info about if we are on desktop, we don't")
     /** test that the css url includes the client/browser, no extra true conditions */
+    @Test
     public void testCssUrlWithClient() throws Exception {
         AuraContext ctx = setupContext();
         ctx.setClient(new Client(UserAgent.GOOGLE_CHROME.getUserAgentString()));
@@ -73,6 +75,7 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
 
     @UnAdaptableTest("core add info about if we are on desktop, we don't")
     /** test that the css url includes multiple app-specified tokens and in the correct order */
+    @Test
     public void testCssUrlWithMultipleAppTokensDefs() throws Exception {
         setupContext("test:fakeTokens2", "test:fakeTokens", "test:fakeTokens3");
         goldFileAppCssUrl();
@@ -80,6 +83,7 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
 
     @UnAdaptableTest("core add info about if we are on desktop, we don't")
     /** test that the css url uses the concrete (provided) tokens descriptors */
+    @Test
     public void testCssUrlWithProvidedTokens() throws Exception {
         String name = "test:fakeTokensWithDescriptorProvider";
         DefDescriptor<TokensDef> desc = DefDescriptorImpl.getInstance(name, TokensDef.class);
@@ -89,6 +93,7 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
 
     @UnAdaptableTest("core add info about if we are on desktop, we don't")
     /** test that the css url includes a hash when a map-provided tokens is used */
+    @Test
     public void testSerializeWithMapProvidedTokens() throws Exception {
         setupContext("test:fakeTokensWithMapProvider", "test:fakeTokens3");
         goldFileAppCssUrl();

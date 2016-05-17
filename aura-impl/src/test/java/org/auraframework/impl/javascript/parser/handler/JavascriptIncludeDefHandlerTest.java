@@ -19,6 +19,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.impl.def.DefinitionTest;
 import org.auraframework.test.source.StringSource;
+import org.junit.Test;
 import org.mockito.Mock;
 
 public class JavascriptIncludeDefHandlerTest extends DefinitionTest<IncludeDef> {
@@ -31,6 +32,7 @@ public class JavascriptIncludeDefHandlerTest extends DefinitionTest<IncludeDef> 
     DefDescriptor<IncludeDef> descriptor;
     private String filename = "dummyPath";
 
+    @Test
     public void testEmpty() throws Exception {
         String code = "";
         StringSource<IncludeDef> source = new StringSource<>(descriptor, code, filename, null);
@@ -40,6 +42,7 @@ public class JavascriptIncludeDefHandlerTest extends DefinitionTest<IncludeDef> 
         assertEquals(code, def.getCode().trim());
     }
 
+    @Test
     public void testFunction() throws Exception {
         String code = "function(){return 'anything'}";
         StringSource<IncludeDef> source = new StringSource<>(descriptor, code, filename, null);
@@ -49,6 +52,7 @@ public class JavascriptIncludeDefHandlerTest extends DefinitionTest<IncludeDef> 
         assertEquals(code, def.getCode());
     }
 
+    @Test
     public void testOtherJsButNotJson() throws Exception {
         String code = "var something = 'borrowed'";
         StringSource<IncludeDef> source = new StringSource<>(descriptor, code, filename, null);

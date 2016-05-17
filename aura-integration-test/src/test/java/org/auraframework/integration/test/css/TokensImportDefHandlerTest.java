@@ -27,6 +27,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.junit.Test;
 
 public class TokensImportDefHandlerTest extends StyleTestCase {
 
@@ -43,17 +44,20 @@ public class TokensImportDefHandlerTest extends StyleTestCase {
         return handler.getElement();
     }
 
+    @Test
     public void testDescriptor() throws Exception {
         TokensImportDef def = source("<aura:import name='test:tokens'/>");
         DefDescriptor<TokensDef> desc = DefDescriptorImpl.getInstance("test:tokens", TokensDef.class);
         assertEquals(desc, def.getImportDescriptor());
     }
 
+    @Test
     public void testDescription() throws Exception {
         TokensImportDef def = source("<aura:import name='test:tokens' description='test'/>");
         assertEquals("test", def.getDescription());
     }
 
+    @Test
     public void testInvalidChild() throws Exception {
         try {
             source("<aura:import name='test:tokens'><ui:button></aura:import>");
@@ -63,6 +67,7 @@ public class TokensImportDefHandlerTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testWithTextBetweenTag() throws Exception {
         try {
             source("<aura:import name='test:tokens'>blah</aura:import>");
@@ -72,6 +77,7 @@ public class TokensImportDefHandlerTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testMissingName() throws Exception {
         try {
             source("<aura:import name=''/>");

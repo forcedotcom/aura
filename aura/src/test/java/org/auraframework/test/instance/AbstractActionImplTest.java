@@ -29,6 +29,7 @@ import org.auraframework.system.LoggingContext;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
@@ -73,6 +74,7 @@ public class AbstractActionImplTest extends UnitTestCase {
         }
     };
 
+    @Test
     public void testId() {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
@@ -93,6 +95,7 @@ public class AbstractActionImplTest extends UnitTestCase {
         return test;
     }
 
+    @Test
     public void testActions() {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
@@ -120,6 +123,7 @@ public class AbstractActionImplTest extends UnitTestCase {
         assertEquals("Action 'd' should be first", "d", actions.get(3).getId());
     }
 
+    @Test
     public void testState() {
         ActionDef def = Mockito.mock(ActionDef.class);
         MyAction test = new MyAction(null, def, null);
@@ -129,6 +133,7 @@ public class AbstractActionImplTest extends UnitTestCase {
         assertEquals("state should be able to change", Action.State.RUNNING, test.getState());
     }
 
+    @Test
     public void testStorable() {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
@@ -143,6 +148,7 @@ public class AbstractActionImplTest extends UnitTestCase {
         assertEquals("id should not change on second setStorable", "x", test.getId());
     }
 
+    @Test
     public void testDescriptor() {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
@@ -153,6 +159,7 @@ public class AbstractActionImplTest extends UnitTestCase {
         assertSame("descriptor should work", expectedDesc, test.getDescriptor());
     }
 
+    @Test
     public void testParams() {
         Map<String, Object> params = Maps.newHashMap();
         ActionDef def = Mockito.mock(ActionDef.class);
@@ -182,6 +189,7 @@ public class AbstractActionImplTest extends UnitTestCase {
         Mockito.verifyNoMoreInteractions(logger);
     }
 
+    @Test
     public void testInstanceStack() {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);
@@ -194,6 +202,7 @@ public class AbstractActionImplTest extends UnitTestCase {
     /**
      * Verify we can set an Id after we get an InstaceStack. Used to threw Exception, now valid.
      */
+    @Test
     public void testSetIdWithInstanceStackSet() {
         ActionDef def = Mockito.mock(ActionDef.class);
         Action test = new MyAction(null, def, null);

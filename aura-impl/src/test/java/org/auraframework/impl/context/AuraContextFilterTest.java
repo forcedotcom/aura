@@ -24,6 +24,7 @@ import org.auraframework.http.AuraContextFilter;
 import org.auraframework.system.AuraContext;
 import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableList;
@@ -42,6 +43,7 @@ public class AuraContextFilterTest extends AuraTestCase {
         AuraPrivateAccessor.invoke(filter, "endContext");
     }
 
+    @Test
     public void testStartContextContextPath() throws Exception {
         AuraContextFilter filter = new AuraContextFilter();
         HttpServletRequest mock = Mockito.mock(HttpServletRequest.class);

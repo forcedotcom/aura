@@ -27,6 +27,7 @@ import org.auraframework.impl.controller.DynamicStylingController;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
+import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -44,6 +45,7 @@ public class DynamicStylingControllerTest extends StyleTestCase {
     }
 
     /** test basic usage */
+    @Test
     public void testApplyTokens() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
@@ -60,6 +62,7 @@ public class DynamicStylingControllerTest extends StyleTestCase {
     }
 
     /** at-rules with tokens inside should be included if applicable */
+    @Test
     public void testTokenInsideMediaQuery() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
@@ -77,6 +80,7 @@ public class DynamicStylingControllerTest extends StyleTestCase {
     }
 
     /** at rules without tokens inside should not be included */
+    @Test
     public void testNoTokenInsideMediaQuery() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
@@ -94,6 +98,7 @@ public class DynamicStylingControllerTest extends StyleTestCase {
     }
 
     /** at-rules using a token directly should be included if applicable */
+    @Test
     public void testMediaQueryUsingTokenDirectly() throws Exception {
         addNsTokens(tokens().token("query", "all and (min-width:300px)"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("query", "screen"));
@@ -111,6 +116,7 @@ public class DynamicStylingControllerTest extends StyleTestCase {
     }
 
     /** at-rules not using a token anywhere should not be included */
+    @Test
     public void testMediaQueryNotUsingTokenDirectlyNorInside() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
@@ -127,6 +133,7 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         assertEquals(expected, action.getReturnValue());
     }
 
+    @Test
     public void testTokenInsideConditional() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
@@ -143,6 +150,7 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         assertEquals(expected, action.getReturnValue());
     }
 
+    @Test
     public void testNoTokenInsideConditional() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
@@ -160,6 +168,7 @@ public class DynamicStylingControllerTest extends StyleTestCase {
     }
 
     /** if a var is an alias, references to the aliased var should be included */
+    @Test
     public void testCrossReference() throws Exception {
         // color2 points to color1
         addNsTokens(tokens().token("color1", "red").token("color2", "{!color1}").token("color3", "yellow"));

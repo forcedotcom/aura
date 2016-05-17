@@ -40,6 +40,7 @@ import org.auraframework.util.AuraLocale;
 import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -70,14 +71,17 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testIcuTimezones() throws Exception {
         validateTimezoneIds(com.ibm.icu.util.TimeZone.getAvailableIDs());
     }
 
+    @Test
     public void testJavaTimezones() throws Exception {
         validateTimezoneIds(TimeZone.getAvailableIDs());
     }
 
+    @Test
     public void testGetEquivalentTimezoneSamples() throws Exception {
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
         String tz = impl.getAvailableTimezone("US/Pacific");
@@ -110,6 +114,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
     }
 
     @UnAdaptableTest("filesystem access")
+    @Test
     public void testAllWalltimeMapped() throws Exception {
         Set<String> timezones = Sets.newHashSet();
         Map<String, String> timezonesMap = AuraPrivateAccessor.<Map<String, String>>invoke(new ConfigAdapterImpl(), "readEquivalentTimezones");
@@ -132,6 +137,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetResetCssUrlDefaultsToReset(){
         String expected="resetCSS.css";
 
@@ -142,6 +148,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertTrue("Reset CSS should default to resetCSS.css. Found: "+resetCssUrl, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldContainFwUid() throws Exception {
         String expected="#FAKEUID#";
 
@@ -152,6 +159,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertTrue("Reset CSS url should contain fake fwUid for long cache headers. Found: "+resetCssUrl, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldDefaultToResetForExtendedTemplate() throws Exception {
         String expected="resetCSS.css";
         String templateSrc = "<aura:component isTemplate='true' extends='aura:template'></aura:component>";
@@ -164,6 +172,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertTrue("Reset CSS url should default to resetCSS.css for extended template. Found: "+resetCssUrl, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldBeOverriddenToNormalizeByExtendedTemplate() throws Exception {
         String expected="normalize.css";
         String templateSrc = "<aura:component isTemplate='true' extends='aura:template'><aura:set attribute='auraResetStyle' value='normalize'/></aura:component>";
@@ -176,6 +185,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertTrue("Reset CSS url should be overridden to resetCss.css for extended template. Found: "+resetCssUrl,actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldReturnNullForExtendedTemplate() throws Exception {
         String expected=null;
         String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
@@ -189,6 +199,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertEquals("Reset CSS url should be null for extended template.", expected, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldBeOverriddenToResetByExtendedTemplate() throws Exception {
         String expected="resetCSS.css";
         String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
@@ -203,6 +214,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertTrue("Reset CSS url should be overridden to normalize.css for extended template. Found: " + resetCssUrl, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldBeSetToResetByLastExtendedTemplate() throws Exception {
         String expected="resetCSS.css";
         String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
@@ -219,6 +231,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertTrue("Reset CSS url should be overridden to normalize.css for last extended template. Found: " + resetCssUrl, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldBeSetToNormalizeByLastExtendedTemplate() throws Exception {
         String expected="normalize.css";
         String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
@@ -235,6 +248,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertTrue("Reset CSS url should be overridden to resetCSS.css for last extended template. Found: "+resetCssUrl,actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldReturnNullForLastExtendedTemplate() throws Exception {
         String expected=null;
         String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'><aura:set attribute='auraResetStyle' value=''/></aura:component>";
@@ -250,6 +264,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertEquals("Reset CSS url should be null for last extended template.", expected, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldRemainResetForLastExtendedTemplate() throws Exception {
         String expected="resetCSS.css";
         String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'><aura:set attribute='auraResetStyle' value='normalize'/></aura:component>";
@@ -267,6 +282,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
     }
 
 
+    @Test
     public void testGetResetCssUrlShouldRemainNormalizeForLastExtendedTemplate() throws Exception {
         String expected="normalize.css";
         String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'><aura:set attribute='auraResetStyle' value='normalize'/></aura:component>";
@@ -284,6 +300,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
     }
 
 
+    @Test
     public void testGetResetCssUrlShouldRemainNullForLastExtendedTemplate() throws Exception {
         String expected=null;
         String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'><aura:set attribute='auraResetStyle' value=''/></aura:component>";
@@ -299,6 +316,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertEquals("Reset CSS url should remain null for last extended template.", expected, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldDefaultToResetFromAncestorsTemplateForExtendedApplication() throws Exception {
         String expected="resetCSS.css";
         String templateSrc = "<aura:component isTemplate='true' extends='aura:template'></aura:component>";
@@ -313,6 +331,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertTrue("Reset CSS url should default to normalize.css for extended application. Found: " + resetCssUrl, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldBeSetToResetFromAncestorsTemplateForExtendedApplication() throws Exception {
         String expected="resetCSS.css";
         String templateSrc = "<aura:component isTemplate='true' extends='aura:template'><aura:set attribute='auraResetStyle' value='reset'/></aura:component>";
@@ -327,6 +346,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertTrue("Reset CSS url should default to resetCSS.css for extended application. Found: " + resetCssUrl, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldBeNullFromAncestorsTemplateForExtendedApplication() throws Exception {
         String expected=null;
         String templateSrc = "<aura:component isTemplate='true' extends='aura:template'><aura:set attribute='auraResetStyle' value=''/></aura:component>";
@@ -340,6 +360,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertEquals("Reset CSS url should default to normalize.css for extended application.", expected, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldDefaultToResetForExtendedApplication() throws Exception {
         String expected="resetCSS.css";
         String templateSrc = "<aura:component isTemplate='true' extends='aura:template'></aura:component>";
@@ -354,6 +375,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertTrue("Reset CSS url should default to normalize.css for extended application. Found: " + resetCssUrl, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldBeSetToResetForExtendedApplication() throws Exception {
         String expected="resetCSS.css";
         String templateSrc = "<aura:component isTemplate='true' extends='aura:template'><aura:set attribute='auraResetStyle' value='reset'/></aura:component>";
@@ -368,6 +390,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertTrue("Reset CSS url should default to resetCSS.css for extended application. Found: " + resetCssUrl, actual);
     }
 
+    @Test
     public void testGetResetCssUrlShouldBeNullForExtendedApplication() throws Exception {
         String expected=null;
         String templateSrc = "<aura:component isTemplate='true' extends='aura:template'><aura:set attribute='auraResetStyle' value=''/></aura:component>";
@@ -396,6 +419,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         return app;
     }
 
+    @Test
     public void testJSLibsEqualivalentTimezone() throws Exception {
         AuraLocale auraLocale = new AuraLocaleImpl(Locale.US, TimeZone.getTimeZone("US/Pacific"));
         LocalizationAdapter mockAdapter = mock(LocalizationAdapter.class);
@@ -409,6 +433,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
                 configAdapter.getJSLibsURL().contains("libs_America-Los_Angeles.js"));
     }
 
+    @Test
     public void testJSLibsInvalidTimezone() throws Exception {
         AuraLocale auraLocale = new AuraLocaleImpl(Locale.US, TimeZone.getTimeZone("HammerTime"));
         LocalizationAdapter mockAdapter = mock(LocalizationAdapter.class);

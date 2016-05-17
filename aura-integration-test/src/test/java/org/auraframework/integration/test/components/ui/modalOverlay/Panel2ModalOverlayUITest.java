@@ -23,6 +23,7 @@ import org.auraframework.test.util.*;
 import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
@@ -60,6 +61,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * [Accessibility] modal closing on Esc key. Bug: W-2617212
      */
+    @Test
     public void testPressEscKeyOnModalWithAutoFocusSet() throws Exception {
         String panelType = "modal";
         Boolean autoFocus = true;
@@ -69,6 +71,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * [Accessibility] panel dialog closing on Esc key. Bug: W-2643030
      */
+    @Test
     public void testPressEscKeyOnPanelDialogWithAutoFocusSet() throws Exception {
         String panelType = "panel";
         Boolean autoFocus = true;
@@ -78,6 +81,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * [Accessibility] modal closing on Esc key. Bug: W-2617212
      */
+    @Test
     public void testPressEscKeyOnModalWithAutoFocusNotSet() throws Exception {
         String panelType = "modal";
         Boolean autoFocus = false;
@@ -87,6 +91,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * [Accessibility] panel dialog closing on Esc key. Bug: W-2643030
      */
+    @Test
     public void testPressEscKeyOnPanelDialogWithAutoFocusNotSet() throws Exception {
         String panelType = "panel";
         Boolean autoFocus = false;
@@ -162,6 +167,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Verify custom close action Bug: W-2619406
      */
+    @Test
     public void testPressEscKeyOnPanelDialogWhenCloseActionSet() throws Exception {
         open(APP + "?" + PARAM_PANEL_TYPE + "panel");
         WebElement enableCustomCloseAction = findDomElement(By.cssSelector(ENABLE_CUSTOM_CLOSEACTION));
@@ -199,6 +205,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Test modal does have scrollbar when content is not so long Test case: W-2615146
      */
+    @Test
     public void testModalWithScrollBar() throws Exception {
         verifyScrollbarPresent(true, MAKE_SCROLLABLE);
     }
@@ -210,6 +217,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
      * bigger than body and the body has overflow-y:auto. Tried css changes to outputText but it did not work.
      */
     @ExcludeBrowsers({BrowserType.IE11})
+    @Test
     public void testModalWithoutScrollBar() throws Exception {
         verifyScrollbarPresent(false, MAKE_NONSCROLLABLE);
     }
@@ -234,18 +242,22 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Test multiple modal one above another, should close top panel when we press ESC on the newest panel
      */
+    @Test
     public void testMultipleModalPressEscKeyWithAutoFocusSet() throws Exception {
         verifyPressingEscOnMultipleModalDestorysModal(PANEL_MODAL, true);
     }
 
+    @Test
     public void testMultipleModalPressEscKeyWithAutoFocusNotSet() throws Exception {
         verifyPressingEscOnMultipleModalDestorysModal(PANEL_MODAL, false);
     }
 
+    @Test
     public void testMultiplePanelPressEscKeyWithAutoFocusSet() throws Exception {
         verifyPressingEscOnMultipleModalDestorysModal(PANEL_DIALOG, true);
     }
 
+    @Test
     public void testMultiplePanelPressEscKeyWithAutoFocusNotSet() throws Exception {
         verifyPressingEscOnMultipleModalDestorysModal(PANEL_DIALOG, false);
     }
@@ -312,6 +324,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * [Accessibility] panel dialog should not close when closeOnClickOut is not set to true
      */
+    @Test
     public void testPanelDialogWithCloseOnClickOutNotSet() throws Exception {
         open(APP + "?" +
                 PARAM_PANEL_TYPE + "panel");
@@ -326,6 +339,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * [Accessibility] panel dialog should close when closeOnClickOut is set to true
      */
+    @Test
     public void testPanelDialogWithCloseOnClickOutSet() throws Exception {
         open(APP + "?" +
                 PARAM_PANEL_TYPE + "panel");
@@ -345,6 +359,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Verify custom close action Bug: W-2619406
      */
+    @Test
     public void testPanelDialogWithCloseOnClickOutSetAndCustomCloseActionSet() throws Exception {
         open(APP + "?" +
                 PARAM_PANEL_TYPE + "panel");
@@ -368,6 +383,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Tabs on Modal overlay should do focus trapping and not close the overlay
      */
+    @Test
     public void testModalFocusTrapping() throws Exception {
         String panelType = "modal";
         String url = APP + "?" + PARAM_PANEL_TYPE + panelType;
@@ -378,6 +394,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Tabs on panel dialog should close the panel and not trap the focus within the panel
      */
+    @Test
     public void testPanelDoesNotDoFocusTrapping() throws Exception {
         String panelType = "panel";
         String url = APP + "?" + PARAM_PANEL_TYPE + panelType;
@@ -388,6 +405,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Verify custom close action Bug: W-2619406
      */
+    @Test
     public void testPanelTabOutCallsCustomCloseActionWhenSet() throws Exception {
         String panelType = "panel";
         String url = APP + "?" + PARAM_PANEL_TYPE + panelType;
@@ -402,6 +420,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Tabs on panel with full-screen should close the panel and not trap the focus within the panel
      */
+    @Test
     public void testPanelWithFullScreenDoesNotDoFocusTrapping() throws Exception {
         String panelType = "panel";
         String flavor = "full-screen";
@@ -414,6 +433,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
      * Tab out closes panel and sets focus back on element that called it. Test panel focuses on reference element after
      * its been closed.
      */
+    @Test
     public void testPanelTabOutFocus() throws Exception {
         String url = APP + "?" + PARAM_PANEL_TYPE + "panel" +
                 PARAM_DIRECTION + "south";
@@ -439,6 +459,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Test tabbing goes through footer
      */
+    @Test
     public void testPanelTabWithFooter() throws Exception {
         String url = APP + "?" + PARAM_PANEL_TYPE + "modal" +
                 PARAM_USE_FOOTER + "true";
@@ -454,6 +475,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Test panel when trapFocus is false
      */
+    @Test
     public void testPanelTabingWithTrapFocusFalse() throws Exception {
     	String url = APP + "?" + PARAM_TRAP_FOCUS + "false";
 
@@ -474,6 +496,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Test back button on browser closes panel.
      */
+    @Test
     public void testBrowserBackButton() throws Exception {
     	String url = APP + "?" + PARAM_CLOSE_ON_LOCATION_CHANGE + "true";
     	open(url);

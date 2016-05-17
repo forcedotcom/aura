@@ -28,6 +28,7 @@ import org.auraframework.impl.adapter.format.html.BaseComponentDefHTMLFormatAdap
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.junit.Test;
 
 /**
  * Tests for BaseComponentDefHTMLFormatAdapter, as it relates to ApplicationDef
@@ -49,6 +50,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
      * Manifest is not appended to <html> if system config is set to disable appcache (aura.noappcache = true).
      */
     @ThreadHostileTest("disables AppCache")
+    @Test
     public void testWriteManifestWithConfigDisabled() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         ServletConfigController.setAppCacheDisabled(Boolean.TRUE);
@@ -67,6 +69,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
     /**
      * Manifest is not appended to <html> if useAppcache is false.
      */
+    @Test
     public void testWriteManifestWithUseAppCacheFalse() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
@@ -85,6 +88,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
     /**
      * Manifest is not appended to <html> if useAppcache is missing (inherits false from aura:application).
      */
+    @Test
     public void testWriteManifestWithUseAppCacheInherited() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
@@ -102,6 +106,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
     /**
      * Manifest is appended to <html> if current app has useAppCache.
      */
+    @Test
     public void testWriteManifest() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
@@ -125,6 +130,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
     /**
      * Context path should be prepended to urls
      */
+    @Test
     public void testUrlContextPath() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         String coolContext = "/cool";
@@ -152,6 +158,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
      * @throws Exception
      */
     @ThreadHostileTest("NamespaceDef modification affects namespace")
+    @Test
     public void testCommentsInTemplateCssNotInjectedToPage() throws Exception {
         String css = "/*" + "*Multi line comment" + "*/\n" + "body{" + "background-color: #ededed;"
                 + "font-size: 13px;" + "/**Inline comment*/\n" + "line-height: 1.3" + "}";

@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 public class GlobMatcherTest extends UnitTestCase {
     private static class GMTSet {
@@ -44,6 +45,7 @@ public class GlobMatcherTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testAll() {
         GlobMatcher gm = new GlobMatcher("*");
         assertTrue("* should be 'all'", gm.isAll());
@@ -55,6 +57,7 @@ public class GlobMatcherTest extends UnitTestCase {
 
     private static String[] ILLEGALS = new String[] { "bah@", "bah.", };
 
+    @Test
     public void testIllegals() {
         for (String x : ILLEGALS) {
             try {
@@ -90,6 +93,7 @@ public class GlobMatcherTest extends UnitTestCase {
             new GMTSet("bah", true, new String[] { "bah" }, new String[] { "humbug", "bah2", "ba" }),
             new GMTSet("3bah", true, new String[] { "3bah" }, new String[] { "humbug", "bah2", "ba" }), };
 
+    @Test
     public void testConstant() {
         matchCheck(CONSTANTS);
     }
@@ -102,6 +106,7 @@ public class GlobMatcherTest extends UnitTestCase {
             new GMTSet("b*ah", false, new String[] { "bah", "bXYZah", "b@ah", "b*ah" }, new String[] { "humbug",
                     "bah2", "ba" }), };
 
+    @Test
     public void testStar() {
         matchCheck(STARS);
     }
@@ -113,6 +118,7 @@ public class GlobMatcherTest extends UnitTestCase {
             new GMTSet("*bah", false, new String[] { "Bah", "xyzbAh", "XYbaH", "*BAH" }, null),
             new GMTSet("b*ah", false, new String[] { "Bah", "bXYZAh", "b@aH", "B*AH" }, null), };
 
+    @Test
     public void testCaseInsensitive() {
         matchCheck(INSENSITIVE);
     }

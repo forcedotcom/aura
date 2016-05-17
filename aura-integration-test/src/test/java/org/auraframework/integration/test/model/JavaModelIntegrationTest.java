@@ -29,6 +29,7 @@ import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 /**
  * Integration tests for Java Model
@@ -41,6 +42,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
     /**
      * Verify that class level annotation is required for a java model.
      */
+    @Test
     public void testClassLevelAnnotationForJavaModel() throws Exception {
         DefDescriptor<ModelDef> javaModelDefDesc = definitionService.getDefDescriptor(
                 "java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
@@ -52,6 +54,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
     /**
      * Verify that InvalidDefinitionException is thrown when getting definition of a Java model without Model annotation.
      */
+    @Test
     public void testExceptionIsThrownWhenModelWithoutAnnotation() {
         DefDescriptor<ModelDef> javaModelDefDesc = definitionService.getDefDescriptor(
                 "java://org.auraframework.impl.java.model.TestModelWithoutAnnotation", ModelDef.class);
@@ -67,6 +70,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
     /**
      * Verify that a Java model can extend another Java model.
      */
+    @Test
     public void testJavaModelInheritance() throws Exception {
         DefDescriptor<ModelDef> javaModelDefDesc = definitionService.getDefDescriptor(
                 "java://org.auraframework.components.test.java.model.TestModelSubclass", ModelDef.class);
@@ -87,6 +91,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
         assertEquals("firstThingDefault", model.getValue(refFirstThing));
     }
 
+    @Test
     public void testExceptionIsThrownWhenModelMethodReturnsVoid() {
         String targetModel = "java://org.auraframework.impl.java.model.TestModelWithVoid";
         try {
@@ -98,6 +103,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testExceptionIsThrownWhenModelMethodIsStatic() throws Exception {
         String targetModel = "java://org.auraframework.impl.java.model.TestModelWithStatic";
         try {
@@ -112,6 +118,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
     /**
      * Verify that DefinitionNotFoundException is thrown if model doesn't exist
      */
+    @Test
     public void testExceptionIsThrownWhenModelNotFound() throws Exception {
         DefDescriptor<ComponentDef> cmpDefDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component model='java://DoesNotExist'/>");
@@ -127,6 +134,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
     /**
      * Verify Java model can be accessed in internal (system) namespace
      */
+    @Test
     public void testModelInInternalNamespace() throws Exception {
         String resourceSource = "<aura:component model='java://org.auraframework.impl.java.model.TestModel'>Hello World!</aura:component>";
         DefDescriptor<ComponentDef> cmpDefDesc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,
@@ -140,6 +148,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
      * Verify model can NOT be accessed in non-internal (custom) namespace
      */
     @UnAdaptableTest("namespace start with c means something special in core")
+    @Test
     public void testExceptionIsThrownWhenUsingJavaModelInExternalNamespace() throws Exception {
         String resourceSource = "<aura:component model='java://org.auraframework.impl.java.model.TestModel'>Hello World!</aura:component>";
         DefDescriptor<ComponentDef> cmpDefDesc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource,
@@ -158,6 +167,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
     /**
      * Verify AuraExecutionException is thrown when accessing value of a non existing property from Java model.
      */
+    @Test
     public void testNonExistingPropertiesOnModel() throws Exception {
         DefDescriptor<ModelDef> javaModelDefDesc = definitionService.getDefDescriptor(
                 "java://org.auraframework.impl.java.model.TestModel", ModelDef.class);

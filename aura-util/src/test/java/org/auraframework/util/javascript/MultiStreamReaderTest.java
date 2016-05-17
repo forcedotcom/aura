@@ -27,12 +27,14 @@ import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 public class MultiStreamReaderTest extends UnitTestCase {
 
+    @Test
     public void testConstructNullArray() throws Exception {
         URL[] urls = null;
         MultiStreamReader reader = new MultiStreamReader(urls);
@@ -40,6 +42,7 @@ public class MultiStreamReaderTest extends UnitTestCase {
         reader.close();
     }
 
+    @Test
     public void testConstructNullCollection() throws Exception {
         Collection<URL> urls = null;
         MultiStreamReader reader = new MultiStreamReader(urls);
@@ -47,6 +50,7 @@ public class MultiStreamReaderTest extends UnitTestCase {
         reader.close();
     }
 
+    @Test
     public void testConstructEmptyArray() throws Exception {
         URL[] urls = new URL[0];
         MultiStreamReader reader = new MultiStreamReader(urls);
@@ -54,6 +58,7 @@ public class MultiStreamReaderTest extends UnitTestCase {
         reader.close();
     }
 
+    @Test
     public void testConstructEmptyCollection() throws Exception {
         Collection<URL> urls = ImmutableSet.of();
         MultiStreamReader reader = new MultiStreamReader(urls);
@@ -61,46 +66,57 @@ public class MultiStreamReaderTest extends UnitTestCase {
         reader.close();
     }
 
+    @Test
     public void testReadSingleStream() throws Exception {
         assertReadingMultipleStreams(1, "something");
     }
 
+    @Test
     public void testReadSingleStreamInChunks() throws Exception {
         assertReadingMultipleStreams(3, "something");
     }
 
+    @Test
     public void testReadSingleEmptyStream() throws Exception {
         assertReadingMultipleStreams(1, "");
     }
 
+    @Test
     public void testReadMultipleShortStreams() throws Exception {
         assertReadingMultipleStreams(1, "a", "b", "c");
     }
 
+    @Test
     public void testReadMultipleEmptyStreams() throws Exception {
         assertReadingMultipleStreams(1, "", "", "");
     }
 
+    @Test
     public void testReadMultipleStreamsWithFirstBeingLonger() throws Exception {
         assertReadingMultipleStreams(1, StringUtils.repeat("a", 100), "b", "c");
     }
 
+    @Test
     public void testReadMultipleStreamsInChunksWithFirstBeingLonger() throws Exception {
         assertReadingMultipleStreams(3, StringUtils.repeat("a", 100), "b", "c");
     }
 
+    @Test
     public void testReadMultipleStreamsWithSecondBeingLonger() throws Exception {
         assertReadingMultipleStreams(1, "a", StringUtils.repeat("b", 100), "c");
     }
 
+    @Test
     public void testReadMultipleStreamsInChunksWithSecondBeingLonger() throws Exception {
         assertReadingMultipleStreams(3, "a", StringUtils.repeat("b", 100), "c");
     }
 
+    @Test
     public void testReadMultipleStreamsWithThirdBeingLonger() throws Exception {
         assertReadingMultipleStreams(1, "a", "b", StringUtils.repeat("c", 100));
     }
 
+    @Test
     public void testReadMultipleStreamsInChunksWithThirdBeingLonger() throws Exception {
         assertReadingMultipleStreams(3, "a", "b", StringUtils.repeat("c", 100));
     }

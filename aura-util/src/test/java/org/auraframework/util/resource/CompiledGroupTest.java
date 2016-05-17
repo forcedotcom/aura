@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /** Test class for the from-jars-only variation of an AuraJavascriptGroup */
 public class CompiledGroupTest extends UnitTestCase {
@@ -64,12 +65,14 @@ public class CompiledGroupTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testWithMockProperties() throws Exception {
         CompiledGroup ajrg = new MockAJRG(GROUP_NAME, SAVE_FILE, "aMockHashValue", "23456789");
         assertEquals("aMockHashValue", ajrg.getGroupHash().toString());
         assertEquals(23456789L, ajrg.getLastMod());
     }
 
+    @Test
     public void testThrowsWithoutProperties() throws Exception {
         try {
             CompiledGroup compiled = new CompiledGroup(GROUP_NAME, SAVE_FILE) {
@@ -88,6 +91,7 @@ public class CompiledGroupTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testThrowsWithBadLastMod() throws Exception {
         try {
             CompiledGroup compiled = new MockAJRG(GROUP_NAME, SAVE_FILE, "aMockHashValue", "BadNumberFormat");
@@ -98,6 +102,7 @@ public class CompiledGroupTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testThrowsWithoutHash() throws Exception {
         try {
             CompiledGroup compiled = new MockAJRG(GROUP_NAME, SAVE_FILE, null, "12345");
@@ -117,6 +122,7 @@ public class CompiledGroupTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testThrowsIOError() throws Exception {
         try {
             CompiledGroup compiled = new CompiledGroup(GROUP_NAME, SAVE_FILE) {

@@ -25,6 +25,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 public class EventHandlerDefHandlerTest extends AuraImplTestCase {
 
@@ -32,6 +33,7 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testEventHandlerDefHandler() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
@@ -41,6 +43,7 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
         assertNotNull(def);
     }
 
+    @Test
     public void testRegisterDuplicateEventNames() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(descriptor, "<aura:component>"
@@ -63,6 +66,7 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
      * also we have have attributes and comments in the markup 
      * @throws Exception
      */
+    @Test
     public void testEventXMLParser() throws Exception {
     	DefDescriptor<EventDef> descriptor = DefDescriptorImpl.getInstance("auratest"+":fakeEvent", EventDef.class);
     	StringSource<EventDef> source = new StringSource<>(descriptor,
@@ -82,6 +86,7 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testEventXMLParserAbstractEventErrorOut() throws Exception {
         try {
     		//runTestEventXMLParser(false, true, true, true, true, "abstract='true'");

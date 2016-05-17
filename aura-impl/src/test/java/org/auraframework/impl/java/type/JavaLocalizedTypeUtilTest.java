@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import org.auraframework.impl.util.AuraLocaleImpl;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
  * Verify implementation of JavaLocalizedTypeUtil used to convert data from a
@@ -30,6 +31,7 @@ public class JavaLocalizedTypeUtilTest extends UnitTestCase {
     /**
      * Verify initialization of converters for Localized Strings and numbers.
      */
+    @Test
     public void testNumberConvertersExist() {
 
         // verify number converters are available
@@ -60,6 +62,7 @@ public class JavaLocalizedTypeUtilTest extends UnitTestCase {
      * Reference for how different countries handle decimals:
      * http://en.wikipedia.org/wiki/Decimal_mark#Examples_of_use
      */
+    @Test
     public void testNumberConvertersWork() {
 
         // verify the converter returns a valid value...

@@ -22,6 +22,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 /**
  * Test validation of attribute names in component markup.
@@ -54,6 +55,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AttributeNotFoundException thrown
      */
+    @Test
     public void testInlineUnknownAttribute() throws Exception {
         DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         assertAttributeNotFoundException("<aura:component><" + myCmp.getDescriptorName()
@@ -76,6 +78,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AttributeNotFoundException thrown
      */
+    @Test
     public void testSetUnknownAttributeInNestedComponent() throws Exception {
         DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         assertAttributeNotFoundException(
@@ -88,6 +91,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AttributeNotFoundException thrown
      */
+    @Test
     public void testInlineUnknownAttributePrefix() throws Exception {
         DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         assertAttributeNotFoundException(
@@ -100,6 +104,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AttributeNotFoundException thrown
      */
+    @Test
     public void testSetUnknownAttributePrefixInNestedComponent() throws Exception {
         DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:attribute name='value' type='String'/></aura:component>");
@@ -113,6 +118,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults attribute value is retrieved
      */
+    @Test
     public void testInvalidAttributePrefix() throws Exception {
         try {
             getComponentInstance("<aura:component><aura:attribute name='aura:special1' type='String' default='hi'/></aura:component>");

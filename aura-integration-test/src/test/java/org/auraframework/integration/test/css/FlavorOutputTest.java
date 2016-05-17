@@ -22,6 +22,7 @@ import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.css.util.Styles;
 import org.auraframework.throwable.quickfix.StyleParserException;
+import org.junit.Test;
 
 import com.salesforce.omakase.broadcast.emitter.SubscriptionException;
 
@@ -34,6 +35,7 @@ public class FlavorOutputTest extends StyleTestCase {
     }
 
     /** [flavorName] -> [namespace][Component]--[flavorName] */
+    @Test
     public void testRenameFlavorClassNames() throws Exception {
         String src = ".THIS--primary {color:red} \n" +
                 ".THIS--secondary {color:red}";
@@ -51,6 +53,7 @@ public class FlavorOutputTest extends StyleTestCase {
     }
 
     /** nested selectors with the flavor name should be renamed too */
+    @Test
     public void testRenameCustomFlavorClassNamesNested() throws Exception {
         String src = ".THIS--primary div .THIS--primary {color:red}";
         String fmt = ".%s--primary div .%s--primary {color:red}";
@@ -65,6 +68,7 @@ public class FlavorOutputTest extends StyleTestCase {
     }
 
     /** test other valid key selectors, such as .THIS-foo, .THIS__foo */
+    @Test
     public void testAlternativeKeySelectors() throws Exception {
         String src = ".THIS-foo {color:red}\n"
                 + ".THIS__foo {color:red}\n"
@@ -89,6 +93,7 @@ public class FlavorOutputTest extends StyleTestCase {
         assertEquals(expected, definitionService.getDefinition(flavor).getCode());
     }
 
+    @Test
     public void testResolvesTokens() throws Exception {
         String src = ".THIS--primary {color:t(color)}";
         String fmt = ".%s--primary {color:red}";
@@ -102,6 +107,7 @@ public class FlavorOutputTest extends StyleTestCase {
         assertEquals(expected, definitionService.getDefinition(flavor).getCode());
     }
 
+    @Test
     public void testRenamesThisShorthand() throws Exception {
         String src = ".THIS {color:red}";
         String fmt = ".%s--default {color:red}";
@@ -115,6 +121,7 @@ public class FlavorOutputTest extends StyleTestCase {
     }
 
     /** selectors must begin with a class selector containing one of the declared flavor names */
+    @Test
     public void testErrorsOnUnscopedSelectorInFlavor() throws Exception {
         try {
             definitionService.getDefinition(addCustomFlavor(addFlavorableComponentDef(), ".bad{}"));
@@ -126,6 +133,7 @@ public class FlavorOutputTest extends StyleTestCase {
     }
 
     /** selectors must begin with a class selector containing one of the declared flavor names */
+    @Test
     public void testErrorsOnUnscopedSelectorNested() throws Exception {
         try {
             definitionService.getDefinition(addStandardFlavor(addFlavorableComponentDef(), "div .THIS--primary{}"));
@@ -137,6 +145,7 @@ public class FlavorOutputTest extends StyleTestCase {
     }
 
     /** flavor extends */
+    @Test
     public void testFlavorExtendsSimple() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
 
@@ -153,12 +162,14 @@ public class FlavorOutputTest extends StyleTestCase {
         assertEquals(String.format(fmt, addedClass), def.getCode());
     }
 
+    @Test
     public void testFlavorExtendsComplex() throws Exception {
         DefDescriptor<ComponentDef> cmp = definitionService.getDefDescriptor("markup://flavorTest:sample_extends", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> dd = Flavors.standardFlavorDescriptor(cmp);
         goldFileText(definitionService.getDefinition(dd).getCode(), ".css");
     }
 
+    @Test
     public void testFlavorExtendsMultiple() throws Exception {
         try {
             String src = ".THIS--default{color:red} \n"
@@ -173,6 +184,7 @@ public class FlavorOutputTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testExtendsUnknownFlavor() throws Exception {
         try {
             String src = ".THIS--default{color:red} \n"
@@ -185,6 +197,7 @@ public class FlavorOutputTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testExtendsMultiLevel() throws Exception {
         try {
             String src = ".THIS--default{color:red} \n"

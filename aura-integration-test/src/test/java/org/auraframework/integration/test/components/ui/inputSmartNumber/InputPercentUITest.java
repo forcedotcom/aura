@@ -16,6 +16,7 @@
 package org.auraframework.integration.test.components.ui.inputSmartNumber;
 
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.junit.Test;
 
 public class InputPercentUITest extends BaseInputSmartNumber {
 
@@ -29,6 +30,7 @@ public class InputPercentUITest extends BaseInputSmartNumber {
      */
     @Override
     @ExcludeBrowsers({BrowserType.IE8, BrowserType.IE9, BrowserType.IE10, BrowserType.IE11})
+    @Test
     public void testChangeEvent() throws Exception {
         super.testChangeEvent();
     }

@@ -26,6 +26,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 import com.google.common.collect.Maps;
 
@@ -46,18 +47,21 @@ public class LabelControllerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testLabelController() throws Exception {
         ControllerDef def = labelCntrDesc.getDef();
         assertNotNull("Failed to fetch the definition of the Label Controller.", def);
         runLabelAction("Related_Lists", "task_mode_today", State.SUCCESS, "Today");
     }
 
+    @Test
     public void testInvalidSection() throws Exception {
         runLabelAction("FOO", "task_mode_today", State.SUCCESS, "Today"); // In Aura, section doesn't matter
         runLabelAction("FOO", null, State.SUCCESS, placeholder);
         runLabelAction("FOO", "", State.SUCCESS, placeholder);
     }
 
+    @Test
     public void testInvalidLabel() throws Exception {
         runLabelAction("Related_Lists", "FooBared", State.SUCCESS, placeholder);
         runLabelAction("FooBared", "FooBared", State.SUCCESS, placeholder);

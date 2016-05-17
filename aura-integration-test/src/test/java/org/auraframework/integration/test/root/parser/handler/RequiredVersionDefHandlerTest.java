@@ -20,6 +20,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
 
@@ -27,6 +28,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testRequiredVersionPositiveCase() throws Exception {
         String markup = "<aura:require namespace='auratest' version='1.0'/>";
         DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
@@ -35,6 +37,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
     }
 
     //test when namespace is missing, same thing apply to version
+    @Test
     public void testRequiredVersionMissNamespace() throws Exception {
         String markup = "<aura:require version='1.0'/>";
         try {
@@ -48,6 +51,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
     }
 
     //test when namespace is empty, samething apply to version
+    @Test
     public void testRequiredVersionEmptyNamespace() throws Exception {
         String markup = "<aura:require namespace='' version='1.0'/>";
         try {
@@ -61,6 +65,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
     }
 
     //test when version is missing, same thing apply to version
+    @Test
     public void testRequiredVersionMissVersion() throws Exception {
         String markup = "<aura:require namespace='auratest'/>";
         try {
@@ -74,6 +79,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
     }
 
     //test when version is empty, samething apply to version
+    @Test
     public void testRequiredVersionEmptyVersion() throws Exception {
         String markup = "<aura:require namespace='auratest' version=''/>";
         try {
@@ -87,6 +93,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
     }
 
     // test when same namespace is required multi times in one component
+    @Test
     public void testRequireDefineSameNamespaceMutliTimes() throws Exception {
         String markup = "<aura:require namespace='auratest' version='1.0'/>" +
                         "<aura:require namespace='auratest' version='2.0'/>";
@@ -100,6 +107,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testRequireDefineMutliNamespaces() throws Exception {
         String markup = "<aura:require namespace='auratest' version='1.0'/>" +
                         "<aura:require namespace='test' version='2.0'/>";

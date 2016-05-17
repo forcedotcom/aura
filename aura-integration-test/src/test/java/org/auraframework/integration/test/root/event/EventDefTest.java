@@ -33,6 +33,7 @@ import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 /**
  * TODO: test extends
@@ -43,6 +44,7 @@ public class EventDefTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testEventDef() throws Exception {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<>();
@@ -65,12 +67,14 @@ public class EventDefTest extends AuraImplTestCase {
         assertNotNull(testInt);
     }
 
+    @Test
     public void testGetEventType() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         EventDefImpl def = vendor.makeEventDef(desc, EventType.COMPONENT, null, null, null);
         assertEquals(EventType.COMPONENT, def.getEventType());
     }
 
+    @Test
     public void testGetExtendsDescriptor() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         DefDescriptor<EventDef> ext = DefDescriptorImpl.getInstance("fake:extendevent", EventDef.class);
@@ -78,6 +82,7 @@ public class EventDefTest extends AuraImplTestCase {
         assertEquals(ext, def.getExtendsDescriptor());
     }
 
+    @Test
     public void testValidateDefinitionNullDescriptor() throws Exception {
         EventDefImpl def = vendor.makeEventDefWithNulls(null, null, null, null, null);
         try {
@@ -87,6 +92,7 @@ public class EventDefTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testValidateDefinitionNullEventType() throws Exception {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         EventDefImpl def = vendor.makeEventDefWithNulls(desc, null, null, null, null);
@@ -97,6 +103,7 @@ public class EventDefTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testValidateReferences() throws Exception {
         FakeRegistry fake = createFakeRegistry();
         EventDefImpl ed = vendor.makeEventDef();
@@ -105,6 +112,7 @@ public class EventDefTest extends AuraImplTestCase {
         ed.validateReferences();
     }
 
+    @Test
     public void testGetExtends() throws Exception {
         DefDescriptor<EventDef> eventDefDescriptor = vendor.makeEventDefDescriptor("test:fakeEvent");
         DefDescriptor<EventDef> eventDefDescriptorParent = vendor.makeEventDefDescriptor("test:parentEvent");
@@ -112,6 +120,7 @@ public class EventDefTest extends AuraImplTestCase {
         assertEquals("parentEvent", ed.getExtendsDescriptor().getName());
     }
 
+    @Test
     public void testDependencies() throws Exception {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         DefDescriptor<EventDef> ext = DefDescriptorImpl.getInstance("fake:extendevent", EventDef.class);
@@ -121,6 +130,7 @@ public class EventDefTest extends AuraImplTestCase {
         assertTrue("dependencies don't contain the superclass: "+dependencies, dependencies.contains(ext));
     }
 
+    @Test
     public void testSerialize() throws Exception {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<>();
@@ -136,6 +146,7 @@ public class EventDefTest extends AuraImplTestCase {
         serializeAndGoldFile(def);
     }
 
+    @Test
     public void testGetAttributeDefs() throws Exception {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<>();
@@ -156,6 +167,7 @@ public class EventDefTest extends AuraImplTestCase {
         assertEquals(expectedAttributes, returnedAttributes);
     }
 
+    @Test
     public void testGetAttributeDefsWithParent() throws Exception {
         DefDescriptor<EventDef> edd = vendor.makeEventDefDescriptor("test:parentEvent");
         EventDefImpl ed = vendor.makeEventDef(null, edd);
@@ -166,6 +178,7 @@ public class EventDefTest extends AuraImplTestCase {
         assertTrue(atts.containsKey(DefDescriptorImpl.getInstance("att2", AttributeDef.class)));
     }
 
+    @Test
     public void testEquals() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         DefDescriptor<EventDef> ext = DefDescriptorImpl.getInstance("fake:extendevent", EventDef.class);
@@ -176,6 +189,7 @@ public class EventDefTest extends AuraImplTestCase {
         assertEquals(def, def2);
     }
 
+    @Test
     public void testEqualsWithDifferentTypes() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         EventDefImpl def = vendor.makeEventDef(desc, EventType.COMPONENT, null, null, null);
@@ -183,6 +197,7 @@ public class EventDefTest extends AuraImplTestCase {
         assertFalse("Equals should have been false due to different event types", def.equals(def2));
     }
 
+    @Test
     public void testEqualsWithDifferentDescriptors() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         DefDescriptor<EventDef> desc2 = DefDescriptorImpl.getInstance("fake:extendevent", EventDef.class);
@@ -191,6 +206,7 @@ public class EventDefTest extends AuraImplTestCase {
         assertFalse("Equals should have been false due to different descriptors", def.equals(def2));
     }
 
+    @Test
     public void testEqualsWithDifferentExtendsDescriptors() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         DefDescriptor<EventDef> ext = DefDescriptorImpl.getInstance("fake:extendevent", EventDef.class);
@@ -200,6 +216,7 @@ public class EventDefTest extends AuraImplTestCase {
         assertFalse("Equals should have been false due to different extends descriptors", def.equals(def2));
     }
 
+    @Test
     public void testEqualsWithNullExtendsDescriptors() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         EventDefImpl def = vendor.makeEventDef(desc, EventType.COMPONENT, null, new Location("filename1", 5, 5, 0),
@@ -209,6 +226,7 @@ public class EventDefTest extends AuraImplTestCase {
         assertEquals(def, def2);
     }
 
+    @Test
     public void testHashCode() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         EventDefImpl def = vendor.makeEventDefWithNulls(desc, EventType.COMPONENT, null, new Location("filename1", 5,
@@ -218,6 +236,7 @@ public class EventDefTest extends AuraImplTestCase {
         assertEquals(def.hashCode(), def2.hashCode());
     }
 
+    @Test
     public void testHashCodeWithDifferentDescriptors() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         DefDescriptor<EventDef> desc2 = DefDescriptorImpl.getInstance("fake:event2", EventDef.class);
@@ -227,6 +246,7 @@ public class EventDefTest extends AuraImplTestCase {
                 def.hashCode() == def2.hashCode());
     }
 
+    @Test
     public void testHashCodeWithDifferentEventTypes() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         EventDefImpl def = vendor.makeEventDef(desc, EventType.COMPONENT, null, null, null);
@@ -235,6 +255,7 @@ public class EventDefTest extends AuraImplTestCase {
                 def.hashCode() == def2.hashCode());
     }
 
+    @Test
     public void testHashCodeWithDifferentAttributeDefs() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         Map<DefDescriptor<AttributeDef>, AttributeDef> attDefs = new HashMap<>();
@@ -246,6 +267,7 @@ public class EventDefTest extends AuraImplTestCase {
                 def.hashCode() == def2.hashCode());
     }
 
+    @Test
     public void testHashCodeWithDifferentLocations() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         EventDefImpl def = vendor.makeEventDef(desc, EventType.COMPONENT, null, new Location("filename1", 5, 5, 0),
@@ -256,6 +278,7 @@ public class EventDefTest extends AuraImplTestCase {
                 def.hashCode() == def2.hashCode());
     }
 
+    @Test
     public void testHashCodeWithDifferentExtendsDescriptors() {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         DefDescriptor<EventDef> ext = DefDescriptorImpl.getInstance("fake:extendevent1", EventDef.class);
@@ -266,6 +289,7 @@ public class EventDefTest extends AuraImplTestCase {
                 def.hashCode() == def2.hashCode());
     }
 
+    @Test
     public void testExtendsWrongEventType() {
         DefDescriptor<?> dd = addSourceAutoCleanup(EventDef.class,
                 "<aura:event type=\"component\" extends=\"test:applicationEvent\"></aura:event>");

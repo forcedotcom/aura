@@ -24,6 +24,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 /**
  * Verify access checks done during Instance creation, particularly in custom (non-internal) namespaces
@@ -38,21 +39,25 @@ public class InstanceAccessTest extends AuraImplTestCase {
         super(name);
     }
     
+    @Test
     public void testAccessToNonGlobalInSameNS() throws Exception {
         DefDescriptor<ComponentDef> otherCmp = buildCmp(DEFAULT, "cmp", "", "");
         assertAccess(otherCmp);
     }
 
+    @Test
     public void testNoAccessToNonGlobalInOtherNS() throws Exception {
         DefDescriptor<ComponentDef> otherCmp = buildCmp(OTHER, "cmp", "", "");
         assertNoAccess(otherCmp);
     }
 
+    @Test
     public void testAccessToGlobalInOtherNS() throws Exception {
         DefDescriptor<ComponentDef> otherCmp = buildCmp(OTHER, "global", "access='GLOBAL'", "");
         assertAccess(otherCmp);
     }
 
+    @Test
     public void testAccessToGlobalExtendingNonGlobalInOtherNS() throws Exception {
         DefDescriptor<ComponentDef> superCmp = buildCmp(OTHER, "super", "extensible='true'", "");
         DefDescriptor<ComponentDef> otherCmp = buildCmp(OTHER, "cmp",
@@ -60,6 +65,7 @@ public class InstanceAccessTest extends AuraImplTestCase {
         assertAccess(otherCmp);
     }
 
+    @Test
     public void testAccessToGlobalExtendingNonGlobalInOtherNSFromSameNS() throws Exception {
         DefDescriptor<ComponentDef> superCmp = buildCmp(OTHER, "super", "extensible='true'", "");
         DefDescriptor<ComponentDef> otherCmp = buildCmp(OTHER, "global",
@@ -69,6 +75,7 @@ public class InstanceAccessTest extends AuraImplTestCase {
         assertAccess(relativeCmp);
     }
 
+    @Test
     public void testNoAccessToOtherGlobalExtendingNonGlobalInAnotherNS() throws Exception {
         DefDescriptor<ComponentDef> anotherCmp = buildCmp(ANOTHER, "super", "extensible='true'", "");
         DefDescriptor<ComponentDef> otherCmp = buildCmp(OTHER, "cmp",
@@ -76,6 +83,7 @@ public class InstanceAccessTest extends AuraImplTestCase {
         assertNoAccess(otherCmp);
     }
 
+    @Test
     public void testAccessToOtherGlobalAsFacetOfSameNS() throws Exception {
         DefDescriptor<ComponentDef> facetCmp = buildCmp(OTHER, "global", "access='GLOBAL'", "");
         DefDescriptor<ComponentDef> holderCmp = buildCmp(DEFAULT, "holder", "", "{!v.body}");
@@ -87,6 +95,7 @@ public class InstanceAccessTest extends AuraImplTestCase {
     /**
      * Should be able to pass provided facet to other global cmp
      */
+    @Test
     public void testAccessToNonGlobalAsFacetOfOtherGlobal() throws Exception {
         DefDescriptor<ComponentDef> facetCmp = buildCmp(DEFAULT, "cmp", "", "");
         DefDescriptor<ComponentDef> holderCmp = buildCmp(OTHER, "holder", "access='GLOBAL'", "{!v.body}");
@@ -95,6 +104,7 @@ public class InstanceAccessTest extends AuraImplTestCase {
         assertAccess(containerCmp);
     }
 
+    @Test
     public void testNoAccessToOtherNonGlobalAsFacetOfOtherGlobal() throws Exception {
         DefDescriptor<ComponentDef> facetCmp = buildCmp(OTHER, "cmp", "", "");
         DefDescriptor<ComponentDef> holderCmp = buildCmp(OTHER, "holder", "access='GLOBAL'", "{!v.body}");
@@ -106,6 +116,7 @@ public class InstanceAccessTest extends AuraImplTestCase {
     /**
      * Should not be able to access other non-global cmp, even if facet of other global cmp
      */
+    @Test
     public void testNoAccessToOtherNonGlobalAsFacetOfOtherGlobalInDefaultGlobal() throws Exception {
         DefDescriptor<ComponentDef> facetCmp = buildCmp(OTHER, "cmp", "", "");
         DefDescriptor<ComponentDef> holderCmp = buildCmp(OTHER, "holder", "access='GLOBAL'", "{!v.body}");
@@ -114,6 +125,7 @@ public class InstanceAccessTest extends AuraImplTestCase {
         assertNoAccess(containerCmp);
     }
 
+    @Test
     public void testNoAccessToOtherNonGlobalAsFacetOfGlobalInSameNS() throws Exception {
         DefDescriptor<ComponentDef> facetCmp = buildCmp(OTHER, "cmp", "", "");
         DefDescriptor<ComponentDef> holderCmp = buildCmp(DEFAULT, "holder", "access='GLOBAL'", "{!v.body}");
@@ -122,6 +134,7 @@ public class InstanceAccessTest extends AuraImplTestCase {
         assertNoAccess(containerCmp);
     }
 
+    @Test
     public void testAccessToOtherGlobalExtendingOtherNonGlobalAsFacetOfNonGlobalInSameNS() throws Exception {
         DefDescriptor<ComponentDef> superCmp = buildCmp(OTHER, "super", "extensible='true'", "");
         DefDescriptor<ComponentDef> facetCmp = buildCmp(OTHER, "global",
@@ -132,6 +145,7 @@ public class InstanceAccessTest extends AuraImplTestCase {
         assertAccess(containerCmp);
     }
 
+    @Test
     public void testAccessToOtherGlobalExtendingOtherAbsNonGlobalImplOtherIntf() throws Exception {
         DefDescriptor<InterfaceDef> intf = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 "<aura:interface/>", OTHER + ":" + getName(), false);

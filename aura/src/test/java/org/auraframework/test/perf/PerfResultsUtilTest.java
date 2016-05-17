@@ -20,9 +20,11 @@ import java.io.File;
 import org.auraframework.test.perf.PerfResultsUtil.ResultsJSON;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.json.JSONObject;
+import org.junit.Test;
 
 public final class PerfResultsUtilTest extends UnitTestCase {
 
+    @Test
     public void testResultsJSON() throws Exception {
         ResultsJSON resultsJSON = new ResultsJSON(false);
         JSONObject json = resultsJSON.getJSON();

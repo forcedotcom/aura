@@ -17,6 +17,7 @@ package org.auraframework.integration.test.components.ui.inputText;
 
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -34,6 +35,7 @@ public class InputCutCopyPasteUITest extends WebDriverTestCase {
 
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
             BrowserType.SAFARI })
+    @Test
     public void testCutCopyPasteEvents() throws Exception {
         if (System.getProperty("os.name").startsWith("Mac")) {
             // Selenium's key event injection are simulated for OSX, and not actually received by

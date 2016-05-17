@@ -37,6 +37,7 @@ import org.auraframework.test.client.UserAgent;
 import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.LineReader;
@@ -186,6 +187,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     /**
      * GET app cache manifest without a supported user agent returns 404.
      */
+    @Test
     public void testGetManifestWithUnsupportedUserAgent() throws Exception {
         setHttpUserAgent(APPCACHE_UNSUPPORTED_USERAGENT);
         String manifest = getManifestURL("/appCache/withpreload.app", false);
@@ -204,6 +206,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      * No manifest url is given when app cache is disabled via config.
      */
     @ThreadHostileTest("disables AppCache")
+    @Test
     public void testGetManifestWithAppCacheDisabled() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
         ServletConfigController.setAppCacheDisabled(Boolean.TRUE);
@@ -216,6 +219,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     /**
      * Manifest url is given even when app has no explicit preloads.
      */
+    @Test
     public void testGetManifestForAppWithoutPreloads() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
         String manifest = getManifestURL("/appCache/nopreload.app", false);
@@ -229,6 +233,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      *
      * note that invalid and absolute css urls are not included
      */
+    @Test
     public void testGetManifestForAppWithPreloads() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
         String manifest = getManifestURL("/appCache/withpreload.app", false);
@@ -245,6 +250,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      * GET app cache manifest with aura.error query param returns empty response and error-valued manifest cookie.
      */
     @UnAdaptableTest
+    @Test
     public void testGetManifestWithAuraErrorParam() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
         String manifest = getManifestURL("/appCache/withpreload.app", false);
@@ -267,6 +273,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     /**
      * GET app cache manifest with manifest cookie with error value, returns 404 and deletes the manifest cookie.
      */
+    @Test
     public void testGetManifestWithErrorManifestCookie() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
         String manifest = getManifestURL("/appCache/withpreload.app", false);
@@ -304,6 +311,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      * GET app cache manifest for app with additional URLs specified using a controller action returns a full manifest
      * containing the additional URLs returned by controller.
      */
+    @Test
     public void testGetManifestForAppWithAdditionalAppCacheURLs() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
         String manifest = getManifestURL("/appCache/additionalUrls.app", false);
@@ -357,6 +365,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      * 
      * UIPerf, UIPerfUi, UIPerfCSS, walltimelocale are uncombinable in PTEST mode.
      */
+    @Test
     public void testUncombinableResourceUrlsAreAddedToAppCacheManifest()throws Exception{
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
         String manifest = getManifestURL("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST, false);

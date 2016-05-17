@@ -24,6 +24,7 @@ import org.auraframework.def.ResourceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.clientlibrary.ResourceDefImpl;
 import org.auraframework.util.json.JsonEncoder;
+import org.junit.Test;
 
 import com.google.common.base.Charsets;
 
@@ -32,11 +33,13 @@ public class ResourceDefImplTest extends AuraImplTestCase {
         super(name);
     }
     
+    @Test
     public void testGetResourceDefWithDefaultPrefix(){
         DefDescriptor<ResourceDef> resourceDef = definitionService.getDefDescriptor("clientLibraryTest.clientLibraryTest", ResourceDef.class);
         assertEquals(DefDescriptor.JAVASCRIPT_PREFIX,resourceDef.getPrefix());
     }
     
+    @Test
     public void testGetComponentJSResourceDef()throws Exception{
         DefDescriptor<ResourceDef> jsResourceDef = definitionService.getDefDescriptor("js://clientLibraryTest.clientLibraryTest", ResourceDef.class);
         assertNotNull(jsResourceDef);
@@ -45,6 +48,7 @@ public class ResourceDefImplTest extends AuraImplTestCase {
         assertTrue("Component resources should be combinable.", ((ResourceDefImpl)def).canCombine());
     }
     
+    @Test
     public void testGetComponentCSSResourceDef()throws Exception{
         DefDescriptor<ResourceDef> cssResourceDef = definitionService.getDefDescriptor("css://clientLibraryTest.clientLibraryTest", ResourceDef.class);
         assertNotNull(cssResourceDef);
@@ -54,6 +58,7 @@ public class ResourceDefImplTest extends AuraImplTestCase {
         assertTrue("Failed to load style resource", ((ResourceDefImpl)def).getContents().contains(".clientLibraryTestStyle"));
     }
 
+    @Test
     public void testResourceDefAsPartOfComponentDef()throws Exception{
         DefDescriptor<ApplicationDef> cmpDesc = definitionService.getDefDescriptor("clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         ApplicationDef def = definitionService.getDefinition(cmpDesc);

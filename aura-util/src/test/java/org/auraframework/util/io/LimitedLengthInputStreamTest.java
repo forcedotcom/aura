@@ -22,6 +22,7 @@ import java.io.InputStream;
 import org.auraframework.util.LimitedLengthInputStream;
 import org.auraframework.util.LimitedLengthInputStream.StreamFinishedListener;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
  * Tests for the LimitedLengthInputStream
@@ -55,6 +56,7 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
         return wrappedStream = new ByteArrayInputStream(bytes);
     }
 
+    @Test
     public void testLimitOfZero() throws Exception {
 
         // We get the callback upon construction in this case
@@ -82,6 +84,7 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testLimitOfOne() throws Exception {
         createTestStream(10);
         final StreamFinishedListener listener = new TestStreamFinishedListener();
@@ -158,6 +161,7 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
      * Ensures that a limit that is greater than the underlying stream and also
      * smaller than Integer.MAX_VALUE works properly
      */
+    @Test
     public void testLimitGreaterThanStream() throws Exception {
         testLimitGreaterThanStream(6);
     }
@@ -166,6 +170,7 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
      * Ensures that a limit that is greater than Integer.MAX_VALUE works
      * properly
      */
+    @Test
     public void testVeryLargeLimit() throws Exception {
         testLimitGreaterThanStream(Long.MAX_VALUE);
     }
@@ -296,6 +301,7 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testLimitEqualToStream() throws Exception {
         createTestStream(5);
         final StreamFinishedListener listener = new TestStreamFinishedListener();
@@ -400,6 +406,7 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testClose() throws Exception {
         createTestStream(5);
         final StreamFinishedListener listener = new TestStreamFinishedListener();
@@ -425,6 +432,7 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
         assertEquals(-1, wrappedStream.read());
     }
 
+    @Test
     public void testMarkingUnsupported() throws Exception {
         InputStream in = new LimitedLengthInputStream(createTestStream(10), 5, new TestStreamFinishedListener());
         try {
@@ -449,6 +457,7 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testBadConstruction() throws Exception {
         try {
             new LimitedLengthInputStream(null, 1, null).close();

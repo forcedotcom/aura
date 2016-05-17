@@ -18,6 +18,7 @@ package org.auraframework.http.resource;
 
 import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.Enumeration;
@@ -46,6 +47,7 @@ public class ManifestTest extends UnitTestCase {
     /**
      * Name is API!.
      */
+    @Test
     public void testName() {
         assertEquals("app.manifest", new Manifest().getName());
     }
@@ -53,6 +55,7 @@ public class ManifestTest extends UnitTestCase {
     /**
      * Format is API!.
      */
+    @Test
     public void testFormat() {
         assertEquals(Format.MANIFEST, new Manifest().getFormat());
     }
@@ -65,6 +68,7 @@ public class ManifestTest extends UnitTestCase {
     /**
      * Test for manifest disabled.
      */
+    @Test
     public void testManifestDisallowed() throws Exception {
         ManifestUtil manifestUtil = Mockito.mock(ManifestUtil.class);
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
@@ -99,6 +103,7 @@ public class ManifestTest extends UnitTestCase {
     /**
      * Test for manifest enabled, but failing cookie check.
      */
+    @Test
     public void testManifestCookieCheck() throws Exception {
         ManifestUtil manifestUtil = Mockito.mock(ManifestUtil.class);
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
@@ -133,6 +138,7 @@ public class ManifestTest extends UnitTestCase {
     /**
      * Test for manifest enabled, but failing cookie check.
      */
+    @Test
     public void testNoDescriptor() throws Exception {
         ManifestUtil manifestUtil = Mockito.mock(ManifestUtil.class);
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
@@ -169,6 +175,7 @@ public class ManifestTest extends UnitTestCase {
     /**
      * Verify that we set the correct contentType to response
      */
+    @Test
     public void testSetContentType() {
     	Manifest manifest = new Manifest();
     	ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);

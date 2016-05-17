@@ -16,9 +16,11 @@
 package org.auraframework.impl.root.parser.handler;
 
 import com.google.common.collect.Sets;
+
 import org.auraframework.def.*;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
+import org.junit.Test;
 
 import java.util.Set;
 
@@ -53,15 +55,18 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
 
     protected abstract XMLHandler<?> getHandler(boolean internal);
 
+    @Test
     public void testAttributeSettings() throws Exception {
         Set<String> intersect = Sets.intersection(publicAttrs, internalAttrs);
         assertTrue("Internal and private sets must not intersect" + intersect, intersect.size() == 0);
     }
 
+    @Test
     public void testInternalAttributeSet() throws Exception {
         compareExpectedWithActual(publicAndInternalAttrs, getHandler(true));
     }
 
+    @Test
     public void testNonInternalAttributeSet() throws Exception {
         compareExpectedWithActual(publicAttrs, getHandler(false));
     }

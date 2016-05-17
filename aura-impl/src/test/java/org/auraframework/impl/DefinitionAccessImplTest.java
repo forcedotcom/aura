@@ -21,6 +21,7 @@ import org.auraframework.def.DefinitionAccess;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
+import org.junit.Test;
 
 public class DefinitionAccessImplTest extends AuraImplTestCase {
     DefinitionParserAdapter definitionParser = null;
@@ -34,6 +35,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
         super.setUp();
         definitionParser = Aura.getDefinitionParserAdapter();
     }
+    @Test
     public void testInvalidAccessStrings()throws Exception{
         for(String s : new String[]{"", "null", " ", "fooBared", "PRIVATEAUTHENTICATED"}){
             try{
@@ -49,6 +51,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
      * Verify authentication values specified with access attribute.
      * @throws Exception
      */
+    @Test
     public void testParseSpecifiedAuthentication()throws Exception{
         DefinitionAccess access = definitionParser.parseAccess(null, "authenticated");
         assertTrue(access.requiresAuthentication());
@@ -76,6 +79,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
     /**
      * Verify access values specified using access attribute.
      */
+    @Test
     public void testParseSpecifiedAccess() throws Exception{
         DefinitionAccess access = definitionParser.parseAccess(null, "GLOBAL");
         assertTrue(access.isGlobal());
@@ -99,6 +103,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testParseStaticMethods()throws Exception{
         //Positive test case
         DefinitionAccess access = definitionParser.parseAccess(null, "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal");
@@ -132,6 +137,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
         
     }
     
+    @Test
     public void testValidation_AccessLevelAndStaticMethodSpecified()throws Exception{
         DefinitionAccess access = definitionParser.parseAccess(null, "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal, PRIVATE");
         try{
@@ -140,6 +146,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
         }catch(InvalidAccessValueException expected){}
     }
     
+    @Test
     public void testValidation_AuthenticationAllowedOnlyInSystemNamespace()throws Exception{
         DefinitionAccess access = definitionParser.parseAccess(null, "AUTHENTICATED");
         access.validate(StringSourceLoader.DEFAULT_NAMESPACE, true, false);
@@ -156,6 +163,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
      * Verify that authentication values cannot be used when validate() is asked not to allow it.
      * @throws Exception
      */
+    @Test
     public void testValidation_AuthenticationCannotBeUsedWhenNotAllowed()throws Exception{
         Boolean allowAuthentication = false;
         DefinitionAccess access = definitionParser.parseAccess(null, "AUTHENTICATED");
@@ -166,6 +174,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
     }
     
     
+    @Test
     public void testValidation_PrivateAccess()throws Exception{
         boolean allowPrivate = true;
         DefinitionAccess access = definitionParser.parseAccess(null, "PRIVATE");
@@ -178,6 +187,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
         }catch(InvalidAccessValueException expected){}
     }
     
+    @Test
     public void testValidation_InternalAccess()throws Exception{
         DefinitionAccess access = definitionParser.parseAccess(null, "INTERNAL");
         access.validate(StringSourceLoader.DEFAULT_NAMESPACE, false, false);
@@ -189,6 +199,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
         }catch(InvalidAccessValueException expected){}
     }
     
+    @Test
     public void testValidation_StaticMethodsUsageRestriction() throws Exception{
         DefinitionAccess access = definitionParser.parseAccess(null, "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal");
         access.validate(StringSourceLoader.DEFAULT_NAMESPACE, false, false);

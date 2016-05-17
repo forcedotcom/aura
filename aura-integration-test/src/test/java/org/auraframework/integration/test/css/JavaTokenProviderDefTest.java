@@ -25,12 +25,14 @@ import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 public class JavaTokenProviderDefTest extends StyleTestCase {
     public JavaTokenProviderDefTest(String name) {
         super(name);
     }
 
+    @Test
     public void testProviderBasic() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF));
         DefDescriptor<TokensDef> concrete = definitionService.getDefinition(desc).getConcreteDescriptor();
@@ -54,6 +56,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testMultipleLevelProvider() throws Exception {
         DefDescriptor<TokensDef> initial = DefDescriptorImpl.getInstance("tokenProviderTest:javaProviderTest1",
                 TokensDef.class);
@@ -78,6 +81,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testProviderThrowsDuringInstantiation() throws Exception {
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + ProviderThrowsOnInstantiate.class.getName())))
@@ -96,6 +100,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testProviderThrowsQFE() throws Exception {
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + ProviderThrowsOnProvide.class.getName()))).getConcreteDescriptor();
@@ -116,6 +121,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testProviderWithoutNoArgConstructor() throws Exception {
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + ProviderConstructorArg.class.getName()))).getConcreteDescriptor();
@@ -136,6 +142,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testProviderWithPrivateConstructor() throws Exception {
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + ProviderPrivateConstructor.class.getName()))).getConcreteDescriptor();
@@ -153,6 +160,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testProviderReturnsNonexistentDef() throws Exception {
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + ProviderNonexistent.class.getName()))).getConcreteDescriptor();
@@ -166,6 +174,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
     public static final class MissingInterface {
     }
 
+    @Test
     public void testProviderMissingInterface() throws Exception {
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + MissingInterface.class.getName()))).getConcreteDescriptor();
@@ -182,6 +191,7 @@ public class JavaTokenProviderDefTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testProviderMissingAnnotation() throws Exception {
         try {
         	definitionService.getDefinition(addSeparateTokens(tokens().descriptorProvider("java://" + MissingAnnotation.class.getName())))

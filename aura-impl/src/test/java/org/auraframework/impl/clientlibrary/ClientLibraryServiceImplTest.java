@@ -21,6 +21,7 @@ import org.auraframework.def.ClientLibraryDef.Type;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.NoContextException;
+import org.junit.Test;
 
 public class ClientLibraryServiceImplTest extends AuraImplTestCase{
 
@@ -36,22 +37,26 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase{
         this.clientLibraryService = new ClientLibraryServiceImpl();
     }
 
+    @Test
     public void testGetResolvedUrlWithNull() {
         assertNull(clientLibraryService.getResolvedUrl(null));
     }
 
+    @Test
     public void testGetResolvedUrlWithClientLibraryDefHasNullName() {
         String name = null;
         ClientLibraryDef clientLibraryDef = vendor.makeClientLibraryDef(name, null, null, null, null);
         assertNull(clientLibraryService.getResolvedUrl(clientLibraryDef));
     }
 
+    @Test
     public void testGetResolvedUrlWithClientLibraryDefHasNullType() {
         Type type = null;
         ClientLibraryDef clientLibraryDef = vendor.makeClientLibraryDef("MyLib", type, null, null, null);
         assertNull(clientLibraryService.getResolvedUrl(clientLibraryDef));
     }
 
+    @Test
     public void testGetUrlsWithNullAuraContext() throws Exception {
         AuraContext context = null;
         try {

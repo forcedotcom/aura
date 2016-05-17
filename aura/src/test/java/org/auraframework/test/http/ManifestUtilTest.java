@@ -20,6 +20,7 @@ import java.util.List;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 public class ManifestUtilTest extends UnitTestCase {
 
@@ -46,6 +47,7 @@ public class ManifestUtilTest extends UnitTestCase {
     /**
      * Null cookie value returns "start" cookie.
      */
+    @Test
     public void testUpdateManifestCookieNull() {
         String value = new ManifestUtil().updateManifestCookieValue(null);
         checkManifestCookieValue(value, 1, 0);
@@ -54,6 +56,7 @@ public class ManifestUtilTest extends UnitTestCase {
     /**
      * Empty cookie value returns "start" cookie.
      */
+    @Test
     public void testUpdateManifestCookieEmpty() {
         String value = new ManifestUtil().updateManifestCookieValue("");
         checkManifestCookieValue(value, 1, 0);
@@ -62,6 +65,7 @@ public class ManifestUtilTest extends UnitTestCase {
     /**
      * Unexpected cookie format (colon-delimited) returns "start" cookie.
      */
+    @Test
     public void testUpdateManifestCookieInvalidFormat() {
         ManifestUtil manifestUtil = new ManifestUtil();
         String value = manifestUtil.updateManifestCookieValue("12345678");
@@ -74,6 +78,7 @@ public class ManifestUtilTest extends UnitTestCase {
     /**
      * Error cookie value returns null.
      */
+    @Test
     public void testUpdateManifestCookieError() {
         assertNull(new ManifestUtil().updateManifestCookieValue("error"));
     }
@@ -81,6 +86,7 @@ public class ManifestUtilTest extends UnitTestCase {
     /**
      * Invalid count cookie value returns null.
      */
+    @Test
     public void testUpdateManifestCookieBadCount() {
         assertNull(new ManifestUtil().updateManifestCookieValue("one:123456789"));
     }
@@ -88,6 +94,7 @@ public class ManifestUtilTest extends UnitTestCase {
     /**
      * Invalid time cookie value returns null.
      */
+    @Test
     public void testUpdateManifestCookieBadTime() {
         assertNull(new ManifestUtil().updateManifestCookieValue("1:jan 6 2013"));
     }
@@ -95,6 +102,7 @@ public class ManifestUtilTest extends UnitTestCase {
     /**
      * Age check before count check.
      */
+    @Test
     public void testUpdateManifestCookieExpired() {
         String value = new ManifestUtil().updateManifestCookieValue("99:0");
         checkManifestCookieValue(value, 1, 0);
@@ -103,6 +111,7 @@ public class ManifestUtilTest extends UnitTestCase {
     /**
      * Cookie count overflow.
      */
+    @Test
     public void testUpdateManifestCookieOverCount() {
         ManifestUtil manifestUtil = new ManifestUtil();
         String value = "";

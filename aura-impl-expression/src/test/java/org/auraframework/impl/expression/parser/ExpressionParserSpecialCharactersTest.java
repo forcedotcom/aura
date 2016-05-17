@@ -19,6 +19,7 @@ import junit.framework.TestSuite;
 
 import org.auraframework.impl.expression.AuraImplExpressionTestCase;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.junit.Test;
 
 /**
  * Shotgun tests for special chars. Tokens shouldn't contain these chars. Remaining special chars have their own tests
@@ -119,6 +120,7 @@ public class ExpressionParserSpecialCharactersTest extends AuraImplExpressionTes
         testDo();
     }
 
+    @Test
     public void testDo() throws Exception {
         try {
             buildExpression(expression);

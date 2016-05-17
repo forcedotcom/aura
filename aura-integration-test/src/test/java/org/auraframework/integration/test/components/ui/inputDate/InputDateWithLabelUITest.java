@@ -23,6 +23,7 @@ import java.util.GregorianCalendar;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -154,6 +155,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     // Home and End Button Test using January (31 days) , February (28 or 29 days), September (30 days)
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
     public void testHomeEnd() throws Exception {
         open(URL);
 
@@ -189,6 +191,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     // Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE9, BrowserType.IE10, BrowserType.IE11, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
     public void testPageUpDownYear() throws Exception {
         DateFormat formatter = new SimpleDateFormat(DATE_FORMAT_STR);
         open(URL);
@@ -292,6 +295,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     // Test case for W-2031902
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
     public void testValueChangeEvent() throws Exception {
         open(URL);
         // Tab test Begins
@@ -384,6 +388,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     // Testing functionality of the ESC key
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
     public void testEscape() throws Exception {
         open(URL);
 
@@ -418,6 +423,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     // Disabling for Safari since Safari does not handle tabs normally
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
 
+    @Test
     public void testFocusOnClosingDP() throws Exception {
 
     	// the different keys we will use to close the datePicker
@@ -456,6 +462,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
     @Flapper
+    @Test
     public void testDateWithOneArrow() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -483,6 +490,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     // Testing functionality of arrows being used one after the other
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
     public void testLeftAndRightArrows() throws Exception {
         // Increase day in month by 1
         open(URL);
@@ -515,6 +523,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     // Testing functionality of arrows being used one after the other, while going through months
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
     public void testUpAndDownArrows() throws Exception {
 
         open(URL);

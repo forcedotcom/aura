@@ -17,6 +17,7 @@ package org.auraframework.integration.test.components.ui.inputError;
 
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -43,6 +44,7 @@ public class InputErrorUITest extends WebDriverTestCase {
      * Test error handling setting errors when firing onError event. Test error handling clearing errors when firing
      * onClearErrors event. Test error handling setting a custom error component.
      */
+    @Test
     public void testServerErrorUsingOnError() throws Exception {
         String expectedErrorMsg = "Custom Error Msg: Error Happens!";
         d = getDriver();
@@ -102,6 +104,7 @@ public class InputErrorUITest extends WebDriverTestCase {
      * Test error handling without setting error message on SimpleValue. Test error handling clearing errors setting
      * error message to null on SimpleValue.
      */
+    @Test
     public void testErrorWithoutSettingErrorMessage() throws Exception {
         d = getDriver();
         open(URL);

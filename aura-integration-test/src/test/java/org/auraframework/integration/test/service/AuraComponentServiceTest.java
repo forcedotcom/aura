@@ -33,6 +33,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 public class AuraComponentServiceTest extends AuraImplTestCase {
 
@@ -48,6 +49,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
      * @hierarchy Aura.Runtime.Service
      * @userStory AuraServlet: POST
      */
+    @Test
     public void testGetComponent() throws Exception {
         Component component = Aura.getInstanceService()
                 .getInstance("auratest:testComponent1", ComponentDef.class, null);
@@ -71,6 +73,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
      * @hierarchy Aura.Runtime.Service
      * @userStory AuraServlet: POST
      */
+    @Test
     public void testGetComponentDef() throws Exception {
         ComponentDef component = definitionService.getDefinition("auratest:testComponent1",
                 ComponentDef.class);
@@ -115,6 +118,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
      * @hierarchy Aura.Runtime.Service
      * @userStory a07B0000000EYU4
      */
+    @Test
     public void testGetApplication() throws QuickFixException {
         Application application = Aura.getInstanceService().getInstance("auratest:testApplication1",
                 ApplicationDef.class, null);
@@ -136,6 +140,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
      * @hierarchy Aura.Runtime.Service
      * @userStory a07B0000000EYU4
      */
+    @Test
     public void testGetApplicationDef() throws Exception {
         ApplicationDef application = definitionService.getDefinition("auratest:testApplication1",
                 ApplicationDef.class);

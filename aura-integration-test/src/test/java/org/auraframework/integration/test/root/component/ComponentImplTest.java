@@ -28,6 +28,7 @@ import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
+import org.junit.Test;
 
 public class ComponentImplTest extends AuraImplTestCase {
 
@@ -37,6 +38,7 @@ public class ComponentImplTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testComponentAttributeMap() throws Exception {
         Component cmp = vendor.makeComponent("test:child1", "meh");
         AttributeDefRef adr = vendor.makeAttributeDefRef("attr", "some value", new Location("meh", 0));
@@ -54,6 +56,7 @@ public class ComponentImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testSerialize() throws Exception {
         Component testComponent = vendor.makeComponent("test:parent", "fuh");
         testComponent.getClass();
@@ -63,6 +66,7 @@ public class ComponentImplTest extends AuraImplTestCase {
     /**
      * Component classes will be serialized with the ComponentDef instead of on the Component.
      */
+    @Test
     public void testComponentClassesNotSerialized() throws Exception {
         Object cmp = vendor.makeComponent("test:parent", "foo");
 
@@ -73,6 +77,7 @@ public class ComponentImplTest extends AuraImplTestCase {
         assertNull(componentClass);
     }
 
+    @Test
     public void testReinitializeModel() throws Exception {
         Component cmp = vendor.makeComponent("test:child1", "meh");
 

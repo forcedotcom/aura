@@ -29,6 +29,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
@@ -64,6 +65,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     /**
      * Fill up the cache with defs and try to get a new def.
      */
+    @Test
     public void testFetchDefsAfterFillingUpCache() throws Exception {
         List<DefDescriptor<ComponentDef>> dummyDefs = fillCachingDefRegistryForComponents();
         // Fetch the defs that were used to fill up the cache initially, chances are most of them were thrown out when
@@ -114,6 +116,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
      */
     // Flaps in SFDC build W-1265411
     @UnAdaptableTest
+    @Test
     public void testForStaleCheckWhenRegistryFull() throws Exception {
         long startTimeStamp = System.currentTimeMillis() - 60000;
         String markup = "<aura:component> %s </aura:component>";
@@ -145,6 +148,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         assertNotNull("Failed to obtain the updated component Def", def.getAttributeDef("attr"));
     }
 
+    @Test
     public void testLocationCaching() throws Exception {
         // Load something from a ResourceSource, which does caching... except it turns out that no such animal exists;
         // even the built-ins are loaded from source (and so from file) under "mvn test", so we have to look to see what
@@ -185,6 +189,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     /**
      * Test to verify that information stored about descriptor in cache are correct.
      */
+    @Test
     public void testExists() {
         String markup = "<aura:component></aura:component>";
         DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class, markup);

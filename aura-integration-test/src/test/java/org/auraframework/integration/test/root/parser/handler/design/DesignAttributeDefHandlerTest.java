@@ -23,6 +23,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
 
@@ -30,6 +31,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testGetElement() throws Exception {
         String name = "mystring";
         DesignAttributeDef element = setupAttributeDesignDef(
@@ -50,6 +52,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         assertNull(element.getAttributeDefault());
     }
 
+    @Test
     public void testRequiredAndReadOnlyAttributeParsingNull() throws Exception {
         String name = "mystring";
         DesignAttributeDef element = setupAttributeDesignDef(name, "<design:attribute name=\"" + name + "\" />");
@@ -57,6 +60,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         assertFalse(element.isReadOnly());
     }
 
+    @Test
     public void testRequiredAndReadOnlyAttributeParsingNotNull() throws Exception {
         String name = "mystring";
         DesignAttributeDef element = setupAttributeDesignDef(name,
@@ -69,6 +73,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         assertFalse(element.isReadOnly());
     }
 
+    @Test
     public void testInvalidSystemAttributeName() throws Exception {
         try {
             String name = "mystring";
@@ -79,6 +84,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testInvalidSystemAttributePrefix() throws Exception {
         try {
             String name = "mystring";
@@ -91,6 +97,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
     }
 
     @UnAdaptableTest("namespace cxxx means something special in core")
+    @Test
     public void testDesignFileWithInvalidAttributeTypesExposed() throws Exception {
         String cmp = "<aura:attribute name=\"invalidAttribute\" type=\"String[]\" />";
         String design = "<design:component><design:attribute name=\"invalidAttribute\" /> </design:component>";
@@ -106,6 +113,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
     }
 
     @UnAdaptableTest("namespace cxxx means something special in core")
+    @Test
     public void testDesignFileWithInvalidAttributeTypeForDataSource() throws Exception {
         String cmp = "<aura:attribute name=\"invalidAttribute\" type=\"Integer\" />";
         String design = "<design:component><design:attribute name=\"invalidAttribute\" datasource=\"1,2,3\" /> </design:component>";
@@ -120,6 +128,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testDesignFileWithDuplicateAttribute() throws Exception {
         final String attr = "attr";
         String cmp = "<aura:attribute name=\"" + attr +"\" type=\"String\" />";
@@ -138,6 +147,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
     }
 
     @UnAdaptableTest("namespace cxxx means something special in core")
+    @Test
     public void testDesignWithDefaultBlockNonInternalFails() throws Exception {
         final String attr = "attr";
         String cmp = "<aura:attribute name=\"" + attr +"\" type=\"String\" />";
@@ -152,6 +162,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testDesignWithDefaultBlock() throws Exception {
         final String attr = "attr";
         String cmp = "<aura:attribute name=\"" + attr +"\" type=\"Object[]\" />";
@@ -162,6 +173,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         definitionService.getDefinition(cmpDesc.getQualifiedName(), DesignDef.class);
     }
 
+    @Test
     public void testDesignWithDefaultBlockAndDefaultAttributeFail() throws Exception {
         final String attr = "attr";
         String cmp = "<aura:attribute name=\"" + attr +"\" type=\"Object[]\" />";
@@ -178,6 +190,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testDesignWithDefaultBlockWithInvalidAttributeType() throws Exception {
         final String attr = "attr";
         String cmp = "<aura:attribute name=\"" + attr +"\" type=\"String\" />";

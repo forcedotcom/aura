@@ -17,6 +17,7 @@ package org.auraframework.impl.root.component;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
@@ -49,6 +50,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -111,12 +113,14 @@ extends RootDefinitionImplUnitTest<I, D, B> {
     }
 
 
+    @Test
     public void testAppendDependenciesDefaultValue() throws Exception {
         Set<DefDescriptor<?>> dependencies = Mockito.spy(Sets.<DefDescriptor<?>> newHashSet());
         buildDefinition().appendDependencies(dependencies);
     }
 
     @Override
+    @Test
     public void testValidateReferences() throws Exception {
         setupValidateReferences();
         this.extendsDescriptor = null;
@@ -128,6 +132,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
     //test for W-2798390
     @SuppressWarnings("unchecked")
 	@Override
+    @Test
     public void testValidateDefinition() throws Exception {
         //set up controllerDescriptors here to make sure we don't check it when validating definition
         this.controllerDescriptors = new ArrayList<>();
@@ -153,6 +158,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         Mockito.verify(this.modelDefDescriptor, Mockito.times(0)).getDef();
     }
     
+    @Test
     public void testValidateReferencesExpressionToOwnPrivateAttribute() throws Exception {
         setupValidateReferences();
 
@@ -181,6 +187,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
     }
 
 
+    @Test
     public void testTemplateMustBeTemplate() throws Exception {
         setupValidateReferences();
         this.extendsDescriptor = null;

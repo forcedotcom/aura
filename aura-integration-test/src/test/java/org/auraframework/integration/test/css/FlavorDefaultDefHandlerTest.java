@@ -28,6 +28,7 @@ import org.auraframework.impl.root.parser.handler.FlavorDefaultDefHandler;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.junit.Test;
 
 public class FlavorDefaultDefHandlerTest extends StyleTestCase {
 
@@ -35,12 +36,14 @@ public class FlavorDefaultDefHandlerTest extends StyleTestCase {
         super(name);
     }
 
+    @Test
     public void testDescription() throws Exception {
         addStandardFlavor(addComponentDef(), ".THIS--test;");
         FlavorDefaultDef def = source("<aura:flavor component='*' default='x' description='testdesc'/>");
         assertEquals("testdesc", def.getDescription());
     }
 
+    @Test
     public void testInvalidChild() throws Exception {
         try {
             source("<aura:flavor component='x' default='test'><ui:button></aura:flavor>");
@@ -50,6 +53,7 @@ public class FlavorDefaultDefHandlerTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testWithTextBetweenTag() throws Exception {
         try {
             source("<aura:flavor component='x' default='test'>blah</aura:flavor>");

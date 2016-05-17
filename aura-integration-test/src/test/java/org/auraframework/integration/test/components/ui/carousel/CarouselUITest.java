@@ -21,6 +21,7 @@ import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.PerfTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -56,6 +57,7 @@ public class CarouselUITest extends WebDriverTestCase {
     /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
+    @Test
     public void testTabIntoCarouselPage() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -128,6 +130,7 @@ public class CarouselUITest extends WebDriverTestCase {
     /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
+    @Test
     public void testTabOutOfCarousel() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -152,6 +155,7 @@ public class CarouselUITest extends WebDriverTestCase {
     /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
+    @Test
     public void testShiftTabOutOfCarousel() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -172,6 +176,7 @@ public class CarouselUITest extends WebDriverTestCase {
      * Using keyboard arrow keys to get to next page.
      */
     @PerfTest
+    @Test
     public void testGoToNextPage() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -182,6 +187,7 @@ public class CarouselUITest extends WebDriverTestCase {
     /**
      * Using keyboard arrow keys to get to previous page.
      */
+    @Test
     public void testGoToPreviousPage() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -192,6 +198,7 @@ public class CarouselUITest extends WebDriverTestCase {
     /**
      * Keyboard up arrow key does not change page on carousel.
      */
+    @Test
     public void testUpArrow() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -202,6 +209,7 @@ public class CarouselUITest extends WebDriverTestCase {
     /**
      * Keyboard down arrow key does not change page on carousel.
      */
+    @Test
     public void testDownArrow() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -212,6 +220,7 @@ public class CarouselUITest extends WebDriverTestCase {
     /**
      * While on first page attempt to move to a non existent page before the first page.
      */
+    @Test
     public void testMovingBeforeFirstPage() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -222,6 +231,7 @@ public class CarouselUITest extends WebDriverTestCase {
     /**
      * While on last page attempt to move to a non existent page after the last page.
      */
+    @Test
     public void testMovingPastLastPage() throws Exception {
         open(URL);
         WebDriver driver = getDriver();

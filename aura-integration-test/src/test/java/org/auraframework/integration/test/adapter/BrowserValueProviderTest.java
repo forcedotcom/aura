@@ -26,6 +26,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.junit.Test;
 
 public class BrowserValueProviderTest extends AuraImplTestCase {
 
@@ -71,6 +72,7 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
                 BrowserValueProvider.IS_IE11, null);
     }
 
+    @Test
     public void testValidate() throws Exception {
         BrowserValueProvider bvp = new BrowserValueProvider();
         bvp.validate(BrowserProperty.isTablet);
@@ -100,6 +102,7 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
 
     // semi-integration test checks that value provider is created and validated
     // on component
+    @Test
     public void testInvalidPropertyInMarkup() throws Exception {
         try {
             DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(
@@ -140,6 +143,7 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
     /**
      * Verify user agent strings return the correct browser properties (form factor, OS, etc.).
      */
+    @Test
     public void testGetValueBrowserProperties() throws Exception {
         assertBrowserProperties(null, false, false, false, "DESKTOP", false, false, false, false);
         assertBrowserProperties(UserAgent.EMPTY, false, false, false, "DESKTOP", false, false, false, false);
@@ -189,12 +193,14 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         assertBrowserProperties(UserAgent.GOOD_ANDROID, false, true, true, "PHONE", false, false, false, false);
     }
 
+    @Test
     public void testGetValueUndefinedProperty() throws Exception {
         BrowserValueProvider bvp = new BrowserValueProvider();
         assertEquals(null,
                 bvp.getValue(new PropertyReferenceImpl("isBlackberry", null))); // undefined property
     }
 
+    @Test
     public void testGetValueBrowserTypes() throws Exception {
         assertBrowserTypes(UserAgent.EMPTY, false, false, false, false, false, false, false, false);
         assertBrowserTypes(UserAgent.GOOGLE_CHROME, true, false, false, false, false, false, false, false);

@@ -24,6 +24,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.util.AuraFiles;
+import org.junit.Test;
 
 /**
  * Ugh...
@@ -36,6 +37,7 @@ public final class ValidationFileSourceLoaderTest extends AuraValidationTestCase
         super(name);
     }
 
+    @Test
     public void testFindIn() {
         if (skipTestIfNotRunningWithAuraSource()) {
             return;

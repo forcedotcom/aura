@@ -21,6 +21,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.junit.Ignore;
+import org.junit.Test;
 
 import com.google.common.collect.Maps;
 
@@ -35,6 +36,7 @@ public class InstanceServiceImplTest extends AuraImplTestCase {
      * an exception.
      */
     @Ignore("W-1483429")
+    @Test
     public void testInstanceCreationWithNonExistingArrtibutes() throws Exception {
         Map<String, Object> attrMap = Maps.newHashMap();
         attrMap.put("iDontExist", "bar");

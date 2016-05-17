@@ -26,6 +26,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraTestCase;
+import org.junit.Test;
 
 /**
  * Automation for ui:input component.
@@ -56,6 +57,7 @@ public class InputComponentsTest extends AuraTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testDomEventsAreComponentEvents() throws Exception {
         HashMap<String, String> events = new HashMap<>();
         events.put("blur", "markup://ui:blur");

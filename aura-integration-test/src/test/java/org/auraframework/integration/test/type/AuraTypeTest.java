@@ -28,6 +28,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.BaseComponent;
+import org.junit.Test;
 
 /**
  * Test to check aura types
@@ -46,6 +47,7 @@ public class AuraTypeTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testAuraConverter() throws Exception {
         ArrayList<String> typeNames = new ArrayList<>();
         String[] types = { "Integer", "Long", "Double", "Decimal", "Boolean", "String", "Object", "Map", "List", "Set",

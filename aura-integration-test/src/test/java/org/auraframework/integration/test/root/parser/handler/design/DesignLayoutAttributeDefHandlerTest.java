@@ -21,6 +21,7 @@ import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignLayoutItemDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -34,6 +35,7 @@ public class DesignLayoutAttributeDefHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testLayoutAttributeWithInvalidAttribute() throws Exception {
         final String invalidAttr = "NotAAttribute";
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
@@ -53,6 +55,7 @@ public class DesignLayoutAttributeDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testLayoutAttribute() throws Exception {
         Set<DesignLayoutItemDef> items = setupDesignLayoutAttributeDef(String.format(ATTRIBUTE, VALID_ATTRIBUTE),
                 VALID_ATTRIBUTE);
@@ -63,6 +66,7 @@ public class DesignLayoutAttributeDefHandlerTest extends AuraImplTestCase {
 
     }
 
+    @Test
     public void testLayoutAttributeOrder() throws Exception {
         StringBuilder items = new StringBuilder();
         items.append(String.format(ATTRIBUTE, VALID_ATTRIBUTE));

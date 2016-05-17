@@ -20,6 +20,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
  */
@@ -29,6 +30,7 @@ public class InterfaceDefDescriptorTest extends UnitTestCase {
         super(name);
     }
 
+    @Test
     public void testGetDefType() {
         DefDescriptor<InterfaceDef> testDescriptor = DefDescriptorImpl.getInstance("aura:testinterfacechild",
                 InterfaceDef.class);

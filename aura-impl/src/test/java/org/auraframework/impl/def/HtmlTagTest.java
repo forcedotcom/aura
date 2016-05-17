@@ -17,6 +17,7 @@ package org.auraframework.impl.def;
 
 import org.auraframework.def.HtmlTag;
 import org.auraframework.impl.AuraImplTestCase;
+import org.junit.Test;
 
 /**
  * Unit test to verify the functioning of HtmlTag class. HtmlTag is an Enum of
@@ -35,6 +36,7 @@ public class HtmlTagTest extends AuraImplTestCase {
      * Test to verify the static method to check if a certain HTML tag is
      * allowed in aura.
      */
+    @Test
     public void testAllowedMethod() {
         assertFalse("Expected HtmlTag to disallow null tags.", HtmlTag.allowed(null));
         assertFalse("Enum does not handle non existing tags.", HtmlTag.allowed("Non existing Tag"));
@@ -46,6 +48,7 @@ public class HtmlTagTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testGoldFileAcceptanceOfHTMLTags() throws Exception {
         StringBuffer tags = new StringBuffer();
         for (HtmlTag tag : HtmlTag.values()) {

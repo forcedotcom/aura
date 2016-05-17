@@ -20,6 +20,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.junit.Test;
 
 public class DefDescriptorImplTest extends AuraImplTestCase {
 
@@ -27,6 +28,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testControllerDescriptorString() {
         DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl.getInstance("java://foo.Bar", ControllerDef.class);
         assertEquals("java", descriptor.getPrefix());
@@ -35,6 +37,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertEquals("java://foo.Bar", descriptor.getQualifiedName());
     }
 
+    @Test
     public void testControllerDescriptorStringLocation() {
         DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl.getInstance("java://foo.Bar", ControllerDef.class);
         assertEquals("java", descriptor.getPrefix());
@@ -43,6 +46,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertEquals("java://foo.Bar", descriptor.getQualifiedName());
     }
 
+    @Test
     public void testBadNameChars() {
         try {
             DefDescriptorImpl.getInstance("markup://foo.1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ+/", ComponentDef.class);
@@ -53,11 +57,13 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testSerialize2() throws Exception {
         DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl.getInstance("java://foo.Bar", ControllerDef.class);
         serializeAndGoldFile(descriptor);
     }
 
+    @Test
     public void testApexDescriptors() {
         DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl.getInstance("apex://foo.Bar", ControllerDef.class);
         assertEquals("apex", descriptor.getPrefix());
@@ -66,12 +72,14 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertEquals("apex://foo.Bar", descriptor.getQualifiedName());
     }
 
+    @Test
     public void testGetDefType() throws Exception {
         DefDescriptor<ComponentDef> testDescriptor = DefDescriptorImpl.getInstance("aura:text", ComponentDef.class);
         assertEquals(testDescriptor.getDefType(), DefType.COMPONENT);
     }
 
     @ThreadHostileTest("cache dependent")
+    @Test
     public void testGetInstance() throws Exception {
         // test getInstance(tag, defClass)
         DefDescriptor<?> testDescriptor = DefDescriptorImpl.getInstance("aura:text", ComponentDef.class);
@@ -126,6 +134,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertEquals(testDescriptor, (DefDescriptorImpl.getInstance("Map<String>", TypeDef.class)));
     }
 
+    @Test
     public void testGetNamespace() throws Exception {
         assertEquals("aura", vendor.makeComponentDefDescriptor("aura:fakeComponent").getNamespace());
         assertEquals("fake", vendor.makeComponentDefDescriptor("fake:component").getNamespace());
@@ -136,6 +145,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertFalse("fake".equals(vendor.makeComponentDefDescriptor("aura:text").getNamespace()));
     }
 
+    @Test
     public void testGetName() throws Exception {
         assertEquals("fakeComponent", vendor.makeComponentDefDescriptor("aura:fakeComponent").getName());
         assertEquals("component", vendor.makeComponentDefDescriptor("fake:component").getName());
@@ -149,6 +159,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertFalse("test".equals(vendor.makeComponentDefDescriptor("fake:component").getName()));
     }
 
+    @Test
     public void testGetTag() throws Exception {
         assertEquals("markup://aura:fakeComponent", vendor.makeComponentDefDescriptor("aura:fakeComponent")
                 .getQualifiedName());
@@ -167,12 +178,14 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertFalse("markup://aura:text".equals(vendor.makeComponentDefDescriptor("fake:component").getQualifiedName()));
     }
 
+    @Test
     public void testSerialize() throws Exception {
         serializeAndGoldFile(vendor.makeComponentDefDescriptor("aura:fakeComponent"), "fakeAura");
         serializeAndGoldFile(vendor.makeComponentDefDescriptor("fake:component"), "fake");
         serializeAndGoldFile(vendor.makeComponentDefDescriptor("aura:text"), "auraText");
     }
 
+    @Test
     public void testToString() throws Exception {
         assertEquals("markup://aura:fakeComponent", vendor.makeComponentDefDescriptor("aura:fakeComponent").toString());
         assertEquals("markup://fake:component", vendor.makeComponentDefDescriptor("fake:component").toString());
@@ -188,6 +201,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertFalse("markup://aura:text".equals(vendor.makeComponentDefDescriptor("fake:component").toString()));
     }
 
+    @Test
     public void testComparison() throws Exception {
         DefDescriptor<?> fakeComponent = DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class);
         DefDescriptor<?> fakeComponent2 = DefDescriptorImpl.getInstance("Aura:FakeComponent", ComponentDef.class);
@@ -211,6 +225,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testEquals() throws Exception {
         testEquals(DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class),
                 vendor.makeComponentDefDescriptor("aura:fakeComponent"), 0);
@@ -243,12 +258,14 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
                 vendor.makeComponentDefDescriptor("aura:text"), -1);
     }
     
+    @Test
     public void testEqualsWithSameBundle() throws Exception {
         DefDescriptor<ComponentDef> bundle = DefDescriptorImpl.getInstance("aura:bundle", ComponentDef.class, null);
         testEquals(DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle),
                 DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle), 0);
     }
 
+    @Test
     public void testEqualsWithEquivalentBundle() throws Exception {
         DefDescriptor<ComponentDef> bundle1 = DefDescriptorImpl.getInstance("aura:bundle", ComponentDef.class, null);
         DefDescriptor<ComponentDef> bundle2 = DefDescriptorImpl.getInstance("aura:BUNDLE", ComponentDef.class, null);
@@ -256,6 +273,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
                 DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle2), 0);
     }
 
+    @Test
     public void testEqualsWithDifferentBundle() throws Exception {
         DefDescriptor<ComponentDef> bundle1 = DefDescriptorImpl.getInstance("aura:bundle1", ComponentDef.class, null);
         DefDescriptor<ComponentDef> bundle2 = DefDescriptorImpl.getInstance("aura:bundle2", ComponentDef.class, null);
@@ -269,6 +287,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
                 DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle2), -1);
     }
 
+    @Test
     public void testFunkyDescriptor() {
         DefDescriptorImpl.getInstance("layout://rl-Case-EDIT-FULL-----_1-0-6c5936744658364d59726d6c6a4d7a31654d697872673d3d.c", ComponentDef.class);
     }

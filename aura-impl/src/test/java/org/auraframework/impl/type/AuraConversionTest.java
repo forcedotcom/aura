@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.util.type.TypeUtil;
+import org.junit.Test;
 
 /**
  * Test to check aura types
@@ -98,6 +99,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/StringToBooleanConverter.java
      */
+    @Test
     public void testBoolean() throws Exception {
         runPassPairs(Boolean.class, new Object[] { "true", Boolean.TRUE, "false", Boolean.FALSE, "True", Boolean.TRUE,
                 "False", Boolean.FALSE, "truE", Boolean.TRUE, "falsE", Boolean.FALSE, "yes", Boolean.FALSE, "on",
@@ -109,6 +111,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/LongToDateConverter.java
      */
+    @Test
     public void testLongToDate() throws Exception {
         runPassPairs(Date.class, new Object[] { Long.valueOf(0L), new Date(0), Long.valueOf(-1234L), new Date(-1234L),
                 Long.valueOf(12345678901234L), new Date(12345678901234L), }, true);
@@ -120,6 +123,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * aura-util/java/src/aura/util/type/converter/StringToArrayListConverter.
      * java
      */
+    @Test
     public void testStringToArrayList() throws Exception {
         runPassPairs(
                 ArrayList.class,
@@ -136,6 +140,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/StringToListConverter.java
      */
+    @Test
     public void testStringToList() throws Exception {
         runPassPairs(List.class,
                 new Object[] { "a,,b, c,d , e ",
@@ -153,6 +158,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * aura-util/java/src/aura/util/type/converter/ArrayListToDateArrayConverter
      * .java
      */
+    @Test
     public void testStringToDateArray() throws Exception {
         runPassPairs(Date.class, Date[].class,
                 new Object[] { new ArrayList<>(Arrays.asList(new String[] { "1234", "2345", "-3456" })),
@@ -183,6 +189,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/BooleanToStringConverter.java
      */
+    @Test
     public void testBooleanToString() throws Exception {
         runPassPairs(String.class, new Object[] { Boolean.TRUE, "true", Boolean.FALSE, "false", }, true);
     }
@@ -193,6 +200,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * aura-util/java/src/aura/util/type/converter/BigDecimalToStringConverter.
      * java
      */
+    @Test
     public void testBigDecimalToString() throws Exception {
         runPassPairs(String.class, new Object[] { new BigDecimal(0), "0", new BigDecimal(12345678901234L),
                 "12345678901234", new BigDecimal(-12345678901234L), "-12345678901234",
@@ -206,6 +214,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * aura-util/java/src/aura/util/type/converter/StringToBigDecimalConverter.
      * java
      */
+    @Test
     public void testStringToBigDecimal() throws Exception {
         runPassPairs(BigDecimal.class, new Object[] { "0", new BigDecimal(0), "12345678901234",
                 new BigDecimal(12345678901234L), "-12345678901234", new BigDecimal(-12345678901234L),
@@ -218,6 +227,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/LongToIntegerConverter.java
      */
+    @Test
     public void testLongToInteger() throws Exception {
         runPassPairs(Integer.class, new Object[] { new Long(1234), new Integer(1234), new Long(-1234),
                 new Integer(-1234), new Long(Integer.MAX_VALUE), new Integer(Integer.MAX_VALUE),
@@ -231,6 +241,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * aura-util/java/src/aura/util/type/converter/
      * ArrayListToIntegerArrayConverter.java
      */
+    @Test
     public void testArrayListToIntegerArray() throws Exception {
         runPassPairs(Integer.class, Integer[].class,
                 new Object[] { new ArrayList<>(Arrays.asList(new String[] { "0", "-1234", "1234567890" })),
@@ -242,6 +253,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/StringToIntegerConverter.java
      */
+    @Test
     public void testStringToInteger() throws Exception {
         runPassPairs(Integer.class, new Object[] { "0", new Integer(0), "-1234", new Integer(-1234), "1234567890",
                 new Integer(1234567890), }, true);
@@ -253,6 +265,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * aura-util/java/src/aura/util/type/converter/StringToStringArrayConverter.
      * java
      */
+    @Test
     public void testStringToStringArray() throws Exception {
         runPassPairs(String.class, String[].class, new Object[] { "a,,b, c,d , e ",
                 new String[] { "a", "", "b", " c", "d ", " e " }, "", new String[] {}, });
@@ -266,6 +279,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * aura-util/java/src/aura/util/type/converter/StringToCalendarConverter.
      * java
      */
+    @Test
     public void testStringToCalendar() throws Exception {
         Calendar c1, c2, c3;
 
@@ -287,6 +301,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * aura-util/java/src/aura/util/type/converter/
      * ArrayListToStringArrayConverter.java
      */
+    @Test
     public void testArrayListToStringArray() throws Exception {
         runPassPairs(String.class, String[].class,
                 new Object[] { new ArrayList<>(Arrays.asList(new String[] { " a ", "b", " ", "c" })),
@@ -299,6 +314,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * aura-util/java/src/aura/util/type/converter/
      * ArrayListToBooleanArrayConverter.java
      */
+    @Test
     public void testArrayListToBooleanArray() throws Exception {
         runPassPairs(Boolean.class, Boolean[].class,
                 new Object[] { new ArrayList<>(Arrays.asList(new Boolean[] { Boolean.TRUE, Boolean.FALSE })),
@@ -318,6 +334,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/StringToHashSetConverter.java
      */
+    @Test
     public void testStringToHashSet() throws Exception {
         runPassPairs(HashSet.class,
                 new Object[] { "a,b, c, d ",
@@ -329,6 +346,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/StringToDoubleConverter.java
      */
+    @Test
     public void testStringToDouble() throws Exception {
         runPassPairs(Double.class, new Object[] { "1234.1234", new Double(1234.1234), }, true);
     }
@@ -338,6 +356,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/StringToLongConverter.java
      */
+    @Test
     public void testStringToLong() throws Exception {
         runPassPairs(Long.class, new Object[] { "1", new Long(1), "-1234", new Long(-1234), }, true);
     }
@@ -347,6 +366,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/IntegerToStringConverter.java
      */
+    @Test
     public void testIntegerToString() throws Exception {
         runPassPairs(String.class, new Object[] { new Integer(0), "0", new Integer(1234567890), "1234567890",
                 new Integer(-1234567890), "-1234567890", }, true);
@@ -358,6 +378,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * aura-util/java/src/aura/util/type/converter/BigDecimalToIntegerConverter.
      * java
      */
+    @Test
     public void testBigDecimalToInteger() throws Exception {
         runPassPairs(Integer.class, new Object[] { new BigDecimal(1234567890), new Integer(1234567890),
                 new BigDecimal(-1234567890), new Integer(-1234567890), }, true);
@@ -368,6 +389,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/StringToDateConverter.java
      */
+    @Test
     public void testStringToDate() throws Exception {
         runPassPairs(Date.class, new Object[] {}, true);
     }
@@ -377,6 +399,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/StringToHashMapConverter.java
      */
+    @Test
     public void testStringToHashMap() throws Exception {
         HashMap<String, String> out = new HashMap<>();
 
@@ -390,6 +413,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * 
      * aura-util/java/src/aura/util/type/converter/LongToStringConverter.java
      */
+    @Test
     public void testLongToString() throws Exception {
         runPassPairs(String.class, new Object[] { new Long(0), "0", new Long(12345678901234L), "12345678901234",
                 new Long(-12345678901234L), "-12345678901234", }, true);
@@ -401,6 +425,7 @@ public class AuraConversionTest extends AuraImplTestCase {
      * aura-util/java/src/aura/util/type/converter/BigDecimalToLongConverter.
      * java
      */
+    @Test
     public void testBigDecimalToLong() throws Exception {
         runPassPairs(Long.class, new Object[] { new BigDecimal(12345678901234L), new Long(12345678901234L),
                 new BigDecimal(-12345678901234L), new Long(-12345678901234L), }, true);

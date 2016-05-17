@@ -25,6 +25,7 @@ import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.StyleParserException;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.junit.Test;
 
 /**
  * Automation to verify that CSS validation override. Aura enforces validation of CSS in component bundles. This css
@@ -47,6 +48,7 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
     /**
      * By default all component CSS is validated by StyleParser.
      */
+    @Test
     public void testDefaultProps() throws Exception {
         assertTrue("By default all component CSS should be validated",
                 Aura.getConfigAdapter().validateCss());
@@ -64,6 +66,7 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
      * Override the validateCss flag on configAdapter and make sure validations are skipped
      */
     @ThreadHostileTest("disables CSS validation")
+    @Test
     public void testOverrideCSSValidation() throws Exception {
         getMockConfigAdapter().setValidateCss(false);
         assertFalse("Expected CSS validation to be overriden.", Aura.getConfigAdapter().validateCss());

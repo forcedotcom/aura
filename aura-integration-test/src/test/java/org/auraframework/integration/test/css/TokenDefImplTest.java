@@ -25,6 +25,7 @@ import org.auraframework.impl.css.token.TokenDefImpl;
 import org.auraframework.impl.css.token.TokenDefImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -65,11 +66,13 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
         return super.buildDefinition(builder);
     }
 
+    @Test
     public void testEqualsWhenSame() throws Exception {
         TokenDef def1 = buildDefinition();
         assertEquals(def1, def1);
     }
 
+    @Test
     public void testNotEquals() throws Exception {
         builder.setValue("def1");
         TokenDef def1 = buildDefinition();
@@ -80,6 +83,7 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
         assertFalse(def2.equals(null));
     }
 
+    @Test
     public void testInvalidName() throws Exception {
         this.descriptorName = "1";
         this.qualifiedDescriptorName = "1";
@@ -91,6 +95,7 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
         }
     }
 
+    @Test
     public void testMissingValue() throws Exception {
         builder.setValue(null);
 
@@ -102,16 +107,19 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
         }
     }
 
+    @Test
     public void testGetValue() throws Exception {
         builder.setValue("test");
         assertEquals("test", buildDefinition().getValue());
     }
 
+    @Test
     public void testGetAllowedProperties() throws Exception {
         builder.setAllowedProperties("border-color");
         assertTrue(buildDefinition().getAllowedProperties().contains("border-color"));
     }
 
+    @Test
     public void testUnknownProperty() throws Exception {
         builder.setAllowedProperties("wall-maria");
 
@@ -123,6 +131,7 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
         }
     }
 
+    @Test
     public void testMultipleUnknownProperties() throws Exception {
         builder.setAllowedProperties("color, wall-maria");
 
@@ -134,6 +143,7 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
         }
     }
 
+    @Test
     public void testUntrustedNamspaceAllowedTokenValues() throws Exception {
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         Mockito.when(configAdapter.isInternalNamespace(parentDescriptor.getNamespace())).thenReturn(true);
@@ -162,6 +172,7 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
         }
     }
 
+    @Test
     public void testUntrustedNamespaceDisallowedTokenValues() throws Exception {
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         Mockito.when(configAdapter.isInternalNamespace(parentDescriptor.getNamespace())).thenReturn(true);

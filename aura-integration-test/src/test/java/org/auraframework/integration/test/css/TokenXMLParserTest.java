@@ -22,6 +22,7 @@ import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.root.parser.handler.TokenDefHandler;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 import com.google.common.collect.Iterables;
 
@@ -33,22 +34,26 @@ public class TokenXMLParserTest extends StyleTestCase {
         super(name);
     }
 
+    @Test
     public void testName() throws Exception {
         TokenDef def = source("<aura:token name='color' value='red'/>");
         assertEquals("didn't get expected aura:token name", "color", def.getName());
     }
 
+    @Test
     public void testValue() throws Exception {
         TokenDef def = source("<aura:token name='color' value='red'/>");
         assertEquals("didn't get expected aura:token value", "red", def.getValue().toString());
     }
 
+    @Test
     public void testProperty() throws Exception {
         TokenDef def = source("<aura:token name='color' value='red' property='color'/>");
         assertEquals(1, def.getAllowedProperties().size());
         assertTrue(def.getAllowedProperties().contains("color"));
     }
 
+    @Test
     public void testMultipleProperties() throws Exception {
         TokenDef def = source("<aura:token name='color' value='red' property='color, background-color'/>");
         assertEquals(2, def.getAllowedProperties().size());
@@ -56,21 +61,25 @@ public class TokenXMLParserTest extends StyleTestCase {
         assertTrue(def.getAllowedProperties().contains("background-color"));
     }
 
+    @Test
     public void testPropertyAbsent() throws Exception {
         TokenDef def = source("<aura:token name='color' value='red'/>");
         assertTrue(def.getAllowedProperties().isEmpty());
     }
 
+    @Test
     public void testDescription() throws Exception {
         TokenDef def = source("<aura:token name='color' value='red' description='test'/>");
         assertEquals("didn't get expected aura:token description", "test", def.getDescription());
     }
 
+    @Test
     public void testValueIsExpression() throws Exception {
         TokenDef def = source("<aura:token name='myColor' value='{!color}'/><aura:token name='color' value='red'/>");
         assertTrue(def.getValue() instanceof PropertyReference);
     }
 
+    @Test
     public void testInvalidChild() throws Exception {
         try {
             source("<aura:token name='f' value='f'><ui:button/></aura:token>");
@@ -80,6 +89,7 @@ public class TokenXMLParserTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testWithTextBetweenTag() throws Exception {
         try {
             source("<aura:token name='f' value='f'>text</aura:token>");
@@ -89,6 +99,7 @@ public class TokenXMLParserTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testMissingName() throws Exception {
         try {
             source("<aura:token  value='f'/>");

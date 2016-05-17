@@ -18,6 +18,7 @@ package org.auraframework.integration.test.components.auradocs;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -41,34 +42,42 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
         getAuraUITestingUtil().setTimeoutInSecs(60);
     }
 
+    @Test
     public void testBaseProd() throws Exception {
         doBase(Mode.PROD);
     }
 
+    @Test
     public void testBaseDev() throws Exception {
         doBase(Mode.DEV);
     }
 
+    @Test
     public void testReferenceProd() throws Exception {
         doReference(Mode.PROD);
     }
 
+    @Test
     public void testReferenceDev() throws Exception {
         doReference(Mode.DEV);
     }
 
+    @Test
     public void testComponentProd() throws Exception {
         doComponent(Mode.PROD);
     }
 
+    @Test
     public void testComponentDev() throws Exception {
         doComponent(Mode.DEV);
     }
 
+    @Test
     public void testAPIProd() throws Exception {
         doAPI(Mode.PROD);
     }
 
+    @Test
     public void testAPIDev() throws Exception {
         doAPI(Mode.DEV);
     }

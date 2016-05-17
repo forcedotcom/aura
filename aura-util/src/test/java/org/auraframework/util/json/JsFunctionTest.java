@@ -16,6 +16,7 @@
 package org.auraframework.util.json;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 
@@ -23,6 +24,7 @@ import com.google.common.collect.ImmutableList;
  */
 public class JsFunctionTest extends UnitTestCase {
 
+    @Test
     public void testSerialize() throws Exception {
         String contents = "var thin = \"brown fox\";\njumps('over the moon');";
         JsFunction f = new JsFunction(ImmutableList.<String> of(), contents);
@@ -34,6 +36,7 @@ public class JsFunctionTest extends UnitTestCase {
         assertEquals("function(arg1, arg2) {something}", JsonEncoder.serialize(f3, true, false));
     }
 
+    @Test
     public void testEquals() throws Exception {
         JsFunction f1 = new JsFunction(ImmutableList.of("arg1"), "these are the contents");
         JsFunction f2 = new JsFunction(ImmutableList.of("arg1"), "these are the contents");

@@ -28,6 +28,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
@@ -43,6 +44,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testNoTypeInLibraryTag() throws Exception {
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component><aura:clientLibrary name='HTML5Shiv'/></aura:component>", "myID",
@@ -50,6 +52,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         assertDefaultType(source, "When no type specified, JS should be the default");
     }
 
+    @Test
     public void testEmptyTypeInLibraryTag() throws Exception {
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component><aura:clientLibrary name='HTML5Shiv' type='' /></aura:component>", "myID",
@@ -64,6 +67,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         assertEquals(Type.JS, libraries.get(0).getType());
     }
 
+    @Test
     public void testInvalidTypeInLibraryTag() throws Exception {
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component><aura:clientLibrary name='HTML5Shiv' type='fooBar' /></aura:component>", "myID",
@@ -78,6 +82,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testCommaSeparatedTypesInLibraryTag() throws Exception {
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component><aura:clientLibrary name='HTML5Shiv' type='JS, CSS' /></aura:component>", "myID",
@@ -91,6 +96,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testNoModeSpecifiedInLibraryTag() throws Exception {
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
@@ -104,6 +110,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         assertTrue(cld1.getModes().isEmpty());
     }
 
+    @Test
     public void testModesSpecifiedInLibraryTag() throws Exception {
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
@@ -120,6 +127,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         assertEquals(Sets.newHashSet(Mode.DEV), cld1.getModes());
     }
 
+    @Test
     public void testInvalidModeSpecificationInLibraryTag() throws Exception {
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
@@ -140,6 +148,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
      * throwing error when containing invalid tags.
      * TODO(W-2970463): update the test when the item is done.
      */
+    @Test
     public void testInvalidAttributeInLibraryTag() throws Exception {
         String cmpMarkup =
                 "<aura:component>" +

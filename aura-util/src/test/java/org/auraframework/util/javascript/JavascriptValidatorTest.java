@@ -21,9 +21,11 @@ import org.auraframework.util.javascript.JavascriptProcessingError.Level;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.validation.ValidationError;
 import org.auraframework.util.validation.ValidationTestUtil;
+import org.junit.Test;
 
 public final class JavascriptValidatorTest extends UnitTestCase {
 
+    @Test
     public void testValidate() throws Exception {
         JavascriptValidator validator = new JavascriptValidator();
         List<JavascriptProcessingError> errors = validator.validate("input.js", "var index = 1;\nindex++\nindex += 4;",
@@ -45,6 +47,7 @@ public final class JavascriptValidatorTest extends UnitTestCase {
         assertEquals("input2.js", errors.get(0).getFilename());
     }
 
+    @Test
     public void test2009JSLint() throws Exception {
         // UC: the new jslint reports unused variables
         JavascriptValidator validator = new JavascriptValidator();

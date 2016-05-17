@@ -31,6 +31,7 @@ import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
+import org.junit.Test;
 
 public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
 
@@ -56,6 +57,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testHandleChildText() throws Exception {
         xmlReader.next();
         htmlHandler.handleChildText();
@@ -66,6 +68,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testHandleChildTag() throws Exception {
         xmlReader.next();
         xmlReader.next();
@@ -76,6 +79,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
         assertEquals("br", cd.get(0).getAttributeDefRef("tag").getValue());
     }
 
+    @Test
     public void testHandleChildSetTag() throws Exception {
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component",
                 ComponentDef.class);
@@ -96,6 +100,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testReadAttributes() throws Exception {
         htmlHandler.readAttributes();
         ComponentDefRef cd = htmlHandler.createDefinition();
@@ -104,15 +109,18 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
         assertEquals("MyClass", attributes.get(DefDescriptorImpl.getInstance("class", AttributeDef.class)));
     }
 
+    @Test
     public void testGetHandledTag() {
         assertEquals("HTML Component Reference", htmlHandler.getHandledTag());
     }
 
+    @Test
     public void testHandlesTag() {
         assertTrue("HTMLComponentDefRefHandler should handle the div tag", htmlHandler.handlesTag("div"));
         assertFalse("HTMLComponentDefRefHandler should not handle a fakeHTMLTag", htmlHandler.handlesTag("fakeHTMLTag"));
     }
 
+    @Test
     public void testCreateDefinition() throws Exception {
         ComponentDefRef cd = htmlHandler.createDefinition();
         assertEquals("html", cd.getDescriptor().getName());
@@ -120,6 +128,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
         assertEquals("div", cd.getAttributeDefRef("tag").getValue());
     }
 
+    @Test
     public void testReadFlavorable() throws Exception {
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc,"<div aura:flavorable='true'></div>", "myID", Format.XML);

@@ -18,6 +18,7 @@ package org.auraframework.http.resource;
 
 import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.io.Writer;
@@ -47,6 +48,7 @@ public class AppCssTest extends UnitTestCase {
     /**
      * Name is API!.
      */
+    @Test
     public void testName() {
     	
         assertEquals("app.css", new AppCss().getName());
@@ -55,6 +57,7 @@ public class AppCssTest extends UnitTestCase {
     /**
      * Format is API!.
      */
+    @Test
     public void testFormat() {
         assertEquals(Format.CSS, new AppCss().getFormat());
     }
@@ -66,6 +69,7 @@ public class AppCssTest extends UnitTestCase {
      * is an exception in the writing of the CSS.
      */
     @SuppressWarnings("unchecked")
+    @Test
     public void testExceptionInWrite() throws Exception {
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
         ServerService serverService = Mockito.mock(ServerService.class);
@@ -109,6 +113,7 @@ public class AppCssTest extends UnitTestCase {
      *
      * This test will need to change if the internals change, but null should mean that nothing gets called.
      */
+    @Test
     public void testNullDependencies() throws Exception {
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
         ServerService serverService = Mockito.mock(ServerService.class);
@@ -137,6 +142,7 @@ public class AppCssTest extends UnitTestCase {
     /**
      * Verify that we set the correct contentType to response
      */
+    @Test
     public void testSetContentType() {
     	AppCss appCss = new AppCss();
     	ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);

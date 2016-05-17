@@ -17,6 +17,7 @@ package org.auraframework.test.system;
 
 import org.auraframework.system.Location;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 public class LocationTest extends UnitTestCase {
     private static final Location testLocationFileOnly = new Location("filenameonly", 10);
@@ -26,16 +27,19 @@ public class LocationTest extends UnitTestCase {
         super(name);
     }
 
+    @Test
     public void testLocationStringIntInt() throws Exception {
         Location testLocationLocal = new Location("filename", 5, 5, 10);
         assertNotNull(testLocationLocal);
     }
 
+    @Test
     public void testLocationString() throws Exception {
         Location testLocationFileOnlyLocal = new Location("filename", 10);
         assertNotNull(testLocationFileOnlyLocal);
     }
 
+    @Test
     public void testGetFileName() throws Exception {
         assertEquals("filenameonly", testLocationFileOnly.getFileName());
         assertEquals("filename", testLocation.getFileName());
@@ -44,6 +48,7 @@ public class LocationTest extends UnitTestCase {
         assertFalse("filename".equals(testLocationFileOnly.getFileName()));
     }
 
+    @Test
     public void testGetLine() throws Exception {
         assertEquals(-1, testLocationFileOnly.getLine());
         assertEquals(5, testLocation.getLine());
@@ -52,6 +57,7 @@ public class LocationTest extends UnitTestCase {
         assertFalse(5 == testLocationFileOnly.getLine());
     }
 
+    @Test
     public void testGetColumn() throws Exception {
         assertEquals(-1, testLocationFileOnly.getColumn());
         assertEquals(5, testLocation.getColumn());
@@ -60,6 +66,7 @@ public class LocationTest extends UnitTestCase {
         assertFalse(5 == testLocationFileOnly.getColumn());
     }
 
+    @Test
     public void testToString() throws Exception {
         assertEquals("filenameonly", testLocationFileOnly.toString());
         assertEquals("filename:5,5", testLocation.toString());
@@ -68,6 +75,7 @@ public class LocationTest extends UnitTestCase {
         assertFalse("filename:5,5".equals(testLocationFileOnly.toString()));
     }
 
+    @Test
     public void testEquals() throws Exception {
         Location testLocationLocal = new Location("filename", 5, 5, 10);
         Location testLocationFileOnlyLocal = new Location("filenameonly", 10);
@@ -82,6 +90,7 @@ public class LocationTest extends UnitTestCase {
         assertFalse(testLocationFileOnlyLocal.equals("string"));
     }
 
+    @Test
     public void testHashCode() throws Exception {
         Location testLocationLocal = new Location("filename", 5, 5, 10);
         Location testLocationFileOnlyLocal = new Location("filenameonly", 10);

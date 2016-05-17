@@ -30,6 +30,7 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.AuraTestLabels;
+import org.junit.Test;
 
 /**
  * This test verifies that the aura servlet checks for CSRF token before
@@ -71,6 +72,7 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
      */
     @SuppressWarnings("unchecked")
     @AuraTestLabels("auraSanity")
+    @Test
     public void testVerifyPostWithoutToken() throws Exception {
         Map<String, String> params = makeBasePostParams();
         params.put("aura.context", String.format("{\"mode\":\"FTEST\",\"fwuid\":\"%s\"}",
@@ -126,6 +128,7 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
      * tries to request an action defined on a controller.
      */
     @AuraTestLabels("auraSanity")
+    @Test
     public void testVerifyPostWithValidToken() throws Exception {
         Map<String, String> params = makeBasePostParams();
         // Valid token

@@ -21,6 +21,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Application;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 /**
  * Unit test to verify the implementation of LocationChange event.
@@ -40,6 +41,7 @@ public class LocationChangeEventTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testApplicationDefWithLocationChange() throws Exception {
         Application cmp = Aura.getInstanceService().getInstance("test:test_LocChng_SimpleComponent",
                 ApplicationDef.class);
@@ -53,6 +55,7 @@ public class LocationChangeEventTest extends AuraImplTestCase {
     /**
      * Negative test case: Check that events used to handle location change always extend aura:locationChange.
      */
+    @Test
     public void testRegisteredLocationChangeEventExtendsAuraLocationChange() throws Exception {
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(
                 "test:test_LocChng_NoExtends", ApplicationDef.class);

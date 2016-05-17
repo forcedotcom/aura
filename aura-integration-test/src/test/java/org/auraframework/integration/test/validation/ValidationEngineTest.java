@@ -25,6 +25,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.validation.AuraValidationTestCase;
 import org.auraframework.impl.validation.ValidationEngine;
 import org.auraframework.util.validation.ValidationError;
+import org.junit.Test;
 
 public final class ValidationEngineTest extends AuraValidationTestCase {
 
@@ -32,6 +33,7 @@ public final class ValidationEngineTest extends AuraValidationTestCase {
         super(name);
     }
 
+    @Test
     public void testValidateDescriptorJavaScript() throws Exception {
         DefDescriptor<?> descriptor = DefDescriptorImpl.getInstance("js://validationTest.basic", ControllerDef.class);
         List<ValidationError> errors = new ValidationEngine().validate(descriptor);
@@ -56,6 +58,7 @@ public final class ValidationEngineTest extends AuraValidationTestCase {
         assertEquals(20, error.getStartColumn());
     }
 
+    @Test
     public void testValidateDescriptorCSS() {
         if (System.getProperty("java.version").startsWith("1.6")) {
             return; // csslint doesn't work with 1.6
@@ -82,6 +85,7 @@ public final class ValidationEngineTest extends AuraValidationTestCase {
         assertEquals(5, csslintError.getStartColumn());
     }
 
+    @Test
     public void testValidateCmp() {
         DefDescriptor<?> descriptor = DefDescriptorImpl
                 .getInstance("markup://validationTest:basic", ComponentDef.class);

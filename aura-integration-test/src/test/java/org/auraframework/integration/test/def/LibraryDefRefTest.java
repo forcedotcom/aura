@@ -22,6 +22,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.LibraryDefRefHandler;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 public class LibraryDefRefTest extends AuraImplTestCase {
 
@@ -32,6 +33,7 @@ public class LibraryDefRefTest extends AuraImplTestCase {
     /**
      * Test to ensure that the property attribute must be specified.
      */
+    @Test
     public void testNoProperty() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<aura:import library='dummy'/>"));
@@ -47,6 +49,7 @@ public class LibraryDefRefTest extends AuraImplTestCase {
     /**
      * Test to ensure that the property must be a valid javascript identifier name.
      */
+    @Test
     public void testInvalidProperty() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "",
@@ -63,6 +66,7 @@ public class LibraryDefRefTest extends AuraImplTestCase {
     /**
      * Test that referenced library is validated to exist.
      */
+    @Test
     public void testLibraryReferenceInvalid() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<aura:import library='not:here' property='p'/>"));
@@ -78,6 +82,7 @@ public class LibraryDefRefTest extends AuraImplTestCase {
     /**
      * Test that referenced library is validated.
      */
+    @Test
     public void testLibraryIsInvalid() throws Exception {
         DefDescriptor<LibraryDef> libraryDesc = addSourceAutoCleanup(LibraryDef.class, "<aura:library/>");
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(

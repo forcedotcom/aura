@@ -24,6 +24,7 @@ import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 /**
  * Tests for the expression parser
@@ -37,6 +38,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Function precedence respects Java conventions.
      */
+    @Test
     public void testPrecedence() throws Exception {
         double result = 3.5 * 280 + 53145.3145 / -2.61;
         Expression e = buildExpression("3.5 * 280 + 53145.3145 / -2.61");
@@ -57,6 +59,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Boolean precedence respects Java conventions.
      */
+    @Test
     public void testBoolPrecedence() throws Exception {
         boolean compare = 324.4326 < 259 / 134.6 + 2356;
         Expression e = buildExpression("324.4326 < 259 / 134.6 + 2356");
@@ -88,6 +91,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Alternate relational operators can be parsed.
      */
+    @Test
     public void testAlternateNames() throws Exception {
         Expression e = buildExpression("55 eq 55");
         assertTrue("Unexpected expression evaluation using alternate relational operators", e.evaluate(null));
@@ -106,6 +110,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Number literals include integers, decimals, and exponents.
      */
+    @Test
     public void testLiteralNumbers() throws Exception {
         Expression e = buildExpression("5");
         assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
@@ -156,6 +161,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * String literals require single quotes and may be empty.
      */
+    @Test
     public void testLiteralStrings() throws Exception {
         Expression e = buildExpression("'ahfdh'");
         assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
@@ -173,6 +179,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Boolean literals are case insensitive.
      */
+    @Test
     public void testLiteralBools() throws Exception {
         Expression e = buildExpression("true");
         assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
@@ -198,6 +205,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Property references can have multiple parts.
      */
+    @Test
     public void testPropertyReference() throws Exception {
         Expression e = buildExpression("im");
         assertEquals("Unexpected expression type", ExpressionType.PROPERTY, e.getExpressionType());
@@ -239,6 +247,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Property references can access array members
      */
+    @Test
     public void testArrayAccessors() throws Exception {
         Expression e = buildExpression("im[0]");
         assertEquals("Unexpected expression type", ExpressionType.PROPERTY, e.getExpressionType());
@@ -284,6 +293,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Array access negative test cases
      */
+    @Test
     public void testInvalidArrayAccessor() throws Exception {
         verifyInvalidExpressionException("[21]", "unexpected token: a left square bracket");
         verifyInvalidExpressionException("blah[letters]", "expecting a positive integer, found 'letters'");
@@ -301,6 +311,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Consecutive boolean operations are parsed correctly.
      */
+    @Test
     public void testBoolChain() throws Exception {
         verifyInvalidExpressionException("true == true == true", "unexpected token: '=='");
         verifyInvalidExpressionException("1 > 2 == true", "unexpected token: '=='");
@@ -310,6 +321,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Escape sequences in strings are parsed correctly.
      */
+    @Test
     public void testEscapedString() throws Exception {
         Expression e = buildExpression("\t'over there! '\r\n\n");
         assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
@@ -338,6 +350,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
      * Unescaped backslash in string should throw a parse exception.
      */
     // currently fails when slash up front
+    @Test
     public void testNonEscapeBackslashInString() throws Exception {
         verifyInvalidExpressionException("'not\\u32unicode'", "mismatched character 'u' expecting set null");
         verifyInvalidExpressionException("'\\'", "expecting ''', found '<EOF>'");
@@ -349,6 +362,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Unicode escapes in strings are parsed correctly.
      */
+    @Test
     public void testUnicodeEscapesInString() throws Exception {
         Expression e = buildExpression("'\\u0032'");
         assertEquals(ExpressionType.LITERAL, e.getExpressionType());
@@ -374,6 +388,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Operators may be accessed as function calls and may be nested.
      */
+    @Test
     public void testFunctionCalls() throws Exception {
         Expression e = buildExpression("or(true, false)");
         assertTrue("Operator could not be accessed as function call", e.evaluate(null));
@@ -400,6 +415,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Non-english string literals are parsed correctly.
      */
+    @Test
     public void testNonEnglishString() throws Exception {
         Expression e = buildExpression("'天ぷらが食べたいです'");
         assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
@@ -409,6 +425,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Missing operands throw a parse exception.
      */
+    @Test
     public void testMissingOperands() throws Exception {
         verifyInvalidExpressionException("1+", "unexpected end of expression");
         verifyInvalidExpressionException("2-", "unexpected end of expression");
@@ -421,6 +438,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Mismatched parentheses throw a parse exception.
      */
+    @Test
     public void testIncompleteParentheses() throws Exception {
         verifyInvalidExpressionException("(1", "unexpected end of expression");
         verifyInvalidExpressionException("2)", "unexpected token: ')'");
@@ -430,6 +448,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
      * Unclosed string throws a parse exception.
      */
     @UnAdaptableTest
+    @Test
     public void testIncompleteString() throws Exception {
         verifyInvalidExpressionException("'unclosed string", "expecting ''', found '<EOF>'");
         verifyInvalidExpressionException("unclosed string'", "unexpected token: an identifier");
@@ -438,6 +457,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Unclosed braces throws a parse exception.
      */
+    @Test
     public void testIncompleteBraces() throws Exception {
         verifyInvalidExpressionException("{!v.noend", "unclosed brace");
         verifyInvalidExpressionException("v.dangled}", "unexpected token: '}'");
@@ -447,6 +467,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Invalid characters in property names throw a parse exception.
      */
+    @Test
     public void testPropertyNameInvalid() throws Exception {
         verifyInvalidExpressionException("\\upfront", "unexpected token: '\\'");
         verifyInvalidExpressionException("followup\\", "unexpected token: '\\'");
@@ -462,6 +483,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Undefined function
      */
+    @Test
     public void testUndefinedFunction() throws Exception {
         try {
             buildExpression("undefined(4)");
@@ -476,6 +498,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Multiple statemts, separated by a semicolon
      */
+    @Test
     public void testMultipleStatements() throws Exception {
         verifyInvalidExpressionException("5==1;5==1;", "unexpected token: ';' at column 5");
     }
@@ -483,6 +506,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Invalid syntax - consecutive property names
      */
+    @Test
     public void testMultipleProperties() throws Exception {
         verifyInvalidExpressionException("test invalid", "unexpected token: an identifier");
     }
@@ -490,6 +514,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Invalid syntax - consecutive literals
      */
+    @Test
     public void testMultipleLiterals() throws Exception {
         verifyInvalidExpressionException("5 'invalid'", "unexpected token: ''invalid''");
     }
@@ -497,6 +522,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Invalid syntax - consecutive functions
      */
+    @Test
     public void testMultipleFunctions() throws Exception {
         verifyInvalidExpressionException("add() subtract()", "unexpected token: 'subtract'");
     }
@@ -504,6 +530,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Invalid syntax - consecutive property names separated by newline
      */
+    @Test
     public void testMultilineProperty() throws Exception {
         verifyInvalidExpressionException("invalid\r\ntest", "unexpected token: an identifier");
     }
@@ -511,6 +538,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Invalid syntax - consecutive literals separated by newline
      */
+    @Test
     public void testMultilineLiteral() throws Exception {
         verifyInvalidExpressionException("5\r\n1", "unexpected token: '1'");
     }
@@ -518,6 +546,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     /**
      * Invalid syntax - consecutive literals separated by newline
      */
+    @Test
     public void testLocationInErrorMessage() throws Exception {
         verifyInvalidExpressionException("5\r\n  1", "unexpected token: '1' at line 2, column 3");
     }

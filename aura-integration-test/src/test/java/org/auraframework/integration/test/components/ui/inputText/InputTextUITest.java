@@ -21,6 +21,7 @@ import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.PerfTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -41,6 +42,7 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    @Test
     public void testUpdateOnAttribute_UsingStringSource() throws Exception {
         String event = "blur";
         String baseTag = "<aura:component  model=\"java://org.auraframework.components.test.java.model.TestJavaModel\"> "
@@ -63,6 +65,7 @@ public class InputTextUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD,
             BrowserType.SAFARI, BrowserType.IPHONE })
     // Change event not picked up on IOS devices
+    @Test
     public void testUpdateOnAttributeForNonIosAndroidDevice() throws Exception {
         doTestUpdateOnAttributeForNonIosAndroidDevice(TEST_CMP);
     }
@@ -87,12 +90,14 @@ public class InputTextUITest extends WebDriverTestCase {
 
     @UnAdaptableTest
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    @Test
     public void testUpdateOnAttribute() throws Exception {
         doTestUpdateOnAttribute(TEST_CMP);
     }
 
     @UnAdaptableTest
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    @Test
     public void testUpdateOnAttributeWithLabels() throws Exception {
         doTestUpdateOnAttribute(TEST_CMP_WITH_LABELS);
     }
@@ -147,11 +152,13 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     @TargetBrowsers({ BrowserType.GOOGLECHROME })
+    @Test
     public void testUpdateOnAttributeWithCertainEventsChrome() throws Exception {
         doTestUpdateOnAttributeWithCertainEventsChrome(TEST_CMP);
     }
 
     @TargetBrowsers({ BrowserType.GOOGLECHROME })
+    @Test
     public void testUpdateOnAttributeWithLabelsWithCertainEventsChrome() throws Exception {
         doTestUpdateOnAttributeWithCertainEventsChrome(TEST_CMP_WITH_LABELS);
     }
@@ -216,11 +223,13 @@ public class InputTextUITest extends WebDriverTestCase {
      * Note we are not using auraUITestingUtil.findElementAndTypeEventNameInIt(eventName) in this test because the
      * Android driver sends a mousedown event when clearing the text field.
      */
+    @Test
     public void testUpdateOnAttributeWithCertainEventsAllBrowsers() throws Exception {
         doTestUpdateOnAttributeWithCertainEventsAllBrowsers(TEST_CMP);
     }
 
     @PerfTest
+    @Test
     public void testUpdateOnAttributeWithLabelsWithCertainEventsAllBrowsers() throws Exception {
         doTestUpdateOnAttributeWithCertainEventsAllBrowsers(TEST_CMP_WITH_LABELS);
     }
@@ -247,6 +256,7 @@ public class InputTextUITest extends WebDriverTestCase {
     // W-1551077: Issue with Webdriver API ignores maxlength HTML5 attribute (iOS/Safari)
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.SAFARI })
+    @Test
     public void testMaxLength() throws Exception {
         open("/uitest/inputText_MaxLength.cmp");
         WebElement input = findDomElement(By.cssSelector("input.uiInputText.uiInput"));
@@ -255,6 +265,7 @@ public class InputTextUITest extends WebDriverTestCase {
         assertEquals("Text not truncated to 5 chars correctly", "12345", input.getAttribute("value"));
     }
 
+    @Test
     public void testNoMaxLength() throws Exception {
         open("/uitest/inputText_NoMaxLength.cmp");
         WebElement input = findDomElement(By.cssSelector("input.uiInputText.uiInput"));
@@ -301,6 +312,7 @@ public class InputTextUITest extends WebDriverTestCase {
         assertTrue("domEvent attribute on event should have been set.", value);
     }
 
+    @Test
     public void testNullValue() throws Exception {
         String cmpSource = "<aura:component  model=\"java://org.auraframework.components.test.java.model.TestJavaModel\"> "
                 + "<ui:inputText value=\"{!m.stringNull}\"/>" + "</aura:component>";
@@ -311,6 +323,7 @@ public class InputTextUITest extends WebDriverTestCase {
         assertEquals("Value of input is incorrect", "", input.getText());
     }
 
+    @Test
     public void testBaseKeyboardEventValue() throws Exception {
         open(TEST_CMP);
         String inputText = "z";
@@ -331,6 +344,7 @@ public class InputTextUITest extends WebDriverTestCase {
     // W-1625895: Safari WebDriver bug- cannot right click because interactions API not implemented
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET })
+    @Test
     public void testBaseMouseClickEventValue() throws Exception {
         open(TEST_CMP);
         WebElement input = findDomElement(By.cssSelector(".keyup2"));
@@ -351,6 +365,7 @@ public class InputTextUITest extends WebDriverTestCase {
     /**
      * Test Case for W-1689213
      */
+    @Test
     public void testInputTextWithLabel() throws Exception {
         open(TEST_CMP);
         WebElement div = findDomElement(By.id("inputwithLabel"));
@@ -373,6 +388,7 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    @Test
     public void testInputTextWithEmptyLabel() throws Exception {
         open(TEST_CMP_WITH_LABELS);
         String value = getCurrentModelValue();

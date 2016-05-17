@@ -28,6 +28,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
@@ -47,6 +48,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** where the token value is unquoted */
+    @Test
     public void testUnquoted() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         String src = ".THIS {color: token(color);}";
@@ -54,6 +56,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** where the token value is double quoted */
+    @Test
     public void testDoubleQuoted() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         String src = ".THIS {color: token(\"color\");}";
@@ -61,6 +64,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** proper stripping of outer quotes when using concatenation */
+    @Test
     public void testQuotedConcatenation() throws Exception {
         addNsTokens(tokens()
                 .token("margin", "10px")
@@ -85,6 +89,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** where the token value is inherited */
+    @Test
     public void testInherited() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "red"));
         addNsTokens(tokens().parent(parent));
@@ -94,6 +99,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** where the token is imported */
+    @Test
     public void testImported() throws Exception {
         DefDescriptor<TokensDef> imported = addSeparateTokens(tokens().token("color", "red"));
         addNsTokens(tokens().imported(imported));
@@ -103,6 +109,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** where the token value is overridden */
+    @Test
     public void testOverridden() throws Exception {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "red"));
         addNsTokens(tokens().parent(parent).token("color", "blue"));
@@ -112,6 +119,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** using the 't' alternative function name */
+    @Test
     public void testShorthand() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         String src = ".THIS {color: t(color);}";
@@ -119,6 +127,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** using multiple token functions in one declaration value */
+    @Test
     public void testMultipleTokenFunctions() throws Exception {
         addNsTokens(tokens().token("marginTB", "7px").token("marginLR", "5px"));
         String src = ".THIS {margin:t(marginTB) t(marginLR)}";
@@ -126,6 +135,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** errors when the def does not exist */
+    @Test
     public void testNonexistentDef() throws Exception {
         try {
             definitionService.getDefinition(addStyleDef(".THIS{color: token(color)")).getCode();
@@ -135,6 +145,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** errors when the token does not exist */
+    @Test
     public void testNonexistentToken() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         try {
@@ -145,6 +156,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** if the token value is an empty string then the declaration should be removed */
+    @Test
     public void testDeclarationRemoval() throws Exception {
         addNsTokens(tokens().token("color", ""));
         String src = ".THIS {color: token(color); font: arial}";
@@ -152,6 +164,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** test expressions */
+    @Test
     public void testExpression() throws Exception {
         addNsTokens(tokens()
                 .token("margin", "10px")
@@ -178,6 +191,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** token in media query */
+    @Test
     public void testInMediaQuery() throws Exception {
         addNsTokens(tokens().token("normal", "only screen and (max-width: 999px) and (orientation: portrait)"));
 
@@ -193,6 +207,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** token in media query has error */
+    @Test
     public void testInMediaQueryHasError() throws Exception {
         addNsTokens(tokens().token("normal", "screen (max-width: 999px)"));
 
@@ -209,6 +224,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** token in media query cannot evaluate to an empty string */
+    @Test
     public void testInMediaQueryEvalsToEmpty() throws Exception {
         addNsTokens(tokens().token("normal", ""));
 
@@ -225,6 +241,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** token values with auto-prefixable properties */
+    @Test
     public void testTokenAutoPrefix() throws Exception {
         addNsTokens(tokens()
                 .token("userSelect", "none")
@@ -248,6 +265,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** test that cross referencing own token works */
+    @Test
     public void testSelfCrossReference() throws Exception {
         addNsTokens(tokens().token("color", "red").token("bg", "{!color}"));
         String src = ".THIS {background: token(bg);}";
@@ -255,6 +273,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** test that multiple level cross references work */
+    @Test
     public void testMultiCrossReference() throws Exception {
         addNsTokens(tokens()
                 .token("bright", "purple")
@@ -265,6 +284,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** test that the correct app tokens are used under various combinations of which files exist */
+    @Test
     public void testAppTokenOverrides() throws Exception {
         // component in a different ns, with ns default tokens
         addNsTokensOtherNamespace(tokens().token("color", "red"));
@@ -279,6 +299,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** test that the explicit override isn't confused with the app's ns default */
+    @Test
     public void testAppTokenOverridesAndNsDefault() throws Exception {
         // component in a different ns, with ns default tokens
         addNsTokensOtherNamespace(tokens().token("color", "red"));
@@ -296,6 +317,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** test that the overrides don't prevent usage of ns-default when the token is not present in the overrides */
+    @Test
     public void testAppTokenOverridesNotRelevant() throws Exception {
         // component in a different ns, with ns default tokens
         addNsTokensOtherNamespace(tokens().token("color", "red"));
@@ -310,6 +332,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** test that inherited tokens are applied */
+    @Test
     public void testAppTokenOverridesInheritedToken() throws Exception {
         // component in a different ns, with ns default tokens
         addNsTokensOtherNamespace(tokens().token("color", "red"));
@@ -327,6 +350,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** test when app tokens inherit from the other cmp's namespace-defaults */
+    @Test
     public void testAppTokenOverridesCircleAround() throws Exception {
         // component in a different ns, with ns default tokens
         DefDescriptor<TokensDef> other = addNsTokensOtherNamespace(tokens().token("color", "red"));
@@ -343,6 +367,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** test when app tokens inherit from the other cmp's namespace-defaults, but then changes the val */
+    @Test
     public void testAppTokenOverridesCircleAroundChanged() throws Exception {
         // component in a different ns, with ns default tokens
         DefDescriptor<TokensDef> other = addNsTokensOtherNamespace(tokens().token("color", "red"));
@@ -367,6 +392,7 @@ public class TokenResolutionTest extends StyleTestCase {
     }
 
     /** test that a provided def works */
+    @Test
     public void testAppExplicitTokensUsesProvider() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<StyleDef> styleDef = addStyleDef(".THIS {color:t(color)}");
@@ -387,6 +413,7 @@ public class TokenResolutionTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testAppExplicitTokensUsesMapProvider() throws Exception {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<StyleDef> styleDef = addStyleDef(".THIS {color:t(color)}");
@@ -423,6 +450,7 @@ public class TokenResolutionTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testVariousTokenTypesCombination() throws Exception {
         // "*" next to the ones that should be used
         // namespace default (color, font, padding, margin, borderRadius*)

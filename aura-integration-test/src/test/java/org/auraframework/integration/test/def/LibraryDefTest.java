@@ -34,6 +34,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.JsonEncoder;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.base.Charsets;
@@ -51,6 +52,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
     /**
      * Verify the loading of libraryDefs.
      */
+    @Test
     public void testGetLibraryInstance() throws Exception {
         LibraryDef libDef = definitionService.getDefinition("test:test_Library", LibraryDef.class);
         assertNotNull(libDef);
@@ -71,6 +73,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
     /**
      * Tests that all includes have been defined and in the same order.
      */
+    @Test
     public void testIncludeOrdering() throws Exception {
         LibraryDef libDef = definitionService.getDefinition("test:test_LibraryOrdering", LibraryDef.class);
         assertNotNull(libDef);
@@ -87,6 +90,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
     /**
      * Tests the {@link LibraryDef} (and {@link IncludeDefRef}) serialization.
      */
+    @Test
     public void testSerialization() throws Exception {
         LibraryDef libDef = definitionService.getDefinition("test:test_Library", LibraryDef.class);
         assertNotNull(libDef);
@@ -100,6 +104,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         goldFileJson(actual);
     }
 
+    @Test
     public void testValidateDefinitionWithoutIncludes() throws Exception {
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);
@@ -117,6 +122,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         }
     }
 
+    @Test
     public void testValidateDefinitionWithDuplicateIncludes() throws Exception {
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);
@@ -143,6 +149,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         }
     }
 
+    @Test
     public void testSerializationWithAuraProdCompression() throws Exception {
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
                 null);

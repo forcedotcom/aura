@@ -25,6 +25,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.RootDefinition.SupportLevel;
 import org.auraframework.impl.root.RootDefinitionImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
+import org.junit.Test;
 
 public abstract class RootDefinitionImplUnitTest<I extends RootDefinitionImpl<D>, D extends RootDefinition, B extends Builder<D>>
         extends DefinitionImplUnitTest<I, D, D, B> {
@@ -37,35 +38,41 @@ public abstract class RootDefinitionImplUnitTest<I extends RootDefinitionImpl<D>
         super(name);
     }
 
+    @Test
     public void testGetProviderDefDefault() throws Exception {
         this.providerDescriptors = null;
         ProviderDef actual = buildDefinition().getProviderDef();
         assertNull(actual);
     }
 
+    @Test
     public void testGetSupportDefault() throws Exception {
         SupportLevel actual = buildDefinition().getSupport();
         assertEquals(SupportLevel.PROTO, actual);
     }
 
+    @Test
     public void testGetSupportProto() throws Exception {
         this.support = SupportLevel.PROTO;
         SupportLevel actual = buildDefinition().getSupport();
         assertEquals(this.support, actual);
     }
 
+    @Test
     public void testGetSupportBeta() throws Exception {
         this.support = SupportLevel.BETA;
         SupportLevel actual = buildDefinition().getSupport();
         assertEquals(this.support, actual);
     }
 
+    @Test
     public void testGetSupportDeprecated() throws Exception {
         this.support = SupportLevel.DEPRECATED;
         SupportLevel actual = buildDefinition().getSupport();
         assertEquals(this.support, actual);
     }
 
+    @Test
     public void testGetSupportGa() throws Exception {
         this.support = SupportLevel.GA;
         SupportLevel actual = buildDefinition().getSupport();

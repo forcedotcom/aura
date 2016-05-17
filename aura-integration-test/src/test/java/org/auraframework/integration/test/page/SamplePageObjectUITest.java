@@ -24,6 +24,7 @@ import org.auraframework.test.util.AuraUITestingUtil;
 import org.auraframework.test.util.AuraUITestingUtil.ActionDuringTransit;
 import org.auraframework.test.util.AuraUITestingUtil.ActionTiming;
 import org.auraframework.test.util.AuraUITestingUtil.StressAction;
+import org.junit.Test;
 /**
  * this is an example for testing UI with PageObject pattern.
  * for more info about the PageObject 'idea': https://code.google.com/p/selenium/wiki/PageObjects
@@ -34,6 +35,7 @@ public class SamplePageObjectUITest extends PageObjectTestCase<SampleAuraPageObj
         super(name);
     }
 
+    @Test
     public void testButtonUi() throws Exception {
         //create the PageObject
         SampleAuraPageObject sapo = new SampleAuraPageObject(this.getName(), true, "uiExamples:buttonExample", this);
@@ -47,6 +49,7 @@ public class SamplePageObjectUITest extends PageObjectTestCase<SampleAuraPageObj
         assertEquals("get different text!","Hi, undefined",outputText);
     }
     
+    @Test
     public void testProxy() throws MalformedURLException, URISyntaxException {
     	final SampleAuraPageObject sapo1 = new SampleAuraPageObject(this.getName(), true, "actionsTest:serverAction", this);
     	//we want to drop action "executeInForeground" right before it get send to server, the Page Object function that

@@ -20,6 +20,7 @@ import java.util.List;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.PerfTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -83,6 +84,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
      * Select one. Choose one option. Deselect one. Deselect one option.
      */
     @PerfTest
+    @Test
     public void testInputSelectSingle() throws Exception {
         for (int i = 0; i < URL.length; i++) {
             openTestPage(i);

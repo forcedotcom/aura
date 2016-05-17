@@ -29,6 +29,7 @@ import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -39,6 +40,7 @@ public class SourceFactoryTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testSourceFactory() {
         SourceLoader loader = StringSourceLoader.getInstance();
         try {
@@ -54,6 +56,7 @@ public class SourceFactoryTest extends AuraImplTestCase {
      * SourceLoaders that implement InternalNamespaceSourceLoaders are considered for determining if a namespace is internal.
      * Namespaces served by SourceLoaders that do not implement InternalNamespaceSourceLoaders are not internal.
      */
+    @Test
     public void testInternalNamespaceSourceLoadersAreRegisteredWithConfigAdapter(){
         SourceLoader friendlyLoader = new FriendlySourceLoader();
         SourceLoader selectiveLoader = new SelectiveSourceLoader();

@@ -23,6 +23,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.junit.Test;
 
 /**
  * Test expression validation
@@ -59,6 +60,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AuraRuntimeException with underlying parse exception when instantiating the component
      */
+    @Test
     public void testParseExceptions() throws Exception {
         verifyInvalidExpressionException("{!too bad}", "", "unexpected token: an identifier");
         verifyInvalidExpressionException("{!5+(6-7}", "", "unexpected end of expression");
@@ -89,6 +91,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults InvalidExpressionException when instantiating the component
      */
+    @Test
     public void testInvalidLabelExpression() throws Exception {
         verifyInvalidExpressionException("{!$Label.SomeSection}", "", "Labels should have a section and a name:");
         verifyInvalidExpressionException("{!$Label.SomeSection.ExtraPart.Name}", "",
@@ -100,6 +103,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AuraRuntimeException when instantiating the component
      */
+    @Test
     public void testNestedExpressions() throws Exception {
         verifyInvalidExpressionException("{!$'test'{!'Attribute'}}", "",
                 "Cannot mix expression and literal string in attribute value");
@@ -226,6 +230,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AuraRuntimeException when instantiating the component
      */
+    @Test
     public void testFunctionNotFound() throws Exception {
         final String noFunction = "No function found for key: ";
         verifyValidationException("{!isNull(null)}", "", noFunction + "isNull", InvalidDefinitionException.class);

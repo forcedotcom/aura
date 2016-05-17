@@ -19,24 +19,29 @@ import java.io.File;
 import java.io.IOException;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 public class GitSourceControlAdapterTest extends UnitTestCase {
     public GitSourceControlAdapterTest(String name) {
         super(name);
     }
 
+    @Test
     public void testCanCheckout() {
         // FIXME: nothing to test.
     }
 
+    @Test
     public void testCheckout() {
         // FIXME: nothing to test.
     }
 
+    @Test
     public void testAdd() {
         // FIXME: nothing to test.
     }
 
+    @Test
     public void testWriteIfDifferentInvalidFile() {
         StringBuilder sb = new StringBuilder("new data");
         File badFile = new File("/god/I/hope/this/file/doesnt/exist/and/no/one/creates/it");
@@ -50,6 +55,7 @@ public class GitSourceControlAdapterTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testWriteIfDifferentValid() {
         // FIXME: come up with a test scenario.
     }

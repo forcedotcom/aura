@@ -19,9 +19,11 @@ import org.auraframework.util.test.perf.metrics.PerfMetric;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.json.JSONArray;
+import org.junit.Test;
 
 public final class PerfGoldFilesUtilTest extends UnitTestCase {
 
+    @Test
     public void testPerfMetricsSerialization() throws Exception {
         // generate metrics gold file
         PerfMetrics metrics = new PerfMetrics();

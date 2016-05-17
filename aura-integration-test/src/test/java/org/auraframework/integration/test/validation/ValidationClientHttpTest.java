@@ -26,6 +26,7 @@ import org.auraframework.util.AuraFiles;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.validation.ValidationClient;
 import org.auraframework.util.validation.ValidationTestUtil;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
@@ -42,6 +43,7 @@ public final class ValidationClientHttpTest extends AuraHttpTestCase {
     /**
      * Checks that the ValidationClient can run with just the aura-util.jar in the classpath
      */
+    @Test
     public void testCanRunStandalone() throws Exception {
         URL url = getTestServletConfig().getBaseUrl();
         String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/validationTest/basic";
@@ -84,6 +86,7 @@ public final class ValidationClientHttpTest extends AuraHttpTestCase {
         }
     }
 
+    @Test
     public void testValidate() throws Exception {
         getTestServletConfig().getBaseUrl(); // make sure the jetty server is started
         String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/validationTest/basic";

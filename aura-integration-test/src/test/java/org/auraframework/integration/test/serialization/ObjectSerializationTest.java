@@ -29,6 +29,7 @@ import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestCaseDef;
+import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -38,6 +39,7 @@ public class ObjectSerializationTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testSerializeTestCaseDef() throws Exception {
         TestSuiteDef suite = definitionService.getDefinition("js://auratest.jsmock", TestSuiteDef.class);
         TestCaseDef test = null;

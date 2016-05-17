@@ -31,6 +31,7 @@ import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.junit.Test;
 
 public class ComponentDefRefHandlerTest extends AuraImplTestCase {
 
@@ -57,12 +58,14 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         cdrHandler.readAttributes();
     }
 
+    @Test
     public void testCreateDefinition() {
         ComponentDefRef cdr = cdrHandler.createDefinition();
         assertEquals("attr value", cdr.getAttributeDefRef("attr").getValue());
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testHandleChildText() throws Exception {
         xmlReader.next();
         cdrHandler.handleChildText();
@@ -74,6 +77,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testHandleChildTag() throws Exception {
         xmlReader.next();
         xmlReader.next();
@@ -84,6 +88,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         assertEquals("foo", compDefs.get(0).getDescriptor().getName());
     }
 
+    @Test
     public void testHandleChildSetTag() throws Exception {
         xmlReader.next();
         xmlReader.next();
@@ -95,6 +100,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         assertEquals("Header Value", value.getAttributeDefRef("value").getValue());
     }
 
+    @Test
     public void testGetHandledTag() {
         assertEquals("Component Reference", cdrHandler.getHandledTag());
     }
@@ -104,6 +110,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testReadSystemAttributes() throws Exception {
         // 1. Verify specifying a invalid load specification
         cdrHandler = createComponentDefHandler("<fake:component aura:load='foo'/>");
@@ -138,6 +145,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
                 Load.EXCLUSIVE, cdrHandler.createDefinition().getLoad());
     }
 
+    @Test
     public void testReadFlavorAttribute() throws Exception {
         cdrHandler = createComponentDefHandler("<fake:component aura:flavor='fake'/>");
         cdrHandler.readSystemAttributes();

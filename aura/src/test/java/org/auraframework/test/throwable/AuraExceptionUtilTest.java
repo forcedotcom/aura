@@ -25,6 +25,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
  * Tests for AuraExceptionUtil.
@@ -48,6 +49,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      * New StackTraceElement with filename and line number is inserted at top of
      * stack if location contains both properties.
      */
+    @Test
     public void testAddLocationWithFileAndLine() throws Exception {
         Throwable t = new Throwable();
         AuraExceptionUtil.addLocation(new Location(getName(), 22, 0, 0), t);
@@ -59,6 +61,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      * New StackTraceElement with filename only is inserted at top of stack if
      * location has negative line number set.
      */
+    @Test
     public void testAddLocationWithoutLine() throws Exception {
         Throwable t = new Throwable();
         AuraExceptionUtil.addLocation(new Location(getName(), 33), t);
@@ -70,6 +73,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      * New StackTraceElement with null filename is inserted at top of stack if
      * location contains null filename.
      */
+    @Test
     public void testAddLocationWithoutFile() throws Exception {
         Throwable t = new Throwable();
         AuraExceptionUtil.addLocation(new Location(null, 33, 0, 0), t);
@@ -80,6 +84,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * No new StackTraceElement is inserted at top of stack if location is null.
      */
+    @Test
     public void testAddLocationWithoutLocation() throws Exception {
         Throwable t = new Throwable();
         StackTraceElement expected = t.getStackTrace()[0];
@@ -90,6 +95,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * QuickFixException is returned as is.
      */
+    @Test
     public void testWrapExecutionExceptionInstanceOfQuickFixException() throws Exception {
         Exception t = new TestQuickFixException(getName());
         assertEquals("Did not get the original QuickFixException", t,
@@ -99,6 +105,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Topmost AuraUnhandledException is wrapped.
      */
+    @Test
     public void testWrapExecutionExceptionInstanceOfAuraUnhandledException() throws Exception {
         Throwable start = new Exception("start");
         Throwable child = new AuraUnhandledException("child", start);
@@ -114,6 +121,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Topmost AuraExecutionException is wrapped.
      */
+    @Test
     public void testWrapExecutionExceptionInstanceOfAuraExecutionException() throws Exception {
         Throwable start = new Exception("start");
         Throwable child = new AuraUnhandledException("child", start);
@@ -129,6 +137,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Topmost AuraHandledException is unwrapped.
      */
+    @Test
     public void testWrapExecutionExceptionInstanceOfAuraHandledException() throws Exception {
         Throwable start = new Exception("start");
         Throwable child = new AuraHandledException(start);
@@ -144,6 +153,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Topmost Error is rethrown.
      */
+    @Test
     public void testWrapExecutionExceptionInstanceOfError() throws Exception {
         Throwable child = new TestQuickFixException(getName());
         Throwable error = new IOError(child);
@@ -166,6 +176,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Nested QuickFixException is returned as is.
      */
+    @Test
     public void testWrapExecutionExceptionNestedQuickFixException() throws Exception {
         Throwable t4 = new TestQuickFixException(getName());
         Throwable t3 = new RuntimeException("intermediate3", t4);
@@ -179,6 +190,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Topmost nested AuraRuntimeException is rethrown.
      */
+    @Test
     public void testWrapExecutionExceptionNestedAuraRuntimeException() throws Exception {
         Throwable t4 = new Exception("intermediate3");
         Throwable t3 = new AuraUnhandledException("intermediate3", t4);
@@ -196,6 +208,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Topmost nested Error is rethrown.
      */
+    @Test
     public void testWrapExecutionExceptionNestedError() throws Exception {
         Throwable t4 = new TestQuickFixException(getName());
         Throwable t3 = new IOError(t4);
@@ -214,6 +227,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      * QuickFixException nested 5 or more levels deep is not extracted. New
      * AuraRuntimeException is thrown.
      */
+    @Test
     public void testWrapExecutionExceptionNestedTooDeep() throws Exception {
         Throwable t4 = new TestQuickFixException(getName());
         Throwable t3 = new RuntimeException("intermediate3", t4);
@@ -232,6 +246,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Any other Throwable is wrapped in a new AuraRuntimeException.
      */
+    @Test
     public void testWrapExecutionExceptionWithoutMatching() throws Exception {
         Exception t = new RuntimeException(getName());
         try {
@@ -245,6 +260,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * QuickFixException is returned as is.
      */
+    @Test
     public void testPassQuickFixInstanceOfQuickFixException() throws Exception {
         Throwable t = new TestQuickFixException(getName());
         assertEquals("Did not get the original QuickFixException", t, AuraExceptionUtil.passQuickFix(t));
@@ -253,6 +269,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Topmost AuraRuntimeException is rethrown.
      */
+    @Test
     public void testPassQuickFixInstanceOfAuraRuntimeException() throws Exception {
         Throwable child = new AuraRuntimeException(getName());
         Throwable t = new AuraRuntimeException(getName(), null, child);
@@ -267,6 +284,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Topmost Error is rethrown.
      */
+    @Test
     public void testPassQuickFixInstanceOfError() throws Exception {
         Throwable child = new TestQuickFixException(getName());
         Throwable t = new IOError(child);
@@ -281,6 +299,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Nested QuickFixException is returned as is.
      */
+    @Test
     public void testPassQuickFixNestedQuickFixException() throws Exception {
         Throwable t4 = new TestQuickFixException(getName());
         Throwable t3 = new RuntimeException("intermediate3", t4);
@@ -293,6 +312,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Topmost nested AuraRuntimeException is rethrown.
      */
+    @Test
     public void testPassQuickFixNestedAuraRuntimeException() throws Exception {
         Throwable t4 = new Exception("intermediate3");
         Throwable t3 = new AuraUnhandledException("intermediate3", t4);
@@ -310,6 +330,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Topmost nested Error is rethrown.
      */
+    @Test
     public void testPassQuickFixNestedError() throws Exception {
         Throwable t4 = new TestQuickFixException(getName());
         Throwable t3 = new IOError(t4);
@@ -328,6 +349,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      * QuickFixException nested 5 or more levels deep is not extracted. New
      * AuraRuntimeException is thrown.
      */
+    @Test
     public void testPassQuickFixNestedTooDeep() throws Exception {
         Throwable t4 = new TestQuickFixException(getName());
         Throwable t3 = new RuntimeException("intermediate3", t4);
@@ -346,6 +368,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     /**
      * Any other Throwable is wrapped in a new AuraRuntimeException.
      */
+    @Test
     public void testPassQuickFixWithoutMatching() throws Exception {
         Throwable t = new RuntimeException(getName());
         try {

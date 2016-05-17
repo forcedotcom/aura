@@ -26,6 +26,7 @@ import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 @UnAdaptableTest("when run in core, we throw error with different type.")
 public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
@@ -40,6 +41,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
      ******************* Tests for Custom Namespace start ****************************
      ************************************************************************************/
     //test default access
+    @Test
     public void testRegisterEventWithDefaultAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA'  /></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -53,6 +55,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         def.validateDefinition();
     }
     
+    @Test
     public void testRegisterEventWithEmptyAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access=''/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -72,6 +75,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithInvalidAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='BLAH'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -91,6 +95,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithInvalidAccessMethodCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>";
         
@@ -112,6 +117,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithInvalidAndValidAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='GLOBAL, BLAH, GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -132,6 +138,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithStaticAccessAndAccessMethodCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -152,6 +159,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithAuthenticationAndAccessMethodCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -176,6 +184,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
      * go through access=GLOBAL,PUBLIC,PRIVATE,INTERNAL,PRIVILEGED for attribute in CustomNamespace
      * INTERNAL and PRIVILEGED are not valid
      */
+    @Test
     public void testRegisterEventWithGlobalAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -188,6 +197,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithPublicAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -200,6 +210,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithPrivateAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -212,6 +223,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithInternalAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='INTERNAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -231,6 +243,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue(e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithPrivilegedAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PRIVILEGED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -254,6 +267,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * go through access=GLOBAL,PUBLIC,PRIVATE,INTERNAL,PRIVILEGED by AccessMethod for attribute in CustomNamespace
      */
+    @Test
     public void testRegisterEventWithGlobalAccessMethodCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -272,6 +286,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithPublicAccessMethodCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -290,6 +305,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithPrivateAccessMethodCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -308,6 +324,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithPrivilegedAccessMethodCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -326,6 +343,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithInternalAccessMethodCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -348,6 +366,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * this verify putting any two different valid access value together won't work. you can try other combinations, but it's the same
      */
+    @Test
     public void testRegisterEventWithGlobalAndPrivateAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='GLOBAL, PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -369,6 +388,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * this verify we can put two same valid access value together 
      */
+    @Test
     public void testRegisterEventWithPublicAndPublicAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PUBLIC, PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -385,6 +405,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * These two verify we cannot use authentication as access, as we are not in InternalNamespace
      */
+    @Test
     public void testComponentWithAuthenticationCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -404,6 +425,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue(e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testComponentWithUnAuthenticationCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='UNAUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -426,6 +448,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * we cannot set access to Authenticated by method, like what we do for access value
      */
+    @Test
     public void testRegisterEventWithUnAuthenticationMethodCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -448,6 +471,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * this verify we cannot have both AUTHENTICATED and UNAUTHENTICATED as access attribute
      */
+    @Test
     public void testRegisterEventWithAuthenticatedAndUnAuthenticationAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -470,6 +494,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * This verify we cannot have Authentication as access attribute, as we are outside InternalNamespace
      */
+    @Test
     public void testRegisterEventWithAuthenticatedAndAuthenticationAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -492,6 +517,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * These verify we cannot have authentication as part of access, as we are not in InternalNamespace. 
      */
+    @Test
     public void testRegisterEventWithAuthenticatedAndGlobalAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -510,6 +536,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithAuthenticatedAndPrivateAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -528,6 +555,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithAuthenticatedAndPublicAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -546,6 +574,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithAuthenticatedAndPrivilegedAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,PRIVILEGED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -564,6 +593,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithAuthenticatedAndInternalAccessCustomNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,INTERNAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -586,6 +616,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /***********************************************************************************
      ******************* Tests for Privileged Namespace start ****************************
      ************************************************************************************/
+    @Test
     public void testRegisterEventWithDefaultAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA'  /></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -599,6 +630,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         def.validateDefinition();
     }
     
+    @Test
     public void testRegisterEventWithEmptyAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access=''/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -618,6 +650,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithInvalidAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='BLAH'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -637,6 +670,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithInvalidAccessMethodPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>";
         
@@ -658,6 +692,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithInvalidAndValidAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='GLOBAL, BLAH, GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -678,6 +713,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithStaticAccessAndAccessMethodPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -698,6 +734,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithAuthenticationAndAccessMethodPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -722,6 +759,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
      * go through access=GLOBAL,PUBLIC,PRIVATE,INTERNAL,PRIVILEGED for attribute in PrivilegedNamespace
      * INTERNAL is not valid
      */
+    @Test
     public void testRegisterEventWithGlobalAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -734,6 +772,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithPublicAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -746,6 +785,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithPrivateAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -758,6 +798,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithInternalAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='INTERNAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -777,6 +818,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue(e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithPrivilegedAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PRIVILEGED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -793,6 +835,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * go through access=GLOBAL,PUBLIC,PRIVATE,INTERNAL,PRIVILEGED by AccessMethod for attribute in PrivilegedNamespace
      */
+    @Test
     public void testRegisterEventWithGlobalAccessMethodPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -811,6 +854,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithPublicAccessMethodPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -829,6 +873,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithPrivateAccessMethodPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -847,6 +892,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithPrivilegedAccessMethodPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -865,6 +911,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithInternalAccessMethodPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -887,6 +934,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * this verify putting any two different valid access value together won't work. you can try other combinations, but it's the same
      */
+    @Test
     public void testRegisterEventWithGlobalAndPrivateAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='GLOBAL, PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -908,6 +956,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * this verify we can put two same valid access value together 
      */
+    @Test
     public void testRegisterEventWithPublicAndPublicAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PUBLIC, PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -924,6 +973,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * These two verify we cannot use authentication as access, as we are not in InternalNamespace
      */
+    @Test
     public void testComponentWithAuthenticationPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -943,6 +993,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue(e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testComponentWithUnAuthenticationPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='UNAUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -965,6 +1016,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * we cannot set access to Authenticated by method, like what we do for access value
      */
+    @Test
     public void testRegisterEventWithUnAuthenticationMethodPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -987,6 +1039,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * this verify we cannot have both AUTHENTICATED and UNAUTHENTICATED as access attribute
      */
+    @Test
     public void testRegisterEventWithAuthenticatedAndUnAuthenticationAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1009,6 +1062,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * This verify we cannot have Authentication as access attribute, as we are outside InternalNamespace
      */
+    @Test
     public void testRegisterEventWithAuthenticatedAndAuthenticationAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1031,6 +1085,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * These verify we cannot have authentication as part of access, as we are not in InternalNamespace. 
      */
+    @Test
     public void testRegisterEventWithAuthenticatedAndGlobalAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1049,6 +1104,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithAuthenticatedAndPrivateAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1067,6 +1123,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithAuthenticatedAndPublicAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1085,6 +1142,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithAuthenticatedAndPrivilegedAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,PRIVILEGED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1103,6 +1161,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithAuthenticatedAndInternalAccessPrivilegedNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,INTERNAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1125,6 +1184,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /***********************************************************************************
      ******************* Tests for Internal Namespace start ****************************
      ************************************************************************************/
+    @Test
     public void testRegisterEventWithDefaultAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA'  /></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1138,6 +1198,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         def.validateDefinition();
     }
     
+    @Test
     public void testRegisterEventWithEmptyAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access=''/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1157,6 +1218,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithInvalidAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='BLAH'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1176,6 +1238,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithInvalidAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>";
         
@@ -1197,6 +1260,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithInvalidAndValidAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='GLOBAL, BLAH, GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1217,6 +1281,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithStaticAccessAndAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1237,6 +1302,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testRegisterEventWithAuthenticationAndAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1261,6 +1327,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
      * go through access=GLOBAL,PUBLIC,PRIVATE,INTERNAL,PRIVILEGED for attribute in InternalNamespace
      * notice PRIVATE is valid
      */
+    @Test
     public void testRegisterEventWithGlobalAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1273,6 +1340,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithPublicAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1285,6 +1353,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithPrivateAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1297,6 +1366,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithInternalAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='INTERNAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1309,6 +1379,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithPrivilegedAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PRIVILEGED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1326,6 +1397,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
      * go through access=GLOBAL,PUBLIC,PRIVATE,INTERNAL,PRIVILEGED by AccessMethod for attribute in InternalNamespace
      * notice AccessMethod is allowed and only allowed because we are inside InternalNamespace
      */
+    @Test
     public void testRegisterEventWithGlobalAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1338,6 +1410,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithPublicAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1350,6 +1423,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithPrivateAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1362,6 +1436,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithPrivilegedAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1374,6 +1449,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
     }
+    @Test
     public void testRegisterEventWithInternalAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1390,6 +1466,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * this verify putting any two different valid access value together won't work. you can try other combinations, but it's the same
      */
+    @Test
     public void testRegisterEventWithGlobalAndPrivateAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='GLOBAL, PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1411,6 +1488,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * this verify we can put two same valid access value together 
      */
+    @Test
     public void testRegisterEventWithPublicAndPublicAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='PUBLIC, PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1427,6 +1505,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * These two verify we cannot use authentication as access, as we are not in InternalNamespace
      */
+    @Test
     public void testComponentWithAuthenticationInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1446,6 +1525,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue(e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testComponentWithUnAuthenticationInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='UNAUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1468,6 +1548,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * we cannot set access to Authenticated by method, like what we do for access value
      */
+    @Test
     public void testRegisterEventWithUnAuthenticationMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1490,6 +1571,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * this verify we cannot have both AUTHENTICATED and UNAUTHENTICATED as access attribute
      */
+    @Test
     public void testRegisterEventWithAuthenticatedAndUnAuthenticationAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1512,6 +1594,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * This verify we cannot have Authentication as access attribute, as we are outside InternalNamespace
      */
+    @Test
     public void testRegisterEventWithAuthenticatedAndAuthenticationAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1534,6 +1617,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     /*
      * These verify we cannot have authentication as part of access, as we are not in InternalNamespace. 
      */
+    @Test
     public void testRegisterEventWithAuthenticatedAndGlobalAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1552,6 +1636,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithAuthenticatedAndPrivateAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1570,6 +1655,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithAuthenticatedAndPublicAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1588,6 +1674,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithAuthenticatedAndPrivilegedAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,PRIVILEGED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1606,6 +1693,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testRegisterEventWithAuthenticatedAndInternalAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='AUTHENTICATED,INTERNAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 

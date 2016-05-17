@@ -21,22 +21,26 @@ import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignTemplateDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 public class DesignTemplateDefHandlerTest extends AuraImplTestCase {
     public DesignTemplateDefHandlerTest(String name) {
         super(name);
     }
 
+    @Test
     public void testGetElement() throws Exception {
         DesignTemplateDef element = setupDesignTemplateDef("<design:template><design:region name=\"regionone\"/></design:template>");
         assertNotNull(element.getDesignTemplateRegionDef("regionone"));
     }
 
+    @Test
     public void testGetEmptyTemplate() throws Exception {
         DesignTemplateDef element = setupDesignTemplateDef("<design:template></design:template>");
         assertTrue(element.getDesignTemplateRegionDefs().isEmpty());
     }
 
+    @Test
     public void testInvalidSystemAttributeName() throws Exception {
         try {
             setupDesignTemplateDef("<design:template name=\"template\" foo=\"bar\" />");
@@ -46,6 +50,7 @@ public class DesignTemplateDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testInvalidSystemAttributePrefix() throws Exception {
         try {
             setupDesignTemplateDef("<design:template name=\"template\" other:name=\"asdf\" />");

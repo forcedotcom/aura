@@ -21,6 +21,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.Client;
 import org.auraframework.system.Client.Type;
 import org.auraframework.test.client.UserAgent;
+import org.junit.Test;
 
 import com.google.common.collect.Maps;
 
@@ -32,6 +33,7 @@ public class ClientTest extends AuraImplTestCase {
     /**
      * Verify that User Agent string is parsed out to obtain right ClientType
      */
+    @Test
     public void testGetType() {
         Map<String, Type> pairs = Maps.newHashMap();
         pairs.put(UserAgent.IE6.getUserAgentString(), Type.IE6);
@@ -81,6 +83,7 @@ public class ClientTest extends AuraImplTestCase {
         assertEquals("Unexpected ClientType from userAgent string:", Type.OTHER, new Client(null).getType());
     }
 
+    @Test
     public void testDefaultClientType() throws Exception {
         Client client = new Client();
         assertEquals("Incorrect default client type.", client.getType().name(), "OTHER");

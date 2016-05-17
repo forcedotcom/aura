@@ -21,6 +21,7 @@ import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 public class DesignDefHandlerTest extends AuraImplTestCase {
 
@@ -28,11 +29,13 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testGetElement() throws Exception {
         DesignDef element = definitionService.getDefinition(setupSimpleDesignDef("<design:component label=\"some label\" />"));
         assertEquals("some label", element.getLabel());
     }
 
+    @Test
     public void testRetrieveSingleAttributeDesign() throws Exception {
         DesignDef element = definitionService.getDefinition(setupSimpleDesignDef(
                 "<design:component><design:attribute name=\"mystring\" required=\"true\"/></design:component>")
@@ -42,6 +45,7 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
         assertTrue(child.isRequired());
     }
 
+    @Test
     public void testMultipleDesignTemplatesFailure() throws Exception {
         try {
         	definitionService.getDefinition(setupSimpleDesignDef(
@@ -54,6 +58,7 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testInvalidSystemAttributeName() throws Exception {
         try {
         	definitionService.getDefinition(setupSimpleDesignDef("<design:component foo=\"bar\" />"));
@@ -63,6 +68,7 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testInvalidSystemAttributePrefix() throws Exception {
         try {
         	definitionService.getDefinition(setupSimpleDesignDef("<design:component other:label=\"some label\" />"));

@@ -16,12 +16,14 @@
 package org.auraframework.util.test.perf.metrics;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 public final class PerfMetricTest extends UnitTestCase {
 
     /**
      * Checks equals()/hashCode()/compareTo()
      */
+    @Test
     public void testEquality() {
         PerfMetric same1 = new PerfMetric("paints", 2);
         PerfMetric same2 = new PerfMetric("paints", 2);

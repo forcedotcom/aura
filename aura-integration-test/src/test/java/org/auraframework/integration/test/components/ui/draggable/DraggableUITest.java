@@ -22,6 +22,7 @@ import java.util.List;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -41,6 +42,7 @@ public class DraggableUITest extends WebDriverTestCase{
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
+    @Test
     public void testDragAndDropWithMatchingTypes() throws MalformedURLException, URISyntaxException {
         helpTestDragAndDrop(DRAGANDDROPTEST_APP, "Draggable Type: Move 1", "Dropzone Type: Move");
         verifyDragAndDropResults("Dropzone Type: Move", "Draggable Type: Move 1", true);
@@ -51,6 +53,7 @@ public class DraggableUITest extends WebDriverTestCase{
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
+    @Test
     public void testDragAndDropWithNonMatchingTypes() throws MalformedURLException, URISyntaxException {
         helpTestDragAndDrop(DRAGANDDROPTEST_APP, "Draggable Type: Move 1", "Dropzone Type: Copy");
         verifyDragAndDropResults("Dropzone Type: Copy", "Draggable Type: Move 1", false);
@@ -81,6 +84,7 @@ public class DraggableUITest extends WebDriverTestCase{
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
+    @Test
     public void testDragAndDropWithDraggableWithNullType() throws MalformedURLException, URISyntaxException {
         helpTestDragAndDrop(DRAGANDDROPTEST_APP, "Draggable Type: None 1", "Dropzone Type: Move");
         verifyDragAndDropResults("Dropzone Type: Move", "Draggable Type: None 1", false);

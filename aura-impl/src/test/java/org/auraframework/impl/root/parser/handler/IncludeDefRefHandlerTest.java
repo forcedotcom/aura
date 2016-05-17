@@ -34,6 +34,7 @@ import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -63,6 +64,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         return xmlReader;
     }
 
+    @Test
     public void testGetElementInLibraryContainer() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
         String expectedParentNamespace = getAuraTestingUtil().getNonce("parentSpace");
@@ -85,6 +87,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         assertEquals(parentDescriptor, actualDesc.getBundle());
     }
 
+    @Test
     public void testGetElementInUnsupportedContainers() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("irrelevant");
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
@@ -106,6 +109,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithoutName() throws Exception {
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
                 "<%s/>", IncludeDefRefHandler.TAG), "myID", Format.XML);
@@ -122,6 +126,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithInvalidName() throws Exception {
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
                 "<%s name='this is invalid'/>", IncludeDefRefHandler.TAG), "myID", Format.XML);
@@ -138,6 +143,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithInvalidImportFormat() throws Exception {
     	
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
@@ -155,6 +161,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithInvalidImportName() throws Exception {
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
                 "<%s name='name' imports='not a descriptor name'/>", IncludeDefRefHandler.TAG), "myID", Format.XML);
@@ -171,6 +178,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithEmptyTag() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
         
@@ -185,6 +193,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         assertEquals(expectedName, actualDef.getName());
     }
 
+    @Test
     public void testGetElementWithNonEmptyTag() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("irrelevant");        
         
@@ -204,6 +213,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithDescription() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
         String expectedDescription = "needs to be included";
@@ -219,6 +229,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         assertEquals(expectedDescription, actualDef.getDescription());
     }
 
+    @Test
     public void testGetElementWithImports() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
         String expectedImports = "importable";
@@ -236,6 +247,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         assertSame(parentDescriptor, actualImports.get(0).getBundle());
     }
 
+    @Test
     public void testGetElementWithFullyQualifiedImport() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
         String expectedBundleNamespace = getAuraTestingUtil().getNonce("bundleNamespace");
@@ -256,6 +268,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         assertEquals(expectedBundleName, actualImports.get(0).getBundle().getName());
     }
 
+    @Test
     public void testGetElementWithMultipleImports() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
         List<String> expectedImports = Lists.newArrayList("import1", "import2", "import3");
@@ -280,6 +293,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithExport() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
         String expectedExports = "exportable";
@@ -295,6 +309,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         assertEquals(expectedExports, actualExports);
     }
 
+    @Test
     public void testGetElementWithUnexpectedAttribute() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(

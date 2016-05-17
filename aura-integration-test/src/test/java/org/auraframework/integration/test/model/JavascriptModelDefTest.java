@@ -28,6 +28,7 @@ import org.auraframework.impl.javascript.model.JavascriptValueDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Model;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 import com.google.common.collect.Maps;
 
@@ -40,6 +41,7 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
     /**
      * Verify that javascript model defs are serializable.
      */
+    @Test
     public void testDefaults() throws Exception {
         // Find the model by autowiring
         definitionService.getDefinition("test:jsModel", ComponentDef.class);
@@ -57,6 +59,7 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
     /**
      * Verify bad value in javascript model throws correct exception.
      */
+    @Test
     public void testBadModelValue() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, ModelDef.class,

@@ -20,6 +20,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -48,6 +49,7 @@ public class PopupUITest extends WebDriverTestCase {
      * @expectedResults Popup launches with the specified size
      * @throws Exception
      */
+    @Test
     public void testPopupWithExtendedTarget() throws Exception {
         String triggerText = "Trigger" + randString(4);
         String popupText = "Target" + randString(4);
@@ -83,6 +85,7 @@ public class PopupUITest extends WebDriverTestCase {
      * @expectedResults popup launches with the label used as the target
      * @throws Exception
      */
+    @Test
     public void testPopupWithLabelTarget() throws Exception {
     	WebDriver driver = this.getDriver();
         String triggerText = "Trigger" + randString(4);
@@ -169,6 +172,7 @@ public class PopupUITest extends WebDriverTestCase {
      *      of it
      * @throws Exception
      */
+    @Test
     public void testPopupCloseOnClickOutside() throws Exception {
         verifyPopupCloseWithClick(false, true);
     }
@@ -181,6 +185,7 @@ public class PopupUITest extends WebDriverTestCase {
      *      of it as well as outside
      * @throws Exception
      */
+    @Test
     public void testPopupCloseOnClickInsideAndOutside() throws Exception {
         verifyPopupCloseWithClick(true, true);
     }
@@ -193,6 +198,7 @@ public class PopupUITest extends WebDriverTestCase {
      *      of it
      * @throws Exception
      */
+    @Test
     public void testPopupCloseOnClickInside() throws Exception {
         verifyPopupCloseWithClick(true, false);
     }
@@ -206,6 +212,7 @@ public class PopupUITest extends WebDriverTestCase {
      *      on the trigger
      * @throws Exception
      */
+    @Test
     public void testPopupCloseOnTriggerClickOnly() throws Exception {
         verifyPopupCloseWithClick(false, false);
     }
@@ -218,6 +225,7 @@ public class PopupUITest extends WebDriverTestCase {
      *      and closes when the button is clicked
      * @throws Exception
      */
+    @Test
     public void testPopupCustomTrigger() throws Exception {
         verifyCustomTrigger(false);
     }
@@ -241,6 +249,7 @@ public class PopupUITest extends WebDriverTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testPopupManualPosition() throws Exception {
     	WebDriver driver = this.getDriver();
         String triggerText = "Trigger" + randString(4);
@@ -286,6 +295,7 @@ public class PopupUITest extends WebDriverTestCase {
      *      closes along with the popup
      * @throws Exception
      */
+    @Test
     public void testPopupWithCurtain() throws Exception {
     	WebDriver driver = this.getDriver();
         String triggerText = "Trigger" + randString(4);

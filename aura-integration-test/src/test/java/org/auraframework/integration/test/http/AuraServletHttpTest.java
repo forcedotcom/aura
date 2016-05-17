@@ -49,6 +49,7 @@ import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 /**
  * Automation to verify the handling of AuraServlet requests.
@@ -150,6 +151,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * Test for W-2063110 this test is to verify the order of actions and context in the response we used to have
      * context before actions, now it's the opposite
      */
+    @Test
     public void testPostRawResponseSimpleAction() throws Exception {
         Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
@@ -167,6 +169,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * When we request a component from the server we should get back it's component class, but only a single occurrence
      * of it to minimize payload.
      */
+    @Test
     public void testGetComponentActionReturnsSingleComponentClass() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component></aura:component>");
@@ -187,6 +190,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                 + ">", firstOccurrence == lastOccurrence);
     }
 
+    @Test
     public void testMulitpleActionsInOnePost() {
         ArrayList<String> qNameList = new ArrayList<>();
         ArrayList<Map<String, Object>> actionParamsArrayList = new ArrayList<>();
@@ -212,6 +216,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     /**
      * Check a post context.
      */
+    @Test
     public void testPostContext() throws Exception {
         Map<String, Object> message = new HashMap<>();
         Map<String, Object> actionInstance = new HashMap<>();
@@ -251,6 +256,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * This is actually an invalid test.
      *
      */
+    @Test
     public void testPostWithOldLastMod() throws Exception {
         Map<String, Object> message = new HashMap<>();
         Map<String, Object> actionInstance = new HashMap<>();
@@ -320,12 +326,14 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     /**
      * nocache in the request will redirect to the input url (minus the protocol and host)
      */
+    @Test
     public void testNoCache() throws Exception {
         assertNoCacheRequest(String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode(
                 "scheme://user:password@any.host:port/m?aura.mode=PROD&aura.format=HTML&something=this+that#someidinhere?has=someparam", "UTF-8")),
                 "/m?aura.mode=PROD&aura.format=HTML&something=this+that#someidinhere?has=someparam");
     }
 
+    @Test
     public void testHTMLTemplateCaching() throws Exception {
         // An application with isOnePageApp set to true
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
@@ -361,6 +369,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     // 1.if we set ancestor resources with more than one url('self' counts as url), we won't create X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     @UnAdaptableTest("CSP is different between aura-stand-alone and core")
+    @Test
     public void testSpecialCspMultipleAncestors() throws Exception {
         Header[] headers = doSpecialCspTest("'self' www.itrustu.com/frame www.also.com/other",
                 null, "www.itrustu.com/frame", "www.also.com/other");
@@ -369,6 +378,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     // 2.if we set ancestor resources with one url (without wildcard), that url will get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
+    @Test
     public void testSpecialCspSingleAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("www.itrustu.com/frame", "www.itrustu.com/frame");
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
@@ -377,6 +387,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     // 3.if we set ancestor resources with protocal like url, we set ALLOWALL for X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
+    @Test
     public void testSpecialCspProtocolAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("https:", "https:");
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
@@ -385,6 +396,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     // 4.if we set ancestor with one wildcard url, we set ALLOWALL for X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
+    @Test
     public void testSpecialCspWildcardAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("https://*.foo.com", "https://*.foo.com");
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
@@ -393,6 +405,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     // 5.if we set ancestor resources with null, DENY get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
+    @Test
     public void testSpecialCspDeniedAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("'none'");
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
@@ -401,6 +414,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     // 6.if we set ancestor resources with [null], SAMEORIGIN get written into X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
+    @Test
     public void testSpecialCspSameOriginAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("'self'", (String) null);
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
@@ -409,11 +423,13 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     // 7.if we set ancestor resources with null [], we won't change X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
+    @Test
     public void testSpecialCspAnyAncestor() throws Exception {
         Header[] headers = doSpecialCspTest("*", (String[]) null);
         assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
     }
 
+    @Test
     public void testHTMLTemplateCachingWhenAppCacheIsEnable() throws Exception {
         setHttpUserAgent(UserAgent.GOOGLE_CHROME.getUserAgentString());
 
@@ -552,6 +568,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testJSFrameworkUrlHasNonce() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application render='client'></aura:application>");
@@ -569,6 +586,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         get.releaseConnection();
     }
 
+    @Test
     public void testGetUnhandledError() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application><aura:attribute name='bah'/></aura:application>");
@@ -585,6 +603,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * Verify providing invalid DefDescriptor format to the aura.tag param results in the proper handled Exception and
      * not an AuraUnhandledException, which results in a Gack on SFDC.
      */
+    @Test
     public void testInvalidDefDescriptorFormat() throws Exception {
         String url = String.format("/aura?aura.tag=foo:bar:baz");
         HttpGet get = obtainGetMethod(url);

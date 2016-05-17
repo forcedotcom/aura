@@ -19,12 +19,14 @@ import javax.script.ScriptEngine;
 
 import org.auraframework.util.phobos.script.javascript.RhinoScriptEngineFactory;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
  * Sanity tests to verify the rhino engine we use works as expected.
  */
 public final class RhinoTest extends UnitTestCase {
 
+    @Test
     public void testSanity() throws Exception {
         ScriptEngine engine = new RhinoScriptEngineFactory().getScriptEngine();
 

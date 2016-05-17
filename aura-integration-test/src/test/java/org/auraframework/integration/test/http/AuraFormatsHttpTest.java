@@ -29,6 +29,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
+import org.junit.Test;
 
 /**
  * Test class to perform sanity tests on AuraServlet with all possible modes.
@@ -104,6 +105,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testResponseHeadersFromAuraServlet() throws Exception {
         for (Format format : Format.values()) {
             switch (format) {

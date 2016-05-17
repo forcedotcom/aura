@@ -25,6 +25,7 @@ import org.auraframework.instance.Action;
 import org.auraframework.instance.ActionWithKeyOverride;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 public class ActionWithKeyOverrideTest extends UnitTestCase {
 
@@ -36,6 +37,7 @@ public class ActionWithKeyOverrideTest extends UnitTestCase {
         super(name);
     }
 
+    @Test
     public void testConstructingWithNullActionAsKey() {
         try {
             new ActionWithKeyOverride(null, null);
@@ -44,6 +46,7 @@ public class ActionWithKeyOverrideTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testConstructingWithNullActionToExecute() {
         final Action actionAsKey = mock(Action.class);
 
@@ -54,6 +57,7 @@ public class ActionWithKeyOverrideTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testConstruction() {
         final Action actionAsKey = mock(Action.class);
         final Action actionToExecute = mock(Action.class);
@@ -66,6 +70,7 @@ public class ActionWithKeyOverrideTest extends UnitTestCase {
         assertNotNull("ActionWithKeyOverride was not properly created.", action);
     }
 
+    @Test
     public void testDelegations() throws Exception {
         final Action actionAsKey = mock(Action.class);
         final Action actionToExecute = mock(Action.class);

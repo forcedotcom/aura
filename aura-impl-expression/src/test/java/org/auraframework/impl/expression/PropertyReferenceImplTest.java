@@ -20,6 +20,7 @@ import java.util.List;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.Location;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
  * expressiony test
@@ -30,6 +31,7 @@ public class PropertyReferenceImplTest extends UnitTestCase {
         super(name);
     }
 
+    @Test
     public void testExpression() throws Exception {
         Location loc = new Location("expressionism", 456);
         PropertyReferenceImpl pr = new PropertyReferenceImpl("test.yo.self", loc);
@@ -49,6 +51,7 @@ public class PropertyReferenceImplTest extends UnitTestCase {
         assertEquals(1, pr3.size());
     }
 
+    @Test
     public void testSimpleExpression() throws Exception {
         Location loc = new Location("expressionism", 92);
         PropertyReferenceImpl pr = new PropertyReferenceImpl("inohaveanydots", loc);
@@ -58,6 +61,7 @@ public class PropertyReferenceImplTest extends UnitTestCase {
         assertNull("stem should have been null", pr.getStem());
     }
 
+    @Test
     public void testToString() throws Exception {
         Location loc = new Location("expressionism", 92);
         PropertyReferenceImpl pr = new PropertyReferenceImpl("test.yo.self", loc);

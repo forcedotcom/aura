@@ -32,6 +32,7 @@ import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -59,6 +60,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
         return xmlReader;
     }
 
+    @Test
     public void testGetElement() throws Exception {
         String expectedLibrary = "my:Lib";
         StringSource<LibraryDefRef> source = new StringSource<>(descriptor, 
@@ -74,6 +76,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
         assertEquals(expectedDescriptor, def.getReferenceDescriptor());
     }
 
+    @Test
     public void testGetElementWithoutLibrary() throws Exception {
         StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
                 "<%s/>", LibraryDefRefHandler.TAG), "myID", Format.XML);
@@ -90,6 +93,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithEmptyLibrary() throws Exception {
         StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
                 "<%s library=''/>", LibraryDefRefHandler.TAG), "myID", Format.XML);
@@ -106,6 +110,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithInvalidLibraryName() throws Exception {
         StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
                 "<%s library='this is invalid'/>", LibraryDefRefHandler.TAG), "myID", Format.XML);
@@ -122,6 +127,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithNonEmptyTag() throws Exception {
         StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
                 "<%s library='l' property='p'>text</%1$s>", LibraryDefRefHandler.TAG), "myID", Format.XML);
@@ -138,6 +144,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithDescription() throws Exception {
         String expectedDescription = "needs to be included";
         StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
@@ -150,6 +157,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
         assertEquals(expectedDescription, actualDef.getDescription());
     }
 
+    @Test
     public void testGetElementWithUnexpectedAttribute() throws Exception {
         StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
                 "<%s library='l' property='p' unexpected='me'/>", LibraryDefRefHandler.TAG), "myID", Format.XML);

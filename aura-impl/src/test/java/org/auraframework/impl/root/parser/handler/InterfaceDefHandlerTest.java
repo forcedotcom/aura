@@ -25,6 +25,7 @@ import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 public class InterfaceDefHandlerTest extends AuraImplTestCase {
 
@@ -38,6 +39,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
      * also in the markup, we can have aura:attribute
      * @throws Exception
      */
+    @Test
     public void testInterfaceDefHandler() throws Exception {
         InterfaceXMLParser parser = new InterfaceXMLParser();
         String namespace = "auratest";
@@ -57,6 +59,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
      * verify interface can extend from another interface
      * @throws Exception
      */
+    @Test
     public void testInterfaceDefHandlerWithExtension() throws Exception {
         InterfaceXMLParser parser = new InterfaceXMLParser();
         DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", InterfaceDef.class);
@@ -71,6 +74,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
      * verify invalid child tag error out
      * @throws Exception
      */
+    @Test
     public void testInterfaceDefHandlerWithInvalidChildTag() throws Exception {
         InterfaceXMLParser parser = new InterfaceXMLParser();
         DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", InterfaceDef.class);
@@ -90,6 +94,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
      * verify we cannot have text in the markup of aura:interface
      * @throws Exception
      */
+    @Test
     public void testInterfaceDefHandlerWithTextBetweenTag() throws Exception {
         InterfaceXMLParser parser = new InterfaceXMLParser();
         DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", InterfaceDef.class);
@@ -109,6 +114,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
      * verify support is not allowed with non-internal namespace
      * @throws QuickFixException
      */
+    @Test
     public void testSupportNotAllowedWithNonInternalNamespace() throws QuickFixException {
     	String namespace = "fakeNamespace";
     	DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance(namespace+":fakeparser", InterfaceDef.class);

@@ -30,6 +30,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.JsonEncoder;
+import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -62,24 +63,28 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         assertTrue(dependencies.isEmpty());
     }
 
+    @Test
     public void testAppendDependenciesDefaultValue() throws Exception {
         Set<DefDescriptor<?>> dependencies = Mockito.spy(Sets.<DefDescriptor<?>> newHashSet());
         buildDefinition().appendDependencies(dependencies);
         Mockito.verify(this.defaultValue).appendDependencies(dependencies);
     }
 
+    @Test
     public void testGetSerializeToNull() throws Exception {
         this.serializeTo = null;
         SerializeToType actual = buildDefinition().getSerializeTo();
         assertEquals(SerializeToType.BOTH, actual);
     }
 
+    @Test
     public void testGetSerializeToNotNull() throws Exception {
         this.serializeTo = SerializeToType.NONE;
         SerializeToType actual = buildDefinition().getSerializeTo();
         assertEquals(this.serializeTo, actual);
     }
 
+    @Test
     public void testGetTypeDef() throws Exception {
         TypeDef expected = Mockito.mock(TypeDef.class);
         Mockito.doReturn(expected).when(this.typeDefDescriptor).getDef();
@@ -87,6 +92,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         assertEquals(expected, actual);
     }
 
+    @Test
     public void testSerializeDescriptor() throws Exception {
         JsonEncoder json = Mockito.mock(JsonEncoder.class);
         buildDefinition().serialize(json);
@@ -96,6 +102,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         inOrder.verify(json).writeMapEnd();
     }
 
+    @Test
     public void testSerializeTypeDefDescriptor() throws Exception {
         JsonEncoder json = Mockito.mock(JsonEncoder.class);
         buildDefinition().serialize(json);
@@ -105,6 +112,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         inOrder.verify(json).writeMapEnd();
     }
 
+    @Test
     public void testSerializeDefaultValue() throws Exception {
         this.defaultValue = new AttributeDefRefImpl.Builder().setValue("Hello").build();
         JsonEncoder json = Mockito.mock(JsonEncoder.class);
@@ -116,6 +124,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         inOrder.verify(json).writeMapEnd();
     }
 
+    @Test
     public void testSerializeRequired() throws Exception {
         this.required = true;
 
@@ -127,6 +136,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         inOrder.verify(json).writeMapEnd();
     }
 
+    @Test
     public void testValidateDefinitionNullTypeDefDescriptor() throws Exception {
         this.typeDefDescriptor = null;
         try {
@@ -137,6 +147,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         }
     }
 
+    @Test
     public void testValidateDefinitionInvalidName() throws Exception {
         this.descriptorName = "i'm invalid";
         this.qualifiedDescriptorName = "i'm invalid";
@@ -149,6 +160,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         }
     }
 
+    @Test
     public void testValidateDefinitionInvalidSerializeToType() throws Exception {
         this.serializeTo = SerializeToType.INVALID;
         try {
@@ -159,6 +171,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         }
     }
 
+    @Test
     public void testValidateReferencesDefaultValue() throws Exception {
         TypeDef typeDef = Mockito.mock(TypeDef.class);
         Mockito.doReturn(typeDef).when(this.typeDefDescriptor).getDef();
@@ -169,6 +182,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         Mockito.verify(this.defaultValue).validateReferences();
     }
 
+    @Test
     public void testValidateReferencesReferenceThrowsClassNotFound() throws Exception {
         Throwable t = new AuraRuntimeException(new ClassNotFoundException());
         Mockito.doThrow(t).when(this.typeDefDescriptor).getDef();
@@ -182,6 +196,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         }
     }
 
+    @Test
     public void testValidateReferencesReferenceThrowsOtherException() throws Exception {
         Throwable expected = new AuraRuntimeException("");
         Mockito.doThrow(expected).when(this.typeDefDescriptor).getDef();

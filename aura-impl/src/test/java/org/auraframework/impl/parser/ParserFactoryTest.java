@@ -25,6 +25,7 @@ import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 public class ParserFactoryTest extends UnitTestCase {
 
@@ -37,6 +38,7 @@ public class ParserFactoryTest extends UnitTestCase {
                 StringSourceLoader.getInstance().createStringSourceDescriptor(null, defClass, null));
     }
 
+    @Test
     public void testGetParserNotFound() {
         DefDescriptor<?> desc = StringSourceLoader.getInstance().createStringSourceDescriptor(null,
                 StyleDef.class, null);
@@ -52,6 +54,7 @@ public class ParserFactoryTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testGetParserFound() {
         assertEquals(JavascriptControllerParser.class, getParser(Format.JS, ControllerDef.class).getClass());
     }

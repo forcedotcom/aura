@@ -17,21 +17,25 @@ package org.auraframework.impl.root.event;
 
 import org.auraframework.def.EventType;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
 */
 public class EventTypeTest extends UnitTestCase {
 
+    @Test
     public void testCanBeFired() {
         assertTrue(EventType.APPLICATION.canBeFired());
         assertTrue(EventType.COMPONENT.canBeFired());
     }
 
+    @Test
     public void testHasSource() {
         assertTrue(EventType.COMPONENT.hasSource());
         assertFalse(EventType.APPLICATION.hasSource());
     }
 
+    @Test
     public void testGetEventType() {
         assertEquals(EventType.APPLICATION, EventType.getEventType("APPLICATION"));
         assertEquals(EventType.COMPONENT, EventType.getEventType("COMPONENT"));

@@ -26,6 +26,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
 import org.auraframework.impl.system.RenderContextImpl;
 import org.auraframework.system.RenderContext;
+import org.junit.Test;
 
 /**
  * Test class to verify implementation of JavascriptRendererDef.
@@ -38,11 +39,13 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
     /**
      * Verify JavascriptRendererDef is non-local.
      */
+    @Test
     public void testIsLocalReturnsFalse() {
         RendererDef rendererDef =  (new JavascriptRendererDef.Builder()).build();
         assertFalse(rendererDef.isLocal());
     }
 
+    @Test
     public void testGetDescriptor() throws Exception {
         DefDescriptor<RendererDef> expectedRendererDesc = addSourceAutoCleanup(RendererDef.class, "({})");
         RendererDef rendererDef = definitionService.getDefinition(expectedRendererDesc);
@@ -54,6 +57,7 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
     /**
      * Verify UnsupportedOperationException is thrown when rendering component locally using client renderer
      */
+    @Test
     public void testThrownExceptionWhenUsingJSRendererLocally() throws Exception {
         RendererDef rendererDef = (new JavascriptRendererDef.Builder()).build();
         StringWriter sw = new StringWriter();
@@ -67,6 +71,7 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testSerializeJavascriptRendererDef() throws Exception {
         String rendererJs =
                 "({\n" +
@@ -82,6 +87,7 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
         goldFileText(rendererDef.getCode());
     }
 
+    @Test
     public void testSerializeJavascriptRendererDefHasNoFunction() throws Exception {
         String rendererJs = "({ })";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);

@@ -22,23 +22,30 @@
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
 	<div>
-		<ui:inlineEditGrid aura:id="grid" class="inline-edit-grid" items="{!v.items}">
+        <div class="toolbar">
+            <ui:button aura:id="appendButton" label="Append Item" press="{!c.appendItem}" />
+        </div>
+		<ui:inlineEditGrid
+		    aura:id="grid"        class="inline-edit-grid"
+		    itemVar="row"         items="{!v.items}"
+		    rowHeaderIndex="1"    delegatedEvents="click,keydown,mouseover">
+		    
 			<aura:set attribute="headerColumns">
-				<ui:dataGridColumn name="id"	label="Id"/>
+				<ui:dataGridColumn name="id"	label="Id" sortable="true"/>
 				<ui:dataGridColumn name="name"	label="Name"/>
 				<ui:dataGridColumn name="grade" label="Grade"/>
 				<ui:dataGridColumn name=""      label="Actions" hideLabel="true"/>
 			</aura:set>
 			
 			<aura:set attribute="columns">
-				<ui:inlineEditCell name="id" edited="{!item.status.id}">
-					<ui:outputText value="{!item.data.id}"/>
+				<ui:inlineEditCell name="id" edited="{!row.status.id}">
+					<ui:outputText value="{!row.data.id}"/>
 				</ui:inlineEditCell>
-				<ui:inlineEditCell name="name" edited="{!item.status.name}">
-					<ui:outputText value="{!item.data.name}"/>
+				<ui:inlineEditCell name="name" edited="{!row.status.name}">
+					<ui:outputText value="{!row.data.name}"/>
 				</ui:inlineEditCell>
-				<ui:inlineEditCell name="grade" edited="{!item.status.grade}">
-					<ui:outputText value="{!item.data.grade}"/>
+				<ui:inlineEditCell name="grade" edited="{!row.status.grade}">
+					<ui:outputText value="{!row.data.grade}"/>
 				</ui:inlineEditCell>
 			</aura:set>
 		</ui:inlineEditGrid>

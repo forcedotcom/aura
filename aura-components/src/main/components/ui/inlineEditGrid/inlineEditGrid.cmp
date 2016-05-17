@@ -18,23 +18,61 @@
 <aura:component support="PROTO">
 	<aura:dependency resource="markup://ui:inlineEditPanelBody" type="COMPONENT" />
 	
-	<aura:attribute name="items" type="Object[]" />
-	<aura:attribute name="headerColumns" type="Aura.Component[]"/>
-	<aura:attribute name="columns" type="Aura.ComponentDefRef[]" />
+	<aura:attribute name="class"       type="String" />
 	<aura:attribute name="editLayouts" type="Object"/>
+    <aura:attribute name="editedItems" type="Object" access="PRIVATE"/>
 	
-	<aura:attribute name="class" type="String" />
+	<!-- Attributes used by the virtualDataGrid -->
+	<aura:attribute name="items"           type="Object[]"                 description="A list of objects representing the rows of data in the grid"/>
+	<aura:attribute name="itemVar"         type="String"   default="item"  description="The name of the variable to use for each item inside the grid"/>
+	<aura:attribute name="headerColumns"   type="Aura.Component[]"         description="Components used as the header of the table"/>
+	<aura:attribute name="columns"         type="Aura.ComponentDefRef[]"   description="Components used as the template for each row"/>
 	
-	<aura:attribute name="editedItems" type="Object" access="PRIVATE"/>
+	<aura:attribute name="rowHeaderIndex"  type="Integer"                          description="Column index to convert into a row header"/>
+	<aura:attribute name="delegatedEvents" type="String"  default="click,keydown"  description="List of events the grid should delegate, separated by comma."/>
+	
+	<!-- Column Resize Plugin Attributes -->
+	<aura:attribute name="enableResizableColumns" type="Boolean"   description="Enables the column resize plugin. The default is false."/>
+	<aura:attribute name="resizableColumnsConfig" type="Object"    description="The column resize configuration. If not provided, the default configuration is used."/>
 	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
-	<aura:handler name="change" value="columns" action="{!c.handleColumnsChange}"/>
-	<aura:handler name="change" value="headerColumns" action="{!c.handleHeaderChange}"/>
+    <aura:handler name="gridAction" event="ui:gridAction" action="{!c.handleGridAction}"/>
 	
-	<aura:handler name="gridAction" event="ui:gridAction" action="{!c.handleGridAction}"/>
+	<!-- Events passed from the virtualDataGrid -->
+	<aura:registerEvent name="onSort"          type="ui:sort"      description="The event fired when a column is sorted."/>
+	<aura:registerEvent name="onColumnResize"  type="ui:resize"    description="The event fired when a column is resized."/>
 	
-	<div class="{!v.class}">
-		<ui:virtualDataGrid aura:id="grid" items="{!v.items}" />
+	<!-- Grid Methods -->
+	<aura:method name="appendItems">
+	   <aura:attribute name="items" type="Object"/>
+	</aura:method>
+	
+	<aura:method name="resizeColumns" description="Resizes columns if the plugin is enabled.">
+	   <aura:attribute name="widths" type="Integer[]"/>
+	</aura:method>
+	
+	<aura:method name="sort">
+	   <aura:attribute name="sortBy" type="String"/>
+	</aura:method>
+	
+	<!-- Component markup begins -->
+    <div>
+        <ui:virtualDataGrid
+            aura:id="grid"
+            class="{!v.class}"
+            items="{!v.items}"
+            columns="{!v.columns}"
+			headerColumns="{!v.headerColumns}"
+			itemVar="{!v.itemVar}"
+							
+			rowHeaderIndex="{!v.rowHeaderIndex}"
+			delegatedEvents="{!v.delegatedEvents}"
+							
+			enableResizableColumns="{!v.enableResizableColumns}"
+			resizableColumnsConfig="{!v.resizableColumnsConfig}"
+			
+			onsort="{!c.handleSort}"
+			onColumnResize="{!c.handleColumnResize}"/>
 		
 		<div class="footer">
 			<ui:button label="Cancel" press="{!c.cancel}"/>

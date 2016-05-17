@@ -15,11 +15,23 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:inputFileInterface">
+<aura:component extensible="false">
 
-    <aura:attribute name="inputFileHtmlElement" type="Object" access="private"/>
+    <!-- Attributes -->
+    <aura:attribute name="accept"         type="String"  default="*/*"   />
+    <aura:attribute name="multiple"       type="Boolean" default="true"  />
+    <aura:attribute name="maxSizeAllowed" type="Integer" />
+    <aura:attribute name="disabled"       type="Boolean" default="false" />
+        <!-- Private attributes -->
+        <aura:attribute name="inputFileHtmlElement" type="Object" access="PRIVATE"/>
 
-    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+    <!--Events -->
+    <aura:registerEvent name="change" type="ui:inputFileChangeEvent" />
+
+    <aura:handler name="init"   value="{! this }"              action="{! c.init }" />
+    <aura:handler name="change" value="{! v.accept }"          action="{! c.reCreateHTMLElement }" />
+    <aura:handler name="change" value="{! v.multiple }"        action="{! c.reCreateHTMLElement }" />
+    <aura:handler name="change" value="{! v.maxSizeAllowed }"  action="{! c.reCreateHTMLElement }" />
 
     <span class="open-browse-container" onclick="{! c.handleOpenClick }">
         {! v.body }

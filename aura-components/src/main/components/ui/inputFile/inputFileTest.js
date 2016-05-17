@@ -211,6 +211,24 @@
                 $A.test.assertEquals('file.jpg', files[0].name,'The file name should be file.jpg');
             }
         ]
+    },
+    testFormElementInside : {
+        attributes : { includeFormElement : true },
+        test : [
+            function (cmp) {
+                var formElementCollection = cmp.getElement().querySelectorAll('form');
+                $A.test.assertEquals(1, formElementCollection.length,'Cmp should include a form element inside');
+            }
+        ]
+    },
+    testWithoutFormElementInside : {
+        attributes : { includeFormElement : false },
+        test : [
+            function (cmp) {
+                var formElementCollection = cmp.getElement().querySelectorAll('form');
+                $A.test.assertEquals(0, formElementCollection.length,'Cmp should include a form element inside');
+            }
+        ]
     }
 })
 /* eslint-enable */

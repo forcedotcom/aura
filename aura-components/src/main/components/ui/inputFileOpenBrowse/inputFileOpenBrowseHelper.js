@@ -20,7 +20,7 @@
     createInputFileElementAndSetListener : function (cmp) {
         var fileSelector = document.createElement('input');
         fileSelector.setAttribute('type', 'file');
-        fileSelector.setAttribute('multiple', cmp.get('v.multiple'));
+        fileSelector.multiple = cmp.get('v.multiple');
         fileSelector.setAttribute('accept',   cmp.get('v.accept'));
 
         // setting listen input change event
@@ -35,7 +35,7 @@
 
         if (this._meetsSizeConditions(cmp, files)) {
             cmp.getEvent('change').setParams({
-                files: files
+                files : files
             }).fire();
         }
     },

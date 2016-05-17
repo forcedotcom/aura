@@ -1,0 +1,12 @@
+<aura:component>
+    <ui:inputFile>
+        <h1>Hey my custom inputFile here</h1>
+        <hr />
+        <ui:inputFileDroppableZone>
+            Here you can Drag and Drop your Files
+        </ui:inputFileDroppableZone>
+        <ui:inputFileOpenBrowse>
+            <ui:button label="browse"></ui:button>
+        </ui:inputFileOpenBrowse>
+    </ui:inputFile>
+</aura:component>

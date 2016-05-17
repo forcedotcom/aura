@@ -15,12 +15,17 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component extensible="true">
+    <!-- Attributes -->
     <aura:attribute name="files" type="Object" />
-    <aura:attribute name="filesArr" type="Object[]" default="[]"  access="private" />
+        <!-- Private attribute -->
+        <aura:attribute name="filesArr" type="Object[]" default="[]"  access="PRIVATE" />
 
+    <!-- Handlers -->
     <aura:handler name="change" value="{! v.files }" action="{! c.mapFilesToArray }" />
 
+
+    <!-- Markup -->
     <h1 class="input-file-header">List of selected files</h1>
     <aura:if isTrue="{! v.filesArr.length == 0 }">
         Empty

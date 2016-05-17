@@ -15,50 +15,69 @@
     limitations under the License.
 
 -->
-<aura:component support="PROTO" implements="ui:inputFileInterface" description="An HTML input element for select uploading files.">
+<aura:component support="PROTO" extensible="false"
+                description="A component for select files on your file system, support drag and drop, content type filter, and limit of bytes for file.">
 
     <!-- Attributes -->
-    <aura:attribute name="files"          type="Object" />
-    <aura:attribute name="name"     type="String"  />
-    <aura:attribute name="disabled" type="Boolean" default="false" />
-    <aura:attribute name="required" type="Boolean" default="false" />
-    <aura:attribute name="browseButton" type="Aura.Component[]"    />
-    <aura:attribute name="bodyText"     type="Aura.Component[]"    />
+    <aura:attribute name="files"              type="Object" />
+    <aura:attribute name="name"               type="String" />
+    <aura:attribute name="disabled"           type="Boolean" default="false" />
+    <aura:attribute name="required"           type="Boolean" default="false" />
+    <aura:attribute name="includeFormElement" type="Boolean" default="true"  />
+    <aura:attribute name="accept"             type="String"  default="*/*"   />
+    <aura:attribute name="multiple"           type="Boolean" default="true"  />
+    <aura:attribute name="maxSizeAllowed"     type="Integer"                 />
+    <aura:attribute name="class"              type="String"  default=""      />
+        <!-- Private Attributes -->
+        <aura:attribute name="privateHelperCmpRefs"     type="Aura.Component[]"    access="PRIVATE" />
+
+    <!--Events -->
+    <aura:registerEvent name="change" type="ui:inputFileChangeEvent" />
+
+    <!--Methods -->
+    <aura:method name="reset" action="{! c.reset }" />
+
 
     <!--Handlers -->
-    <aura:handler name="change" event="ui:inputFileChangeEvent" action="{! c.handleChange }" />
+    <aura:handler name="init"   value="{! this }"                action="{! c.init }"/>
+    <aura:handler name="change" event="ui:inputFileChangeEvent"  action="{! c.handleChange }"/>
 
-
-
-    <ui:inputFileDroppableZone multiple="{!v.multiple}" accept="{!v.accept}" maxSizeAllowed="{!v.maxSizeAllowed}"
-                               disabled="{!v.disabled}" class="{!v.class}"   classOver="{!v.classOver}" aura:id="dropZone">
-
+    <!-- Markup -->
+    <div class="inputFileContainer">
         <!--Hidden HTML input file-->
-        <input type="file" multiple="{!v.multiple}" accept="{!v.accept}" tabindex="-1"
-               class="hidden-input-file" name="{! v.name}" />
+        <aura:if isTrue="{! v.includeFormElement }">
+            <!-- Include form element inside by default -->
+            <form aura:id="upload-form" action="" method="post" enctype="multipart/form-data"
+                  encoding="multipart/form-data">
+                <input type="file" multiple="{!v.multiple}" accept="{!v.accept}" tabindex="-1"
+                       class="hidden-input-file" name="{! v.name}" aura:id="hidden-input"/>
+            </form>
+            <aura:set attribute="else">
+                <!-- Without form element, then form element is used as wrap of inputFile -->
+                <input type="file" multiple="{!v.multiple}" accept="{!v.accept}" tabindex="-1"
+                       class="hidden-input-file" name="{! v.name}" aura:id="hidden-input"/>
+            </aura:set>
+        </aura:if>
+
 
         <!-- Body -->
         <div class="input-file-body">
-            <!--Body text-->
-            <span class="input-file-body-text">
-                <aura:if isTrue="{! v.bodyText.length > 0 }">
-                    {! v.bodyText }
-                    <aura:set attribute="else">
+            <aura:if isTrue="{! v.body.length > 0 }">
+                {! v.body }
+                <aura:set attribute="else">
+                    <!-- Default markup -->
+                    <ui:inputFileDroppableZone multiple="{!v.multiple}" accept="{!v.accept}" maxSizeAllowed="{!v.maxSizeAllowed}"
+                                               disabled="{!v.disabled}" class="{!v.class}"
+                                               aura:id="dropZone">
                         Drag and Drop files here or
-                    </aura:set>
-                </aura:if>
-            </span>
-            <!-- Browse button -->
-            <ui:inputFileOpenBrowse multiple="{!v.multiple}" accept="{!v.accept}">
-                <aura:if isTrue="{! v.browseButton.length > 0 }">
-                    {! v.browseButton }
-                    <aura:set attribute="else">
-                        <a>Browse</a>
-                    </aura:set>
-                </aura:if>
-            </ui:inputFileOpenBrowse>
+                        <ui:inputFileOpenBrowse multiple="{!v.multiple}" accept="{!v.accept}">
+                            <a>Browse</a>
+                        </ui:inputFileOpenBrowse>
+                        <ui:inputFileFilesList files="{! v.files }"/>
+                    </ui:inputFileDroppableZone>
+                </aura:set>
+            </aura:if>
         </div>
-        <!--Footer -->
-        <ui:inputFileFilesList files="{! v.files }"/>
-    </ui:inputFileDroppableZone>
+    </div>
+
 </aura:component>

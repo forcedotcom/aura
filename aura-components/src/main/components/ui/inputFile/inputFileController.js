@@ -14,9 +14,33 @@
  * limitations under the License.
  */
 ({
+    init : function (cmp, event, helper) {
+        var body = cmp.get('v.body')
+          , helperCmpList;
+
+        helperCmpList = helper.findAllHelperCmps(body);
+
+        // Storing helper component list, then we don't have traverse the body more than one
+        helper.storeHelperCmpRefs(cmp, helperCmpList);
+
+        helperCmpList.forEach(function (helperCmp) {
+            helperCmp.setAttributeValueProvider(cmp);
+            helper.setCmpContext(cmp, helperCmp);
+        });
+    },
     handleChange : function (cmp, event, helper) {
         var files = event.getParam('files');
         helper.updateInputFile(cmp,files);
         helper.updateFilesAttr(cmp,files);
+        helper.attachFormElement(cmp,event);
+
+        if (helper.thereIsHelperCmps(cmp)) {
+            helper.updateHelperCmpContext(cmp);
+        }
+    },
+    reset : function (cmp, event, helper) {
+        var EMPTY_OBJ = {};
+        helper.fireChangeEvent(cmp, EMPTY_OBJ);
     }
+
 });

@@ -15,7 +15,7 @@
  */
 ({
     init : function (cmp, event, helper) {
-        helper.setDropZoneClassList(cmp);
+        helper.setDropZoneClassNames(cmp);
     },
     handleDragEnter : function (cmp, event, helper) {
         helper.setElementOverStyleClass(cmp);
@@ -26,7 +26,6 @@
     handleOnDrop : function (cmp, event, helper) {
         event.preventDefault();
         helper.removeElementOverStyleClass(cmp);
-
         if (helper.thereAreFiles(event) && helper.filesAreValid(cmp,event)) {
             helper.fireDropEvent(cmp,event);
         }

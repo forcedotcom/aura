@@ -15,17 +15,16 @@
  */
 ({
     setElementOverStyleClass : function (cmp) {
-        this.setDropZoneClassList(cmp,['drag-over',cmp.get('v.classOver')]);
+        this.setDropZoneClassNames(cmp,['drag-over',cmp.get('v.classOver')]);
     },
     removeElementOverStyleClass : function (cmp) {
-        this.setDropZoneClassList(cmp);
+        this.setDropZoneClassNames(cmp);
     },
-    setDropZoneClassList : function (cmp, obj) {
+    setDropZoneClassNames : function (cmp, obj) {
         var classnames = this.lib.classnames;
         var classAttr  = cmp.get('v.class');
-        cmp.set('v.dropZoneClassList',classnames.ObjectToString({
-            'droppable-zone' : true
-        }, classAttr, obj));
+        var classes = classnames.ObjectToString('droppable-zone', obj, classAttr);
+        cmp.set('v.dropZoneClassList', classes);
     },
     thereAreFiles : function (dragEvent) {
         return dragEvent.dataTransfer.files.length > 0;

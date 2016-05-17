@@ -133,7 +133,15 @@ AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
  * @export
  */
 AuraStorage.prototype.clear = function() {
-    return this.adapter.clear();
+    var that = this;
+    return this.adapter.clear()
+        .then(
+            undefined,
+            function(e) {
+                that.logError({ "operation": "clear", "error": e });
+                throw e;
+            }
+        );
 };
 
 /**
@@ -155,10 +163,10 @@ AuraStorage.prototype.get = function(key) {
             return undefined;
         }
         return { "value" : item["value"], "isExpired" : (new Date().getTime() > item["expires"]) };
-    },function (err) {
-        that.logError({ "operation": "get" });
+    },function (e) {
+        that.logError({ "operation": "get", "error": e });
         that.getOperationsInFlight -= 1;
-        return Promise["reject"](err);
+        throw e;
     });
 
     this.sweep();
@@ -203,7 +211,7 @@ AuraStorage.prototype.getAll = function() {
         that.log("getAll() - found " + results.length + " items");
         return results;
     }, function (e) {
-        that.logError({ "operation": "getAll" });
+        that.logError({ "operation": "getAll", "error": e });
         throw e;
     });
 };
@@ -246,7 +254,7 @@ AuraStorage.prototype.put = function(key, value) {
                 $A.storageService.fireModified();
             },
             function (e) {
-                that.logError({ "operation": "put" });
+                that.logError({ "operation": "put", "error": e });
                 throw e;
             }
         );
@@ -272,7 +280,7 @@ AuraStorage.prototype.remove = function(key, doNotFireModified) {
                 $A.storageService.fireModified();
             }
         }, function (e) {
-            that.logError({ "operation": "remove" });
+            that.logError({ "operation": "remove", "error": e });
             throw e;
         }
     );
@@ -318,11 +326,12 @@ AuraStorage.prototype.sweep = function() {
         this.adapter.sweep()
             .then(
                 undefined, // noop
-                function() {
-                    that.logError({ "operation": "sweep" });
+                function(e) {
+                    that.logError({ "operation": "sweep", "error": e });
+                    // do not rethrow to move to resolve state
                 }
             )
-            .then(doneSweeping);
+            .then(doneSweeping, doneSweeping);
         return;
     }
 
@@ -330,8 +339,8 @@ AuraStorage.prototype.sweep = function() {
     this.adapter.getExpired()
         .then(
             undefined, // noop
-            function() {
-                that.logError({ "operation": "getExpired" });
+            function(e) {
+                that.logError({ "operation": "getExpired", "error": e });
                 return [];
             }
         )
@@ -408,13 +417,18 @@ AuraStorage.prototype.log = function() {
 };
 
 /**
+ * Logs an error to the server.
+ * @param {Object} payload The error payload object.
+ * @param {String} payload.operation The operation which errored (eg get, put)
+ * @param {Error=} payload.error Optional error object
  * @private
  */
-AuraStorage.prototype.logError = function(error) {
+AuraStorage.prototype.logError = function(payload) {
     $A.metricsService.transaction("aura", "errorStorage", { "context": {
-        "name"      : this.name, 
+        "name"      : this.name,
         "adapter"   : this.getName(),
-        "operation" : error["operation"]
+        "operation" : payload["operation"],
+        "error"     : payload["error"] && payload["error"].toString()
     }});
 };
 
@@ -469,10 +483,14 @@ AuraStorage.prototype.getVersion  = function() {
 AuraStorage.prototype.deleteStorage = function() {
     var that = this;
     if (this.adapter.deleteStorage) {
-        return this.adapter.deleteStorage().then(undefined, function (e) {
-            that.logError({ "operation": "deleteStorage" });
-            throw e;
-        });
+        return this.adapter.deleteStorage()
+            .then(
+                undefined,
+                function (e) {
+                    that.logError({ "operation": "deleteStorage", "error": e });
+                    throw e;
+                }
+            );
 
     } else {
         return new Promise(function(success) {

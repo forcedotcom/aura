@@ -24,9 +24,14 @@
     <aura:method name="testGetEventReturnsSecureEvent" action="{!c.testGetEventReturnsSecureEvent}"/>
     <aura:method name="testGetCThrowsError" action="{!c.testGetCThrowsError}"/>
     <aura:method name="testAddValueProviderExploit" action="{!c.testAddValueProviderExploit}"/>
+    <aura:method name="testAuraMethod" action="{!c.testAuraMethod}"/>
 
     <aura:registerevent name="press" type="ui:press"/>
+    
+  	<aura:method name="sayHello" action="{!c.sayHello}"/>
 
     <div>SecureComponent test</div>
     <lockerTest:basicTest aura:id="innerCmp"/>
+    
+    <div aura:id="message"></div>
 </aura:component>

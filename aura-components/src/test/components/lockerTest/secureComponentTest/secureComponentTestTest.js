@@ -45,5 +45,11 @@
         test: function(cmp) {
             cmp.testAddValueProviderExploit();
         }
+    },
+    
+    testAuraMethod: {
+        test: function(cmp) {
+            cmp.testAuraMethod();
+        }
     }
 })

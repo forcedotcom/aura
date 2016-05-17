@@ -94,7 +94,8 @@ function SecureComponent(component, key) {
     var defs = component.getDef().methodDefs;
     if (defs) {
         defs.forEach(function(method) {
-    		SecureObject.addMethodIfSupported(o, component, method.name);
+        	var descriptor = new DefDescriptor(method.name);
+    		SecureObject.addMethodIfSupported(o, component, descriptor.getName());
         }, o);
     }
 

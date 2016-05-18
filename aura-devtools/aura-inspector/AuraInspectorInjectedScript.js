@@ -349,7 +349,16 @@
                 actionDropPercentage = data.actionDropPercentage;
             }
 
-            //clean up
+            /*
+            clearAllAuraStorages(
+                function() {
+                    $Aura.Inspector.publish("AuraInspector:OnNewChaosRunNewStatus", {'message': "Successfully Clear up All Aura Storage"});    
+                },
+                function(e) {
+                    $Aura.Inspector.publish("AuraInspector:OnNewChaosRunNewStatus", {'message': "There was a problem trying to clear aura storage"});
+                    console.warn(e);
+                }
+            );*/
             currentChaosRun = {};
             currentChaosRunSteps = [];
             sessionStorage.removeItem("chaosRunToReplay");
@@ -844,17 +853,11 @@
             console.error(errMsg);
         }
         var elementToClick = elementToClickObj.element;
-
-        var cssPath = getCssPath(elementToClick);
-        if(!document.querySelector(cssPath)) {
-            console.error("get bad cssPath?");
-            getCssPath(elementToClick);
-        }
         //ask AuraInspectorChaosView to create a chaos card
         var data = {
             'textContent': elementToClick.textContent,
             'locator': elementToClickObj.locator,
-            'cssPath': getCssPath(elementToClick)
+            'cssPath': elementToClickObj.cssPath
         };
         currentChaosRunSteps.push(data);
         //this will call AuraInspectorChaosView_OnClickSomeElement in AuarInspectorChaosView to create a chaos card
@@ -866,13 +869,20 @@
         intervalFunctionRef_anyAuraRenderedElementPresent = setInterval(waitAnyAuraRenderedElementPresent, defaultSamplingInterval);
     }
 
+    /*
+    {
+        'element': 
+        'cssPath': string
+        'locator': { 'root': string, 'parent': string, 'context': {string --> nodeValue} }
+    }
+    */
     function getRandomClickableAuraElement() {
         var res = {};
         var resLocator = {};
         var elementNodeList; var elements = [];
         var randomClickableClassIndex;
         var randomElementsIndex;
-        var element;
+        var elementObj, element;
         var renderingComponent;
         var idx;
 
@@ -883,8 +893,10 @@
             selector = '.'+clicableClassList[randomClickableClassIndex]+'[data-aura-rendered-by] ';
             elementNodeList = document.querySelectorAll(selector);
             for (idx = 0; idx < elementNodeList.length; idx++) {
-                if( isElementVisible(elementNodeList.item(idx)) ) {
-                    elements.push(elementNodeList.item(idx));
+                var elementNode = elementNodeList.item(idx);
+                var cssPath = getCssPath(elementNode);
+                if( isElementVisible(elementNode) && cssPath ) {
+                    elements.push( { 'element': elementNode, 'cssPath': cssPath } );
                 }
             }
             //console.log("try selector#"+randomClickableClassIndex+":"+selector);
@@ -895,8 +907,9 @@
         }
 
         randomElementsIndex = Math.floor( Math.random() * elements.length );
-        element = elements[randomElementsIndex];
-        res['element'] = element;
+        elementObj = elements[randomElementsIndex];
+        res = elementObj;
+        element = elementObj.element;
         renderingComponent = $A.componentService.getRenderingComponentForElement(element);
         if(renderingComponent.getLocalId()) {
             var parentCmp = getClosestAncestorWithLocalId(renderingComponent);
@@ -1044,12 +1057,11 @@
     }
 
     function getCssPath (element) {
-      // False on non-elements
       if (!(element instanceof HTMLElement)) { return false; }
       var path = [];
       while (element.nodeType === Node.ELEMENT_NODE) {
         var selector = element.nodeName;
-        if (element.id && element.id.indexOf(";a")<0) { selector += ('#' + element.id); }
+        if (element.id && element.id.indexOf(";")<0 && element.id.indexOf(":")<0 ) { selector += ('#' + element.id); }
         else {
           // Walk backwards until there is no previous sibling
           var sibling = element;

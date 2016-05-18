@@ -84,15 +84,19 @@ function AuraInspectorChaosView(devtoolsPanel) {
 
         // Start listening for events to draw
         devtoolsPanel.subscribe("AuraInspector:OnPanelConnect", AuraInspectorChaosView_OnBootstrap.bind(this));
-        devtoolsPanel.subscribe("AuraInspector:OnReplayChaosRunFinished", AuraInspectorChaosView_OnReplayChaosRunFinished.bind(this));
+        
         devtoolsPanel.subscribe("AuraInspector:OnClickSomeElement", AuraInspectorChaosView_OnClickSomeElement.bind(this));
-        devtoolsPanel.subscribe("AuraInspector:OnRecordActionDropForChaosRun", AuraInspectorChaosView_OnRecordActionDropForChaosRun.bind(this));
+        
+        devtoolsPanel.subscribe("AuraInspector:OnRecordActionDropForChaosRun", AuraInspectorChaosView_OnRecordActionDropForChaosRun.bind(this)); 
+        devtoolsPanel.subscribe("AuraInspector:OnNewChaosRunNewStatus", AuraInspectorChaosView_OnNewChaosRunNewStatus.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnChaosRunSaved", AuraInspectorChaosView_OnChaosRunSaved.bind(this));
-        devtoolsPanel.subscribe("AuraInspector:OnChaosRunLoaded", AuraInspectorChaosView_OnChaosRunLoaded.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnStopNewChaosRunWithError", stopChaosRun.bind(this));
+        
+        devtoolsPanel.subscribe("AuraInspector:OnChaosRunLoaded", AuraInspectorChaosView_OnChaosRunLoaded.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnReplayChaosRunNewStatus", AuraInspectorChaosView_OnReplayChaosRunNewStatus.bind(this));
+        devtoolsPanel.subscribe("AuraInspector:OnReplayChaosRunFinished", AuraInspectorChaosView_OnReplayChaosRunFinished.bind(this));
+        
         devtoolsPanel.subscribe("AuraInspector:OnCreateChaosCard", AuraInspectorChaosView_OnCreateChaosCard.bind(this));
-
 
     };
 
@@ -105,6 +109,7 @@ function AuraInspectorChaosView(devtoolsPanel) {
         document.querySelector("#save_chaos_run").classList.add("hidden");
         document.querySelector("#replay_chaos_run").classList.add("hidden");
         document.querySelector("#stop_all_chaos_run").classList.remove("hidden");
+        document.querySelector("#newrun_status").classList.add("hidden");
         document.querySelector("#replaying_status").classList.add("hidden");
         console.log("chaosView.refresh");
     };
@@ -116,6 +121,18 @@ function AuraInspectorChaosView(devtoolsPanel) {
     function AuraInspectorChaosView_OnReplayChaosRunNewStatus(status) {
         if (status && status.message) {
             var div_replaying_status = document.querySelector("#replaying_status");
+            div_replaying_status.classList.remove("hidden");
+            div_replaying_status.textContent = status.message;
+        }
+    }
+
+    /*
+        event handler for "AuraInspector:OnNewChaosRunNewStatus"
+        status : {'message': string}
+    */
+    function AuraInspectorChaosView_OnNewChaosRunNewStatus(status) {
+        if (status && status.message) {
+            var div_replaying_status = document.querySelector("#newrun_status");
             div_replaying_status.classList.remove("hidden");
             div_replaying_status.textContent = status.message;
         }

@@ -230,6 +230,16 @@ Aura.OverrideMap = function OverrideMap() {
             function(orig) {
                 $A.renderingService.addDirtyValue = orig;
             }
+        ),
+
+        "MetricsService.transaction" : new Aura.Utils.Override($A.metricsService, $A.metricsService.transaction,
+            false,
+            function(bound) {
+                $A.metricsService.transaction = bound;
+            },
+            function(orig) {
+                $A.metricsService.transaction = orig;
+            }
         )
     };
 };

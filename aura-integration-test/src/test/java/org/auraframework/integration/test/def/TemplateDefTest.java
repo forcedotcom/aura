@@ -33,10 +33,6 @@ import org.junit.Test;
  * for all applications and components.
  */
 public class TemplateDefTest extends AuraImplTestCase {
-    public TemplateDefTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testDefaultTemplate() throws Exception {
         assertTemplate(ComponentDef.class, String.format(baseComponentTag, "", ""), null,

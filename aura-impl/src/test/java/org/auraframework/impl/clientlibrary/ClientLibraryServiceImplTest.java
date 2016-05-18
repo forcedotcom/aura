@@ -27,10 +27,6 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase{
 
     private ClientLibraryService clientLibraryService;
 
-    public ClientLibraryServiceImplTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

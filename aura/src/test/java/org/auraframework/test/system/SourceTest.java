@@ -29,10 +29,6 @@ import org.junit.Test;
 public class SourceTest extends UnitTestCase {
     private final static int DEFAULT_HASHCODE = 3;
 
-    public SourceTest(String name) throws NoSuchAlgorithmException {
-        super(name);
-    }
-
     private int getHashCode(String string) throws NoSuchAlgorithmException {
         return Arrays.hashCode(MessageDigest.getInstance("MD5").digest(string.getBytes()));
     }

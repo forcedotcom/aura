@@ -24,11 +24,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class DesignDefHandlerTest extends AuraImplTestCase {
-
-    public DesignDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetElement() throws Exception {
         DesignDef element = definitionService.getDefinition(setupSimpleDesignDef("<design:component label=\"some label\" />"));

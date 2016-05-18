@@ -33,11 +33,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class JavascriptControllerParserTest extends AuraImplTestCase {
-
-    public JavascriptControllerParserTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify JavascriptControllerParser parsing client controller
      */

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test;
+package org.auraframework.integration.test;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -29,12 +29,12 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.JSTest;
@@ -59,7 +59,7 @@ public class ComponentJSTestSuite extends TestSuite {
         private final Throwable cause;
 
         private FailTestCase(DefDescriptor<TestSuiteDef> descriptor, Throwable cause) {
-            super(descriptor.getQualifiedName());
+            this.setName(descriptor.getQualifiedName());
             this.cause = cause;
         }
 
@@ -144,7 +144,7 @@ public class ComponentJSTestSuite extends TestSuite {
 
     public static class ComponentTestCase extends WebDriverTestCase {
         private ComponentTestCase(ComponentTestSuite suite, TestCaseDef caseDef) {
-            super(String.format("%s$%s", suite.getName(), caseDef.getName()));
+            this.setName(String.format("%s$%s", suite.getName(), caseDef.getName()));
             this.suite = suite;
             this.caseDef = caseDef;
             for (String browser : caseDef.getBrowsers()) {

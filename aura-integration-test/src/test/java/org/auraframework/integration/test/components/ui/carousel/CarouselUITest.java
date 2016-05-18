@@ -17,8 +17,8 @@ package org.auraframework.integration.test.components.ui.carousel;
 
 import java.util.List;
 
-import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.PerfTest;
 import org.junit.Test;
@@ -46,10 +46,6 @@ public class CarouselUITest extends WebDriverTestCase {
     private final String CAROUSEL_PAGE_SELECTOR = "section[class*='uiCarouselPage']";
     private final String CAROUSEL_PAGE_ITEM_SELECTOR = "li[class*='pageItem']";
     private final String AURA_RENDERED_BY_ID = "data-aura-rendered-by";
-
-    public CarouselUITest(String name) {
-        super(name);
-    }
 
     /**
      * Able to tab into a page on the carousel.

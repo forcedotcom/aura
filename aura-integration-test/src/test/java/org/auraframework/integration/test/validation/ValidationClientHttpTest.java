@@ -21,7 +21,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 
-import org.auraframework.test.util.AuraHttpTestCase;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraFiles;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.validation.ValidationClient;
@@ -35,10 +35,6 @@ import com.google.common.collect.Lists;
  */
 @UnAdaptableTest
 public final class ValidationClientHttpTest extends AuraHttpTestCase {
-
-    public ValidationClientHttpTest(String name) {
-        super(name);
-    }
 
     /**
      * Checks that the ValidationClient can run with just the aura-util.jar in the classpath

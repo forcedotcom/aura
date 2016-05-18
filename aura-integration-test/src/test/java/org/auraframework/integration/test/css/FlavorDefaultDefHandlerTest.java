@@ -32,10 +32,6 @@ import org.junit.Test;
 
 public class FlavorDefaultDefHandlerTest extends StyleTestCase {
 
-    public FlavorDefaultDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testDescription() throws Exception {
         addStandardFlavor(addComponentDef(), ".THIS--test;");

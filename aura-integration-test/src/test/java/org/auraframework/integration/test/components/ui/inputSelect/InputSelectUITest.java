@@ -17,7 +17,7 @@ package org.auraframework.integration.test.components.ui.inputSelect;
 
 import java.util.List;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.PerfTest;
 import org.junit.Test;
@@ -34,10 +34,6 @@ public class InputSelectUITest extends WebDriverTestCase {
     private final String optionLocator = "option[text()='%1$s'] | optgroup/option[text()='%1$s']";
 
     private String selectId;
-
-    public InputSelectUITest(String name) {
-        super(name);
-    }
 
     /**
      * Selecting any option should work

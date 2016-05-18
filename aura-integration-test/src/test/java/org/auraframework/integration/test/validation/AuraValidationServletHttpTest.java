@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.auraframework.test.util.AuraHttpTestCase;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraFiles;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
@@ -43,10 +43,6 @@ import com.google.common.base.Charsets;
 public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
 
     private HttpRequestBase method;
-
-    public AuraValidationServletHttpTest(String name) {
-        super(name);
-    }
 
     @Override
     public void tearDown() throws Exception {

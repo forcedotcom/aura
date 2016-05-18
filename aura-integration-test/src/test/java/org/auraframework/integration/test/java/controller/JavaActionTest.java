@@ -45,16 +45,8 @@ import org.mockito.Mockito;
  * Integration tests for JavaAction.
  */
 public class JavaActionTest extends AuraImplTestCase {
-
-    InstanceService instanceService;
-    CachingService cachingService;
-
-    public JavaActionTest(String name) {
-        super(name);
-        // inject the services after merging with uitier
-        instanceService = Aura.getInstanceService();
-        cachingService = Aura.getCachingService();
-    }
+    private InstanceService instanceService = Aura.getInstanceService();
+    private CachingService cachingService = Aura.getCachingService();
 
     /**
      * Tests to verify the APIs on Action to mark actions as storable.

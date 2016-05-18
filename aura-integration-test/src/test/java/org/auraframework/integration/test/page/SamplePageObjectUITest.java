@@ -30,11 +30,6 @@ import org.junit.Test;
  * for more info about the PageObject 'idea': https://code.google.com/p/selenium/wiki/PageObjects
  */
 public class SamplePageObjectUITest extends PageObjectTestCase<SampleAuraPageObject> {
-
-    public SamplePageObjectUITest(String name) throws MalformedURLException, URISyntaxException {
-        super(name);
-    }
-
     @Test
     public void testButtonUi() throws Exception {
         //create the PageObject
@@ -64,5 +59,4 @@ public class SamplePageObjectUITest extends PageObjectTestCase<SampleAuraPageObj
     	apoi.open();
     	apoi.clickOnButton();
     }
-
 }

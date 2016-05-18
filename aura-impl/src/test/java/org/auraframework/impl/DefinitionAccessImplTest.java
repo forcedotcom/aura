@@ -26,10 +26,6 @@ import org.junit.Test;
 public class DefinitionAccessImplTest extends AuraImplTestCase {
     DefinitionParserAdapter definitionParser = null;
     
-    public DefinitionAccessImplTest(String name) {
-        super(name);
-    }
-    
     @Override
     public void setUp() throws Exception{
         super.setUp();

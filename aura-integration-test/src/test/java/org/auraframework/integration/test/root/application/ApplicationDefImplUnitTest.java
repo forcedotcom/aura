@@ -39,8 +39,8 @@ public class ApplicationDefImplUnitTest extends
     String additionalAppCacheURLs;
     Boolean isOnePageApp;
 
-    public ApplicationDefImplUnitTest(String name) {
-        super(name);
+    public ApplicationDefImplUnitTest() {
+        super();
         descriptorName = "application";
         qualifiedDescriptorName = "test:application";
     }

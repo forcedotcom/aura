@@ -23,10 +23,6 @@ import org.junit.Test;
 
 public class LoggingTimerTest extends UnitTestCase {
 
-    public LoggingTimerTest(String name) {
-        super(name);
-    }
-    
     @Test
     public void testTimer() throws Exception {
         Timer timer = new Timer("foo");

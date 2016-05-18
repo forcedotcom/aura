@@ -37,10 +37,6 @@ import com.google.common.collect.ImmutableList;
  * DirectiveBasedJavascriptGroup object.
  */
 public class DirectiveParserTest extends UnitTestCase {
-    public DirectiveParserTest(String name) {
-        super(name);
-    }
-
     /**
      * Try to pass an empty set of directive. Ideally the test should return
      * just the contents of the file after stripping of all the lines with

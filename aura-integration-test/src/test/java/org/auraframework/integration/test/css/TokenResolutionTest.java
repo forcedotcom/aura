@@ -38,10 +38,6 @@ import com.google.common.collect.Lists;
  * Unit tests for resolving token function values in CSS files.
  */
 public class TokenResolutionTest extends StyleTestCase {
-    public TokenResolutionTest(String name) {
-        super(name);
-    }
-
     private void assertStyle(DefDescriptor<StyleDef> style, String expected) throws QuickFixException {
         expected = expected.replace(".THIS", "." + definitionService.getDefinition(style).getClassName());
         assertEquals("Did not get the expected css code", expected, getParsedCssUseAppTokens(style));

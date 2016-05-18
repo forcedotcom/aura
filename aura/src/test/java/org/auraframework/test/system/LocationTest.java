@@ -23,10 +23,6 @@ public class LocationTest extends UnitTestCase {
     private static final Location testLocationFileOnly = new Location("filenameonly", 10);
     private static final Location testLocation = new Location("filename", 5, 5, 10);
 
-    public LocationTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testLocationStringIntInt() throws Exception {
         Location testLocationLocal = new Location("filename", 5, 5, 10);

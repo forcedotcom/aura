@@ -33,12 +33,6 @@ import com.google.common.collect.Maps;
  * Integration tests for Java provider
  */
 public class JavaProviderIntegrationTest extends AuraImplTestCase {
-
-
-    public JavaProviderIntegrationTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testConcreteProviderInjection() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();

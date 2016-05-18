@@ -41,11 +41,6 @@ import org.mockito.Mockito;
 import com.google.common.collect.Lists;
 
 public class IncludeDefRefHandlerTest extends AuraImplTestCase {
-
-    public IncludeDefRefHandlerTest(String name) {
-        super(name);
-    }
-
     @Mock
     DefDescriptor<IncludeDefRef> descriptor;
 

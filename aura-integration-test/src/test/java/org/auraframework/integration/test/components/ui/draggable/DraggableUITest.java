@@ -19,8 +19,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -32,10 +32,6 @@ public class DraggableUITest extends WebDriverTestCase{
 
     private static final String DRAGANDDROPTEST_APP = "/uitest/dragAndDrop_Test.cmp";
     private WebDriver driver;
-
-    public DraggableUITest(String name) {
-        super(name);
-    }
 
     /**
      * Tests successful drag and drop draggable and dropzone have matching type.

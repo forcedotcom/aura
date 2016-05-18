@@ -27,12 +27,12 @@ import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.perf.PerfMockAttributeValueProvider;
 import org.auraframework.test.perf.PerfWebDriverUtil;
-import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
@@ -53,7 +53,7 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
     private String testName;
 
     public AbstractPerfTestCase(String name) {
-        super(name);
+    	this.setName(name);
         // needs to temporarily be set to something non-null as getName() should never return null
         testName = name;
     }

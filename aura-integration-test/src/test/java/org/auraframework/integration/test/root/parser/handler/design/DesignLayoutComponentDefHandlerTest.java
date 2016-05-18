@@ -36,10 +36,6 @@ public class DesignLayoutComponentDefHandlerTest extends AuraImplTestCase {
     private final static DefDescriptor<ComponentDef> ANOTHER_VALID_CMP_DEF =
             Aura.getDefinitionService().getDefDescriptor(ANOTHER_VALID_COMPONENT, ComponentDef.class);
 
-    public DesignLayoutComponentDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testLayoutComponentWithInvalidComponent() throws Exception {
         try {

@@ -32,9 +32,9 @@ import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.client.UserAgent;
-import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -47,10 +47,6 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     private static final String APPCACHE_SUPPORTED_USERAGENT = UserAgent.GOOGLE_CHROME.getUserAgentString();
     private static final String APPCACHE_UNSUPPORTED_USERAGENT = UserAgent.EMPTY.getUserAgentString();
     private static final Pattern HTML_MANIFEST_PATTERN = Pattern.compile("<html[^>]* manifest=\"(.*?)\"[^>]*>");
-
-    public AppCacheManifestHttpTest(String name) {
-        super(name);
-    }
 
     private String getManifestURL(String appPath, Mode mode, boolean expectNull) throws Exception {
         HttpGet get = obtainGetMethod(appPath + String.format("?aura.mode=%s",mode.toString()));

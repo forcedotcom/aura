@@ -40,10 +40,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 public class TokensDefImplTest extends StyleTestCase {
-    public TokensDefImplTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testEmpty() throws QuickFixException {
         TokensDef emptyDef = definitionService.getDefinition(addSeparateTokens("<aura:tokens />"));

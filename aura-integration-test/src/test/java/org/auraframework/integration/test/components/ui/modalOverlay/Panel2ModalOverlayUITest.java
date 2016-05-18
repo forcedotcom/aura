@@ -19,8 +19,9 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.*;
-import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -53,10 +54,6 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private final String APP_INPUT = ".appInput";
     private final String APP_INPUT2 = ".appInput2";
     private final String CLOSE_BTN = "closeBtn";
-
-    public Panel2ModalOverlayUITest(String name) {
-        super(name);
-    }
 
     /**
      * [Accessibility] modal closing on Esc key. Bug: W-2617212

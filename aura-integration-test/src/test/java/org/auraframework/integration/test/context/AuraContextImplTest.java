@@ -69,13 +69,10 @@ import com.google.common.collect.Sets;
 
 /**
  * Unit tests for AuraContextImpl.
- *
- * @hierarchy Aura.Basic
- * @priority high
  */
 public class AuraContextImplTest extends AuraImplTestCase {
-    public AuraContextImplTest(String name) {
-        super(name, false);
+    public AuraContextImplTest() {
+    	this.setShouldSetupContext(false);
     }
 
     @Override

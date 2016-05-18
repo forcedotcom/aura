@@ -48,8 +48,8 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
     protected boolean required;
     protected SerializeToType serializeTo;
 
-    public AttributeDefImplUnitTest(String name) {
-        super(name);
+    public AttributeDefImplUnitTest() {
+        super();
         this.descriptorName = "testAttribute";
         this.qualifiedDescriptorName = "testAttribute";
     }

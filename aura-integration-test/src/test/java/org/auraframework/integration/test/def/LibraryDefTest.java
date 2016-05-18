@@ -44,11 +44,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 public class LibraryDefTest extends DefinitionTest<LibraryDef> {
-
-    public LibraryDefTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify the loading of libraryDefs.
      */

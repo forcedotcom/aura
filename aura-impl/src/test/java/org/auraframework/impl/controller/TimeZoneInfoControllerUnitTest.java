@@ -21,6 +21,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.controller.TimeZoneInfoController;
 import org.auraframework.impl.controller.TimeZoneInfoController.TimeZoneInfo;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -49,7 +50,8 @@ public class TimeZoneInfoControllerUnitTest extends UnitTestCase {
 	/** 
 	 * Test null value
 	 */
-	public void testNullTimeZoneInfo() throws Exception{
+    @Test
+    public void testNullTimeZoneInfo() throws Exception{
 		TimeZoneInfo ti = TimeZoneInfoController.getTimeZoneInfo(null);
 		assertEquals(null, ti);		
 	}
@@ -57,7 +59,8 @@ public class TimeZoneInfoControllerUnitTest extends UnitTestCase {
 	/** 
 	 * Test empty string as time zone value
 	 */
-	public void testEmptyTimeZoneInfo() throws Exception{
+    @Test
+    public void testEmptyTimeZoneInfo() throws Exception{
 		TimeZoneInfo ti = TimeZoneInfoController.getTimeZoneInfo("");
 		assertEquals(null, ti);		
 	}
@@ -65,7 +68,8 @@ public class TimeZoneInfoControllerUnitTest extends UnitTestCase {
 	/** 
 	 * Test string with slash only as time zone value
 	 */
-	public void testSlashTimeZoneInfo() throws Exception{
+    @Test
+    public void testSlashTimeZoneInfo() throws Exception{
 		TimeZoneInfo ti = TimeZoneInfoController.getTimeZoneInfo("/");
 		assertEquals(null, ti);		
 	}
@@ -73,7 +77,8 @@ public class TimeZoneInfoControllerUnitTest extends UnitTestCase {
 	/** 
 	 * Test invalid time zone value
 	 */
-	public void testInvalidTimeZoneInfo() throws Exception{
+    @Test
+    public void testInvalidTimeZoneInfo() throws Exception{
 		String timezoneId = "America/San_Francisco";	
 		Mockito.when(mci.getAvailableTimezone("America/San_Francisco")).thenReturn("GMT");
 		TimeZoneInfo ti = TimeZoneInfoController.getTimeZoneInfo(timezoneId);
@@ -83,7 +88,8 @@ public class TimeZoneInfoControllerUnitTest extends UnitTestCase {
 	/**
 	 * Test valid time zone value
 	 */
-	public void testLATimeZoneInfo() throws Exception{
+    @Test
+    public void testLATimeZoneInfo() throws Exception{
 		String timezoneId = "America/Los_Angeles";	
 		String info = "Los_Angeles";
 		Mockito.when(mci.getAvailableTimezone("America/Los_Angeles")).thenReturn("America/Los_Angeles");
@@ -96,7 +102,8 @@ public class TimeZoneInfoControllerUnitTest extends UnitTestCase {
 	/** 
 	 * Test valid time zone value
 	 */
-	public void testNYTimeZoneInfo() throws Exception{
+    @Test
+    public void testNYTimeZoneInfo() throws Exception{
 		String timezoneId = "America/New_York";	
 		String info = "New_York";
 		Mockito.when(mci.getAvailableTimezone("America/New_York")).thenReturn("America/New_York");
@@ -109,7 +116,8 @@ public class TimeZoneInfoControllerUnitTest extends UnitTestCase {
 	/** 
 	 * Test equivalent time zone value
 	 */
-	public void testIETTimeZoneInfo() throws Exception{
+    @Test
+    public void testIETTimeZoneInfo() throws Exception{
 		String timezoneId = "IET";	
 		String availableTimezoneId = "America/Indiana/Indianapolis";
 		String info = "IET";

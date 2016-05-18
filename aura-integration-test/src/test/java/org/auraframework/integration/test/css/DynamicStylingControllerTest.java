@@ -40,10 +40,6 @@ import com.google.common.collect.Lists;
 public class DynamicStylingControllerTest extends StyleTestCase {
     private static final String ACTION = "java://org.auraframework.impl.controller.DynamicStylingController/ACTION$applyTokens";
 
-    public DynamicStylingControllerTest(String name) {
-        super(name);
-    }
-
     /** test basic usage */
     @Test
     public void testApplyTokens() throws Exception {

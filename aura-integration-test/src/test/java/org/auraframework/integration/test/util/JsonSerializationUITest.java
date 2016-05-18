@@ -18,14 +18,9 @@ package org.auraframework.integration.test.util;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
-import org.auraframework.test.util.WebDriverTestCase;
 import org.junit.Test;
 
 public class JsonSerializationUITest extends WebDriverTestCase {
-    public JsonSerializationUITest(String name) {
-        super(name);
-    }
-
     // currently fails to parse on client because !-- gets encoded to \u0021-- which is invalid js
     public void _testJsOperationBangMinusMinus() throws Exception {
         DefDescriptor<ComponentDef> cmpdd = addSourceAutoCleanup(ComponentDef.class,

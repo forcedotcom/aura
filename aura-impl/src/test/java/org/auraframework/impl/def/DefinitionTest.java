@@ -18,12 +18,5 @@ package org.auraframework.impl.def;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.AuraImplTestCase;
 
-/**
- */
 public abstract class DefinitionTest<T extends Definition> extends AuraImplTestCase {
-
-    public DefinitionTest(String name) {
-        super(name);
-    }
-
 }

@@ -15,18 +15,22 @@
  */
 package org.auraframework.impl.expression.parser;
 
-import junit.framework.TestSuite;
-
+import com.google.common.collect.Lists;
 import org.auraframework.impl.expression.AuraImplExpressionTestCase;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Shotgun tests for special chars. Tokens shouldn't contain these chars. Remaining special chars have their own tests
  * in ExpressionParserTest.
- * 
- * @userStory a07B0000000Ed9n
  */
+@RunWith(Parameterized.class)
 public class ExpressionParserSpecialCharactersTest extends AuraImplExpressionTestCase {
     private static final String validChars = "oO0_";
     private static final char[] otherChars = "`=[]',~@#^&{}|:\"天".toCharArray();
@@ -85,43 +89,35 @@ public class ExpressionParserSpecialCharactersTest extends AuraImplExpressionTes
             "unexpected token: '天'",
     };
 
-    private final String expression;
-    private final String msgStartsWith;
-
-    public ExpressionParserSpecialCharactersTest(String name) {
-        super(name);
-        expression = "";
-        msgStartsWith = "";
-    }
+    private String expression;
+    private String msgStartsWith;
 
     public ExpressionParserSpecialCharactersTest(String name, String expression, String errorMsg) {
-        super(name);
+        super();
         this.expression = expression;
         this.msgStartsWith = errorMsg;
     }
 
-    public static TestSuite suite() throws Exception {
-        TestSuite suite = new TestSuite(ExpressionParserSpecialCharactersTest.class.getName());
+    @Parameters(name = "{0}")
+    public static Collection<Object> generateTestParameters() {
+        List<Object> parameters = Lists.newLinkedList();
         for (int i = 0; i < otherChars.length; i++) {
             char c = otherChars[i];
             String hex = String.format("%#x", (int) c);
-            suite.addTest(new ExpressionParserSpecialCharactersTest("testTokenStartsWith" + hex
-                    + "ThrowsQuickFixException", c + validChars, errorMsgStartsWith[i]));
-            suite.addTest(new ExpressionParserSpecialCharactersTest("testTokenEndsWith" + hex
-                    + "ThrowsQuickFixException", validChars + c, errorMsgEndsWith[i]));
-            suite.addTest(new ExpressionParserSpecialCharactersTest("testTokenContains" + hex
-                    + "ThrowsQuickFixException", validChars + c + validChars, errorMsgContains[i]));
+            parameters.add(new Object[]{"TokenStartsWith" + hex + "ThrowsQuickFixException", c + validChars,
+                    errorMsgStartsWith[i]});
+            parameters.add(new Object[]{"TokenStartsWith" + hex + "ThrowsQuickFixException", c + validChars,
+                    errorMsgStartsWith[i]});
+            parameters.add(new Object[]{"TokenEndsWith" + hex + "ThrowsQuickFixException", validChars + c,
+                    errorMsgEndsWith[i]});
+            parameters.add(new Object[]{"TokenContains" + hex + "ThrowsQuickFixException",
+                    validChars + c + validChars, errorMsgContains[i]});
         }
-        return suite;
-    }
-
-    @Override
-    public void runTest() throws Exception {
-        testDo();
+        return parameters;
     }
 
     @Test
-    public void testDo() throws Exception {
+    public void test() throws Exception {
         try {
             buildExpression(expression);
             fail("No execption thrown for <" + expression + ">. Expected InvalidExpressionException");

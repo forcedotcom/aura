@@ -33,11 +33,6 @@ import org.junit.Test;
 import com.google.common.collect.Maps;
 
 public class JavascriptModelDefTest extends AuraImplTestCase {
-
-    public JavascriptModelDefTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify that javascript model defs are serializable.
      */

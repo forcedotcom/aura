@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.components.test.java.model;
+package org.auraframework.integration.test.java.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,11 +26,11 @@ import java.util.Set;
 
 import junit.framework.TestSuite;
 
+import org.auraframework.integration.test.ComponentJSTestSuite;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-import org.auraframework.test.ComponentJSTestSuite;
 import org.auraframework.test.util.WebDriverProvider;
-import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.ServiceLocator;

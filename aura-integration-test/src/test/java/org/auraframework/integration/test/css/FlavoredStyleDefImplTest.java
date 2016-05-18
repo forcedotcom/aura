@@ -34,10 +34,6 @@ import com.google.common.collect.Sets;
  * Unit tests for {@link FlavoredStyleDef}.
  */
 public class FlavoredStyleDefImplTest extends StyleTestCase {
-    public FlavoredStyleDefImplTest(String name) {
-        super(name);
-    }
-
     /** basic loading of a standard flavor within the component bundle */
     @Test
     public void testLoadStandardFlavor() throws Exception {

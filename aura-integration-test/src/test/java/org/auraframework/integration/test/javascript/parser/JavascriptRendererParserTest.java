@@ -29,10 +29,6 @@ import org.auraframework.test.source.StringSourceLoader;
 import org.junit.Test;
 
 public class JavascriptRendererParserTest extends AuraImplTestCase {
-    public JavascriptRendererParserTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify JavascriptRendererParser can parse normal JavaScript Renderer.
      */

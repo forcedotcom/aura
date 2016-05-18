@@ -37,11 +37,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 
 public class LibraryDefRefHandlerTest extends AuraImplTestCase {
-
-    public LibraryDefRefHandlerTest(String name) {
-        super(name);
-    }
-
     @Mock
     DefDescriptor<LibraryDefRef> descriptor;
 

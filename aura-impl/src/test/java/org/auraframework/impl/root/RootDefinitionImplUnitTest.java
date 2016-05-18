@@ -34,10 +34,6 @@ public abstract class RootDefinitionImplUnitTest<I extends RootDefinitionImpl<D>
     protected List<String> providerDescriptors;
     protected SupportLevel support;
 
-    public RootDefinitionImplUnitTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetProviderDefDefault() throws Exception {
         this.providerDescriptors = null;

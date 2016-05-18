@@ -23,11 +23,6 @@ import org.auraframework.impl.clientlibrary.resolver.AuraResourceResolver;
 import org.junit.Test;
 
 public class ClientLibraryResolverRegistryImplTest extends AuraImplTestCase {
-
-    public ClientLibraryResolverRegistryImplTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testRegister() {
         ClientLibraryResolverRegistry reg = ClientLibraryResolverRegistryImpl.INSTANCE;

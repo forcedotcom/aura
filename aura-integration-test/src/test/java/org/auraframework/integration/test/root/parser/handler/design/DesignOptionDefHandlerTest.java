@@ -26,10 +26,6 @@ public class DesignOptionDefHandlerTest extends AuraImplTestCase {
     private static final String NAME = "name=\"%s\"";
     private static final String VALUE = "value=\"%s\"";
 
-    public DesignOptionDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testOptionWithNameOnly() throws Exception {
         DesignDef def = setupDesignOptionDef("test", null);

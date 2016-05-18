@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -34,6 +35,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
+import org.auraframework.AuraDeprecated;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -53,6 +55,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.google.common.collect.Maps;
 
@@ -79,7 +82,18 @@ public class AuraContextFilter implements Filter {
 
     private static final Log LOG = LogFactory.getLog(AuraContextFilter.class);
 
-    protected static final AuraTestFilter testFilter = new AuraTestFilter();
+    private AuraTestFilter testFilter;
+
+    private AuraDeprecated auraDeprecated; // force initialization of Aura
+
+    @Inject
+    public void setAuraTestFilter(AuraTestFilter testFilter) {
+        this.testFilter = testFilter;
+    }
+
+    public AuraTestFilter getAuraTestFilter() {
+        return testFilter;
+    }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
@@ -316,10 +330,24 @@ public class AuraContextFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        processInjection(filterConfig);
         String dirConfig = filterConfig.getInitParameter("componentDir");
         if (!AuraTextUtil.isNullEmptyOrWhitespace(dirConfig)) {
             componentDir = filterConfig.getServletContext().getRealPath("/") + dirConfig;
         }
         testFilter.init(filterConfig);
+    }
+
+    public void processInjection(FilterConfig filterConfig) {
+        SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, filterConfig.getServletContext());
+    }
+
+    public AuraDeprecated getAuraDeprecated() {
+        return auraDeprecated;
+    }
+    
+    @Inject
+    public void setAuraDeprecated(AuraDeprecated auraDeprecated) {
+        this.auraDeprecated = auraDeprecated;
     }
 }

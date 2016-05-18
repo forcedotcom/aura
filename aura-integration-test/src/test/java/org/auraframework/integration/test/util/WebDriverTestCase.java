@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.util;
+package org.auraframework.integration.test.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,6 +54,10 @@ import org.auraframework.test.perf.PerfResultsUtil;
 import org.auraframework.test.perf.PerfWebDriverUtil;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
 import org.auraframework.test.perf.util.PerfExecutorTest;
+import org.auraframework.test.util.AuraUITestingUtil;
+import org.auraframework.test.util.SauceUtil;
+import org.auraframework.test.util.WebDriverProvider;
+import org.auraframework.test.util.WebDriverUtil;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.util.AuraUtil;
@@ -148,10 +152,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     @Target({ ElementType.TYPE, ElementType.METHOD })
     @Inherited
     public @interface Flapper {
-    }
-
-    public WebDriverTestCase(String name) {
-        super(name);
     }
 
     public String getBrowserTypeString() {

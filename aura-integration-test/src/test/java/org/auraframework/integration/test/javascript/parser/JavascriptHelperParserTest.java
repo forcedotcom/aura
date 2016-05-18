@@ -30,11 +30,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class JavascriptHelperParserTest extends AuraImplTestCase {
-
-    public JavascriptHelperParserTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify JavascriptHelperParser parsing client helper
      */

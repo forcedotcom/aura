@@ -78,10 +78,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class ServerServiceImplTest extends AuraImplTestCase {
-    public ServerServiceImplTest(String name) {
-        super(name, false);
-    }
-
     private static final Set<String> GLOBAL_IGNORE = Sets.newHashSet("context", "actions", "perf");
 
     // Do not test for null message, it cannot legally be null.

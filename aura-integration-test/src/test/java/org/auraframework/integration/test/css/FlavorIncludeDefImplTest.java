@@ -34,11 +34,6 @@ import org.junit.Test;
 import com.google.common.collect.Table;
 
 public class FlavorIncludeDefImplTest extends StyleTestCase {
-
-    public FlavorIncludeDefImplTest(String name) {
-        super(name);
-    }
-
     /* util */
     private FlavorIncludeDef source(String flavorIncludeSource) throws QuickFixException {
         String fmt = String.format("<aura:flavors>%s</aura:flavors>", flavorIncludeSource);

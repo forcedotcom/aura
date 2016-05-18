@@ -19,10 +19,6 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.junit.Test;
 
 public class ResourceSourceLoaderTest extends AuraImplTestCase {
-    public ResourceSourceLoaderTest(String name){
-        super(name);
-    }
-    
     /**
      * All namespaces loaded by ResourceSourceLoader are internal, verify that ResourceSourceLoader says so.
      */

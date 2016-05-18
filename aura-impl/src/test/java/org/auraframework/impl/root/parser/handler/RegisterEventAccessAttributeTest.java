@@ -30,13 +30,6 @@ import org.junit.Test;
 
 @UnAdaptableTest("when run in core, we throw error with different type.")
 public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
-
-	public RegisterEventAccessAttributeTest(String name) {
-		super(name);
-	}
-
-
-    
     /***********************************************************************************
      ******************* Tests for Custom Namespace start ****************************
      ************************************************************************************/

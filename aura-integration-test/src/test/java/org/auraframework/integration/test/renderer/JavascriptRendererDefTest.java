@@ -32,10 +32,6 @@ import org.junit.Test;
  * Test class to verify implementation of JavascriptRendererDef.
  */
 public class JavascriptRendererDefTest extends AuraImplTestCase {
-    public JavascriptRendererDefTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify JavascriptRendererDef is non-local.
      */

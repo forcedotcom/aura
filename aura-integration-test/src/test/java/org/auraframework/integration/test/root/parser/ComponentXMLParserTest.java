@@ -28,10 +28,6 @@ import org.junit.Test;
 public class ComponentXMLParserTest extends AuraImplTestCase {
     ComponentXMLParser parser = new ComponentXMLParser();
 
-    public ComponentXMLParserTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

@@ -21,7 +21,7 @@ import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
 
-public class AuraIntegraionIntegrationTest {
+public class AuraIntegrationIntegrationTestSuite {
 	 public static TestSuite suite() throws Exception {
 	        TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraIntegrationTestInventory");
 	        TestSuite suite = inventory.getTestSuite(Type.INTEGRATION);

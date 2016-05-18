@@ -31,8 +31,8 @@ import org.junit.Test;
 
 public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
 
-    public ComponentDefTest(String name) {
-        super(name, ComponentDef.class, "aura:component");
+    public ComponentDefTest() {
+        super(ComponentDef.class, "aura:component");
     }
 
     /**

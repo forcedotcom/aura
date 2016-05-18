@@ -31,9 +31,6 @@ public class DesignLayoutAttributeDefHandlerTest extends AuraImplTestCase {
     private final static String VALID_ATTRIBUTE = "test";
     private final static String VALID_ATTRIBUTE_2 = "something";
     private final static String VALID_ATTRIBUTE_3 = "else";
-    public DesignLayoutAttributeDefHandlerTest(String name) {
-        super(name);
-    }
 
     @Test
     public void testLayoutAttributeWithInvalidAttribute() throws Exception {

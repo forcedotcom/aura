@@ -33,11 +33,6 @@ import org.auraframework.test.source.StringSource;
 import org.junit.Test;
 
 public class AttributeDefRefHandlerTest extends AuraImplTestCase {
-
-    public AttributeDefRefHandlerTest(String name) throws Exception {
-        super(name);
-    }
-
     @Test
     public void testAttributeDefRefParsing() throws Exception {
         ComponentXMLParser parser = new ComponentXMLParser();

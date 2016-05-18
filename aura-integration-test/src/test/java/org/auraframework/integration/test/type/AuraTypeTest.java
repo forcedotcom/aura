@@ -32,20 +32,10 @@ import org.junit.Test;
 
 /**
  * Test to check aura types
- * 
- * @hierarchy Aura.Mobile Web
- * @userStorySyncIdOrName a07B0000000EQgW
  */
 public class AuraTypeTest extends AuraImplTestCase {
-
-    public AuraTypeTest(String name) {
-        super(name);
-    }
-
     /**
      * Test Aura Data Types.
-     * 
-     * @throws Exception
      */
     @Test
     public void testAuraConverter() throws Exception {

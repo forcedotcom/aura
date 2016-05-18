@@ -28,10 +28,6 @@ import org.junit.Test;
  * Test class to verify implementation of JavascriptHelperDef.
  */
 public class JavascriptHelperDefTest extends AuraImplTestCase {
-    public JavascriptHelperDefTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify JavascriptHelperDef is non-local.
      */

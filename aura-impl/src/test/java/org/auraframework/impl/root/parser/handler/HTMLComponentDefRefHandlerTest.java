@@ -38,10 +38,6 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     private XMLStreamReader xmlReader;
     private HTMLComponentDefRefHandler<?> htmlHandler;
 
-    public HTMLComponentDefRefHandlerTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

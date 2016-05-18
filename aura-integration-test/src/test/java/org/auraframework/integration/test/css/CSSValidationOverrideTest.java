@@ -34,10 +34,6 @@ import org.junit.Test;
  */
 
 public class CSSValidationOverrideTest extends AuraImplTestCase {
-    public CSSValidationOverrideTest(String name) {
-        super(name);
-    }
-
     private Source<StyleDef> getInvalidStyleSource() {
         DefDescriptor<StyleDef> styleDefDesc = definitionService.getDefDescriptor("css://fake.name", StyleDef.class);
         return new StringSource<StyleDef>(styleDefDesc, 

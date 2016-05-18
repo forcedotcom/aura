@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.util;
+package org.auraframework.integration.test.util;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -33,6 +33,7 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
+import org.auraframework.AuraConfiguration;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -42,22 +43,27 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.IntegrationTest;
 import org.auraframework.util.test.configuration.TestServletConfig;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
  * Base class for all Aura integration tests.
  */
 @SuppressWarnings("deprecation")
 @IntegrationTest
+@RunWith(BlockJUnit4ClassRunner.class)
+@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class})
+@ContextConfiguration(classes = {AuraConfiguration.class})
 public abstract class IntegrationTestCase extends AuraTestCase {
     private TestServletConfig servletConfig = null;
     private HttpClient httpClient = null;
-
-    public IntegrationTestCase(String name) {
-        super(name);
-    }
 
     @Override
     public void tearDown() throws Exception {

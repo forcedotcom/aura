@@ -30,16 +30,8 @@ import org.junit.Test;
 
 /**
  * Test to check aura types
- * 
- * @hierarchy Aura.Framework
- * @userStorySyncIdOrName a07B0000000EQgW
  */
 public class AuraConversionTest extends AuraImplTestCase {
-
-    public AuraConversionTest(String name) {
-        super(name);
-    }
-
     /**
      * Run a set of conversions checking for equality when they are arrays.
      * 

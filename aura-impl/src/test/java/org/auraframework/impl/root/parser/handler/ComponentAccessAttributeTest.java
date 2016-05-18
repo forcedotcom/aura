@@ -30,11 +30,6 @@ import org.junit.Test;
 
 @UnAdaptableTest("when run in core, we throw error with different type.")
 public class ComponentAccessAttributeTest extends AuraImplTestCase {
-
-	public ComponentAccessAttributeTest(String name) {
-		super(name);
-	}
-	
 	/***********************************************************************************
      ****** Tests for Custom (non-internal, non-privileged) Namespace start ************
      ************************************************************************************/

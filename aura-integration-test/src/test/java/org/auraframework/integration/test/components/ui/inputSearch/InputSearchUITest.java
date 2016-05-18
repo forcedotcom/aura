@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test.components.ui.inputSearch;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -26,10 +26,6 @@ import org.openqa.selenium.WebElement;
  * UI Tests for inputSearch Component
  */
 public class InputSearchUITest extends WebDriverTestCase {
-
-    public InputSearchUITest(String name) {
-        super(name);
-    }
 
     // W-1551076: Webdriver not firing search event in Safari, IPAD and IPHONE
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,

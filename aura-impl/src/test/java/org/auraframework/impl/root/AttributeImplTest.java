@@ -20,10 +20,6 @@ import org.auraframework.instance.Attribute;
 import org.junit.Test;
 
 public class AttributeImplTest extends AuraImplTestCase {
-    public AttributeImplTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testAttribute() throws Exception {
         Attribute testAttribute = vendor.makeAttribute("testAttribute");

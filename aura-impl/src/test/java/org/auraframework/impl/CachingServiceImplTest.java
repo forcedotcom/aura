@@ -42,6 +42,7 @@ import org.auraframework.service.CachingService;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.base.Function;
@@ -50,10 +51,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class CachingServiceImplTest extends AuraImplTestCase {
-
-	public CachingServiceImplTest(String name) {
-		super(name);
-	}
 
 	private class Log4jCaptureAppender extends AppenderSkeleton {
 
@@ -78,7 +75,8 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 		}
 	}
 
-	public void testNotifyDependentSourceChange_LogsErrorIfWriteLockLocked() {
+    @Test
+    public void testNotifyDependentSourceChange_LogsErrorIfWriteLockLocked() {
 		// capture logger output
 		StringWriter writer = new StringWriter();
 		Logger logger = Logger.getLogger(CachingServiceImpl.class);
@@ -118,7 +116,8 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 		}
 	}
 
-	public void testNotifyDependentSourceChange_NotifiesListeners() {
+    @Test
+    public void testNotifyDependentSourceChange_NotifiesListeners() {
 		DefDescriptor<?> source = DefDescriptorImpl.getInstance(
 				getAuraTestingUtil().getNonce("some:descriptor"),
 				ComponentDef.class);
@@ -138,7 +137,8 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 		}
 	}
 
-	public void testNotifyDependentSourceChange_NotifiesNoListeners() {
+    @Test
+    public void testNotifyDependentSourceChange_NotifiesNoListeners() {
 		DefDescriptor<?> source = DefDescriptorImpl.getInstance(
 				getAuraTestingUtil().getNonce("some:descriptor"),
 				ComponentDef.class);
@@ -196,7 +196,8 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 		}
 	};
 
-	public void testNotifyDependentSourceChange_InvalidatesAllCachedDependencies() {
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesAllCachedDependencies() {
 		Set<String> keys = Sets.newHashSet(
 				getAuraTestingUtil().getNonce("some:descriptor"),
 				getAuraTestingUtil().getNonce("other:descriptor"),
@@ -213,7 +214,8 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 				}, keys);
 	}
 
-	public void testNotifyDependentSourceChange_InvalidatesAllCachedDescriptorFilters() {
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesAllCachedDescriptorFilters() {
 		Set<String> keys = Sets.newHashSet(
 				getAuraTestingUtil().getNonce("some:descriptor"),
 				getAuraTestingUtil().getNonce("other:descriptor"),
@@ -230,7 +232,8 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 				}, keys);
 	}
 
-	public void testNotifyDependentSourceChange_InvalidatesAllCachedStrings() {
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesAllCachedStrings() {
 		Set<String> keys = Sets.newHashSet(
 				getAuraTestingUtil().getNonce("some:descriptor"),
 				getAuraTestingUtil().getNonce("other:descriptor"),
@@ -246,7 +249,8 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 				}, keys);
 	}
 
-	public void testNotifyDependentSourceChange_InvalidatesAllCachedDefinitionsIfDescriptorNull() {
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesAllCachedDefinitionsIfDescriptorNull() {
 		Set<DefDescriptor<?>> keys = Sets.newHashSet();
 		keys.add(DefDescriptorImpl.getInstance(
 				getAuraTestingUtil().getNonce("some:descriptor"),
@@ -288,7 +292,8 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 				cache, valGenerator, dds, source, invalidatedDds);
 	}
 
-	public void testNotifyDependentSourceChange_InvalidatesCachedSelfAndCmpDefinitionsIfDescriptorFound() {
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesCachedSelfAndCmpDefinitionsIfDescriptorFound() {
 		DefDescriptor<?> source = DefDescriptorImpl.getInstance(
 				getAuraTestingUtil().getNonce("markup://some.desc"),
 				HelperDef.class);
@@ -312,7 +317,8 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 				mockDefinitionFunction, baseDds, source, invalidatedDds);
 	}
 
-	public void testNotifyDependentSourceChange_InvalidatesCachedSelfAndCmpExistsIfDescriptorFound() {
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesCachedSelfAndCmpExistsIfDescriptorFound() {
 		DefDescriptor<?> source = DefDescriptorImpl.getInstance(
 				getAuraTestingUtil().getNonce("markup://some.desc"),
 				StyleDef.class);
@@ -340,7 +346,8 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 				}, baseDds, source, invalidatedDds);
 	}
 
-	public void testNotifyDependentSourceChange_InvalidatesAllCachedExistsIfDescriptorNull() {
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesAllCachedExistsIfDescriptorNull() {
 		Set<DefDescriptor<?>> keys = Sets.newHashSet();
 		keys.add(DefDescriptorImpl.getInstance(
 				getAuraTestingUtil().getNonce("some:descriptor"),

@@ -24,10 +24,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class DesignTemplateDefHandlerTest extends AuraImplTestCase {
-    public DesignTemplateDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetElement() throws Exception {
         DesignTemplateDef element = setupDesignTemplateDef("<design:template><design:region name=\"regionone\"/></design:template>");

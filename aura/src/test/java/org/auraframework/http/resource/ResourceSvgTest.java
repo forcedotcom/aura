@@ -26,10 +26,6 @@ import org.mockito.Mockito;
 
 public class ResourceSvgTest extends UnitTestCase {
 
-	public ResourceSvgTest(String name) {
-		super(name);
-	}
-	
 	/**
      * Unit Test, Name is API!.
      */

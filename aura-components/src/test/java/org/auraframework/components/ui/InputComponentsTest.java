@@ -40,10 +40,6 @@ import org.junit.Test;
  * @since 0.0.99
  */
 public class InputComponentsTest extends AuraTestCase {
-    public InputComponentsTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

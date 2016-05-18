@@ -26,13 +26,13 @@ import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.test.mock.MockingUtil;
 import org.auraframework.instance.ComponentConfig;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.mock.MockModel;
-import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -47,10 +47,6 @@ import com.google.common.collect.Lists;
 public class MockingUtilUITest extends WebDriverTestCase {
 
     private MockingUtil mockingUtil;
-
-    public MockingUtilUITest(String name) {
-        super(name);
-    }
 
     @Override
     public void setUp() throws Exception {

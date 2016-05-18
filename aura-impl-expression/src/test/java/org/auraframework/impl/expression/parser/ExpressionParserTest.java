@@ -30,11 +30,6 @@ import org.junit.Test;
  * Tests for the expression parser
  */
 public class ExpressionParserTest extends AuraImplExpressionTestCase {
-
-    public ExpressionParserTest(String name) {
-        super(name);
-    }
-
     /**
      * Function precedence respects Java conventions.
      */

@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test.components.ui.inputSelect;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -33,10 +33,8 @@ public class BaseInputSelectUI extends WebDriverTestCase{
         return URL;
     }
 
-    
     public BaseInputSelectUI(String url, By sel_loc, String opt_loc, String [] opts, String sel_id) {
-        super(url);
-        // TODO Auto-generated constructor stub
+    	this.setName(url);
         
         this.URL = url;
         this.SELECT_LOCATOR = sel_loc;

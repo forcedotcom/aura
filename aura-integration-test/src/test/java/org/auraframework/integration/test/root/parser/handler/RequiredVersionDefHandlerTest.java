@@ -23,11 +23,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
-
-    public RequiredVersionDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testRequiredVersionPositiveCase() throws Exception {
         String markup = "<aura:require namespace='auratest' version='1.0'/>";

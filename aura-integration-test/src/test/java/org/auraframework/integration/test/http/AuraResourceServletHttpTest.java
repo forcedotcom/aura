@@ -27,9 +27,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicHeader;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
@@ -40,11 +40,6 @@ import org.junit.Test;
  * components in a given namespace. It is also used to load CSS
  */
 public class AuraResourceServletHttpTest extends AuraHttpTestCase {
-
-    public AuraResourceServletHttpTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify style def ordering for components included as facets. Create a chain of components as facet and verify the
      * order of css(Style Defs)

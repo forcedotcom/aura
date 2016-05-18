@@ -62,10 +62,6 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
         }
     };
 
-    public ExpressionTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testNumberExpression() throws Exception {
         Expression e = new FunctionCallImpl(ADD, ImmutableList.<Expression> of(i314, i235325), l);

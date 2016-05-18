@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test.components.ui.inputRichText;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
@@ -40,10 +40,6 @@ public class InputRichTextUITest extends WebDriverTestCase {
     private final String IN_RICHTEXT_BODY = ".inputRichTextBody";
     private final String RT_CMP = "Text";
 
-    public InputRichTextUITest(String name) {
-        super(name);
-    }
-    
     @Override
     public void setUp() throws Exception {
         super.setUp();

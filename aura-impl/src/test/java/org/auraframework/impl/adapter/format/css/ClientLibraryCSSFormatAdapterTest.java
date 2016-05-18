@@ -30,8 +30,8 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 public class ClientLibraryCSSFormatAdapterTest extends AuraImplTestCase {
-    public ClientLibraryCSSFormatAdapterTest(String name){
-        super(name, false);
+    public ClientLibraryCSSFormatAdapterTest(){
+    	this.setShouldSetupContext(false);
     }
     
     @Test

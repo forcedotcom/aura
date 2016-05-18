@@ -19,15 +19,10 @@ import java.util.List;
 
 import org.auraframework.components.ui.TreeNode;
 import org.auraframework.docs.ApiContentsModel;
-import org.auraframework.test.util.IntegrationTestCase;
+import org.auraframework.integration.test.util.IntegrationTestCase;
 import org.junit.Test;
 
 public class ApiContentsModelTest extends IntegrationTestCase {
-    
-    public ApiContentsModelTest(String name) {
-        super(name);
-    }
-
 	/**
      * Verifies generated jsdoc JSON file is loaded and contains list of jsdoc
      * items.

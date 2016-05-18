@@ -13,6 +13,10 @@
             <artifactId>aura-interfaces</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-spring</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
@@ -79,6 +83,11 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <properties>

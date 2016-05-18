@@ -32,10 +32,6 @@ import org.junit.Test;
  * Integration tests for java Controllers.
  */
 public class JavaControllerTest extends AuraImplTestCase {
-    public JavaControllerTest(String name) {
-        super(name);
-    }
-
     //TODO: Enable this after merging uitier branch
     public void _testJavaControllerMissesImplements() throws Exception {
         String targetController = "org.auraframework.impl.java.controller.TestControllerWithoutImplements";

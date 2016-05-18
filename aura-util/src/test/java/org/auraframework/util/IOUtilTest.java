@@ -24,10 +24,6 @@ import org.junit.Test;
 import com.google.common.io.Files;
 
 public class IOUtilTest extends UnitTestCase {
-    public IOUtilTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testDelete() throws Exception {
         File testFolder = null;

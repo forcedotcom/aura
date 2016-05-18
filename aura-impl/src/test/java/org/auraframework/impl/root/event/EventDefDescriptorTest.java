@@ -22,18 +22,10 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.junit.Test;
 
-/**
- */
 public class EventDefDescriptorTest extends AuraImplTestCase {
-
-    public EventDefDescriptorTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetDefType() throws Exception {
         DefDescriptor<EventDef> testDescriptor = DefDescriptorImpl.getInstance("aura:testevent", EventDef.class);
         assertEquals(testDescriptor.getDefType(), DefType.EVENT);
     }
-
 }

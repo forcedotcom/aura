@@ -56,10 +56,6 @@ extends UnitTestCase {
 
     protected AuraContext testAuraContext;
 
-    public DefinitionImplUnitTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetDescription() throws Exception {
         this.description = "this is a test Definition";

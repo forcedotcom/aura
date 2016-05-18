@@ -25,10 +25,6 @@ import org.junit.Test;
 
 public class ComponentDefDescriptorTest extends AuraImplTestCase {
 
-    public ComponentDefDescriptorTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetDefType() throws Exception {
         DefDescriptor<ComponentDef> testDescriptor = DefDescriptorImpl.getInstance("aura:text", ComponentDef.class);

@@ -24,7 +24,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.test.util.AuraHttpTestCase;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.AuraTestLabels;
@@ -36,10 +36,6 @@ import com.google.common.collect.Maps;
  * Basic HTTP retrieve test for checking preloaded namespaces and componentDefs.
  */
 public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
-    public PreloadNameSpaceHttpTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify that when a component is serialized down to the client, the component Def only has the descriptor and
      * nothing else.

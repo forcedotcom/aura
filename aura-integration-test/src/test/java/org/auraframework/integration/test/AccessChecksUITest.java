@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
 import org.openqa.selenium.*;
@@ -23,10 +23,6 @@ import org.openqa.selenium.*;
 @ThreadHostileTest("Tests modify what namespaces are Internal or not and locker service enabled")
 //I'm doing the AccessChecks with component tests now, this file will get removed soon
 public class AccessChecksUITest extends WebDriverTestCase {
-
-    public AccessChecksUITest(String name) {
-        super(name);
-    }
 
     @Override
     public void setUp() throws Exception {

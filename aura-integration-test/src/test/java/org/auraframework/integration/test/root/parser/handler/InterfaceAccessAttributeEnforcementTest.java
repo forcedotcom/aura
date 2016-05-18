@@ -15,8 +15,6 @@
  */
 package org.auraframework.integration.test.root.parser.handler;
 
-import javax.inject.Inject;
-
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -30,15 +28,10 @@ import org.junit.Test;
 @UnAdaptableTest("namespace start with c means something special in core")
 public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
 	
-	@Inject
-    protected StringSourceLoader stringSourceLoader;
+    protected StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
 	
-	public InterfaceAccessAttributeEnforcementTest(String name) {
-		super(name);
-	}
-	
-	@Test
-	public void testInterfaceWithSystemNamespaceExtendsRootComponentInterface() throws Exception {
+    @Test
+    public void testInterfaceWithSystemNamespaceExtendsRootComponentInterface() throws Exception {
 			String interfaceSource = "<aura:interface extends='aura:rootComponent'/>";
 			DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, 
 					interfaceSource,
@@ -46,8 +39,8 @@ public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
 			interfaceDescriptor.getDef();
 	}
 	
-	@Test
-	public void testInterfaceWithCustomNamespaceExtendsRootComponentInterface() throws Exception {
+    @Test
+    public void testInterfaceWithCustomNamespaceExtendsRootComponentInterface() throws Exception {
 			String interfaceSource = "<aura:interface extends='aura:rootComponent'/>";
 			DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, 
 					interfaceSource,

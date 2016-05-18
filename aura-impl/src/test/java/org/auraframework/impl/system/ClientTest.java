@@ -26,10 +26,6 @@ import org.junit.Test;
 import com.google.common.collect.Maps;
 
 public class ClientTest extends AuraImplTestCase {
-    public ClientTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify that User Agent string is parsed out to obtain right ClientType
      */

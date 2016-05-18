@@ -16,7 +16,7 @@
 package org.auraframework.integration.test.http;
 
 import org.apache.http.HttpStatus;
-import org.auraframework.test.util.AuraHttpTestCase;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.junit.Test;
 
@@ -24,15 +24,8 @@ import org.junit.Test;
  * Tests for ResourceRewriteFilter handling. The tests don't validate the
  * response content, but just whether the request is forwarded to the
  * AuraResourceServlet.
- * 
- * 
- * @since 0.0.92
  */
 public class AuraResourceRewriteFilterHttpTest extends AuraHttpTestCase {
-    public AuraResourceRewriteFilterHttpTest(String name) {
-        super(name);
-    }
-
     /**
      * URLs should be forwarded to AuraResourceServlet only if they appear to
      * have the required format. We expect 404 for all other URLs, as they

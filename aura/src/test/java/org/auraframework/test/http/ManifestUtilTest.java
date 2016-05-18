@@ -24,10 +24,6 @@ import org.junit.Test;
 
 public class ManifestUtilTest extends UnitTestCase {
 
-    public ManifestUtilTest(String name) {
-        super(name);
-    }
-
     private long checkManifestCookieValue(String cookie, int count, long time) {
         List<String> parts = AuraTextUtil.splitSimple(":", cookie, 2);
         int ccount = Integer.parseInt(parts.get(0));

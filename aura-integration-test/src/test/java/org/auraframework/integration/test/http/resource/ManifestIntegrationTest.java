@@ -47,11 +47,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 public class ManifestIntegrationTest extends AuraImplTestCase {
-
-    public ManifestIntegrationTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify manifest doesn't include null when ResetCss is null.
      */

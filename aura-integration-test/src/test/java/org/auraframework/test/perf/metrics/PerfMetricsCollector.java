@@ -20,10 +20,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.PerfRunMode;
 import org.auraframework.test.perf.PerfResultsUtil;
 import org.auraframework.test.perf.PerfWebDriverUtil;
-import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverTestCase.PerfRunMode;
 import org.auraframework.util.test.perf.metrics.PerfMetric;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.test.perf.rdp.CPUProfilerAnalyzer;

@@ -26,10 +26,6 @@ import org.junit.Test;
  */
 public class InterfaceDefDescriptorTest extends UnitTestCase {
 
-    public InterfaceDefDescriptorTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetDefType() {
         DefDescriptor<InterfaceDef> testDescriptor = DefDescriptorImpl.getInstance("aura:testinterfacechild",

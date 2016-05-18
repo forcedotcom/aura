@@ -33,10 +33,6 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 public class TokensImportImplTest extends StyleTestCase {
-    public TokensImportImplTest(String name) {
-        super(name);
-    }
-
     private TokensImportDef source(String src) throws Exception {
         DefDescriptor<TokensImportDef> desc = definitionService.getDefDescriptor("test", TokensImportDef.class);
         StringSource<TokensImportDef> ss = new StringSource<>(desc, src, "myID", Format.XML);

@@ -47,10 +47,6 @@ public class TokenCacheImplTest extends StyleTestCase {
     private DefDescriptor<TokensDef> desc2;
     private DefDescriptor<TokensDef> desc3;
 
-    public TokenCacheImplTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

@@ -29,10 +29,6 @@ import org.junit.Test;
 import com.google.common.base.Charsets;
 
 public class ResourceDefImplTest extends AuraImplTestCase {
-    public ResourceDefImplTest(String name){
-        super(name);
-    }
-    
     @Test
     public void testGetResourceDefWithDefaultPrefix(){
         DefDescriptor<ResourceDef> resourceDef = definitionService.getDefDescriptor("clientLibraryTest.clientLibraryTest", ResourceDef.class);

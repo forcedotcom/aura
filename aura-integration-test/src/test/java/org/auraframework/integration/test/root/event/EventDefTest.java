@@ -35,15 +35,7 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
-/**
- * TODO: test extends
- */
 public class EventDefTest extends AuraImplTestCase {
-
-    public EventDefTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testEventDef() throws Exception {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);

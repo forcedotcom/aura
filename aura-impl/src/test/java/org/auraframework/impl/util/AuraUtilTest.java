@@ -27,11 +27,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 public class AuraUtilTest extends AuraImplTestCase {
-
-    public AuraUtilTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testAuraUtil() {
         new AuraUtil();

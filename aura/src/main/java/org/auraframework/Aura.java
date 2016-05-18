@@ -50,7 +50,7 @@ import org.auraframework.util.adapter.SourceControlAdapter;
  * Entry point for accessing Aura services
  */
 @ServiceComponent
-public class Aura {
+public class Aura implements AuraDeprecated {
     private static ClientLibraryService clientLibraryService;
 
     @Inject

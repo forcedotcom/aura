@@ -32,12 +32,12 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.TestInventory;
@@ -49,7 +49,7 @@ import com.google.common.collect.Maps;
 
 @UnAdaptableTest
 // @PerfTestSuite
-public class ComponentPerfSuiteTest extends TestSuite {
+public class ComponentPerfTestSuite extends TestSuite {
     // List components that we can't able to instantiate from client side.
     // The reason could be a dependency to a server side model. Eg. ui:inputDate
     // ui:action cmp shold be abstract?
@@ -58,13 +58,13 @@ public class ComponentPerfSuiteTest extends TestSuite {
             , "markup://ui:action" // this should be abstract
             , "markup://perfTest:dummyPerf");
 
-    private static final Logger LOG = Logger.getLogger(ComponentPerfSuiteTest.class.getSimpleName());
+    private static final Logger LOG = Logger.getLogger(ComponentPerfTestSuite.class.getSimpleName());
 
-    public ComponentPerfSuiteTest() throws Exception {
+    public ComponentPerfTestSuite() throws Exception {
         this("Component Perf tests");
     }
 
-    public ComponentPerfSuiteTest(String name) throws Exception {
+    public ComponentPerfTestSuite(String name) throws Exception {
         LOG.info("ComponentPerfSuiteTest: " + name);
         setName(name);
         createTestCases();
@@ -103,7 +103,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
     }
 
     public static TestSuite suite() throws Exception {
-        return new ComponentPerfSuiteTest();
+        return new ComponentPerfTestSuite();
     }
 
     /**
@@ -145,7 +145,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
 
                     Test test;
                     try {
-                        test = new ComponentSuiteTest((DefDescriptor<ComponentDef>)descriptor);
+                        test = new ComponentTestSuite((DefDescriptor<ComponentDef>)descriptor);
                     } catch (Throwable t) {
                         test = new FailTestCase(descriptor, t);
                     }
@@ -173,8 +173,8 @@ public class ComponentPerfSuiteTest extends TestSuite {
         }
     }
 
-    private class ComponentSuiteTest extends TestSuite {
-        ComponentSuiteTest(DefDescriptor<ComponentDef> descriptor) {
+    private class ComponentTestSuite extends TestSuite {
+        ComponentTestSuite(DefDescriptor<ComponentDef> descriptor) {
             super(descriptor.getName());
             TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraTestInventory");
             Vector<Class<? extends Test>> testClasses = inventory.getTestClasses(Type.PERFCMP);
@@ -197,7 +197,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
         private final Throwable cause;
 
         private FailTestCase(DefDescriptor<?> descriptor, Throwable cause) {
-            super(descriptor.getQualifiedName());
+            this.setName(descriptor.getQualifiedName());
             this.cause = cause;
         }
 

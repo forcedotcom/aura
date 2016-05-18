@@ -34,9 +34,7 @@ import org.junit.Test;
 // Tokens not supported in custom, namespaces at this time
 public class TokensAccessAttributeTest extends AuraImplTestCase {
 
-	public TokensAccessAttributeTest(String name) {
-		super(name);
-		
+	public TokensAccessAttributeTest() {
 		ConfigAdapter adapter = Aura.getConfigAdapter();
         adapter.addPrivilegedNamespace("privilegedNS");
 	}

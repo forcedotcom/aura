@@ -15,19 +15,14 @@
  */
 package org.auraframework.integration.test.clientlibrary;
 
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.CheckAccessibility;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverTestCase.CheckAccessibility;
 import org.junit.Ignore;
 import org.junit.Test;
 
 @CheckAccessibility(false)
 public class ClientLibraryTagUITest extends WebDriverTestCase {
-    public ClientLibraryTagUITest(String name) {
-        super(name);
-    }
-
-
     /**
      * Verify that Javascript and Style resources marked as uncombinable are available at the client. WalltimeLocale is
      * an uncombinable JS resource.

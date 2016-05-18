@@ -16,7 +16,7 @@
 
 package org.auraframework.integration.test;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -25,10 +25,6 @@ import org.openqa.selenium.By;
 @UnAdaptableTest("We don't run access check test across browsers")
 @ThreadHostileTest("Tests modify what namespaces are Internal or not and locker service enabled")
 public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
-
-    public GetDefinitionAccessCheckUITest(String name) {
-        super(name);
-    }
 
     @Override
     public void setUp() throws Exception {

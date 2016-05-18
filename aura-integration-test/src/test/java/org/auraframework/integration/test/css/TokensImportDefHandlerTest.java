@@ -30,11 +30,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
 
 public class TokensImportDefHandlerTest extends StyleTestCase {
-
-    public TokensImportDefHandlerTest(String name) {
-        super(name);
-    }
-
     private TokensImportDef source(String src) throws Exception {
         DefDescriptor<TokensImportDef> desc = definitionService.getDefDescriptor("test", TokensImportDef.class);
         StringSource<TokensImportDef> ss = new StringSource<>(desc, src, "myID", Format.XML);

@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -45,11 +45,6 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     private final String DATEPICKER_SEL = "div.uiDatePicker.visible";
 
     private final String CLASSNAME = "return $A.test.getActiveElement().className";
-
-    public InputDateWithLabelUITest(String name) {
-        super(name);
-
-    }
 
     /**
      * Excluded Browser Reasons:

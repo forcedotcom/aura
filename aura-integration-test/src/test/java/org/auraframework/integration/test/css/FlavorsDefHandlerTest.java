@@ -20,11 +20,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class FlavorsDefHandlerTest extends StyleTestCase {
-
-    public FlavorsDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testInvalidChild() throws Exception {
         try {

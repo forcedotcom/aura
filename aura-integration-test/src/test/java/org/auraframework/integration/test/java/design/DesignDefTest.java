@@ -34,11 +34,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class DesignDefTest extends AuraImplTestCase {
-
-    public DesignDefTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testLoadFakeDesignDefinition() throws Exception {
         DesignDef c = definitionService.getDefinition("test:fakeComponent", DesignDef.class);

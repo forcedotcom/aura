@@ -24,13 +24,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
 public class MethodDefHandlerTest extends AuraImplTestCase {
-
-    public MethodDefHandlerTest(String name) {
-        super(name);
-        // TODO Auto-generated constructor stub
-    }
-    
-    
     //sanity test : positive case
     @Test
     public void testBasicMethod() throws QuickFixException  {

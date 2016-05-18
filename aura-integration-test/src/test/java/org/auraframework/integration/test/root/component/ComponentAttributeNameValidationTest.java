@@ -26,15 +26,8 @@ import org.junit.Test;
 
 /**
  * Test validation of attribute names in component markup.
- * 
- * @hierarchy Aura.Unit Tests.Components.Attributes.Validation
- * @userStory a07B000000090oq
  */
 public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
-    public ComponentAttributeNameValidationTest(String name) {
-        super(name);
-    }
-
     private Component getComponentInstance(String markup) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
         return Aura.getInstanceService().getInstance(cmpDesc);

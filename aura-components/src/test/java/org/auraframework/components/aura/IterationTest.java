@@ -38,11 +38,6 @@ import com.google.common.collect.Maps;
  * Server-side aura:iteration tests
  */
 public class IterationTest extends AuraImplTestCase {
-
-    public IterationTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

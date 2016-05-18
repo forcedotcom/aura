@@ -28,15 +28,6 @@ import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
 public class ActionWithKeyOverrideTest extends UnitTestCase {
-
-    public ActionWithKeyOverrideTest() {
-        super();
-    }
-
-    public ActionWithKeyOverrideTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testConstructingWithNullActionAsKey() {
         try {

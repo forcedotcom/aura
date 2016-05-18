@@ -25,11 +25,11 @@ import java.util.logging.Logger;
 import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.perf.PerfWebDriverUtil;
-import org.auraframework.test.util.*;
-import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraFiles;
@@ -49,7 +49,7 @@ import com.google.gson.Gson;
 
 @PerfCmpTest
 @TargetBrowsers({ BrowserType.GOOGLECHROME })
-public class PerfExecutorTest extends WebDriverTestCase {
+public abstract class PerfExecutorTest extends WebDriverTestCase {
 
     private static final Logger logger = Logger.getLogger(PerfExecutorTest.class.getSimpleName());
     private DefDescriptor<BaseComponentDef> def;
@@ -63,7 +63,7 @@ public class PerfExecutorTest extends WebDriverTestCase {
     private static int DEFAULT_TIMEOUT = 60; // Webdriver timeout of 60 secs
     
     public PerfExecutorTest(DefDescriptor<BaseComponentDef> def, PerfConfig config, String db) {
-    	super("perf_" + def.getDescriptorName());
+    	this.setName("perf_" + def.getDescriptorName());
         this.def = def;
         this.config = config;
         this.setDB(db);

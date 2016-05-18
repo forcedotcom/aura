@@ -36,10 +36,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class AbstractActionImplTest extends UnitTestCase {
-    public AbstractActionImplTest(String name) throws Exception {
-        super(name);
-    }
-
     //
     // A class to remove the 'abstract'
     //

@@ -26,11 +26,6 @@ import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
 public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
-
-    public DesignAttributeDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetElement() throws Exception {
         String name = "mystring";

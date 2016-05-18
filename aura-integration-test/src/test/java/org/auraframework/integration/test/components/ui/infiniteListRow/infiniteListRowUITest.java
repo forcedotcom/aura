@@ -19,10 +19,11 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -47,17 +48,14 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 		SWIPE_VERTICAL_UP,
     };
     
-	public infiniteListRowUITest(String name) {
-		super(name);
-	}
-	
 	/**
 	 * Test to verify that logging for swipe works. This is basically checking to make sure that the event fires correctly 
 	 * @throws MalformedURLException
 	 * @throws URISyntaxException
 	 * @throws InterruptedException
 	 */
-	public void testHorizontolSwipeLogs () throws MalformedURLException, URISyntaxException, InterruptedException {
+    @Test
+    public void testHorizontolSwipeLogs () throws MalformedURLException, URISyntaxException, InterruptedException {
 		open(TEST_APP);
 		setViewPortVariable();
 		
@@ -102,7 +100,8 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws URISyntaxException
 	 * @throws InterruptedException
 	 */
-	public void testHorizontalSwipeGesturesDefaultBehavior() throws MalformedURLException, URISyntaxException, InterruptedException{
+    @Test
+    public void testHorizontalSwipeGesturesDefaultBehavior() throws MalformedURLException, URISyntaxException, InterruptedException{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
@@ -125,7 +124,8 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws URISyntaxException
 	 * @throws InterruptedException
 	 */
-	public void testHorizontalLeftSwipeBehavior() throws MalformedURLException, URISyntaxException, InterruptedException{
+    @Test
+    public void testHorizontalLeftSwipeBehavior() throws MalformedURLException, URISyntaxException, InterruptedException{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
@@ -175,11 +175,13 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws URISyntaxException
 	 * @throws InterruptedException
 	 */
-	public void testRefreshOnListRowsClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
+    @Test
+    public void testRefreshOnListRowsClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
         verifyListRowAfterRefreshOrShowMoreAction("refresh");
 	}
 	
-	public void testScrollingAnyVerifyDefaultSwipeBehavior() throws MalformedURLException, URISyntaxException, InterruptedException {
+    @Test
+    public void testScrollingAnyVerifyDefaultSwipeBehavior() throws MalformedURLException, URISyntaxException, InterruptedException {
 		open(TEST_APP);
         setViewPortVariable();
         clickOnShowMore();
@@ -226,7 +228,8 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws InterruptedException
 	 * Bug: W-2257072
 	 */
-	public void testVerticalSwipeClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
+    @Test
+    public void testVerticalSwipeClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
@@ -246,7 +249,8 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws URISyntaxException
 	 * @throws InterruptedException
 	 */
-	public void testTapOnNonActiveRowClosesActiveRow() throws MalformedURLException, URISyntaxException, InterruptedException{
+    @Test
+    public void testTapOnNonActiveRowClosesActiveRow() throws MalformedURLException, URISyntaxException, InterruptedException{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);

@@ -19,10 +19,10 @@ import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.ManifestUtil;
+import org.auraframework.integration.test.util.IntegrationTestCase;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.IntegrationTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
 
@@ -32,10 +32,6 @@ import org.junit.Test;
  * @since 0.0.2.48
  */
 public class AuraServletIntegrationTest extends IntegrationTestCase {
-	public AuraServletIntegrationTest(String name) {
-        super(name);
-    }
-
     /**
      * check manifest URL when context has no preloads.
      */

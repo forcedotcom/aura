@@ -38,10 +38,6 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;
     ComponentDefRefHandler<?> cdrHandler;
 
-    public ComponentDefRefHandlerTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

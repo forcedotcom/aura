@@ -28,11 +28,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
 public class InterfaceDefHandlerTest extends AuraImplTestCase {
-
-    public InterfaceDefHandlerTest(String name) {
-        super(name);
-    }
-    
     /**
      * sanity test. 
      * check we can pass support/description to aura:interface (support only works for internal namespace)

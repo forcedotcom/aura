@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test.components.ui.pillContainerAutoComplete;
 
-import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
+import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 
 @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX })

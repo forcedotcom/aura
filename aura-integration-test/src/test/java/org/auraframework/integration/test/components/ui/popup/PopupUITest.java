@@ -17,8 +17,8 @@ package org.auraframework.integration.test.components.ui.popup;
 
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -37,10 +37,6 @@ public class PopupUITest extends WebDriverTestCase {
 
 	private final String POPUP_CONTAINER = ".popupTargetContainer";
     private final String POPUP_CONTAINER_TARGET = POPUP_CONTAINER + " div";
-    
-    public PopupUITest(String name) {
-        super(name);
-    }
     
     /**
      * Creates a popup with an extended target and confirms the

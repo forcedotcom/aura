@@ -17,8 +17,9 @@ package org.auraframework.integration.test.components.ui.autocomplete;
 
 import java.util.*;
 
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.*;
-import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 import org.openqa.selenium.*;
@@ -62,7 +63,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     };
 
     public BaseAutoComplete(String urlPath) {
-        super(urlPath);
+    	this.setName(urlPath);
         this.URL = urlPath;
     }
 

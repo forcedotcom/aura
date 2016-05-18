@@ -40,12 +40,7 @@ import com.ibm.icu.text.NumberFormat;
  */
 public class LocalizationServiceImplTest extends AuraTestCase {
 
-    public LocalizationService localizationService = null;
-
-    public LocalizationServiceImplTest(String name) {
-        super(name);
-        localizationService = Aura.getLocalizationService();
-    }
+    public LocalizationService localizationService = Aura.getLocalizationService();
 
     /**
      * Tests to verify Date parser across different Locale

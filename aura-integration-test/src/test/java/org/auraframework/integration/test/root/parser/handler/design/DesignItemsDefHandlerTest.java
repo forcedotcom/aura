@@ -29,9 +29,6 @@ import java.util.Set;
 public class DesignItemsDefHandlerTest extends AuraImplTestCase {
     private final static String ITEMS = "<design:layoutitems/>";
     private final static String ITEMS_NAME = "<design:layoutitems name=\"%s\"/>";
-    public DesignItemsDefHandlerTest(String name) {
-        super(name);
-    }
 
     @Test
     public void testNoItemsSection() throws Exception {

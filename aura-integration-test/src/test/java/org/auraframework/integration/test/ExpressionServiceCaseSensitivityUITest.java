@@ -15,8 +15,8 @@
  */
 package org.auraframework.integration.test;
 
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.WebDriverTestCase;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -26,10 +26,6 @@ import org.junit.Test;
  * TODO(W-2498010): Convert these to JS tests when we have the ability to set the server mode there.
  */
 public class ExpressionServiceCaseSensitivityUITest extends WebDriverTestCase {
-
-    public ExpressionServiceCaseSensitivityUITest(String name) {
-        super(name);
-    }
 
     /**
      * Verify Aura error pops up suggesting the proper case when trying to get a nested map attribute with the wrong

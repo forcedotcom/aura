@@ -32,11 +32,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 public class EncryptionKeyTest extends UnitTestCase{
-
-    public EncryptionKeyTest(String name) {
-        super(name);
-    }
-    
     /**
      * Unit Test, Name is API!.
      */

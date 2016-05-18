@@ -40,10 +40,6 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
     @Mock
     protected DefDescriptor<TokensDef> parentDescriptor;
 
-    public TokenDefImplTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

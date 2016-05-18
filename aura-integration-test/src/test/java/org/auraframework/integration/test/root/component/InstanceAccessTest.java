@@ -35,10 +35,6 @@ public class InstanceAccessTest extends AuraImplTestCase {
     private static final String OTHER = StringSourceLoader.OTHER_CUSTOM_NAMESPACE;//'csstring1'
     private static final String ANOTHER = StringSourceLoader.ANOTHER_CUSTOM_NAMESPACE;//csstring2
 
-    public InstanceAccessTest(String name) {
-        super(name);
-    }
-    
     @Test
     public void testAccessToNonGlobalInSameNS() throws Exception {
         DefDescriptor<ComponentDef> otherCmp = buildCmp(DEFAULT, "cmp", "", "");

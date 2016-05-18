@@ -35,18 +35,10 @@ import org.mockito.Mockito;
 
 /**
  * Test class to verify implementation of Java (server side) renderers for component.
- * 
- * @hierarchy Aura.Components.Renderer
- * @priority high
- * @userStory a07B0000000Doob
  */
 public class JavaRendererDefTest extends AuraImplTestCase {
     public Component dummyCmp = null;
     StringWriter sw = null;
-
-    public JavaRendererDefTest(String name) {
-        super(name);
-    }
 
     @Override
     public void setUp() throws Exception {

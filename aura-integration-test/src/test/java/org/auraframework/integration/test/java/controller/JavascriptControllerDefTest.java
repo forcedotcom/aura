@@ -40,10 +40,6 @@ import org.junit.Test;
  * Test class to verify implementation of JavascriptControllerDef.
  */
 public class JavascriptControllerDefTest extends AuraImplTestCase {
-    public JavascriptControllerDefTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify JavascriptRendererDef is non-local.
      */

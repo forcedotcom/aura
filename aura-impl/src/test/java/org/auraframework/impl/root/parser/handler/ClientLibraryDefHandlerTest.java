@@ -40,10 +40,6 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     private DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser",
             ComponentDef.class);
 
-    public ClientLibraryDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testNoTypeInLibraryTag() throws Exception {
         StringSource<ComponentDef> source = new StringSource<>(descriptor,

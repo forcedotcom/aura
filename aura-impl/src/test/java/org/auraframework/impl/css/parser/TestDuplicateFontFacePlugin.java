@@ -31,10 +31,6 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
     private DuplicateFontFacePlugin fontFamilyPlugin;
     private StringBuilder out;
 
-    public TestDuplicateFontFacePlugin(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

@@ -37,10 +37,6 @@ import org.junit.Test;
  */
 public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFormatAdapterTest<ApplicationDef> {
 
-    public ApplicationDefHTMLFormatAdapterTest(String name) {
-        super(name);
-    }
-
     @Override
     public Class<ApplicationDef> getDefClass() {
         return ApplicationDef.class;

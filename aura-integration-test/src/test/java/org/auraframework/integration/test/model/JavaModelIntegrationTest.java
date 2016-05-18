@@ -35,10 +35,6 @@ import org.junit.Test;
  * Integration tests for Java Model
  */
 public class JavaModelIntegrationTest extends AuraImplTestCase {
-    public JavaModelIntegrationTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify that class level annotation is required for a java model.
      */

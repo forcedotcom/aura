@@ -26,13 +26,11 @@ import org.auraframework.impl.root.parser.DocumentationXMLParser;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 public class DocumentationDefHandlerTest extends AuraImplTestCase {
-	public DocumentationDefHandlerTest(String name) {
-		super(name);
-	}
-
-	public void testDocDefWithDescription() throws Exception {
+    @Test
+    public void testDocDefWithDescription() throws Exception {
 		String description = "testing <code>DocumentationDef</code> &lt;ui:inputText/&gt;";
 		String name = "sample Description";
 		String docDefSource = "<aura:documentation><aura:description name='"+name+"'>"+description+"</aura:description></aura:documentation>";
@@ -47,7 +45,8 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
 
 	}
 
-	public void testMultipleDescriptions() throws Exception {
+    @Test
+    public void testMultipleDescriptions() throws Exception {
 		String[] descriptions = {"d1","d2"};
 		String docDefSource = "<aura:documentation>" +
 				"<aura:description>"+descriptions[0]+"</aura:description>" +
@@ -66,7 +65,8 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
 
 	}
 
-	public void testMultipleDescriptionsWithSameName() throws Exception {
+    @Test
+    public void testMultipleDescriptionsWithSameName() throws Exception {
 
 		String docDefSource = "<aura:documentation>" +
 				"<aura:description name='sameName'>foo</aura:description>" +
@@ -92,7 +92,8 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
 
 	}
 
-	public void testInvalidMarkup() throws Exception {
+    @Test
+    public void testInvalidMarkup() throws Exception {
 		String[][] invalidMarkupsWithExpectedErrorMessages = {
 				//empty
 				{"",
@@ -136,7 +137,8 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
 		}	
 	}
 	
-	public void testDocDefWithExample() throws Exception{
+    @Test
+    public void testDocDefWithExample() throws Exception{
 		String description = "myDescription";
 		String exampleName = "myExample";
 		String exampleLabel = "my Label";
@@ -158,7 +160,8 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
 		
 	}
 	
-	public void testMultipleExamplesWithSameName() throws Exception {
+    @Test
+    public void testMultipleExamplesWithSameName() throws Exception {
 
 		String docDefSource = "<aura:documentation>" +
 				"<aura:description>random description</aura:description>" +
@@ -185,7 +188,8 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
 
 	}
 
-	public void testMultipleExamples() throws Exception {
+    @Test
+    public void testMultipleExamples() throws Exception {
 		String[] examples = {"e1","e2"};
 		String docDefSource = "<aura:documentation>" +
 				"<aura:description>random description</aura:description>" +
@@ -213,5 +217,4 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
 
 		return new DocumentationXMLParser().parse(vendor.getDocumentationDefDescriptor(), source);
 	}
-
 }

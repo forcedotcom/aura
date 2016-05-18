@@ -27,6 +27,7 @@ import org.auraframework.system.Client;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -36,10 +37,6 @@ import org.junit.Test;
  * .auraTest
  */
 public class StyleParserTest extends AuraImplTestCase {
-    public StyleParserTest(String name) {
-        super(name);
-    }
-
     private void serializeAndGoldFile(StyleDef styleDef, String suffix) throws Exception {
         String styleStr = toJson(styleDef);
         // strip any cachebusters from URLs (simplistically), we have other
@@ -340,6 +337,7 @@ public class StyleParserTest extends AuraImplTestCase {
     /**
      * Context path should be prepended to any /auraFW url in css url function
      */
+    @Ignore("flapper")
     @Test
     public void testUrlFunctionContextPath() throws Exception {
         if (Aura.getContextService().isEstablished()) {

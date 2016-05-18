@@ -41,11 +41,6 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.junit.Test;
 
 public class AttributeDefHandlerTest extends AuraImplTestCase {
-
-    public AttributeDefHandlerTest(String name) {
-        super(name);
-    }
-
     DefDescriptor<AttributeDef> desc = null;
     StringSource<AttributeDef> componentSource = null;
     XMLStreamReader componentXmlReader = null;

@@ -37,11 +37,6 @@ import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 @UnAdaptableTest
 public class LocaleValueProviderTest extends AuraImplTestCase {
-
-    public LocaleValueProviderTest(String name) {
-        super(name);
-    }
-
     private enum LocaleProperty {
         language(LocaleValueProvider.LANGUAGE),
         country(LocaleValueProvider.COUNTRY),
@@ -238,7 +233,8 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
      * Test to verify getValue returns null for undefined property
      * @throws Exception
      */
-	public void testGetValueUndefinedProperty() throws Exception {
+    @Test
+    public void testGetValueUndefinedProperty() throws Exception {
 		AuraContext context = Aura.getContextService().getCurrentContext();
         context.setRequestedLocales(Arrays.asList(Locale.UK));
     	LocaleValueProvider lvp = new LocaleValueProvider();

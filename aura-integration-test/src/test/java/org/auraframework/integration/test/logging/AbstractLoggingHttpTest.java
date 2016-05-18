@@ -18,7 +18,7 @@ package org.auraframework.integration.test.logging;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.auraframework.impl.test.util.LoggingTestAppender;
-import org.auraframework.test.util.AuraHttpTestCase;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 
 /**
@@ -33,10 +33,6 @@ public abstract class AbstractLoggingHttpTest extends AuraHttpTestCase {
     private Logger logger;
     private Level originalLevel;
     protected LoggingTestAppender appender;
-
-    public AbstractLoggingHttpTest(String name) {
-        super(name);
-    }
 
     @Override
     public void setUp() throws Exception {

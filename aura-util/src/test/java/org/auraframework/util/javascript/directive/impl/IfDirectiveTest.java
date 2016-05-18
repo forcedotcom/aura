@@ -33,10 +33,6 @@ import com.google.common.collect.ImmutableList;
  * Tests to verify the functioning of the IF directive {@link IfDirective}
  */
 public class IfDirectiveTest extends UnitTestCase {
-    public IfDirectiveTest(String name) {
-        super(name);
-    }
-
     /**
      * Test basic initialization.
      */

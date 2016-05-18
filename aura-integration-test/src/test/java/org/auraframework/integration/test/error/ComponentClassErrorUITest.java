@@ -18,8 +18,8 @@ package org.auraframework.integration.test.error;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
+import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -31,11 +31,6 @@ import org.openqa.selenium.By;
  */
 @TargetBrowsers({ BrowserType.GOOGLECHROME })
 public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
-
-    public ComponentClassErrorUITest(String name) {
-        super(name);
-    }
-
     /* Test with dynamic created component */
     // create componentClassParent.cmp in controller dynamically, expect it to error out from render
     @Test

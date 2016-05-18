@@ -29,15 +29,15 @@ import org.auraframework.util.test.util.TestInventory.Type;
 
 @UnAdaptableTest
 //@PerfTestSuite
-public class FrameworkPerfTestSuiteTest extends TestSuite {
+public class FrameworkPerfTestSuite extends TestSuite {
 
-    private static final Logger LOG = Logger.getLogger(FrameworkPerfTestSuiteTest.class.getSimpleName());
+    private static final Logger LOG = Logger.getLogger(FrameworkPerfTestSuite.class.getSimpleName());
 
     public static TestSuite suite() throws Exception {
-        return new FrameworkPerfTestSuiteTest();
+        return new FrameworkPerfTestSuite();
     }
 
-    private FrameworkPerfTestSuiteTest() throws Exception {
+    private FrameworkPerfTestSuite() throws Exception {
         super("Framework Perf tests");
         createTestCases();
     }

@@ -43,10 +43,6 @@ import com.google.common.collect.ImmutableList;
 public class TokenValueProviderImplTest extends StyleTestCase {
     private DefDescriptor<StyleDef> def;
 
-    public TokenValueProviderImplTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

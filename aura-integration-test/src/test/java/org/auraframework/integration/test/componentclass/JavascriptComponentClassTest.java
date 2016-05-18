@@ -40,10 +40,6 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
 
 	private Builder builder;
 
-    public JavascriptComponentClassTest(String name) {
-        super(name);
-    }
-    
     @Mock
     private DefDescriptor<ComponentDef> descriptor;
 

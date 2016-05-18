@@ -49,10 +49,6 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     private String ns1;
     private String ns2;
 
-    public StyleTestCase(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

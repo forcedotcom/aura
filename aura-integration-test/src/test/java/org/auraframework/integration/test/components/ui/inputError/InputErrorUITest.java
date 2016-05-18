@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test.components.ui.inputError;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -35,10 +35,6 @@ public class InputErrorUITest extends WebDriverTestCase {
     final String STATUS_CLEAR = "Cleared error";
     final String URL = "/uitest/inputError_Test.cmp";
     final String URL_CST = "/uitest/inputError_CustomTest.cmp";
-
-    public InputErrorUITest(String name) {
-        super(name);
-    }
 
     /**
      * Test error handling setting errors when firing onError event. Test error handling clearing errors when firing

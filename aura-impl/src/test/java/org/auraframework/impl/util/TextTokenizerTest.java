@@ -40,10 +40,6 @@ public class TextTokenizerTest extends AuraImplTestCase {
 
     private static final String testWhitespace = "     {!true}     {!false}     five spaces";
 
-    public TextTokenizerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testUnwrap() {
         assertEquals("ab.cab", TextTokenizer.unwrap("{!ab.cab}"));

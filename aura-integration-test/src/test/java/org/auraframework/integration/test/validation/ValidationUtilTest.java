@@ -30,11 +30,6 @@ import org.auraframework.impl.validation.ValidationUtil;
 import org.junit.Test;
 
 public final class ValidationUtilTest extends AuraValidationTestCase {
-
-    public ValidationUtilTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetAllDescriptorsIn() throws Exception {
         if (skipTestIfNotRunningWithAuraSource()) {

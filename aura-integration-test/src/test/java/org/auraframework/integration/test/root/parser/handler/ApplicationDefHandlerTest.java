@@ -38,10 +38,6 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;
     ApplicationDefHandlerOverride cdHandler;
 
-    public ApplicationDefHandlerTest(String name) {
-        super(name);
-    }
-
     private static class ApplicationDefHandlerOverride extends ApplicationDefHandler {
         public ApplicationDefHandlerOverride(DefDescriptor<ApplicationDef> applicationDefDescriptor,
                 Source<ApplicationDef> source, XMLStreamReader xmlReader) {

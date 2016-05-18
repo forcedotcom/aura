@@ -31,9 +31,8 @@ import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
 
 public class AuraContextServiceImplTest extends AuraImplTestCase {
-
-    public AuraContextServiceImplTest(String name) {
-        super(name, false);
+    public AuraContextServiceImplTest() {
+    	this.setShouldSetupContext(false);
     }
 
     @Test

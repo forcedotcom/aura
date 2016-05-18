@@ -22,13 +22,8 @@ import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerE
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
-
 public class RegistrySerializerTest extends UnitTestCase {
-    AuraComponentTestBuilder actb;
-
-    public RegistrySerializerTest(String name) {
-        super(name);
-    }
+    private AuraComponentTestBuilder actb;
 
     @Override
     public void setUp() throws Exception {

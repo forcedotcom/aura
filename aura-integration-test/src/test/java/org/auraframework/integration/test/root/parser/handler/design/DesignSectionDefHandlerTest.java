@@ -30,10 +30,6 @@ public class DesignSectionDefHandlerTest extends AuraImplTestCase {
     private static final String SECTION = "<design:section/>";
     private static final String SECTION_NAME = "<design:section name=\"%s\"/>";
 
-    public DesignSectionDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testNoSection() throws Exception {
         Set<DesignSectionDef> layout = setupDesignSectionDef("");

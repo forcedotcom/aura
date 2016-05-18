@@ -39,7 +39,6 @@ import org.auraframework.util.json.JsonSerializationContext;
  * Base class for Aura unit tests that establishes a AuraTestContext that looks up components in the
  * aura-test/components/ directory.
  */
-
 public abstract class AuraImplTestCase extends AuraTestCase {
     private final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 
@@ -49,13 +48,8 @@ public abstract class AuraImplTestCase extends AuraTestCase {
     protected final DefDescriptor<ApplicationDef> laxSecurityApp = definitionService.getDefDescriptor(
             "test:laxSecurity", ApplicationDef.class);
 
-    public AuraImplTestCase(String name) {
-        this(name, true);
-    }
-
-    public AuraImplTestCase(String name, boolean setupContext) {
-        super(name);
-        shouldSetupContext = setupContext;
+    protected void setShouldSetupContext(boolean setupContext) {
+        this.shouldSetupContext = setupContext;
     }
 
     @Override

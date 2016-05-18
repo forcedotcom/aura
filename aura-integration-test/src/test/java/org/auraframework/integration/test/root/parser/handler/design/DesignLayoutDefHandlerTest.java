@@ -30,10 +30,6 @@ public class DesignLayoutDefHandlerTest extends AuraImplTestCase {
     private final static String LAYOUT = "<design:layout> </design:layout>";
     private final static String LAYOUT_NAME = "<design:layout name=\"%s\"> </design:layout>";
 
-    public DesignLayoutDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testNoLayout() throws Exception {
         DesignDef def = setupDesignLayoutDef("", true);

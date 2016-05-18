@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -77,6 +78,8 @@ public class AppCssTest extends UnitTestCase {
                     Mockito.any(HttpServletResponse.class), Mockito.any(AuraContext.class)))
             .thenReturn(new HashSet<DefDescriptor<?>>());
         Mockito.doThrow(t).when(serverService).writeAppCss(Mockito.anySet(), Mockito.any(Writer.class));
+        PrintWriter writer = new PrintWriter(System.out);
+        Mockito.when(response.getWriter()).thenReturn(writer);
 
         appCss.write(null, response, null);
 

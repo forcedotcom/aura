@@ -1606,8 +1606,8 @@ var Editor = (function(){
   return Editor;
 })();
 
-addEventHandler(window, "load", function() {
-  var CodeMirror = window.frameElement.CodeMirror;
-  var e = CodeMirror.editor = new Editor(CodeMirror.options);
-  this.parent.setTimeout(method(CodeMirror, "init"), 0);
-});
+// addEventHandler(window, "load", function() {
+//   var CodeMirror = window.frameElement.CodeMirror;
+//   var e = CodeMirror.editor = new Editor(CodeMirror.options);
+//   this.parent.setTimeout(method(CodeMirror, "init"), 0);
+// });

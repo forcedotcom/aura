@@ -91,18 +91,12 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 }
 
                 sb.setLength(0);
-                writeHtmlScripts(context, servletUtilAdapter.getBaseScripts(context, componentAttributes), false, sb);
+                writeHtmlScripts(context, Aura.getServletUtilAdapter().getBaseScripts(context, componentAttributes), true/*async*/, sb);
                 attributes.put("auraBaseScriptTags", sb.toString());
 
                 sb.setLength(0);
-                writeHtmlScripts(context, servletUtilAdapter.getFrameworkScripts(context, true, componentAttributes),
-                        true, sb);
+                writeHtmlScripts(context, Aura.getServletUtilAdapter().getFrameworkScripts(context, true/*inlineJS*/, false/*dontIgnoreBootstrap*/, componentAttributes), true/*async*/, sb);
                 attributes.put("auraNamespacesScriptTags", sb.toString());
-
-                if(mode != Mode.PROD && mode != Mode.PRODDEBUG &&
-                        Aura.getContextService().getCurrentContext().getIsDebugToolEnabled()) {
-                    attributes.put("auraInitBlock", "<script>var debugWindow=window.open('/aura/debug.cmp','Aura Debug Tool','width=900,height=305,scrollbars=0,location=0,toolbar=0,menubar=0');$A.util.setDebugToolWindow(debugWindow);</script>");
-                }
 
                 Map<String, Object> auraInit = Maps.newHashMap();
                 if (componentAttributes != null && !componentAttributes.isEmpty()) {

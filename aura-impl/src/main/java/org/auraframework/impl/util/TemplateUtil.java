@@ -26,6 +26,7 @@ public class TemplateUtil {
     private static final String HTML_INLINE_SCRIPT = "       <script src=\"%s\"></script>\n";
     private static final String HTML_LAZY_SCRIPT = "       <script data-src=\"%s\" ></script>\n";
     private static final String HTML_DEFER_SCRIPT = "       <script src=\"%s\" defer ></script>\n";
+    private static final String HTML_ASYNC_SCRIPT = "       <script src=\"%s\" async defer></script>\n";
 
     public void writeHtmlStyle(String url, Appendable out) throws IOException {
         if (url != null) {
@@ -59,13 +60,13 @@ public class TemplateUtil {
             case IE7:
             case IE6:
                 if (canBeAsync) {
-                    format = HTML_LAZY_SCRIPT;
+                    format = HTML_DEFER_SCRIPT;
                 } else {
                     format = HTML_INLINE_SCRIPT;
                 }
                 break;
             default:
-                format = HTML_DEFER_SCRIPT;
+                format = HTML_ASYNC_SCRIPT;
                 break;
             }
             for (String script : scripts) {

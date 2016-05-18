@@ -27,17 +27,17 @@ import org.openqa.selenium.WebElement;
 public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     /**
      * In prod mode, the error message has three lines:<br>
-     *   Something has gone wrong. [MESSAGES]<br>
-     *   Failing descriptor: [DESCRIPTOR]<br>
-     *   Please try again.
+     * Something has gone wrong. [MESSAGES]<br>
+     * Failing descriptor: [DESCRIPTOR]<br>
+     * Please try again.
      */
     private static int NUM_OF_MSG_LINES_PROD_MODE = 3;
     /**
      * In non-prod mode, the error message has three lines, excluding stack trace:<br>
-     *   Something has gone wrong. [MESSAGES]<br>
-     *   Failing descriptor: [DESCRIPTOR]<br>
-     *   [STACKTRACE]<br>
-     *   Please try again.
+     * Something has gone wrong. [MESSAGES]<br>
+     * Failing descriptor: [DESCRIPTOR]<br>
+     * [STACKTRACE]<br>
+     * Please try again.
      */
     private static int NUM_OF_MSG_LINES_NON_PROD_MODE = 3;
 
@@ -77,8 +77,8 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button
-     * when $A has not been initialized yet.
+     * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button when
+     * $A has not been initialized yet.
      */
     @Test
     public void testErrorMessageDisplayAndCloseWhenAuraIsNotInitialized() throws Exception {
@@ -102,7 +102,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedMsg = "Error from app client controller";
         assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
         assertClientErrorContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_NON_PROD_MODE);
-   }
+    }
 
     @Test
     public void testErrorMessageFromErrorNotContainsStacktraceInProdMode() throws Exception {
@@ -187,12 +187,13 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertThat("Did not find expected error in error message element.", actualMessage,
+                containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
     @Test
-    public void testCustomHandleFailedAuraAssertFromClientController() throws Exception{
+    public void testCustomHandleFailedAuraAssertFromClientController() throws Exception {
         String expectedContainedMessage = "Assert failed in app client controller";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
 
@@ -201,13 +202,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertThat("Did not find expected error in error message element.", actualMessage,
+                containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
     /**
-     * Verify Aura default error handler can handle systemError event when an error is thrown from
-     * an App's client side controller.
+     * Verify Aura default error handler can handle systemError event when an error is thrown from an App's client side
+     * controller.
      */
     @Test
     public void testDefaultHandleErrorThrownFromClientController() throws Exception {
@@ -221,8 +223,8 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * Verify custom error handler can handle systemError event when an error is thrown from
-     * an App's client side controller.
+     * Verify custom error handler can handle systemError event when an error is thrown from an App's client side
+     * controller.
      */
     @Test
     public void testCustomHandleErrorThrownFromClientController() throws Exception {
@@ -233,13 +235,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertThat("Did not find expected error in error message element.", actualMessage,
+                containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
     /**
-     * Verify Aura default error handler can handle systemError event when an error is thrown from
-     * a component's client side controller.
+     * Verify Aura default error handler can handle systemError event when an error is thrown from a component's client
+     * side controller.
      */
     @Test
     public void testDefaultHandleErrorThrownFromContainedCmpClientController() throws Exception {
@@ -252,8 +255,8 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * Verify custom error handler can handle systemError event when an error is thrown from
-     * a component's client side controller.
+     * Verify custom error handler can handle systemError event when an error is thrown from a component's client side
+     * controller.
      */
     @Test
     public void testCustomHandleErrorThrownFromContainedCmpClientController() throws Exception {
@@ -265,13 +268,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnCmp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='cmpErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertThat("Did not find expected error in error message element.", actualMessage,
+                containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
     /**
-     * Verify custom error handler in a component can handle systemError event when an error is thrown from
-     * a component's client side controller.
+     * Verify custom error handler in a component can handle systemError event when an error is thrown from a
+     * component's client side controller.
      */
     @Test
     public void testComponetCustomHandleErrorThrownFromClientController() throws Exception {
@@ -283,13 +287,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnCmp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='cmpErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertThat("Did not find expected error in error message element.", actualMessage,
+                containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
     /**
-     * Verify custom error handler in a component can handle systemError event when an error is thrown from
-     * its containing app's client side controller.
+     * Verify custom error handler in a component can handle systemError event when an error is thrown from its
+     * containing app's client side controller.
      */
     @Test
     public void testComponentCustomHandleErrorThrownFromContainingAppClientController() throws Exception {
@@ -301,13 +306,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnCmp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='cmpErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertThat("Did not find expected error in error message element.", actualMessage,
+                containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
     /**
-     * Verify Aura default error handler can handle systemError event when an error is thrown from
-     * a server action's callback.
+     * Verify Aura default error handler can handle systemError event when an error is thrown from a server action's
+     * callback.
      */
     @Test
     public void testDefaultHandleErrorThrownFromServerActionCallback() throws Exception {
@@ -320,8 +326,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * Verify custom error handler can handle systemError event when an error is thrown from
-     * a server action's callback.
+     * Verify custom error handler can handle systemError event when an error is thrown from a server action's callback.
      */
     @Test
     public void testCustomHandleErrorThrownFromServerActionCallback() throws Exception {
@@ -333,13 +338,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertThat("Did not find expected error in error message element.", actualMessage,
+                containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
     /**
-     * Verify Aura default error handler can handle systemError event when an error is thrown from
-     * creatComponent's callback.
+     * Verify Aura default error handler can handle systemError event when an error is thrown from creatComponent's
+     * callback.
      */
     @Test
     public void testDefaultHandleErrorThrownFromCreateComponentCallback() throws Exception {
@@ -352,8 +358,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * Verify custom error handler can handle systemError event when an error is thrown from
-     * creatComponent's callback.
+     * Verify custom error handler can handle systemError event when an error is thrown from creatComponent's callback.
      */
     @Test
     public void testCustomtHandleErrorThrownFromCreateComponentCallback() throws Exception {
@@ -365,13 +370,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertThat("Did not find expected error in error message element.", actualMessage,
+                containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
     /**
-     * Verify Aura default error handler can handle systemError event when an error is thrown from
-     * a function which is wrapped in $A.getCallback().
+     * Verify Aura default error handler can handle systemError event when an error is thrown from a function which is
+     * wrapped in $A.getCallback().
      */
     @Test
     public void testDefaultHandleErrorThrownFromFunctionWrappedInGetCallback() throws Exception {
@@ -385,8 +391,8 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * Verify custom error handler can handle systemError event when an error is thrown from
-     * a function which is wrapped in $A.getCallback().
+     * Verify custom error handler can handle systemError event when an error is thrown from a function which is wrapped
+     * in $A.getCallback().
      */
     @Test
     public void testCustomHandleErrorThrownFromFunctionWrappedInGetCallback() throws Exception {
@@ -398,13 +404,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertThat("Did not find expected error in error message element.", actualMessage,
+                containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
     /**
-     * Verify Aura default error handler can handle systemError event when an error is thrown from
-     * a function that is imported from library.
+     * Verify Aura default error handler can handle systemError event when an error is thrown from a function that is
+     * imported from library.
      */
     @Test
     public void testDefaultHandleErrorFromLibraryCode() throws Exception {
@@ -416,8 +423,8 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * Verify custom error handler can handle systemError event when an error is thrown from
-     * a function that is imported from library.
+     * Verify custom error handler can handle systemError event when an error is thrown from a function that is imported
+     * from library.
      */
     @Test
     public void testCustomHandleErrorFromLibraryCode() throws Exception {
@@ -429,7 +436,8 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertThat("Did not find expected error in error message element.", actualMessage,
+                containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
@@ -446,8 +454,8 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
     /**
      * Verify systemError event can be handled by Aura default error handler event when an error is thrown from render()
-     * if a cmp/app contains custom error handler.
-     * When error is thrown from render(), $A is not initialized, so the event has to be handled by default handler.
+     * if a cmp/app contains custom error handler. When error is thrown from render(), $A is not initialized, so the
+     * event has to be handled by default handler.
      */
     @Test
     public void testDefaultHandleErrorFromRenderWhenMarkEventHandled() throws Exception {
@@ -470,9 +478,9 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * Verify systemError event can be handled by Aura default error handler event when an error is thrown from afterRender()
-     * if a cmp/app contains custom error handler.
-     * When error is thrown from afterRender(), $A is not initialized, so the event has to be handled by default handler.
+     * Verify systemError event can be handled by Aura default error handler event when an error is thrown from
+     * afterRender() if a cmp/app contains custom error handler. When error is thrown from afterRender(), $A is not
+     * initialized, so the event has to be handled by default handler.
      */
     @Test
     public void testDefaultHandleErrorFromAfterRenderWhenMarkEventHandled() throws Exception {
@@ -498,7 +506,8 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * Verify custom handle on App can hanle systemError event when an error is thrown from rerender() of its contained component.
+     * Verify custom handle on App can hanle systemError event when an error is thrown from rerender() of its contained
+     * component.
      */
     @Test
     public void testHandleErrorThrownFromRerenderWhenMarkEventHandled() throws Exception {
@@ -511,7 +520,8 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertThat("Did not find expected error in error message element.", actualMessage,
+                containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
@@ -542,7 +552,8 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertThat("Did not find expected error in error message element.", actualMessage,
+                containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
@@ -559,9 +570,9 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * Verify systemError event can be handled by Aura default error handler event when an error is thrown during init phase
-     * if a cmp/app contains custom error handler.
-     * When error is thrown during init phase, $A is not initialized, so the event has to be handled by default handler.
+     * Verify systemError event can be handled by Aura default error handler event when an error is thrown during init
+     * phase if a cmp/app contains custom error handler. When error is thrown during init phase, $A is not initialized,
+     * so the event has to be handled by default handler.
      */
     @Test
     public void testDefaultHandleErrorFromInitWhenMarkEventHandled() throws Exception {
@@ -576,7 +587,8 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * Verify Aura default error handler can handle systemError event when there is an invalid component.
      */
     @Test
-    public void testDefaultHandleInvalidComponentErrorWhenMarkEventHandled() throws Exception {
+    // TODO(W-3178863): New bootstrap sequence needs to handle errors during boot better
+    public void _testDefaultHandleInvalidComponentErrorWhenMarkEventHandled() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true&addInvalidComponent=true", Mode.PROD, false);
 
         String actualMessage = findErrorMessage();

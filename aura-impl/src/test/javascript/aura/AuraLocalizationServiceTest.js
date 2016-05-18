@@ -1439,8 +1439,10 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             var actual;
 
             // Act
-            mockGetNormalizedFormat(function(){
-            	actual = targetService.displayDateTime(targetDateTimeObj, targetFormat, '');
+            mockMoment(function () {
+                mockGetNormalizedFormat(function(){
+                    actual = targetService.displayDateTime(targetDateTimeObj, targetFormat, '');
+                });    
             });
 
             // Assert
@@ -2252,8 +2254,10 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             });
 
             // Act
-            mockUtil(function(){
-    			targetService.init();
+            mockMoment(function () {
+                mockUtil(function(){
+        			targetService.init();
+                });
             });
 
             // Assert

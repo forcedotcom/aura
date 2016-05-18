@@ -52,7 +52,7 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.events = [];
     this.components = null;
     this.actionId = Action.prototype.nextActionId++;
-    this.id = this.actionId + ";" + suffix;
+    this.id = this.actionId > 0 ? this.actionId + ";" + suffix : suffix;
     this.originalResponse = undefined;
     this.storable = false;
     this.caboose = caboose;
@@ -98,7 +98,7 @@ Action.getStorage = function() {
 
 // Instance methods:
 
-Action.prototype.nextActionId = 1;
+Action.prototype.nextActionId = 0;
 
 /**
  * Gets the Action Id.

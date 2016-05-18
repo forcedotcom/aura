@@ -5,7 +5,9 @@
         "moment/moment.js",
         "walltime-js/walltime.js",
         "text-encoder/encoding.js",
-        "domPurify/purify.js"
+        "domPurify/purify.js",
+        "libraryBootstrap/libraryBootstrap.js"
     ],
+
     "walltimeLocaleDir": "walltime-js/olson"
 }

@@ -16,23 +16,49 @@
 
 package org.auraframework.http.resource;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.net.URL;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.util.IOUtil;
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.resource.ResourceLoader;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 
 public class AppJs extends AuraResourceImpl {
     private ServerService serverService = Aura.getServerService();
+    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
+    private String bootstrapJsPayload = "";
 
     public AppJs() {
         super("app.js", Format.JS);
+    }
+    
+    private void prependBootstrapJsPayload (PrintWriter writer) {
+    	String tmp = "";
+        ResourceLoader resourceLoader = configAdapter.getResourceLoader();
+		try {
+			URL url = resourceLoader.getResource("js/prependAppJs.js");
+			tmp = Resources.toString(url, Charsets.UTF_8);
+		} catch (IOException e) {
+			throw new AuraRuntimeException(e);
+		}
+		
+		writer.append(tmp);
     }
 
     @Override
@@ -43,7 +69,9 @@ public class AppJs extends AuraResourceImpl {
             return;
         }
         try {
-            serverService.writeDefinitions(dependencies, response.getWriter());
+        	PrintWriter writer = response.getWriter();
+        	prependBootstrapJsPayload(writer);
+            serverService.writeDefinitions(dependencies, writer);
         } catch (Throwable t) {
             servletUtilAdapter.handleServletException(t, false, context, request, response, false);
         }
@@ -54,6 +82,9 @@ public class AppJs extends AuraResourceImpl {
      */
     public void setServerService(ServerService serverService) {
         this.serverService = serverService;
+    }
+    public void setConfigAdapter (ConfigAdapter configAdapter) {
+    	this.configAdapter = configAdapter;
     }
 
 }

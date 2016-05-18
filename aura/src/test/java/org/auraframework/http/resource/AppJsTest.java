@@ -17,16 +17,19 @@
 package org.auraframework.http.resource;
 
 import org.auraframework.test.util.DummyHttpServletResponse;
+import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
-
+import java.io.PrintWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.ServerService;
@@ -67,16 +70,27 @@ public class AppJsTest extends UnitTestCase {
     public void testExceptionInWrite() throws Exception {
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
         ServerService serverService = Mockito.mock(ServerService.class);
+        ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
+        ResourceLoader loader = Mockito.mock(ResourceLoader.class);
+        URL url = new URL("http://foo.test.com");
+        
         AppJs appJs = new AppJs();
         Throwable t = new RuntimeException();
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         appJs.setServletUtilAdapter(servletUtilAdapter);
         appJs.setServerService(serverService);
+        appJs.setConfigAdapter(configAdapter);
+        
+        Mockito.when(loader.getResource(Mockito.anyString())).thenReturn(url);
+     
         Mockito.when(servletUtilAdapter.verifyTopLevel(Mockito.any(HttpServletRequest.class),
                     Mockito.any(HttpServletResponse.class), Mockito.any(AuraContext.class)))
             .thenReturn(new HashSet<DefDescriptor<?>>());
         Mockito.doThrow(t).when(serverService).writeDefinitions(Mockito.anySet(), Mockito.any(Writer.class));
-
+        PrintWriter writer = new PrintWriter(System.out);
+        Mockito.when(response.getWriter()).thenReturn(writer);
+        
+        Mockito.when(configAdapter.getResourceLoader()).thenReturn(loader);
         appJs.write(null, response, null);
 
         //
@@ -138,13 +152,13 @@ public class AppJsTest extends UnitTestCase {
      */
     @Test
     public void testSetContentType() {
-    	AppJs appJs = new AppJs();
-    	ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
-    	appJs.setServletUtilAdapter(servletUtilAdapter);
-    	Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.JS))
+        AppJs appJs = new AppJs();
+        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
+        appJs.setServletUtilAdapter(servletUtilAdapter);
+        Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.JS))
         .thenReturn("text/javascript");
-    	
-    	DummyHttpServletResponse response = new DummyHttpServletResponse() {
+        
+        DummyHttpServletResponse response = new DummyHttpServletResponse() {
             String contentType = "defaultType";
 
             @Override
@@ -157,9 +171,9 @@ public class AppJsTest extends UnitTestCase {
                 this.contentType = contentType;
             }
         };
-    	
-    	appJs.setContentType(response);
-    	
-    	assertEquals("text/javascript", response.getContentType());
+        
+        appJs.setContentType(response);
+        
+        assertEquals("text/javascript", response.getContentType());
     }
 }

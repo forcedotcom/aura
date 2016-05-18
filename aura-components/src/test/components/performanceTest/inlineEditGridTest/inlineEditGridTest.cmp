@@ -1,0 +1,39 @@
+<!-- -->
+
+<aura:component extends="performance:perfTest">
+<aura:attribute name="items" type="Object[]" />
+<aura:attribute name="numRows" type="Integer" default="10"/>
+<aura:attribute name="testPanels" type="Boolean" default="true" description="opens each inputText panel"/>
+<aura:attribute name="testEdit" type="Boolean" default="true" description="opens each inputText panel, changes the value, and triggers a keydown ENTER to save it"/>
+<aura:registerevent name="keydown"   type="ui:keydown"   access="INTERNAL"/>
+
+
+    <ui:inlineEditGrid aura:id="grid" class="inline-edit-grid" items="{!v.items}" >
+            <aura:set attribute="headerColumns">
+                <ui:dataGridColumn name="A"    label="A"/>
+                <ui:dataGridColumn name="B"  label="B"/>
+                <ui:dataGridColumn name="C" label="C"/>
+            </aura:set>
+            
+            <aura:set attribute="columns">
+                <ui:inlineEditCell name="A" edited="{!item.status.A}">
+                    <ui:outputText value="{!item.data.A}"/>
+                </ui:inlineEditCell>
+                <ui:inlineEditCell name="B" edited="{!item.status.B}">
+                    <ui:outputText value="{!item.data.B}"/>
+                </ui:inlineEditCell>
+                <ui:inlineEditCell name="C" edited="{!item.status.C}">
+                    <ui:outputText value="{!item.data.C}"/>
+                </ui:inlineEditCell>
+            </aura:set>
+        </ui:inlineEditGrid>
+
+        <div class="manager">
+            <ui:panelManager2 aura:id="pm">
+                <aura:set attribute="registeredPanels">
+                        <ui:panel alias="panel"/>
+                </aura:set>
+            </ui:panelManager2>
+        </div>
+
+</aura:component>

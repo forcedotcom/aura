@@ -41,6 +41,7 @@
     <!-- These should be aura methods instead -->
     <aura:registerevent name="addTab" type="ui:tabsetEvent" description="Add new tab to the component." />
     <aura:registerevent name="removeTab" type="ui:tabsetEvent" description="Remove a tab from the component." />
+    <aura:registerevent name="updateTab" type="ui:tabsetEvent" description="Update an existing tab." />
     <aura:registerevent name="activateTab" type="ui:tabsetEvent" description="Activate a tab." />
     <aura:registerevent name="getActiveTab" type="ui:tabsetEvent" description="Get the currently active tab." />
 
@@ -52,6 +53,7 @@
 
     <aura:handler name="addTab" action="{!c.addTab}" />
     <aura:handler name="removeTab" action="{!c.removeTab}" />
+    <aura:handler name="updateTab" action="{!c.updateTab}" />
     <aura:handler name="activateTab" action="{!c.activateTab}" />
     <aura:handler name="getActiveTab" action="{!c.getActiveTab}" />
 

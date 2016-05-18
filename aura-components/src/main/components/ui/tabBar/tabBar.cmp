@@ -27,9 +27,10 @@
     <aura:attribute name="overflowData" type="Map" default="{}" access="PRIVATE" description="Internal object used to store overflow information"/>
     <aura:attribute name="tabHeaders" type="Aura.Component[]" access="PRIVATE" />
 
-    <aura:registerevent name="setActive" type="ui:tabsetEvent" description="This event is fired from parent component to activate a tab item."/>
-    <aura:registerevent name="addTab" type="ui:tabsetEvent" description="This event is fired from parent component to add a tab item." />
-    <aura:registerevent name="closeTab" type="ui:tabsetEvent" description="This event is fired from parent component to close a tab item." />
+    <aura:registerevent name="setActive" type="ui:tabsetEvent" description="This event is fired from the parent component to activate a tab item."/>
+    <aura:registerevent name="addTab" type="ui:tabsetEvent" description="This event is fired from the parent component to add a tab item." />
+    <aura:registerevent name="closeTab" type="ui:tabsetEvent" description="This event is fired from the parent component to close a tab item." />
+    <aura:registerevent name="updateTab" type="ui:tabsetEvent" description="This event is fired from the parent component to update a tab item." />
     <aura:registerevent name="onTabClosed" type="ui:tabsetEvent" description="This event is fired when the close icon is clicked." />
     <aura:registerevent name="onTabActivated" type="ui:tabsetEvent" description="This event is fired when the tab item is clicked." />
     <aura:registerevent name="onTabHover" type="ui:onTabHover" description="The event is fired when the mouse moves over a tab or when a tab is put into focus." />
@@ -38,6 +39,7 @@
     <aura:handler name="setActive" action="{!c.setActive}" />
     <aura:handler name="addTab" action="{!c.addTab}" />
     <aura:handler name="closeTab" action="{!c.closeTab}" />
+    <aura:handler name="updateTab" action="{!c.updateTab}" />
 
     <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
 

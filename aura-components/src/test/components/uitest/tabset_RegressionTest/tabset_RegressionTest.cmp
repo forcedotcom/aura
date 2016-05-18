@@ -31,6 +31,21 @@
 	</div>
 	</aura:if>
 
+	<aura:if isTrue="{! v.renderItem == 'testUpdateTab'}">
+	<div class="block">
+	    <div>
+	        <h1>Dynamically updates existing tabs in ui:tabset</h1>
+	    </div>
+	    <div>
+	        <ui:tabset class="tabset" aura:id="tabSet">
+	        	<!-- One tab has a name and the other does not -->
+	        	<ui:tab title="tab 0 title" name="tab0" closable="true">tab 0 content</ui:tab>
+	        	<ui:tab title="tab 1 title" name="tab1" closable="true">tab 1 content</ui:tab>
+	        </ui:tabset>
+	    </div>
+	</div>
+	</aura:if>
+
 	<aura:if isTrue="{! v.renderItem == 'testRemoveTab'}">
 	<div class="block">
 	    <div>

@@ -25,7 +25,7 @@
     /**
      * Test the client side foreground action is executed once enqueued
      */
-    testClientActionInForeground : {
+    testRunClientActionInForeground : {
         test : [ function(component) {
             var action = component.get("c.clientExecuteInForeground");
             component._gotResponse = false;
@@ -44,7 +44,7 @@
     /**
      * Test the client side foreground action is executed once enqueued
      */
-    testClientActionInBackground : {
+    testRunClientActionInBackground : {
         test : [ function(component) {
             var action = component.get("c.clientExecuteInBackground");
             component._gotResponse = false;

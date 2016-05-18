@@ -56,55 +56,6 @@
     },
 
     /**
-     * Will an infinite loop of controller chain be caught by the server.
-     */
-    //TODO W-1252082
-    _testInfiniteChainingAtClient:{
-        test:function(cmp){
-            var doNothing = $A.test.getAction(cmp,"c.doNothing",{ });
-            doNothing.setChained();
-            var add = $A.test.getAction(cmp,"c.add",{ });
-
-            for(var i=0;i<10;i++){
-                add.setParams({"a" : 1, "b" : 99,
-                            "actions": $A.util.json.encode({
-                                        actions: [doNothing]
-                                    })
-                        });
-                doNothing.setParams({"actions": $A.util.json.encode({actions:[add]})})
-            }
-            this.enqueueServerActionAndFireEvent(cmp, add);
-            //"Server failed to detect an infinite chain."
-            $A.test.addWaitFor("ERROR", function(){return doNothing.getState()},
-                                function(){
-                                    $A.test.assertEquals("ERROR", doNothing.getState(), "Server failed to detect an infinite chain.");
-                                    $A.test.assertEquals("ERROR", add.getState(), "Server failed to detect an infinite chain.");
-                                });
-        }
-    },
-
-    //W-1251785: Unable to detect server side infinite action.
-    _testInfiniteChainingAtServer:{
-        test:function(cmp){
-            var infiniteChain = $A.test.getAction(cmp,"c.infiniteChain",{});
-            this.enqueueServerActionAndFireEvent(cmp, infiniteChain);
-            //"Server failed to detect an infinite chain."
-            $A.test.addWaitFor("ERROR", function(){return infiniteChain.getState()},
-                                function(){
-                                    $A.test.assertEquals("ERROR", infiniteChain.getState(), "Server failed to detect an infinite chain.");
-                                });
-        }
-    },
-
-    //TODO: W-1252083 Setting chained action to be abortable
-    //Not really sure how it impacts action chaining at this point
-    testSettingChainedActionTobeAbortable:{
-        test:function(cmp){
-
-        }
-    },
-
-    /**
      * Verify chaining the same action multiple times.
      *
      */
@@ -145,22 +96,5 @@
                 $A.test.addWaitFor(3, function(){return cmp.get('v.callbackCount');});
             }]
 
-    },
-
-    /**
-     * Should not be able to chain a client action.
-     *
-     * This is no longer quite valid. Not sure how to fix the test.
-     */
-    _testChainingClientAction:{
-        test:function(cmp){
-            var clientAction = cmp.get("c.handleClick");
-            try{
-                $A.test.callServerAction(clientAction);
-                $A.test.fail("Should not be able to chain a client action.");
-            }catch(e){
-                $A.test.assertTrue(e.message.indexOf("Assertion Failed!: RunAfter() cannot be called on a client action. Use runDeprecated() on a client action instead.")==0, e.message);
-            }
-        }
     }
 })

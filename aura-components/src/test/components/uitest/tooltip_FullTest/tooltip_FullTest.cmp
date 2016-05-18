@@ -586,6 +586,12 @@
 	            </div>
 	            <div class="case">
 	                <h1>TT Body:</h1>
+	                <ui:tooltip aura:id="bodyLongWord" class="bodyLongWord" advanced="false" trigger="hover" tooltipBody="SupercalifragilisticexpialidociousEventhoughthesoundofitissomethingquiteatrociousIfyousayitloudenoughyoullalwayssoundprecociousSupercalifragilisticexpialidocious">
+	                	<ui:label aura:id="bodyLongWordlabel" for="bodyLongWord" label="?"/>
+	                </ui:tooltip>               
+	            </div>
+	            <div class="case">
+	                <h1>TT Body:</h1>
 	                <ui:tooltip aura:id="bodyHTML" class="bodyHTML" advanced="false" trigger="hover" tooltipBody="&lt;h1&gt;Hello&lt;/h1&gt;">
 	                	<ui:label aura:id="bodyHTMLlabel" for="bodyHTML" label="?"/>
 	                </ui:tooltip>               

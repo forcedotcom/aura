@@ -13,5 +13,6 @@
         testUtils.assertEquals("debugLog", secureAuraEvent.getName());
         testUtils.assertEquals(params.message, secureAuraEvent.getParams().message);
         testUtils.assertDefined(secureAuraEvent.fire);
+        testUtils.assertDefined(secureAuraEvent.stopPropagation);
     }
 })

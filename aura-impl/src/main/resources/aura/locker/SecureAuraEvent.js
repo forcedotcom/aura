@@ -24,17 +24,14 @@ function SecureAuraEvent(event, key) {
             }
         }
     });
-    Object.defineProperties(o, {
-        "fire": SecureObject.createFilteredMethod(o, event, "fire"),
-        "getName": SecureObject.createFilteredMethod(o, event, "getName"),
-        "getParam": SecureObject.createFilteredMethod(o, event, "getParam"),
-        "getParams": SecureObject.createFilteredMethod(o, event, "getParams"),
-        "getSource": SecureObject.createFilteredMethod(o, event, "getSource"),
-        "setParam": SecureObject.createFilteredMethod(o, event, "setParam"),
-        "setParams": SecureObject.createFilteredMethod(o, event, "setParams")
-    });
+    
+	[ "fire", "getName", "getParam", "getParams", "getSource", "setParam", "setParams", "stopPropagation" ]
+	.forEach(function(name) {
+		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name));
+	});
 
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", event);
+
     return Object.seal(o);
 }

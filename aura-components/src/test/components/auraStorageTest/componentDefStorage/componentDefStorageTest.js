@@ -72,7 +72,15 @@
         var found = false;
 
         function checkDefStorage(desc) {
-            $A.storageService.getStorage("ComponentDefStorage").getAll()
+            var storage = $A.storageService.getStorage("ComponentDefStorage");
+
+            // def storage may not exist until the XHR is back and the def is stored
+            if (!storage) {
+                window.setTimeout(function() { checkDefStorage(desc); }, 250);
+                return;
+            }
+
+            storage.getAll()
                 .then(function(items) {
                     items = items || [];
                     for (var i = 0; i < items.length; i++) {

@@ -23,29 +23,30 @@
                     secure : true
                 }
         };
-        
+
         var adapter = adapters[adapterName];
         if (!adapter) {
             $A.error("Couldn't find adapter " + adapterName);
             return;
         }
-        
+
         // delete any existing instance
         var storage = $A.storageService.getStorage(storageName);
         if (storage) {
             $A.storageService.deleteStorage(storageName);
         }
 
-        storage = $A.storageService.initStorage(
-            storageName,            /* name */
-            adapter.persistent,     /* persistent */
-            adapter.secure,         /* secure */
-            adapterSize * 1024,     /* maxSize (bytes) */
-            10000,                  /* defaultExpiration  (sec) */
-            10000,                  /* defaultAutoRefreshInterval (sec) */
-            true,                  /* debugLoggingEnabled */
-            true,                   /* clearStorageOnInit */
-            1);                     /* version */
+        storage = $A.storageService.initStorage({
+            name: storageName,
+            persistent: adapter.persistent,
+            secure: adapter.secure,
+            maxSize: adapterSize * 1024, /* (bytes) */
+            expiration: 10000,
+            autoRefreshInterval: 10000,
+            debugLogging: true,
+            clearOnInit: true,
+            version: "1"
+        });
 
         if (storage.getName() !== adapterName) {
             $A.error("Aura Storage Service did not select desired adapter. Wanted " + adapterName + ", got " + storage.getName());
@@ -143,7 +144,7 @@
                     opsIterations = 1; // only run once for clear operation
                 } else if(op  === "getAll") {
                     opsIterations = Math.min(5, opsIterations); // run at most 5 times
-                } 
+                }
                 return that.runOperation(cmp, prefix, opsIterations, op);
             }).then(function() {
                 if (doAnalysis) {

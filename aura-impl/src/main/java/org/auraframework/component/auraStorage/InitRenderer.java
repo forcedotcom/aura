@@ -48,10 +48,16 @@ public class InitRenderer implements Renderer {
         renderContext.pushScript();
 
         String script = String.format(
-                "$A.storageService.initStorage('%s', %s, %s, %d, %d, %d, %s, %s, '%s');\n",
-                name, persistent, secure, maxSize.longValue() * 1024, defaultExpiration.longValue(),
+                "$A.storageService.initStorage({name: '%s', persistent: %s, secure: %s, maxSize: %d, expiration: %d, autoRefreshInterval: %d, debugLogging: %s, clearOnInit: %s, version: '%s'});\n",
+                name,
+                persistent,
+                secure,
+                maxSize.longValue() * 1024,
+                defaultExpiration.longValue(),
                 defaultAutoRefreshInterval.longValue(),
-                debugLoggingEnabled, clearStorageOnInit, version);
+                debugLoggingEnabled,
+                clearStorageOnInit,
+                version);
         renderContext.getCurrent().append(script);
 
         renderContext.popScript();

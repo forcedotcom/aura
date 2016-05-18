@@ -19,16 +19,15 @@
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store"); });
     },
 
-    createStorage: function(name, maxSize, defaultExpiration, defaultAutoRefreshInterval) {
-        return $A.storageService.initStorage(
-                name,
-                true,   // secure
-                true,   // persistent
-                maxSize,
-                defaultExpiration,
-                defaultAutoRefreshInterval,
-                true,   // debug logging
-                true);  // clear on init
+    createStorage: function(name, maxSize, expiration, autoRefreshInterval) {
+        // StorageService.selectAdapter override ensures crypto is always returned
+        return $A.storageService.initStorage({
+            name: name,
+            maxSize: maxSize,
+            expiration: expiration,
+            autoRefreshInterval: autoRefreshInterval,
+            debugLogging: true
+        });
     },
 
     /**
@@ -185,7 +184,7 @@
             cmp._storageLib.testReplaceExistingWithEntryTooLarge_stage2(cmp, this.storage);
         }]
     },
-    
+
     testStorageInfo: {
         test: function(cmp) {
             cmp._storageLib.testStorageInfo(this.storage, true, true);

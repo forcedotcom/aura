@@ -88,16 +88,15 @@ ComponentDefStorage.prototype.setupDefinitionStorage = function() {
             if (!storage) {
                 // only create (and then remove) if the app hasn't defined one
                 removeStorage = true;
-                storage = $A.storageService.initStorage(
-                    "ComponentDefStorage",  // name
-                    true,           // persistent
-                    false,          // secure
-                    4096000,        // maxSize 4MB
-                    10886400,       // defaultExpiration (1/2 year because we handle eviction ourselves)
-                    0,              // defaultAutoRefreshInterval
-                    true,           // debugLoggingEnabled
-                    false           // clearStorageOnInit
-                );
+                storage = $A.storageService.initStorage({
+                    "name":         "ComponentDefStorage",
+                    "persistent":   true,
+                    "secure":       false,
+                    "maxSize":      4096000, // 4MB
+                    "expiration":   10886400, // 1/2 year because we handle eviction ourselves
+                    "debugLogging": true,
+                    "clearOnInit":  false
+                });
             }
 
             // def storage only enabled with persistent storage

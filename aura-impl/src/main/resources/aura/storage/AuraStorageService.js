@@ -27,7 +27,8 @@ function AuraStorageService(){
 }
 
 /**
- * Returns an existing storage using the specified name. For example, <code>$A.storageService.getStorage("MyStorage").getSize()</code> returns the cache size.
+ * Returns an existing storage using the specified name.
+ * For example, <code>$A.storageService.getStorage("MyStorage").getSize()</code> returns the size of MyStorage.
  * <p>See Also: <a href="#reference?topic=api:AuraStorage">AuraStorage</a></p>
  * @param {String} name The name of the requested storage.
  * @memberOf AuraStorageService
@@ -52,77 +53,82 @@ AuraStorageService.prototype.getStorages = function() {
 
 
 /**
- * Initializes and returns new storage.
- * @param {String} name The unique name of the storage to be initialized.
- * @param {Boolean} [persistent] Set to true if the requested storage is persistent.
- * @param {Boolean} [secure] Set to true if the requested storage is secure.
- * @param {number} [maxSize] Specifies the maximum storage size (bytes).
- * @param {number} [defaultExpiration] Specifies the default time (seconds) after which the cache expires. When an item is requested that has gone past the default cache expiration time, it will not be used.
- * @param {number} [defaultAutoRefreshInterval] Specifies the default interval (seconds) after which cached data is to be refreshed.
- * @param {Boolean} [debugLoggingEnabled] Set to true to enable debug logging in the JavaScript console for the Aura Storage Service.
- * @param {Boolean} [clearStorageOnInit] Set to true to clear storage when storage is initialized.
- * @param {String} [version] The version of storage. for any item in the storage. This is useful if you want to avoid retrieving stale cached items for a newer version of your application.
+ * Initializes and returns a new storage.
+ * @param {Object} config The configuration for the new storage.
+ * @param {String} config.name The unique name of the storage to be initialized.
+ * @param {Boolean=} config.persistent Set to true if storage can be persistent. Default is false.
+ * @param {Boolean=} config.secure Set to true if storage must be secure. Default is false.
+ * @param {Number=} config.maxSize Specifies the maximum storage size (bytes). Default is 1000KB.
+ * @param {Number=} config.expiration Specifies the time (seconds) after which an item expires. When an item is requested that has gone past the expiration time, it will not be used. Default is 10s.
+ * @param {Boolean=} config.debugLogging Set to true to enable debug logging in the JavaScript console. Default is false.
+ * @param {Boolean=} config.clearOnInit Set to true to clear storage when storage is initialized. Default is true.
+ * @param {String=} config.version The version of the storage. Only items matching the version are returned. This is useful to avoid retrieving items for an older version of your application. Default is "".
+ * @param {Number=} config.autoRefreshInterval Specifies the interval (seconds) after which an item is to be refreshed. The caller must track and perform the refresh itself. Default is 30s.
  * @memberOf AuraStorageService
  * @returns {AuraStorage} Returns an AuraStorage object for the new storage.
  * @export
  */
-AuraStorageService.prototype.initStorage = function(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit, version) {
-    $A.assert(name, "Storage name is a required argument");
-    $A.assert(!this.storages[name], "Storage named '" + name + "' already exists!");
+AuraStorageService.prototype.initStorage = function(config) {
+    $A.assert($A.util.isObject(config), "config must be an object");
+    $A.assert($A.util.isString(config["name"]) && config["name"], "name must be a non-empty string");
+    $A.assert(!this.storages[config["name"]], "Storage named '" + config["name"] + "' already exists");
 
     // default values come from <auraStorage:init/>
-    persistent = !!persistent;
-    secure = !!secure;
-    maxSize = $A.util.isFiniteNumber(maxSize) && maxSize > 0 ? maxSize : 1000 * 1024;
-    defaultExpiration = $A.util.isFiniteNumber(defaultExpiration) && defaultExpiration > 0 ? defaultExpiration : 10;
-    defaultAutoRefreshInterval = $A.util.isFiniteNumber(defaultAutoRefreshInterval) && defaultAutoRefreshInterval >= 0 ? defaultAutoRefreshInterval : 30;
-    debugLoggingEnabled = !!debugLoggingEnabled;
-    clearStorageOnInit = $A.util.isBoolean(clearStorageOnInit) ? clearStorageOnInit : true;
-
-    // apply the default version if one is not specified (falsey values, like <auraStorage:init/>'s default empty string, is treated as not specified)
-    if (!version) {
-        version = this.version;
-    }
-
-    var adapter = this.createAdapter(this.selectAdapter(persistent, secure), name, maxSize, debugLoggingEnabled, defaultExpiration);
-
-    var config = {
-        "name": name,
-        "adapter": adapter,
-        "maxSize": maxSize,
-        "defaultExpiration": defaultExpiration,
-        "defaultAutoRefreshInterval": defaultAutoRefreshInterval,
-        "debugLoggingEnabled": debugLoggingEnabled,
-        "clearStorageOnInit": clearStorageOnInit,
-        "version": version,
-        "isolationKey": this.isolationKey
+    var validatedConfig = {
+        "name": config["name"],
+        "persistent": !!config["persistent"],
+        "secure": !!config["secure"],
+        "maxSize": $A.util.isFiniteNumber(config["maxSize"]) && config["maxSize"] > 0 ? config["maxSize"] : 1000 * 1024,
+        "expiration": $A.util.isFiniteNumber(config["expiration"]) && config["expiration"] > 0 ? config["expiration"] : 10,
+        "debugLogging": !!config["debugLogging"],
+        "clearOnInit": $A.util.isBoolean(config["clearOnInit"]) ? config["clearOnInit"] : true,
+         // falsey values, like <auraStorage:init/>'s default empty string, are treated as not specified
+        "version": config["version"] ? "" + config["version"] : this.version,
+        "isolationKey": this.isolationKey,
+        "autoRefreshInterval":  $A.util.isFiniteNumber(config["autoRefreshInterval"]) && config["autoRefreshInterval"] >= 0 ? config["autoRefreshInterval"] : 30
     };
 
-    var storage = new AuraStorage(config);
-    this.storages[name] = storage;
+    var adapterName = this.selectAdapter(validatedConfig["persistent"], validatedConfig["secure"]);
+    validatedConfig["adapterClass"] = this.adapters[adapterName]["adapterClass"];
 
+    var storage = new AuraStorage(validatedConfig);
+    this.storages[validatedConfig["name"]] = storage;
     return storage;
 };
+
 
 /**
  * Registers a new Aura Storage Service adapter.
  *
  * @param {Object} config Adapter configuration object.
+ * @param {String} config.name Name of the adapter. Must be unique among adapters.
+ * @param {AuraStorageAdapter} config.adapterClass Constructor function of the adapter.
+ * @param {Boolean} config.persistent True if the adapter is persistent.
+ * @param {Boolean} config.secure True if the adapter is secure.
  * @memberOf AuraStorageService
  * @export
  */
 AuraStorageService.prototype.registerAdapter = function(config) {
-    var name = config["name"];
-    $A.assert(!this.adapters[name], "AuraStorageService.registerAdapter() adapter '" + name + "' already registered!");
-    this.adapters[name] = config;
+    $A.assert($A.util.isString(config["name"]) && config["name"], "config.name must be a non-empty string");
+    $A.assert($A.util.isFunction(config["adapterClass"]), "config.adapterClass must be a function");
+    $A.assert(!this.adapters[config["name"]], "Adapter '" + config["name"] + "' already registered");
+
+    var validatedConfig = {
+        "name": config["name"],
+        "adapterClass": config["adapterClass"],
+        "persistent": !!config["persistent"],
+        "secure": !!config["secure"]
+    };
+
+    this.adapters[validatedConfig["name"]] = validatedConfig;
 };
 
 /**
  * Whether an adapter is registered
  *
- * @param {String} name adapter name
+ * @param {String} name The adapter's name.
+ * @returns {Boolean} Whether adapter is registered.
  * @memberOf AuraStorageService
- * @returns {boolean} whether adapter is registered
  * @export
  */
 AuraStorageService.prototype.isRegisteredAdapter = function(name) {
@@ -132,42 +138,13 @@ AuraStorageService.prototype.isRegisteredAdapter = function(name) {
 /**
  * Returns an adapter's configuration.
  *
- * @param {String} adapter name of the adapter
+ * @param {String} adapter Name of the adapter.
  * @memberOf AuraStorageService
  * @export
  */
+// TODO - remove? Only real use is CryptoAdapter
 AuraStorageService.prototype.getAdapterConfig = function(adapter) {
     return this.adapters[adapter];
-};
-
-/**
- * Creates a storage adapter. Used only by tests.
- * <p>Example:</p>
- * <code>$A.storageService.createAdapter("memory", "test", 4096, true);</code>
- * @param {String} adapter The new adapter to create.
- * @param {String} name The name of the adapter.
- * @param {number} maxSize The maximum size (bytes) to allocate to the storage adapter.
- * @param {Boolean} debugLoggingEnabled Set to true to enable logging, or false otherwise.
- * @param {number} expiration Specifies the expiration time (seconds) for entries.
- * @memberOf AuraStorageService
-//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-	@export
- //#end
- */
-AuraStorageService.prototype.createAdapter = function(adapter, name, maxSize, debugLoggingEnabled, expiration) {
-    var config = this.adapters[adapter];
-    $A.assert(config, "AuraStorageService.createAdapter() unknown adapter '" + adapter + "'!");
-
-    var AdapterClass = config["adapterClass"];
-
-    var adapterConfig = {
-        "name": name,
-        "maxSize": maxSize,
-        "debugLoggingEnabled": debugLoggingEnabled,
-        "expiration": expiration
-    };
-
-    return new AdapterClass(adapterConfig);
 };
 
 AuraStorageService.prototype.fireModified = function() {
@@ -178,9 +155,11 @@ AuraStorageService.prototype.fireModified = function() {
 };
 
 /**
- * Selects an adapter based on the given configuration. Used mostly in non-production modes.
- * @param {Boolean} persistent Set to true if the adapter should be persistent, or false otherwise.
- * @param {Boolean} secure Set to true if the adapter should be secure, or false otherwise.
+ * Selects an adapter based on the given configuration. Some configuration is a hard requirement;
+ * other is best effort.
+ * @param {Boolean} persistent Set to true if the adapter should be persistent.
+ * @param {Boolean} secure Set to true if the adapter must be secure.
+ * @return {String} The name of the selected adapter.
  * @memberOf AuraStorageService
  //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 	@export
@@ -188,7 +167,6 @@ AuraStorageService.prototype.fireModified = function() {
  */
 AuraStorageService.prototype.selectAdapter = function(persistent, secure) {
     // Find the best match for the specific implementation based on the requested configuration
-
     var candidates = [];
     for (var name in this.adapters) {
         var adapter = this.adapters[name];
@@ -199,9 +177,10 @@ AuraStorageService.prototype.selectAdapter = function(persistent, secure) {
         }
     }
 
+    // failure case that should never be possible: fallback to memory
     if (candidates.length === 0) {
-        $A.warning("AuraStorageService.selectAdapter() unable to find a secure adapter implementation!");
-        return null;
+        $A.assert(this.adapters[Aura.Storage.MemoryAdapter.NAME], "Memory Aura Storage Adapter was not registered");
+        return Aura.Storage.MemoryAdapter.NAME;
     }
 
     // Now take the set of candidates and weed out any non-persistent if persistence is requested (not required)
@@ -224,18 +203,17 @@ AuraStorageService.prototype.selectAdapter = function(persistent, secure) {
 /**
  * Deletes a storage.
  * @param {String} name name of storage to delete.
+ * @return {Promise} a promise that resolves when the specified storage is deleted.
  * @export
  */
 AuraStorageService.prototype.deleteStorage = function(name) {
     var storage = this.getStorage(name);
     if (!storage) {
-        // Nothing to delete, just call success callback
         return Promise["resolve"]();
     }
 
-    var promise = storage.deleteStorage();
     delete this.storages[name];
-    return promise;
+    return storage.deleteStorage();
 };
 
 /**
@@ -264,7 +242,7 @@ AuraStorageService.prototype.getVersion = function() {
  * the isolation key to the user id.
  *
  * It should only be called once during the application life cycle, since it
- * will be deleted in production mode.
+ * will be deleted after invocation in production mode.
  *
  *
  * @param {String} isolationKey the key defining isolation.
@@ -272,7 +250,7 @@ AuraStorageService.prototype.getVersion = function() {
  */
 AuraStorageService.prototype.setIsolation = function(isolationKey) {
     // ensure string
-    this.isolationKey = (isolationKey || "") + "";
+    this.isolationKey = "" + (isolationKey || "");
 
     //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     delete AuraStorageService.prototype.setIsolation;

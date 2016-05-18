@@ -2,7 +2,7 @@
     /**
      * CryptoAdapter delegates its storage operations to an underlying adapter, IndexedDB by default and MemoryAdapter
      * as a fallback. This class stubs in an underlying adapter that fails on all operations.
-     * 
+     *
      * A real world scenario that this emulates is Firefox in private browsing mode.
      */
 
@@ -66,16 +66,14 @@
         // of the real IndexedDBAdapter.
         $A.storageService.getAdapterConfig("indexeddb").adapterClass = MockStorageAdapter;
 
-        $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this); 
-        this.storage = $A.storageService.initStorage(
-                this.storageName,
-                true,   // secure
-                true,   // persistent
-                32768,
-                2000,
-                3000,
-                true,   // debug logging
-                false);  // clear on init
+        $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this);
+        this.storage = $A.storageService.initStorage({
+            name: this.storageName,
+            maxSize: 32768,
+            expiration: 2000,
+            autoRefreshInterval: 3000,
+            clearOnInit: false
+        });
 
         $A.installOverride("MetricsService.transaction",
                 function(overrideConfig, ns, name, config){
@@ -85,7 +83,7 @@
                             config: config
                     };
                     that.transactions.push(transaction);
-                }, 
+                },
                 this);
     },
 
@@ -185,7 +183,7 @@
      * AuraStorage.js will log errors in it's promise reject handler for operations delegated to the underlying adapter.
      * We override the MetricsService API to capture the logs and verify them here. We check the 'name' and 'operation'
      * parameters of the transaction log since we can identify where the error is coming from with those 2 pieces of info.
-     * 
+     *
      * @param {String} operation The storage operation we are expecting to fail
      */
     verifyLogs: function(operation) {

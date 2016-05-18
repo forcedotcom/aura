@@ -164,7 +164,6 @@
                 action.setStorable();
 
                 action.setCallback(this, function(a) {
-                    debugger;
                     callbackDone = true;
                     $A.test.assertTrue(a.isFromStorage(), "Action should have reported it was from storage");
                     $A.test.assertEquals(cmp._expected, a.getReturnValue().Counter, "Return value from storage was incorrect");

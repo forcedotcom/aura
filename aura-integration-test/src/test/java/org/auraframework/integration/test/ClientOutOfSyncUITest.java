@@ -818,7 +818,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 String script = "var callback = arguments[arguments.length - 1];" +
                         "if (!window.initialized || !$A) { callback(null); return; }" +
                         "if (!$A.storageService.getStorage('ComponentDefStorage')) {" +
-                        "  $A.storageService.initStorage('ComponentDefStorage', true, false, 442368, 3600, 0, true, false);" +
+                        "  $A.storageService.initStorage({name: 'ComponentDefStorage', persistent: true, secure: false, maxSize: 442368, expiration: 3600, debugLogging: true, clearOnInit: false});" +
                         "}" +
                         "var storage = $A.storageService.getStorage('ComponentDefStorage');" +
                         "storage.getAll().then(" +

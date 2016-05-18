@@ -46,6 +46,7 @@
      * named auraStorage:init in templates?
      */
     // auraErrorsExpectedDuringInit is not supported.
+    // TODO - this test should pass
     _testDuplicateNamedStorage : {
         auraErrorsExpectedDuringInit : ["Storage named 'dupNamedStorage' already exists!"],
         attributes : {

@@ -39,6 +39,6 @@ public class NamedAuraStorageUITest extends WebDriverTestCase {
         String jsErrors = getText(By.cssSelector("div[id='auraErrorMessage']"));
 
         assertNotNull("Expected to see JS errors while loading component.", jsErrors);
-        assertTrue("Unexpected error message: "+jsErrors, jsErrors.contains("Storage named 'dup' already exists!"));
+        assertTrue("Unexpected error message: "+jsErrors, jsErrors.contains("Storage named 'dup' already exists"));
     }
 }

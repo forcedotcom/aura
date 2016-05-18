@@ -18,16 +18,15 @@
         $A.storageService.CryptoAdapter.setKey("invalid");
     },
 
-    createStorage: function(name, maxSize, defaultExpiration, defaultAutoRefreshInterval) {
-        return $A.storageService.initStorage(
-                name,
-                true,   // secure
-                true,   // persistent
-                maxSize,
-                defaultExpiration,
-                defaultAutoRefreshInterval,
-                true,   // debug logging
-                true);  // clear on init
+    createStorage: function(name, maxSize, expiration, autoRefreshInterval) {
+        // StorageService.selectAdapter override ensures crypto is always returned
+        return $A.storageService.initStorage({
+            name: name,
+            maxSize: maxSize,
+            expiration: expiration,
+            autoRefreshInterval: autoRefreshInterval,
+            debugLogging: true
+        });
     },
 
     /**
@@ -159,7 +158,7 @@
             cmp.helper.lib.storageTest.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
         }]
     },
-    
+
     testSetItemOverMaxSize : {
         test : [function(cmp) {
             cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "Item larger than size limit");

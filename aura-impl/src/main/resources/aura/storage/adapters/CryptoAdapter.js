@@ -42,7 +42,7 @@
  */
 function CryptoAdapter(config) {
     this.instanceName = config["name"];
-    this.debugLoggingEnabled = config["debugLoggingEnabled"];
+    this.debugLogging = config["debugLogging"];
     this.key = undefined;
 
     // we need a key before we can process get/set
@@ -56,8 +56,10 @@ function CryptoAdapter(config) {
     this.config = config;
 
     // default storage is indexeddb (alternative is memory adapter)
-    var adapterClass = $A.storageService.getAdapterConfig("indexeddb")["adapterClass"];
+    // TODO - this indirection is used by auraStorageTest:cryptoFailedAdapter. this needs to be improved.
+    var adapterClass = $A.storageService.getAdapterConfig(Aura.Storage.IndexedDBAdapter.NAME)["adapterClass"];
     this.adapter = new adapterClass(config);
+    // this.adapter = new Aura.Storage.IndexedDBAdapter(config)
 
     this.mode = CryptoAdapter.NAME;
 
@@ -630,14 +632,6 @@ CryptoAdapter.prototype.clear = function() {
 
 
 /**
- * Clears storage on initialization, before any other operation is performed.
- */
-CryptoAdapter.prototype.clearOnInit = function() {
-    return this.adapter.clearOnInit();
-};
-
-
-/**
  * Sweeps over the store to evict expired items.
  * @returns {Promise} a promise that resolves when the sweep is complete.
  */
@@ -699,7 +693,7 @@ CryptoAdapter.prototype.isPersistent = function() {
  * @private
  */
 CryptoAdapter.prototype.log = function (level, msg, obj) {
-    if (this.debugLoggingEnabled || level.id >= CryptoAdapter.LOG_LEVEL.WARNING.id) {
+    if (this.debugLogging || level.id >= CryptoAdapter.LOG_LEVEL.WARNING.id) {
         $A[level.fn]("CryptoAdapter '"+this.instanceName+"' "+msg, obj);
     }
 };

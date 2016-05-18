@@ -4,6 +4,7 @@
         var auraId = event.getParam("arguments").auraId;
         var elementPropertiesWhitelist = event.getParam("arguments").elementPropertiesWhitelist;
         var elementProperitesBlacklist = event.getParam("arguments").elementPropertiesBlacklist;
+                  debugger;
         var element = cmp.find(auraId).getElement();
 
         elementPropertiesWhitelist.forEach(function(name) {

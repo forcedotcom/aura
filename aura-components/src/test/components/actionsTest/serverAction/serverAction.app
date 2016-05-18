@@ -15,12 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.impl.java.controller.ParallelActionTestController">
+<aura:application template="auraStorageTest:actionsStorageTemplate" controller="java://org.auraframework.impl.java.controller.ParallelActionTestController">
     <aura:attribute name="text" type="String"/>
     <aura:attribute name="errorMessage" type="String"/>
     <aura:attribute name="transactionId" type="Integer" default="999"/><!-- we use this to store tmp information for tests with abortable actions-->
-
-    <auraStorage:init name="actions" secure="true" debugLoggingEnabled="true" defaultExpiration="60" defaultAutoRefreshInterval="60"/>
 
     <ui:button label="Run two server actions (enqueue)" press="{!c.twoActions}" aura:id="twoActions"/>
 
@@ -34,4 +32,4 @@
     <p/>
     <ui:button label="Run server action in foreground with error" press="{!c.cErrorInForeground}" aura:id="errorInForeground"/>
     <p/>
-</aura:component>
+</aura:application>

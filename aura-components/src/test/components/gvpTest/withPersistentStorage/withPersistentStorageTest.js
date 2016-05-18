@@ -6,12 +6,6 @@
     // Test modifies/deletes the persistent database
     labels : [ "threadHostile" ],
 
-    setUp : function(cmp) {
-        $A.installOverride("StorageService.selectAdapter", function(){ return "indexeddb" }, this);
-        var storage = $A.storageService.initStorage("actions", true, false, 32768, 2000, 3000, true, true);
-        $A.test.addCleanup(function(){ $A.storageService.deleteStorage("actions")});
-    },
-
     failTest: function(error) {
         var string;
         if (typeof error === "string") {

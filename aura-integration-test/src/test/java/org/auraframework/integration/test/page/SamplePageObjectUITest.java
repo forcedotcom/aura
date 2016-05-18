@@ -51,7 +51,7 @@ public class SamplePageObjectUITest extends PageObjectTestCase<SampleAuraPageObj
     
     @Test
     public void testProxy() throws MalformedURLException, URISyntaxException {
-    	final SampleAuraPageObject sapo1 = new SampleAuraPageObject(this.getName(), true, "actionsTest:serverAction", this);
+    	final SampleAuraPageObject sapo1 = new SampleAuraPageObject(this.getName(), false, "actionsTest:serverAction", this);
     	//we want to drop action "executeInForeground" right before it get send to server, the Page Object function that
     	//send the action is "clickOnButton"
     	String methodWeWantToIntercept = "clickOnButton";

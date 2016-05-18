@@ -32,6 +32,7 @@ import org.auraframework.def.RendererDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.JavascriptComponentClass;
 import org.auraframework.impl.root.component.ComponentDefImpl.Builder;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -58,12 +59,14 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
         builder.setDescriptor(descriptor);
     }
 
+    @Test
     public void testWriteClassForPlainComponent() throws Exception {
         ComponentDef componentDef = builder.build();
         JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).build();
     	this.goldFileText(javascriptClass.getCode());
     }
 
+    @Test
     public void testWriteClassForComponentWithClientController() throws Exception {
         String controllerCode =
                 "({\n" +
@@ -79,6 +82,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
     	this.goldFileText(javascriptClass.getCode());
     }
 
+    @Test
     public void testWriteClassForComponentWithHelper() throws Exception {
         String helperCode =
                 "({" +
@@ -94,6 +98,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
     	this.goldFileText(javascriptClass.getCode());
     }
 
+    @Test
     public void testWriteClassForComponentWithClientProvider() throws Exception {
         
         String providerCode =
@@ -110,6 +115,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
     	this.goldFileText(javascriptClass.getCode());
     }
 
+    @Test
     public void testWriteClassForComponentWithClientRenderer() throws Exception {
         String rendererCode =
                 "({\n" +
@@ -125,6 +131,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
     	this.goldFileText(javascriptClass.getCode());
     }
 
+    @Test
     public void testWriteClassForComponentWithClientEmptyRenderer() throws Exception {
         String rendererCode = "({ })";
         DefDescriptor<RendererDef> rendererDescriptor = addSourceAutoCleanup(RendererDef.class, rendererCode);
@@ -136,6 +143,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testWriteClassForComponentImportsLib() throws Exception {
 
         DefDescriptor<LibraryDef> libraryDescriptor = mock(DefDescriptor.class);
@@ -160,6 +168,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testWriteClassForComponentExtendingOtherComponent() throws Exception {
         // mock testing component's super component def descriptor
         DefDescriptor<ComponentDef> mockParentDescriptor = mock(DefDescriptor.class);
@@ -171,6 +180,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
     	this.goldFileText(javascriptClass.getCode());
     }
 
+    @Test
     public void testWriteClassForLockerComponentMinified() throws Exception {
         // Fake a non-internal namespace so component is put in Locker
         Mockito.doReturn("nonInternal").when(descriptor).getNamespace();
@@ -189,6 +199,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
         this.goldFileText(javascriptClass.getMinifiedCode());
     }
 
+    @Test
     public void testWriteClassForLockerComponentUnminified() throws Exception {
         // Fake a non-internal namespace so component is put in Locker
         Mockito.doReturn("nonInternal").when(descriptor).getNamespace();

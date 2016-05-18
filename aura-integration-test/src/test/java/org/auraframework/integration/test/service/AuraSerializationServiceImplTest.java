@@ -26,6 +26,7 @@ import org.auraframework.impl.SerializationServiceImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.SerializationService;
+import org.junit.Test;
 
 public class AuraSerializationServiceImplTest extends AuraImplTestCase {
 
@@ -33,11 +34,13 @@ public class AuraSerializationServiceImplTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testAuraSerializationService() {
         SerializationService serializationService = Aura.getSerializationService();
         assertTrue(serializationService instanceof SerializationServiceImpl);
     }
 
+    @Test
     public void testWriteJson() throws Exception {
         InstanceService instanceService = Aura.getInstanceService();
         SerializationService serializationService = Aura.getSerializationService();

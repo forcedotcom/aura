@@ -32,6 +32,7 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.text.Hash;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -59,27 +60,32 @@ extends UnitTestCase {
         super(name);
     }
 
+    @Test
     public void testGetDescription() throws Exception {
         this.description = "this is a test Definition";
         String actual = buildDefinition().getDescription();
         assertEquals(this.description, actual);
     }
 
+    @Test
     public void testGetDescriptor() throws Exception {
         Object actual = buildDefinition().getDescriptor();
         assertEquals(this.descriptor, actual);
     }
 
+    @Test
     public void testGetLocation() throws Exception {
         Location actual = buildDefinition().getLocation();
         assertEquals(this.location, actual);
     }
 
+    @Test
     public void testGetName() throws Exception {
         String actual = buildDefinition().getName();
         assertEquals(this.descriptorName, actual);
     }
 
+    @Test
     public void testGetNameNullDescriptor() throws Exception {
         this.descriptor = null;
         R instance = buildDefinition();
@@ -88,6 +94,7 @@ extends UnitTestCase {
         assertEquals(expected, actual);
     }
 
+    @Test
     public void testGetOwnHashWithSourceHash() throws Exception {
         Mockito.doReturn("myhash").when(this.sourceHash).toString();
         Mockito.doReturn(true).when(this.sourceHash).isSet();
@@ -95,6 +102,7 @@ extends UnitTestCase {
         assertEquals("myhash", actual);
     }
 
+    @Test
     public void testGetOwnHashWithOwnHashAndNoSourceHash() throws Exception {
         this.sourceHash = null;
         this.ownHash = "ownhash";
@@ -102,6 +110,7 @@ extends UnitTestCase {
         assertEquals(this.ownHash, actual);
     }
 
+    @Test
     public void testGetSubDefinition() throws Exception {
         @SuppressWarnings("unchecked")
         SubDefDescriptor<?, D> subdesc = Mockito.mock(SubDefDescriptor.class);
@@ -111,12 +120,14 @@ extends UnitTestCase {
         assertEquals(def, actual);
     }
 
+    @Test
     public void testGetSubDefinitionNull() throws Exception {
         this.subDefs = ImmutableMap.of();
         Definition actual = buildDefinition().getSubDefinition(null);
         assertNull(actual);
     }
 
+    @Test
     public void testGetSubDefinitionWithoutSubDefinitions() throws Exception {
         SubDefDescriptor<?, ?> subdesc = Mockito.mock(SubDefDescriptor.class);
         this.subDefs = null;
@@ -124,6 +135,7 @@ extends UnitTestCase {
         assertNull(actual);
     }
 
+    @Test
     public void testGetSubDefinitionNotFound() throws Exception {
         SubDefDescriptor<?, ?> subdesc = Mockito.mock(SubDefDescriptor.class);
         this.subDefs = ImmutableMap.of();
@@ -131,18 +143,21 @@ extends UnitTestCase {
         assertNull(actual);
     }
 
+    @Test
     public void testAccessGlobal() throws Exception {
         this.access = new DefinitionAccessImpl(null, "global");
         DefinitionAccess actual = buildDefinition().getAccess();
         assertTrue(actual.isGlobal());
     }
 
+    @Test
     public void testAccessGlobalDynamic() throws Exception {
         this.access = new DefinitionAccessImpl(null, "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal");
         DefinitionAccess actual = buildDefinition().getAccess();
         assertTrue(actual.isGlobal());
     }
 
+    @Test
     public void testAccessDefault() throws Exception {
         this.access = DefinitionAccessImpl.defaultAccess(null);
         DefinitionAccess actual = buildDefinition().getAccess();
@@ -150,11 +165,13 @@ extends UnitTestCase {
     }
 
 
+    @Test
     public void testIsValid() throws Exception {
         boolean actual = buildDefinition().isValid();
         assertFalse(actual);
     }
 
+    @Test
     public void testMarkValid() throws Exception {
         R def = buildDefinition();
         def.markValid();
@@ -162,6 +179,7 @@ extends UnitTestCase {
         assertTrue(actual);
     }
 
+    @Test
     public void testValidateDefinition() throws Exception {
         if (testAuraContext != null) {
             Aura.getContextService().endContext();
@@ -172,6 +190,7 @@ extends UnitTestCase {
         buildDefinition().validateDefinition();
     }
 
+    @Test
     public void testValidateDefinitionNullDescriptor() throws Exception {
         this.descriptor = null;
         try {
@@ -183,6 +202,7 @@ extends UnitTestCase {
     }
 
     // used to setup references to be validated by subclasses
+    @Test
     public void testValidateReferences() throws Exception {
         if (testAuraContext != null) {
             Aura.getContextService().endContext();

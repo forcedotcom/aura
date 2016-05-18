@@ -35,6 +35,7 @@ import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.junit.Test;
 
 /**
  * Test class to verify that clientside cache is invalidated by Aura Servlet.
@@ -56,6 +57,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testPostRequestWithDifferentUID() throws Exception {
         HttpPost post = getPostMethod("auratest:test_TokenValidation", true);
         HttpResponse httpResponse = perform(post);                                                        // days
@@ -73,6 +75,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
      * @throws Exception
      */
     @AuraTestLabels("auraSanity")
+    @Test
     public void testPostRequestWithValidUID() throws Exception {
         HttpPost post = getPostMethod("auratest:test_TokenValidation", false);
         HttpResponse httpResponse = perform(post);

@@ -24,6 +24,7 @@ import org.auraframework.impl.java.model.JavaModelDefFactory;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Model;
 import org.auraframework.util.json.Json;
+import org.junit.Test;
 
 /**
  * This class provides automation for Java models.
@@ -34,12 +35,14 @@ public class JavaModelTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testSerializeMetadata() throws Exception {
         JavaModelDefFactory factory = new JavaModelDefFactory();
         ModelDef def = factory.getDef(descriptor);
         serializeAndGoldFile(def);
     }
 
+    @Test
     public void testSerializeData() throws Exception {
         JavaModelDefFactory factory = new JavaModelDefFactory(null);
         ModelDef def = factory.getDef(descriptor);

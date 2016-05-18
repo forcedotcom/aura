@@ -30,6 +30,7 @@ import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.impl.util.TextTokenizer.Token;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.junit.Test;
 
 public class TextTokenizerTest extends AuraImplTestCase {
     private static final String[] testText = new String[] { "this is text", "{!this.is.an.expression}",
@@ -43,6 +44,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testUnwrap() {
         assertEquals("ab.cab", TextTokenizer.unwrap("{!ab.cab}"));
         assertEquals("ab.cab", TextTokenizer.unwrap("ab.cab"));
@@ -53,6 +55,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
     /**
      * Test method for {@link TextTokenizer#TextTokenizer(String, Location)}.
      */
+    @Test
     public void testTextTokenizer() throws AuraValidationException {
         TextTokenizer.TokenType[] testTypes = new TextTokenizer.TokenType[] { TextTokenizer.TokenType.PLAINTEXT,
                 TextTokenizer.TokenType.EXPRESSION, TextTokenizer.TokenType.PLAINTEXT };
@@ -67,6 +70,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testAsValues() throws Exception {
         TextTokenizer tokenizer = TextTokenizer.tokenize(wholeText, null);
         ComponentDefHandler cdh = new ComponentDefHandler(null, null, null);
@@ -79,6 +83,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testSingleAsValue() throws Exception {
         TextTokenizer tokenizer = TextTokenizer.tokenize(testText[0], null);
         ComponentDefHandler cdh = new ComponentDefHandler(null, null, null);
@@ -93,6 +98,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
         assertEquals("Incorrect value returned from asValue()", testText[1], e.toString(true));
     }
 
+    @Test
     public void testAsComponentDefRefs() throws Exception {
         TextTokenizer tokenizer = TextTokenizer.tokenize(wholeText, null);
         ComponentDefHandler cdh = new ComponentDefHandler(null, null, null);
@@ -113,6 +119,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
         assertEquals("Incorrect ComponentDefRef value", testText[2], c.getAttributeDefRef("value").getValue());
     }
 
+    @Test
     public void testWhitespacePreserve() throws Exception {
         String[] descNames = new String[] { //
         		"text", //
@@ -142,6 +149,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testWhitespaceOptimize() throws Exception {
         String[] descNames = new String[] { "expression", "expression", "text" };
         String[] testResults = new String[] { "[value=org.auraframework.impl.expression.LiteralImpl",
@@ -162,6 +170,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testIncompleteExpressionQuickFix() throws Exception {
         try {
             TextTokenizer.tokenize("{!incompleteExpression", null);
@@ -171,6 +180,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testCurlyBangInversionQuickFix() throws Exception {
         try {
             TextTokenizer.tokenize("!{malformed}", null);

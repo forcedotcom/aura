@@ -27,6 +27,7 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef;
 import org.auraframework.impl.validation.AuraValidationTestCase;
 import org.auraframework.impl.validation.ValidationUtil;
+import org.junit.Test;
 
 public final class ValidationUtilTest extends AuraValidationTestCase {
 
@@ -34,6 +35,7 @@ public final class ValidationUtilTest extends AuraValidationTestCase {
         super(name);
     }
 
+    @Test
     public void testGetAllDescriptorsIn() throws Exception {
         if (skipTestIfNotRunningWithAuraSource()) {
             return;
@@ -45,6 +47,7 @@ public final class ValidationUtilTest extends AuraValidationTestCase {
         assertTrue(descriptors.contains(definitionService.getDefDescriptor("validationTest.basic", StyleDef.class)));
     }
 
+    @Test
     public void testFindComponentSourceDirs() {
         if (skipTestIfNotRunningWithAuraSource()) {
             return;
@@ -66,6 +69,7 @@ public final class ValidationUtilTest extends AuraValidationTestCase {
         assertEquals(new File("src/test/components"), roots.get(0));
     }
 
+    @Test
     public void testFindDefinitions() throws Exception {
         DefDescriptor<StyleDef> styleDesc = definitionService.getDefDescriptor("ui.button", StyleDef.class);
         assertEquals("css://ui.button", styleDesc.toString());

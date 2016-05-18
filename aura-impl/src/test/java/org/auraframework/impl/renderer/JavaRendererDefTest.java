@@ -30,6 +30,7 @@ import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.JsonEncoder;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
@@ -62,6 +63,7 @@ public class JavaRendererDefTest extends AuraImplTestCase {
     /**
      * Verify that server side renderers are defined as local.
      */
+    @Test
     public void testIsLocal() throws Exception {
         JavaRendererDef.Builder builder = new JavaRendererDef.Builder().setRendererClass(TestSimpleRenderer.class);
         JavaRendererDef def = builder.build();
@@ -71,6 +73,7 @@ public class JavaRendererDefTest extends AuraImplTestCase {
     /**
      * Verify that JavaRendererDef creates nothing when serialized.
      */
+    @Test
     public void testSerializedFormat() throws Exception {
         JavaRendererDef def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
         assertTrue(JsonEncoder.serialize(def, false, false).isEmpty());
@@ -83,6 +86,7 @@ public class JavaRendererDefTest extends AuraImplTestCase {
      * @expectedResults JavaRendererDef.render() function accepts a character stream and returns the stream, populated
      *                  with markup.
      */
+    @Test
     public void testInvokeRender() throws Exception {
         JavaRendererDef def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
         RenderContext rc = Mockito.mock(RenderContext.class);
@@ -105,6 +109,7 @@ public class JavaRendererDefTest extends AuraImplTestCase {
      * ComponentImpl just makes render() call on the RenderDef object. All exceptions should be wrapped in
      * AuraExecutionException, while errors and quickfix exceptions are passed through.
      */
+    @Test
     public void testExceptionThrownByComponentRendererHandled() throws Exception {
         JavaRendererDef def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
         RuntimeException re = new RuntimeException("expected");

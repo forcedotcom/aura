@@ -30,6 +30,7 @@ import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.junit.Test;
 
 /**
  * Abstract component validation
@@ -45,6 +46,7 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testExtendsComponent() throws Exception {
         ComponentDefImpl.Builder builder = createAbstractBuilder();
         DefDescriptor<ComponentDef> desc = DefDescriptorImpl.getInstance("test:fakeComponent", ComponentDef.class);
@@ -63,6 +65,7 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testExtendsAbstract() throws Exception {
         ComponentDefImpl.Builder builder = createAbstractBuilder();
         builder.setDescriptor(DefDescriptorImpl.getInstance("test:fakeAbstractChild", ComponentDef.class));
@@ -82,6 +85,7 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testImplementsIntf() throws Exception {
         Set<DefDescriptor<InterfaceDef>> interfaces = new HashSet<>();
         interfaces.add(DefDescriptorImpl.getInstance("test:fakeInterface", InterfaceDef.class));
@@ -103,6 +107,7 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testEvents() throws Exception {
         Map<String, RegisterEventDef> eventDefs = new HashMap<>();
 
@@ -128,6 +133,7 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testTextComponent() throws Exception {
         ComponentDefImpl.Builder builder = createAbstractBuilder();
         DefDescriptor<ComponentDef> desc = DefDescriptorImpl.getInstance("test:text", ComponentDef.class);

@@ -17,6 +17,7 @@ package org.auraframework.integration.test;
 
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.junit.Test;
 import org.openqa.selenium.*;
 
 @ThreadHostileTest("Tests modify what namespaces are Internal or not and locker service enabled")
@@ -35,6 +36,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
         getMockConfigAdapter().setLockerServiceEnabled(false);
     }
 
+    @Test
     public void testGlobalComponentAccessibleFromExternalNamespace() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessGlobalComponent");
@@ -66,6 +68,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
      * Note that since we did not include auratest:accessInternalComponent as a dependency on
      * accessExternalNamespace, this will attempt to get the component from the server.
      */
+    @Test
     public void testInternalComponentInaccessibleFromExternalNamespace() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessInternalComponent");
@@ -87,6 +90,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     /**
      * Component in a External namespace can _not_ extend a Internal namespace component marked PUBLIC
      */
+    @Test
     public void testExternalComponentExtendsInternalComponent() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=componentTest:accessExtendsPublic");
@@ -99,6 +103,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     /**
      * External component cannot access public attribute of Internal namespace
      */
+    @Test
     public void testAccessPublicMarkupOnInternalNamespaceFromExternal() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessPublicAttribute");
@@ -112,6 +117,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
         doAttributeAccessTest("PUBLIC");
     }
 
+    @Test
     public void testAccessGlobalMarkupOnInternalNamespaceFromExternal() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessGlobalAttribute");
@@ -131,6 +137,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
         doAttributeAccessTest("GLOBAL");
     }
 
+    @Test
     public void testAccessPrivateMarkupOnInternalNamespaceFromExternal() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessPrivateAttribute");
@@ -143,6 +150,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
         doAttributeAccessTest("undefined");
     }
 
+    @Test
     public void testAccessInternalMarkupOnInternalNamespaceFromExternal() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessInternalAttribute");
@@ -152,6 +160,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     /**
      * Setting an attribute to have access level INTERNAL in a non-Internal namespace will error.
      */
+    @Test
     public void testAccessInternalMarkupOnExternalNamespace() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("auratest");
         openNoAura("/auratest/accessInternalAttribute.cmp");
@@ -166,6 +175,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
      * verify the internal component access is checked against the global providing component, not the top level
      * External component.
      */
+    @Test
     public void testAccessGlobalProvidesInternalComponent() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessGlobalProvidesInternal.cmp");
@@ -197,6 +207,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
                 getDriver().findElement(By.className("accessGlobalComponent")), "auratest:accessGlobalComponent");
     }
 
+    @Test
     public void testAccessInternalProvidesPublicComponent() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("auratest");
         open("/componentTest/accessGlobalProvidesPublic.cmp");

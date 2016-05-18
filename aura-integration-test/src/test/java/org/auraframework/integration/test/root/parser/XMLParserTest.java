@@ -38,6 +38,7 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 public class XMLParserTest extends AuraImplTestCase {
 
@@ -62,10 +63,12 @@ public class XMLParserTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testParseDescriptor() throws Exception {
         assertEquals("Unexpected Descriptor", descriptor, def.getDescriptor());
     }
 
+    @Test
     public void testParseInvalid() throws Exception {
         ComponentXMLParser parser = new ComponentXMLParser();
         descriptor = DefDescriptorImpl.getInstance("test:parserInvalid", ComponentDef.class);
@@ -82,6 +85,7 @@ public class XMLParserTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testParseFragment() throws Exception {
         ComponentXMLParser parser = new ComponentXMLParser();
         descriptor = DefDescriptorImpl.getInstance("test:parserFragment", ComponentDef.class);
@@ -99,6 +103,7 @@ public class XMLParserTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testParseNonexistent() throws Exception {
         ComponentXMLParser parser = new ComponentXMLParser();
         
@@ -136,6 +141,7 @@ public class XMLParserTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testParseNull() throws Exception {
         ComponentXMLParser parser = new ComponentXMLParser();
         descriptor = DefDescriptorImpl.getInstance("test:parserNonexistent", ComponentDef.class);
@@ -149,10 +155,12 @@ public class XMLParserTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetLocationNull() throws Exception {
         assertNull(XMLParser.getLocation(null, null));
     }
 
+    @Test
     public void testParseEvent() throws Exception {
         EventXMLParser parser = new EventXMLParser();
         DefDescriptor<EventDef> eventDescriptor = DefDescriptorImpl.getInstance("test:anevent", EventDef.class);
@@ -171,6 +179,7 @@ public class XMLParserTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testParseComments() throws Exception {
         ComponentXMLParser parser = new ComponentXMLParser();
         descriptor = DefDescriptorImpl.getInstance("test:test_Parser_Comments", ComponentDef.class);

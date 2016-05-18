@@ -27,6 +27,7 @@ import org.auraframework.impl.javascript.parser.JavascriptHelperParser;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 public class JavascriptHelperParserTest extends AuraImplTestCase {
 
@@ -37,6 +38,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
     /**
      * Verify JavascriptHelperParser parsing client helper
      */
+    @Test
     public void testParseNormalJSHelper() throws Exception {
         String helperJs =
             "({\n" +
@@ -59,6 +61,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
     /**
      * Verify JavascriptHelperParser parsing client helper with comments
      */
+    @Test
     public void testParseJSHelperWithComments() throws Exception {
         String helperJs =
             "({\n" +
@@ -84,6 +87,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
     /**
      * Verify when there are multiple helper functions have same name, only keep the later one.
      */
+    @Test
     public void testParseJSHelperWithDuplicateFunction() throws Exception {
         String helperJs =
                 "({\n" +
@@ -102,6 +106,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
         assertEquals("The latest function should survive.", "{\n    \"function1\":function(cmp) {var v = 2;}\n  }", code);
     }
 
+    @Test
     public void testParseHelperWithNonFunctionElements() throws Exception {
         String helperJs =
                 "({\n" +
@@ -123,6 +128,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
      * Verify parsing invalid client helper with invalid helper syntax. There is a variable declaration.
      * Parser doesn't throw any exception but store the exception. Throwing the exception when validate the definition.
      */
+    @Test
     public void testParseInvalidJSHelper() throws Exception {
         String helperJs =
                 "({\n" +

@@ -18,6 +18,7 @@ package org.auraframework.integration.test.components.ui.inputTextArea;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -39,6 +40,7 @@ public class InputTextAreaUITest extends WebDriverTestCase {
     /**
      * Test Case for W-1731003 ui:inputTextArea throws error when value is changed
      */
+    @Test
     public void testInputTextAreaWithLabel() throws Exception {
         open(TEST_CMP);
         WebElement div = findDomElement(By.id("textAreaWithLabel"));
@@ -64,6 +66,7 @@ public class InputTextAreaUITest extends WebDriverTestCase {
     /*
      * Ensuring \r\n for line breaks in textarea to match aloha form-encode Test Case for W-2326901
      */
+    @Test
     public void testEncodedTextAreaBehavior() throws Exception {
         open(TEST_CMP);
         WebElement div = findDomElement(By.id("textAreaWithLabel"));
@@ -90,6 +93,7 @@ public class InputTextAreaUITest extends WebDriverTestCase {
      * Bug: W-2356548
      * Issue is on firefox and IE
      */
+    @Test
     public void testTextAreaWithMultipleLinesOfText() throws Exception {
         open(TEST_CMP2);
         WebElement div = findDomElement(By.id("textAreaWithLabel"));
@@ -118,6 +122,7 @@ public class InputTextAreaUITest extends WebDriverTestCase {
     // W-1551077: Issue with Webdriver API ignores maxlength HTML5 attribute (iOS/Safari)
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.SAFARI })
+    @Test
     public void testMaxLengthInTextArea() throws Exception {
         open("/uitest/inputTextArea_MaxLength.cmp?maxlength=5");
         WebElement input = findDomElement(By.className("textArea"));
@@ -126,6 +131,7 @@ public class InputTextAreaUITest extends WebDriverTestCase {
         assertEquals("Text not truncated to 5 chars correctly", "12345", input.getAttribute("value"));
     }
 
+    @Test
     public void testNoMaxLengthInTextArea() throws Exception {
         open("/uitest/inputTextArea_MaxLength.cmp");
         WebElement input = findDomElement(By.className("textArea"));

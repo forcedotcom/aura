@@ -16,6 +16,7 @@
 package org.auraframework.impl.source.resource;
 
 import org.auraframework.impl.AuraImplTestCase;
+import org.junit.Test;
 
 public class ResourceSourceLoaderTest extends AuraImplTestCase {
     public ResourceSourceLoaderTest(String name){
@@ -25,6 +26,7 @@ public class ResourceSourceLoaderTest extends AuraImplTestCase {
     /**
      * All namespaces loaded by ResourceSourceLoader are internal, verify that ResourceSourceLoader says so.
      */
+    @Test
     public void testIsInternalNamespace(){
         ResourceSourceLoader rs = new ResourceSourceLoader(null);
         assertTrue("All namespaces loaded by ResourceSourceLoader are to be internal",

@@ -23,6 +23,7 @@ import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Component;
 import org.auraframework.util.type.CustomPairType;
+import org.junit.Test;
 
 /**
  * Unit test for using custom java data types for attribute values.
@@ -39,6 +40,7 @@ public class CustomDataTypeTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testCustomDataTypeConversion() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,

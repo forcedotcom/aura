@@ -22,6 +22,7 @@ import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.def.DefinitionTest;
+import org.junit.Test;
 
 public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
 
@@ -31,6 +32,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         super(name);
     }
 
+    @Test
     public void testSerializeMinimal() throws Exception {
 		String code = "function(){}";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
@@ -48,6 +50,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
                 		JavascriptIncludeClass.getClientDescriptor(includeDesc), code), def.getCode(false));
     }
 
+    @Test
     public void testSerializeWithSingleComments() throws Exception {
         String code = "//this doc should be helpful\nfunction(){\n//fix later\nreturn this;}//last word";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
@@ -65,6 +68,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
                 		JavascriptIncludeClass.getClientDescriptor(includeDesc), code), def.getCode(false));
     }
 
+    @Test
     public void testSerializeWithMultiComments() throws Exception {
         String code = "/*this doc should be helpful*/function(){/*fix later*/return this;}/*last word*/";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, 
@@ -82,6 +86,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
                 		JavascriptIncludeClass.getClientDescriptor(includeDesc), code), def.getCode(false));
     }
 
+    @Test
     public void testSerializeWithImport() throws Exception {
     	String code = "function(){}";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, 
@@ -104,6 +109,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
                 		JavascriptIncludeClass.getClientDescriptor(importDesc), code), def.getCode(false));
     }
 
+    @Test
     public void testSerializeWithExternalImport() throws Exception {
     	String code = "function(){}";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, 
@@ -130,6 +136,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
                 		JavascriptIncludeClass.getClientDescriptor(extIncludeDesc), code), def.getCode(false));
     }
 
+    @Test
     public void testSerializeWithMultipleImports() throws Exception {
     	String code = "function(){}";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
@@ -160,6 +167,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
 				JavascriptIncludeClass.getClientDescriptor(extImportDesc), code), def.getCode(false));
     }
 
+    @Test
     public void testSerializeWithExports() throws Exception {
     	String code = "var myexpt=function(){return 'something'}";
         String export = "myexpt";

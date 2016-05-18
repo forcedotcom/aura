@@ -34,6 +34,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraTestCase;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -58,6 +59,7 @@ public class OutputComponentsTest extends AuraTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testDomEventsAreOutputComponentEvents() throws Exception {
         HashMap<String, String> events = new HashMap<>();
         events.put("blur", "markup://ui:blur");
@@ -95,6 +97,7 @@ public class OutputComponentsTest extends AuraTestCase {
      * Verify that ui:output is not registered to throw certain events like
      * "change" that are part of DOM Events.
      */
+    @Test
     public void testDomEventsWhichAreNotOutputComponentEvents() throws Exception {
 
         // Events which are not registered as ui:output components

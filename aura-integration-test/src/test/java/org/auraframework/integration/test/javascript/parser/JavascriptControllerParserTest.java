@@ -30,6 +30,7 @@ import org.auraframework.impl.javascript.parser.JavascriptControllerParser;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 public class JavascriptControllerParserTest extends AuraImplTestCase {
 
@@ -40,6 +41,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
     /**
      * Verify JavascriptControllerParser parsing client controller
      */
+    @Test
     public void testParseNormalJSController() throws Exception {
         String controllerJs =
             "({\n" +
@@ -62,6 +64,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
     /**
      * Verify JavascriptControllerParser parsing client controller with comments
      */
+    @Test
     public void testParseJSControllerWithComments() throws Exception {
         String controllerJs =
             "({\n" +
@@ -87,6 +90,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
     /**
      * Verify when there are multiple controller functions have same name, only keep the later one.
      */
+    @Test
     public void testParseJSControllerWithDuplicateFunction() throws Exception {
         String controllerJs =
                 "({\n" +
@@ -113,6 +117,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
      * Verify parsing invalid client controller with invalid controller syntax. There is a variable declaration.
      * Parser doesn't throw any exception but store the exception. Throwing the exception when validate the definition.
      */
+    @Test
     public void testParseInvalidJSController() throws Exception {
         String controllerJs =
                 "({\n" +
@@ -134,6 +139,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
      * Verify parsing invalid client controller with invalid controller syntax. There is a non function element.
      * Parser doesn't throw any exception but store the exception. Throwing the exception when validate the definition.
      */
+    @Test
     public void testParseControllerWithNonFunctionElement() throws Exception {
         String controllerJs =
                 "({\n" +

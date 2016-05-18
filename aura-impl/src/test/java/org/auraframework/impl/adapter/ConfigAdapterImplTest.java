@@ -37,6 +37,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.resource.FileGroup;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.text.Hash;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
@@ -59,6 +60,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
      * Make sure that version file is available in aura package. If this test fails, then we have a build/packaging
      * issue.
      */
+    @Test
     public void testVersionPropFile() throws Exception {
         String path = "/version.prop";
         InputStream stream = ConfigAdapterImpl.class.getResourceAsStream(path);
@@ -75,6 +77,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     /**
      * Test we can read the props as resources.
      */
+    @Test
     public void testConfigAdapterCtor() {
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
         String version = impl.getAuraVersion();
@@ -89,6 +92,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
      * Test regenerateAuraJS() functionality. For failure testing, the test makes a fake jsGroup which will still act as
      * though it saw an error (and should be handled as such).
      */
+    @Test
     public void testRegenerateHandlesErrors() throws Exception {
         // The real case should work, of course:
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
@@ -149,6 +153,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
      * 
      * Also testing the hash results are consistent
      */
+    @Test
     public void testFrameworkUid() throws Exception {
 
         final AuraJavascriptGroup jsGroup = mock(AuraJavascriptGroup.class);
@@ -209,6 +214,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         assertEquals("Framework uid is not correct", uid, "BJTaoiCDxoAF4Wbh0iC9lA");
     }
 
+    @Test
     public void testIsInternalNamespaceWithBadArguments() {
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
         assertFalse("null should not be an internal namespace", impl.isInternalNamespace(null));
@@ -217,6 +223,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         assertFalse(impl.isInternalNamespace("?"));
     }
 
+    @Test
     public void testIsInternalNamespaceAfterRegistering() {
         String namespace = this.getName() + System.currentTimeMillis();
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
@@ -226,6 +233,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
                 impl.isInternalNamespace(namespace.toUpperCase()));
     }
 
+    @Test
     public void testAddInternalNamespacesWithBadArguments() {
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
         impl.addInternalNamespace(null);
@@ -235,6 +243,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         assertFalse(impl.isInternalNamespace(""));
     }
 
+    @Test
     public void testGetInternalNamespacesReturnsSortedNamespaces() {
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
         impl.getInternalNamespaces().clear();

@@ -19,6 +19,7 @@ import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -56,6 +57,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
     /* Excluding ipad and safari because safari driver has issues with element.sendkeys(Keys.TAB) */
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
     public void testRichTextTabbing() throws Exception {
         open(URL);
         WebElement beforeLink = getAuraUITestingUtil().waitForElement(By.cssSelector(LINKBEFORE_LOCATOR));
@@ -87,6 +89,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD,
             BrowserType.IPHONE })
     @ThreadHostileTest("testHtmlContentEscaped is not thread-safe")
+    @Test
     public void testHtmlContentEscaped() throws Exception {
         open(URL);
         WebElement ckEditor = getAuraUITestingUtil().waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
@@ -105,6 +108,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
      */
     // Excluding test as switchTo not supported with android drivers
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    @Test
     public void testRenderInitialValueOfRichText() throws Exception {
         String defaultText = "testing text";
         WebDriver driver = this.getDriver();

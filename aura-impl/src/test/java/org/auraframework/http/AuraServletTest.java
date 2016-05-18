@@ -27,6 +27,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -85,6 +86,7 @@ public class AuraServletTest extends UnitTestCase {
         assertEquals(String.format("Unexpected value for '%s' header", name), value, headers.get(0));
     }
 
+    @Test
     public void testDoGet_NoCacheStartsWithSlash() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -100,6 +102,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
+    @Test
     public void testDoGet_NoCacheIsRoot() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -119,6 +122,7 @@ public class AuraServletTest extends UnitTestCase {
      * This handles a Chrome (or maybe WebKit) bug where a Location semi-correctly beginning with a double or more slash
      * is taken as a hostname (i.e. as if it were http: + the location),
      */
+    @Test
     public void testDoGet_NoCacheDoubleSlash() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -134,6 +138,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
+    @Test
     public void testDoGet_NoCacheNoFragment() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -149,6 +154,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
+    @Test
     public void testDoGet_NoCacheNoQuery() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -164,6 +170,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
+    @Test
     public void testDoGet_NoCacheDoesNotStartWithSlash() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -179,6 +186,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
+    @Test
     public void testDoGet_NoCacheUriExploit() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -194,6 +202,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
+    @Test
     public void testDoGet_NoCacheInvalid() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -209,6 +218,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
+    @Test
     public void testDoGet_NoCacheHttpsToHttp() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -226,6 +236,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
+    @Test
     public void testDoGet_NoCacheHttpToHttps() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -241,6 +252,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
+    @Test
     public void testDoGet_NoCacheHttpsToHttps() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -274,6 +286,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
+    @Test
     public void testDoGet_NoCacheEmpty() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -290,6 +303,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).send404(Mockito.any(), Mockito.eq(request), Mockito.eq(response));
     }
 
+    @Test
     public void testDoGet_NoCacheNull() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -306,6 +320,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).send404(Mockito.any(), Mockito.eq(request), Mockito.eq(response));
     }
 
+    @Test
     public void testDoGet_NoCacheNoPath() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);

@@ -24,6 +24,7 @@ import org.auraframework.impl.root.component.BaseComponentDefTest;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
@@ -36,6 +37,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     /**
      * App will inherit useAppcache='false' from aura:application if attribute not specified
      */
+    @Test
     public void testIsAppCacheEnabledInherited() throws Exception {
         DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseTag, "useAppcache='true' extensible='true'", ""));
@@ -48,6 +50,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     /**
      * App's useAppcache attribute value overrides value from aura:application
      */
+    @Test
     public void testIsAppCacheEnabledOverridesDefault() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseTag, "useAppcache='true'", ""));
@@ -58,6 +61,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     /**
      * App's useAppcache attribute value overrides value from parent app
      */
+    @Test
     public void testIsAppCacheEnabledOverridesExtends() throws Exception {
         DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseTag, "useAppcache='true' extensible='true'", ""));
@@ -70,6 +74,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     /**
      * App's useAppcache attribute value is empty
      */
+    @Test
     public void testIsAppCacheEnabledUseAppcacheEmpty() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application useAppCache=''/>");
@@ -80,6 +85,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     /**
      * App's useAppcache attribute value is invalid
      */
+    @Test
     public void testIsAppCacheEnabledUseAppcacheInvalid() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application useAppCache='yes'/>");
@@ -92,6 +98,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      *
      * @throws Exception
      */
+    @Test
     public void testNonExistantNameSpace() throws Exception {
         try {
             definitionService.getDefinition("auratest:test_Preload_ScrapNamespace", ApplicationDef.class);
@@ -107,6 +114,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      *
      * @throws Exception
      */
+    @Test
     public void testIsOnePageApp() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseTag, "isOnePageApp='true'", ""));
@@ -124,6 +132,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     }
 
     /** verify that we set tokens explicitly set on the tokens tag */
+    @Test
     public void testExplicitTokenOverrides() throws QuickFixException {
         DefDescriptor<TokensDef> tokens = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
         String src = String.format("<aura:application tokens=\"%s\"/>", tokens.getDescriptorName());
@@ -133,6 +142,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     }
 
     /** verify tokens descriptor is added to dependency set */
+    @Test
     public void testTokensAddedToDeps() throws QuickFixException {
         DefDescriptor<TokensDef> tokens = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
         String src = String.format("<aura:application tokens=\"%s\"/>", tokens.getDescriptorName());
@@ -144,6 +154,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     }
 
     /** verify tokens descriptor ref is validated */
+    @Test
     public void testInvalidTokensRef() throws QuickFixException {
         String src = String.format("<aura:application tokens=\"%s\"/>", "wall:maria");
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);

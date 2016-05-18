@@ -22,6 +22,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
+import org.junit.Test;
 
 /**
  * Automation to verify how attributes behave in abstract components.
@@ -41,6 +42,7 @@ public class AttributesInAbstractComponentsTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testSettingAttributeValuesInChildComponent() throws Exception {
         String markup = String.format(abstractCmpMarkup, "<aura:attribute type='String' name='text' required='true'/>");
         DefDescriptor<ComponentDef> abstractCmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
@@ -62,6 +64,7 @@ public class AttributesInAbstractComponentsTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testSettingAttributeUsingSetBodyInChildComponent() throws Exception {
         String markup = String.format(abstractCmpMarkup,
                 "<aura:attribute type='Aura.Component[]' name='innerBody' required='true'/>");

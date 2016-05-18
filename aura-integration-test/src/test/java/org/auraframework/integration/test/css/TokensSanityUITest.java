@@ -17,6 +17,7 @@ package org.auraframework.integration.test.css;
 
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.CheckAccessibility;
+import org.junit.Test;
 import org.openqa.selenium.By;
 
 /**
@@ -34,6 +35,7 @@ public class TokensSanityUITest extends WebDriverTestCase {
     /**
      * Using token variables in CSS
      */
+    @Test
     public void testTokenVariablesInCSS() throws Exception {
         final String expectedBgColor = "rgba(0, 128, 0, 1)"; // green
         final String expectedFgColor = "rgba(255, 0, 0, 1)"; // red
@@ -58,6 +60,7 @@ public class TokensSanityUITest extends WebDriverTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testTokenOverride() throws Exception {
         // base tokens
         final String expectedHeight1 = "300px";

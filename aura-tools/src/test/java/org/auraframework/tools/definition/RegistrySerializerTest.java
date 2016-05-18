@@ -20,6 +20,7 @@ import java.nio.file.Path;
 
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerException;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 
 public class RegistrySerializerTest extends UnitTestCase {
@@ -41,6 +42,7 @@ public class RegistrySerializerTest extends UnitTestCase {
         super.tearDown();
     }
 
+    @Test
     public void testNullOutput() {
         RegistrySerializer rs = new RegistrySerializer(null, actb.getComponentsPath().toFile(), null, null);
         try {
@@ -50,6 +52,7 @@ public class RegistrySerializerTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testComponentDirIsFile() throws Exception {
         Path path = Files.createTempFile("badOutput", "foo");
         RegistrySerializer rs = new RegistrySerializer(path.toFile(), actb.getComponentsPath().toFile(), null, null);
@@ -61,6 +64,7 @@ public class RegistrySerializerTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testOutputDirIsFile() throws Exception {
         Path path = Files.createTempFile("badOutput", "foo");
         RegistrySerializer rs = new RegistrySerializer(actb.getComponentsPath().toFile(), path.toFile(), null, null);

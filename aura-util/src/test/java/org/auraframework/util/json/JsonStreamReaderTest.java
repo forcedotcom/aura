@@ -34,6 +34,7 @@ import org.auraframework.util.IOUtil;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 import org.auraframework.util.json.JsonStreamReader.JsonStreamParseException;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -66,6 +67,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
     /**
      * Testing extreme cases for constructor
      */
+    @Test
     public void testExtremeCases() throws Exception {
         Reader nullReader = null;
         String nullString = null;
@@ -100,6 +102,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
     /**
      * Passing a literal to a Json reader should throw an exception
      */
+    @Test
     public void testLiteral() throws Exception {
         runParseFailures(literal_failures);
         runParseSuccesses(literal_successes);
@@ -111,6 +114,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
         new ParseSuccess("true", "true", Boolean.TRUE),
         new ParseSuccess("false", "false", Boolean.FALSE),
     };
+    @Test
     public void testBoolean() throws Exception {
         runParseFailures(boolean_failures);
         runParseSuccesses(boolean_successes);
@@ -139,6 +143,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
 
         new ParseSuccess("not-a-number", "NaN", Double.NaN),
     };
+    @Test
     public void testNumber() throws Exception {
         runParseFailures(number_failures);
         runParseSuccesses(number_successes);
@@ -183,6 +188,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
         new ParseSuccess("russian, german, hebrew", "\"Быстрый Браун Фокс выросло за ленивый собака. Die schnelle Braun Fuchs sprang über den faulen Hund. השועל החום המהיר קפץ מעל הכלב העצלן.\"","Быстрый Браун Фокс выросло за ленивый собака. Die schnelle Braun Fuchs sprang über den faulen Hund. השועל החום המהיר קפץ מעל הכלב העצלן."),
 
     };
+    @Test
     public void testString() throws Exception {
         runParseFailures(string_failures);
         runParseSuccesses(string_successes);
@@ -210,6 +216,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
     /**
      * Tests to verify parsing of Arrays.
      */
+    @Test
     public void testArray() throws Exception {
         runParseFailures(array_failures);
         runParseSuccesses(array_successes);
@@ -268,6 +275,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
 
     };
 
+    @Test
     public void testObject() throws Exception {
         for (ParseObjectSuccess pos : object_successes) {
             @SuppressWarnings("unchecked")
@@ -293,6 +301,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
      * Positive and negative tests for {@link JsonStreamReader#getList()} for
      * when recursive reading is disabled
      */
+    @Test
     public void testGetListWithRecursiveReadDisabled() throws Exception {
         runGetListTest(new JsonStreamGetObjectOrArrayTestConfig() {
             @Override
@@ -313,6 +322,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
     /**
      * Positive and negative tests for {@link JsonStreamReader#getList()}.
      */
+    @Test
     public void testGetList() throws Exception {
         runGetListTest(new JsonStreamGetObjectOrArrayTestConfig() {
             @Override
@@ -423,6 +433,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
      * {@link JsonStreamReader#next()} when recursive reading is disabled. Also
      * other cases while parsing a string representing an Object
      */
+    @Test
     public void testGetObjectWithRecursiveReadDisabled() throws Exception {
         runGetObjectTest(new JsonStreamGetObjectOrArrayTestConfig() {
             @Override
@@ -445,6 +456,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
      * {@link JsonStreamReader#next()}. Also other cases while parsing a string
      * representing an Object
      */
+    @Test
     public void testGetObject() throws Exception {
         runGetObjectTest(new JsonStreamGetObjectOrArrayTestConfig() {
             @Override
@@ -529,6 +541,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
      * FIXME: this test is a random amalgamation of stuff, we could do better with individual tests.
      */
     @SuppressWarnings("unchecked")
+    @Test
     public void testNext() throws IOException {
         
         String func = "function(arg1, arg2) {   /*comment\n\n\n*/var str = \"\\\"\"; var str2 = '\\'vads\\nadf' var foo = {\n}; var func = function(){ var foo = {};var str = \"{\";};}";
@@ -580,6 +593,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
     /**
      * Tests for reading functions.
      */
+    @Test
     public void testReadFunction() throws Exception {
         String func = "{key:function (arg1, arg2) {   " + "var str = \"\\\"\"; " + "var func = function(){ "
                 + "var foo = {};" + "var str = \"{\";" + "}; " +
@@ -665,6 +679,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
      * FIXME: this is a mess.
      */
     @SuppressWarnings("unchecked")
+    @Test
     public void testReadString() throws Exception {
         String key1 = "key1";
         String value1 = "value1";
@@ -707,6 +722,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
+    @Test
     public void testReadMap() throws IOException {
         String json = "{\"key1\":\"val1\",\"key2\":\"val2\"}";
         Object o = parseAndRetrieve(json);
@@ -733,6 +749,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
     /**
      * Tests to verify all accepted forms of n
      */
+    @Test
     public void testReadNumbers() throws IOException {
         String json = "1";
         Object o = parseAndRetrieve(json);
@@ -751,6 +768,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
      * JsonStreamReader.readArray(), and JsonStreamReader.getHandlerProvider()
      */
     @SuppressWarnings("unchecked")
+    @Test
     public void testReadComplexObject() throws IOException {
         String json = "{\"key1\":" + "[" + "[\"string1\",\"string2\"]," + "true," + "10," + "[" + "false," + "1.5,"
                 + "{\"key2\":[\"string1\",\"string2\"]}" + "]" + "]" + "}";
@@ -791,6 +809,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
      * @userStorySyncIdOrName a07B0000000DUGn
      */
     @SuppressWarnings("unchecked")
+    @Test
     public void testCommentsInJsonBody() throws Exception {
         // Positive test Case1
         String commentsAtStartOfObject = "/*Multiline comment \n Yeah really */ {\n"
@@ -846,6 +865,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
      * Tests cases of illegal input, which historically were "successfully"
      * parsed because of quirks in the comment parsing.
      */
+    @Test
     public void testBadParseSlashAndStar() throws Exception {
         String invalidSymbols = "{\n" + "  / foo: 3,\n" + "}";
         try {
@@ -888,6 +908,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
     /**
      * Tests cases of string values which could confuse parsing.
      */
+    @Test
     public void testAnnoyingStrings() throws Exception {
         String jsonString = "{\n" + "  foo: \"unterminated string,\n" + "  bar: \'unterminated string,\n" + "}";
         try {
@@ -927,6 +948,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
     /**
      * Ensures that down-the-middle JSON+binary works properly
      */
+    @Test
     public void testJsonPlusBinary() throws Exception {
 
         // Create our test data, which has several binary streams in it
@@ -1001,6 +1023,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
         assertEquals(-1, in.read());
     }
 
+    @Test
     public void testDisableLengthLimitsBecauseIAmStreamingAndMyMemoryUseIsNotProportionalToTheStreamLength()
             throws Exception {
 

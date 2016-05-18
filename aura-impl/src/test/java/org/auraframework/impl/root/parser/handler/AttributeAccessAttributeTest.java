@@ -26,6 +26,7 @@ import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 @UnAdaptableTest("when run in core, we throw error with different type.")
 public class AttributeAccessAttributeTest extends AuraImplTestCase {
@@ -1123,6 +1124,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	/***********************************************************************************
      ******************* Tests for Internal Namespace start ****************************
      ************************************************************************************/
+    @Test
     public void testAttributeWithDefaultAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String'  /></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1136,6 +1138,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         def.validateDefinition();
     }
     
+    @Test
     public void testAttributeWithEmptyAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access=''/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1155,6 +1158,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testAttributeWithInvalidAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='BLAH'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1174,6 +1178,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testAttributeWithInvalidAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>";
         
@@ -1195,6 +1200,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testAttributeWithInvalidAndValidAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, BLAH, GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1215,6 +1221,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testAttributeWithStaticAccessAndAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1235,6 +1242,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         }
     }
     
+    @Test
     public void testAttributeWithAuthenticationAndAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1259,6 +1267,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      * go through access=GLOBAL,PUBLIC,PRIVATE,INTERNAL,PRIVILEGED for attribute in InternalNamespace
      * notice PRIVATE is valid
      */
+    @Test
     public void testAttributeWithGlobalAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1271,6 +1280,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
+    @Test
     public void testAttributeWithPublicAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1283,6 +1293,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
+    @Test
     public void testAttributeWithPrivateAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1295,6 +1306,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
+    @Test
     public void testAttributeWithInternalAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='INTERNAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1307,6 +1319,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
     }
+    @Test
     public void testAttributeWithPrivilegedAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVILEGED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1324,6 +1337,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      * go through access=GLOBAL,PUBLIC,PRIVATE,INTERNAL,PRIVILEGED by AccessMethod for attribute in InternalNamespace
      * notice AccessMethod is allowed and only allowed because we are inside InternalNamespace
      */
+    @Test
     public void testAttributeWithGlobalAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1336,6 +1350,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
     }
+    @Test
     public void testAttributeWithPublicAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1348,6 +1363,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
     }
+    @Test
     public void testAttributeWithPrivateAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1360,6 +1376,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
     }
+    @Test
     public void testAttributeWithPrivilegedAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1372,6 +1389,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
     }
+    @Test
     public void testAttributeWithInternalAccessMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1388,6 +1406,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     /*
      * this verify putting any two different valid access value together won't work. you can try other combinations, but it's the same
      */
+    @Test
     public void testAttributeWithGlobalAndPrivateAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1409,6 +1428,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     /*
      * this verify we can put two same valid access value together 
      */
+    @Test
     public void testAttributeWithPublicAndPublicAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC, PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1425,6 +1445,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     /*
      * These two verify we cannot use authentication as access, as we are not in InternalNamespace
      */
+    @Test
     public void testComponentWithAuthenticationInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1444,6 +1465,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
             assertTrue(e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testComponentWithUnAuthenticationInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='UNAUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1466,6 +1488,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     /*
      * we cannot set access to Authenticated by method, like what we do for access value
      */
+    @Test
     public void testAttributeWithUnAuthenticationMethodInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1488,6 +1511,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     /*
      * this verify we cannot have both AUTHENTICATED and UNAUTHENTICATED as access attribute
      */
+    @Test
     public void testAttributeWithAuthenticatedAndUnAuthenticationAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1510,6 +1534,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     /*
      * This verify we cannot have Authentication as access attribute, as we are outside InternalNamespace
      */
+    @Test
     public void testAttributeWithAuthenticatedAndAuthenticationAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1532,6 +1557,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     /*
      * These verify we cannot have authentication as part of access, as we are not in InternalNamespace. 
      */
+    @Test
     public void testAttributeWithAuthenticatedAndGlobalAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,GLOBAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1550,6 +1576,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testAttributeWithAuthenticatedAndPrivateAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVATE'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1568,6 +1595,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testAttributeWithAuthenticatedAndPublicAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PUBLIC'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1586,6 +1614,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testAttributeWithAuthenticatedAndPrivilegedAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVILEGED'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 
@@ -1604,6 +1633,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
             assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
         }
     }
+    @Test
     public void testAttributeWithAuthenticatedAndInternalAccessInternalNamespace() throws Exception {
         String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,INTERNAL'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = 

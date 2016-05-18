@@ -28,6 +28,7 @@ import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
+import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
@@ -41,6 +42,7 @@ public class StyleDefImplTest extends StyleTestCase {
         super(name);
     }
 
+    @Test
     public void testDependenciesIncludesNsDefault() throws QuickFixException {
         DefDescriptor<TokensDef> nsDefault = addNsTokens(tokens().token("color", "red"));
         DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: token(color) }");
@@ -50,6 +52,7 @@ public class StyleDefImplTest extends StyleTestCase {
         assertTrue(dependencies.contains(nsDefault));
     }
 
+    @Test
     public void testInvalidRef() throws QuickFixException {
         addNsTokens("<aura:tokens><aura:token name='color' value='red'/></aura:tokens>");
         DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: token(bam) }");
@@ -62,6 +65,7 @@ public class StyleDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testGetClassName() throws QuickFixException {
         DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: red }");
         String expected = style.getNamespace() + AuraTextUtil.initCap(style.getName());
@@ -73,6 +77,7 @@ public class StyleDefImplTest extends StyleTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testDefSerializationWhenPreloaded() throws Exception {
         DefDescriptor<StyleDef> styleDesc = addStyleDef(".THIS {color: red }");
         Aura.getContextService().getCurrentContext().setPreloading(false);
@@ -87,6 +92,7 @@ public class StyleDefImplTest extends StyleTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testDefSerializationWhenNotPreloaded() throws Exception {
         DefDescriptor<StyleDef> styleDesc = addStyleDef(".THIS {color: green }");
         Aura.getContextService().getCurrentContext().setPreloading(false);
@@ -95,6 +101,7 @@ public class StyleDefImplTest extends StyleTestCase {
         verifyStyleDefSerialization(styleDesc, true);
     }
 
+    @Test
     public void testGetTokenNames() throws Exception {
         addNsTokens(tokens()
                 .token("color", "red")

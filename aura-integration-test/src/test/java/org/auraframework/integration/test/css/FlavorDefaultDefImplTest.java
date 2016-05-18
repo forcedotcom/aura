@@ -29,6 +29,7 @@ import org.auraframework.impl.css.flavor.FlavorOverrideLocationImpl;
 import org.auraframework.impl.css.flavor.FlavorOverrideLocatorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -68,6 +69,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testSingleComponentStandardFlavor() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         addStandardFlavor(cmp, ".THIS--foo{}");
@@ -76,6 +78,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         checkMatches(fmt, ImmutableMap.of(cmp, "foo"), NO_OVERRIDES);
     }
 
+    @Test
     public void testSingleComponentFromMapping() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<FlavoredStyleDef> style = addCustomFlavor(cmp, "THIS--foo{}");
@@ -86,6 +89,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         checkMatches(fmt, ImmutableMap.of(cmp, "foo"), mapping);
     }
 
+    @Test
     public void testFullGlobMatchFromBundle() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         addStandardFlavor(cmp, ".THIS{} .THIS--foo{}");
@@ -94,6 +98,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         checkMatches(fmt, ImmutableMap.of(cmp, "foo"), NO_OVERRIDES);
     }
 
+    @Test
     public void testFullGlobMatchFromMapping() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<FlavoredStyleDef> style = addCustomFlavor(cmp, "THIS--foo{}");
@@ -104,6 +109,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         checkMatches(fmt, ImmutableMap.of(cmp, "foo"), mapping);
     }
 
+    @Test
     public void testFullGlobMatchInBoth() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         addStandardFlavor(cmp, ".THIS{} .THIS--foo{}");
@@ -115,6 +121,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         checkMatches(fmt, ImmutableMap.of(cmp, "foo"), mapping);
     }
 
+    @Test
     public void testFullGlobNoMatch() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         addApp(cmp);
@@ -122,6 +129,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         checkMatches(fmt, ImmutableMap.<DefDescriptor<ComponentDef>, String>of(), NO_OVERRIDES);
     }
 
+    @Test
     public void testNamespaceGlobMatchFromBundle() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<ComponentDef> cmp2 = addComponentDefOtherNamespace("<aura:component><div aura:flavorable='true'></div></aura:component>");
@@ -135,6 +143,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         checkMatches(fmt, ImmutableMap.of(cmp, "foo"), NO_OVERRIDES);
     }
 
+    @Test
     public void testNamespaceGlobNoMatch() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<ComponentDef> cmp2 = addComponentDefOtherNamespace("<aura:component><div aura:flavorable='true'></div></aura:component>");
@@ -148,6 +157,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         checkMatches(fmt, ImmutableMap.<DefDescriptor<ComponentDef>, String>of(), NO_OVERRIDES);
     }
 
+    @Test
     public void testNameGlobMatchFromBundle() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<ComponentDef> cmp2 = addComponentDefOtherNamespace("<aura:component><div aura:flavorable='true'></div></aura:component>");
@@ -161,6 +171,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         checkMatches(fmt, ImmutableMap.of(cmp, "foo"), NO_OVERRIDES);
     }
 
+    @Test
     public void testNameGlobNoMatch() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<ComponentDef> cmp2 = addComponentDefOtherNamespace("<aura:component><div aura:flavorable='true'></div></aura:component>");

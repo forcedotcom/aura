@@ -27,6 +27,7 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
+import org.junit.Test;
 
 /**
  * This class has automation to verify implementation of rendering for
@@ -50,6 +51,7 @@ public class RendererDefTest extends AuraImplTestCase {
      * 
      * @expectedResults No rendererDef section found in componentDef
      */
+    @Test
     public void testComponentDefWhenRedererIsJava() throws Exception {
         DefDescriptor<ComponentDef> d = definitionService.getDefDescriptor("test:test_SimpleJavaRenderer",
                 ComponentDef.class);
@@ -70,6 +72,7 @@ public class RendererDefTest extends AuraImplTestCase {
      * @expectedResults Rendering section found in component instance.
      * @throws Exception
      */
+    @Test
     public void testComponentInstanceDefWhenRendererIsJava() throws Exception {
         Component component = Aura.getInstanceService().getInstance("test:test_SimpleJavaRenderer", ComponentDef.class,
                 null);
@@ -91,6 +94,7 @@ public class RendererDefTest extends AuraImplTestCase {
      * @expectedResults AuraRuntimeException
      * @throws Exception
      */
+    @Test
     public void testComponentInstanceDefWhenInvalidJavaRendererSpecified() throws Exception {
         try {
             Aura.getInstanceService().getInstance("test:test_NonExistingJavaRenderer", ComponentDef.class, null);

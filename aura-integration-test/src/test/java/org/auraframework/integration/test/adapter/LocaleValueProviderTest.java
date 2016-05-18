@@ -34,6 +34,7 @@ import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 @UnAdaptableTest
 public class LocaleValueProviderTest extends AuraImplTestCase {
 
@@ -71,6 +72,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testValidateLocaleProperty() throws Exception {
         LocaleValueProvider lvp = new LocaleValueProvider();
         for (LocaleProperty lp : LocaleProperty.values()) {
@@ -95,6 +97,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
     
     // semi-integration test checks that value provider is created and validated
     // on component
+    @Test
     public void testInvalidLocalePropertyInMarkup() throws Exception {
         try {
             DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(
@@ -110,6 +113,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
     }
     
     // Setting some locales for testing
+    @Test
     public void testCurrency() throws Exception {
     	HashMap<String, Object> defaultLocaleProperties = new HashMap<>();
     	defaultLocaleProperties.put(LocaleValueProvider.LANGUAGE, "en");
@@ -139,6 +143,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
     /**
      * this test when we pass more than one locals to current context, we only honor the FIRST one.
      */
+    @Test
     public void testMultiLocale() {
     	HashMap<String, Object> localeProperties = new HashMap<>();
         createLocaleProperties_ENZA(localeProperties);
@@ -149,6 +154,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
      * tests for number and percent formats for US, South Africa(ZA) and France
      * http://en.wikipedia.org/wiki/ISO_3166-2
      */
+    @Test
     public void testNumberAndPercentFormats() {
     	HashMap<String, Object> localeProperties = new HashMap<>();
         createLocaleProperties_ENUS(localeProperties);
@@ -244,6 +250,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
 	/**
      * Test name of months is returned correctly
      */
+    @Test
     public void testNameOfMonths() throws Exception {
     HashMap<String, String> expectedMonthNames = new HashMap<>();
         expectedMonthNames.put("Jan", "January");
@@ -279,6 +286,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
     /**
      * Test name of day is returned correctly
      */
+    @Test
     public void testNameOfWeekdays() throws Exception {
         HashMap<String, String> expectedDayNames = new HashMap<>();
         expectedDayNames.put("MON", "Monday");
@@ -304,6 +312,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
     /**
      * Test Today label is returned correctly
      */
+    @Test
     public void testToday() throws Exception {
         assertTodayLocaleProperty(null, "Today");  // enUS
         assertTodayLocaleProperty(Locale.JAPANESE, "今日");

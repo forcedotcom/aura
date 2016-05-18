@@ -24,6 +24,7 @@ import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.text.Hash;
+import org.junit.Test;
 
 public class SourceTest extends UnitTestCase {
     private final static int DEFAULT_HASHCODE = 3;
@@ -44,6 +45,7 @@ public class SourceTest extends UnitTestCase {
     /**
      * HashingReader does not set hashCode until end of stream.
      */
+    @Test
     public void testHashingReaderProgress() throws Exception {
         int expectedHashCode = getHashCode("hi");
 
@@ -77,6 +79,7 @@ public class SourceTest extends UnitTestCase {
     /**
      * Hash computed based on bytes read rather than full buffer contents.
      */
+    @Test
     public void testHashingReaderLargerBuffer() throws Exception {
         int expectedHashCode = getHashCode("hi");
 
@@ -95,6 +98,7 @@ public class SourceTest extends UnitTestCase {
     /**
      * Hashing reader doesn't choke on null source content.
      */
+    @Test
     public void testHashingReaderNull() throws Exception {
         int expectedHashCode = getHashCode("");
 
@@ -112,6 +116,7 @@ public class SourceTest extends UnitTestCase {
     /**
      * Hashing reader doesn't choke on empty source content.
      */
+    @Test
     public void testHashingReaderEmpty() throws Exception {
         int expectedHashCode = getHashCode("");
 

@@ -28,6 +28,7 @@ import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
+import org.junit.Test;
 
 /**
  * Tests to verify AttributeSetImpl class. Component/Application instances are assigned an AttributeSet. A
@@ -44,6 +45,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
     /**
      * Verify that attribute names used in expressions are not case sensitive. Attributes are used as {!v.<attrName>}
      */
+    @Test
     public void testCaseSensitivityOfAttributesInExpressions() throws Exception {
         // 1. Local attributes in a component
         DefDescriptor<ComponentDef> parentDesc = addSourceAutoCleanup(ComponentDef.class,
@@ -84,6 +86,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
                                 .getExternalLocation("direct attributeset access"))));
     }
 
+    @Test
     public void testCaseSensitivityOfAttributesInMarkup() throws Exception {
         DefDescriptor<ComponentDef> parentDesc = addSourceAutoCleanup(ComponentDef.class, String.format(
                 baseComponentTag, "extensible='true'",
@@ -145,6 +148,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
     /**
      * Verify invalid attribute types throw error
      */
+    @Test
     public void testUnknownAttributeType() throws Exception {
         // With a default value.
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
@@ -169,6 +173,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
     /**
      * Only serialize attributes with serializeTo == BOTH.
      */
+    @Test
     public void testSerializeTo() throws Exception {
         // set has some attributes with serializeTo == BOTH
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(

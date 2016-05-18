@@ -25,6 +25,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.SourceListener;
 import org.auraframework.util.FileChangeEvent;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 import org.mockito.*;
 
 /**
@@ -48,6 +49,7 @@ public class FileSourceListenerTest extends UnitTestCase {
         listener = spy(listener);
     }
 
+    @Test
     public void testCreateEvent() throws Exception {
         when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath("/some/awesome/ui/inputSearch/inputSearch.cmp"));
 
@@ -58,6 +60,7 @@ public class FileSourceListenerTest extends UnitTestCase {
         assertFileChangeEvent();
     }
 
+    @Test
     public void testDeleteEvent() throws Exception {
         when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath("/some/awesome/ui/inputSearch/inputSearch.cmp"));
 
@@ -68,6 +71,7 @@ public class FileSourceListenerTest extends UnitTestCase {
         assertFileChangeEvent();
     }
 
+    @Test
     public void testChangeEvent() throws Exception {
         when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath("/some/awesome/ui/inputSearch/inputSearch.cmp"));
 
@@ -91,6 +95,7 @@ public class FileSourceListenerTest extends UnitTestCase {
      * {@link FileSourceListener} then null should be passed to DefinitionService.onSourceChanged() to wipe out the
      * whole cache.
      */
+    @Test
     public void testNullDefDescriptor() throws Exception {
         when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath("/some/awesome/ui/inputSearch/inputSearchModel.java"));
 
@@ -101,76 +106,91 @@ public class FileSourceListenerTest extends UnitTestCase {
         assertNull(defDescriptorCaptor.getValue());
     }
 
+    @Test
     public void testSourceChangedApplication() throws Exception {
         assertSourceChangedCalled("markup", "appCache", "withpreload", DefDescriptor.DefType.APPLICATION,
                 "/some/awesome/appCache/withpreload/withpreload.app");
     }
 
+    @Test
     public void testSourceChangedComponent() throws Exception {
         assertSourceChangedCalled("markup", "ui", "inputSearch", DefDescriptor.DefType.COMPONENT,
                 "/some/awesome/ui/inputSearch/inputSearch.cmp");
     }
 
+    @Test
     public void testSourceChangedEvent() throws Exception {
         assertSourceChangedCalled("markup", "ui", "focus", DefDescriptor.DefType.EVENT,
                 "/some/awesome/ui/focus/focus.evt");
     }
 
+    @Test
     public void testSourceChangedInterface() throws Exception {
         assertSourceChangedCalled("markup", "ui", "visible", DefDescriptor.DefType.INTERFACE,
                 "/some/awesome/ui/visible/visible.intf");
     }
 
+    @Test
     public void testSourceChangedStyle() throws Exception {
         assertSourceChangedCalled("css", "ui", "inputSearch", DefDescriptor.DefType.STYLE,
                 "/some/awesome/ui/inputSearch/inputSearch.css");
     }
 
+    @Test
     public void testSourceChangedStandardFlavor() throws Exception {
         assertSourceChangedCalled("css", "ui", "inputSearch", DefDescriptor.DefType.FLAVORED_STYLE,
                 "/some/awesome/ui/inputSearch/inputSearchFlavors.css");
     }
 
+    @Test
     public void testSourceChangedCustomFlavor() throws Exception {
         assertSourceChangedCalled(DefDescriptor.CUSTOM_FLAVOR_PREFIX, "foo", "ui-inputSearchFlavors", DefDescriptor.DefType.FLAVORED_STYLE,
                 "/some/awesome/foo/flavors/ui-inputSearchFlavors.css");
     }
 
+    @Test
     public void testSourceChangedFlavorAssortment() throws Exception {
         assertSourceChangedCalled("markup", "ui", "baseFlavors", DefDescriptor.DefType.FLAVORS,
                 "/some/awesome/ui/baseFlavors/baseFlavors.flavors");
     }
 
+    @Test
     public void testSourceChangedTokens() throws Exception {
         assertSourceChangedCalled("markup", "ui", "uiNamespace", DefDescriptor.DefType.TOKENS,
                 "/some/awesome/ui/uiNamespace/uiNamespace.tokens");
     }
 
+    @Test
     public void testSourceChangedTestSuite() throws Exception {
         assertSourceChangedCalled("js", "ui", "inputSelect", DefDescriptor.DefType.TESTSUITE,
                 "/some/awesome/ui/inputSelect/inputSelectTest.js");
     }
 
+    @Test
     public void testSourceChangedController() throws Exception {
         assertSourceChangedCalled("js", "ui", "inputSearch", DefDescriptor.DefType.CONTROLLER,
                 "/some/awesome/ui/inputSearch/inputSearchController.js");
     }
 
+    @Test
     public void testSourceChangedRenderer() throws Exception {
         assertSourceChangedCalled("js", "ui", "inputSearch", DefDescriptor.DefType.RENDERER,
                 "/some/awesome/ui/inputSearch/inputSearchRenderer.js");
     }
 
+    @Test
     public void testSourceChangedProvider() throws Exception {
         assertSourceChangedCalled("js", "ui", "pager", DefDescriptor.DefType.PROVIDER,
                 "/some/awesome/ui/pager/pagerProvider.js");
     }
 
+    @Test
     public void testSourceChangedHelper() throws Exception {
         assertSourceChangedCalled("js", "ui", "inputSearch", DefDescriptor.DefType.HELPER,
                 "/some/awesome/ui/inputSearch/inputSearchHelper.js");
     }
 
+    @Test
     public void testSourceChangedModel() throws Exception {
         assertSourceChangedCalled("js", "test", "jsModel", DefDescriptor.DefType.MODEL,
                 "/some/awesome/test/jsModel/jsModelModel.js");

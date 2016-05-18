@@ -17,6 +17,7 @@ package org.auraframework.impl.css.parser.plugin;
 
 import org.auraframework.Aura;
 import org.auraframework.impl.AuraImplTestCase;
+import org.junit.Test;
 
 import com.salesforce.omakase.ast.declaration.UrlFunctionValue;
 
@@ -56,6 +57,7 @@ public class UrlCacheBustingPluginTest extends AuraImplTestCase {
     /**
      * Empty URL string should still have the buster returned.
      */
+    @Test
     public void testAddCacheBusterToEmptyString() throws Exception {
         assertBustedUrl("/?aura.cb=%s", "/");
     }
@@ -63,6 +65,7 @@ public class UrlCacheBustingPluginTest extends AuraImplTestCase {
     /**
      * Basic URL, without query or hash, has buster simply appended as query.
      */
+    @Test
     public void testAddCacheBusterWithoutQueryOrHash() throws Exception {
         assertBustedUrl("/something?aura.cb=%s", "/something");
     }
@@ -70,6 +73,7 @@ public class UrlCacheBustingPluginTest extends AuraImplTestCase {
     /**
      * URL with query will have buster appended to query.
      */
+    @Test
     public void testAddCacheBusterWithQuery() throws Exception {
         assertBustedUrl("/something?is=fishy&aura.cb=%s", "/something?is=fishy");
     }
@@ -77,6 +81,7 @@ public class UrlCacheBustingPluginTest extends AuraImplTestCase {
     /**
      * URL with hash will have buster appended as query (before the hash).
      */
+    @Test
     public void testAddCacheBusterWithHash() throws Exception {
         assertBustedUrl("/something?aura.cb=%s#toremember", "/something#toremember");
     }
@@ -84,6 +89,7 @@ public class UrlCacheBustingPluginTest extends AuraImplTestCase {
     /**
      * URL with hash with query will have buster appended as query (before the hash).
      */
+    @Test
     public void testAddCacheBusterWithHashQuery() throws Exception {
         assertBustedUrl("/something?aura.cb=%s#layout?option=value", "/something#layout?option=value");
     }
@@ -91,6 +97,7 @@ public class UrlCacheBustingPluginTest extends AuraImplTestCase {
     /**
      * URL with query and hash will have buster appended to query (before the hash).
      */
+    @Test
     public void testAddCacheBusterWithQueryAndHash() throws Exception {
         assertBustedUrl("/something?is=fishy&aura.cb=%s#inside", "/something?is=fishy#inside");
     }
@@ -98,6 +105,7 @@ public class UrlCacheBustingPluginTest extends AuraImplTestCase {
     /**
      * URL with query and hash with query will have buster appended to query (before the hash).
      */
+    @Test
     public void testAddCacheBusterWithQueryAndHashQuery() throws Exception {
         assertBustedUrl("/something?is=fishy&aura.cb=%s#inside?where=fridge", "/something?is=fishy#inside?where=fridge");
     }

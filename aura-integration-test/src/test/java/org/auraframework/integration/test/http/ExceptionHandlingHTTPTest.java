@@ -18,6 +18,7 @@ package org.auraframework.integration.test.http;
 import java.util.Map;
 
 import org.auraframework.test.util.AuraHttpTestCase;
+import org.junit.Test;
 
 public class ExceptionHandlingHTTPTest extends AuraHttpTestCase {
 
@@ -29,6 +30,7 @@ public class ExceptionHandlingHTTPTest extends AuraHttpTestCase {
      * Test to verify row and column numbers in stacktrace on Exceptions.
      */
     @SuppressWarnings("unchecked")
+    @Test
     public void testExceptionLineColNums() throws Exception {
         // Verify -1,-1 aren't line/col numbers in stacktrace if Location doesn't provide them
         ServerAction a = new ServerAction(

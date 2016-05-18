@@ -19,6 +19,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.adapter.format.html.BaseComponentDefHTMLFormatAdapterTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 /**
  * Tests for BaseComponentDefHTMLFormatAdapter, as it relates to ComponentDef
@@ -41,6 +42,7 @@ public class ComponentDefHTMLFormatAdapterTest extends BaseComponentDefHTMLForma
      * directly.
      */
     @UnAdaptableTest
+    @Test
     public void testWriteManifestWithPreloads() throws Exception {
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component render='client'></aura:component>");

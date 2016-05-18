@@ -28,6 +28,7 @@ import org.auraframework.impl.root.parser.handler.TokensImportDefHandler;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
@@ -45,11 +46,13 @@ public class TokensImportImplTest extends StyleTestCase {
         return handler.getElement();
     }
 
+    @Test
     public void testEqualsWhenSame() throws Exception {
         TokensImportDef def1 = source("<aura:import name='blah:blah'/>");
         assertEquals(def1, def1);
     }
 
+    @Test
     public void testNotEquals() throws Exception {
         TokensImportDef def1 = source("<aura:import name='blah:blah'/>");
         TokensImportDef def2 = source("<aura:import name='blah2:blah2'/>");
@@ -58,6 +61,7 @@ public class TokensImportImplTest extends StyleTestCase {
         assertFalse(def2.equals(null));
     }
 
+    @Test
     public void testAppendDependencies() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens());
         TokensImportDef def = source(String.format("<aura:import name='%s'/>", desc.getDescriptorName()));
@@ -67,6 +71,7 @@ public class TokensImportImplTest extends StyleTestCase {
         assertTrue(deps.contains(desc));
     }
 
+    @Test
     public void testInvalidReference() throws Exception {
         try {
             TokensImportDef def = source("<aura:import name='blah:blah'/>");

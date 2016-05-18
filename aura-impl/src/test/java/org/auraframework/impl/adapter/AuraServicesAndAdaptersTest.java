@@ -22,6 +22,7 @@ import org.auraframework.util.ServiceLoaderImpl;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.sampleServices.UnimplementedService;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 /**
  * Unit tests for various service and adapter registration.
@@ -37,6 +38,7 @@ public class AuraServicesAndAdaptersTest extends AuraImplTestCase {
     }
 
     @UnAdaptableTest
+    @Test
     public void testServicesAndAdaptersRegistered() {
         ConfigAdapter c = Aura.getConfigAdapter();
         assertNotNull(c);

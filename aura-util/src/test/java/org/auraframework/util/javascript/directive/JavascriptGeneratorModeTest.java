@@ -18,6 +18,7 @@ package org.auraframework.util.javascript.directive;
 import java.util.HashSet;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
  * Automation to verify JavascriptGeneratorMode class.
@@ -31,6 +32,7 @@ public class JavascriptGeneratorModeTest extends UnitTestCase {
      * various modes is parallelized. If two modes use the same suffix,
      * generation can cause exceptions.
      */
+    @Test
     public void testUniqueSuffix() {
         HashSet<String> suffixes = new HashSet<>();
         for (JavascriptGeneratorMode m : JavascriptGeneratorMode.values()) {

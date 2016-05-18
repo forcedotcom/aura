@@ -37,6 +37,7 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -127,6 +128,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         waitForAuraFrameworkReady();
     }
 
+    @Test
     public void testGetServerRenderingAfterMarkupChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "hi"));
@@ -140,6 +142,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     @ThreadHostileTest("NamespaceDef modification affects namespace")
+    @Test
     public void testGetClientRenderingAfterStyleChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<div id='out'>hi</div>"));
@@ -157,6 +160,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     @ThreadHostileTest("NamespaceDef modification affects namespace")
+    @Test
     public void testGetClientRenderingAfterTokensChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<div id='out'>hi</div>"));
@@ -179,6 +183,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 getAuraUITestingUtil().findDomElement(By.cssSelector("." + className)).getCssValue("font-size"));
     }
 
+    @Test
     public void testGetClientRenderingAfterJsControllerChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<div id='click' onclick='{!c.clicked}'>click</div>"));
@@ -206,6 +211,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         });
     }
 
+    @Test
     public void testGetClientRenderingAfterJsProviderChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ComponentDef.class, null);
@@ -224,6 +230,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         assertEquals("golden egg", getText(By.cssSelector("body")));
     }
 
+    @Test
     public void testGetClientRenderingAfterJsHelperChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ComponentDef.class, null);
@@ -240,6 +247,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         assertEquals("complicated", getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().getHelp();"));
     }
 
+    @Test
     public void testGetClientRenderingAfterJsRendererChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ComponentDef.class, null);
@@ -256,6 +264,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         assertEquals("custom", getText(By.cssSelector("body")));
     }
 
+    @Test
     public void testGetClientRenderingAfterEventChange() throws Exception {
         DefDescriptor<?> eventDesc = addSourceAutoCleanup(EventDef.class,
                 "<aura:event type='APPLICATION'><aura:attribute name='explode' type='String' default='pow'/></aura:event>");
@@ -275,6 +284,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 eventDesc.getDescriptorName())));
     }
 
+    @Test
     public void testGetServerRenderingAfterInterfaceChange() throws Exception {
         DefDescriptor<?> interfaceDesc = addSourceAutoCleanup(
                 InterfaceDef.class,
@@ -292,6 +302,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         getAuraUITestingUtil().waitForElementText(By.cssSelector("body"), "secret", true);
     }
 
+    @Test
     public void testGetClientRenderingAfterDependencyChange() throws Exception {
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<aura:attribute name='val' type='String' default='initial'/>"));
@@ -309,6 +320,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 "return $A.componentService.newComponent('%s').get('v.val');", depDesc.getDescriptorName())));
     }
 
+    @Test
     public void testPostAfterMarkupChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='sample'>free</div>");
         open(cmpDesc);
@@ -321,6 +333,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     @ThreadHostileTest("NamespaceDef modification affects namespace")
+    @Test
     public void testPostAfterStyleChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='out'>hi</div>");
         String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
@@ -380,6 +393,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     @ThreadHostileTest("NamespaceDef modification affects namespace")
+    @Test
     public void testPostAfterTokensChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='out'>hi</div>");
         String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
@@ -405,6 +419,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         });
     }
 
+    @Test
     public void testPostAfterJsControllerChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -448,6 +463,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         });
     }
 
+    @Test
     public void testPostAfterJsProviderChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil()
                 .createStringSourceDescriptor(null, ComponentDef.class, null);
@@ -479,6 +495,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 "golden egg", true);
     }
 
+    @Test
     public void testPostAfterJsHelperChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil()
                 .createStringSourceDescriptor(null, ComponentDef.class, null);
@@ -504,6 +521,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         });
     }
 
+    @Test
     public void testPostAfterJsRendererChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil()
                 .createStringSourceDescriptor(null, ComponentDef.class, null);
@@ -524,6 +542,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         getAuraUITestingUtil().waitForElementText(By.cssSelector("#target"), "custom", true);
     }
 
+    @Test
     public void testPostAfterEventChange() throws Exception {
         final DefDescriptor<?> eventDesc = addSourceAutoCleanup(EventDef.class,
                 "<aura:event type='APPLICATION'><aura:attribute name='explode' type='String' default='pow'/></aura:event>");
@@ -549,6 +568,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         });
     }
 
+    @Test
     public void testPostAfterInterfaceChange() throws Exception {
         DefDescriptor<?> interfaceDesc = addSourceAutoCleanup(
                 InterfaceDef.class,
@@ -565,6 +585,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         getAuraUITestingUtil().waitForElementText(By.cssSelector("#target"), "secret", true);
     }
 
+    @Test
     public void testPostAfterDependencyChange() throws Exception {
         final DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<aura:attribute name='val' type='String' default='initial'/>"));
@@ -589,6 +610,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         });
     }
 
+    @Test
     public void testGetClientRenderingAfterIncludeChange() throws Exception {
         DefDescriptor<?> helperDesc = addSourceAutoCleanup(HelperDef.class, "({})");
         DefDescriptor<?> libraryDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class, null);
@@ -615,6 +637,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 "return $A.getRoot().getDef().getHelper().mylib.%s;", includeDesc.getName())));
     }
 
+    @Test
     public void testGetClientRenderingAfterLibraryChange() throws Exception {
         DefDescriptor<?> helperDesc = addSourceAutoCleanup(HelperDef.class, "({})");
         DefDescriptor<?> libraryDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class, null);
@@ -645,6 +668,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 "return $A.getRoot().getDef().getHelper().mylib.%s;", includeOtherDesc.getName())));
     }
 
+    @Test
     public void testPostAfterIncludeChange() throws Exception {
         DefDescriptor<?> helperDesc = addSourceAutoCleanup(HelperDef.class, "({})");
         DefDescriptor<?> libraryDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class, null);
@@ -675,6 +699,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         });
     }
 
+    @Test
     public void testPostAfterLibraryChange() throws Exception {
         DefDescriptor<?> helperDesc = addSourceAutoCleanup(HelperDef.class, "({})");
         DefDescriptor<?> libraryDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class, null);

@@ -31,6 +31,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.junit.Test;
 
 public class FileSourceLoaderTest extends AuraImplTestCase {
 
@@ -51,10 +52,12 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testFileSourceLoaderSanity() {
         assertNotNull(new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile()));
     }
 
+    @Test
     public void testFileSourceLoaderWithNonExistentFile() {
         try {
             new FileSourceLoader(new File("this_probably_doesnt_exist"));
@@ -64,6 +67,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testFileSourceLoaderWithNullFile() {
         try {
             new FileSourceLoader(null);
@@ -74,6 +78,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
 
     }
 
+    @Test
     public void testGetComponentSource() {
         FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:parent", ComponentDef.class);
@@ -108,6 +113,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
 
     }
 
+    @Test
     public void testGetEventSource() {
         FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
         DefDescriptor<EventDef> descriptor = DefDescriptorImpl.getInstance("test:anevent", EventDef.class);
@@ -140,6 +146,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
 
     }
 
+    @Test
     public void testGetNamespaces() {
         FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
         Set<String> namespaces = loader.getNamespaces();
@@ -148,6 +155,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         assertTrue(namespaces.contains("setAttributesTest"));
     }
 
+    @Test
     public void testFindRegex() {
         FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
         Set<DefDescriptor<?>> found;
@@ -171,6 +179,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     /**
      * All namespaces loaded by FileSourceLoader are internal, verify that FileSourceLoader says so.
      */
+    @Test
     public void testIsInternalNamespace(){
         FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
         assertTrue("All namespaces loaded by FileSourceLoader are to be intenal",

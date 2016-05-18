@@ -17,6 +17,7 @@ package org.auraframework.integration.test.css;
 
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 public class FlavorsDefHandlerTest extends StyleTestCase {
 
@@ -24,6 +25,7 @@ public class FlavorsDefHandlerTest extends StyleTestCase {
         super(name);
     }
 
+    @Test
     public void testInvalidChild() throws Exception {
         try {
             addFlavorAssortment("<aura:flavors><aura:foo/></aura:flavors>").getDef();
@@ -33,6 +35,7 @@ public class FlavorsDefHandlerTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testWithTextBetweenTag() throws Exception {
         try {
         	definitionService.getDefinition(addFlavorAssortment("<aura:flavors>Test</aura:flavors>"));

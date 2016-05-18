@@ -20,6 +20,7 @@ import java.util.Set;
 import org.auraframework.util.javascript.directive.Directive;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
  * Tests to verify functions of Debugger Directive {@link DebuggerDirective}.
@@ -28,6 +29,7 @@ public class DebuggerDirectiveTest extends UnitTestCase {
     /**
      * Test basic initialization.
      */
+    @Test
     public void testDebuggerDirectiveTypeBasicInitialization() {
         DebuggerDirectiveType d = new DebuggerDirectiveType();
         assertEquals("debugger", d.getLabel());
@@ -38,6 +40,7 @@ public class DebuggerDirectiveTest extends UnitTestCase {
     /**
      * Test javascript generation modes specification for debuggerDirective.
      */
+    @Test
     public void testJavascriptModesForDebuggerDirectiveType() {
         DebuggerDirective d = new DebuggerDirective(4, "{\"modes\" : [\"DEVELOPMENT\", \"TESTING\"]}");
         Set<JavascriptGeneratorMode> modes = d.getModes();
@@ -49,6 +52,7 @@ public class DebuggerDirectiveTest extends UnitTestCase {
     /**
      * Test default javascript generation mode in debuggerDirective.
      */
+    @Test
     public void testDefaultJavascriptModeForDebuggerDirectiveType() {
         DebuggerDirective d = new DebuggerDirective(4, null);
         Set<JavascriptGeneratorMode> modes = d.getModes();

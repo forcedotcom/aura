@@ -27,6 +27,7 @@ import java.util.Scanner;
 
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 import com.google.common.io.Files;
 
@@ -135,6 +136,7 @@ public class ResourceLoaderTest extends UnitTestCase {
     /**
      * Must specify a cache directory location.
      */
+    @Test
     public void testCacheDirNull() throws Exception {
         try {
             new ResourceLoader(null, null, false);
@@ -148,6 +150,7 @@ public class ResourceLoaderTest extends UnitTestCase {
      * Verify that null value for parent is handled.
      */
     // Automation for "W-1405114"
+    @Test
     public void testParentDirNull() throws Exception {
         try {
             ResourceLoader loader = new ResourceLoader(tempFolder.getPath(), null, false);
@@ -161,6 +164,7 @@ public class ResourceLoaderTest extends UnitTestCase {
     /**
      * Cache directory is created if it doesn't exist.
      */
+    @Test
     public void testCacheDirDoesntExist() throws Exception {
         // We should get the same results, regardless of the value of
         // deleteOnStart.
@@ -176,6 +180,7 @@ public class ResourceLoaderTest extends UnitTestCase {
     /**
      * Existing cache contents are retained if deleteCacheOnStart is false.
      */
+    @Test
     public void testCacheDirDoesExist() throws Exception {
         File childDir = new File(cacheFolder, "child");
         childDir.mkdirs();
@@ -192,6 +197,7 @@ public class ResourceLoaderTest extends UnitTestCase {
      * Existing cache contents are deleted if deleteCacheOnStart is true.
      */
 
+    @Test
     public void testCacheDirDoesExistDeleteOnStart() throws Exception {
         cacheFolder.mkdirs();
         File childDir = new File(cacheFolder, "child");
@@ -208,6 +214,7 @@ public class ResourceLoaderTest extends UnitTestCase {
      * Cache directory parent is actually a file, not a directory.
      */
 
+    @Test
     public void testCacheDirParentIsAFile() throws Exception {
         File testFile = makeTestFile();
         // Create a temp folder that is actually a file.
@@ -226,6 +233,7 @@ public class ResourceLoaderTest extends UnitTestCase {
     /**
      * Cache directory parent not writable.
      */
+    @Test
     public void testCacheDirParentNotWritable() throws Exception {
         File testFile = makeTestFile();
         tempFolder.setWritable(false, false);
@@ -245,6 +253,7 @@ public class ResourceLoaderTest extends UnitTestCase {
     /**
      * Cache directory parent not readable. Cache still OK if writable at least.
      */
+    @Test
     public void testCacheDirParentNotReadable() throws Exception {
         tempFolder.setReadable(false, false);
         try {
@@ -261,6 +270,7 @@ public class ResourceLoaderTest extends UnitTestCase {
     /**
      * Resource not already in cache is cached.
      */
+    @Test
     public void testGetResourceNotCached() throws Exception {
         File testFile = makeTestFile();
         String expected = getName();
@@ -283,6 +293,7 @@ public class ResourceLoaderTest extends UnitTestCase {
     /**
      * Cached resource is served, even if original is updated.
      */
+    @Test
     public void testGetResourceCached() throws Exception {
         File testFile = makeTestFile();
         String expected = getName();
@@ -304,6 +315,7 @@ public class ResourceLoaderTest extends UnitTestCase {
      * re-read and version updated if refreshCached called.
      */
 
+    @Test
     public void testGetResourceCachedUpdated() throws Exception {
         File testFile = makeTestFile();
         String expected = getName();
@@ -341,6 +353,7 @@ public class ResourceLoaderTest extends UnitTestCase {
         assertFalse("Version not updated", versionValue.equals(readStreamAsString(new FileInputStream(version))));
     }
 
+    @Test
     public void testFileUpdates() throws Exception {
         File testFile = makeTestFile();
         writeStringToFile(testFile, "version 1");
@@ -358,6 +371,7 @@ public class ResourceLoaderTest extends UnitTestCase {
      * and is only required during development.
      */
 
+    @Test
     public void testGetResourceCachedMissing() throws Exception {
         File testFile = makeTestFile();
         writeStringToFile(testFile, "bogus");
@@ -398,6 +412,7 @@ public class ResourceLoaderTest extends UnitTestCase {
      * recomputed on refreshCache.
      */
 
+    @Test
     public void testGetResourceCachedMissingVersion() throws Exception {
         File testFile = makeTestFile();
         String expected = getName();
@@ -442,6 +457,7 @@ public class ResourceLoaderTest extends UnitTestCase {
      * <p>
      * Regression test for W-1387862
      */
+    @Test
     public void testObstructedRecurisvely() throws Exception {
         // create a file tree consisting of <origFolder>/foo/bar
         File foo = new File(origFolder, "foo");

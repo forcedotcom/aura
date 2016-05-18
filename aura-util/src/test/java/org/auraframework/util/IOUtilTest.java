@@ -19,6 +19,7 @@ import java.io.File;
 
 import org.auraframework.util.IOUtil.DeleteFailedException;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 import com.google.common.io.Files;
 
@@ -27,6 +28,7 @@ public class IOUtilTest extends UnitTestCase {
         super(name);
     }
 
+    @Test
     public void testDelete() throws Exception {
         File testFolder = null;
         File testFile = null;
@@ -87,6 +89,7 @@ public class IOUtilTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testCreateTempDirTwiceReturnsDifferentPaths() throws Exception {
         String prefix = "testPrefix";
         String path1 = IOUtil.newTempDir(prefix);
@@ -100,12 +103,14 @@ public class IOUtilTest extends UnitTestCase {
         assertFalse("IOUtil.newTempDir should not return the same path on subsequent calls", path1.equals(path2));
     }
 
+    @Test
     public void testCreateTempDirWithNullParamSucceeds() throws Exception {
         String path = IOUtil.newTempDir(null);
         File file = new File(path);
         assertTrue("Failed to create directory with null parameter", file.exists() && file.isDirectory());
     }
 
+    @Test
     public void testGetDefaultTempDirReturnsSamePathOnSubsequentCalls() throws Exception {
         String path1 = IOUtil.getDefaultTempDir();
         String path2 = IOUtil.getDefaultTempDir();

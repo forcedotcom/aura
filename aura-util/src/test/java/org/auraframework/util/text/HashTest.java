@@ -22,6 +22,7 @@ import java.util.Arrays;
 
 import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.text.Hash.StringBuilder;
+import org.junit.Test;
 
 public class HashTest extends UnitTestCase {
 
@@ -32,6 +33,7 @@ public class HashTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testAsPromise() {
         byte[] bytes = { 12, 34, 56, 78, 90 };
         Hash hash = new ExposedHash();
@@ -65,6 +67,7 @@ public class HashTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testToString() throws Exception {
         byte[] bytes = { 12, 34, 56, 78, 90 };
         Hash hash = new Hash(bytes);
@@ -89,6 +92,7 @@ public class HashTest extends UnitTestCase {
         assertEquals("Bad character in string", "", findNonPrint(val));
     }
 
+    @Test
     public void testFromBytes() {
         byte[] bytes1 = { 12, 34, 56, 78, 90 };
         byte[] bytes2 = { 12, 43, 56, 78, 90 };
@@ -100,11 +104,13 @@ public class HashTest extends UnitTestCase {
         assertFalse(hash2.equals(hash1));
     }
 
+    @Test
     public void testFromBytecode() throws Exception {
         Hash hash = new Hash(HashTest.class.getName());
         assertTrue(hash.isSet());
     }
 
+    @Test
     public void testFromReader() throws Exception {
         String text = "Some text to be read by the reader and hashed";
         Hash readerHash = new Hash(new StringReader(text));
@@ -117,6 +123,7 @@ public class HashTest extends UnitTestCase {
         assertEquals(readerHash.hashCode(), setHash.hashCode());
     }
 
+    @Test
     public void testCannotReset() throws Exception {
         byte[] bytes = { 12, 34, 56, 78, 90 };
         Hash hash = new ExposedHash();
@@ -136,6 +143,7 @@ public class HashTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testEqualsAndHashcode() {
         byte[] bytes1 = { 12, 34, 56, 78, 90 };
         byte[] bytes2 = { 12, 43, 56, 78, 90 };
@@ -165,14 +173,17 @@ public class HashTest extends UnitTestCase {
         assertHash(builder.build(), true, expected);
     }
 
+    @Test
     public void testStringBuilderEmptyString() throws Exception {
         assertStringBuilderHash("");
     }
 
+    @Test
     public void testStringBuilderSingleString() throws Exception {
         assertStringBuilderHash("never can say goodbye");
     }
 
+    @Test
     public void testStringBuilderMultipleStrings() throws Exception {
         String toHash = "never can say goodbye";
         int expected = getHashCode(toHash);
@@ -185,12 +196,14 @@ public class HashTest extends UnitTestCase {
         assertHash(builder.build(), true, expected);
     }
 
+    @Test
     public void testStringBuilderNoStrings() throws Exception {
         int expected = Arrays.hashCode(MessageDigest.getInstance("MD5").digest());
         StringBuilder builder = new StringBuilder();
         assertHash(builder.build(), true, expected);
     }
 
+    @Test
     public void testStringBuilderNull() throws Exception {
         int expected = Arrays.hashCode(MessageDigest.getInstance("MD5").digest());
         StringBuilder builder = new StringBuilder();

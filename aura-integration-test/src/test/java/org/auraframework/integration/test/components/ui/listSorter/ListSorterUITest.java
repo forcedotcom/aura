@@ -23,6 +23,7 @@ import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.PerfTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -54,6 +55,7 @@ public class ListSorterUITest extends WebDriverTestCase {
      * @throws URISyntaxException
      */
     @PerfTest
+    @Test
     public void testTabOutOfListSorter() throws MalformedURLException, URISyntaxException {
         verifyTabOutAndEscBehaviour(Keys.TAB, true);
     }

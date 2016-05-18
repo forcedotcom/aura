@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -41,6 +42,7 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
      * 
      * @exception Changes the URL to the location specified in the client action but nothing else.
      */
+    @Test
     public void testNoHandlerForLocationChange() throws MalformedURLException, URISyntaxException {
         open("/test/test_LocChng_NoHandler.app");
         String content = getBodyText();
@@ -59,6 +61,7 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
      * registered an event for handling Location Change. Have a handler which handles this location change event. Verify
      * that the handler was evoked when aura.historyService.set()
      */
+    @Test
     public void testBrowserHistoryInteractionInSimpleComponent() throws MalformedURLException, URISyntaxException {
         open("/test/test_LocChng_SimpleComponent.app");
         findByCssSelector(".SimpleComponent").click();
@@ -78,6 +81,7 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
      * both location change events. Verify that the handler was evoked when aura.historyService.set() This also tests
      * that all handlers registered for the location change event are invoked.
      */
+    @Test
     public void testBrowserHistoryInteractionInComplexComponent() throws MalformedURLException, URISyntaxException {
         open("/test/test_LocChng_CompositeComponent.app");
         String compositeCmp = ".CompositeComponent";
@@ -127,6 +131,7 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
      * history service set() is setting the values of this attribute. The actions registered for Location Change event
      * handlers use this num. The number is extracted from the event.
      */
+    @Test
     public void testNavigation() throws Exception {
         open("/test/test_LocChng_Navigation.app");
         int i = 0;

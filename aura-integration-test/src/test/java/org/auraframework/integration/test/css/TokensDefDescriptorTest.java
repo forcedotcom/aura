@@ -20,11 +20,13 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
  * Unit tests for {@link TokensDef} {@link DefDescriptor}s.
  */
 public class TokensDefDescriptorTest extends UnitTestCase {
+    @Test
     public void testGetDefType() {
         DefDescriptor<TokensDef> testDescriptor = DefDescriptorImpl.getInstance("blah:blah", TokensDef.class);
         assertEquals(DefType.TOKENS, testDescriptor.getDefType());

@@ -19,6 +19,7 @@ package org.auraframework.integration.test;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 
 @UnAdaptableTest("We don't run access check test across browsers")
@@ -47,6 +48,7 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
         assertEquals("null", actual);
     }
 
+    @Test
     public void testGetComponentDefinitionWithoutAccess() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("clientApiTest");
         open("/clientApiTest/getDefinition.cmp");

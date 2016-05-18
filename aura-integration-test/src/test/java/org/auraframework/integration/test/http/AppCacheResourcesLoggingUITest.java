@@ -337,8 +337,8 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      * TODO(W-2955424) : un-comment the last 4 lines, and update what we should be expecting.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
-    @Test
     @ThreadHostileTest("depends on cache state")
+    @Test
     public void testComponentMarkupChange() throws Exception {
         AppDescription app = new AppDescription();
         List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
@@ -363,8 +363,8 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      * Persistent storage (IndexedDB) is disabled in Safari so only run in Chrome.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME })
-    @Test
     @ThreadHostileTest("depends on cache state")
+    @Test
     public void testStoragesClearedOnAppcacheUpdate() throws Exception {
         AppDescription app = new AppDescription();
         // Override app we load in the test with a custom one that uses a template to setup persistent storage and an

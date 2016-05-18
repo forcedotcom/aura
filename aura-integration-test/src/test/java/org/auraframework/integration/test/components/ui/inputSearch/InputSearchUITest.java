@@ -17,6 +17,7 @@ package org.auraframework.integration.test.components.ui.inputSearch;
 
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -33,6 +34,7 @@ public class InputSearchUITest extends WebDriverTestCase {
     // W-1551076: Webdriver not firing search event in Safari, IPAD and IPHONE
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
             BrowserType.SAFARI })
+    @Test
     public void testSearch() throws Exception {
         String valueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.searched");
         String cmpValueExpression = getAuraUITestingUtil().prepareReturnStatement(getAuraUITestingUtil()
@@ -54,6 +56,7 @@ public class InputSearchUITest extends WebDriverTestCase {
     // W-1410946: "x" not displayed on IE7/IE8
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
             BrowserType.SAFARI, BrowserType.IE7, BrowserType.IE8 })
+    @Test
     public void testClearSelection() throws Exception {
         String valueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.searched");
         valueExpression = getAuraUITestingUtil().prepareReturnStatement(valueExpression);

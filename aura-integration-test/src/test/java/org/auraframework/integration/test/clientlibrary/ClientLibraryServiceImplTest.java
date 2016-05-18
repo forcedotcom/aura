@@ -39,6 +39,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Unit tests for {@link ClientLibraryServiceImpl}. Coverage should include {@link ClientLibraryResolverRegistryImpl},
@@ -79,11 +80,13 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
      * Verify the ClientLibraryService used by Aura Standalone. It is important that ClientLibraryServiceImpl is used
      * for aura standalone.
      */
+    @Test
     public void testClientLibraryService() {
         ClientLibraryService cls = Aura.getClientLibraryService();
         assertTrue(cls instanceof ClientLibraryServiceImpl);
     }
 
+    @Test
     public void testContextPath() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<ApplicationDef> appDesc = definitionService
@@ -107,6 +110,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetUrlsWithNullArgument() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
@@ -115,6 +119,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
     }
 
     @UnAdaptableTest
+    @Test
     public void testGetUrlsChangesWithMode() throws Exception {
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PTEST, Format.JSON, Authentication.AUTHENTICATED);
@@ -128,6 +133,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
 
     // Should we do this with a simple string source?
     @Ignore("TODO: W-2970512 Need more libraries to test this")
+    @Test
     public void testCaseSensitiveName() throws Exception {
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.STATS, Format.JSON, Authentication.AUTHENTICATED);
@@ -138,6 +144,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertFalse(res.isEmpty());
     }
 
+    @Test
     public void testDifferentModes() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
@@ -172,6 +179,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertTrue("Missing library for JSTEST mode", jsUrls.contains(url));
     }
 
+    @Test
     public void testGetUrlsForAppWithDependencies() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
@@ -182,6 +190,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
     }
 
     @Ignore("TODO: W-2970512 Need test only injection of random1 & random2")
+    @Test
     public void testGetUrlsForAppWithDependenciesInPTESTMode() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
@@ -209,6 +218,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
      * Verify ClientLibraryService doesn't process ClientLibraryDef whose name contain separated library names.
      * Each library name has to have its own aura:clientLibrary tag.
      */
+    @Test
     public void testCommaSeparatedStringInNameWillNotResolve() throws Exception {
         ClientLibraryService tmpService = new ClientLibraryServiceImpl();
         ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("MyLib, MyLib2", ClientLibraryDef.Type.JS,

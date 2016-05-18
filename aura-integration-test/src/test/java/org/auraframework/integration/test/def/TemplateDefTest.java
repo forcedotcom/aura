@@ -16,6 +16,7 @@
 package org.auraframework.integration.test.def;
 
 import java.util.regex.Pattern;
+
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -24,6 +25,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 /**
  * Unit tests for templates. Components can be marked as template using the "isTemplate" attribute. Applications cannot
@@ -35,6 +37,7 @@ public class TemplateDefTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testDefaultTemplate() throws Exception {
         assertTemplate(ComponentDef.class, String.format(baseComponentTag, "", ""), null,
                 "Expected aura:template to be default template for components");
@@ -53,6 +56,7 @@ public class TemplateDefTest extends AuraImplTestCase {
         assertEquals(msg, expectedTemplate, def.getTemplateDef().getDescriptor());
     }
 
+    @Test
     public void testCustomTemplate() throws Exception {
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "isTemplate='true'", ""));
@@ -69,6 +73,7 @@ public class TemplateDefTest extends AuraImplTestCase {
                 template, "Failed to register a custom template for an application");
     }
 
+    @Test
     public void testIsTemplateAttribute() throws Exception {
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
@@ -92,6 +97,7 @@ public class TemplateDefTest extends AuraImplTestCase {
         assertEquals(msg, isTemplate, definitionService.getDefinition(desc).isTemplate());
     }
 
+    @Test
     public void testApplicationIsNotATemplate() {
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "isTemplate='true'", ""));
@@ -106,6 +112,7 @@ public class TemplateDefTest extends AuraImplTestCase {
     /**
      * Verify that a component marked as template can also be instantiated stand alone.
      */
+    @Test
     public void testInstantiatingTemplateComponent() {
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "isTemplate='true'", ""));
@@ -119,6 +126,7 @@ public class TemplateDefTest extends AuraImplTestCase {
     /**
      * Verify that only components marked as 'isTemplate=true' can be used as templates.
      */
+    @Test
     public void testIsTemplateAttributeRequired() {
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "isTemplate='true'", ""));
@@ -150,6 +158,7 @@ public class TemplateDefTest extends AuraImplTestCase {
     /**
      * A template cannot be abstract because if it is, it cannot be instantiated directly and that is not good.
      */
+    @Test
     public void testTemplateCannotBeAbstract() {
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "isTemplate='true' abstract='true'", ""));
@@ -170,6 +179,7 @@ public class TemplateDefTest extends AuraImplTestCase {
     /**
      * isTemplate attribute is not inherited by children.
      */
+    @Test
     public void testTemplateExtension() throws Exception {
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "isTemplate='true' extensible='true'", ""));
@@ -194,6 +204,7 @@ public class TemplateDefTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testValidScriptTags() throws Exception {
         // Script tags inline in a template markup
         String scriptInclude = "<script type='text/javascript' src='/aura/ckeditor/ckeditor.js'></script>";
@@ -224,6 +235,7 @@ public class TemplateDefTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testInvalidScriptTags() throws Exception {
         // Script tags inline in a component markup
         String scriptInclude = "<script type='text/javascript' src='/aura/ckeditor/ckeditor.js'></script>";
@@ -245,6 +257,7 @@ public class TemplateDefTest extends AuraImplTestCase {
     }
 
     // Automation for W-1584537
+    @Test
     public void testExtraTagsCanAccessModel() throws Exception {
         String extraScriptTags = "<aura:set attribute='extraScriptTags'><script type='text/javascript' src='{!m.firstThing}'/></aura:set>";
         String extraStyleTags = "<aura:set attribute='extraStyleTags'><script type='text/javascript' src='{!m.readOnlyThing}'/></aura:set>";
@@ -291,6 +304,7 @@ public class TemplateDefTest extends AuraImplTestCase {
     /**
      * Verify the new errorTitle attribute, with default error message.
      */
+    @Test
     public void testDefaultErrorTitleAttributeInTemplate() throws Exception {    	       
         DefDescriptor<ComponentDef> errorTitleIntemplate = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -311,6 +325,7 @@ public class TemplateDefTest extends AuraImplTestCase {
     /**
      * Verify the new errorTitle attribute, when error message is provided in template.
      */
+    @Test
     public void testCustomErrorTitleAttributeInTemplate() throws Exception {
     	String errorTitle = "<aura:set attribute='errorTitle' value='Looks like theres a problem.'></aura:set>";        
         DefDescriptor<ComponentDef> errorTitleIntemplate = addSourceAutoCleanup(

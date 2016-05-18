@@ -32,6 +32,7 @@ import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.validation.ValidationError;
 import org.auraframework.util.validation.ValidationTestUtil;
+import org.junit.Test;
 
 import com.google.common.base.Charsets;
 
@@ -59,6 +60,7 @@ public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
         }
     }
 
+    @Test
     public void testServlet() throws Exception {
         String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/validationTest/basic";
         assertTrue(path, new File(path).exists());
@@ -79,6 +81,7 @@ public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
     /**
      * Same as testServlet(), but only uses JDK classes
      */
+    @Test
     public void testServletStandalone() throws Exception {
         String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/validationTest/basic";
         assertTrue(path, new File(path).exists());

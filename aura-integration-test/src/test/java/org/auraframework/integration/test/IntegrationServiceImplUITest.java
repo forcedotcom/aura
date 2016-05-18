@@ -34,6 +34,7 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -84,6 +85,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      */
     // Click is unsupported in these touch based platforms
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE})
+    @Test
     public void testSimpleComponentWithModelAndController() throws Exception {
         verifySimpleComponentWithModelControllerHelperandProvider(defaultStubCmp);
     }
@@ -93,6 +95,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Controller. (ASYNC)
      */
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE})
+    @Test
     public void testSimpleComponentWithModelAndControllerAsync() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
             ComponentDef.class,
@@ -242,10 +245,12 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         return cmpDesc;
     }
 
+    @Test
     public void testSimpleComponentWithExtension() throws Exception {
         verifySimpleComponentWithExtension(defaultStubCmp);
     }
 
+    @Test
     public void testSimpleComponentWithExtensionAsync() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
             ComponentDef.class,
@@ -302,6 +307,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * https://code.google.com/p/chromedriver/issues/detail?id=887
      */
     @ExcludeBrowsers(BrowserType.GOOGLECHROME)
+    @Test
     public void testAttributesInitialization() throws Exception {
         verifyAttributesInitialization(defaultStubCmp);
     }
@@ -313,6 +319,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * https://code.google.com/p/chromedriver/issues/detail?id=887
      */
     @ExcludeBrowsers(BrowserType.GOOGLECHROME)
+    @Test
     public void testAttributesInitializationAsync() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -382,6 +389,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * (ASYNC) Click is unsupported in these touch based platforms
      */
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
     public void testExtendedAppWithRegisteredEventsAsync() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -397,6 +405,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      */
     // Click is unsupported in these touch based platforms
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
     public void testComponentWithRegisteredEvents() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -412,6 +421,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * (ASYNC)
      */
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
     public void testComponentWithRegisteredEventsAsync() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -510,6 +520,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * @throws Exception
      */
     @Ignore("W-1498384")
+    @Test
     public void testComponentArrayAsAttribute() throws Exception {
         String attributeMarkup = "<aura:attribute name='cmps' type='Aura.Component[]'/>{!v.cmps}";
         String attributeWithDefaultsMarkup = "<aura:attribute name='cmpsDefault' type='Aura.Component[]'>"
@@ -549,6 +560,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     /**
      * Verify the behavior of injectComponent when the placeholder specified is missing.
      */
+    @Test
     public void testMissingPlaceholder() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -562,6 +574,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     /**
      * Verify the behavior of injectComponent when the placeholder specified is missing. (ASYNC)
      */
+    @Test
     public void testMissingPlaceholderAsync() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -591,6 +604,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     /**
      * Verify that specifying localId(aura:id) for an injected component is allowed.
      */
+    @Test
     public void testMissingLocalId() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -605,6 +619,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     /**
      * Verify that specifying localId(aura:id) for an injected component is allowed. (ASYNC)
      */
+    @Test
     public void testMissingLocalIdAsync() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -631,6 +646,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     /**
      * Verify that exceptions that happen during component instance creation are surfaced on the page.
      */
+    @Test
     public void testExceptionDuringComponentInitialization() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -644,6 +660,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     /**
      * Verify that exceptions that happen during component instance creation are surfaced on the page. (ASYNC)
      */
+    @Test
     public void testExceptionDuringComponentInitializationAsync() throws Exception {
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -672,6 +689,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Verify that using multiple integration objects on page does not duplicate Aura Framework injection.
      */
     @Ignore("W-1498404")
+    @Test
     public void testMultipleIntegrationObjectsOnSamePage() throws Exception {
         DefDescriptor<ComponentDef> cmpToInject = setupSimpleComponentWithModelControllerHelperAndProvider();
         Map<String, Object> attributes = Maps.newHashMap();
@@ -704,6 +722,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     @Ignore("W-1498404 - Based on the fix, this test case should be implemented")
+    @Test
     public void testMultipleIntegrationObjectsOnSamePageWithDifferentModes() throws Exception {
 
     }
@@ -716,6 +735,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      */
     // History Service is not supported in IE7 or IE8
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8 })
+    @Test
     public void testHistoryServiceAPIs() throws Exception {
         String expectedTxt = "";
         openIntegrationStub(

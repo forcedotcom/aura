@@ -33,6 +33,7 @@ import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 /**
  * Automation to verify the functioning of AuraResourceServlet. AuraResourceServlet is used to preload definitions of
@@ -51,6 +52,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      * @throws Exception
      */
     @AuraTestLabels("auraSanity")
+    @Test
     public void testCSSOrdering_AcrossFacets() throws Exception {
         String modeAndContext = getAuraTestingUtil().getContextURL(Mode.DEV, Format.CSS,
                 "auratest:test_css_a", ComponentDef.class, false);
@@ -75,6 +77,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     }
 
     @AuraTestLabels("auraSanity")
+    @Test
     public void testCSSOrdering_AcrossInheritance() throws Exception {
         String modeAndContext = getAuraTestingUtil().getContextURL(Mode.DEV, Format.CSS, "auratest:test_css_child",
                 ComponentDef.class, false);
@@ -103,6 +106,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      * @throws Exception
      */
     @UnAdaptableTest
+    @Test
     public void testSpecialCharactersInCSSAreSerialized() throws Exception {
         String modeAndContext = getSimpleContext(Format.CSS, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
@@ -129,6 +133,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      * @throws Exception
      */
     @UnAdaptableTest
+    @Test
     public void testSpecialCharactersInMarkupAreSerialized() throws Exception {
         String modeAndContext = getSimpleContext(Format.JS, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.js";
@@ -153,6 +158,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      * GET with If-Modified-Since header from an hour ago, will return 304 if the UID is correct.
      */
     @AuraTestLabels("auraSanity")
+    @Test
     public void testGetWithIfModifiedSinceOld() throws Exception {
         String requestContext = getSimpleContext(Format.JS, false);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
@@ -177,6 +183,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      * GET with If-Modified-Since header from an hour ago, will return 304 if the UID is correct.
      */
     @AuraTestLabels("auraSanity")
+    @Test
     public void testGetWithIfModifiedSinceOldModified() throws Exception {
         String requestContext = getSimpleContext(Format.JS, true);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
@@ -201,6 +208,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      * GET with If-Modified-Since header 45 days from now, will return 304 with empty body.
      */
     @AuraTestLabels("auraSanity")
+    @Test
     public void testGetWithIfModifiedSinceNew() throws Exception {
         String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/app.js";
         Calendar stamp = Calendar.getInstance();
@@ -223,6 +231,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      * GET without If-Modified-Since header from an hour ago, will return the expected resource.
      */
     @AuraTestLabels("auraSanity")
+    @Test
     public void testGetWithoutIfModifiedSince() throws Exception {
         String requestContext = getSimpleContext(Format.JS, false);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
@@ -241,6 +250,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      * Verify that an svg resource can be retrieved and will return the expected source for components with svg
      * definitions. Also verify that no source is returned in the case that the svg definition does not exist.
      */
+    @Test
     public void testGetSvgResource() throws Exception {
         String requestContext = getSimpleContext(Format.SVG, false);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/test:fakeComponent/resources.svg";
@@ -268,6 +278,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         assertTrue("SVG source should not have been returned.", response.isEmpty());
     }
 
+    @Test
     public void testInlineJSNoCacheHeaders() throws Exception {
         String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/inline.js";
 

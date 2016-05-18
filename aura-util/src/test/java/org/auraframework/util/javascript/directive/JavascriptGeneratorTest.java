@@ -16,6 +16,7 @@
 package org.auraframework.util.javascript.directive;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 /**
  */
@@ -25,6 +26,7 @@ public class JavascriptGeneratorTest extends UnitTestCase {
         super(name);
     }
 
+    @Test
     public void testGeneration() throws Exception {
         TestGroup g = new TestGroup(getResourceFile("/testdata/directive/testGeneration.js"));
         g.parse();

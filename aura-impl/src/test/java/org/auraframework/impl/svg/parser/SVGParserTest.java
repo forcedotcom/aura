@@ -22,6 +22,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 
 public class SVGParserTest extends AuraImplTestCase {
@@ -167,12 +168,14 @@ public class SVGParserTest extends AuraImplTestCase {
         parser = SVGParser.getInstance();
     }
 
+    @Test
     public void testValidTags() throws QuickFixException {
         DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(VALID_SVG);
         Source<SVGDef> source = new StringSource<>(descriptor, VALID_SVG, "test", null);
         parser.parse(descriptor,source);
     }
 
+    @Test
     public void testInvalidTags() {
         try {
             DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(INVALID_SCRIPT);
@@ -185,6 +188,7 @@ public class SVGParserTest extends AuraImplTestCase {
         fail("SVG can not contain script tags");
     }
 
+    @Test
     public void testInvalidCharacters() {
         try {
             DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(INVALID_CHAR);
@@ -197,6 +201,7 @@ public class SVGParserTest extends AuraImplTestCase {
         fail("SVG can not contain characters, &, /, <, > ");
     }
 
+    @Test
     public void testInvalidXML() {
         try {
             DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(INVALID_XML);
@@ -209,6 +214,7 @@ public class SVGParserTest extends AuraImplTestCase {
         fail("SVG Should not be able to parse invalid xml");
     }
 
+    @Test
     public void testInvalidAttribute() {
         try {
 

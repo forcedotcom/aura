@@ -24,6 +24,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.IntegrationTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.junit.Test;
 
 /**
  * Tests for AuraServlet.
@@ -38,6 +39,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     /**
      * check manifest URL when context has no preloads.
      */
+    @Test
     public void testGetManifestWithoutPreloads() throws Exception {
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(
                 "appCache:nopreload", ApplicationDef.class);
@@ -52,6 +54,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
      * check manifest URL when context has preloads.
      */
     @ThreadHostileTest("preload sensitive")
+    @Test
     public void testGetManifestWithPreloads() throws Exception {
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(
                 "appCache:withpreload", ApplicationDef.class);

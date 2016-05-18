@@ -59,6 +59,7 @@ import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceType;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableMap;
@@ -90,6 +91,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * Components which are 'preloaded' will be serialized as the descriptor. This allows the client to determine that
      * the component should be present easily, and give a more reasonable error message if it is not.
      */
+    @Test
     public void testComponentDefSerializedFormat() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "preloadTest:dependenciesApp", ApplicationDef.class);
@@ -107,6 +109,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     /**
      * Verify we are able to check what DefDescriptors have been preloaded.
      */
+    @Test
     public void testIsPreloaded() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "preloadTest:dependenciesApp", ApplicationDef.class);
@@ -134,6 +137,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * Context app descriptor gets serialized.
      */
     @UnAdaptableTest
+    @Test
     public void testSerializeWithApp() throws Exception {
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor("arbitrary:appname",
                 ApplicationDef.class);
@@ -150,6 +154,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      *
      * Don't use a gold file here, the nonce changes often.
      */
+    @Test
     public void testSerializeNonceWithCmp() throws Exception {
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("arbitrary:cmpname",
                 ComponentDef.class);
@@ -167,6 +172,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * Context app descriptor gets serialized.
      */
     @UnAdaptableTest
+    @Test
     public void testSerializeWithCmp() throws Exception {
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("arbitrary:cmpname",
                 ComponentDef.class);
@@ -182,6 +188,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * App not serialized for context without descriptor.
      */
     @UnAdaptableTest
+    @Test
     public void testSerializeWithoutApp() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         ctx.setFrameworkUID("#FAKEUID#");
@@ -193,6 +200,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * Verify setting a Context's DefDescriptor.
      */
     @UnAdaptableTest
+    @Test
     public void testSetApplicationDescriptor() throws Exception {
         DefDescriptor<ApplicationDef> descApp1 = definitionService.getDefDescriptor("arbitrary:appnameApp1",
                 ApplicationDef.class);
@@ -224,6 +232,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testAttachingEvents() throws Exception {
         // Verify that nulls are filtered
         AuraContext lc = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
@@ -271,6 +280,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     /**
      * Expect a map that doesn't include dropped descriptors.
      */
+    @Test
     public void testGetLoaded() throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON,
                 Authentication.UNAUTHENTICATED);
@@ -298,6 +308,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     /**
      * Loaded map contains the loaded descriptor.
      */
+    @Test
     public void testSerializeWithLoaded() throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON,
                 Authentication.UNAUTHENTICATED);
@@ -311,6 +322,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         goldFileJson(res);
     }
 
+    @Test
     public void testSerializeWithUnPreLoadedEvent() throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON,
                 Authentication.UNAUTHENTICATED);
@@ -336,6 +348,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     /**
      * Loaded map contains deleted descriptors.
      */
+    @Test
     public void testSerializeWithDroppedLoaded() throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.JSON,
                 Authentication.UNAUTHENTICATED);
@@ -352,6 +365,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     /**
      * Verify that an app descriptor specified to startContext() is used to setup AuraContext.
      */
+    @Test
     public void testSettingAppDescriptorOnContext() {
         if (Aura.getContextService().isEstablished()) {
             Aura.getContextService().endContext();
@@ -366,6 +380,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     /**
      * Verify that an cmp descriptor specified to startContext() is used to setup AuraContext.
      */
+    @Test
     public void testSettingAComponentAsAppDescriptorOnContext() {
         if (Aura.getContextService().isEstablished()) {
             Aura.getContextService().endContext();
@@ -377,6 +392,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertEquals(cmpDesc, cntx.getApplicationDescriptor());
     }
 
+    @Test
     public void testStyleContext() throws Exception {
         DefDescriptor<TokensDef> t = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
         String src = String.format("<aura:application access='unauthenticated' tokens='%s'/>", t.getDescriptorName());
@@ -395,6 +411,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     /**
      * Verify contextPath property in JSON is set when contextPath present.
      */
+    @Test
     public void testSerializeWithContextPath() throws Exception {
         DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeTokensApp", ApplicationDef.class);
 
@@ -422,6 +439,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     }
 
     @UnAdaptableTest("Browser in context's GVP is different in OSS")
+    @Test
     public void testSerializeWithRegisteredGlobal() throws Exception {
         final String name = "someNewValue";
         registerGlobal(name, true, "some default value");
@@ -432,21 +450,25 @@ public class AuraContextImplTest extends AuraImplTestCase {
         goldFileJson(res);
     }
 
+    @Test
     public void testValidateGlobalRegistered() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         assertEquals(true, ctx.validateGlobal("isVoiceOver"));
     }
 
+    @Test
     public void testValidateGlobalUnregistered() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         assertEquals(false, ctx.validateGlobal("unknown"));
     }
 
+    @Test
     public void testValidateGlobalNull() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         assertEquals(false, ctx.validateGlobal(null));
     }
 
+    @Test
     public void testSetGlobalUnregistered() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         try {
@@ -458,6 +480,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testSetGlobalNullName() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         try {
@@ -469,6 +492,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testSetGlobal() throws Exception {
         final String name = getName();
         registerGlobal(name, true, "some default value");
@@ -478,6 +502,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertEquals(expected, ctx.getGlobal(name));
     }
 
+    @Test
     public void testSetGlobalNullValue() throws Exception {
         final String name = getName();
         registerGlobal(name, true, "some default value");
@@ -487,6 +512,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertEquals(expected, ctx.getGlobal(name));
     }
 
+    @Test
     public void testGetGlobalUnregistered() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         try {
@@ -498,6 +524,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetGlobalNull() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         try {
@@ -509,6 +536,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetGlobalDefault() throws Exception {
         final String name = getName();
         Object expected = new Object();
@@ -517,6 +545,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertEquals(expected, ctx.getGlobal(name));
     }
 
+    @Test
     public void testGetGlobalDefaultNull() throws Exception {
         final String name = getName();
         Object expected = null;
@@ -525,6 +554,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertEquals(expected, ctx.getGlobal(name));
     }
 
+    @Test
     public void testGetGlobalSetValue() throws Exception {
         final String name = getName();
         Object defaultValue = new Object();
@@ -535,6 +565,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertEquals(expected, ctx.getGlobal(name));
     }
 
+    @Test
     public void testGetGlobalSetNull() throws Exception {
         final String name = getName();
         Object defaultValue = new Object();
@@ -545,6 +576,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertEquals(expected, ctx.getGlobal(name));
     }
 
+    @Test
     public void testGetGlobals() throws Exception {
         String name1 = getName() + "first";
         String name2 = getName() + "second";
@@ -562,6 +594,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertEquals("unexpected second value", setValue, globals.get(name2).getValue());
     }
 
+    @Test
     public void testGetAccessVersion() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
         String descr = "java://org.auraframework.components.test.java.controller.VersionTestController/ACTION$getContextAccessVersion";
@@ -654,6 +687,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     /**
      * GVP with refSupport should serialize reference IDs of data that supports references.
      */
+    @Test
     public void testSerializeGlobalValueProviderWithRefSupport() throws Exception {
         TestValueProvider provider = new TestValueProvider();
         provider.prefix = "$REFS";
@@ -677,6 +711,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     /**
      * GVP without refSupport should serialize data, that supports references, as-is (without reference IDs).
      */
+    @Test
     public void testSerializeGlobalValueProviderWithoutRefSupport() throws Exception {
         TestValueProvider provider = new TestValueProvider();
         provider.prefix = "$NONE";
@@ -700,6 +735,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     /**
      * GVP with refSupport should handle data without references.
      */
+    @Test
     public void testSerializeGlobalValueProviderWithRefSupportWithoutAReference() throws Exception {
         TestValueProvider provider = new TestValueProvider();
         provider.prefix = "$REFS";
@@ -724,6 +760,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * GVPs with mixed refSupport should handle respective data with and without references. Note: ordering of
      * serialized providers is not guaranteed, but should be consistent.
      */
+    @Test
     public void testSerializeGlobalValueProvidersWithMixedRefSupport() throws Exception {
         TestValueProvider provider1 = new TestValueProvider();
         provider1.prefix = "$REFS1";

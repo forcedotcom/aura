@@ -24,6 +24,7 @@ import java.io.Writer;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.text.Hash;
+import org.junit.Test;
 
 /**
  * Tests for CommonJavascriptGroupImpl class {@link CommonJavascriptGroupImpl}. This class has implementation of some
@@ -40,6 +41,7 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testBasicInitialization() throws Exception {
         getResourceFile("/testdata/javascript/head.js");
         getResourceFile("/testdata/javascript/JSfilterValidation.junk.js");
@@ -120,6 +122,7 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
      * value should only depend on the file content which is defined in the test and shouldn't depend on file names or
      * other external factors.
      */
+    @Test
     public void testGetGroupHash() throws Exception {
         File newFile = getResourceFile("/testdata/javascript/testGetGroupHash.js");
         newFile.getParentFile().mkdirs();

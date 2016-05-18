@@ -23,6 +23,7 @@ import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.openqa.selenium.By;
 
 /**
@@ -68,6 +69,7 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
     /**
      * Test loading component using /perfTest/perf.app
      */
+    @Test
     public void testButton() throws Exception {
         runWithPerfApp(definitionService.getDefDescriptor("ui:button", ComponentDef.class));
     }
@@ -93,6 +95,7 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
 
     // ui:label: perf.app was not showing the label in the page
 
+    @Test
     public void testLabel() throws Exception {
         runWithPerfApp(definitionService.getDefDescriptor("ui:label", ComponentDef.class));
     }
@@ -111,6 +114,7 @@ public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
 
     // perfTest:dummyPerf
 
+    @Test
     public void testDummyPerf() throws Exception {
         runWithPerfApp(definitionService.getDefDescriptor("perfTest:dummyPerf", ComponentDef.class));
     }

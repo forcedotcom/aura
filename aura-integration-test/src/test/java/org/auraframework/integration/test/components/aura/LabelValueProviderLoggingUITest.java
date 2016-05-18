@@ -20,6 +20,7 @@ import java.util.List;
 import org.apache.log4j.spi.LoggingEvent;
 import org.auraframework.integration.test.logging.AbstractLoggingUITest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 
 /**
@@ -39,6 +40,7 @@ public class LabelValueProviderLoggingUITest extends AbstractLoggingUITest {
     /**
      * Test we have one java call for each valid label request.
      */
+    @Test
     public void testEfficientActionRequests() throws Exception {
         open(URL);
         getAuraUITestingUtil().waitForElementText(label1, "simplevalue1: Today", true);

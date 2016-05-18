@@ -22,6 +22,7 @@ import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignLayoutItemDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -39,6 +40,7 @@ public class DesignLayoutComponentDefHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testLayoutComponentWithInvalidComponent() throws Exception {
         try {
             setupDesignLayoutComponentDef(String.format(COMPONENT, "NotAComponent"));
@@ -48,6 +50,7 @@ public class DesignLayoutComponentDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testLayoutComponent() throws Exception {
         Set<DesignLayoutItemDef> items = setupDesignLayoutComponentDef(String.format(COMPONENT, VALID_COMPONENT));
         assertTrue("Design component was not discovered", items.size() == 1);
@@ -57,6 +60,7 @@ public class DesignLayoutComponentDefHandlerTest extends AuraImplTestCase {
 
     }
 
+    @Test
     public void testLayoutComponentOrder() throws Exception {
         StringBuilder items = new StringBuilder();
         items.append(String.format(COMPONENT, VALID_COMPONENT));

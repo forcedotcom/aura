@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.auraframework.impl.AuraImplTestCase;
+import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -31,10 +32,12 @@ public class AuraUtilTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testAuraUtil() {
         new AuraUtil();
     }
 
+    @Test
     public void testImmutableSet() {
         Set<String> set = new HashSet<>();
         set.add("fee");
@@ -51,6 +54,7 @@ public class AuraUtilTest extends AuraImplTestCase {
         assertNotNull(AuraUtil.immutableSet(null));
     }
 
+    @Test
     public void testImmutableList() {
         List<String> list = new ArrayList<>();
         list.add("fee");

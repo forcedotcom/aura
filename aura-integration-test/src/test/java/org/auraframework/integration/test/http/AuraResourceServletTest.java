@@ -46,6 +46,7 @@ import org.auraframework.test.util.DummyHttpServletRequest;
 import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
+import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
@@ -76,6 +77,7 @@ public class AuraResourceServletTest extends AuraTestCase {
      * verify we response SC_NOT_FOUND when getting app.manifest where manifest is not enabled
      * @throws Exception
      */
+    @Test
     public void testWriteManifestException() throws Exception {
         // Start a context to fetch manifests; the other details don't matter
         // much 'cause we'll error out. Then try to fetch one, with that error:
@@ -111,6 +113,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
     }
 
+    @Test
     public void testAddAppManifestCookie() throws Exception {
         Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
                 AuraContext.Authentication.UNAUTHENTICATED);
@@ -198,6 +201,7 @@ public class AuraResourceServletTest extends AuraTestCase {
     }
 
     @UnAdaptableTest("W-2931019 enable this once 3Tier change is in")
+    @Test
     public void testRequestFromDifferentBrowserOnSamePage() throws Exception {
         runTestRequestFromDifferentBrowserOnSamePage(UserAgent.IE9.getUserAgentString(), Type.IE9, "");
         // ui:button has special session for IE7 in button.css under @if (IE7){...}
@@ -211,6 +215,7 @@ public class AuraResourceServletTest extends AuraTestCase {
      * story: W-1450222
      */
     @UnAdaptableTest("W-2931019 enable this once 3Tier change is in")
+    @Test
     public void testCssCacheClearedOnSourceChange() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload", ApplicationDef.class);
         AuraContext context = Aura.getContextService()
@@ -251,6 +256,7 @@ public class AuraResourceServletTest extends AuraTestCase {
      * FIXME: this test should not be here.... it should be on MDR.
      */
     @UnAdaptableTest("W-2929438")
+    @Test
     public void testJsCacheClearedOnSourceChange() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload", ApplicationDef.class);
         AuraContext context = Aura.getContextService()
@@ -288,6 +294,7 @@ public class AuraResourceServletTest extends AuraTestCase {
      * Verify cache of SVG definitions is cleared on source change in DEV mode.
      */
     @UnAdaptableTest("W-2929438")
+    @Test
     public void testSvgCacheClearedOnSourceChange() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload", ApplicationDef.class);
         AuraContext context = Aura.getContextService()
@@ -324,6 +331,7 @@ public class AuraResourceServletTest extends AuraTestCase {
     /**
      * Verify SVG requests return a correct etag.
      */
+    @Test
     public void testSvgCacheUsesEtag() throws Exception {
         DefDescriptor<ApplicationDef> appDesc =
                 definitionService.getDefDescriptor("markup://appCache:withpreload", ApplicationDef.class);
@@ -362,6 +370,7 @@ public class AuraResourceServletTest extends AuraTestCase {
     /**
      * Verify SVG servlet returns 304 if etag's match.
      */
+    @Test
     public void testSvgReturns304() throws Exception {
         DefDescriptor<ApplicationDef> appDesc =
                 definitionService.getDefDescriptor("markup://appCache:withpreload", ApplicationDef.class);
@@ -392,6 +401,7 @@ public class AuraResourceServletTest extends AuraTestCase {
      * Verify SVG servlet returns Content-Disposition = attachment; filename=resources.svg if referer header is null
      * This is to prevent any scripts hidden in the SVG from running on the local domain
      */
+    @Test
     public void testSvgNoReferer() throws Exception {
         DefDescriptor<ApplicationDef> appDesc =
                 definitionService.getDefDescriptor("markup://appCache:withpreload", ApplicationDef.class);
@@ -420,6 +430,7 @@ public class AuraResourceServletTest extends AuraTestCase {
      * Verify that context path is prepended on all Aura urls in appcache manifest
      */
     @UnAdaptableTest("W-2929438")
+    @Test
     public void testManifestContentWithContextPath() throws Exception {
         if (Aura.getContextService().isEstablished()) {
             Aura.getContextService().endContext();
@@ -455,6 +466,7 @@ public class AuraResourceServletTest extends AuraTestCase {
      * Verify framework UID exists in auraFW javascript urls in appcache manifest
      */
     @UnAdaptableTest("W-2929438")
+    @Test
     public void testManifestFwJsUrlContainsFWId() throws Exception {
         // Arrange
         if (Aura.getContextService().isEstablished()) {

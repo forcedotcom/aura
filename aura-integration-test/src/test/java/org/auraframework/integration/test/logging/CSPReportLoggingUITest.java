@@ -33,6 +33,7 @@ import org.auraframework.impl.test.util.LoggingTestAppender;
 import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -45,6 +46,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
         super(name, "LoggingContextImpl");
     }
 
+    @Test
     public void testReportCSPViolationForClientRenderedCSS() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -65,6 +67,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
         assertThat("Could not find expected violated directive", cspReport, containsString(exptectedViolatedDirective));
     }
 
+    @Test
     public void testReportCSPViolationForServerRenderedCSS() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "render='server'",
@@ -87,6 +90,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
     }
 
     @UnAdaptableTest("The CSP filter on SFDC handles iframes differently than standalone Aura")
+    @Test
     public void testReportCSPViolationForClientRenderedIframe() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -108,6 +112,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
     }
 
     @UnAdaptableTest("The CSP filter on SFDC handles iframes differently than standalone Aura")
+    @Test
     public void testReportServerRenderedIframe() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -133,6 +138,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
      * have been received before it.
      */
     @UnAdaptableTest("The font policy on Aura OSS is different with on SFDC")
+    @Test
     public void testAllowFontSrc() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
@@ -162,6 +168,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
 
     // TODO(W-2903378): re-enable when we are able to inject TestLoggingAdapter.
     @UnAdaptableTest
+    @Test
     public void testReportJavaScript() throws Exception {
         // This test loads script via its template, since <script> is not allowed in component markup
         DefDescriptor<ComponentDef> templateDesc = addSourceAutoCleanup(
@@ -197,6 +204,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
      * a report should be generated when an XHR is sent to invalid origin.
      */
     @UnAdaptableTest
+    @Test
     public void testReportXHRConnect() throws Exception {
         String externalUri = "http://www.example.com";
         String externalUriString = String.format("'%s'",externalUri);
@@ -245,6 +253,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
      * Automation for the connect-src CSP policy.
      * http://invalid.salesforce.com is white-listed, getting it via XHR shouldn't give us CSP error
      */
+    @Test
     public void testReportXHRConnectWhitelistedUrl() throws Exception {
         String urlString = "\"http://invalid.salesforce.com\"";
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(

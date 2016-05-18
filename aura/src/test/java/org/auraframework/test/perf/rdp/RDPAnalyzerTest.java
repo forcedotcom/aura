@@ -35,6 +35,7 @@ import org.json.JSONObject;
 import com.google.common.collect.Lists;
 
 import org.junit.Ignore;
+import org.junit.Test;
 
 //Roman TODO: remove @UnAdaptableTest once we also use SauceLabs for perf tests in autobuild
 @UnAdaptableTest
@@ -65,6 +66,7 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
         return 0; // run only the first warmup run
     }
 
+    @Test
     public void testProtocol() throws Exception {
         // run WebDriver test
         openTotallyRaw("/ui/label.cmp?label=foo");
@@ -115,6 +117,7 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
     /**
      * Checks the timeline has the marks we are adding
      */
+    @Test
     public void testTimelineMarks() throws Exception {
         runWithPerfApp(definitionService.getDefDescriptor("ui:button", ComponentDef.class));
 
@@ -143,6 +146,7 @@ public final class RDPAnalyzerTest extends AbstractPerfTestCase {
                 marks.toString());
     }
 
+    @Test
     public void testGetDevToolsLog() throws Exception {
         PerfMetricsCollector metricsCollector = new PerfMetricsCollector(this, PerfRunMode.TIMELINE);
         metricsCollector.startCollecting();

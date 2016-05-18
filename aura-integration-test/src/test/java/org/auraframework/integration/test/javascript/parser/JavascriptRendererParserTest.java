@@ -26,6 +26,7 @@ import org.auraframework.impl.javascript.parser.JavascriptRendererParser;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
+import org.junit.Test;
 
 public class JavascriptRendererParserTest extends AuraImplTestCase {
     public JavascriptRendererParserTest(String name) {
@@ -35,6 +36,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
     /**
      * Verify JavascriptRendererParser can parse normal JavaScript Renderer.
      */
+    @Test
     public void testParseNormalJSRenderer() throws Exception {
         String rendererJs =
                 "({\n" +
@@ -52,6 +54,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
         rendererDef.validateDefinition();
     }
 
+    @Test
     public void testParseJSRendererWithComments() throws Exception {
         String rendererJs =
                 "({\n" +
@@ -75,6 +78,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
     /**
      * Verify when there are duplicate render functions, only keep the one.
      */
+    @Test
     public void testParseJSRendererWithDuplicateFunction() throws Exception {
         String rendererJs =
                 "({\n" +
@@ -93,6 +97,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
         assertEquals("The latest function should survive.", "{\n    \"render\":function(cmp) {var v = 2;}\n  }", code);
     }
 
+    @Test
     public void testParseJSRendererWithNonRendererFunctionElements() throws Exception {
         String rendererJs =
                 "({\n" +

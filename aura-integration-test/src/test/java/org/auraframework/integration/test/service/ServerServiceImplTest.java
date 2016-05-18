@@ -69,6 +69,7 @@ import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -312,6 +313,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testSharedCmp() throws Exception {
         Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         Map<String, Object> attributes = Maps.newHashMap();
@@ -387,6 +389,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      * to run all actions, store the result in Message, then write them into response at once, in the old way we won't
      * have anything in string writer/response until Action3 is finished.
      */
+    @Test
     public void testMultipleActions() throws Exception {
         Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         StringWriter sw = new StringWriter();
@@ -418,6 +421,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      * reuse the action. the second run will over-write the previous run's returnValue(unless we change the run()), but
      * response keep the info from previous run, so we are good
      */
+    @Test
     public void testSameActionTwice() throws Exception {
         Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         StringWriter sw = new StringWriter();
@@ -445,6 +449,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      *
      * We carefully test only the parts that we care about for ServerService.
      */
+    @Test
     public void testSimpleAction() throws Exception {
         Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
 
@@ -462,6 +467,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      *
      * We carefully test only the parts that we care about for ServerService.
      */
+    @Test
     public void testSimpleActionWithExtras() throws Exception {
         Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
 
@@ -484,6 +490,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      * added twice, once because they were part of preload namespace and a second time because of component dependency.
      * This test mocks such duplication. W-1588568
      */
+    @Test
     public void testWriteCssWithoutDupes() throws Exception {
         ServerService ss = Aura.getServerService();
         DefDescriptor<ApplicationDef> appDesc = definitionService
@@ -512,6 +519,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     /**
      * Verify that the css writer writes in the order given.
      */
+    @Test
     public void testCSSOrder() throws Exception {
         ServerService ss = Aura.getServerService();
         DefDescriptor<ApplicationDef> appDesc = definitionService
@@ -550,6 +558,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
                 css.indexOf(".setAttributesTestParent") < css.indexOf(".setAttributesTestAnotherChild"));
     }
 
+    @Test
     public void testPreloadCSSDependencies() throws Exception {
         ServerService ss = Aura.getServerService();
         DefDescriptor<ComponentDef> appDesc = definitionService
@@ -574,6 +583,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     /**
      * Sanity check to make sure that app.js doesn't blow up
      */
+    @Test
     public void testWriteDefinitionsWithoutDupes() throws Exception {
         ServerService ss = Aura.getServerService();
         DefDescriptor<ApplicationDef> appDesc = definitionService
@@ -603,6 +613,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testPreloadJSDependencies() throws Exception {
         ServerService ss = Aura.getServerService();
         DefDescriptor<ComponentDef> appDesc = definitionService
@@ -635,6 +646,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     /**
      * Tests aura definitions has no syntax errors and can be compressed
      */
+    @Test
     public void testNoAppJSCompressionErrors() throws Exception {
         // check js compression on main aura namespaces
         String[] namespaces = new String[] { "aura", "ui",
@@ -658,6 +670,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     /**
      * When we write out the application javascript we should only include component classes once per component.
      */
+    @Test
     public void testNoComponentClassDuplicate() throws Exception {
         Object componentClass = null;
         Boolean found = false;
@@ -698,6 +711,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      * exception.
      * Verify the original (real) IO exception is thrown from method run.
      */
+    @Test
     public void testThrowsOriginalIOExceptionFromRun() throws Exception {
         String exceptionMessage = "Test exception";
         Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
@@ -736,6 +750,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      * Unhandled exceptions such has InterruptedException should set response status to 500 for JS (and CSS)
      * so it doesn't cache in browser, appcache, etc
      */
+    @Test
     public void testHandleInterruptedException() throws Exception {
         PrintWriter writer = mock(PrintWriter.class);
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
@@ -773,6 +788,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      * we throw 'EmptyStackException' when getting InstanceStack, then verify
      * Aura.getExceptionAdapter().handleException(death) is called with it
      */
+    @Test
     public void testHandleExceptionDeathCaught() throws Exception {
         PrintWriter writer = mock(PrintWriter.class);
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
@@ -814,6 +830,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      * Aura.getExceptionAdapter().handleException(death) handle the exception,
      * we throw second exception, then verify we printout the error message to response's writer
      */
+    @Test
     public void testHandleExceptionDoubleDeathCaught() throws Exception {
         PrintWriter writer = mock(PrintWriter.class);
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);

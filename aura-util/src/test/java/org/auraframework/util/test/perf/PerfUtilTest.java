@@ -16,9 +16,11 @@
 package org.auraframework.util.test.perf;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 public final class PerfUtilTest extends UnitTestCase {
 
+    @Test
     public void testElapsedMicros() {
         assertEquals(872, PerfUtil.elapsedMicros("1.397600335105528E12", "1.397600335106401E12"));
     }

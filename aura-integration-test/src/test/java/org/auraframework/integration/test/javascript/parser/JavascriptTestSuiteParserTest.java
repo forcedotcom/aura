@@ -38,6 +38,7 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.ServiceLocator;
+import org.junit.Test;
 
 public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
 
@@ -48,6 +49,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
     /**
      * Test method for {@link JavascriptParser#parse(DefDescriptor, Source)}.
      */
+    @Test
     public void testParse() throws Exception {
         DefDescriptor<TestSuiteDef> descriptor = DefDescriptorImpl.getInstance(
                 "js://test.testJSTestSuite", TestSuiteDef.class);
@@ -68,6 +70,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
      * <li>Trying to create a Source for a Def type while no corresponding js file is present for the component</li>
      * </ul>
      */
+    @Test
     public void testNullCases() throws Exception {
         DefDescriptor<TestSuiteDef> descriptor = DefDescriptorImpl.getInstance(
                 "js://test.testNoJSControllers", TestSuiteDef.class);
@@ -108,6 +111,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
      * Test method for {@link JavascriptParser#parse(DefDescriptor, Source)}. The DefDescriptor in this case is
      * referring to a simple Component with a Javascript test {@link DefType#TESTSUITE}.
      */
+    @Test
     public void testJSTestSuite() throws Exception {
 
         DefDescriptor<TestSuiteDef> descriptor = DefDescriptorImpl.getInstance(
@@ -179,6 +183,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
      * no function assigned to them, this should cause an Exception
      */
 
+    @Test
     public void testJSTestSuiteWithoutAttributes() throws Exception {
         DefDescriptor<TestSuiteDef> descriptor = DefDescriptorImpl.getInstance(
                 "js://test.testJSTestSuiteWithoutAttributes",
@@ -233,6 +238,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
      * referring to a simple Component with a Javascript test suite {@link DefType#TESTSUITE}. One of the test cases has
      * no function assigned to them, this should cause an Exception
      */
+    @Test
     public void testJSTestSuiteWithoutTestFunc() throws Exception {
         assertInvalidTestCase("{testWithString:{test:'empty'}}",
                 "testWithString 'test' must be a function or an array of functions");

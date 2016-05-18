@@ -20,6 +20,7 @@ import org.auraframework.clientlibrary.ClientLibraryResolverRegistry;
 import org.auraframework.def.ClientLibraryDef.Type;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.clientlibrary.resolver.AuraResourceResolver;
+import org.junit.Test;
 
 public class ClientLibraryResolverRegistryImplTest extends AuraImplTestCase {
 
@@ -27,6 +28,7 @@ public class ClientLibraryResolverRegistryImplTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testRegister() {
         ClientLibraryResolverRegistry reg = ClientLibraryResolverRegistryImpl.INSTANCE;
         reg.register(null);
@@ -121,6 +123,7 @@ public class ClientLibraryResolverRegistryImplTest extends AuraImplTestCase {
 
     }
 
+    @Test
     public void testStandardAuraFrameworkLib() {
         assertResolvers("CkEditor", Type.JS, AuraResourceResolver.class);
     }

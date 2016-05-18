@@ -29,12 +29,14 @@ import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 public class FlavorIncludeDefHandlerTest extends StyleTestCase {
     public FlavorIncludeDefHandlerTest(String name) {
         super(name);
     }
 
+    @Test
     public void testReadsSourceAttribute() throws Exception {
         DefDescriptor<ComponentDef> cmp = addComponentDef();
         addStandardFlavor(cmp, ".THIS--test{}");
@@ -43,12 +45,14 @@ public class FlavorIncludeDefHandlerTest extends StyleTestCase {
         assertEquals("foo:flavors", def.getSource());
     }
 
+    @Test
     public void testDescription() throws Exception {
         addStandardFlavor(addComponentDef(), ".THIS--test{}");
         FlavorIncludeDef def = source("<aura:include source='foo:flavors' description='testdesc'/>");
         assertEquals("testdesc", def.getDescription());
     }
 
+    @Test
     public void testInvalidChild() throws Exception {
         try {
             source("<aura:include source='foo:flavors'><ui:button></aura:include>");
@@ -58,6 +62,7 @@ public class FlavorIncludeDefHandlerTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testWithTextBetweenTag() throws Exception {
         try {
             source("<aura:include source='foo:flavors'>blah</aura:include>");
@@ -67,6 +72,7 @@ public class FlavorIncludeDefHandlerTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testErrorsIfMissingSource() throws Exception {
         try {
             source("<aura:include/>");
@@ -76,6 +82,7 @@ public class FlavorIncludeDefHandlerTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testErrorsIfEmptySource() throws Exception {
         try {
             source("<aura:include source=''/>");

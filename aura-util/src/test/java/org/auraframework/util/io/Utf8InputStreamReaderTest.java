@@ -24,6 +24,7 @@ import java.util.Arrays;
 
 import org.auraframework.util.Utf8InputStreamReader;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 import com.google.common.base.Charsets;
 
@@ -36,6 +37,7 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
         super(name);
     }
 
+    @Test
     public void testLatinCharsOnly() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(10);
         final String testChars = "abc123_+/`";
@@ -64,6 +66,7 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
      * decode into UTF-16 surrogate pairs, using an InputStream that reads only
      * one byte at a time, just to exercise the inner bulk read in read()
      */
+    @Test
     public void testUTF8CharsUsingAnInputStreamThatReadsOneByteAtATime() throws Exception {
         testUTF8Chars(true);
     }
@@ -72,6 +75,7 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
      * Tests 1-byte, 2-byte, 3-byte, and 4-byte UTF-8 characters, some which
      * decode into UTF-16 surrogate pairs
      */
+    @Test
     public void testUTF8Chars() throws Exception {
         testUTF8Chars(false);
     }
@@ -133,6 +137,7 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testFiveAndSixByteUTF8Char() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(20);
         baos.write(0xfc); // 6-byte UTF-8 (maybe someday...)
@@ -163,6 +168,7 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testInvalidUTF8() throws Exception {
 
         // Try an invalid UTF-8 sequence. The problem here is on the third and
@@ -190,6 +196,7 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
      * byte sequence causes the current sequence to be skipped and the next
      * character read.
      */
+    @Test
     public void testMiddleOfUTF8ByteSequence() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(12);
         baos.write(0xBF); // middle of a UTF-8 sequence
@@ -213,6 +220,7 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testTooShortUTF8() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(3);
         baos.write(0xF0);
@@ -230,6 +238,7 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
      * in UTF-8, but they could be given to us by a customer's crazy software
      * anyway.
      */
+    @Test
     public void testBOMs() throws Exception {
 
         // Time to drop some BOMs
@@ -258,6 +267,7 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
      * get ignored. These codepoints are to exist only in UTF-16 bytes as per
      * the standard. CharsetDecoder conveniently skips these for us.
      */
+    @Test
     public void testUTF16SurrogatePairs() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(7);
         baos.write(0xED); // First high surrogate, expressed as UTF-8

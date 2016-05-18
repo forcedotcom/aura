@@ -19,6 +19,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.CheckAccessibility;
 import org.junit.Ignore;
+import org.junit.Test;
 
 @CheckAccessibility(false)
 public class ClientLibraryTagUITest extends WebDriverTestCase {
@@ -33,6 +34,7 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testNonCombinableResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app");
         waitForAuraFrameworkReady();
@@ -44,6 +46,7 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
      * Verify that resource change depending on Mode.
      */
     @Ignore("TODO W-2970512 missing resources to test - need to inject extra client libs")
+    @Test
     public void testModeDependentResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
 

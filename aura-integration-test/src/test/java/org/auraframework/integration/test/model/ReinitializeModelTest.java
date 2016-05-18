@@ -23,6 +23,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -162,10 +163,12 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testReinitializedModelSuperCmp() throws Exception {
         runTestReinitializedModelSuperCmp(false, "org.auraframework.components.test.java.model.TestReinitializeModel");
     }
 
+    @Test
     public void testReinitializedModelSuperCmpWithCount() throws Exception {
         runTestReinitializedModelSuperCmp(true, "org.auraframework.integration.test.model.TestReinitializeModelWithCount");
     }
@@ -238,10 +241,12 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testSameCmpSameModel() throws Exception {
         runTestSameCmpSameModel(false, "org.auraframework.components.test.java.model.TestReinitializeModel");
     }
 
+    @Test
     public void testSameCmpSameModelWithCount() throws Exception {
         runTestSameCmpSameModel(true, "org.auraframework.integration.test.model.TestReinitializeModelWithCount");
     }
@@ -298,10 +303,12 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testDiffCMPSameModel() throws Exception {
         runTestDiffCMPSameModel(false, "org.auraframework.components.test.java.model.TestReinitializeModel");
     }
 
+    @Test
     public void testDiffCMPSameModelWithCount() throws Exception {
         runTestDiffCMPSameModel(true, "org.auraframework.integration.test.model.TestReinitializeModelWithCount");
     }
@@ -365,10 +372,12 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testNestedCmp() throws Exception {
         runTestNestedCmp(false, "org.auraframework.components.test.java.model.TestReinitializeModel");
     }
 
+    @Test
     public void testNestedCmpCount() throws Exception {
         runTestNestedCmp(true, "org.auraframework.integration.test.model.TestReinitializeModelWithCount");
     }
@@ -426,10 +435,12 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testCmpAsAttribute() throws Exception {
         runTestCmpAsAttribute(false, "org.auraframework.components.test.java.model.TestReinitializeModel");
     }
 
+    @Test
     public void testCmpAsAttributeCount() throws Exception {
         runTestCmpAsAttribute(true, "org.auraframework.integration.test.model.TestReinitializeModelWithCount");
     }
@@ -439,6 +450,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
      * reinitializeModel on main component should rebuild model for the provided component. ParentCMP(test_Model_Parent)
      * set m.valueParent with v.attrInParent
      */
+    @Test
     public void testCmpWithJavaProvider() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("whatToDo", "provideTestModelParentCmp");
@@ -482,6 +494,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
      * A component with aura:if and a model, m.value is set by v.attr we output v.attr and m.value inside aura:if. this
      * test change v.attr to see if m.value get updated
      */
+    @Test
     public void testReinitializedModelIf() throws Exception {
         String source = "<aura:if isTrue=\"true\">value from attr:{!v.attr},value from model:{!m.value}</aura:if>";
         Map<String, Object> attributes = Maps.newHashMap();
@@ -505,6 +518,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
      * set by inner cmp's v.attr, Inner cmp's v.attr is set by outer cmp's v.attr_out this test change attr_out, see if
      * inner cmp's module.value get update
      */
+    @Test
     public void testReinitializedModelIfInnerCMP() throws Exception {
         String sourceInnerCMP = "<aura:if isTrue=\"true\"><ifTest:testIfWithModel attr=\"{!v.attr_out}\"/></aura:if>";
         Map<String, Object> attributes = Maps.newHashMap();

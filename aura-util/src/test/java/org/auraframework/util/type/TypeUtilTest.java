@@ -17,6 +17,7 @@ package org.auraframework.util.type;
 
 import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.type.TypeUtil.ConversionException;
+import org.junit.Test;
 
 /**
  * Verify implementation of TypeUtil used to convert data from a given type to
@@ -30,6 +31,7 @@ public class TypeUtilTest extends UnitTestCase {
     /**
      * Verify conversion of String to Custom data type using custom converters.
      */
+    @Test
     public void testRegisteringTypeConverter() {
 
         // 1. Convert from String to a custom type
@@ -62,6 +64,7 @@ public class TypeUtilTest extends UnitTestCase {
     /**
      * Verify conversion of custom converters that handle multiple output types.
      */
+    @Test
     public void testRegisteringMulticonverters() {
 
         // 1. Try to convert from String to subclasses of CustomAbstractType.
@@ -87,6 +90,7 @@ public class TypeUtilTest extends UnitTestCase {
      * we use the last converter to be encountered while going through classes
      * in classpath.
      */
+    @Test
     public void testRegisteringDuplicateTypeConverters() {
         assertTrue("Failed to register custom converter",
                 TypeUtil.hasConverter(String.class, CustomDupType.class, null));
@@ -101,6 +105,7 @@ public class TypeUtilTest extends UnitTestCase {
     /**
      * Verify that value of assignable types don't need a special converter.
      */
+    @Test
     public void testImplicitConversionThroughInheritance() {
         // 1. Upcasting value object
         CustomChildType obj = new CustomChildType();
@@ -129,10 +134,12 @@ public class TypeUtilTest extends UnitTestCase {
      * Verify that TypeUtil doesn't barf because of bad converters. Enable
      * converter registration in TestTypeConvertersConfig.java
      */
+    @Test
     public void testHandlingNulls() {
         assertFalse(TypeUtil.hasConverter(CustomPairType.class, String.class, null));
     }
 
+    @Test
     public void testParameterizedConverter() {
         assertTrue("Failed to locate parameterized converter.",
                 TypeUtil.hasConverter(String.class, CustomPairType.class, "String,Integer"));

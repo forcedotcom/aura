@@ -25,6 +25,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 public class RegisterEventHandlerTest extends AuraImplTestCase {
 
@@ -32,6 +33,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testSanity() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
@@ -45,6 +47,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         assertTrue(red.isGlobal());
     }
 
+    @Test
     public void testInvalidAccess() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
@@ -60,6 +63,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testTextContent() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
@@ -75,6 +79,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testMissingType() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
@@ -89,6 +94,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testMissingNameForComponentEvent() throws Exception {
         DefDescriptor<EventDef> eventDesc = addSourceAutoCleanup(EventDef.class, "<aura:event type='COMPONENT'/>");
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
@@ -105,6 +111,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testMissingNameForApplicationEvent() throws Exception {
         DefDescriptor<EventDef> eventDesc = addSourceAutoCleanup(EventDef.class, "<aura:event type='APPLICATION'/>");
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);

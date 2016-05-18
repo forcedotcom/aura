@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
@@ -37,6 +38,7 @@ public class JsonReaderTest extends UnitTestCase {
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
+    @Test
     public void testReadComplexObject() throws IOException {
         String json = "{\"key1\":[[\"string1\",\"string2\"],true,10,[false,1.5,{\"key2\":[\"string1\",\"string2\"]}]]}";
         Object o = new JsonReader().read(json);
@@ -60,6 +62,7 @@ public class JsonReaderTest extends UnitTestCase {
     /**
      * Make sure our escape sequence is yelled about correctly.
      */
+    @Test
     public void testReadBadEscape() throws IOException {
         try {
             new JsonReader().read("{\"\\~\":\"b\"}");
@@ -75,6 +78,7 @@ public class JsonReaderTest extends UnitTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testIOException() throws Exception {
         File newFileobj = getResourceFile("/testdata/IOExceptionSimulate.txt");
         newFileobj.getParentFile().mkdirs();

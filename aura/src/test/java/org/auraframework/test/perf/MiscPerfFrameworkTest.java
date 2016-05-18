@@ -26,6 +26,7 @@ import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.test.perf.metrics.PerfRunsCollector;
 import org.json.JSONObject;
 import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Miscellaneous tests for the perf framework.
@@ -82,6 +83,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
     // assertTrue("delta js heap size: " + delta, delta > 1000000);
     // }
 
+    @Test
     public void testProfile() throws Exception {
         startProfile();
         openTotallyRaw("/ui/label.cmp?label=foo");
@@ -94,6 +96,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         }
     }
 
+    @Test
     public void testUsedJSHeapSize() throws Exception {
         openTotallyRaw("/ui/label.cmp?label=foo");
 
@@ -101,6 +104,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         assertTrue("JS Heap Size: " + size, size > 1000);
     }
 
+    @Test
     public void testResourceTimingAPI() throws Exception {
         openTotallyRaw("/ui/label.cmp?label=foo");
 
@@ -120,6 +124,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         // PerfWebDriverUtil.showResourceTimingData(data);
     }
 
+    @Test
     public void testMultipleRunsReuseWebDriver() throws Exception {
         PerfRunsCollector runs = new PerfRunsCollector();
         for (int i = 0; i < 2; i++) {
@@ -132,6 +137,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
         runs.show(System.out);
     }
 
+    @Test
     public void testMultipleRunsNewWebDriver() throws Exception {
         PerfRunsCollector runs = new PerfRunsCollector();
         for (int i = 0; i < 2; i++) {

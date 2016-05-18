@@ -25,6 +25,7 @@ import org.auraframework.util.javascript.directive.DirectiveType;
 import org.auraframework.util.javascript.directive.DirectiveTypes;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 
@@ -39,6 +40,7 @@ public class IfDirectiveTest extends UnitTestCase {
     /**
      * Test basic initialization.
      */
+    @Test
     public void testIfDirectiveBasicInitialization() throws Exception {
         IfDirectiveType directiveTypeObj = new IfDirectiveType();
         assertTrue("If Directive type should be labled as 'if'", directiveTypeObj.getLabel().equals("if"));
@@ -56,6 +58,7 @@ public class IfDirectiveTest extends UnitTestCase {
     /**
      * Test basic javascript generation with IF directives
      */
+    @Test
     public void testJSSourceWithIfDirective() throws Exception {
         File file = getResourceFile("/testdata/javascript/testIfDirective_positive.js");
         DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy", file.getParentFile(),

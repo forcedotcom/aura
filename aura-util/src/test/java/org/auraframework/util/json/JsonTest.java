@@ -31,6 +31,7 @@ import java.util.UUID;
 
 import org.auraframework.util.Utf8InputStreamReader;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -40,6 +41,7 @@ import com.google.common.collect.Lists;
  */
 public class JsonTest extends UnitTestCase {
 
+    @Test
     public void testSerializeNumbers() throws IOException {
         byte b = 127;
         short s = 32767;
@@ -55,6 +57,7 @@ public class JsonTest extends UnitTestCase {
         assertEquals("-1.2E-20", JsonEncoder.serialize(-1.2E-20));
     }
 
+    @Test
     public void testSerializeCharacters() throws IOException {
         assertEquals("\"a\"", JsonEncoder.serialize('a'));
         assertEquals("\"\\n\"", JsonEncoder.serialize('\n'));
@@ -76,11 +79,13 @@ public class JsonTest extends UnitTestCase {
         assertEquals("0", JsonEncoder.serialize(0x00));
     }
 
+    @Test
     public void testSerializeBoolean() throws IOException {
         assertEquals("true", JsonEncoder.serialize(true));
         assertEquals("false", JsonEncoder.serialize(false));
     }
 
+    @Test
     public void testSerializeStrings() throws IOException {
         assertEquals("null", JsonEncoder.serialize((String) null));
         assertEquals("\"\"", JsonEncoder.serialize(""));
@@ -95,6 +100,7 @@ public class JsonTest extends UnitTestCase {
                 JsonEncoder.serialize("Быстрый Браун Фокс выросло за ленивый собака. Die schnelle Braun Fuchs sprang über den faulen Hund. השועל החום המהיר קפץ מעל הכלב העצלן."));
     }
 
+    @Test
     public void testSerializeArray() throws IOException {
         String[] s = new String[2];
         assertEquals("[]", JsonEncoder.serialize(s));
@@ -105,6 +111,7 @@ public class JsonTest extends UnitTestCase {
         assertEquals("[\n  \"test1\",\n  \"test2\"\n]", JsonEncoder.serialize(s, true, false));
     }
 
+    @Test
     public void testSerializeMap() throws IOException {
         Map<Object, Object> m = new LinkedHashMap<>(2);
         assertEquals("{}", JsonEncoder.serialize(m));
@@ -119,6 +126,7 @@ public class JsonTest extends UnitTestCase {
         assertEquals("{\"stringKey\":\"stringValue\"}", JsonEncoder.serialize(stringMap));
     }
 
+    @Test
     public void testSerializeCollection() throws IOException {
         Collection<Object> c = new ArrayList<>();
         assertEquals("[]", JsonEncoder.serialize(c));
@@ -129,6 +137,7 @@ public class JsonTest extends UnitTestCase {
         assertEquals("[\n  \"val1\",\n  \"val2\"\n]", JsonEncoder.serialize(c, true, false));
     }
 
+    @Test
     public void testSerializeComplexObject() throws IOException {
         Map<Object, Object> m = new LinkedHashMap<>(1);
         Map<Object, Object> m2 = new LinkedHashMap<>(1);
@@ -150,6 +159,7 @@ public class JsonTest extends UnitTestCase {
 
 
 
+    @Test
     public void testSerializeIdentityReferenceType() throws IOException {
         JsonIdentitySerializableTest obj1 = new JsonIdentitySerializableTest(1);
         JsonIdentitySerializableTest obj2 = new JsonIdentitySerializableTest(1);
@@ -164,6 +174,7 @@ public class JsonTest extends UnitTestCase {
                 JsonEncoder.serialize(objArray2, false, true));
     }
 
+    @Test
     public void testWriteMapBegin() throws IOException {
         JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeMapBegin();
@@ -189,6 +200,7 @@ public class JsonTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testWriteValueNoSerializer() throws IOException {
         JsonEncoder json = new JsonEncoder(new StringBuilder(), null, new NoSerializerContext());
         try {
@@ -199,6 +211,7 @@ public class JsonTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testWriteKeyNoSerializer() throws IOException {
         JsonEncoder json = new JsonEncoder(new StringBuilder(), null, new NoSerializerContext());
         json.writeMapBegin();
@@ -210,6 +223,7 @@ public class JsonTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testWriteMapEnd() throws IOException {
         try {
             JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
@@ -240,6 +254,7 @@ public class JsonTest extends UnitTestCase {
         assertEquals("\n}", json.getAppendable().toString());
     }
 
+    @Test
     public void testWriteArrayBegin() throws IOException {
         JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeArrayBegin();
@@ -249,6 +264,7 @@ public class JsonTest extends UnitTestCase {
         assertEquals("[\n", json.getAppendable().toString());
     }
 
+    @Test
     public void testWriteArrayEnd() throws IOException {
         try {
             JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
@@ -279,6 +295,7 @@ public class JsonTest extends UnitTestCase {
         assertEquals("\n]", json.getAppendable().toString());
     }
 
+    @Test
     public void testMismatchStartEnd() throws Exception {
         try {
             JsonEncoder json = new JsonEncoder(new StringBuilder(), true, false);
@@ -305,6 +322,7 @@ public class JsonTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testCommentBody() throws Exception {
         JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
 
@@ -341,6 +359,7 @@ public class JsonTest extends UnitTestCase {
         assertEquals("\n/*\n * hi\n */", json.getAppendable().toString());
     }
 
+    @Test
     public void testWriteComma() throws IOException {
         JsonEncoder json = new JsonEncoder(new StringBuilder(), true, false);
         try {
@@ -359,12 +378,14 @@ public class JsonTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testWriteLiteral() throws IOException {
         JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeLiteral(5);
         assertEquals("5", json.getAppendable().toString());
     }
 
+    @Test
     public void testWriteString() throws IOException {
         JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeString("test");
@@ -376,6 +397,7 @@ public class JsonTest extends UnitTestCase {
                 .getAppendable().toString());
     }
 
+    @Test
     public void testWriteArrayEntry() throws IOException {
         JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeArrayBegin();
@@ -398,6 +420,7 @@ public class JsonTest extends UnitTestCase {
         assertEquals("[\n  \"test1\",\n  \"test2\"\n]", json.getAppendable().toString());
     }
 
+    @Test
     public void testWriteMapEntry() throws IOException {
         JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeMapBegin();
@@ -420,6 +443,7 @@ public class JsonTest extends UnitTestCase {
         assertEquals("{\n  \"key1\":\"value1\",\n  \"key2\":\"value2\"\n}", json.getAppendable().toString());
     }
 
+    @Test
     public void testWriteMapEntryTyped() throws IOException {
         List<String> list = new ArrayList<>(2);
         list.add("item1");
@@ -447,6 +471,7 @@ public class JsonTest extends UnitTestCase {
         assertEquals("{\"map1\":{\"item1\":1,\"item2\":2},\"map2\":{}}", json.getAppendable().toString());
     }
 
+    @Test
     public void testWriteMapKey() throws IOException {
         JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeMapBegin();
@@ -472,6 +497,7 @@ public class JsonTest extends UnitTestCase {
     /**
      * Ensures that a down-the-middle binary stream case works properly
      */
+    @Test
     public void testBinaryStream() throws Exception {
 
         // Write out a JSON+binary stream
@@ -561,6 +587,7 @@ public class JsonTest extends UnitTestCase {
     /**
      * Ensures that trying to stream on an unsupported scenario fails
      */
+    @Test
     public void testBinaryStreamOnAppendable() throws Exception {
         final StringBuilder str = new StringBuilder(1);
         final JsonEncoder json = new JsonEncoder(str, false, false);
@@ -572,6 +599,7 @@ public class JsonTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testBinaryStreamEndBeforeBegin() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
         final JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
@@ -583,6 +611,7 @@ public class JsonTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testBinaryStreamTooShort() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
         final JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
@@ -596,6 +625,7 @@ public class JsonTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testBinaryStreamTooLong() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
         final JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
@@ -613,6 +643,7 @@ public class JsonTest extends UnitTestCase {
      * Ensures that it's not possible to put a binary stream within a binary
      * stream
      */
+    @Test
     public void testBinaryStreamWithinBinaryStream() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
         final JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
@@ -625,6 +656,7 @@ public class JsonTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testBinaryStreamOfSizeZero() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
         final JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
@@ -645,6 +677,7 @@ public class JsonTest extends UnitTestCase {
         }
     }
 
+    @Test
     public void testNullValuesInMapsWithJsonStream() throws Exception {
         final Map<String, Object> map = new LinkedHashMap<>(8);
         map.put("cats", null);
@@ -668,6 +701,7 @@ public class JsonTest extends UnitTestCase {
                 new String(baos.toByteArray(), Charsets.UTF_8));
     }
 
+    @Test
     public void testNullValuesInArraysWithJsonStream() throws Exception {
         final List<String> list = Lists.newArrayList(null, "cats", "dogs", null, "bacteria");
 
@@ -714,6 +748,7 @@ public class JsonTest extends UnitTestCase {
     /**
      * Ensure that encoding is is correct while encoding the nullable object.
      */
+    @Test
     public void testSerializeSimpleWithNulls() throws IOException {
         SendNullObject sno = new SendNullObject("a", "b");
         assertEquals("{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"}", JsonEncoder.serialize(sno));
@@ -724,6 +759,7 @@ public class JsonTest extends UnitTestCase {
     /**
      * Ensure that encoding is restored to normal after encoding the nullable object.
      */
+    @Test
     public void testSerializeComplexWithNulls() throws IOException {
         Map<Object, Object> m = new LinkedHashMap<>(1);
         m.put("v", "c");
@@ -737,6 +773,7 @@ public class JsonTest extends UnitTestCase {
     // we have two ways to output null in serialization, one is
     // setNullValueEnabled with SerializationContext, another
     //one is set it when createJsonStream. This test mix them together, and verify it works.
+    @Test
     public void testSerializeComplexWithNullsWithJsonStreamAndSetNullValueEnabled() throws IOException {
         Map<Object, Object> m = new LinkedHashMap<>(1);
         m.put("v", "c");

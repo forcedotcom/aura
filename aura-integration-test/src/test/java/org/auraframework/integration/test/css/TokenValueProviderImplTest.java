@@ -33,6 +33,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
+import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 
@@ -53,12 +54,14 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     /** check that a simple resolves */
+    @Test
     public void testSimple() throws QuickFixException {
         addNsTokens(tokens().token("color", "red"));
         assertEquals("red", setup().getValue("color", null));
     }
 
     /** confirm that we get the right inherited token value */
+    @Test
     public void testInherited() throws QuickFixException {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "red"));
         addNsTokens(tokens().parent(parent).token("margin", "10px"));
@@ -66,6 +69,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     /** confirm that we get the value from an override instead of the original */
+    @Test
     public void testOverriddenDirectly() throws QuickFixException {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> override = addSeparateTokens(tokens().token("color", "blue"));
@@ -73,6 +77,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     /** confirm that we get the value from an override through inheritance instead of the original */
+    @Test
     public void testOverriddenThroughInheritance() throws QuickFixException {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "blue"));
@@ -81,6 +86,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     /** confirm that multiple overrides can be specified */
+    @Test
     public void testMultipleOverrides() throws QuickFixException {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> o1 = addSeparateTokens(tokens().token("skip1", "one"));
@@ -91,6 +97,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     /** confirm that we get the value from an override when multiple are present */
+    @Test
     public void testMultipleOverridesThroughInheritance() throws QuickFixException {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "blue"));
@@ -109,6 +116,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     /** the override may utilize a provider, in which case we should find and use the concrete def */
+    @Test
     public void testOverrideUsesProvider() throws QuickFixException {
         addNsTokens(tokens().token("color", "red"));
 
@@ -121,6 +129,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     /** check that we get an error if the namespace default doesn't exist */
+    @Test
     public void testNamespaceDefaultDoesntExist() throws QuickFixException {
         try {
             setup().getValue("color", null);
@@ -131,6 +140,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     /** check that we get an error if the token doesn't exist */
+    @Test
     public void testTokenDoesntExist() throws QuickFixException {
         addNsTokens(tokens().token("color", "red"));
         try {
@@ -142,6 +152,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     /** confirm that we get an error if the override is specified but non existent */
+    @Test
     public void testAppTokensDoesntExist() throws QuickFixException {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> override = DefDescriptorImpl.getInstance("idont:exist", TokensDef.class);
@@ -158,6 +169,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
      * if the namespace default doesn't have the token, but the override does, it should still resolve. However note
      * that this is overall an error and would be caught by StyleDef#validateReferences.
      */
+    @Test
     public void testSpecifiedInOverrideButMissingFromNamespaceDefault() throws QuickFixException {
         addNsTokens(tokens().token("font", "arial"));
         DefDescriptor<TokensDef> override = addSeparateTokens(tokens().token("color", "blue"));
@@ -165,6 +177,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     /** check that we get an error if the number of parts in the argument are too many */
+    @Test
     public void testMalformedLong() throws QuickFixException {
         addNsTokens(tokens().token("color", "red"));
         try {
@@ -176,12 +189,14 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     /** confirm that cross referencing a token defined in the same def resolves */
+    @Test
     public void testCrossReferenceSelf() throws QuickFixException {
         addNsTokens(tokens().token("color", "red").token("myColor", "{!color}"));
         assertEquals("red", setup().getValue("myColor", null));
     }
 
     /** confirm that cross referencing a token defined in a parent def resolves */
+    @Test
     public void testCrossReferenceInherited() throws QuickFixException {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color", "red"));
         addNsTokens(tokens().parent(parent).token("myColor", "{!color}"));
@@ -189,6 +204,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     /** confirm that an error is thrown if the cross referenced token doesn't exist */
+    @Test
     public void testCrossReferenceDoesntExist() throws QuickFixException {
         addNsTokens(tokens().token("myColor", "{!color}"));
 
@@ -200,6 +216,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
         }
     }
 
+    @Test
     public void testExtractTokenNamesNoCrossRef() throws QuickFixException {
         addNsTokens(tokens().token("color1", "red"));
         Set<String> names = setup().extractTokenNames("color1", true);
@@ -207,6 +224,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
         assertTrue(names.contains("color1"));
     }
 
+    @Test
     public void testExtractTokenNamesFollowCrossRefsFalse() throws QuickFixException {
         addNsTokens(tokens().token("color1", "red").token("color2", "{!color1}"));
         Set<String> names = setup().extractTokenNames("color2", false);
@@ -214,6 +232,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
         assertTrue(names.contains("color2"));
     }
 
+    @Test
     public void testExtractTokenNamesCrossRefSelf() throws QuickFixException {
         addNsTokens(tokens().token("color1", "red").token("color2", "{!color1}"));
         Set<String> names = setup().extractTokenNames("color2", true);
@@ -222,6 +241,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
         assertTrue(names.contains("color2"));
     }
 
+    @Test
     public void testExtractTokenNamesCrossRefParent() throws QuickFixException {
         DefDescriptor<TokensDef> parent = addSeparateTokens(tokens().token("color1", "red"));
         addNsTokens(tokens().parent(parent).token("color2", "{!color1}"));
@@ -231,6 +251,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
         assertTrue(names.contains("color2"));
     }
 
+    @Test
     public void testExtractTokenNamesCrossRefMultiple() throws QuickFixException {
         addNsTokens(tokens()
                 .token("color1", "red")

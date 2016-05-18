@@ -23,6 +23,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.impl.adapter.format.css.StyleDefCSSFormatAdapter;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.util.AuraUtil;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.salesforce.omakase.ast.declaration.Declaration;
@@ -69,6 +70,7 @@ public class StyleAdapterImplTest extends StyleTestCase {
 //        assertEquals("expected plugin to run at runtime", 2, observer.count);
 //    }
 
+    @Test
     public void testContextualPlugins() throws Exception {
         TestStyleAdapter adapter = TestStyleAdapter.contextual(observer);
         format = new StyleDefCSSFormatAdapter();

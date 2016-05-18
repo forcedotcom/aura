@@ -24,6 +24,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
+import org.junit.Test;
 
 /**
  * @hierarchy Aura.Unit Tests.Components.EventHandlerDef.Validation
@@ -33,6 +34,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testSerialize() throws Exception {
         EventHandlerDefImpl eventHandlerDef2 = vendor.makeEventHandlerDefWithNulls(
                 vendor.makeEventDefDescriptor("auratest:testevent"), new PropertyReferenceImpl("c.foo", null),
@@ -40,6 +42,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         serializeAndGoldFile(eventHandlerDef2);
     }
 
+    @Test
     public void testHandlerWithoutNameOrEventAttribute() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
                 "handleEventTest:handlerWithoutNameOrEvent", ComponentDef.class);
@@ -56,6 +59,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
      * A aura:handler for a component event with event attribute specified is invalid. Should be name attribute that is
      * specified.
      */
+    @Test
     public void testHandlerWithEventAttributeForComponentEvent() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
                 "handleEventTest:handlerWithEventForComponentEvent", ComponentDef.class);
@@ -74,6 +78,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
      * A aura:handler for an application event with name attribute specified is invalid. Should be event attribute that
      * is specified.
      */
+    @Test
     public void testHandlerWithNameAttributeForApplicationEvent() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
                 "handleEventTest:handlerWithNameForApplicationEvent", ComponentDef.class);
@@ -88,6 +93,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testHandlerWithInvalidNameAttributeForComponentEvent() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
                 "handleEventTest:handlerWithUnregisteredName", ComponentDef.class);
@@ -100,6 +106,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testHandlerWithInvalidEventAttributeForApplicationEvent() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
                 "handleEventTest:handlerWithInvalidEvent", ComponentDef.class);
@@ -114,6 +121,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testHandlerWithEmptyNameAttributeForComponentEvent() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:handler name='' action='{!c.handleIt}'/></aura:component>");
@@ -126,6 +134,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testHandlerWithEmptyEventAttributeForApplicationEvent() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:handler event='' action='{!c.handleIt}'/></aura:component>");
@@ -141,6 +150,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
     /**
      * An aura:handler for a component event with no action parameter declared.
      */
+    @Test
     public void testHandlerWithNoAction() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:registerevent name='somename' type='handleEventTest:event'/>"
@@ -154,6 +164,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetDescription() throws Exception {
         String cmpMarkup = "<aura:component >%s</aura:component>";
         String markup = String

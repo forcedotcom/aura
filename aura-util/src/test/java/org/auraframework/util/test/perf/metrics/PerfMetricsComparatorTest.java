@@ -16,9 +16,11 @@
 package org.auraframework.util.test.perf.metrics;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 public final class PerfMetricsComparatorTest extends UnitTestCase {
 
+    @Test
     public void testCompare() throws Exception {
         PerfMetrics expected = new PerfMetrics(new PerfMetric("Timeline.metric", 10), new PerfMetric("Aura.metric", 10));
 

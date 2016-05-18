@@ -22,12 +22,14 @@ import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
     public DesignTemplateRegionDefHandlerTest(String name) {
         super(name);
     }
 
+    @Test
     public void testGetElement() throws Exception {
         String name = "regionone";
         DesignTemplateRegionDef element = setupDesignTemplateRegionDef(name, "<design:region name=\"" + name + "\"/>");
@@ -36,6 +38,7 @@ public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
         assertTrue(element.getAllowedInterfaces().isEmpty());
     }
 
+    @Test
     public void testAllowedInterfaces() throws Exception {
         String name = "regionone";
         DesignTemplateRegionDef element = setupDesignTemplateRegionDef(name, "<design:region name=\"" + name
@@ -50,6 +53,7 @@ public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testInvalidSystemAttributeName() throws Exception {
         try {
             String name = "regionone";
@@ -60,6 +64,7 @@ public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testInvalidSystemAttributePrefix() throws Exception {
         try {
             String name = "regionone";

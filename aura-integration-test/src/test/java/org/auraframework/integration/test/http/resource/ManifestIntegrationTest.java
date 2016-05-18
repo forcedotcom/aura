@@ -43,6 +43,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.resource.Manifest;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.AuraContext;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 public class ManifestIntegrationTest extends AuraImplTestCase {
@@ -54,6 +55,7 @@ public class ManifestIntegrationTest extends AuraImplTestCase {
     /**
      * Verify manifest doesn't include null when ResetCss is null.
      */
+    @Test
     public void testManifestNotIncludeNullResetCssURL() throws Exception {
         // Arrange
         if (Aura.getContextService().isEstablished()) {

@@ -25,12 +25,14 @@ import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 public class FlavorsDefImplTest extends StyleTestCase {
     public FlavorsDefImplTest(String name) {
         super(name);
     }
 
+    @Test
     public void testLoadsIndependently() throws QuickFixException {
         // flavor assortments can be placed independently in their own bundles
         DefDescriptor<FlavorsDef> fa = addFlavorAssortment("<aura:flavors></aura:flavors>");
@@ -38,6 +40,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
         definitionService.getDefinition(fa).validateDefinition(); // no errors
     }
 
+    @Test
     public void testLoadsFromAppBundle() throws QuickFixException {
         DefDescriptor<FlavorsDef> fa = addSourceAutoCleanup(FlavorsDef.class, "<aura:flavors></aura:flavors>");
 
@@ -49,6 +52,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
         definitionService.getDefinition(fa).validateDefinition(); // no errors
     }
 
+    @Test
     public void testGetFlavorIncludeDefs() throws QuickFixException {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         addStandardFlavor(cmp, ".THIS--test{}");
@@ -58,6 +62,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
         assertEquals("flavors did not have the right size", 1, definitionService.getDefinition(fa).getFlavorIncludeDefs().size());
     }
 
+    @Test
     public void testGetFlavorDefaultDefs() throws QuickFixException {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         addStandardFlavor(cmp, ".THIS--test{}");
@@ -69,6 +74,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
         assertEquals("flavors did not have the right size", 1, definitionService.getDefinition(fa).getFlavorDefaultDefs().size());
     }
 
+    @Test
     public void testIterationOrderOfComputeOverrides() throws Exception {
         // both of these should have flavors for x_sample
         String fmt = "<aura:flavors>"
@@ -85,6 +91,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
         assertEquals(style, mapping.getLocation(cmp1, "default").get().getDescriptor());
     }
 
+    @Test
     public void testSerialization() throws Exception {
         DefDescriptor<ComponentDef> cmp1 = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<ComponentDef> cmp2 = DefDescriptorImpl.getInstance("flavorTest:x_landmark", ComponentDef.class);

@@ -25,6 +25,7 @@ import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.junit.Test;
 
 /**
  * Test for {@link ContainerTagHandler}.
@@ -37,6 +38,7 @@ public class ContainerTagHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testGetDefRefHandler() throws Exception {
         // 1. Verify that specifying invalid load level in a component def ref,
         // throws Exception.

@@ -22,6 +22,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.helper.JavascriptHelperDef;
+import org.junit.Test;
 
 /**
  * Test class to verify implementation of JavascriptHelperDef.
@@ -34,11 +35,13 @@ public class JavascriptHelperDefTest extends AuraImplTestCase {
     /**
      * Verify JavascriptHelperDef is non-local.
      */
+    @Test
     public void testIsLocalReturnsFalse() {
         HelperDef helperDef =  (new JavascriptHelperDef.Builder()).build();
         assertFalse(helperDef.isLocal());
     }
 
+    @Test
     public void testGetDescriptor() throws Exception {
         DefDescriptor<HelperDef> expectedHelperDesc = addSourceAutoCleanup(HelperDef.class, "({})");
         HelperDef helperDef = definitionService.getDefinition(expectedHelperDesc);
@@ -47,6 +50,7 @@ public class JavascriptHelperDefTest extends AuraImplTestCase {
         assertSame(expectedHelperDesc, actualHelperDesc);
     }
 
+    @Test
     public void testSerializeJavascriptHelperDef() throws Exception {
         String helperJS =
                 "({\n" +

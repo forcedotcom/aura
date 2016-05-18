@@ -21,9 +21,11 @@ import org.auraframework.util.javascript.JavascriptProcessingError.Level;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
 
 public final class ValidationErrorTest extends UnitTestCase {
 
+    @Test
     public void testJsonSerialization() {
         ValidationError error = new ValidationError("tool", "/file/name", 11, 3, "message", "evidence",
                 Level.Error, "rule");
@@ -33,6 +35,7 @@ public final class ValidationErrorTest extends UnitTestCase {
         assertEquals(error.toCommonFormat(), dError.toCommonFormat());
     }
 
+    @Test
     public void testTextSerialization() {
         ValidationError error = new ValidationError("tool", "/file/name", 11, 3, "message", "evidence",
                 Level.Error, "rule");

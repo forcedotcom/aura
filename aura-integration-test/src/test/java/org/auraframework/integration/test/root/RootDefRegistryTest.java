@@ -19,6 +19,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.junit.Test;
 
 public class RootDefRegistryTest extends AuraImplTestCase {
 
@@ -26,6 +27,7 @@ public class RootDefRegistryTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testGetComponentDefWithExtends() throws Exception {
         DefDescriptor<ComponentDef> childDescriptor = DefDescriptorImpl.getInstance("test:extendsChild",
                 ComponentDef.class);

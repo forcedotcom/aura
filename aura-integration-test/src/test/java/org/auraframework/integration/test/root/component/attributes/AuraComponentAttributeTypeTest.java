@@ -27,6 +27,7 @@ import org.auraframework.impl.type.ComponentDefRefArrayTypeDef;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.junit.Test;
 
 /**
  * Unit tests for attributes of type Aura.Component, Aura.Component[] and
@@ -46,6 +47,7 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testUsageOfComponentDefRefArray() throws Exception {
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "",
                 "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" + "<test:text/>"
@@ -75,6 +77,7 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testEmptyBodyForComponentDefRefArray() throws Exception {
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "",
                 "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" + "</aura:attribute>"));
@@ -90,6 +93,7 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testComponentDefRefIsNotValidType() throws Exception {
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "",
                 "<aura:attribute type='Aura.ComponentDefRef' name='attr' default=''/>"));
@@ -100,6 +104,7 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testAttributesInComponentDefRefArray() throws Exception {
         // 1. Expression using outer attributes
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "",
@@ -124,6 +129,7 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testMarkupValidationInComponentDefRefArray() throws Exception {
         // Incomplete formula
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "",

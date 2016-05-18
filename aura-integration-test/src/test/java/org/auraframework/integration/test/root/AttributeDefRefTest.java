@@ -28,6 +28,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.type.TypeUtil.ConversionException;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableList;
@@ -71,6 +72,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
     /**
      * Non-expressions are parsed by the TypeDef.
      */
+    @Test
     public void testParseValueSimple() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         String typeName = getAuraTestingUtil().getNonce("customType");
@@ -86,6 +88,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
     /**
      * Expressions are not parsed in parseValue.
      */
+    @Test
     public void testParseValueExpression() throws Exception {
         Expression expr = Mockito.mock(Expression.class);
         assertParsedValue(expr, "long", expr);
@@ -95,6 +98,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
     /**
      * Primitives converted to respective types.
      */
+    @Test
     public void testParseValuePrimitives() throws Exception {
         // current types with default converters
         assertParsedValue("1", "int", 1);
@@ -108,6 +112,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
     /**
      * Parse errors wrapped in InvalidExpressionException.
      */
+    @Test
     public void testParseValueWithConversionException() throws Exception {
         // values without a converter from String
         assertParseException("1", "byte", ConversionException.class, "No Converter or MultiConverter found for ");
@@ -122,6 +127,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
         // assertParseException("987654321987654321987654321", "int", ParseException.class, "Unparseable number: ");
     }
 
+    @Test
     public void testValidateReferencesChainsToValue() throws Exception {
         Definition value = Mockito.mock(Definition.class);
         AttributeDefRefImpl adr = vendor.makeAttributeDefRef(testAttributeDescriptorName, value, null);
@@ -130,6 +136,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
         Mockito.verify(value, Mockito.times(1)).validateReferences();
     }
 
+    @Test
     public void testValidateReferencesChainsThroughCollection() throws Exception {
         Definition value = Mockito.mock(Definition.class);
         AttributeDefRefImpl adr = vendor
@@ -139,6 +146,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
         Mockito.verify(value, Mockito.times(1)).validateReferences();
     }
 
+    @Test
     public void testAppendDependenciesChainsToValue() throws Exception {
         Definition value = Mockito.mock(Definition.class);
         AttributeDefRefImpl adr = vendor.makeAttributeDefRef(testAttributeDescriptorName, value, null);
@@ -148,6 +156,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
         Mockito.verify(value, Mockito.times(1)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
     }
 
+    @Test
     public void testAppendDependenciesChainsThroughCollection() throws Exception {
         Definition value = Mockito.mock(Definition.class);
         AttributeDefRefImpl adr = vendor.makeAttributeDefRef(testAttributeDescriptorName, Sets.newHashSet(value), null);
@@ -160,6 +169,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
     /**
      * Equality is based on unparsed values.
      */
+    @Test
     public void testEquals() throws Exception {
         AttributeDefRefImpl adr1 = vendor.makeAttributeDefRef(testAttributeDescriptorName, "1", null);
         AttributeDefRefImpl adr2 = vendor.makeAttributeDefRef(testAttributeDescriptorName, "1", null);

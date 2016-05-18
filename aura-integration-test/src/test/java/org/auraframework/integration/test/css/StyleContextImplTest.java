@@ -24,6 +24,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.token.StyleContextImpl;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -36,6 +37,7 @@ public class StyleContextImplTest extends AuraImplTestCase {
         super(name);
     }
 
+    @Test
     public void testFromMap() {
         Map<String, Object> map = new HashMap<>();
 

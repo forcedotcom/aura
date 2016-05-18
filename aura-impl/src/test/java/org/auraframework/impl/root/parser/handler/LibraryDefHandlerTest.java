@@ -32,6 +32,7 @@ import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -49,6 +50,7 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
     DefDescriptor<IncludeDef> includeDescriptor;
     private String filename = "sanity";
 
+    @Test
     public void testGetElement() throws Exception {
         StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format(
                 "<%s><%s name=\"%s\"/></%1$s>",
@@ -63,6 +65,7 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
         assertEquals("sanity", includes.get(0).getName());
     }
 
+    @Test
     public void testGetElementWithEmptyTag() throws Exception {
         StringSource<LibraryDef> source = new StringSource<>(descriptor, 
         		String.format("<%s></%1$s>", LibraryDefHandler.TAG), "myID", Format.XML);
@@ -73,6 +76,7 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
         assertTrue(actualDef.getIncludes().isEmpty());
     }
 
+    @Test
     public void testGetElementWithBodyText() throws Exception {
         StringSource<LibraryDef> source = new StringSource<>(descriptor, 
         		String.format("<%s>text</%1$s>", LibraryDefHandler.TAG), "myID", Format.XML);
@@ -87,6 +91,7 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithUnsupportedBodyTag() throws Exception {
         StringSource<LibraryDef> source = new StringSource<>(descriptor, 
         		String.format("<%s><br/></%1$s>", LibraryDefHandler.TAG), "myID", Format.XML);
@@ -100,6 +105,7 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetElementWithDescription() throws Exception {
         String expectedDescription = "needs to be included";
         StringSource<LibraryDef> source = new StringSource<>(descriptor, 
@@ -110,6 +116,7 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
         assertEquals(expectedDescription, actualDef.getDescription());
     }
 
+    @Test
     public void testGetElementWithUnexpectedAttribute() throws Exception {
         StringSource<LibraryDef> source = new StringSource<>(descriptor, 
         		String.format("<%s unexpected='me'></%1$s>", LibraryDefHandler.TAG), "myID", Format.XML);

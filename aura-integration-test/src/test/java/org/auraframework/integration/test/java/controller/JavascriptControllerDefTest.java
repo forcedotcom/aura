@@ -34,6 +34,7 @@ import org.auraframework.instance.Action;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Test;
 
 /**
  * Test class to verify implementation of JavascriptControllerDef.
@@ -46,11 +47,13 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
     /**
      * Verify JavascriptRendererDef is non-local.
      */
+    @Test
     public void testIsLocalReturnsFalse() {
         ControllerDef controllerDef = (new JavascriptControllerDef.Builder()).build();
         assertFalse(controllerDef.isLocal());
     }
 
+    @Test
     public void testRetrieveLabelsWithInvalidLabelExpression() throws QuickFixException {
         // the label expression is missing a part, "name"
         PropertyReference propertyReference = new PropertyReferenceImpl("$Label.section", null);
@@ -66,6 +69,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
         }
     }
 
+    @Test
     public void testGetDescriptor() throws Exception {
         DefDescriptor<ControllerDef> expectedControllerDesc = addSourceAutoCleanup(ControllerDef.class, "({})");
         ControllerDef controllerDef = definitionService.getDefinition(expectedControllerDesc);
@@ -74,6 +78,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
         assertSame(expectedControllerDesc, actualControllerDesc);
     }
 
+    @Test
     public void testGetActionDefs() throws Exception {
         String controllerJs =
                 "({ " +
@@ -96,6 +101,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
         assertEquals("function2", actionDef2.getName());
     }
 
+    @Test
     public void testGetSubDefinition() throws Exception {
         String expected = "function1";
         String controllerJs = "({ function1: function(arg) {} })";
@@ -109,6 +115,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
         assertEquals(expected, actionDef.getName());
     }
 
+    @Test
     public void testSerializeJavascriptControllerDef() throws Exception {
         String controllerJs =
                 "({\n" +
@@ -129,6 +136,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
     /**
      * Verify JavascriptControllerDef creates an JavascriptPseudoAction object on server side.
      */
+    @Test
     public void testCreateAction() throws Exception {
         String controllerJs = "({ function1: function(arg) {} })";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
@@ -140,6 +148,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
         assertThat(action, instanceOf(JavascriptPseudoAction.class));
     }
 
+    @Test
     public void testCreateActionThrowsExceptionWhenCreatingNonExsitingAction() throws Exception {
         String controllerJs = "({ function1: function(arg) {} })";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);

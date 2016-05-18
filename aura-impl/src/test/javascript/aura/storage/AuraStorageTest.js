@@ -63,6 +63,39 @@ Test.Aura.Storage.Adapters.AuraStorageTest = function() {
 
 
     [Fixture]
+    function getExpiration() {
+        var AdapterClass = function() {};
+        AdapterClass.prototype.getName = function() {};
+        var config = {
+            adapterClass: AdapterClass
+        };
+
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                util: {
+                    format: function() {}
+                }
+            },
+            "AuraStorage": {}
+        });
+
+        [Fact]
+        function RespectsConstructorConfig() {
+            var expected = 1;
+            var actual;
+
+            config.expiration = expected;
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                actual = target.getExpiration();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+
+    [Fixture]
     function getMaxSize() {
         var AdapterClass = function() {};
         AdapterClass.prototype.getName = function() {};

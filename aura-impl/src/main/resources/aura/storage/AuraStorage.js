@@ -430,14 +430,21 @@ AuraStorage.prototype.getVersion  = function() {
 };
 
 /**
+ * Returns the expiration in seconds.
+ * @returns {number} The expiration in seconds.
+ * @export
+ */
+AuraStorage.prototype.getExpiration = function() {
+    return this.expiration / 1000;
+};
+
+/**
  * Returns the auto-refresh interval in seconds.
  * @returns {number} The auto-refresh interval in seconds.
  */
 AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
     return this.autoRefreshInterval;
 };
-
-
 
 /**
  * Asynchronously deletes this storage.

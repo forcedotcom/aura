@@ -63,7 +63,7 @@
       }
    ],
    "options":{  
-
+      "skipDiff":true
    },
    "customOptions":[  
       {  

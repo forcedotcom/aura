@@ -50,9 +50,6 @@
          "Tracing.Painting.Paint":10
       },
       {  
-         "Tracing.Memory.jsHeapSizeUsed":10
-      },
-      {  
          "Tracing.Memory.jsEventListeners":25
       },
       {  
@@ -67,25 +64,21 @@
    },
    "customOptions":[  
       {  
-         "testDefault":{  
-            "_lazyRenderTabs":false,
-            "_userOverflowMenu":false,
-            "testDynamicLoading":false
+         "testGridRender":{  
+            "testPanels":false,
+            "testEdit":false
          }
       },
       {  
-         "testLazyRenderTabs":{  
-            "_lazyRenderTabs":true
+         "testPanelRender":{  
+            "testPanels":true,
+            "testEdit":false
          }
       },
       {  
-         "testOverflowMenu":{  
-            "_useOverflowMenu":true
-         }
-      },
-      {  
-         "testDynamicTabLoading":{  
-            "testDynamicTabLoading":true
+         "testEdit":{  
+            "testPanels":true,
+            "testEdit":true
          }
       }
    ]

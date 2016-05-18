@@ -61,7 +61,9 @@ public class PerfMetricsUtil {
         //PerfResultsUtil.exportToCsv(test, dbURI);
 
         // Diff the results file against an existing goldfile per component
-        PerfResultsUtil.assertPerfDiff(test, "goldfile.json", metrics);
+        if(config.getOptions().get("skipDiff") == null || config.getOptions().get("skipDiff") == "false"){
+        	PerfResultsUtil.assertPerfDiff(test, "goldfile.json", metrics);
+        }
     }
 
     /**

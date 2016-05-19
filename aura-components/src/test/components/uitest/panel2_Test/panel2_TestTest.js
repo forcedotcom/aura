@@ -47,6 +47,21 @@
     },
     
     /**
+     * Class set correctly on modal using join
+     * Bug: W-3157190
+     */
+    testClassSetCorrectlyOnModalUsingJoin: {
+        test: [function(cmp) {
+            this.createPanel(cmp);
+        }, function(cmp) {
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var modalElement = $A.test.select(".uiModal")[0];
+                return $A.util.hasClass(modalElement, "PanelModalClass "+$A.get('$Browser.formFactor'));
+            }, "Modal should have class: PanelModalClass "+$A.get('$Browser.formFactor'));
+        }]
+    },
+    
+    /**
      * Active class set correctly on panel/modal
      * Bug: W-2647558
      */

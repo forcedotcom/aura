@@ -19,7 +19,7 @@
 	<aura:attribute name="testPanelType"    type="String"  default="modal"/>
 	<aura:attribute name="testTitle"        type="String"  default="New Panel"/>
 	<aura:attribute name="testDisplayTitle" type="Boolean" default="true"/>
-	<aura:attribute name="testClass"        type="String"/>
+	<aura:attribute name="testClass"        type="String" default="PanelModalClass"/>
 	<aura:attribute name="testFlavor"       type="String"/>
 	<aura:attribute name="testIsVisible"    type="Boolean" default="true"/>
 	<aura:attribute name="testStartOfDialogLabel" type="String"  default="Start of Dialog"/>

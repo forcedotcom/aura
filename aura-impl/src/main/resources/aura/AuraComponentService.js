@@ -288,7 +288,7 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
 
     var config = {
         "componentDef" : this.createDescriptorConfig(type),
-        "attributes"   : { "valueProvider": $A.getContext().getCurrentAccess(), "values" : attributes },
+        "attributes"   : { "values" : attributes },
         "localId"      : attributes && attributes["aura:id"],
         "flavor"       : (attributes && attributes["aura:flavor"]),
         "skipCreationPath": true
@@ -367,10 +367,6 @@ AuraComponentService.prototype.createComponentFromConfig = function(config) {
 
     if (!config["attributes"] ) {
         config["attributes"] = {};
-    }
-
-    if(!config["attributes"]["valueProvider"]) {
-        config["attributes"]["valueProvider"] = $A.getContext().getCurrentAccess();
     }
 
     return this.createComponentPriv(config);
@@ -454,10 +450,6 @@ AuraComponentService.prototype.newComponent = function(config, attributeValuePro
  */
 AuraComponentService.prototype.newComponentDeprecated = function(config, attributeValueProvider, localCreation, doForce){
     $A.assert(config, "config is required in ComponentService.newComponentDeprecated(config)");
-
-    if(!attributeValueProvider) {
-        attributeValueProvider = $A.getContext().getCurrentAccess();
-    }
 
     if ($A.util.isArray(config)){
         return this.newComponentArray(config, attributeValueProvider, localCreation, doForce);
@@ -668,10 +660,6 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
     var overallStatus="SUCCESS";
     var statusList=[];
     var collected=0;
-
-    if(!attributeValueProvider) {
-        attributeValueProvider = $A.getContext().getCurrentAccess();
-    }
 
     function collectComponent(newComponent,status,statusMessage,index){
         components[index]=newComponent;

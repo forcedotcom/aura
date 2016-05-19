@@ -177,6 +177,7 @@
                 logId : "Client"
             }, function(newCmp) {
                 var output = cmp.find("clientTarget");
+                newCmp.setAttributeValueProvider(output);
                 var body = output.get("v.body");
                 body.push(newCmp);
                 output.set("v.body", body);
@@ -210,6 +211,7 @@
                 provideByHandler : "test:testEventBubblingHandlerChild"
             }, function(newCmp) {
                 var output = cmp.find("clientTarget");
+                newCmp.setAttributeValueProvider(output);
                 var body = output.get("v.body");
                 body.push(newCmp);
                 output.set("v.body", body);

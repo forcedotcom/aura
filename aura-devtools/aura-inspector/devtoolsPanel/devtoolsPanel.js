@@ -28,6 +28,14 @@
      * AuraInspector:OnClientActionStart
      * AuraInspector:OnClientActionEnd
      * AuraInspector:OnDescriptorSelect             A descriptor was clicked on, we may want to take some action here such as showing a panel that has more information. 
+     * AuraInspector:OnStartChaosRun                User has click button "Start Chaos Run" in chaos tab, let's start randomly clicking through the app
+     * AuraInspector:OnStopChaosRun                 User has click button "Stop the Run", we are done with current new chaos run
+     * AuraInspector:OnSaveChaosRun                 User has click button "Save the Run", we will save the chaos run into local file
+     * AuraInspector:OnLoadChaosRun                 User has load a chaos run from local file
+     * AuraInspector:OnReplayChaosRun               User has click button "Replay Chaos Run", let's start replaying
+     * AuraInspector:OnContinueChaosRun             We might need to refresh during a replay, this will continue the ongoing replay.
+     * AuraInspector:OnStopAllChaosRun              User has click the panic button, let's stop all chaos run, and clear up everything
+     * AuraInspector:OnSomeActionGetDropped         We just drop some action during a replay
      */
 
     var panel = new AuraInspectorDevtoolsPanel();

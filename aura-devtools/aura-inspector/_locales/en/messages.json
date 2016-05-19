@@ -419,6 +419,10 @@
 		"message": "Replay Chaos Run",
 		"description": "area for buttons on replaying existing chaos run"
 	},
+	"chaosview_button_cancel": {
+		"message": "Cancel",
+		"description": "push this to clear up the loaded chaos run"
+	},
 	"chaosview_button_replay": {
 		"message": "Replay Chaos Run",
 		"description": "push this to replay the saved chaos run"

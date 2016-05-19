@@ -9,6 +9,7 @@ function AuraInspectorChaosView(devtoolsPanel) {
         "buttonStart": chrome.i18n.getMessage("chaosview_button_start"),
         "buttonStop": chrome.i18n.getMessage("chaosview_button_stop"),
         "buttonSave": chrome.i18n.getMessage("chaosview_button_save"),
+        "buttonCancel": chrome.i18n.getMessage("chaosview_button_cancel"),
         "oldChaosRun": chrome.i18n.getMessage("chaosview_old_chaos_run"),
         "buttonReplay": chrome.i18n.getMessage("chaosview_button_replay"),
         "chaosRunResult": chrome.i18n.getMessage("chaosview_chaos_run_result"),
@@ -51,6 +52,7 @@ function AuraInspectorChaosView(devtoolsPanel) {
             </div>
             <div class="m-top--x-small">
               <button id="replay_chaos_run" class="replay_chaos_run text-button hidden">${labels.buttonReplay}</button>
+              <button id="cancel_the_loaded_chaos_run" class="cancel_the_loaded_chaos_run text-button hidden">${labels.buttonCancel}</button>
             </div>
             <div class="replaying_status hidden label m-top--x-small" id="replaying_status"></div>
           </div>
@@ -78,6 +80,8 @@ function AuraInspectorChaosView(devtoolsPanel) {
         tabBody.querySelector("#save_chaos_run").addEventListener("click", saveChaosRun.bind(this));
 
         tabBody.querySelector("#replay_chaos_run").addEventListener("click", replayChaosRun.bind(this));
+        tabBody.querySelector("#cancel_the_loaded_chaos_run").addEventListener("click", cancelTheLoadedChaosRun.bind(this));
+
         tabBody.querySelector("#stop_all_chaos_run").addEventListener("click", stopAllChaosRun.bind(this));
         tabBody.querySelector('#choose_chaos_run_file').addEventListener('change', handleFileSelect.bind(this), false);
 
@@ -468,6 +472,7 @@ function AuraInspectorChaosView(devtoolsPanel) {
         fileReader.readAsText(files[0]);
 
         document.querySelector("#replay_chaos_run").classList.remove("hidden");
+        document.querySelector("#cancel_the_loaded_chaos_run").classList.remove("hidden");
 
         document.querySelector("#stop_all_chaos_run").classList.add("hidden");
 
@@ -480,6 +485,8 @@ function AuraInspectorChaosView(devtoolsPanel) {
     function replayChaosRun(event) {
         //WARNING MAGIC !
         InTheMiddleOfAChaosRun = true;
+
+        document.querySelector("#stop_all_chaos_run").classList.remove("hidden");
 
         // Collect run parameter
         var samplingInterval = document.querySelector("#samplingInterval").value;
@@ -497,6 +504,16 @@ function AuraInspectorChaosView(devtoolsPanel) {
         devtoolsPanel.publish("AuraInspector:OnReplayChaosRun", dataToPublish);
 
         removeAllCards();
+    }
+
+    function cancelTheLoadedChaosRun() {
+        document.querySelector("#replay_chaos_run").classList.add("hidden");
+        document.querySelector("#start_chaos_run").classList.remove("hidden");
+
+        removeAllCards();
+
+        //call AuraInspectorInjectedScript.CancelTheLoadedChaosRun
+        devtoolsPanel.publish("AuraInspector:OnCancelTheLoadedChaosRun", {});
     }
 
 }

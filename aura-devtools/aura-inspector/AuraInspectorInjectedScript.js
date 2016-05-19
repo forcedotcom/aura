@@ -342,48 +342,32 @@
         */
         "AuraDevToolService.StartChaosRun": function(data) {
             var samplingInterval = defaultSamplingInterval;
-            if(data && data.samplingInterval && data.samplingInterval > 0 ) {
+            if(data && data.hasOwnProperty('samplingInterval') && data.samplingInterval > 0 ) {
                 samplingInterval = data.samplingInterval;
             }
-            if(data && data.actionDropPercentage && data.actionDropPercentage > 0) {
+            if(data && data.hasOwnProperty('actionDropPercentage') && data.actionDropPercentage > 0) {
                 actionDropPercentage = data.actionDropPercentage;
             }
 
-            /*
-            clearAllAuraStorages(
-                function() {
-                    $Aura.Inspector.publish("AuraInspector:OnNewChaosRunNewStatus", {'message': "Successfully Clear up All Aura Storage"});    
-                },
-                function(e) {
-                    $Aura.Inspector.publish("AuraInspector:OnNewChaosRunNewStatus", {'message': "There was a problem trying to clear aura storage"});
-                    console.warn(e);
-                }
-            );*/
             currentChaosRun = {};
             currentChaosRunSteps = [];
             sessionStorage.removeItem("chaosRunToReplay");
-            //and stop all intervals if there is any
-            clearInterval(intervalFunctionRef_elementInNextStepReady);
-            intervalFunctionRef_elementInNextStepReady = undefined;
-            count_waitForElementFromAStepToAppear = 0;
-            clearInterval(intervalFunctionRef_anyAuraRenderedElementPresent);
-            intervalFunctionRef_anyAuraRenderedElementPresent = undefined;
-            count_waitAnyAuraRenderedElementPresent = 0;
+            stopAllIntervals();
 
             //build a client-side timemachine
             if(typeof(Storage) !== "undefined") {
-                currentChaosRunTimeMachine = {};
-                var startUrl = window.location.href;
-                if(startUrl.indexOf("?t=") > 0) {
-                    startUrl = startUrl.substr(0,startUrl.indexOf("?t="));
-                    //console.log("rip ?t= from current href:"+startUrl);
-                }
-                currentChaosRunTimeMachine['startUrl'] = startUrl;
-                currentChaosRunTimeMachine['localCache'] = {}; //TODO, look into what we have in storage/ADS/etc
-                currentChaosRun['currentChaosRunTimeMachine'] = currentChaosRunTimeMachine;
-                //console.log("Save timeMachine:", currentChaosRunTimeMachine);
+                        currentChaosRunTimeMachine = {};
+                        var startUrl = window.location.href;
+                        if(startUrl.indexOf("?t=") > 0) {
+                            startUrl = startUrl.substr(0,startUrl.indexOf("?t="));
+                            //console.log("rip ?t= from current href:"+startUrl);
+                        }
+                        currentChaosRunTimeMachine['startUrl'] = startUrl;
+                        currentChaosRunTimeMachine['localCache'] = {}; //TODO, look into what we have in storage/ADS/etc
+                        currentChaosRun['currentChaosRunTimeMachine'] = currentChaosRunTimeMachine;
+                        //console.log("Save timeMachine:", currentChaosRunTimeMachine);
             } else {
-                console.warn("There is no web storage, cannot build Time Machine to service browser location change");
+                        console.warn("There is no web storage, cannot build Time Machine to service browser location change");
             }
 
             if(intervalFunctionRef_anyAuraRenderedElementPresent != undefined) {
@@ -393,6 +377,7 @@
                 count_waitAnyAuraRenderedElementPresent = 0;
             }
             intervalFunctionRef_anyAuraRenderedElementPresent = setInterval(waitAnyAuraRenderedElementPresent, defaultSamplingInterval);
+            
         },
 
         //event handler for AuraInspector:stopChaosRun, called by AuraInspectorChaosView.stopChaosRun
@@ -480,7 +465,6 @@
                     sessionStorage.setItem("chaosRunToReplay", chaosRunFromFile);
 
                     //call AuraInspectorChaosView_OnChaosRunLoaded in AuarInspectorChaosView to display steps of the chaosRun
-                    //var chaosRunToReplay =  JSON.parse(chaosRunFromFile);
                     $Aura.Inspector.publish("AuraInspector:OnChaosRunLoaded", JSON.parse(chaosRunFromFile));
                 } else {
                     console.error("No localStorage found");
@@ -490,6 +474,15 @@
             }
         },
 
+        /*
+            event handler for AuraInspector:OnCancelTheLoadedChaosRun, called by AuraInspectorChaosView.cancelTheLoadedChaosRun
+        */
+        "AuraDevToolService.CancelTheLoadedChaosRun": function() {
+            if(typeof(Storage) !== "undefined" && sessionStorage.getItem("chaosRunToReplay")) {
+                sessionStorage.removeItem("chaosRunToReplay");
+            }
+            chaosRunToReplay = undefined;
+        },
         /*
             event handler for AuraInspector:OnReplayChaosRun, called by AuraInspectorChaosView.replayChaosRun
             build time machine, replay the loaded chaos run
@@ -506,7 +499,7 @@
                 //set indexOfStep, also update it in session storage
                 chaosRunToReplay["indexOfStep"] = 0;
                 //we honor the samplingInterval in the recording, if any. if not, use the number use choose, from chaosView
-                if(chaosRunToReplay.samplingInterval && chaosRunToReplay.samplingInterval > 0) {}
+                if(chaosRunToReplay.hasOwnProperty('samplingInterval') && chaosRunToReplay.samplingInterval > 0) {}
                 else if(data && data.samplingInterval){
                     chaosRunToReplay["samplingInterval"] = data.samplingInterval;
                 }
@@ -562,7 +555,7 @@
                     //store steps in currentChaosRunSteps, repeately check if the first element show up in dom
                     currentChaosRunSteps = chaosRunToReplay.currentChaosRunSteps;
                     var samplingInterval = defaultSamplingInterval;
-                    if(chaosRunToReplay.samplingInterval && chaosRunToReplay.samplingInterval > 0) {
+                    if(chaosRunToReplay.hasOwnProperty('samplingInterval') && chaosRunToReplay.samplingInterval > 0) {
                         samplingInterval = chaosRunToReplay.samplingInterval;
                     }
 
@@ -934,6 +927,15 @@
     /****************************************************************
     ****************** Utility Functions Starts **********************
     ****************************************************************/
+
+    function stopAllIntervals() {
+        clearInterval(intervalFunctionRef_elementInNextStepReady);
+        intervalFunctionRef_elementInNextStepReady = undefined;
+        count_waitForElementFromAStepToAppear = 0;
+        clearInterval(intervalFunctionRef_anyAuraRenderedElementPresent);
+        intervalFunctionRef_anyAuraRenderedElementPresent = undefined;
+        count_waitAnyAuraRenderedElementPresent = 0;
+    }
 
     function clearAllAuraStorages(resolveFunc, rejectFunc) {
         var storages = $A.storageService.getStorages();
@@ -1729,7 +1731,7 @@
 
     //This return true if the object is an array, and it's not empty
     function isNonEmptyArray(obj) {
-        if(obj && typeof obj === "object" && obj instanceof Array && obj.length && obj.length > 0) {
+        if(obj && typeof obj === "object" && obj instanceof Array && obj.hasOwnProperty('length') && obj.length > 0) {
             return true;
         } else {
             return false;

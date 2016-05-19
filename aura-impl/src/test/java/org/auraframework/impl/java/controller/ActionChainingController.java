@@ -69,13 +69,4 @@ public class ActionChainingController {
                 Action.class);
         currentAction.add(Lists.newArrayList(actions));
     }
-
-    @AuraEnabled
-    public static void infiniteChain() throws Exception {
-        Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
-        Action actions = Aura.getInstanceService().getInstance(
-                "java://org.auraframework.java.controller.ActionChainingController/ACTION$infiniteChain",
-                ActionDef.class, null);
-        currentAction.add(Lists.newArrayList(actions));
-    }
 }

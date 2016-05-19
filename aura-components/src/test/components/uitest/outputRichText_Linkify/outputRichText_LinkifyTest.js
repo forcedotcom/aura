@@ -52,6 +52,13 @@
         }
     },
 
+    testNoHttpNoWWWLink:{
+        attributes : {textValue: 'visit salesforce.com for more details'},
+        test: function(cmp){
+            this.assertLinksPresent(cmp, "href=\"http://salesforce.com\"");
+        }
+    },
+
     testFtpLink:{
         attributes : {textValue: 'visit ftp://user:password@example.com/pub/file.txt for more details'},
         test: function(cmp){

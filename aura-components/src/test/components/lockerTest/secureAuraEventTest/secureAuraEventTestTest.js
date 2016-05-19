@@ -17,6 +17,16 @@
         }
     },
 
+    /**
+     * Verify getSource returns SecureComponentRef when the event is created in
+     * a component under different namespace.
+     */
+    testGetSourceReturnsSecureComponentRefWhenNoAccess: {
+        test:function(cmp) {
+            $A.test.clickOrTouch(cmp.find("button").getElement());
+        }
+    },
+
     testExerciseEventAPIs: {
         test: function(cmp) {
             cmp.testExerciseEventAPIs();

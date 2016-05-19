@@ -80,7 +80,7 @@
                         '<use xlink:href="#text"></use>';
  
         var elements = svg.getElementsByTagName('use');
-        testUtils.assertEquals(1, elements.length);
+        testUtils.assertEquals(1, elements.length, "Failed to find expected use element");
         testUtils.assertEquals('#text', elements[0].getAttribute('xlink:href'));
     },
 
@@ -90,12 +90,11 @@
         element.textContent = "text content";
         testUtils.assertEquals("text content", element.textContent);
     },
-    
+
     testInnerText: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
 
         var element = document.createElement("div");
-               
         // Node.innerText is not supported on all browsers
         if ("innerText" in element) {
             element.testInnerText = "innerText content";

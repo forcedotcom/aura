@@ -32,14 +32,16 @@ function SecureComponentRef(component, key) {
         "getGlobalId": SecureObject.createFilteredMethod(o, component, "getGlobalId"),
         "getLocalId": SecureObject.createFilteredMethod(o, component, "getLocalId"),
         "addValueProvider": SecureObject.createFilteredMethod(o, component, "addValueProvider"),
+        "getEvent": SecureObject.createFilteredMethod(o, component, "getEvent"),
         "set": SecureObject.createFilteredMethod(o, component, "set"),
         "get": {
             enumerable: true,
             value: function(name) {
                 // protection against anything other then `cmp.get('v.something')`
-                if (typeof name !== "string" || name.length < 3 || name.indexOf("v.") !== 0) {
+                if (typeof name !== "string" || name.length < 3 || (name.indexOf("v.") !== 0 && name.indexOf("e.") !== 0)) {
                     throw new SyntaxError('Invalid key '+ name);
                 }
+   
                 return SecureObject.filterEverything(o, component["get"](name));
             }
         }

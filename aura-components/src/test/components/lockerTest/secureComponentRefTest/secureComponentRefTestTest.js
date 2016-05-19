@@ -36,5 +36,11 @@
         test: function(cmp) {
             cmp.testGetFacetActionThrowsError();
         }
+    },
+    
+    testGetComponentEvent: {
+        test: function(cmp) {
+            cmp.testGetComponentEvent();
+        }
     }
 })

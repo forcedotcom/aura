@@ -429,12 +429,12 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
         // before 3 or 4 completes; that's ok because ComponentDefStorage#enqueue provides mutual exclusion
         // to persistent def store manipulation.
 
-        $A.clientService.runWhenXHRIdle(function() {
-            // log that we're clearing
-            metricsPayload = $A.util.apply({}, metricsPayload);
-            metricsPayload["evicted"] = "all";
-            $A.metricsService.transaction("aura", "evictedDefs", { "context": metricsPayload });
+        // log that we're starting the clear
+        metricsPayload = $A.util.apply({}, metricsPayload);
+        metricsPayload["evicted"] = "all";
+        $A.metricsService.transactionStart("aura", "evictedDefs", { "context": metricsPayload });
 
+        $A.clientService.runWhenXHRIdle(function() {
             $A.warning("ComponentDefStorage.clear: clearing all defs and actions");
 
             // clear aura.context.loaded
@@ -448,7 +448,6 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
                     function(e) {
                         $A.warning("ComponentDefStorage.clear: failure clearing actions store", e);
                         metricsPayload["actionsError"] = true;
-                        $A.metricsService.transactionUpdate("aura", "evictedDefs", { "context": metricsPayload });
                         // do not rethrow to return to resolve state
                     }
                 );
@@ -461,12 +460,17 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
                 function(e) {
                     $A.warning("ComponentDefStorage.clear: failure clearing cmp def store", e);
                     metricsPayload["componentDefStorageError"] = true;
-                    $A.metricsService.transactionUpdate("aura", "evictedDefs", { "context": metricsPayload });
                     // do not rethrow to return to resolve state
                 }
             );
 
-            resolve(Promise.all([actionClear, defClear]));
+            var promise = Promise.all([actionClear, defClear]).then(
+                function() {
+                    // done the clearing. metricsPayload is updated with any errors
+                    $A.metricsService.transactionEnd("aura", "evictedDefs", { "context": metricsPayload });
+                }
+            );
+            resolve(promise);
         });
     });
 };

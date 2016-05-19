@@ -36,6 +36,7 @@
                         body.push(newCmp);
                     }
                     cmp.set("v.body", body);
+                    cmp.index(config.localId, newCmp.getGlobalId());
                 },
                 config
             );

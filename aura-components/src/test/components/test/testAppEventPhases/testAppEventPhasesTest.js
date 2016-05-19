@@ -104,6 +104,7 @@
                         $A.createComponent("test:testAppEventPhasesHandlerChild", {
                             logId: progId
                         }, function(newCmp) {
+                            newCmp.setAttributeValueProvider(curCmp);
                             var wrapperCmp = curCmp.find("wrapper");
                             var newBody;
                             if(!appendToBody) {

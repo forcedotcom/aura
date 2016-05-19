@@ -31,7 +31,7 @@
 function SecureWindow(win, key, globalAttributeWhitelist) {
 	"use strict";
 	
-    var hostedDefinedGlobals = ["alert", "clearInterval", "clearTimeout", "confirm", "console", "location", "Node"];
+    var hostedDefinedGlobals = ["alert", "clearInterval", "clearTimeout", "confirm", "console", "location", "Node", "requestAnimationFrame", "cancelAnimationFrame"];
 
 	var o = Object.create(null, {
 		document: {
@@ -76,25 +76,41 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 		}
 	});
 
+	[ "outerHeight", "outerWidth" ].forEach(function(name) {
+		SecureObject.addPropertyIfSupported(o, win, name, {
+			filterOpaque : true
+		});
+	});
+	
+	[ "getComputedStyle", "scroll", "scrollBy", "scrollTo" ].forEach(function(name) {
+		SecureObject.addMethodIfSupported(o, win, name, {
+			filterOpaque : true
+		});
+	});	
+	
 	SecureElement.addSecureGlobalEventHandlers(o, win, key);
 	SecureElement.addEventTargetMethods(o, win, key);
+	
+    // Salesforce API entry points (first phase) - W-3046191 is tracking adding $A.lockerService.publish() API enhancement where we will move these 
+    // to their respective javascript/container architectures
+    ["sforce", "Sfdc"].forEach(function(name) {
+		SecureObject.addPropertyIfSupported(o, win, name);
+	});
 
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", win);
 
 	// Has to happen last because it depends on the secure getters defined above that require the object to be keyed
 	globalAttributeWhitelist.forEach(function(name) {
-		if (!o[name] && name !== "Object") {
-			// These are direct passthrough's and should never be wrapped in a SecureObject
-			Object.defineProperty(o, name, {
-				enumerable: true,
-				value: win[name]
-			});
-		}
+		// These are direct passthrough's and should never be wrapped in a SecureObject
+		Object.defineProperty(o, name, {
+			enumerable: true,
+			value: win[name]
+		});
 	});
 
 	hostedDefinedGlobals.forEach(function(name) {
-		if (!o[name]) {
+		if (!(name in o) && (name in win)) {
 			// These are direct passthrough's and should never be wrapped in a SecureObject
 			var value = win[name];
 			Object.defineProperty(o, name, {

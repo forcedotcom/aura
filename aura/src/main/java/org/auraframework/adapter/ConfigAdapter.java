@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.auraframework.def.RootDefinition;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.resource.ResourceLoader;
 
@@ -126,4 +127,5 @@ public interface ConfigAdapter extends AuraAdapter {
 	ContentSecurityPolicy getContentSecurityPolicy(String app, HttpServletRequest request);
 	
 	boolean isLockerServiceEnabled();
+	boolean requireLocker(RootDefinition def);
 }

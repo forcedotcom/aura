@@ -46,7 +46,7 @@ function SecureXMLHttpRequest(key) {
 		// Properties
 		["readyState", "status", "statusText", "response", "responseType", "responseText", 
 		 "responseXML", "responseURL", "timeout", "withCredentials"].forEach(function (name) {
-			Object.defineProperty(o, name, SecureObject.createFilteredProperty(o, xhr, name));
+			SecureObject.addMethodIfSupported(o, xhr, name);
 		});
 			
 		// Event handlers

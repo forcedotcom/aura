@@ -32,6 +32,8 @@
     <aura:method name="testQuerySelectorAllReturnsSecureNodeList" action="{!c.testQuerySelectorAllReturnsSecureNodeList}"/>
     <aura:method name="testDocumentBodyConstructorNotExposed" action="{!c.testDocumentBodyConstructorNotExposed}"/>
     <aura:method name="testCreateElementCoersionExploit" action="{!c.testCreateElementCoersionExploit}"/>
+    <aura:method name="testCreateElementNSForSVGElement" action="{!c.testCreateElementNSForSVGElement}"/>
+    <aura:method name="testGetElementsByTagNameForScriptTag" action="{!c.testGetElementsByTagNameForScriptTag}"/>
 
     <div id="title">SecureDocument test</div>
 

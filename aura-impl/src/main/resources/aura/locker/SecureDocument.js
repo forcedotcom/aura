@@ -90,17 +90,18 @@ function SecureDocument(doc, key) {
         body: SecureObject.createFilteredProperty(o, doc, "body"),
         head: SecureObject.createFilteredProperty(o, doc, "head"),
 
-        childNodes: SecureObject.createFilteredProperty(o, doc, "childNodes"),
+        childNodes: SecureObject.createFilteredProperty(o, doc, "childNodes", { filterOpaque: true }),
 
         nodeType: SecureObject.createFilteredProperty(o, doc, "nodeType"),
 
-        getElementById: SecureObject.createFilteredMethod(o, doc, "getElementById"),
-        getElementsByClassName: SecureObject.createFilteredMethod(o, doc, "getElementsByClassName"),
-        getElementsByName: SecureObject.createFilteredMethod(o, doc, "getElementsByName"),
-        getElementsByTagName: SecureObject.createFilteredMethod(o, doc, "getElementsByTagName"),
+        getElementById: SecureObject.createFilteredMethod(o, doc, "getElementById", { filterOpaque: true }),
+        getElementsByClassName: SecureObject.createFilteredMethod(o, doc, "getElementsByClassName", { filterOpaque: true }),
+        getElementsByName: SecureObject.createFilteredMethod(o, doc, "getElementsByName", { filterOpaque: true }),
+        getElementsByTagName: SecureObject.createFilteredMethod(o, doc, "getElementsByTagName", { filterOpaque: true }),
+        getElementsByTagNameNS: SecureObject.createFilteredMethod(o, doc, "getElementsByTagNameNS", { filterOpaque: true }),
 
-        querySelector: SecureObject.createFilteredMethod(o, doc, "querySelector"),
-        querySelectorAll: SecureObject.createFilteredMethod(o, doc, "querySelectorAll"),
+        querySelector: SecureObject.createFilteredMethod(o, doc, "querySelector", { filterOpaque: true }),
+        querySelectorAll: SecureObject.createFilteredMethod(o, doc, "querySelectorAll", { filterOpaque: true }),
 
         title: SecureObject.createFilteredProperty(o, doc, "title"),
 

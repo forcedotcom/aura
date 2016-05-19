@@ -47,6 +47,8 @@ import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
@@ -732,7 +734,22 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return true;
     }
 
-    protected boolean isSafeEvalWorkerURI(String uri) {
+	@Override
+	public boolean requireLocker(RootDefinition def) {
+        boolean requireLocker = !isInternalNamespace(def.getDescriptor().getNamespace());
+		if (!requireLocker) {
+            DefDescriptor<InterfaceDef> requireLockerDescr = Aura.getDefinitionService().getDefDescriptor("aura:requireLocker", InterfaceDef.class);
+        	try {
+				requireLocker = def.isInstanceOf(requireLockerDescr);
+			} catch (QuickFixException e) {
+				throw new AuraRuntimeException(e);
+			}
+    	} 
+        
+		return requireLocker;
+	}
+	
+	protected boolean isSafeEvalWorkerURI(String uri) {
         return uri.endsWith("/lockerservice/safeEval.html");
     }
 }

@@ -4,6 +4,7 @@
         var auraId = event.getParam("arguments").auraId;
         var elementPropertiesWhitelist = event.getParam("arguments").elementPropertiesWhitelist;
         var elementProperitesBlacklist = event.getParam("arguments").elementPropertiesBlacklist;
+                  debugger;
         var element = cmp.find(auraId).getElement();
 
         elementPropertiesWhitelist.forEach(function(name) {
@@ -52,7 +53,6 @@
     testRemoveEventListener: function(cmp, event) {
         var testUtils = cmp.get("v.testUtils");
         var counter = 0;
-
         var element = cmp.find("title").getElement();
         var testWithUseCapture = event.getParam("arguments").testWithUseCapture;
         var useCapture = undefined;

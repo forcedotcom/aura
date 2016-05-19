@@ -23,7 +23,7 @@
             // Few notes
             // (1) These are only @platform APIs exposed in Aura.js, not everything you can potentially get to from $A
             // (2) @platform APIs not exposed: localizationService, reportError, getToken, set, getReference, run, error (deprecated)
-            var exposedAPIs = ["util", "warning", "getCallback", "get", "getRoot", "log"];
+            var exposedAPIs = ["util", "warning", "getCallback", "get", "getRoot", "log", "localizationService"];
             cmp.testPlatformExposedAPIs(exposedAPIs);
         }
     },

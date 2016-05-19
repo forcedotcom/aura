@@ -203,6 +203,12 @@
         }
     },
 
+    testModifyGetAllObject:{
+        test:function(cmp){
+            cmp._storageLib.testModifyGetAllObject(cmp, this.storage);
+        }
+    },
+
     testUpdate: {
         test:function(cmp){
             cmp._storageLib.testUpdate(cmp, this.storage);

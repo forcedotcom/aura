@@ -48,7 +48,7 @@ function storageTest () {
 
     function runUnsureKey(cmp, storage, key) {
         var completed = false;
-        var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
+        var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
         append(cmp, "put("+key+",value);");
         storage.put(key, "value")
             .then(function() {
@@ -74,7 +74,7 @@ function storageTest () {
 
     function runFullCycle(cmp, storage, key, value) {
         var completed = false;
-        var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
+        var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
         append(cmp, "put("+key+","+value+");");
         storage.put(key, value)
             .then(function() {
@@ -256,7 +256,7 @@ function storageTest () {
         },
 
         testSetItemOverMaxSize_stage2: function(cmp, storage) {
-            var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
             var completed = false;
             storage.get("overSize")
                 .then(function (item) {
@@ -365,13 +365,14 @@ function storageTest () {
         },
 
         testModifyObject: function(cmp, storage) {
-            var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
             var completed = false;
             var stuff = { "changeling": 2 };
             storage.put("testModifyObject", stuff)
                 .then(function() {
                     stuff["changeling"] = 3;
-                    return storage.get("testModifyObject"); })
+                    return storage.get("testModifyObject");
+                })
                 .then(function(item) {
                     $A.test.assertEquals(2, item.value["changeling"],
                         "testModifyObject: Object changed while stored");
@@ -380,8 +381,29 @@ function storageTest () {
             $A.test.addWaitFor(true, function() { return completed; });
         },
 
+        testModifyGetAllObject: function(cmp, storage) {
+            var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
+            var completed = false;
+            var stuff = { "changeling": 2 };
+            storage.put("testModifyObject", stuff)
+                .then(function() {
+                    return storage.getAll();
+                })
+                .then(function(all) {
+                    $A.test.assertEquals(1, all.length, "Unexpected items returned by getAll()");
+                    all[0].value["changeling"] = 3;
+                    return storage.getAll();
+                })
+                .then(function(all) {
+                    $A.test.assertEquals(1, all.length, "Unexpected items returned by getAll()");
+                    $A.test.assertEquals(2, all[0].value["changeling"], "Object changed while stored");
+                    completed = true;
+                })['catch'](failTest);
+            $A.test.addWaitFor(true, function() { return completed; });
+        },
+
         testUpdate: function(cmp, storage) {
-            var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
             var completed = false;
 
             storage.put("testUpdate", "ORIGINAL")
@@ -404,7 +426,7 @@ function storageTest () {
          * so max size is not exceeded.
          */
         testOverflow: function(cmp, storage) {
-            var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
             var completed = false;
             var chunk = new Array(512).join("x");
             var keyLength = 14;
@@ -441,7 +463,7 @@ function storageTest () {
         },
 
         testClear_stage1: function(cmp, storage) {
-            var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
             var completed = false;
 
             storage.clear()
@@ -461,7 +483,7 @@ function storageTest () {
         },
 
         testClear_stage2: function(cmp, storage) {
-            var failTest = function(error) { completed=true; failTest(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
             var completed = false;
 
             storage.put("key1" , new Array(1024).join("x"))

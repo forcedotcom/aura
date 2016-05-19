@@ -82,9 +82,10 @@
             function(cmp) {
                 var self = this,
                 tabSet = cmp.find(self.SELECTOR.tabsetcmp),
-                newTitle = "Updated Title";
+                newTitle = "Updated Title",
+                tab0Name = "tab0";
 
-                self.updateTab(tabSet, 0, undefined, {title: newTitle});
+                self.updateTab(tabSet, undefined, tab0Name, {title: newTitle});
 
                 $A.test.addWaitForWithFailureMessage(
                     newTitle,

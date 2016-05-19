@@ -71,16 +71,15 @@
      */
     updateTab: function (cmp, index, tab, callback, name) {
 
-        var self = this,
-            tabs = cmp.get("v.tabHeaders"),
+        var tabs = cmp.get("v.tabHeaders"),
             existingTab;
 
         //Prioritize finding a tab by name rather than index
         if(name) {
-            existingTab = tabs.filter(function(tab) {
-                return tab.get("v.name") == name;
+            existingTab = tabs.filter(function(tabHeader) {
+                return tabHeader.get("v.name") === name;
             })[0];
-        } else if($A.util.isNumber(index) && index >= 0 && index <= tabs.length) {
+        } else if($A.util.isNumber(index) && index >= 0 && index < tabs.length) {
             existingTab = tabs[index];
         }
 
@@ -93,7 +92,7 @@
                     if(typeof callback === "function") {
                         callback(existingTab);
                     }
-                }, tab.icon)
+                }, tab.icon);
             } else if(typeof callback === "function") {
                 callback(existingTab);
             }

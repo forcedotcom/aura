@@ -21,32 +21,30 @@
  * @export
  */
 var AuraStorage = function AuraStorage(config) {
+    var AdapterCtr = config["adapterClass"];
+    this.adapter = new AdapterCtr(config);
+
+    // extract values this class uses
     this.name = config["name"];
-    this.adapter = config["adapter"];
     this.maxSize = config["maxSize"];
-    this.defaultExpiration = config["defaultExpiration"] * 1000;
-    this.defaultAutoRefreshInterval = config["defaultAutoRefreshInterval"] * 1000;
-    this.debugLoggingEnabled = config["debugLoggingEnabled"];
+    this.expiration = config["expiration"] * 1000;
+    this.autoRefreshInterval = config["autoRefreshInterval"] * 1000;
+    this.debugLogging = config["debugLogging"];
+    this.version = "" + config["version"];
+    this.keyPrefix = this.generateKeyPrefix(config["isolationKey"], this.version);
+
     this.getOperationsInFlight = 0;
 
-    this.isolationKey = config["isolationKey"];
-    this.setVersion(config["version"]);
-    this.updateKeyPrefix();
-
     // frequency guard for sweeping
-    this.sweepInterval = Math.min(Math.max(this.defaultExpiration*0.5, AuraStorage["SWEEP_INTERVAL"]["MIN"]), AuraStorage["SWEEP_INTERVAL"]["MAX"]);
-
+    this.sweepInterval = Math.min(Math.max(this.expiration*0.5, AuraStorage["SWEEP_INTERVAL"]["MIN"]), AuraStorage["SWEEP_INTERVAL"]["MAX"]);
     this.lastSweepTime = new Date().getTime();
+    this.sweepingSuspended = false;
 
-    this._sweepingSuspended = false;
-
-    var clearStorageOnInit = config["clearStorageOnInit"];
-
-    this.log($A.util.format("initializing storage adapter using { maxSize: {0} KB, defaultExpiration: {1} sec, defaultAutoRefreshInterval: {2} sec, clearStorageOnInit: {3}, version: {4} }",
-            (this.maxSize/1024).toFixed(1), this.defaultExpiration/1000, this.defaultAutoRefreshInterval/1000, clearStorageOnInit, this.version
+    this.log($A.util.format("initializing storage adapter using { maxSize: {0} KB, expiration: {1} sec, autoRefreshInterval: {2} sec, clearStorageOnInit: {3}, isolationKey: {4} }",
+            (this.maxSize/1024).toFixed(1), this.expiration/1000, this.autoRefreshInterval/1000, config["clearOnInit"], this.keyPrefix
         ));
 
-    // work around the obfuscation logic to allow external Adapters to properly plug in
+    // work around the obfuscation logic to allow external adapters to properly plug in
     this.adapter.clear = this.adapter.clear || this.adapter["clear"];
     this.adapter.getExpired = this.adapter.getExpired || this.adapter["getExpired"];
     this.adapter.sweep = this.adapter.sweep || this.adapter["sweep"];
@@ -60,13 +58,8 @@ var AuraStorage = function AuraStorage(config) {
     this.adapter.isSecure = this.adapter.isSecure || this.adapter["isSecure"];
     this.adapter.isPersistent = this.adapter.isPersistent || this.adapter["isPersistent"];
     this.adapter.clearOnInit = this.adapter.clearOnInit || this.adapter["clearOnInit"];
-
     this.adapter.suspendSweeping = this.adapter.suspendSweeping || this.adapter["suspendSweeping"];
     this.adapter.resumeSweeping = this.adapter.resumeSweeping || this.adapter["resumeSweeping"];
-
-    var adapterConfig = $A.storageService.getAdapterConfig(this.adapter.getName());
-    this.persistent = !$A.util.isUndefinedOrNull(adapterConfig["persistent"]) && adapterConfig["persistent"];
-    this.secure = !$A.util.isUndefinedOrNull(adapterConfig["secure"]) && adapterConfig["secure"];
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     // for storage adapter testing
@@ -77,23 +70,11 @@ var AuraStorage = function AuraStorage(config) {
     this.adapter["getAll"] = this.adapter.getAll;
     this.adapter["sweep"] = this.adapter.sweep;
     //#end
-
-
-    // clear on init is special: it must complete before any subsequent operation
-    // is executed.
-    if (clearStorageOnInit === true) {
-        this.log("clearing " + this.getName() + " storage on init");
-        if (this.adapter.clearOnInit) {
-            this.adapter.clearOnInit();
-        } else {
-            this.adapter.clear();
-        }
-     }
 };
 
 /**
- * Returns the name of the storage type. For example, "indexeddb" or "memory".
- * @returns {String} The storage type.
+ * Returns the name of the storage adapter. For example, "indexeddb" or "memory".
+ * @returns {String} The storage adapter's name.
  * @export
  */
 AuraStorage.prototype.getName = function() {
@@ -101,8 +82,8 @@ AuraStorage.prototype.getName = function() {
 };
 
 /**
- * Asynchronously gets the current storage size in KB.
- * @returns {Promise} A Promise that will get the current storage size in KB.
+ * Gets the current storage size in KB.
+ * @returns {Promise} A Promise that resolves to the current storage size in KB.
  * @export
  */
 AuraStorage.prototype.getSize = function() {
@@ -117,14 +98,6 @@ AuraStorage.prototype.getSize = function() {
  */
 AuraStorage.prototype.getMaxSize = function() {
     return this.maxSize / 1024.0;
-};
-
-/**
- * Returns the default auto-refresh interval in seconds.
- * @returns {number} The default auto-refresh interval.
- */
-AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
-    return this.defaultAutoRefreshInterval;
 };
 
 /**
@@ -147,22 +120,21 @@ AuraStorage.prototype.clear = function() {
 /**
  * Asynchronously gets an item from storage corresponding to the specified key.
  * @param {String} key The item key. This is the key used when the item was added to storage using <code>put()</code>.
- * @returns {Promise} A Promise that resolves to an object in storage or undefined if the key is not found.
- *      The object consists of {value: *, isExpired: Boolean}.
-
+ * @param {Boolean} includeExpired True to return expired items, falsey to not return expired items.
+ * @returns {Promise} A Promise that resolves to the stored item or undefined if the key is not found.
  * @export
  */
-AuraStorage.prototype.get = function(key) {
+AuraStorage.prototype.get = function(key, includeExpired) {
     this.getOperationsInFlight += 1;
     var that = this;
     var promise = this.adapter.getItem(this.keyPrefix + key).then(function(item) {
         that.log("get() " + (item ? "HIT" : "MISS") + " - key: " + key + ", value: " + item);
         that.getOperationsInFlight -= 1;
 
-        if (!item) {
+        if (!item || (!includeExpired && new Date().getTime() > item["expires"])) {
             return undefined;
         }
-        return { "value" : item["value"], "isExpired" : (new Date().getTime() > item["expires"]) };
+        return item["value"];
     },function (e) {
         that.logError({ "operation": "get", "error": e });
         that.getOperationsInFlight -= 1;
@@ -176,9 +148,8 @@ AuraStorage.prototype.get = function(key) {
 
 
 /**
- * In flight operations counter
- * @returns {Integer} Number of operations currently waiting on being resolved
-
+ * In-flight operations counter.
+ * @returns {Integer} Number of operations currently waiting on being resolved.
  * @export
  */
 AuraStorage.prototype.inFlightOperations = function() {
@@ -187,11 +158,12 @@ AuraStorage.prototype.inFlightOperations = function() {
 
 /**
  * Asynchronously gets all items from storage.
+ * @param {Boolean} [includeExpired] True to return expired items, falsey to not return expired items.
  * @returns {Promise} A Promise that resolves to an array of objects in storage. Each
- *      object consists of {key: String, value: *, isExpired: Boolean}.
+ *      object consists of {key: String, value: *}.
  * @export
  */
-AuraStorage.prototype.getAll = function() {
+AuraStorage.prototype.getAll = function(includeExpired) {
     var that = this;
     return this.adapter.getAll().then(function(items) {
         var length = items.length ? items.length : 0;
@@ -200,11 +172,11 @@ AuraStorage.prototype.getAll = function() {
         var results = [];
         for (var i = 0; i < length; i++) {
             var item = items[i];
-            if (item["key"].indexOf(that.keyPrefix) === 0) {
+            if (item["key"].indexOf(that.keyPrefix) === 0 && (includeExpired || now < item["expires"])) {
                 var key = item["key"].replace(that.keyPrefix, "");
-                results.push({ "key": key, "value": item["value"], "isExpired": (now > item["expires"]) });
+                results.push({ "key": key, "value": item["value"] });
             }
-            // wrong isolationKey/version so ignore the entry
+            // wrong isolationKey/version or item is expired so ignore the entry
             // TODO - capture entries to be removed async
         }
 
@@ -226,7 +198,6 @@ AuraStorage.prototype.getAll = function() {
  * @export
  */
 AuraStorage.prototype.put = function(key, value) {
-
     // For the size calculation, consider only the inputs to the storage layer: key and value
     // Ignore all the extras in the item object below
     var size = $A.util.estimateSize(key) + $A.util.estimateSize(value);
@@ -243,7 +214,7 @@ AuraStorage.prototype.put = function(key, value) {
     var item = {
         "value": value,
         "created": now,
-        "expires": now + this.defaultExpiration
+        "expires": now + this.expiration
     };
 
     var that = this;
@@ -297,7 +268,7 @@ AuraStorage.prototype.sweep = function() {
         return;
     }
     // 2. sweeping has been suspended. often set when the client goes offline or the store's size is being manually managed.
-    if (this._sweepingSuspended) {
+    if (this.sweepingSuspended) {
         return;
     }
     // 3. framework hasn't finished init'ing
@@ -383,7 +354,7 @@ AuraStorage.prototype.sweep = function() {
 AuraStorage.prototype.suspendSweeping = function() {
     this.log("suspendSweeping()");
 
-    this._sweepingSuspended = true;
+    this.sweepingSuspended = true;
 
     if (this.adapter.suspendSweeping) {
         this.adapter.suspendSweeping();
@@ -397,7 +368,7 @@ AuraStorage.prototype.suspendSweeping = function() {
 AuraStorage.prototype.resumeSweeping = function() {
     this.log("resumeSweeping()");
 
-    this._sweepingSuspended = false;
+    this.sweepingSuspended = false;
 
     if (this.adapter.resumeSweeping) {
         this.adapter.resumeSweeping();
@@ -410,7 +381,7 @@ AuraStorage.prototype.resumeSweeping = function() {
  * @private
  */
 AuraStorage.prototype.log = function() {
-    if (this.debugLoggingEnabled) {
+    if (this.debugLogging) {
         var msg = Array.prototype.join.call(arguments, " ");
         $A.log("AuraStorage '" + this.name + "' [" + this.getName() + "] : " + msg);
     }
@@ -438,10 +409,7 @@ AuraStorage.prototype.logError = function(payload) {
  * @export
  */
 AuraStorage.prototype.isPersistent = function() {
-    if (this.adapter.isPersistent) {
-        return this.adapter.isPersistent();
-    }
-    return this.persistent;
+    return this.adapter.isPersistent();
 };
 
 /**
@@ -450,21 +418,7 @@ AuraStorage.prototype.isPersistent = function() {
  * @export
  */
 AuraStorage.prototype.isSecure = function() {
-    if (this.adapter.isSecure) {
-        return this.adapter.isSecure();
-    }
-    return this.secure;
-};
-
-/**
- * Sets the storage version.
- * @param {String} version storage version.
- * @export
- */
-AuraStorage.prototype.setVersion  = function(version) {
-    // ensure string
-    this.version = (version || "") + "";
-    this.updateKeyPrefix();
+    return this.adapter.isSecure();
 };
 
 /**
@@ -474,6 +428,23 @@ AuraStorage.prototype.setVersion  = function(version) {
  */
 AuraStorage.prototype.getVersion  = function() {
     return this.version;
+};
+
+/**
+ * Returns the expiration in seconds.
+ * @returns {number} The expiration in seconds.
+ * @export
+ */
+AuraStorage.prototype.getExpiration = function() {
+    return this.expiration / 1000;
+};
+
+/**
+ * Returns the auto-refresh interval in seconds.
+ * @returns {number} The auto-refresh interval in seconds.
+ */
+AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
+    return this.autoRefreshInterval;
 };
 
 /**
@@ -491,21 +462,18 @@ AuraStorage.prototype.deleteStorage = function() {
                     throw e;
                 }
             );
-
-    } else {
-        return new Promise(function(success) {
-            that.log("AuraStorage '" + that.name + "' [" + that.getName() + "] : " + "Does not implement deleteStorage(), returning success");
-            success();
-        });
     }
+    return Promise["resolve"]();
 };
 
 /**
- * Update the prefix for all storage keys.
+ * Generates the key prefix for storage.
+ * @param {String} isolationKey The isolation key.
+ * @param {String} version The version.
  * @private
  */
-AuraStorage.prototype.updateKeyPrefix = function() {
-    this.keyPrefix = this.isolationKey + this.version + AuraStorage.KEY_DELIMITER;
+AuraStorage.prototype.generateKeyPrefix = function(isolationKey, version) {
+    return "" + isolationKey + version + AuraStorage.KEY_DELIMITER;
 };
 
 

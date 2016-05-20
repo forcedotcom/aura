@@ -2,7 +2,15 @@
     init: function(cmp) {
         var secure = cmp.get("v.secure");
         $A.storageService.CryptoAdapter.register();
-        cmp._storage = $A.storageService.initStorage("persistentStorageCmp", true, secure, 32768, 2000, 3000, true, false);
+        cmp._storage = $A.storageService.initStorage({
+            name: "persistentStorageCmp",
+            persistent: true,
+            secure: secure,
+            maxSize: 32768,
+            expiration: 2000,
+            autoRefreshInterval: 3000,
+            clearOnInit: false
+        });
     },
 
     resetStorage: function(cmp) {
@@ -30,11 +38,11 @@
         cmp.set("v.status", "Getting");
         var key = cmp.get("v.key");
         cmp._storage.get(key)
-            .then(function(item) {
-                if (item === undefined) {
+            .then(function(value) {
+                if (value === undefined) {
                     cmp.set("v.return", "undefined");
                 } else {
-                    cmp.set("v.return", item.value);
+                    cmp.set("v.return", value);
                 }
                 cmp.set("v.status", "Done Getting");
             }, function(error) {

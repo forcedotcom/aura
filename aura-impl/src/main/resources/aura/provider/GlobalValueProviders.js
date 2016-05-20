@@ -136,20 +136,18 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
         var that = this;
         $A.util.Mutex.lock(that.MUTEX_KEY , function (unlock) {
             that.mutexUnlock = unlock;
-            storage.get(that.STORAGE_KEY)
-                .then(function(item) {
-                    if (item && item.value) {
+            storage.get(that.STORAGE_KEY, true)
+                .then(function(value) {
+                    if (value) {
                         // NOTE: we merge into the value from storage to avoid modifying toStore, which may hold
                         // references to mutable objects from the live GVPs (due to getValues() etc above). this means
                         // the live GVPs don't see the additional values from storage.
 
                         try {
-                            item = item.value;
-
                             var j;
                             var map = {};
-                            for (j in item) {
-                                map[item[j]["type"]] = item[j]["values"];
+                            for (j in value) {
+                                map[value[j]["type"]] = value[j]["values"];
                             }
 
 
@@ -157,12 +155,12 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                                 type = toStore[j]["type"];
                                 if (!map[type]) {
                                     map[type] = {};
-                                    item.push({"type":type, "values":map[type]});
+                                    value.push({"type":type, "values":map[type]});
                                 }
                                 $A.util.apply(map[type], toStore[j]["values"], true, true);
                             }
 
-                            toStore = item;
+                            toStore = value;
                         } catch (err) {
                             $A.warning("GlobalValueProvider.merge(), merging from storage failed, overwriting, error:" + err);
                         }
@@ -206,18 +204,17 @@ GlobalValueProviders.prototype.loadFromStorage = function(callback) {
     var storage = this.getStorage();
     var that = this;
     if (storage) {
-        storage.get(this.STORAGE_KEY)
-            .then(function (item) {
+        storage.get(this.STORAGE_KEY, true)
+            .then(function (value) {
                     $A.run(function() {
-                        if (item) {
-                            // TODO W-2512654: storage.get() returns expired items, need to check value['isExpired']
-                            that.merge(item.value, true);
+                        if (value) {
+                            that.merge(value, true);
 
                             // some GVP values were loaded from storage
                             that.LOADED_FROM_PERSISTENT_STORAGE = true;
                         }
 
-                        callback(!!item);
+                        callback(!!value);
                     });
             })
             .then(

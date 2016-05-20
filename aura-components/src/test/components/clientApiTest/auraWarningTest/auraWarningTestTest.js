@@ -93,7 +93,6 @@
                     // "console" uses particular format to create log message.
                     // Referring to the implementation of devDebugConsoleLog in Logger.js
                     // to mock the function.
-                    // debugger;
                     if(format === "%s") {
                         actualMsg += message;
                     } else if(format === "%o") {

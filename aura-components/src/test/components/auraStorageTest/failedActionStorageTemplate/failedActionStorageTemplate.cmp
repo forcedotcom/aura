@@ -6,6 +6,8 @@
             var MockStorageAdapter = function MockStorageAdapter(config) {  this.name = config['name']; };
             MockStorageAdapter.NAME = "mock";
             MockStorageAdapter.prototype.getName = function() { return MockStorageAdapter.NAME; };
+            MockStorageAdapter.prototype.isPersistent = function() { return true; };
+            MockStorageAdapter.prototype.isSecure = function() { return true; };
 
             MockStorageAdapter.prototype.getSize = function() {
                 return Promise.reject(new Error("getSize(): mock always fails"));
@@ -44,11 +46,15 @@
             });
 
             // force test to select our mock adapter
-            $A.installOverride("StorageService.selectAdapter", function(){ return MockStorageAdapter.NAME }, this); 
+            $A.installOverride("StorageService.selectAdapter", function(){ return MockStorageAdapter.NAME }, this);
 
-            // create the magic "actions" store. the requested attributes (notably persistence) will
-            // cause our mock adapter to be selected
-            $A.storageService.initStorage("actions", true, true, 4096, 200, 300, true, true);
+            // create the magic "actions" store
+            $A.storageService.initStorage({
+                name: "actions",
+                maxSize: 4096,
+                expiration: 200,
+                autoRefreshInterval: 300
+            });
         </script>
     </aura:set>
 </aura:component>

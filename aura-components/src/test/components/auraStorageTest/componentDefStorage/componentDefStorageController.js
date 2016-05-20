@@ -79,7 +79,7 @@
 
     verifyDefsRestored: function(cmp, evt, helper) {
         helper.setStatus(cmp, "Verifying Defs Restored");
-        $A.storageService.getStorage('ComponentDefStorage').getAll()
+        $A.storageService.getStorage('ComponentDefStorage').getAll(true)
             .then(function(items) {
                 if (items.length > 0) {
                     helper.setStatus(cmp, "Verified Defs Restored");

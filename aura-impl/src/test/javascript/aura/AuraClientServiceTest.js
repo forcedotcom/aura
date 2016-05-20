@@ -346,8 +346,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 var that = this;
                 return new Promise(function(success, error) {
                     if (that._stubs && that._stubs.get) {
-                        var value = { value : that._stubs.get[key], isExpired : false };
-                        success(value);
+                        success(that._stubs.get[key]);
                     } else {
                         throw "actionsStorage.get(..) called before it was stubbed out.";
                     }

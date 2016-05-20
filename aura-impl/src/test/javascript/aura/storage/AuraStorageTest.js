@@ -29,13 +29,145 @@ Test.Aura.Storage.Adapters.AuraStorageTest = function() {
     });
 
 
+    [Fixture]
+    function getName() {
+        var AdapterClass = function() {};
+        AdapterClass.prototype.getName = function() {};
+        var config = {
+            adapterClass: AdapterClass
+        };
+
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                util: {
+                    format: function() {}
+                }
+            },
+            "AuraStorage": {}
+        });
+
+        [Fact]
+        function DelegatesToAdapter() {
+            var expected = "name";
+            var actual;
+
+            AdapterClass.prototype.getName = function() {return expected;};
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                actual = target.getName();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+
+    [Fixture]
+    function getExpiration() {
+        var AdapterClass = function() {};
+        AdapterClass.prototype.getName = function() {};
+        var config = {
+            adapterClass: AdapterClass
+        };
+
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                util: {
+                    format: function() {}
+                }
+            },
+            "AuraStorage": {}
+        });
+
+        [Fact]
+        function RespectsConstructorConfig() {
+            var expected = 1;
+            var actual;
+
+            config.expiration = expected;
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                actual = target.getExpiration();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+
+    [Fixture]
+    function getMaxSize() {
+        var AdapterClass = function() {};
+        AdapterClass.prototype.getName = function() {};
+        var config = {
+            adapterClass: AdapterClass
+        };
+
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                util: {
+                    format: function() {}
+                }
+            },
+            "AuraStorage": {}
+        });
+
+        [Fact]
+        function RespectsConstructorConfig() {
+            var expected = 1; // output as KB
+            var actual;
+
+            config.maxSize = expected * 1024; // input as bytes
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                actual = target.getMaxSize();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+
+    [Fixture]
+    function getVersion() {
+        var AdapterClass = function() {};
+        AdapterClass.prototype.getName = function() {};
+        var config = {
+            adapterClass: AdapterClass
+        };
+
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                util: {
+                    format: function() {}
+                }
+            },
+            "AuraStorage": {}
+        });
+
+        [Fact]
+        function RespectsConstructorConfig() {
+            var expected = "a";
+            var actual;
+
+            config.version = expected;
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                actual = target.getVersion();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
 
     [Fixture]
     function sweep() {
+        var AdapterClass = function() {};
+        AdapterClass.prototype.getName = function() {};
+
         var config = {
-            adapter: {
-                getName: function() {}
-            }
+            adapterClass: AdapterClass
         };
 
         var NoopPromise = function NoopPromise() {
@@ -80,7 +212,7 @@ Test.Aura.Storage.Adapters.AuraStorageTest = function() {
             var expected = 1;
             var actual = 0;
 
-            config.adapter.sweep = function() {
+            AdapterClass.prototype.sweep = function() {
                 actual++;
                 return new NoopPromise();
             };
@@ -104,7 +236,7 @@ Test.Aura.Storage.Adapters.AuraStorageTest = function() {
             var expected = 0;
             var actual = 0;
 
-            config.adapter.sweep = function() {
+            AdapterClass.prototype.sweep = function() {
                 actual++;
                 return new NoopPromise();
             };
@@ -127,7 +259,7 @@ Test.Aura.Storage.Adapters.AuraStorageTest = function() {
             var expected = 1;
             var actual = 0;
 
-            config.adapter.sweep = function() {
+            AdapterClass.prototype.sweep = function() {
                 actual++;
                 return new NoopPromise();
             };
@@ -150,7 +282,7 @@ Test.Aura.Storage.Adapters.AuraStorageTest = function() {
             var expected = 0;
             var actual = 0;
 
-            config.adapter.sweep = function() {
+            AdapterClass.prototype.sweep = function() {
                 actual++;
                 return new NoopPromise();
             };
@@ -175,8 +307,8 @@ Test.Aura.Storage.Adapters.AuraStorageTest = function() {
             var expected = 0;
             var actual = 0;
 
-            config.defaultExpiration = 1;
-            config.adapter.sweep = function() {
+            config.expiration = 1;
+            AdapterClass.prototype.sweep = function() {
                 actual++;
                 return new NoopPromise();
             };
@@ -200,8 +332,8 @@ Test.Aura.Storage.Adapters.AuraStorageTest = function() {
             var expected = 1;
             var actual = 0;
 
-            config.defaultExpiration = 1;
-            config.adapter.sweep = function() {
+            config.expiration = 1;
+            AdapterClass.prototype.sweep = function() {
                 actual++;
                 return new NoopPromise();
             };
@@ -226,8 +358,8 @@ Test.Aura.Storage.Adapters.AuraStorageTest = function() {
             var actual = 0;
 
             // set config such that max interval applies
-            config.defaultExpiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
-            config.adapter.sweep = function() {
+            config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
+            AdapterClass.prototype.sweep = function() {
                 actual++;
                 return new NoopPromise();
             };
@@ -252,8 +384,8 @@ Test.Aura.Storage.Adapters.AuraStorageTest = function() {
             var actual = 0;
 
             // set config such that max interval applies
-            config.defaultExpiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
-            config.adapter.sweep = function() {
+            config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
+            AdapterClass.prototype.sweep = function() {
                 actual++;
                 return new NoopPromise();
             };

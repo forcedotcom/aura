@@ -10,15 +10,12 @@
         cmp._iframeLib = cmp.helper.iframeLib.iframeTest;
 
         $A.installOverride("StorageService.selectAdapter", function(){ return "indexeddb" }, this);
-        this.storage = $A.storageService.initStorage(
-                "browserdb",    // name
-                true,           // persistent
-                false,          // secure
-                32768,          // size
-                2000,           // expiration
-                3000,           // auto-refresh
-                true,           // debug logging
-                true);          // clear on init
+        this.storage = $A.storageService.initStorage({
+            name: "browserdb",
+            maxSize: 32768,
+            expiration: 2000,
+            debugLogging: true
+        });
 
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb"); });
     },
@@ -156,10 +153,13 @@
         test: [
         function putItemThenReplaceWithEntryTooLarge(cmp) {
             var maxSize = 5120;
-            $A.installOverride("StorageService.selectAdapter", function(){ return "indexeddb" }, this);
-            cmp._storage = $A.storageService.initStorage("browserdb-testReplaceTooLarge",
-                    true, false, maxSize, 2000, 3000, true, true);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testReplaceTooLarge"); });
+            cmp._storage = $A.storageService.initStorage({
+                name: "browserdb-testReplaceExistingWithEntryTooLarge",
+                maxSize: maxSize,
+                expiration: 2000,
+                debugLogging: true
+            });
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testReplaceExistingWithEntryTooLarge"); });
 
             cmp._storageLib.testReplaceExistingWithEntryTooLarge_stage1(cmp, cmp._storage);
         },
@@ -184,9 +184,9 @@
             var that = this;
             this.storage.put("testCyclicObject", stuff)
                 .then(function() { return that.storage.get("testCyclicObject"); })
-                .then(function(item) {
-                    $A.test.assertEquals(2, item.value["a"], "testCyclicObject: constant is wrong");
-                    $A.test.assertEquals(item.value["b"], item.value, "testCyclicObject: looped value should be defined");
+                .then(function(value) {
+                    $A.test.assertEquals(2, value["a"], "testCyclicObject: constant is wrong");
+                    $A.test.assertEquals(value["b"], value, "testCyclicObject: looped value should be defined");
                     completed = true;
                 })['catch'](function(e) {
                    completed = true;
@@ -219,8 +219,12 @@
         test:function(cmp) {
             // Due to differences in size calculation between adapters, pass in a storage with the correct size to
             // fill up the storage after 5 entries of a 512 character string.
-            cmp._storage = $A.storageService.initStorage("browserdb-testOverflow",
-                    true, false, 5000, 2000, 3000, true, true);
+            cmp._storage = $A.storageService.initStorage({
+                name: "browserdb-testOverflow",
+                maxSize: 5000,
+                expiration: 2000,
+                debugLogging: true
+            });
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow"); });
 
             cmp._storageLib.testOverflow(cmp, cmp._storage);
@@ -257,8 +261,8 @@
                 })
                 .then(function() { return that.storage.get("testErrorValue"); })
                 .then(
-                    function(item){
-                        $A.test.assertUndefined(item, "Expected undefined because put() failed");
+                    function(value){
+                        $A.test.assertUndefined(value, "Expected undefined because put() failed");
                         completed = true;
                     },
                     function(err) { failTest(cmp, err); }
@@ -284,8 +288,8 @@
                 )
                 .then(function() { return that.storage.get("testFunctionValue"); })
                 .then(
-                    function(item){
-                        $A.test.assertUndefined(item, "Expected undefined because put() failed");
+                    function(value){
+                        $A.test.assertUndefined(value, "Expected undefined because put() failed");
                         completed = true;
                     },
                     function(e) {
@@ -299,9 +303,13 @@
 
     testGetSize:{
         test:[function (cmp) {
-            cmp._storage = $A.storageService.initStorage("browserdb-testOverflow",
-                    true, false, 32768, 2000, 3000, true, true);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow"); });
+            cmp._storage = $A.storageService.initStorage({
+                name: "browserdb-testGetSize",
+                maxSize: 32768,
+                expiration: 2000,
+                debugLogging: true
+            });
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testGetSize"); });
             cmp._failTest = function(error) { cmp._storageLib.failTest(cmp, error); }.bind(this);
             cmp._append = function(string) { cmp._storageLib.appendLine(cmp, string); }.bind(this);
         }, function(cmp){
@@ -309,7 +317,7 @@
 
             cmp._storage.put("testGetSize.key1", new Array(1024).join("x"))  // 1kb
                 .then(function() { return cmp._storage.get("testGetSize.key1"); })
-                .then(function(item) { $A.test.assertDefined(item.value, "Fail item."); })
+                .then(function(value) { $A.test.assertDefined(value, "Fail item."); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
                 .then(function(result) { cmp._append("result length = "+result.length); return cmp._storage.getSize(); })
                 .then(function(size) {
@@ -327,7 +335,7 @@
             //Two value to see that size is recalculated
             cmp._storage.put("testGetSize.key2" , new Array(3072).join("y")) //5kb
                 .then(function() { return cmp._storage.get("testGetSize.key2"); })
-                .then(function(item) { $A.test.assertDefined(item.value, "testGetSize: Fail - item undefined."); })
+                .then(function(value) { $A.test.assertDefined(value, "testGetSize: Fail - item undefined."); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
                 .then(function() { return cmp._storage.getSize(); })
                 .then(function(size) {
@@ -344,7 +352,7 @@
             // Careful... this does not calculate size correctly.
             cmp._storage.put("testGetSize.key2" , new Array(1024).join("z")) //1kb
                 .then(function() { return cmp._storage.get("testGetSize.key2"); })
-                .then(function(item) { $A.test.assertDefined(item.value); })
+                .then(function(value) { $A.test.assertDefined(value); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
                 .then(function(results) { return cmp._storage.getSize(); })
                 .then(function(size) {
@@ -355,7 +363,7 @@
             $A.test.addWaitFor(true, function() { return completed; });
         } ]
     },
-    
+
     /**
      * Verify indexedDB is scoped per app
      */
@@ -422,7 +430,7 @@
     testDeleteDatabase: {
         test: [
         function deleteDatabase(cmp) {
-            var failTest = function(error) { completed=true; debugger;cmp._storageLib.failTest(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); }.bind(this);
             var dbName = "browserdb";
             var completed = false;
             var results;
@@ -486,7 +494,12 @@
             $A.storageService.deleteStorage(cmp._dbName)
                 .then(function() {
                     $A.test.assertUndefined($A.storageService.getStorage(cmp._dbName));
-                    $A.storageService.initStorage(cmp._dbName, true, false, 32768, 2000, 3000, true, true);
+                    $A.storageService.initStorage({
+                        name: cmp._dbName,
+                        maxSize: 32768,
+                        expiration: 2000,
+                        debugLogging: true
+                    });
                 })
                 .then(function() {
                     $A.test.assertDefined($A.storageService.getStorage(cmp._dbName));
@@ -532,15 +545,14 @@
                // store max size
                var maxSize = 400;
 
-               cmp._storage = $A.storageService.initStorage(
-                       "actions", // name
-                       true,      // persistent
-                       false,     // secure
-                       maxSize,   // size
-                       0.1,       // expiration
-                       1,         // auto-refresh
-                       true,      // debug logging
-                       true);     // clear on init
+               cmp._storage = $A.storageService.initStorage({
+                   name: "actions",
+                   maxSize: maxSize,
+                   expiration: 2000,
+                   expiration: 0.1,
+                   autoRefreshInterval: 1,
+                   debugLogging: true
+               });
 
                // blacklisted keys to never expire. copied from AuraComponentService.js
                cmp._actionsBlacklist = ["globalValueProviders",                                /* GlobalValueProviders.js */

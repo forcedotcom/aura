@@ -26,12 +26,12 @@
                           persistent="true" />
        <script>
             $A.clientService.setUseBootstrapCache(false);
-            
+
             window._storageGets = [];
             var origGet = $A.storageService.getStorage('actions').get;
-            $A.storageService.getStorage('actions').get = function(key) {
+            $A.storageService.getStorage('actions').get = function(key, includeExpired) {
                 window._storageGets.push(key);
-                return origGet.apply(this,arguments);
+                return origGet.apply(this, arguments);
             }
         </script>
     </aura:set>
@@ -45,7 +45,7 @@
             if(location.hash.indexOf('launchOffline') > 0) {
                 auraInit.host = '//offline';
             }
-            
+
             $A.initAsync(auraInit);
         </script>
     </aura:set>

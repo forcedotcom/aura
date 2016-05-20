@@ -56,14 +56,14 @@
 
             // Get label from storage and change value
             var storage = $A.storageService.getStorage("actions");
-            storage.get("globalValueProviders")
+            storage.get("globalValueProviders", true)
                 .then(function(gvps) {
-                    for(var i = 0; i < gvps.value.length; i++) {
-                        if (gvps.value[i]["type"] === "$Label") {
-                            gvps.value[i]["values"]["Related_Lists"]["task_mode_today"] = "Updated";
+                    for(var i = 0; i < gvps.length; i++) {
+                        if (gvps[i]["type"] === "$Label") {
+                            gvps[i]["values"]["Related_Lists"]["task_mode_today"] = "Updated";
                         }
                     }
-                    return storage.put("globalValueProviders", gvps.value);
+                    return storage.put("globalValueProviders", gvps);
                 })
                 .then(function() { completed = true; })
                 ["catch"](failTest);
@@ -94,10 +94,9 @@
             if ($A.test.isComplete()) {
                 return;
             }
-            storage.get("globalValueProviders")
+            storage.get("globalValueProviders", true)
             .then(function(gvps) {
-                if (gvps && gvps.value) {
-                    gvps = gvps.value;
+                if (gvps) {
                     for(var i = 0; i < gvps.length; i++) {
                         if (gvps[i]["type"] === "$Label") {
                             var values = gvps[i]["values"];

@@ -29,6 +29,17 @@
         var secure = $A.util.getBooleanValue(cmp.get("v.secure"));
         var version = cmp.get("v.version");
 
-        $A.storageService.initStorage(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit, version);
+        $A.storageService.initStorage({
+            "name":                name,
+            "persistent":          persistent,
+            "secure":              secure,
+            "maxSize":             maxSize,
+            "expiration":          defaultExpiration,
+            "debugLogging":        debugLoggingEnabled,
+            "clearOnInit":         clearStorageOnInit,
+            "version":             version,
+            "autoRefreshInterval": defaultAutoRefreshInterval
+        });
+
     }
 })// eslint-disable-line semi

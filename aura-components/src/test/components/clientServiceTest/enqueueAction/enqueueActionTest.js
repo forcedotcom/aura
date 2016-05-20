@@ -22,7 +22,16 @@
         // Initialize storage here, in JS to avoid issues with instantiating the component multiple
         // times.
         //
-        $A.storageService.initStorage("actions", false, false, 100000, 50, 0, true, true, 1);
+        $A.storageService.initStorage({
+            name: "actions",
+            persistent: false,
+            secure: false,
+            maxSize: 100000,
+            expiration: 50,
+            autoRefreshInterval: 0,
+            version: "1"
+        });
+
         cmp.helper.buildHierarchy(cmp);
         var ready = false;
         $A.test.callServerAction($A.test.getAction(cmp, "c.execute", {
@@ -236,9 +245,9 @@
      * Test that we can have more than one foreground actions run in parallel on server.
      *
      * max 4 foreground actions can be run in parallel. here we enqueue 4 foreground actions. ask first 3 to wait on
-     * server till 4th arrives, then release them all. 
-     * 
-     * if enqueue 4 foreground action without releasing any of them, we will run out of available XHR when we want to 
+     * server till 4th arrives, then release them all.
+     *
+     * if enqueue 4 foreground action without releasing any of them, we will run out of available XHR when we want to
      * enqueue another, no error/warning message on anywhere though, we just put actions in the deferred queue.
      *
      * This is dangerous, so we have to ensure that we don't create races. To avoid races, we explicitely chain
@@ -287,7 +296,7 @@
                  this.addWaitForLogRace(cmp, 0, 3, "fore4: SUCCESS fore1,fore2,fore3,fore4");
             } ]
     },
-    
+
 
     /**
      * Test to ensure that caboose actions are not executed until another foreground action is sent.
@@ -295,7 +304,7 @@
      * Guarantees:
      *  * Caboose action will not be sent until a server side foreground action is enqueued.
      *  * allAboardCallback will be called before the action is sent, but after the foreground action is enqueued
-     *  
+     *
      * This test emulates the log+flush pattern that can be used with a combination of caboose actions and allAboard
      * callbacks. This pattern lets the user queue a caboose action and use allAboardCallback to set a param (in this
      * case fake log data) to be attached to the action right before the XHR is sent to the server.
@@ -346,7 +355,7 @@
     },
 
     /**
-     * run storable action ('c.execute', param:'WAIT;READ') couple times, make sure we read response from storage 
+     * run storable action ('c.execute', param:'WAIT;READ') couple times, make sure we read response from storage
      * also check storage is updated when new response come from server (we did it by bgAction1/2/etc).
      * NOTE: from storage point of view, only action def and parameter matters, foreground or background are the same
      */
@@ -370,7 +379,7 @@
             this.addWaitForLogRace(cmp, 0, 1,  "back: SUCCESS ");
         }, function(cmp) {
             //fire foreground action(a), because we already have its response('initial') stored, it will just get that.
-            //we also fire background action(bgAction2), it update a's return with a new value, 
+            //we also fire background action(bgAction2), it update a's return with a new value,
             //it will update stored response for a.
             this.sendAction(cmp, [],
                 [ [ "WAIT", "prime" ],
@@ -391,11 +400,11 @@
             //fire foreground action, it update response in storage
         }, function(cmp) {
             //enqueue foreground action(a) again to double check update from foreAction1 is indeed in storage.
-            //enqueue background action bgAction3 to release a from server, 
+            //enqueue background action bgAction3 to release a from server,
             //also update the storage with new response 'theEnd'
         } ]
     },
-    
+
     /**
      * Make sure that we send only one of two duplicate actions enqueued.
      *
@@ -435,7 +444,7 @@
     /**
      * enqueue two actions, a1(foreground), a2(background) with same action def and param, they run in parallel
      * make sure they read response from storage first, then update the storage with their responses.
-     * 
+     *
      * Note a1&a2 are not both foreground/background, a2 won't become a dupe of a1
      */
     testParallelStorable : {
@@ -467,7 +476,7 @@
             // both callbacks with stored value executed. These should be executed _before_ any refreshes go out.
             this.addWaitForLogRace(cmp, 3, 4, "retrieve-fore[stored]: SUCCESS initial");
             this.addWaitForLogRace(cmp, 3, 4, "retrieve-back[stored]: SUCCESS initial");
-            
+
             //last param=true:we only check partial match
             this.addWaitForLogRace(cmp, 5, 6, "retrieve-fore: SUCCESS ", true);
             this.addWaitForLogRace(cmp, 5, 6, "retrieve-back: SUCCESS ", true);

@@ -18,13 +18,15 @@
 
 /**
  * @description The Javascript memory adapter for Aura Storage Service.
+ * This adapter must always be registered to ensure at least one adapter is available.
+ *
  * @constructor
  */
 var MemoryAdapter = function MemoryAdapter(config) {
     this.reset();
     this.maxSize = config["maxSize"];
     this.instanceName = config["name"];
-    this.debugLoggingEnabled = config["debugLoggingEnabled"];
+    this.debugLogging = config["debugLogging"];
 };
 
 MemoryAdapter.NAME = "memory";
@@ -272,7 +274,7 @@ MemoryAdapter.prototype.getMRU = function() {
  * @private
  */
 MemoryAdapter.prototype.log = function (level, msg, obj) {
-    if (this.debugLoggingEnabled || level.id >= MemoryAdapter.LOG_LEVEL.WARNING.id) {
+    if (this.debugLogging || level.id >= MemoryAdapter.LOG_LEVEL.WARNING.id) {
         $A[level.fn]("MemoryAdapter '"+this.instanceName+"' "+msg, obj);
     }
 };
@@ -295,6 +297,21 @@ MemoryAdapter.prototype.deleteStorage = function() {
     this.reset();
     return Promise["resolve"]();
 };
+
+/**
+ * @returns {Boolean} whether the adapter is secure.
+ */
+MemoryAdapter.prototype.isSecure = function() {
+    return true;
+};
+
+/**
+ * @returns {Boolean} whether the adapter is persistent.
+ */
+MemoryAdapter.prototype.isPersistent = function() {
+    return false;
+};
+
 
 /**
  * @description A cache entry in the backing store of the MemoryAdapter.

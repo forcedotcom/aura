@@ -28,15 +28,11 @@
 
         $A.installOverride("StorageService.selectAdapter", function(){ return "memory" }, this);
 
-        this.storage = $A.storageService.initStorage(
-                    "memory-store",
-                    false,   // persistent
-                    true,    // secure
-                    4096,
-                    1000,
-                    0,
-                    true,    // debug logging
-                    true);   // clear on init
+        this.storage = $A.storageService.initStorage({
+            name: "memory-store",
+            maxSize: 4096,
+            expiration: 1000
+        });
 
         // direct reference to the adapter to call private functions
         this.adapter = this.storage.adapter;
@@ -230,8 +226,12 @@
         test:function(cmp) {
             // Due to differences in size calculation between adapters, pass in a storage with the correct size to
             // fill up the storage after 5 entries of a 512 character string.
-            cmp._storage = $A.storageService.initStorage("memory-testOverflow",
-                    false, true, 5000, 2000, 3000, true, true);
+            cmp._storage = $A.storageService.initStorage({
+                name: "memory-testOverflow",
+                maxSize: 5000,
+                expiration: 2000
+            });
+
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("memory-testOverflow"); });
 
             cmp.helper.lib.storageTest.testOverflow(cmp, cmp._storage);
@@ -430,14 +430,14 @@
 
                 // touch key1 to move it up to the top of the MRU
                 .then(function() {return that.storage.get("key1"); })
-                .then(function(item) { return that.adapter.getMRU(); })
+                .then(function(value) { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key2", "key1"]), mru.toString()); })
 
                 // add another item to push out the oldest item
                 // oldest (key2) item should have been evicted
                 .then(function() { return that.storage.put("key3", {"value" : {"baz" : new Array(3300).join("z")}}); })
                 .then(function() { return that.storage.get("key2"); })
-                .then(function(item) { $A.util.isUndefined(item); })
+                .then(function(value) { $A.util.isUndefined(value); })
                 .then(function() { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key1", "key3"]), mru.toString()); })
                 .then(function() { return that.storage.getSize(); })
@@ -519,7 +519,10 @@
         test: function(cmp) {
             var completed = false;
             var name = "memoryTest";
-            $A.storageService.initStorage(name, false, true, 4096);
+            $A.storageService.initStorage({
+                name: name,
+                maxSize: 4096
+            });
             $A.test.assertDefined($A.storageService.getStorage(name));
 
             $A.storageService.deleteStorage(name)
@@ -545,8 +548,11 @@
             // set min sweep interval to 1ms
             AuraStorage.SWEEP_INTERVAL.MIN = 1;
 
-            var name = "ageBasedEviction";
-            var storage = $A.storageService.initStorage(name, false, true, 4096, 0.1 /* sec */);
+            var storage = $A.storageService.initStorage({
+                name: "ageBasedEviction",
+                maxSize: 4096,
+                expiration: 0.1
+            });
 
             var completed = false;
             var key = "key1";
@@ -556,16 +562,17 @@
                     // returns undefined indicating sweep has run
 
                     var checkIfItemEvicted = function() {
-                        storage.get(key).then(function(item) {
-                            if (item === undefined) {
-                                completed = true;
-                                return; // so we don't loop
-                            }
+                        storage.get(key).then(
+                            function(value) {
+                                if (value === undefined) {
+                                    completed = true;
+                                    return; // so we don't loop
+                                }
 
-                            // not yet expired so loop
-                            checkIfItemEvicted();
-                        })
-                        ["catch"](function(error) { $A.test.fail(error.toString()); });
+                                // not yet expired so loop
+                                checkIfItemEvicted();
+                            })
+                            ["catch"](function(error) { $A.test.fail(error.toString()); });
                     }
 
                     // start looping...

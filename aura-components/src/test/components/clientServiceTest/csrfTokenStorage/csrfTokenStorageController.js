@@ -1,10 +1,11 @@
 ({
     init: function(cmp) {
         var storage = $A.storageService.getStorage("actions");
+        // TODO - straight against adapter so must use value.value
         storage.adapter.getItem("$AuraClientService.token$").then(
-            function(value) {
-                if(value && value.value && value.value.token) {
-                    cmp.set("v.token", value.value.token);
+            function(item) {
+                if(item && item.value && item.value.token) {
+                    cmp.set("v.token", item.value.token);
                 }
             }, function() {
                 cmp.set("v.token", "ERROR: failed to get token from storage");

@@ -69,7 +69,7 @@
             }
             iterationCount++;
 
-            defs.getAll().then(function(items) {
+            defs.getAll(true).then(function(items) {
                 items = items || [];
 
                 // recurse if transaction key is found
@@ -107,16 +107,15 @@
         var defCreated = false;
         if (!def) {
             defCreated = true;
-            def = $A.storageService.initStorage(
-                "ComponentDefStorage",
-                true,      // persistent
-                false,     // secure
-                442368,    // maxSize
-                10886400,  // defaultExpiration
-                0,         // defaultAutoRefreshInterval
-                true,      // debugLoggingEnabled
-                false      // clearStorageOnInit
-            );
+            def = $A.storageService.initStorage({
+                name: "ComponentDefStorage",
+                persistent: true,
+                secure: false,
+                maxSize: 442368,
+                expiration: 10886400,
+                debugLogging: true,
+                clearOnInit: false
+            });
         }
 
         return Promise.all([$A.storageService.getStorage("actions").clear(), def.clear()])

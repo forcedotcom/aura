@@ -15,28 +15,28 @@
  */
 ({
   browsers: ["-IE7","-IE8"],
-  
+
   ASSISTIVE_SORT_TEXT : "Sort ",
-  
+
   /**************************************************HELPER FUNCTIONS**************************************************/
-  
+
   /**
    * Function that will create the expected data for the expected headers
-   */ 
+   */
   getExpectedData : function(){
-	var elements = [], 
+	var elements = [],
 	    values = [],
 	    keys = [],
 	    inBetweenValues=[],
 	    skipItem = -1,
 	    arrayValue;
-	 		
+
 		values = ["", "Foo ", "2014-01-01 ", "John Doe ", "Acme "];
 		keys   = ['id', 'subject', 'date', 'name', 'relatedTo'];
-	
+
 	for(var i = 0; i < 10; i++){
 		inBetweenValues=[];
-		
+
 		for(var j = 0; j < values.length; j++){
 			if(skipItem !== j){
 				arrayValue = values[j]+""+(i+1);
@@ -50,7 +50,7 @@
 	}
 	return {"keys" : keys,  "values" : elements };
   },
-  
+
   /**
    * Verify that each row element is correct and does what we want it to
    *
@@ -59,7 +59,7 @@
 	  if (!$A.util.isUndefinedOrNull(expectedValues) && isDecending) {
 		  expectedValues = {"keys":expectedValues.keys,  "values":expectedValues.values.reverse()};
 	  }
-	  
+
       var keys = expectedValues["keys"];
       var expectedRows = expectedValues["values"];
       var tds = null;
@@ -75,18 +75,18 @@
     	  }
       }
   },
-   
+
   /**
    * Verify sortable headers
    */
   verifySortableHeaders : function(expectedSortableHeaders) {
 	  var sortableHeadersRendered = $A.test.getElementByClass("toggle");
-	  
+
 	  for (var i=0; i<sortableHeadersRendered.length; i++) {
 		  var header = sortableHeadersRendered[i];
 		  var headerText = $A.test.getText(header);
 		  var foundColIndex = -1;
-		  
+
 		  for (var j=0; j<expectedSortableHeaders.length; j++) {
 			  var expectedHeader = expectedSortableHeaders[j].name;
 			  if (headerText.toUpperCase().indexOf(expectedHeader) >= 0) {
@@ -94,24 +94,24 @@
 				  break;
 			  }
 		  }
-		  
+
 		  if (foundColIndex >= 0) {
 			  var expectedHeader = expectedSortableHeaders[foundColIndex];
-			  
+
 			  if (expectedHeader.isEnabled) {
 				  var expectedSort = expectedHeader.sort;
 				  var actualSort = $A.test.getText(header.getElementsByTagName("span")[1]).toUpperCase();
 				  $A.test.assertEquals(expectedSort, actualSort , "Sort direction incorrect");
 			  } else {
 				  var headerClass = $A.util.getElementAttributeValue(header, "class");
-				  $A.test.assertEquals("toggle disabled", headerClass, "header should have been disalbed");  
+				  $A.test.assertEquals("toggle disabled", headerClass, "header should have been disalbed");
 			  }
 		  } else {
 			  $A.test.fail("Could not find '" + headerText + "' in list of expected columns");
 		  }
 	  }
   },
-  
+
   /**
    * Toggle sortable column's sort order
    */
@@ -124,11 +124,10 @@
 	  $A.test.addWaitForWithFailureMessage(true, function() {
 		//  expectedSortOrder = " descending";//added
 		//  return (origClassName !== $A.util.getElementAttributeValue(parent, "class"));
-		// debugger;
 		  return ($A.util.hasClass(parent, expectedSortOrder));
-	  },"The class should be" + expectedSortOrder); 
+	  },"The class should be" + expectedSortOrder);
   },
-  
+
   /**
    * function that will retrieve all the elements that are sorted (class is either 'ascending' or 'descending' or both)
    */
@@ -150,34 +149,34 @@
 	  }
 	  return allSortedElements;
   },
-  
+
   /**
    * function that will check that the expected element is sorted
    */
   verifySortedElements: function(expectedNumberOfElements,expectedElementToBeSorted) {
-	  
+
 	  allSortedElements = this.getCurrentSortElement(); //gets all elements with class being either 'ascending' or 'descending' or both
 	  if(allSortedElements) //if there is at least one element that is sorted
 	  {
-		  length = allSortedElements.length;	
+		  length = allSortedElements.length;
 		  // assert that the correct element is sorted
 		  $A.test.assertEquals(this.ASSISTIVE_SORT_TEXT.length, $A.test.getText(allSortedElements[0]).toUpperCase().indexOf(expectedElementToBeSorted), "Wrong element is sorted");
-	  }			  
+	  }
 	  else //when no element is sorted (initial case when page loads)
 		  length = 0;
-	  
+
 	  //assert correct number of elements are sorted - 0:initially, 1:remaining cases
 	  $A.test.assertEquals(expectedNumberOfElements, length, "Number of sorted classes do not match");
-	  		   
+
   },
-  
-  
+
+
    /**
      * function that will only get the elements that are not comments
      */
     getOnlyTrs : function(elements){
       var elementArray = [];
-      
+
        for(var i = 0; i < elements.length; i++){
           if(elements[i].tagName != "!"){
             elementArray.push(elements[i]);
@@ -185,10 +184,10 @@
        }
       return elementArray;
     },
-  
+
   /**
    * get specific row elements
-   */ 
+   */
   getRowElements : function(cmp, colCount){
             var tbody = document.getElementsByTagName("tbody")[0];
             var trs = this.getOnlyTrs(tbody.children);
@@ -199,16 +198,16 @@
 
             return [trs, itemsInBody];
   },
-  
+
   /**
    * Make sure that the body that has been rendered is correct. This will check both internal and external variables
    */
   verifyBodyElements : function(cmp, expectedElements, assertFunc, isDecending){
       var trs = this.getRowElements(cmp, 10);
-      
+
       var body_rendered = trs[0];
       var body_internal = trs[1];
-      
+
       if($A.util.isUndefinedOrNull(assertFunc)){
     	  assertFunc = function(td, expectedDomRow, currCmpRow){
     		  $A.test.assertEquals(td, expectedDomRow, "Row element data does not match what it should be");
@@ -217,94 +216,94 @@
       }
       this.verifyRow(body_rendered, expectedElements ,body_internal, assertFunc, isDecending);
   },
- 
+
 
 
   /**************************************************HELPER FUNCTIONS END**************************************************/
-  
+
   testRowHeaders : {
 	  attributes : {"rowHeaderIndex" : 2},
 	  test : function(cmp) {
 		  var tbody = document.getElementsByTagName("tbody")[0],
 		      rowElements = this.getOnlyTrs(tbody.children);
-		  
+
 		  for (var i = 0; i < rowElements.length; ++i) {
 			  var tagName = rowElements[i].children[2].tagName.toLowerCase();
 			  $A.test.assertEquals("th", tagName, "Row Header tag is incorrect");
-			  
+
 			  var scope = rowElements[i].children[2].getAttribute("scope");
 			  $A.test.assertEquals("row", scope, "Scope attribute on row header tag is incorrect");
 		  }
 	  }
   },
-  
+
   /*
    * Test sortable headers: mark the appropriate header as sorted and remaining as unsorted
    */
   testSortableColumns : {
 	  attributes : {"sortBy" : "id"},
 	  test : [function(cmp) {
-		  
-			  // test initial sort			 
+
+			  // test initial sort
 			  expectedSortableColumns = [{name:"ID",sort:"",isEnabled:true}, {name:"SUBJECT",sort:"",isEnabled:true}];
-			  this.verifySortableHeaders(expectedSortableColumns);			  
+			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData());
-			  
+
 			  // check that no elements are sorted
 			  expectedNumberOfElements = 0;  // since initially none of the columns are sorted
 			  expectedElementToBeSorted = "";
-			  this.verifySortedElements(expectedNumberOfElements, expectedElementToBeSorted); 	
-			  
+			  this.verifySortedElements(expectedNumberOfElements, expectedElementToBeSorted);
+
 			  // test toggling/clicking 2nd sortable column
 			  expectedSort = "descending";
 			  columnNumber = 2;
 			  this.toggleSortForSortableColumn(columnNumber,expectedSort);
-				
+
 		  }, function(cmp) {
-			  
+
 			  //check if only 2nd column is sorted
 			  expectedElementToBeSorted = "SUBJECT"; // since we toggled/clicked column no.2
 			  expectedNumberOfElements = 1; // test will now have 1 class having either 'ascending' or 'descending'
-			  this.verifySortedElements(expectedNumberOfElements, expectedElementToBeSorted);  	  
-						  
+			  this.verifySortedElements(expectedNumberOfElements, expectedElementToBeSorted);
+
 			  expectedSortableColumns = [{name:"ID",sort:"",isEnabled:true}, {name:"SUBJECT",sort:"SORTED DESCENDING",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData(), null, true);
-			  
+
 			  // test toggling sort order on same column
 			  expectedSort = "ascending";
 			  columnNumber = 2;
 			  this.toggleSortForSortableColumn(columnNumber, expectedSort);
-				 
-			  	
+
+
 		  }, function(cmp) {
-			  
+
 			  // check if only 2nd column is sorted
 			  expectedElementToBeSorted = "SUBJECT";
 			  expectedNumberOfElements = 1; //test will now have 1 class having either 'ascending' or 'descending'
-			  this.verifySortedElements(expectedNumberOfElements, expectedElementToBeSorted);  
-			  
+			  this.verifySortedElements(expectedNumberOfElements, expectedElementToBeSorted);
+
 			  expectedSortableColumns = [{name:"ID",sort:"",isEnabled:true}, {name:"SUBJECT",sort:"SORTED ASCENDING",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData());
-			  
-			  // test switching sort order to another column 
+
+			  // test switching sort order to another column
 			  expectedSort = "descending";
 			  columnNumber = 1;
 			  this.toggleSortForSortableColumn(columnNumber, expectedSort);
-				
-			  
+
+
 		  }, function(cmp) {
-			  
+
 			  // check if only 1st column is sorted
 			  expectedElementToBeSorted = "ID";
 			  expectedNumberOfElements = 1; //test will now have 1 class having either 'ascending' or 'descending'
-			  this.verifySortedElements(expectedNumberOfElements, expectedElementToBeSorted);  
-			  
+			  this.verifySortedElements(expectedNumberOfElements, expectedElementToBeSorted);
+
 			  expectedSortableColumns = [{name:"ID",sort:"SORTED DESCENDING",isEnabled:true}, {name:"SUBJECT",sort:"",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData(), null, true);
 	  }]
   }
-  
+
 })

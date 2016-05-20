@@ -40,13 +40,13 @@
 var IndexedDBAdapter = function IndexedDBAdapter(config) {
     this.instanceName = config["name"];
     this.sizeMax = config["maxSize"];
-    this.debugLoggingEnabled = config["debugLoggingEnabled"];
+    this.debugLogging = config["debugLogging"];
     this.db = undefined;
     // whether the ObjectStore is ready to service operations
     // undefined = being setup, true = ready, false = permanent error
     this.ready = undefined;
     // whether the ObjectStore should be cleared as part of the setup process
-    this.clearBeforeReady = false;
+    this.clearBeforeReady = config["clearOnInit"];
     // requests received before this.ready is moved to true or false
     this.pendingRequests = [];
 
@@ -102,8 +102,8 @@ IndexedDBAdapter.prototype.getName = function() {
  */
 IndexedDBAdapter.prototype.initialize = function(version) {
     // Set version number when changing schema ie adding index, etc
-    var dbRequest,
-        that = this;
+    var dbRequest;
+    var that = this;
 
     // Firefox private browsing mode throws an uncatchable (except by window.onerror) InvalidStateError when
     // indexedDB.open is called. the onerror handler is also invoked which allows us to set the adapter to a
@@ -195,6 +195,21 @@ IndexedDBAdapter.prototype.resumeSweeping = function() {
 };
 
 /**
+ * @returns {Boolean} whether the adapter is secure.
+ */
+IndexedDBAdapter.prototype.isSecure = function() {
+    return false;
+};
+
+/**
+ * @returns {Boolean} whether the adapter is persistent.
+ */
+IndexedDBAdapter.prototype.isPersistent = function() {
+    return true;
+};
+
+
+/**
  * Stores an item in storage.
  * @param {String} key key for item
  * @param {Object} item item to store
@@ -220,13 +235,6 @@ IndexedDBAdapter.prototype.removeItem = function(key) {
         that.removeItemInternal(key, resolve, reject);
     };
     return this.enqueue(execute);
-};
-
-/**
- * Clears storage on initialization, before any other operation is performed.
- */
-IndexedDBAdapter.prototype.clearOnInit = function() {
-    this.clearBeforeReady = true;
 };
 
 /**
@@ -736,7 +744,7 @@ IndexedDBAdapter.prototype.setSize = function(size, count) {
  * @private
  */
 IndexedDBAdapter.prototype.log = function (level, msg, obj) {
-    if (this.debugLoggingEnabled || level.id >= IndexedDBAdapter.LOG_LEVEL.WARNING.id) {
+    if (this.debugLogging || level.id >= IndexedDBAdapter.LOG_LEVEL.WARNING.id) {
         $A[level.fn]("IndexedDBAdapter '"+this.instanceName+"' "+msg, obj);
     }
 };

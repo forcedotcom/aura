@@ -4,11 +4,11 @@
         <script>
             /*
              * Settings for the test to set and flags for the test to verify. By default this template will fail all
-             * operations on the ComponentDefStorage. To fail specific adapter funcitons set failAll to false and
+             * operations on the ComponentDefStorage. To fail specific adapter functions set failAll to false and
              * fail[FunctionName] to true.
              *
              * clearCallCount - Track how many times clear was called for tests to verify
-             * failAll - Fail all storage operations with a rejected Promise. true by default.
+             * failAll - Fail all storage operations with a rejected Promise. True by default.
              */
             window.mockComponentDefStorage = {
                 clearCallCount : 0,
@@ -16,15 +16,31 @@
             };
 
             // Some of the component def caching logic is bypassed without an actions cache
-            $A.storageService.initStorage("actions", true, false, 4096, 200, 300, true, true);
+            $A.storageService.initStorage({
+                name: "actions",
+                persistent: true,
+                secure: false,
+                maxSize: 4096,
+                expiration: 200,
+                autoRefreshInterval: 300
+            });
 
             // Create a functional storage to pass through to when we want operations to pass
-            var realStorage = $A.storageService.initStorage("ComponentDefStorageReal", true, false, 4096, 200, 300, true, false);
+            var realStorage = $A.storageService.initStorage({
+                name: "ComponentDefStorageReal",
+                persistent: true,
+                secure: false,
+                maxSize: 4096,
+                expiration: 200
+            });
+
 
             // A storage adapter that fails all operations by default and can be overriden to fail on specific methods
             var MockStorageAdapter = function MockStorageAdapter(config) {  this.name = config['name']; };
             MockStorageAdapter.NAME = "mockComponentDefStorage";
             MockStorageAdapter.prototype.getName = function() { return MockStorageAdapter.NAME; };
+            MockStorageAdapter.prototype.isPersistent = function() { return true; };
+            MockStorageAdapter.prototype.isSecure = function() { return true; };
 
             MockStorageAdapter.prototype.getSize = function() {
                 if (window.mockComponentDefStorage.failAll || window.mockComponentDefStorage.failGetSize) {
@@ -87,7 +103,15 @@
             // Force test to select our mock adapter
             $A.installOverride("StorageService.selectAdapter", function(){ return MockStorageAdapter.NAME; }, this);
 
-            $A.storageService.initStorage("ComponentDefStorage", true, true, 4096, 200, 300, true, false);
+            $A.storageService.initStorage({
+                name: "ComponentDefStorage",
+                persistent: true,
+                secure: true,
+                maxSize: 4096,
+                expiration: 200,
+                debugLogging: true,
+                clearOnInit: false
+            });
         </script>
     </aura:set>
 </aura:component>

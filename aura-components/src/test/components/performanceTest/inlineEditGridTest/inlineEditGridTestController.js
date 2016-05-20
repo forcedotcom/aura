@@ -57,7 +57,7 @@
                         }
 
                         click = true;
-                        // reset the active element 
+                        // reset the active element
                         document.activeElement.blur();
                         if (j < 2) {
                             j = j + 1;
@@ -67,7 +67,6 @@
                         }
 
                         if (i == cmp.numRows) {
-                            debugger;
                             finishRun();
                         }
                     }

@@ -28,41 +28,50 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
         Import("aura-impl/src/main/resources/aura/storage/AuraStorageService.js");
     });
 
-
     var mockOnLoadUtil = Mocks.GetMocks(Object.Global(), {
         "$A": $A,
         Aura: Aura
-    });
-    var targetService;
-    mockOnLoadUtil(function() {
-        targetService = new Aura.Services.AuraStorageService();
     });
 
 
     [Fixture]
     function initStorage() {
+        var targetService;
+        mockOnLoadUtil(function() {
+            targetService = new Aura.Services.AuraStorageService();
+            // mock initStorage() calls to select and get the adapter class
+            targetService.selectAdapter = function() { return "fake"; };
+            targetService.adapters["fake"] = { adapterClass: function(){} };
+        });
+
+        var configPassedToAuraStorage;
         var mockA = Mocks.GetMocks(Object.Global(), {
             "$A": {
                 assert: function() {},
                 util: {
                     isBoolean: function(obj) { return typeof obj === 'boolean'; },
-                    isFiniteNumber: function(obj) { return typeof obj === 'number' && isFinite(obj); }
+                    isFiniteNumber: function(obj) { return typeof obj === 'number' && isFinite(obj); },
+                    isString: function(obj) { return typeof obj === 'string'; },
+                    isObject: function(obj) { return typeof obj === "object" && obj !== null && !Array.isArray(obj); }
                 }
             },
-            "AuraStorage": function() {}
+            "AuraStorage": function(config) { configPassedToAuraStorage = config; }
         });
 
-        targetService.createAdapter = function() {};
-        targetService.selectAdapter = function() {};
-
         [Fact]
-        function RequiresTruthyName() {
+        function RequiresConfig() {
             var expected = new Error("expected");
+            var actual;
+
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
                 assert: function(value, msg) {
                     if (!value) {
                         throw expected;
                     }
+                },
+                util: {
+                    isString: function(obj) { return typeof obj === 'string'; },
+                    isObject: function(obj) { return typeof obj === "object" && obj !== null && !Array.isArray(obj); }
                 }
             });
 
@@ -70,284 +79,196 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
                 try {
                     targetService.initStorage();
                     Assert.Fail("Error should've been thrown");
-                } catch (actual) {
-                    Assert.Equal(expected, actual);
+                } catch (e) {
+                    actual = e;
                 }
             });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function RequiresTruthyName() {
+            var expected = new Error("expected");
+            var actual;
+
+            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+                assert: function(value, msg) {
+                    if (!value) {
+                        throw expected;
+                    }
+                },
+                util: {
+                    isString: function(obj) { return typeof obj === 'string'; },
+                    isObject: function(obj) { return typeof obj === "object" && obj !== null && !Array.isArray(obj); }
+                }
+            });
+
+            mockAssert(function() {
+                try {
+                    targetService.initStorage({});
+                    Assert.Fail("Error should've been thrown");
+                } catch (e) {
+                    actual = e;
+                }
+            });
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
         function PersistentDefaultsFalse() {
-            var actual;
-
-            targetService.createAdapter = function() {};
-            targetService.selectAdapter = function(persistent, secure) {
-                actual = persistent;
-            };
-
             mockA(function() {
-                targetService.initStorage("name");
+                targetService.initStorage({name:"name"});
             });
 
-            Assert.False(actual);
+            Assert.False(configPassedToAuraStorage.persistent);
         }
 
         function PersistentRespectsArgument() {
-            var actual;
-
-            targetService.createAdapter = function() {};
-            targetService.selectAdapter = function(persistent, secure) {
-                actual = persistent;
-            };
-
             mockA(function() {
-                targetService.initStorage("name", true);
+                targetService.initStorage({name:"name", persistent:true});
             });
 
-            Assert.True(actual);
+            Assert.True(configPassedToAuraStorage.persistent);
         }
 
         [Fact]
         function SecureDefaultsFalse() {
-            var actual;
-
-            targetService.createAdapter = function() {};
-            targetService.selectAdapter = function(persistent, secure) {
-                actual = secure;
-            };
-
             mockA(function() {
-                targetService.initStorage("name", true);
+                targetService.initStorage({name:"name"});
             });
 
-            Assert.False(actual);
+            Assert.False(configPassedToAuraStorage.secure);
         }
 
         [Fact]
         function SecureRespectsArgument() {
-            var actual;
-
-            targetService.createAdapter = function() {};
-            targetService.selectAdapter = function(persistent, secure) {
-                actual = secure;
-            };
-
             mockA(function() {
-                targetService.initStorage("name", true, true);
+                targetService.initStorage({name:"name", secure:true});
             });
 
-            Assert.True(actual);
+            Assert.True(configPassedToAuraStorage.secure);
         }
 
         [Fact]
         function UndefinedMaxSizeDefaults1MB() {
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.maxSize;
-                }
+            mockA(function() {
+                targetService.initStorage({name:"name"});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true);
-            })});
-
-            Assert.Equal(1000*1024, actual);
+            Assert.Equal(1000*1024, configPassedToAuraStorage.maxSize);
         }
 
         [Fact]
         function ZeroMaxSizeDefaults1MB() {
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.maxSize;
-                }
+            mockA(function() {
+                targetService.initStorage({name:"name", maxSize:0});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 0);
-            })});
-
-            Assert.Equal(1000*1024, actual);
+            Assert.Equal(1000*1024, configPassedToAuraStorage.maxSize);
         }
 
         [Fact]
         function MaxSizeRespectsArgument() {
             var expected = 25;
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.maxSize;
-                }
+            mockA(function() {
+                targetService.initStorage({name:"name", maxSize:expected});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, expected);
-            })});
-
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, configPassedToAuraStorage.maxSize);
         }
 
         [Fact]
         function UndefinedExpirationDefaults10() {
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.defaultExpiration;
-                }
+            mockA(function() {
+                targetService.initStorage({name:"name"});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 1);
-            })});
-
-            Assert.Equal(10, actual);
+            Assert.Equal(10, configPassedToAuraStorage.expiration);
         }
 
         [Fact]
         function NegativeExpirationDefaults10() {
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.defaultExpiration;
-                }
+            mockA(function() {
+                targetService.initStorage({name:"name", expiration:-1});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 1, -1);
-            })});
-
-            Assert.Equal(10, actual);
+            Assert.Equal(10, configPassedToAuraStorage.expiration);
         }
 
         [Fact]
-        function DefaultExpirationRespectsArgument() {
+        function ExpirationRespectsArgument() {
             var expected = 25;
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.defaultExpiration;
-                }
+            mockA(function() {
+                targetService.initStorage({name:"name",expiration:expected});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 1, expected);
-            })});
-
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, configPassedToAuraStorage.expiration);
         }
 
         [Fact]
         function UndefinedAutoRefreshIntervalDefaults30() {
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.defaultAutoRefreshInterval;
-                }
+            mockA(function() {
+                targetService.initStorage({name:"name"});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 1, 2);
-            })});
-
-            Assert.Equal(30, actual);
+            Assert.Equal(30, configPassedToAuraStorage.autoRefreshInterval);
         }
 
         [Fact]
         function NegativeAutoRefreshIntervalDefaults30() {
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.defaultAutoRefreshInterval;
-                }
+            mockA(function() {
+                targetService.initStorage({name:"name", autoRefreshInterval:-1});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 1, 2, -1);
-            })});
-
-            Assert.Equal(30, actual);
+            Assert.Equal(30, configPassedToAuraStorage.autoRefreshInterval);
         }
 
         [Fact]
-        function DefaultAutoRefreshIntervalRespectsArgument() {
+        function AutoRefreshIntervalRespectsArgument() {
             var expected = 25;
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.defaultAutoRefreshInterval;
-                }
+            mockA(function() {
+                targetService.initStorage({name:"name", autoRefreshInterval:expected});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 1, 2, expected);
-            })});
-
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, configPassedToAuraStorage.autoRefreshInterval);
         }
 
         [Fact]
-        function DebugLoggingEnabledDefaultsFalse() {
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.debugLoggingEnabled;
-                }
+        function DebugLoggingDefaultsFalse() {
+            mockA(function() {
+                targetService.initStorage({name:"name"});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 1, 2, 3);
-            })});
-
-            Assert.False(actual);
+            Assert.False(configPassedToAuraStorage.debugLogging);
         }
 
         [Fact]
-        function DebugLoggingEnabledRespectsArgument() {
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.debugLoggingEnabled;
-                }
+        function DebugLoggingRespectsArgument() {
+            mockA(function() {
+                targetService.initStorage({name:"name", debugLogging:true});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 1, 2, 3, true);
-            })});
-
-            Assert.True(actual);
+            Assert.True(configPassedToAuraStorage.debugLogging);
         }
 
         [Fact]
-        function ClearStorageOnInitDefaultsTrue() {
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.clearStorageOnInit;
-                }
+        function ClearOnInitDefaultsTrue() {
+            mockA(function() {
+                targetService.initStorage({name:"name"});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 1, 2, 3, 4);
-            })});
-
-            Assert.True(actual);
+            Assert.True(configPassedToAuraStorage.clearOnInit);
         }
 
         [Fact]
-        function ClearStorageOnInitRespectsArgument() {
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.clearStorageOnInit;
-                }
+        function ClearOnInitRespectsArgument() {
+            mockA(function() {
+                targetService.initStorage({name:"name", clearOnInit:false});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 1, 2, 3, 4, false);
-            })});
-
-            Assert.False(actual);
+            Assert.False(configPassedToAuraStorage.clearOnInit);
         }
 
 
@@ -355,101 +276,177 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
         function VersionDefault() {
             var expected = "expected";
             targetService.version = expected;
-
-            var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.version;
-                }
+            mockA(function() {
+                targetService.initStorage({name:"name"});
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 1, 2, 3, 4, 5);
-            })});
-
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, configPassedToAuraStorage.version);
         }
 
         [Fact]
         function VersionRespectsArgument() {
             var expected = "version";
+            mockA(function() {
+                targetService.initStorage({name:"name", version:expected});
+            });
+
+            Assert.Equal(expected, configPassedToAuraStorage.version);
+        }
+    }
+
+
+    [Fixture]
+    function selectAdapter() {
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "Aura": {
+                "Storage": {
+                    "MemoryAdapter": {
+                        "NAME": "memory"
+                    }
+                }
+            },
+            "$A": {
+                assert: function(condition, assertMessage) {
+                    if (!condition) { throw new Error(assertMessage); }
+                },
+                util: {
+                    isString: function(obj) { return typeof obj === 'string'; },
+                    isFunction: function(obj) { return true; }
+                }
+            },
+
+        });
+
+        function registerAdapter(service, name, persistent, secure) {
+            service.registerAdapter({
+               name: name,
+               persistent: persistent,
+               secure: secure,
+               adapterClass: function(){}
+            });
+        }
+
+
+        [Fact]
+        function SecureRespectedIfPossible() {
+            var expected = "PersistentFalseSecureTrue";
             var actual;
-            var mockAuraStorage = Mocks.GetMocks(Object.Global(), {
-                "AuraStorage": function(config) {
-                    actual = config.version;
+
+            mockA(function() {
+                var targetService = new Aura.Services.AuraStorageService();
+                registerAdapter(targetService, "PersistentTrueSecureFalse", true, false)
+                registerAdapter(targetService, expected, false, true)
+                actual = targetService.selectAdapter(false, true);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function SecureFallsBackToMemoryAdapter() {
+            var actual;
+
+            mockA(function() {
+                var targetService = new Aura.Services.AuraStorageService();
+                registerAdapter(targetService, "memory", false, false)
+                actual = targetService.selectAdapter(false, true);
+            });
+
+            Assert.Equal("memory", actual);
+        }
+
+        [Fact]
+        function SecureErrorsIfMemoryAdapterNotRegistered() {
+            var expected = "Memory Aura Storage Adapter was not registered";
+            var actual;
+
+            mockA(function() {
+                var targetService = new Aura.Services.AuraStorageService();
+                registerAdapter(targetService, "PersistentFalseSecureFalse", false, false)
+
+                try {
+                    targetService.selectAdapter(false, true);
+                    Assert.Fail("Error should've been thrown");
+                } catch (e) {
+                    actual = e;
                 }
             });
 
-            mockA(function() { mockAuraStorage(function() {
-                targetService.initStorage("name", true, true, 1, 2, 3, 4, 5, expected);
-            })});
-
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, actual.message);
         }
 
         [Fact]
-        function NamePassed() {
-            var expected = "name";
+        function PersistentRespectedIfPossible() {
+            var expected = "PersistentTrueSecureFalse";
             var actual;
 
-            targetService.createAdapter = function(adapter, name, maxSize, debugLoggingEnabled, defaultExpiration) {
-                actual = name;
-            };
-
             mockA(function() {
-                targetService.initStorage(expected);
+                var targetService = new Aura.Services.AuraStorageService();
+                registerAdapter(targetService, "PersistentFalseSecureTrue", false, true)
+                registerAdapter(targetService, expected, true, false)
+                actual = targetService.selectAdapter(true, false);
             });
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        function MaxSizePassed() {
-            var expected = 1;
+        function PersistentNotRespectedIfNotPossible() {
+            var expected = "PersistentFalseSecureTrue";
             var actual;
 
-            targetService.createAdapter = function(adapter, name, maxSize, debugLoggingEnabled, defaultExpiration) {
-                actual = maxSize;
-            };
-
             mockA(function() {
-                targetService.initStorage("name", true, true, expected);
+                var targetService = new Aura.Services.AuraStorageService();
+                registerAdapter(targetService, expected, false, true)
+                actual = targetService.selectAdapter(true, false);
             });
 
             Assert.Equal(expected, actual);
         }
+    }
 
+    [Fixture]
+    function deleteStorage() {
         [Fact]
-        function DefaultExpirationPassed() {
-            var expected = 1;
+        function DeleteCallsAdapterDelete() {
+            var name = "arbitrary";
             var actual;
 
-            targetService.createAdapter = function(adapter, name, maxSize, debugLoggingEnabled, defaultExpiration) {
-                actual = defaultExpiration;
+            var targetService = new Aura.Services.AuraStorageService();
+            targetService.storages[name] = {
+                deleteStorage: function() {
+                    actual = true;
+                }
             };
 
-            mockA(function() {
-                targetService.initStorage("name", true, true, 1, expected);
-            });
-
-            Assert.Equal(expected, actual);
+            targetService.deleteStorage(name);
+            Assert.True(actual);
         }
 
         [Fact]
-        function DebugLoggingEnabledPassed() {
-            var expected = true;
-            var actual;
-
-            targetService.createAdapter = function(adapter, name, maxSize, debugLoggingEnabled, defaultExpiration) {
-                actual = debugLoggingEnabled;
+        function DeleteCausesGetStorageToReturnNull() {
+            var name = "arbitrary";
+            var targetService = new Aura.Services.AuraStorageService();
+            targetService.storages[name] = {
+                deleteStorage: function() {}
             };
 
-            mockA(function() {
-                targetService.initStorage("name", false, false, 1, 2, 3, expected);
-            });
+            targetService.deleteStorage(name);
+            var actual = targetService.getStorage(name);
+            Assert.Undefined(actual);
+        }
 
-            Assert.Equal(expected, actual);
+        [Fact]
+        function DeleteNonExistentStorage() {
+            var name = "arbitrary";
+            var targetService = new Aura.Services.AuraStorageService();
+            targetService.deleteStorage(name);
+            var actual = targetService.getStorage(name);
+            Assert.Undefined(actual);
         }
 
     }
+
+
+
 }

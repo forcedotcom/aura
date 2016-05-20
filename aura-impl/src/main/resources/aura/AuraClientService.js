@@ -931,7 +931,7 @@ AuraClientService.prototype.setConnected = function(isConnected) {
 AuraClientService.prototype.saveTokenToStorage = function() {
     // update the persisted CSRF token so it's accessible when the app is launched while offline.
     // fire-and-forget style, matching action response persistence.
-    var storage = Action.prototype.getStorage();
+    var storage = Action.getStorage();
     if (storage && this._token) {
         var token = this._token;
         // certain storage adapters require token object be wrapped in "value" object for indexing
@@ -954,9 +954,16 @@ AuraClientService.prototype.saveTokenToStorage = function() {
  * @return {Promise} resolves or rejects based on data loading.
  */
 AuraClientService.prototype.loadTokenFromStorage = function() {
-    var storage = Action.prototype.getStorage();
+    var storage = Action.getStorage();
     if (storage) {
-        return storage.adapter.getItem(this._tokenStorageKey);
+        // TODO - why go straight to the adapter?
+        return storage.adapter.getItem(this._tokenStorageKey)
+            .then(function(item) {
+                if (item) {
+                    return item["value"];
+                }
+                return undefined;
+            });
     }
     return Promise["reject"](new Error("no Action storage"));
 };
@@ -1209,8 +1216,8 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
     var acs = this;
     this.loadTokenFromStorage().then(
         function (value) {
-            if (value && value.value && value.value["token"]) {
-                acs._token = value.value["token"];
+            if (value && value["token"]) {
+                acs._token = value["token"];
                 $A.log("AuraClientService.loadComponent(): token found in storage");
             } else {
                 $A.log("AuraClientService.loadComponent(): no token found in storage");
@@ -1252,7 +1259,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             // * loaded truthy means we have initialized.
             //
             var stored = false;
-            var storage = Action.prototype.getStorage();
+            var storage = Action.getStorage();
             var loaded;
 
             var failCallback = function (force, err) {
@@ -1500,7 +1507,7 @@ AuraClientService.prototype.continueProcessing = function() {
  */
 AuraClientService.prototype.getStoredResult = function(action, storage, index) {
     //
-    // For cacheable actions check the storage service to see if we already have a viable cached action
+    // For storable actions check the storage service to see if we already have a viable cached action
     // response we can complete immediately. In this case, we get a callback, so we create a callback
     // for each one (ugh, this could have been handled via passing an additional param to the action,
     // but we don't have that luxury now.)
@@ -1514,10 +1521,10 @@ AuraClientService.prototype.getStoredResult = function(action, storage, index) {
         that.collectServerAction(action, index);
     } else {
         // using storage so callbacks *must* be in an aura loop
-        storage.get(key).then(
+        storage.get(key, true).then(
             function(value) {
-                if (value && value.value) {
-                    that.executeStoredAction(action, value.value, that.collector.collected, index);
+                if (value) {
+                    that.executeStoredAction(action, value, that.collector.collected, index);
                     that.collector.actionsToCollect -= 1;
                     that.finishCollection();
                 } else {
@@ -1556,8 +1563,7 @@ AuraClientService.prototype.executeStoredAction = function(action, response, col
                 action.finishAction($A.getContext());
             } catch (e) {
                 refreshAction = action.getRetryFromStorageAction();
-                $A.warning("Finishing cached action failed. Trying to refetch from server: "
-                    + refreshAction.getStorageKey(), e);
+                $A.warning("Finishing cached action failed. Trying to refetch from server: " + refreshAction.getStorageKey(), e);
                 // Clear potential leftover configs
                 $A.getContext().clearComponentConfigs(action.getId());
             }
@@ -2197,11 +2203,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
     var token = responseMessage["token"];
     if (token) {
         this._token = token;
-        try {
-            this.saveTokenToStorage();
-        } catch (e) {
-            $A.logger.reportError(e);
-        }
+        this.saveTokenToStorage(); // async fire-and-forget
     }
     var context=$A.getContext();
     var priorAccess=context.getCurrentAccess();
@@ -2685,14 +2687,6 @@ AuraClientService.prototype.deferAction = function (action) {
 };
 
 /**
- * Gets whether or not the Aura "actions" cache exists.
- * @returns {Boolean} true if the Aura "actions" cache exists.
- */
-AuraClientService.prototype.hasActionStorage = function() {
-    return !!Action.getStorage();
-};
-
-/**
  * Determines whether an action is stored.
  *
  * @param {String} descriptor - action descriptor.
@@ -2718,9 +2712,9 @@ AuraClientService.prototype.isActionInStorage = function(descriptor, params, cal
     }
 
     storage.get(key).then(
-        function(response) {
+        function(value) {
             $A.run(function() {
-                callback(!!response && !!response.value && !response["isExpired"]);
+                callback(!!value);
             });
         },
         function(err) {
@@ -2757,10 +2751,10 @@ AuraClientService.prototype.revalidateAction = function(descriptor, params, call
         return;
     }
 
-    storage.get(key).then(
-        function(response) {
-            if (response && response.value) {
-                storage.put(key, response.value).then(
+    storage.get(key, true).then(
+        function(value) {
+            if (value) {
+                storage.put(key, value).then(
                     function() { callback(true); },
                     function(/*error*/) { callback(false); }
                 );
@@ -2938,7 +2932,7 @@ AuraClientService.prototype.setUseBootstrapCache = function(useBootstrapCache) {
  */
 AuraClientService.prototype.disableBootstrapCacheOnNextLoad = function() {
     // can only get a cache hit on getApplication with persistent storage
-    var storage = Action.prototype.getStorage();
+    var storage = Action.getStorage();
     if (storage && storage.isPersistent()) {
         var expire = new Date(new Date().getTime() + 1000*60*60*24*7); // + 1 week
         document.cookie = this._disableBootstrapCacheCookie + '=true; expires=' + expire.toUTCString();
@@ -3022,7 +3016,7 @@ AuraClientService.prototype.populatePersistedActionsFilter = function() {
     }
 
     var acs = this;
-    return actionStorage.getAll()
+    return actionStorage.getAll(true)
         .then(function(all) {
             if (all) {
                 for (var i in all) {

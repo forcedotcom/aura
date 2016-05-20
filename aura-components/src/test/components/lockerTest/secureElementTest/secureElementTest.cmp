@@ -42,8 +42,7 @@
     <aura:method name="testInnerText" action="{!c.testInnerText}"/>
     <aura:method name="testAddEventListenerMultipleCalls" action="{!c.testAddEventListenerMultipleCalls}">
     </aura:method>
-    
-    <aura:method name="getDiv" action="{!c.getDiv}"/>
+    <aura:method name="testSvgGetBBox" action="{!c.testSvgGetBBox}"/>r
 
     <lockerTest:facet/>
     <div aura:id="title">SecureElement test</div>

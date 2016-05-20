@@ -35,5 +35,20 @@
         } catch (e) {
             testUtils.assertEquals("Invalid key c.press", e.message);
         }
+    },
+    
+    testGetComponentEvent: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var eventSource = cmp.find("eventSource");
+        
+        var foo = eventSource.get("e.foo");
+        testUtils.assertDefined(foo);
+
+        foo = eventSource.getEvent("foo");
+        testUtils.assertDefined(foo);
+    },
+    
+    doFoo: function(cmp) {
+    	// Do nothing
     }
 })

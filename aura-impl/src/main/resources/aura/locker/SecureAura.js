@@ -55,7 +55,7 @@ function SecureAura(AuraInstance, key) {
 	Object.seal(o);
 
 	// SecureUtil: creating a proxy for $A.util
-	[ "isEmpty", "hasClass", "addClass", "removeClass", "toggleClass" ].forEach(function(name) {
+	[ "addClass", "getBooleanValue", "hasClass", "isArray", "isEmpty", "isObject", "isUndefined", "removeClass", "toggleClass" ].forEach(function(name) {
 		Object.defineProperty(su, name, SecureObject.createFilteredMethod(su, AuraInstance["util"], name));
 	});
 
@@ -63,7 +63,7 @@ function SecureAura(AuraInstance, key) {
 	setLockerSecret(su, "ref", AuraInstance["util"]);
 	Object.seal(su);
 
-	// SecureLocalizationService: creating a proxy for $A.util
+	// SecureLocalizationService: creating a proxy for $A.localizationService
 	[ "displayDuration", "displayDurationInDays", "displayDurationInHours", "displayDurationInMilliseconds", "displayDurationInMinutes",
 			"displayDurationInMonths", "displayDurationInSeconds", "duration", "endOf", "formatCurrency", "formatDate", "formatDateTime", "formatDateTimeUTC",
 			"formatDateUTC", "formatNumber", "formatPercent", "formatTime", "formatTimeUTC", "getDateStringBasedOnTimezone", "getDaysInDuration",

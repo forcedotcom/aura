@@ -5,7 +5,7 @@
      */
 
     // LockerService not supported on older IE
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+    browsers: ["-IE8", "-IE9", "-IE10"],
 
     setUp: function(cmp) {
         cmp.set("v.testUtils", $A.test);

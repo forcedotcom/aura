@@ -5,7 +5,7 @@
      */
 
     // LockerService not supported on older IE
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+    browsers: ["-IE8", "-IE9", "-IE10"],
 
     setUp: function(cmp) {
         cmp.set("v.testUtils", $A.test);
@@ -87,6 +87,8 @@
     },
 
     testDefineGetterExploit: {
+        // This exploit not covered in IE11
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
         // Remove UnAdaptableTest label when unsafe-eval and unsafe-inline are added back to CSP
         labels: ["UnAdaptableTest"],
         test: function(cmp) {
@@ -119,11 +121,12 @@
     },
 
     testAttemptToEvalToWindow: {
-        browsers: ["-IE11"],
+        // This exploit not covered in IE11
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
         test: function(cmp) {
-        	cmp.testEvalBlocking();
+            cmp.testEvalBlocking();
 
-        	// DCHASMAN TOOD Port these to cmp.testEvalBlocking()
+            // DCHASMAN TOOD Port these to cmp.testEvalBlocking()
 
             // eval attempts that result in an error
             /*try {

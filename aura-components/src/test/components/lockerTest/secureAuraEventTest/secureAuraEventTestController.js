@@ -5,6 +5,12 @@
         testUtils.assertStartsWith("SecureComponent", secureAuraEvent.getSource().toString());
     },
 
+    testGetSourceReturnsSecureComponentRefWhenNoAccess: function(cmp, event) {
+        var testUtils = cmp.get("v.testUtils");
+        var actual = event.getSource();
+        testUtils.assertStartsWith("SecureComponentRef", actual.toString());
+    },
+
     testExerciseEventAPIs: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var secureAuraEvent = cmp.getEvent("debugLog");
@@ -12,6 +18,7 @@
         secureAuraEvent.setParams(params);
         testUtils.assertEquals("debugLog", secureAuraEvent.getName());
         testUtils.assertEquals(params.message, secureAuraEvent.getParams().message);
-        testUtils.assertDefined(secureAuraEvent.fire);
+        testUtils.assertEquals("function", typeof secureAuraEvent.fire);
+        testUtils.assertEquals("function", typeof secureAuraEvent.stopPropagation);
     }
 })

@@ -45,5 +45,15 @@
         }
         cmp.addValueProvider('foo', vp); 
         cmp.get('foo.x');
-    }
+    },
+    
+    testAuraMethod: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        cmp.sayHello();
+        testUtils.assertEquals("Hello from sayHello()", cmp.find("message").textContent);
+    },
+    
+    sayHello: function(cmp) {
+		cmp.find("message").textContent = "Hello from sayHello()";
+	}
 })

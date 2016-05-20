@@ -5,7 +5,7 @@
      */
 
     // LockerService not supported on older IE
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+    browsers: ["-IE8", "-IE9", "-IE10"],
 
     // TODO(tbliss): make these lists on SecureElement accessible here for maintainablility
     ElementPropertiesWhitelist: ['attributes', 'childElementCount', 'classList', 'className', 'id', 'tagName', 'innerHTML', 'namespaceURI'],
@@ -390,6 +390,30 @@
         test: function(cmp) {
             var actual = cmp.get("v.text");
             $A.test.assertStartsWith("Error: Access denied", actual);
+        }
+    },
+
+    testInnerHTMLSupportsUseTagForSvgElement: {
+        test: function(cmp) {
+            cmp.testInnerHTMLSupportsUseTagForSvgElement();
+        }
+    },
+    
+    testTextContent: {
+        test: function(cmp) {
+            cmp.testTextContent();
+        }
+    },
+    
+    testInnerText: {
+        test: function(cmp) {
+            cmp.testInnerText();
+        }
+    },
+    
+    testAddEventListenerMultipleCalls: {
+        test: function(cmp) {
+            cmp.testAddEventListenerMultipleCalls();
         }
     }
 })

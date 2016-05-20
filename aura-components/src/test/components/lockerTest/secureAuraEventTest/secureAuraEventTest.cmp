@@ -18,10 +18,12 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
+    <div>SecureAuraEvent test</div>
+
     <aura:method name="testGetEventSourceReturnsSecureComponent" action="{!c.testGetEventSourceReturnsSecureComponent}"/>
     <aura:method name="testExerciseEventAPIs" action="{!c.testExerciseEventAPIs}"/>
+    <ui:button label="press event" aura:id="button" press="c.testGetSourceReturnsSecureComponentRefWhenNoAccess"/>
 
     <aura:registerevent name="debugLog" type="aura:debugLog"/>
 
-    <div>SecureAuraEvent test</div>
 </aura:component>

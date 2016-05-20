@@ -82,6 +82,7 @@ Aura.Event.Event.prototype.getPhase = function(){
  * Sets whether the event can bubble or not. This will throw 
  * an error if called in the "default" phase.
  * The default is false.
+ * @platform
  * @export
  */
 Aura.Event.Event.prototype.stopPropagation = function() {

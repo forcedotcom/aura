@@ -1,0 +1,3 @@
+<aura:component implements="aura:requireLocker">
+    <aura:registerevent name="foo" type="lockertest:fooEvent"/>
+</aura:component>

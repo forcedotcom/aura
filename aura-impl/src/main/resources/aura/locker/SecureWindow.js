@@ -31,7 +31,8 @@
 function SecureWindow(win, key, globalAttributeWhitelist) {
 	"use strict";
 	
-    var hostedDefinedGlobals = ["alert", "clearInterval", "clearTimeout", "confirm", "console", "location", "Node", "requestAnimationFrame", "cancelAnimationFrame"];
+    var hostedDefinedGlobals = ["alert", "clearInterval", "clearTimeout", "confirm", "console", "DOMParser", 
+                                "location", "Node", "requestAnimationFrame", "cancelAnimationFrame"];
 
 	var o = Object.create(null, {
 		document: {

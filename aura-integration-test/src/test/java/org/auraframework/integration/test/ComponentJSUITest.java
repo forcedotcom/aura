@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test;
 
-import org.auraframework.test.ComponentJSTestSuite;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 @UnAdaptableTest

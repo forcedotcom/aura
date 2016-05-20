@@ -15,15 +15,21 @@
  */
 package org.auraframework.impl.util;
 
-import junit.framework.TestSuite;
-
+import com.google.common.collect.Lists;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.annotation.UnitTest;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import static org.hamcrest.core.Is.is;
@@ -31,32 +37,62 @@ import static org.junit.Assert.assertThat;
 
 @UnAdaptableTest
 @UnitTest
-public class BrowserAgentTest extends TestSuite {
+@RunWith(Parameterized.class)
+public class BrowserAgentTest extends UnitTestCase {
 
-    public static TestSuite suite() throws Throwable {
-        TestSuite suite = new TestSuite("BrowserAgentTestSuite");
+    @Parameters(name = "testBrowserAgent_{0}")
+    public static Collection<Object> generateTestParameters() throws IOException {
+        List<Object> parameters = Lists.newLinkedList();
+
         InputStreamReader fixtureStream = new InputStreamReader(getFixture("results/BrowserAgentTest/BrowserAgentTest.csv"));
-        try (BufferedReader reader = new BufferedReader(fixtureStream)) {
+        BufferedReader reader = new BufferedReader(fixtureStream);
 
-            String line;
-            boolean firstLine = true;
+        String line;
+        boolean firstLine = true;
 
-            while ((line = reader.readLine()) != null) {
-                if (firstLine) {
-                    // Ignore first line as it contains the CSV header and not actual browser information
-                    firstLine = false;
-                    continue;
-                }
-                if (ignore(line)) {
-                    continue;
-                }
-
-                BrowserTestInfo expectedBrowserInfo = readExpectedBrowserInfo(line);
-
-                suite.addTest(new BrowserAgentTestCase(expectedBrowserInfo));
+        while ((line = reader.readLine()) != null) {
+            if (firstLine) {
+                // Ignore first line as it contains the CSV header and not actual browser information
+                firstLine = false;
+                continue;
             }
+            if (ignore(line)) {
+                continue;
+            }
+
+            BrowserTestInfo expectedBrowserInfo = readExpectedBrowserInfo(line);
+            parameters.add(new Object[]{expectedBrowserInfo});
         }
-        return suite;
+        return parameters;
+    }
+
+    private final BrowserTestInfo expected;
+
+    public BrowserAgentTest(BrowserTestInfo expectedBrowserInfo) {
+        super();
+        expected = expectedBrowserInfo;
+    }
+
+    @Test
+    public void test() throws Exception {
+        BrowserInfo computed = new BrowserInfo(expected.userAgent);
+
+        assertThat("Is a Tablet", computed.isTablet(), is(expected.tablet));
+        assertThat("Is a Phone", computed.isPhone(), is(expected.phone));
+        assertThat("Is an iPad", computed.isIPad(), is(expected.iPad));
+        assertThat("Is an iPhone", computed.isIPhone(), is(expected.iPhone));
+        assertThat("Is iOS", computed.isIOS(), is(expected.iOS));
+        assertThat("Is Android", computed.isAndroid(), is(expected.android));
+        assertThat("Is Windows Phone", computed.isWindowsPhone(), is(expected.windowsPhone));
+        assertThat("Is Firefox", computed.isFirefox(), is(expected.firefox));
+        assertThat("Is WebKit", computed.isWebkit(), is(expected.webkit));
+        assertThat("Is IE6", computed.isIE6(), is(expected.ie6));
+        assertThat("Is IE7", computed.isIE7(), is(expected.ie7));
+        assertThat("Is IE8", computed.isIE8(), is(expected.ie8));
+        assertThat("Is IE9", computed.isIE9(), is(expected.ie9));
+        assertThat("Is IE10", computed.isIE10(), is(expected.ie10));
+        assertThat("Is IE11", computed.isIE11(), is(expected.ie11));
+        assertThat("Form factor", computed.getFormFactor(), is(expected.formFactor));
     }
 
     private static BrowserTestInfo readExpectedBrowserInfo(String line) {
@@ -94,45 +130,6 @@ public class BrowserAgentTest extends TestSuite {
         return line.trim().startsWith("#");
     }
 
-    public static class BrowserAgentTestCase extends UnitTestCase {
-
-        private final BrowserTestInfo expected;
-        private final String name;
-
-        public BrowserAgentTestCase(BrowserTestInfo expectedBrowserInfo) {
-            super("testBrowserAgent");
-            expected = expectedBrowserInfo;
-            name = "testBrowserAgent" + "_" + expectedBrowserInfo.client;
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        public void testBrowserAgent() throws Exception {
-            BrowserInfo computed = new BrowserInfo(expected.userAgent);
-
-            assertThat("Is a Tablet", computed.isTablet(), is(expected.tablet));
-            assertThat("Is a Phone", computed.isPhone(), is(expected.phone));
-            assertThat("Is an iPad", computed.isIPad(), is(expected.iPad));
-            assertThat("Is an iPhone", computed.isIPhone(), is(expected.iPhone));
-            assertThat("Is iOS", computed.isIOS(), is(expected.iOS));
-            assertThat("Is Android", computed.isAndroid(), is(expected.android));
-            assertThat("Is Windows Phone", computed.isWindowsPhone(), is(expected.windowsPhone));
-            assertThat("Is Firefox", computed.isFirefox(), is(expected.firefox));
-            assertThat("Is WebKit", computed.isWebkit(), is(expected.webkit));
-            assertThat("Is IE6", computed.isIE6(), is(expected.ie6));
-            assertThat("Is IE7", computed.isIE7(), is(expected.ie7));
-            assertThat("Is IE8", computed.isIE8(), is(expected.ie8));
-            assertThat("Is IE9", computed.isIE9(), is(expected.ie9));
-            assertThat("Is IE10", computed.isIE10(), is(expected.ie10));
-            assertThat("Is IE11", computed.isIE11(), is(expected.ie11));
-            assertThat("Form factor", computed.getFormFactor(), is(expected.formFactor));
-        }
-
-    }
-
     private static class BrowserTestInfo {
 
         String client;
@@ -154,5 +151,10 @@ public class BrowserAgentTest extends TestSuite {
         boolean ie9;
         boolean ie10;
         boolean ie11;
+
+        @Override
+        public String toString() {
+            return client;
+        }
     }
 }

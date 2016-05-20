@@ -33,10 +33,6 @@ import com.google.common.collect.Sets;
  * Unit tests for StyleContextImpl.
  */
 public class StyleContextImplTest extends AuraImplTestCase {
-    public StyleContextImplTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testFromMap() {
         Map<String, Object> map = new HashMap<>();

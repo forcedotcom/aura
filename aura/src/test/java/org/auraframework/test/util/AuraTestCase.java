@@ -19,7 +19,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 import org.auraframework.Aura;
+import org.auraframework.AuraDeprecated;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -45,6 +48,9 @@ public abstract class AuraTestCase extends UnitTestCase {
     protected final static String baseApplicationTag = "<aura:application %s>%s</aura:application>";
     protected final static String baseComponentTag = "<aura:component %s>%s</aura:component>";
 
+    @Inject
+    AuraDeprecated aura; // Initializes Aura with Spring
+
     //
     // FIXME: Definition service cannot be used in ./aura/ this needs to be moved up a level.
     //
@@ -52,10 +58,6 @@ public abstract class AuraTestCase extends UnitTestCase {
 
     private AuraTestingUtil auraTestingUtil;
     private AuraTestingMarkupUtil auraTesingMarkupUtil;
-
-    public AuraTestCase(String name) {
-        super(name);
-    }
 
     @Override
     public void setUp() throws Exception {

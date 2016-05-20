@@ -22,6 +22,6 @@ import org.springframework.context.annotation.Configuration;
  * Spring configuration to autoscan all aura packages
  */
 @Configuration
-@ComponentScan({ "org.auraframework" })
+@ComponentScan(basePackages = {"org.auraframework"}, lazyInit = true)
 public class AuraConfiguration {
 }

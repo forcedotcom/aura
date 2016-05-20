@@ -36,10 +36,6 @@ import com.google.common.collect.ImmutableMap;
 public class FlavorDefaultDefImplTest extends StyleTestCase {
     private static final FlavorOverrideLocator NO_OVERRIDES = new FlavorOverrideLocatorImpl.Builder().build();
 
-    public FlavorDefaultDefImplTest(String name) {
-        super(name);
-    }
-
     /* util */
     private FlavorDefaultDef source(String flavorDefaultSource) throws QuickFixException {
         String fmt = String.format("<aura:flavors>%s</aura:flavors>", flavorDefaultSource);

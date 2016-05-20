@@ -45,6 +45,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -70,6 +71,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -77,6 +79,7 @@ import com.google.common.collect.Lists;
 /**
  * Supports test framework functionality, primarily for jstest mocks.
  */
+@ServiceComponent
 public class AuraTestFilter implements Filter {
     private static final Log LOG = LogFactory.getLog(AuraTestFilter.class);
 
@@ -252,6 +255,11 @@ public class AuraTestFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         servletContext = filterConfig.getServletContext();
+        processInjection(filterConfig);
+    }
+    
+    public void processInjection(FilterConfig filterConfig) {
+        SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, servletContext);
     }
 
     @Override

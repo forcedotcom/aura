@@ -43,10 +43,6 @@ import com.google.common.collect.Sets;
  * Common tests for ui:output components
  */
 public class OutputComponentsTest extends AuraTestCase {
-    public OutputComponentsTest(String name) {
-        super(name);
-    }
-
     private ComponentDef getUiOutputComponent() throws Exception {
         ComponentDef def = definitionService.getDefinition("markup://ui:output", ComponentDef.class);
         return def;

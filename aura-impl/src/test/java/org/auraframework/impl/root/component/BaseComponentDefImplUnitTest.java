@@ -107,12 +107,6 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         }
     }
 
-
-    public BaseComponentDefImplUnitTest(String name) {
-        super(name);
-    }
-
-
     @Test
     public void testAppendDependenciesDefaultValue() throws Exception {
         Set<DefDescriptor<?>> dependencies = Mockito.spy(Sets.<DefDescriptor<?>> newHashSet());

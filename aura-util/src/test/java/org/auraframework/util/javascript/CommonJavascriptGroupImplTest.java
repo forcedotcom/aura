@@ -32,10 +32,6 @@ import org.junit.Test;
  * verifying the implementation of javascript grouping functionality.
  */
 public class CommonJavascriptGroupImplTest extends UnitTestCase {
-    public CommonJavascriptGroupImplTest(String name) {
-        super(name);
-    }
-
     /**
      * Test basic initialization and other exposed public methods of CommonJavascriptGroupImpl.java.
      * 

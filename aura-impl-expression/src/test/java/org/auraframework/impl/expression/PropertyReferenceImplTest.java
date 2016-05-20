@@ -27,10 +27,6 @@ import org.junit.Test;
  */
 public class PropertyReferenceImplTest extends UnitTestCase {
 
-    public PropertyReferenceImplTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testExpression() throws Exception {
         Location loc = new Location("expressionism", 456);

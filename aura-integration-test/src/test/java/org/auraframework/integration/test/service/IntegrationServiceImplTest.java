@@ -41,17 +41,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
- * 
  * Unit tests for IntegrationService. IntegrationService is used to inject aura
  * components into pages other than ones boot strapped with the Aura Framework.
  * As part of the Integration, the required aura framework(aura_dev, aura_prod),
  * preload definitions etc.
- * 
  */
 public class IntegrationServiceImplTest extends AuraImplTestCase {
-    public IntegrationServiceImplTest(String name) {
+    public IntegrationServiceImplTest() {
         // Do not setup a context, integration service manages its own context.
-        super(name, false);
+        this.setShouldSetupContext(false);
     }
 
     AuraTestingMarkupUtil tmu;

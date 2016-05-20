@@ -18,8 +18,8 @@ package org.auraframework.integration.test.root.event.locationchange;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
-import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -33,10 +33,6 @@ import org.openqa.selenium.WebElement;
 // History Service is not supported in IE7 or IE8
 @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8 })
 public class BrowserHistoryManagementUITest extends WebDriverTestCase {
-    public BrowserHistoryManagementUITest(String name) {
-        super(name);
-    }
-
     /**
      * A basic component which has specified a event to be fired for location change but has no handler.
      * 

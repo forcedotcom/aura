@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test.root.component.rendering;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -35,17 +35,9 @@ import com.google.common.base.Function;
  * to render it. If render = 'client', the aura servlet assumes the component
  * should be rendered clientside. In context of tests, Applications and
  * components can be used interchangeably.
- *
- * @hierarchy Aura.Components.Renderer
- * @priority high
- * @userStory a07B0000000EWWg
  */
 @AuraTestLabels("auraSanity")
 public class ComponentRenderingUITest extends WebDriverTestCase {
-    public ComponentRenderingUITest(String name) {
-        super(name);
-    }
-
     /**
      * Verify that text, expressions and HTML can be rendered serverside. Text,
      * Expression and Html are the basic building blocks of aura. These can be

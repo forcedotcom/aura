@@ -16,22 +16,15 @@
 package org.auraframework.integration.test.http;
 
 import org.apache.http.HttpStatus;
-import org.auraframework.test.util.AuraHttpTestCase;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.junit.Test;
 
 /**
  * Automation to verify the handling of urls by AuraRewriteFilter.
  * AuraRewriteFilter forwards requests to AuraServlet.
- * 
- * 
- * @since 0.0.125
  */
 public class AuraRewriteFilterHttpTest extends AuraHttpTestCase {
-    public AuraRewriteFilterHttpTest(String name) {
-        super(name);
-    }
-
     @AuraTestLabels("auraSanity")
     @Test
     public void testDoFilterOfValidURLs() throws Exception {

@@ -30,11 +30,6 @@ import org.junit.Test;
  * This class provides automation for Java models.
  */
 public class JavaModelTest extends AuraImplTestCase {
-
-    public JavaModelTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testSerializeMetadata() throws Exception {
         JavaModelDefFactory factory = new JavaModelDefFactory();

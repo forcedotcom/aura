@@ -40,10 +40,10 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.client.UserAgent;
-import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
@@ -53,9 +53,6 @@ import org.junit.Test;
 
 /**
  * Automation to verify the handling of AuraServlet requests.
- *
- *
- * @since 0.0.139
  */
 public class AuraServletHttpTest extends AuraHttpTestCase {
 
@@ -141,10 +138,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         public String getReportUrl() {
             return "http://doesnt.matter.com/";
         }
-    }
-
-    public AuraServletHttpTest(String name) {
-        super(name);
     }
 
     /**
@@ -622,7 +615,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * not an AuraUnhandledException.
      */
 	@UnAdaptableTest("PROD mode will likely be handled differently by the ExceptionAdapter")
-	public void testInvalidDefDescriptorFormatExploitInProdMode()
+    @Test
+    public void testInvalidDefDescriptorFormatExploitInProdMode()
 			throws Exception {
 		String url = "/aura?aura.tag=any:thing%3Csvg%3E%3Cscript%3E0%3C1%3Ealert(document.domain)%3C%2Fscript%3E.app";
 		HttpGet get = obtainGetMethod(url + "&aura.mode=PROD");
@@ -640,7 +634,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 		get.releaseConnection();
 	}
 
-	public void testInvalidDefDescriptorFormatExploitInDevMode()
+    @Test
+    public void testInvalidDefDescriptorFormatExploitInDevMode()
 			throws Exception {
 		String url = "/aura?aura.tag=any:thing%3Csvg%3E%3Cscript%3E0%3C1%3Ealert(document.domain)%3C%2Fscript%3E.app";
 		HttpGet get = obtainGetMethod(url + "&aura.mode=DEV");

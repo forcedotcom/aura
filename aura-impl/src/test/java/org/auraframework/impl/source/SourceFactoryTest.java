@@ -35,11 +35,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class SourceFactoryTest extends AuraImplTestCase {
-
-    public SourceFactoryTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testSourceFactory() {
         SourceLoader loader = StringSourceLoader.getInstance();

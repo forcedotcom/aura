@@ -30,8 +30,8 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-import org.auraframework.test.util.TestExecutor;
-import org.auraframework.test.util.TestExecutor.TestRun;
+import org.auraframework.integration.test.util.TestExecutor;
+import org.auraframework.integration.test.util.TestExecutor.TestRun;
 import org.auraframework.test.util.WebDriverProvider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraUtil;

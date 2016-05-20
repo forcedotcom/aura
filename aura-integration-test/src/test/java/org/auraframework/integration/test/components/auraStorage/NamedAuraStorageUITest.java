@@ -17,15 +17,11 @@ package org.auraframework.integration.test.components.auraStorage;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
 public class NamedAuraStorageUITest extends WebDriverTestCase {
-    public NamedAuraStorageUITest(String name){
-        super(name);
-    }
-
     /**
      * Verify that registering duplicate named storage using auraStorage:init in a template will throw an error.
      */

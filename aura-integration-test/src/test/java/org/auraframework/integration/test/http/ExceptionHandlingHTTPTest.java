@@ -17,15 +17,10 @@ package org.auraframework.integration.test.http;
 
 import java.util.Map;
 
-import org.auraframework.test.util.AuraHttpTestCase;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.junit.Test;
 
 public class ExceptionHandlingHTTPTest extends AuraHttpTestCase {
-
-    public ExceptionHandlingHTTPTest(String name) {
-        super(name);
-    }
-
     /**
      * Test to verify row and column numbers in stacktrace on Exceptions.
      */

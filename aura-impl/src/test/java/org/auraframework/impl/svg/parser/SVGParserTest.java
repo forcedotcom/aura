@@ -158,10 +158,6 @@ public class SVGParserTest extends AuraImplTestCase {
 
     private SVGParser parser;
 
-    public SVGParserTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

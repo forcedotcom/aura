@@ -46,21 +46,21 @@ import com.google.common.collect.ImmutableList;
 
 @UnAdaptableTest
 @PerfTestSuite
-public class PerfEngineTest extends TestSuite implements PerfTestFramework {
+public class PerfEngineTestSuite extends TestSuite implements PerfTestFramework {
 
     private PerfConfigUtil perfConfigUtil;
     private static String DB_INSTANCE = System.getProperty("dbURI");
-    private static final Logger LOG = Logger.getLogger(PerfEngineTest.class.getSimpleName());
+    private static final Logger LOG = Logger.getLogger(PerfEngineTestSuite.class.getSimpleName());
 
     public static TestSuite suite() throws Exception {
-        return new PerfEngineTest();
+        return new PerfEngineTestSuite();
     }
 
-    public PerfEngineTest() throws Exception {
+    public PerfEngineTestSuite() throws Exception {
         this("Component Perf tests");
     }
 
-    public PerfEngineTest(String name) throws Exception {
+    public PerfEngineTestSuite(String name) throws Exception {
         LOG.info("ComponentPerfTestEngine: " + name);
         setName(name);
         init();
@@ -76,7 +76,7 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
     public void runTests(Map<DefDescriptor<BaseComponentDef>, PerfConfig> tests) throws Exception {
         // Map component def to component config options.
         for (Map.Entry<DefDescriptor<BaseComponentDef>, PerfConfig> entry : tests.entrySet()) {
-            addTest(new ComponentSuiteTest(entry.getKey(), entry.getValue()));
+            addTest(new ComponentTestSuite(entry.getKey(), entry.getValue()));
         }
     }
 
@@ -100,8 +100,8 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
         return contextService;
     }
 
-    private class ComponentSuiteTest extends TestSuite {
-        ComponentSuiteTest(DefDescriptor<BaseComponentDef> defDescriptor, final PerfConfig config) {
+    private class ComponentTestSuite extends TestSuite {
+        ComponentTestSuite(DefDescriptor<BaseComponentDef> defDescriptor, final PerfConfig config) {
             super(defDescriptor.getName());
             ContextService contextService = establishAuraContext();
             TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraTestInventory");

@@ -18,7 +18,7 @@ package org.auraframework.integration.test.logging;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.auraframework.impl.test.util.LoggingTestAppender;
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 
 /**
@@ -35,17 +35,17 @@ public abstract class AbstractLoggingUITest extends WebDriverTestCase {
     protected LoggingTestAppender appender;
 
     public AbstractLoggingUITest(String name) {
-        super(name);
+    	this.setName(name);
         logger = Logger.getRootLogger();
     }
 
     public AbstractLoggingUITest(String name, Class<?> loggerClass) {
-        super(name);
+        this(name);
         logger = Logger.getLogger(loggerClass);
     }
 
     public AbstractLoggingUITest(String name, String loggerName) {
-        super(name);
+        this(name);
         logger = Logger.getLogger(loggerName);
     }
 

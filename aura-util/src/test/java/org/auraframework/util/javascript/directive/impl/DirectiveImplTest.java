@@ -32,10 +32,6 @@ import org.junit.Test;
  * test the basic implementation in DirectiveImpl abstract class.
  */
 public class DirectiveImplTest extends UnitTestCase {
-    public DirectiveImplTest(String name) {
-        super(name);
-    }
-
     /**
      * 1. Testing basic initialization stuff of DirectiveImpl 2. Tests that
      * content cannot be set for a MultiLine Directive

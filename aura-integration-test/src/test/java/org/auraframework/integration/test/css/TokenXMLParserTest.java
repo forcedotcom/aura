@@ -30,10 +30,6 @@ import com.google.common.collect.Iterables;
  * Unit tests for {@link TokenDefHandler}.
  */
 public class TokenXMLParserTest extends StyleTestCase {
-    public TokenXMLParserTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testName() throws Exception {
         TokenDef def = source("<aura:token name='color' value='red'/>");

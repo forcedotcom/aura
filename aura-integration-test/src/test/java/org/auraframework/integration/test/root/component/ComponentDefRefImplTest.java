@@ -42,10 +42,6 @@ import com.google.common.collect.ImmutableMap;
 public class ComponentDefRefImplTest extends AuraImplTestCase {
     private ComponentDefRef testComponentDefRef;
 
-    public ComponentDefRefImplTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

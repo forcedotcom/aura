@@ -28,12 +28,6 @@ import org.junit.Test;
 
 @UnAdaptableTest("namespace start with c means something special in core")
 public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
-
-
-    public ComponentAccessAttributeEnforcementTest(String name) {
-        super(name);
-    }
-
     /**
      * Template tests start
      * template cannot have access='Private' 

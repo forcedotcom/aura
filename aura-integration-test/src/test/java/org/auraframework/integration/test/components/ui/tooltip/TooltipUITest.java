@@ -15,26 +15,23 @@
  */
 package org.auraframework.integration.test.components.ui.tooltip;
 
-import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD, BrowserType.IE7, BrowserType.IE8})
-public class TooltipUiTest extends WebDriverTestCase {
+public class TooltipUITest extends WebDriverTestCase {
 	private final String URL_FULL_CMP = "/uitest/tooltip_FullTest.cmp";
-
-	public TooltipUiTest(String name) {
-		super(name);
-	}
 
 	/**
 	 * If tooltip is triggered by click then it should open and close by
 	 * pressing enter on keyboard
 	 */
-	public void testToolTipOpenAndCloseWithEnterKey() throws Exception {
+    @Test
+    public void testToolTipOpenAndCloseWithEnterKey() throws Exception {
 		open(URL_FULL_CMP);
 
 		WebElement trigger = findDomElement(By.cssSelector(".triggerClick"));

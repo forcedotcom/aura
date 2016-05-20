@@ -25,8 +25,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Format;
-import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 import org.junit.Test;
@@ -35,10 +35,6 @@ import org.junit.Test;
  * Test class to perform sanity tests on AuraServlet with all possible modes.
  *
  * This should be killed.
- *
- * @hierarchy Aura.Configuration
- * @priority high
- * @userStory a07B0000000Dtmj
  */
 public class AuraFormatsHttpTest extends AuraHttpTestCase {
     private final String componentTag = "&aura.tag=auratest:test_TokenValidation";
@@ -53,10 +49,6 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         FORMAT_CONTENTTYPE.put(Format.MANIFEST, "text/cache-manifest;charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.SVG, "image/svg+xml;charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.ENCRYPTIONKEY, "text/plain;charset=" + AuraBaseServlet.UTF_ENCODING);
-    }
-
-    public AuraFormatsHttpTest(String name) {
-        super(name);
     }
 
     private void requestAndAssertContentType(HttpRequestBase method, String url, Format format, boolean expectHeaders)

@@ -25,11 +25,6 @@ import org.auraframework.impl.java.controller.JavaActionDef;
 import org.junit.Test;
 
 public class JavaActionDefTest extends AuraImplTestCase {
-
-    public JavaActionDefTest(String name){
-        super(name);
-    }
-
     /**
      * Verify Java action without background annotation is not background
      */

@@ -15,13 +15,7 @@
  */
 package org.auraframework.test.instance;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -32,10 +26,16 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 /**
  * Unit tests for InstanceStack.java.
@@ -44,8 +44,8 @@ public class InstanceStackTest extends UnitTestCase {
 
     private ConfigAdapter mci;
 
-    public InstanceStackTest(String name) {
-        super(name);
+    @Before
+    public void setup() {
         mci = Mockito.mock(ConfigAdapter.class);
         Mockito.when(mci.isInternalNamespace((String) Mockito.any())).thenReturn(true);
     }
@@ -359,8 +359,8 @@ public class InstanceStackTest extends UnitTestCase {
         assertEquals("Components should empty when no registered components", 0, iStack.getComponents().size());
         verifyZeroInteractions(jsonMock);
     }
-
-    @Test
+	
+	@Test
     public void testInternal() throws Exception {
         // setting up
         String namespace_Internal = "internal";

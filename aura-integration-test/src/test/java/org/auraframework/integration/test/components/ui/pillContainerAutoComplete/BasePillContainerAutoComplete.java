@@ -19,7 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -32,7 +32,7 @@ public class BasePillContainerAutoComplete extends WebDriverTestCase {
     public static final String LISTCONTENT_LOCATOR = ".visible";
     
     public BasePillContainerAutoComplete(String urlPath) {
-    	super(urlPath);
+    	this.setName(urlPath);
         this.CMP_URL = urlPath;
     }
     

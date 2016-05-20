@@ -36,11 +36,6 @@ import org.junit.Test;
  * Abstract component validation
  */
 public class AbstractComponentDefTest extends AuraImplTestCase {
-
-    public AbstractComponentDefTest(String name) {
-        super(name);
-    }
-
     /**
      * Abstract component extends regular component.
      * 

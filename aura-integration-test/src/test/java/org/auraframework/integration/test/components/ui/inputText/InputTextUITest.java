@@ -17,7 +17,7 @@ package org.auraframework.integration.test.components.ui.inputText;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.PerfTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
@@ -36,10 +36,6 @@ public class InputTextUITest extends WebDriverTestCase {
 
     public static final String TEST_CMP = "/uitest/inputtext_updateontest.cmp";
     public static final String TEST_CMP_WITH_LABELS = "/uitest/inputtext_updateonwithlabeltest.cmp";
-
-    public InputTextUITest(String name) {
-        super(name);
-    }
 
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     @Test

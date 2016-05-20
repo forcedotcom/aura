@@ -30,7 +30,7 @@ import org.auraframework.def.HelperDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.http.CSPReporterServlet;
 import org.auraframework.impl.test.util.LoggingTestAppender;
-import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
+import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;

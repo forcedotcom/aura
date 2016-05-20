@@ -15,8 +15,8 @@
  */
 package org.auraframework.integration.test.css;
 
-import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverTestCase.CheckAccessibility;
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.CheckAccessibility;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
@@ -28,10 +28,6 @@ import org.openqa.selenium.By;
  */
 @CheckAccessibility(false)
 public class TokensSanityUITest extends WebDriverTestCase {
-    public TokensSanityUITest(String name) {
-        super(name);
-    }
-
     /**
      * Using token variables in CSS
      */

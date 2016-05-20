@@ -27,10 +27,6 @@ import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
 public class DescriptorFilterTest extends UnitTestCase {
-    public DescriptorFilterTest(String name) {
-        super(name);
-    }
-
     private String getLabel(DescriptorFilter dm, boolean expected, String what, String value) {
         String match;
 

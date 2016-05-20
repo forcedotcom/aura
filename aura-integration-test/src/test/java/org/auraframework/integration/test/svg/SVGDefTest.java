@@ -22,11 +22,6 @@ import org.auraframework.throwable.quickfix.SVGParserException;
 import org.junit.Test;
 
 public class SVGDefTest extends AuraImplTestCase {
-
-    public SVGDefTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetSVGDef() throws Exception {
         SVGDef svg = definitionService.getDefinition("test:fakeComponent", SVGDef.class);

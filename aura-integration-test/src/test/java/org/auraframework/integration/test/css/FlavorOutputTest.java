@@ -30,10 +30,6 @@ import com.salesforce.omakase.broadcast.emitter.SubscriptionException;
  * General unit tests for expected flavor parsed output.
  */
 public class FlavorOutputTest extends StyleTestCase {
-    public FlavorOutputTest(String name) {
-        super(name);
-    }
-
     /** [flavorName] -> [namespace][Component]--[flavorName] */
     @Test
     public void testRenameFlavorClassNames() throws Exception {

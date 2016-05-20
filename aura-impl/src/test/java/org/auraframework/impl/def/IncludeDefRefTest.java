@@ -37,10 +37,6 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
     @Mock(answer = Answers.RETURNS_MOCKS)
     DefDescriptor<IncludeDefRef> descriptor;
 
-    public IncludeDefRefTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testValidateDefintionWithoutDescriptor() throws Exception {
         IncludeDefRef def = builder.build();

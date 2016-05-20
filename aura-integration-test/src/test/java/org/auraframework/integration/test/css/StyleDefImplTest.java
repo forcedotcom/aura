@@ -38,10 +38,6 @@ import com.google.common.collect.Sets;
  * @since 0.0.240
  */
 public class StyleDefImplTest extends StyleTestCase {
-    public StyleDefImplTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testDependenciesIncludesNsDefault() throws QuickFixException {
         DefDescriptor<TokensDef> nsDefault = addNsTokens(tokens().token("color", "red"));

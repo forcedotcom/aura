@@ -34,10 +34,6 @@ public class ContainerTagHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;
     ComponentDefRefHandler<?> cdrHandler;
 
-    public ContainerTagHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetDefRefHandler() throws Exception {
         // 1. Verify that specifying invalid load level in a component def ref,

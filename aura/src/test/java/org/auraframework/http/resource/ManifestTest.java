@@ -40,10 +40,6 @@ import org.auraframework.system.AuraContext.Format;
  */
 public class ManifestTest extends UnitTestCase {
 
-    public ManifestTest(String name) {
-        super(name);
-    }
-
     /**
      * Name is API!.
      */

@@ -30,10 +30,6 @@ import org.junit.Test;
 
 public class BrowserValueProviderTest extends AuraImplTestCase {
 
-    public BrowserValueProviderTest(String name) {
-        super(name);
-    }
-
     private interface BrowserProperty {
         final PropertyReference isTablet = new PropertyReferenceImpl(
                 BrowserValueProvider.IS_TABLET, null);

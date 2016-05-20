@@ -26,6 +26,7 @@ import org.auraframework.Aura;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 @SuppressWarnings("serial")
 public abstract class AuraBaseServlet extends HttpServlet {
@@ -98,6 +99,11 @@ public abstract class AuraBaseServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
+        processInjection(config);
+    }
+
+    public void processInjection(ServletConfig config) {
+        SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     @Deprecated

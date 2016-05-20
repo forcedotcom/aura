@@ -24,16 +24,10 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.junit.Test;
 
 public class AuraComponentServiceImplTest extends AuraImplTestCase {
-
-    public AuraComponentServiceImplTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetComponent() throws Exception {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr", "yo");
         assertNotNull(Aura.getInstanceService().getInstance("test:child1", ComponentDef.class, attributes));
     }
-
 }

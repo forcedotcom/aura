@@ -30,11 +30,6 @@ import org.mockito.Mockito;
 import com.google.common.collect.ImmutableList;
 
 public class AuraContextFilterTest extends AuraTestCase {
-
-    public AuraContextFilterTest(String name) {
-        super(name);
-    }
-
     private void assertContextPath(AuraContextFilter filter, HttpServletRequest mock, String input, String expected)
             throws Exception {
         Mockito.when(mock.getContextPath()).thenReturn(input);

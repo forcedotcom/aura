@@ -26,10 +26,6 @@ import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
 public class AuraRegistryProviderImplTest extends AuraImplTestCase {
-    public AuraRegistryProviderImplTest(String name) {
-        super(name);
-    }
-
     // Stop running the test in SFDC integration build. The test includes all component location
     // adapters. It's often broke by other teams.
     @UnAdaptableTest("Prevent this test running with SFDC integration build. W-2820492")

@@ -32,11 +32,6 @@ import org.junit.Test;
  * @userStory a07B0000000E82y
  */
 public class ExpressionValidationTest extends AuraImplTestCase {
-
-    public ExpressionValidationTest(String name) {
-        super(name);
-    }
-
     /**
      * Expressions are not allowed for top-level component attributes.
      * 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.caching;
+package org.auraframework.integration.test.caching;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,11 +26,11 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.AuraTestLabels;
@@ -39,18 +39,9 @@ import org.junit.Test;
 
 /**
  * Test class to verify that clientside cache is invalidated by Aura Servlet.
- * 
- * @hierarchy Aura.Caching
- * @priority high
- * @userStorySyncIdOrName a07B0000000Dj10
  */
 @ThreadHostileTest("relies on getLastMod")
 public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
-
-    public AuraServletCacheInvalidationHttpTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify that AuraServlet returns an error code in the response body when
      * an expired lastmod timestamp is used in a POST request.

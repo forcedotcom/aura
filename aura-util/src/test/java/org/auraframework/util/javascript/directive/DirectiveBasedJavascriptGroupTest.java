@@ -35,10 +35,6 @@ import com.google.common.collect.ImmutableList;
  * javascript modularized.
  */
 public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
-    public DirectiveBasedJavascriptGroupTest(String name) {
-        super(name);
-    }
-
     /**
      * Should not be able to specify a Directory as start file for a Javascript group
      */

@@ -41,11 +41,6 @@ import org.auraframework.util.ServiceLocator;
 import org.junit.Test;
 
 public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
-
-    public JavascriptTestSuiteParserTest(String name) {
-        super(name);
-    }
-
     /**
      * Test method for {@link JavascriptParser#parse(DefDescriptor, Source)}.
      */

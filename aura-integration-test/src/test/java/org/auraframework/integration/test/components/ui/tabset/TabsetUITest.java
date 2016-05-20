@@ -17,7 +17,7 @@ package org.auraframework.integration.test.components.ui.tabset;
 
 import java.util.List;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -42,10 +42,6 @@ public class TabsetUITest extends WebDriverTestCase {
             "tab 5 contents", "tab 6 contents", "tab 7 contents"};
     private int NUMBER_OF_TABS = 7;
     private int NUMBER_OF_TABS_OVERFLOW_TABSET = 8;
-
-    public TabsetUITest(String name) {
-        super(name);
-    }
 
     /********************************************** HELPER FUNCTIONS ******************************************/
 

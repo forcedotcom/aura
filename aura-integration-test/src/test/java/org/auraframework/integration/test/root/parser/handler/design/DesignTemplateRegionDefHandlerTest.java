@@ -25,10 +25,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
-    public DesignTemplateRegionDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetElement() throws Exception {
         String name = "regionone";

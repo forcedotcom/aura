@@ -28,11 +28,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class RegisterEventHandlerTest extends AuraImplTestCase {
-
-    public RegisterEventHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testSanity() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);

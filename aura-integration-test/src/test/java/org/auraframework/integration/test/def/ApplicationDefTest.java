@@ -30,8 +30,8 @@ import com.google.common.collect.Sets;
 
 public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
-    public ApplicationDefTest(String name) {
-        super(name, ApplicationDef.class, "aura:application");
+    public ApplicationDefTest() {
+        super(ApplicationDef.class, "aura:application");
     }
 
     /**

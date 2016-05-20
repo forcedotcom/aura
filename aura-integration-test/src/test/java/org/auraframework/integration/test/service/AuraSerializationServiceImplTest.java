@@ -29,11 +29,6 @@ import org.auraframework.service.SerializationService;
 import org.junit.Test;
 
 public class AuraSerializationServiceImplTest extends AuraImplTestCase {
-
-    public AuraSerializationServiceImplTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testAuraSerializationService() {
         SerializationService serializationService = Aura.getSerializationService();
@@ -56,5 +51,4 @@ public class AuraSerializationServiceImplTest extends AuraImplTestCase {
         serializationService.write(c, null, Component.class, out);
         assertFalse(out.toString().contains("invalid"));
     }
-
 }

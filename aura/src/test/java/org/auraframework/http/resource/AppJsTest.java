@@ -40,11 +40,6 @@ import org.auraframework.system.AuraContext.Format;
  * for now.
  */
 public class AppJsTest extends UnitTestCase {
-
-    public AppJsTest(String name) {
-        super(name);
-    }
-
     /**
      * Name is API!.
      */

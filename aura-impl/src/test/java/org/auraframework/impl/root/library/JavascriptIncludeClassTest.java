@@ -28,10 +28,6 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
 
 	IncludeDefRefImpl.Builder builder = new IncludeDefRefImpl.Builder();
 
-    public JavascriptIncludeClassTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testSerializeMinimal() throws Exception {
 		String code = "function(){}";

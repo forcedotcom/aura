@@ -22,10 +22,6 @@ import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
 public class GitSourceControlAdapterTest extends UnitTestCase {
-    public GitSourceControlAdapterTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testCanCheckout() {
         // FIXME: nothing to test.

@@ -37,10 +37,6 @@ public class ComponentDefRefImplUnitTest extends
     protected String localId;
     protected Load load;
 
-    public ComponentDefRefImplUnitTest(String name) {
-        super(name);
-    }
-
     @Override
     protected void setupValidateReferences() throws Exception {
         super.setupValidateReferences();

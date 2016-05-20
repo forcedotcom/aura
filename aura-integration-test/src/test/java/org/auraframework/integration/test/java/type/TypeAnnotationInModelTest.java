@@ -35,10 +35,6 @@ import org.junit.Test;
  * This class has automation to verify the implementation of @Type() annotation in models.
  */
 public class TypeAnnotationInModelTest extends AuraImplTestCase {
-    public TypeAnnotationInModelTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testValidTypeAnnotationInJavaModel() throws Exception {
         Model model = getJavaModelByQualifiedName("java://org.auraframework.components.test.java.model.TestModelWithJavaTypeAnnotation");

@@ -44,10 +44,6 @@ import com.google.common.collect.Sets;
  * Comprehensive functional tests for serialization of app.css urls.
  */
 public class StyleContextSerializationTest extends AuraImplTestCase {
-    public StyleContextSerializationTest(String name) {
-        super(name);
-    }
-
     @UnAdaptableTest("core add info about if we are on desktop, we don't")
     /** test that the css url includes the client/browser, no extra true conditions */
     @Test

@@ -22,12 +22,6 @@ import org.auraframework.util.test.util.UnitTestCase;
  * Base test class for testing the expression parser.
  */
 public abstract class AuraImplExpressionTestCase extends UnitTestCase {
-
-    public AuraImplExpressionTestCase(String name) {
-        super(name);
-
-    }
-
     /**
      * The assertTrue/False methods in junit only takes a boolean
      */

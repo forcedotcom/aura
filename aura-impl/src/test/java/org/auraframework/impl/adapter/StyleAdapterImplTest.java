@@ -34,13 +34,8 @@ import com.salesforce.omakase.plugin.Plugin;
  * Functional tests for {@link StyleAdapterImpl}.
  */
 public class StyleAdapterImplTest extends StyleTestCase {
-    private Observer observer;
+    private Observer observer = new Observer();
     private StyleDefCSSFormatAdapter format;
-
-    public StyleAdapterImplTest(String name) {
-        super(name);
-        observer = new Observer();
-    }
 
 //    public void testCompilationPlugins() throws Exception {
 //        TestStyleAdapter adapter = TestStyleAdapter.compilation(observer);

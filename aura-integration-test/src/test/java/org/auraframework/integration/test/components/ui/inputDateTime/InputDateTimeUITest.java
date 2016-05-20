@@ -16,8 +16,9 @@
 
 package org.auraframework.integration.test.components.ui.inputDateTime;
 
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.*;
-import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 import org.openqa.selenium.*;
@@ -41,10 +42,6 @@ public class InputDateTimeUITest extends WebDriverTestCase {
     private final String TIME_1230_XPATH = "//li[@data-hours='12' and @data-minutes='30']";
 
     private final String ACTIVE_ELEM = "return $A.test.getActiveElement()";
-
-    public InputDateTimeUITest(String name) {
-        super(name);
-    }
 
     /**
      * Test Flow:

@@ -36,18 +36,9 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
 public class AuraComponentServiceTest extends AuraImplTestCase {
-
-    public AuraComponentServiceTest(String name) {
-        super(name);
-    }
-
     /**
      * Testing the getComponent method. Get a component and call each getting
      * for the component.
-     *
-     * @throws Exception
-     * @hierarchy Aura.Runtime.Service
-     * @userStory AuraServlet: POST
      */
     @Test
     public void testGetComponent() throws Exception {
@@ -69,9 +60,6 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
     /**
      * Testing the getComponentDef method. Get a componentDef and call each
      * getting for the componentDef.
-     *
-     * @hierarchy Aura.Runtime.Service
-     * @userStory AuraServlet: POST
      */
     @Test
     public void testGetComponentDef() throws Exception {
@@ -112,11 +100,6 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
 
     /**
      * Get an application and call each getting for the component.
-     *
-     * @throws QuickFixException
-     *
-     * @hierarchy Aura.Runtime.Service
-     * @userStory a07B0000000EYU4
      */
     @Test
     public void testGetApplication() throws QuickFixException {
@@ -136,9 +119,6 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
 
     /**
      * Get an applicationDef and call each getting for the componentDef.
-     *
-     * @hierarchy Aura.Runtime.Service
-     * @userStory a07B0000000EYU4
      */
     @Test
     public void testGetApplicationDef() throws Exception {

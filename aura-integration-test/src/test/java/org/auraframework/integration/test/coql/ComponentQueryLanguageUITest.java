@@ -16,8 +16,8 @@
 package org.auraframework.integration.test.coql;
 
 import org.auraframework.controller.java.ServletConfigController;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -29,10 +29,6 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
  * Automation for COQL (Component Query Language). COQL is available in all modes except PRODUCTION
  */
 public class ComponentQueryLanguageUITest extends WebDriverTestCase {
-    public ComponentQueryLanguageUITest(String name) {
-        super(name);
-    }
-
     /**
      * Verify that query language is not available in PROD mode.
      */

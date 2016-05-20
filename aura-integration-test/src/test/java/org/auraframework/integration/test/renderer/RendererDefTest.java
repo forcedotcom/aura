@@ -41,10 +41,6 @@ import org.junit.Test;
  * is sent to the client as part of the component instance(ComponentImpl).
  */
 public class RendererDefTest extends AuraImplTestCase {
-    public RendererDefTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify the structure of a ComponentDef when a component uses Java
      * Renderer.

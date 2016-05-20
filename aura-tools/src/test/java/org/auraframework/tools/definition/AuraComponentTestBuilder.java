@@ -15,11 +15,11 @@
  */
 package org.auraframework.tools.definition;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ComponentLocationAdapter;
@@ -27,6 +27,7 @@ import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.source.DescriptorFileMapper;
 import org.auraframework.system.SourceListener;
+import org.auraframework.util.IOUtil;
 
 /**
  * A class to build a temporary components folder to allow for read/write tests.
@@ -37,7 +38,6 @@ import org.auraframework.system.SourceListener;
  * tests are run in a try-with-resources, this should automatically get cleaned up.
  */
 public class AuraComponentTestBuilder extends DescriptorFileMapper implements AutoCloseable {
-    private final static AtomicInteger nonce = new AtomicInteger(1);
     private Path componentsPath;
     private final ComponentLocationAdapter cla;
 //    private Set<ComponentLocationAdapter> modified;
@@ -46,8 +46,9 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
      * Create a new test builder.
      */
     public AuraComponentTestBuilder() throws IOException {
-        componentsPath = Files.createTempDirectory("testComponents" + nonce.incrementAndGet() + "_");
-        cla = new ComponentLocationAdapter.Impl(componentsPath.toFile());
+        File tmpDir = new File(IOUtil.newTempDir("testComponens"));
+        componentsPath = tmpDir.toPath();
+        cla = new ComponentLocationAdapter.Impl(tmpDir);
     }
 
     @Override

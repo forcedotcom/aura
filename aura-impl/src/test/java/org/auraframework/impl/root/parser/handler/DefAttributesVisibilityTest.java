@@ -25,11 +25,6 @@ import org.junit.Test;
 import java.util.Set;
 
 public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
-
-    public DefAttributesVisibilityTest(String name){
-        super(name);
-    }
-
     protected Set<String> publicAttrs;
     protected Set<String> internalAttrs;
     protected Set<String> publicAndInternalAttrs;
@@ -72,10 +67,6 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     }
 
     public static class ApplicationDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
-        public ApplicationDefAttributesVisibilityTest(String name) {
-            super(name);
-        }
-
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "implements", "useAppcache",
@@ -94,10 +85,6 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     }
 
     public static class ComponentDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
-        public ComponentDefAttributesVisibilityTest(String name) {
-            super(name);
-        }
-
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "implements", "controller",
@@ -115,10 +102,6 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     }
 
     public static class EventDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
-        public EventDefAttributesVisibilityTest(String name) {
-            super(name);
-        }
-
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "extends", "type", "apiVersion");
@@ -133,10 +116,6 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     }
 
     public static class InterfaceDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
-        public InterfaceDefAttributesVisibilityTest(String name) {
-            super(name);
-        }
-
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "extends", "apiVersion");
@@ -151,10 +130,6 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     }
 
     public static class AttributeDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
-        public AttributeDefAttributesVisibilityTest(String name) {
-            super(name);
-        }
-
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "default", "description", "name", "required", "type");
@@ -171,10 +146,6 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     }
 
     public static class RegisterEventAttributesVisibilityTest extends DefAttributesVisibilityTest {
-        public RegisterEventAttributesVisibilityTest(String name) {
-            super(name);
-        }
-
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "name", "type");
@@ -191,10 +162,6 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     }
 
     public static class AttributeDefRefAttributesVisibilityTest extends DefAttributesVisibilityTest {
-        public AttributeDefRefAttributesVisibilityTest(String name) {
-            super(name);
-        }
-
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("attribute", "value");
@@ -211,10 +178,6 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     }
 
     public static class EventHandlerDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
-        public EventHandlerDefAttributesVisibilityTest(String name) {
-            super(name);
-        }
-
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("action", "description", "event", "name", "value", "phase");

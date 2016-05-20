@@ -25,10 +25,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class DependencyDefImplTest extends AuraImplTestCase {
-    public DependencyDefImplTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testDependencyDefAndValidate() throws Exception {
         DependencyDef testDependencyDef = null;

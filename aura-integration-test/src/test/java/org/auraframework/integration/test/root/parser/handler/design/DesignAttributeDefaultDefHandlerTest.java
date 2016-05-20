@@ -36,10 +36,6 @@ public class DesignAttributeDefaultDefHandlerTest extends AuraImplTestCase {
             "<design:attributeDefault>%s</design:attributeDefault>" +
             "</design:attribute></design:component>";
 
-    public DesignAttributeDefaultDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testBasicDefault() throws Exception {
         DesignAttributeDef attribute = createComponentAndDesignWithAttributeDefault("<ui:button label=\"test\"/>");

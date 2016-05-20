@@ -47,10 +47,6 @@ public class ReinitializeModelTest extends AuraImplTestCase {
             + "<aura:set attribute='attrInParent' value='%s'/>"
             + "<br/>GrandCHILD CMP<br/>" + "%s" + "</aura:component>";
 
-    public ReinitializeModelTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

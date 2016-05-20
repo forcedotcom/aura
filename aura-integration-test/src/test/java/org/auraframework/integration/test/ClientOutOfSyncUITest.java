@@ -34,7 +34,7 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
@@ -52,11 +52,7 @@ import com.google.common.base.Function;
  */
 public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
-    public ClientOutOfSyncUITest(String name) {
-        super(name);
-    }
-
-    @Override
+	@Override
     public void setUp() throws Exception {
         super.setUp();
         // these tests trigger server recompilation which can take a bit of time

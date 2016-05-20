@@ -18,7 +18,6 @@ package org.auraframework.integration.test.util;
 import java.net.Socket;
 
 import org.apache.log4j.Logger;
-import org.auraframework.test.util.TestExecutor;
 import org.openqa.grid.selenium.GridLauncher;
 
 /**

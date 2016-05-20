@@ -39,11 +39,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class InterfaceDefTest extends AuraImplTestCase {
-
-    public InterfaceDefTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testHashCode() {
         InterfaceDefImpl intDef2 = vendor.makeInterfaceDefWithNulls(

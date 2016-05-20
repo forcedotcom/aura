@@ -30,11 +30,6 @@ import org.junit.Test;
 
 @UnAdaptableTest("when run in core, we throw error with different type.")
 public class InterfaceAccessAttributeTest extends AuraImplTestCase {
-
-	public InterfaceAccessAttributeTest(String name) {
-		super(name);
-	}
-	
 	/***********************************************************************************
      ******************* Tests for Internal Namespace start ****************************
      ************************************************************************************/

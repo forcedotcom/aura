@@ -25,21 +25,11 @@ import org.junit.Test;
 
 /**
  * Unit test to verify the implementation of LocationChange event.
- * 
- * @hierarchy Aura.Components.Events.Browser History Management
- * @priority high
- * @userStory a07B0000000EYU4
  */
 public class LocationChangeEventTest extends AuraImplTestCase {
-    public LocationChangeEventTest(String name) {
-        super(name);
-    }
-
     /**
      * A basic test to demonstrate how every application is registered to fire the LocationChange event. The
      * definition(tree) of the application has a section called "locationChangeEventDef".
-     * 
-     * @throws Exception
      */
     @Test
     public void testApplicationDefWithLocationChange() throws Exception {

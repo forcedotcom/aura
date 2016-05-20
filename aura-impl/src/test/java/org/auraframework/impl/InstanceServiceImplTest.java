@@ -26,11 +26,6 @@ import org.junit.Test;
 import com.google.common.collect.Maps;
 
 public class InstanceServiceImplTest extends AuraImplTestCase {
-
-    public InstanceServiceImplTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify that calling InstanceService with an undefined attributes throws
      * an exception.

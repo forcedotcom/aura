@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test.components.ui.autocomplete;
 
-import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 
 /**

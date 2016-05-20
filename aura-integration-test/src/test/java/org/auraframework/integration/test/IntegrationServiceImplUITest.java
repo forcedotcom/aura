@@ -27,8 +27,8 @@ import org.auraframework.def.HelperDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.AuraTestingMarkupUtil;
-import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
@@ -58,10 +58,6 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     String defaultLocalId = "injectedComponent";
 
     AuraTestingMarkupUtil tmu;
-
-    public IntegrationServiceImplUITest(String name) {
-        super(name);
-    }
 
     @Override
     public void setUp() throws Exception {

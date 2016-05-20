@@ -34,11 +34,6 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
 
 public class ObjectSerializationTest extends AuraImplTestCase {
-
-    public ObjectSerializationTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testSerializeTestCaseDef() throws Exception {
         TestSuiteDef suite = definitionService.getDefinition("js://auratest.jsmock", TestSuiteDef.class);

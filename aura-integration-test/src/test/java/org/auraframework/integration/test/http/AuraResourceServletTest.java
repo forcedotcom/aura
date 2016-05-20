@@ -64,10 +64,6 @@ public class AuraResourceServletTest extends AuraTestCase {
         private static final long serialVersionUID = 411181168049748986L;
     }
 
-    public AuraResourceServletTest() {
-        super(AuraResourceServletTest.class.getName());
-    }
-
     private void doGet(AuraResourceServlet servlet,  HttpServletRequest request, HttpServletResponse response) throws Exception {
         AuraPrivateAccessor.invoke(servlet, "doGet", request, response);
     }

@@ -17,7 +17,7 @@ package org.auraframework.integration.test.components.aura.iteration;
 
 import java.util.List;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -26,11 +26,6 @@ import org.openqa.selenium.WebElement;
  * aura:interation UI tests.
  */
 public class IterationUITest extends WebDriverTestCase {
-
-    public IterationUITest(String name) {
-        super(name);
-    }
-
     @Test
     public void testSimpleIteration() throws Exception {
         open("/iterationTest/simpleIteration.cmp");

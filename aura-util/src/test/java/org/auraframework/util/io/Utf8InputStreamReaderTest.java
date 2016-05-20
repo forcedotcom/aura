@@ -33,10 +33,6 @@ import com.google.common.base.Charsets;
  */
 public class Utf8InputStreamReaderTest extends UnitTestCase {
 
-    public Utf8InputStreamReaderTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testLatinCharsOnly() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(10);

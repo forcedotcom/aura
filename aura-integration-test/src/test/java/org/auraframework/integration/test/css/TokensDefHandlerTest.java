@@ -32,10 +32,6 @@ import org.junit.Test;
  * Unit tests for {@link TokensDefHandler}.
  */
 public class TokensDefHandlerTest extends StyleTestCase {
-    public TokensDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testTokens() throws Exception {
         TokensDef def = definitionService.getDefinition(addSeparateTokens(tokens().token("test1", "1").token("test2", "2")));

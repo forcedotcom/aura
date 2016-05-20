@@ -50,10 +50,6 @@ import com.google.common.collect.Maps;
  *
  */
 public class FunctionsTest extends AuraImplExpressionTestCase {
-    public FunctionsTest(String name) {
-        super(name);
-    }
-
     private Object evaluate(Function f, Object... args) {
         return f.evaluate(Lists.newArrayList(args));
     }
@@ -1764,7 +1760,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     // FORMAT: argument type
 
     //<expressionTest:test expression="{!format(v.label2, null, undefined)}" exprText="format(v.label2, null, undefined" expected="'Hello  and '"/>
-	public void testFormatArgNull() throws Exception {
+    @Test
+    public void testFormatArgNull() throws Exception {
 	    assertEquals("X", evaluate(FORMAT, "X{0}", (Object) null));
 	}
 

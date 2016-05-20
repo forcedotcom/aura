@@ -19,12 +19,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
 import org.auraframework.Aura;
 import org.auraframework.service.LoggingService;
 import org.auraframework.util.json.JsonReader;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.google.common.net.HttpHeaders;
 
@@ -54,6 +56,16 @@ public class CSPReporterServlet extends HttpServlet {
     public static final String VIOLATED_DIRECTIVE = "violated-directive";
     public static final String EFFECTIVE_DIRECTIVE = "effective-directive";
     
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        processInjection(config);
+    }
+    
+    public void processInjection(ServletConfig config) {
+        SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

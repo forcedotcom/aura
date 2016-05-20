@@ -28,10 +28,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
 public class FlavorsDefImplTest extends StyleTestCase {
-    public FlavorsDefImplTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testLoadsIndependently() throws QuickFixException {
         // flavor assortments can be placed independently in their own bundles

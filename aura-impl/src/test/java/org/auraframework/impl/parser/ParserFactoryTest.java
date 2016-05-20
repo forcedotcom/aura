@@ -29,10 +29,6 @@ import org.junit.Test;
 
 public class ParserFactoryTest extends UnitTestCase {
 
-    public ParserFactoryTest(String name) {
-        super(name);
-    }
-
     private Parser<?> getParser(Format format, Class<? extends Definition> defClass) {
         return ParserFactory.getParser(format,
                 StringSourceLoader.getInstance().createStringSourceDescriptor(null, defClass, null));

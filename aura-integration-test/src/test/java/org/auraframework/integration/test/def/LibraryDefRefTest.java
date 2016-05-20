@@ -25,11 +25,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class LibraryDefRefTest extends AuraImplTestCase {
-
-    public LibraryDefRefTest(String name) {
-        super(name);
-    }
-
     /**
      * Test to ensure that the property attribute must be specified.
      */

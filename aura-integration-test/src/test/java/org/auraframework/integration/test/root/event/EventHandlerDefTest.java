@@ -26,14 +26,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.junit.Test;
 
-/**
- * @hierarchy Aura.Unit Tests.Components.EventHandlerDef.Validation
- */
 public class EventHandlerDefTest extends AuraImplTestCase {
-    public EventHandlerDefTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testSerialize() throws Exception {
         EventHandlerDefImpl eventHandlerDef2 = vendor.makeEventHandlerDefWithNulls(

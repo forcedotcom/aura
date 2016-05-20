@@ -33,15 +33,8 @@ import org.junit.Test;
 /**
  * Tests to verify AttributeSetImpl class. Component/Application instances are assigned an AttributeSet. A
  * component/application instances relies on its AttributeSet to decide the value of its attributes.
- * 
- * 
- * @since 138
  */
 public class AttributeSetImplTest extends AuraImplTestCase {
-    public AttributeSetImplTest(String name) {
-        super(name);
-    }
-
     /**
      * Verify that attribute names used in expressions are not case sensitive. Attributes are used as {!v.<attrName>}
      */

@@ -34,11 +34,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
 
 public class FileSourceLoaderTest extends AuraImplTestCase {
-
-    public FileSourceLoaderTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

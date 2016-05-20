@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.util;
+package org.auraframework.integration.test.util;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -72,11 +72,6 @@ import com.google.common.collect.Maps;
  */
 @SuppressWarnings("deprecation")
 public abstract class AuraHttpTestCase extends IntegrationTestCase {
-
-    public AuraHttpTestCase(String name) {
-        super(name);
-    }
-
     /**
      * Given a URL to post a GET request, this method compares the actual status code of the response with an expected
      * status code.

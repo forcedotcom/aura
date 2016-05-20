@@ -32,11 +32,6 @@ import org.junit.Test;
  * Fixme... this test should be written using something other than aura-components.
  */
 public final class ValidationFileSourceLoaderTest extends AuraValidationTestCase {
-
-    public ValidationFileSourceLoaderTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testFindIn() {
         if (skipTestIfNotRunningWithAuraSource()) {

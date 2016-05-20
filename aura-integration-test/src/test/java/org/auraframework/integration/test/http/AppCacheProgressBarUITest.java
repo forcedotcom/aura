@@ -15,9 +15,9 @@
  */
 package org.auraframework.integration.test.http;
 
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.FreshBrowserInstance;
 import org.junit.Test;
@@ -41,10 +41,6 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
     private final String APPCACHECACHED = String.format(PROGRESSEVENTSCRIPT, "cached", "");
 
     private final By appCacheProgressDiv = By.cssSelector("div[id='auraAppcacheProgress']");
-
-    public AppCacheProgressBarUITest(String name) {
-        super(name);
-    }
 
     /**
      * Verify that progress bar shows true progress by simulating the progress event.

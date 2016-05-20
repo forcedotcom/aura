@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.java.controller;
+package org.auraframework.integration.test.java.controller;
 
 import java.io.File;
 import java.io.FileReader;

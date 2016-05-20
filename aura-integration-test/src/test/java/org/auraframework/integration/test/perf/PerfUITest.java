@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test.perf;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.PerfTest;
 import org.junit.Test;
 
@@ -24,11 +24,6 @@ import org.junit.Test;
  */
 @PerfTest
 public final class PerfUITest extends WebDriverTestCase {
-
-    public PerfUITest(String name) {
-        super(name);
-    }
-
     @Test
     public void testLabel() throws Exception {
         openTotallyRaw("/ui/label.cmp?label=foo");

@@ -28,11 +28,6 @@ import org.junit.Test;
 
 @UnAdaptableTest("namespace start with c means something special in core")
 public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
-    
-    public AttributeAccessAttributeEnforcementTest(String name) throws Exception {
-        super(name);
-    }       
-    
     /**
      * Privileged access tests start.
      * for component inside custom namespace, we do not allow to have attribute with access='Privileged'

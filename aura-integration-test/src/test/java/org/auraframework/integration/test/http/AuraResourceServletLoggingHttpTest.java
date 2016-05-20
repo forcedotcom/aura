@@ -43,10 +43,6 @@ import org.junit.Test;
 @UnAdaptableTest("AbstractLoggingUITest has tag @ThreadHostileTest which is not supported in SFDC.")
 public class AuraResourceServletLoggingHttpTest extends AbstractLoggingHttpTest {
 
-    public AuraResourceServletLoggingHttpTest(String name) {
-        super(name);
-    }
-
     class Request implements Callable<Integer> {
         private CloseableHttpClient httpClient;
         private String url;

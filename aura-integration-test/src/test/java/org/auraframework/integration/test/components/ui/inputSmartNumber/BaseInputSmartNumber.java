@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -37,7 +37,7 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
     protected final String EVENTLIST_SEL = ".eventList li";
 
     public BaseInputSmartNumber(String urlPath) {
-        super(urlPath);
+        this.setName(urlPath);
         this.URL = urlPath;
     }
 

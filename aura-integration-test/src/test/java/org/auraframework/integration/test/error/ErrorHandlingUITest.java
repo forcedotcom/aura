@@ -25,11 +25,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
 public class ErrorHandlingUITest extends AbstractErrorUITestCase {
-
-    public ErrorHandlingUITest(String name) {
-        super(name);
-    }
-
     /**
      * In prod mode, the error message has three lines:<br>
      *   Something has gone wrong. [MESSAGES]<br>

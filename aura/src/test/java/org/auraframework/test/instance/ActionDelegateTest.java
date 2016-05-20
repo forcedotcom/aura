@@ -28,10 +28,6 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 public class ActionDelegateTest extends UnitTestCase {
-    public ActionDelegateTest(String name) throws Exception {
-        super(name);
-    }
-
     //
     // A class to remove the 'abstract'
     //

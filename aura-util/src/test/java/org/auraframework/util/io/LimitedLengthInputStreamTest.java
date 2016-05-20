@@ -31,10 +31,6 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
     private boolean callbackCalled;
     private InputStream wrappedStream;
 
-    public LimitedLengthInputStreamTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         callbackCalled = false;

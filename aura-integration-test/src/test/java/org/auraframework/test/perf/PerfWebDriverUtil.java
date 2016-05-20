@@ -20,9 +20,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.auraframework.integration.test.util.WebDriverTestCase.UnexpectedError;
 import org.auraframework.test.util.AuraUITestingUtil;
 import org.auraframework.test.util.SauceUtil;
-import org.auraframework.test.util.WebDriverTestCase.UnexpectedError;
 import org.auraframework.util.test.perf.PerfUtil;
 import org.auraframework.util.test.perf.rdp.CPUProfilerAnalyzer;
 import org.auraframework.util.test.perf.rdp.RDPNotification;

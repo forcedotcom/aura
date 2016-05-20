@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.client.methods.HttpRequestBase;
-import org.auraframework.test.util.AuraHttpTestCase;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 
 import com.google.common.collect.Maps;
 
@@ -29,10 +29,6 @@ import org.junit.Test;
 public final class ValidationHttpTest extends AuraHttpTestCase {
 
     private HttpRequestBase method;
-
-    public ValidationHttpTest(String name) {
-        super(name);
-    }
 
     @Override
     public void tearDown() throws Exception {

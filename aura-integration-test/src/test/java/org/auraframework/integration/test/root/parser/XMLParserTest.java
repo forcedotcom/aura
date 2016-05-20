@@ -45,10 +45,6 @@ public class XMLParserTest extends AuraImplTestCase {
     private DefDescriptor<ComponentDef> descriptor;
     private ComponentDef def;
 
-    public XMLParserTest(String name) {
-        super(name);
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

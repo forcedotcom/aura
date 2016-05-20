@@ -46,19 +46,10 @@ import com.google.common.collect.Maps;
 @UnAdaptableTest("AbstractLoggingUITest has tag @ThreadHostileTest which is not supported in SFDC.")
 public class JavaControllerLoggingTest extends AbstractLoggingTest {
 
-    private ServerService serverService;
-    private InstanceService instanceService;
-    private ContextService contextService;
-    private LoggingService loggingService;
-
-    public JavaControllerLoggingTest(String name) {
-        super(name);
-        // TODO: inject these services after merging uitier
-        serverService = Aura.getServerService();
-        instanceService = Aura.getInstanceService();
-        contextService = Aura.getContextService();
-        loggingService = Aura.getLoggingService();
-    }
+    private ServerService serverService = Aura.getServerService();
+    private InstanceService instanceService = Aura.getInstanceService();
+    private ContextService contextService = Aura.getContextService();
+    private LoggingService loggingService = Aura.getLoggingService();
 
     @Test
     public void testParamLogging_NoParams() throws Exception {

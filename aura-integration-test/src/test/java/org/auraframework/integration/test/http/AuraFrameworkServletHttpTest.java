@@ -30,7 +30,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.test.util.AuraHttpTestCase;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -39,8 +39,6 @@ import org.junit.Test;
  * Automation to verify the implementation of AuraFrameworkServlet. AuraFrameworkServlet responds to requests of pattern
  * /auraFW/* This config is stored in aura/dist/config/web.xml for aura running on jetty. In SFDC build, the config is
  * in main-sfdc/config/aura.conf AuraFrameworkServlet sets resources to be cached for 45 days.
- *
- * @since 0.0.298
  */
 public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     public final String sampleBinaryResourcePath = "/auraFW/resources/aura/auraIdeLogo.png";
@@ -50,10 +48,6 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     public final String sampleBinaryResourcePathWithNonce = "/auraFW/resources/%s/aura/auraIdeLogo.png";
     public final String sampleTextResourcePathWithNonce = "/auraFW/resources/%s/aura/resetCSS.css";
     private final long timeWindowExpiry = 600000; // ten minute expiration test window
-
-    public AuraFrameworkServletHttpTest(String name) {
-        super(name);
-    }
 
     private boolean ApproximatelyEqual(long a, long b, long delta) {
         return (Math.abs(a - b) < delta);

@@ -32,10 +32,6 @@ import org.junit.Test;
  * Automation for Aura JavascriptGroup.
  */
 public class AuraJavascriptGroupTest extends AuraImplTestCase {
-    public AuraJavascriptGroupTest(String name) {
-        super(name);
-    }
-
     @Override
     public void runTest() throws Throwable {
         if (AuraImplFiles.AuraJavascriptSourceDirectory.asFile().exists()) {
@@ -45,10 +41,6 @@ public class AuraJavascriptGroupTest extends AuraImplTestCase {
 
     /**
      * Verify that AuraJavascriptGroup does not fail JSLint validation.
-     * 
-     * @priority high
-     * @hierarchy Aura.Unit Tests.Javascript Library
-     * @userStory a07B0000000FDWP
      */
     @Test
     public void testJSLintValidationForAuraJavascriptGroup() throws Exception {
@@ -65,10 +57,6 @@ public class AuraJavascriptGroupTest extends AuraImplTestCase {
 
     /**
      * Verify that AuraJavascriptGroup can be compressed with all modes.
-     * 
-     * @priority high
-     * @hierarchy Aura.Unit Tests.Javascript Library
-     * @userStory a07B0000000FDWP
      */
     @Test
     public void testCompressionOfAuraJavascriptGroup() throws Exception {

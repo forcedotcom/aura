@@ -28,11 +28,6 @@ import org.auraframework.util.validation.ValidationError;
 import org.junit.Test;
 
 public final class ValidationEngineTest extends AuraValidationTestCase {
-
-    public ValidationEngineTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testValidateDescriptorJavaScript() throws Exception {
         DefDescriptor<?> descriptor = DefDescriptorImpl.getInstance("js://validationTest.basic", ControllerDef.class);

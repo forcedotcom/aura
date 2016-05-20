@@ -34,10 +34,6 @@ public class ComponentImplTest extends AuraImplTestCase {
 
     protected final static String baseComponentTag = "<aura:component %s>%s</aura:component>";
 
-    public ComponentImplTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testComponentAttributeMap() throws Exception {
         Component cmp = vendor.makeComponent("test:child1", "meh");

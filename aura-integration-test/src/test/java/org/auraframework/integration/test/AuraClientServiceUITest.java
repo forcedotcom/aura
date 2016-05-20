@@ -15,18 +15,13 @@
  */
 package org.auraframework.integration.test;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 public class AuraClientServiceUITest extends WebDriverTestCase {
-
-    public AuraClientServiceUITest(String name) {
-        super(name);
-    }
-
     @ThreadHostileTest("ConfigAdapter modified, can't tolerate other tests.")
     @Test
     public void testCsrfTokenSavedOnBootstrap() throws Exception {
@@ -38,5 +33,4 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
 
         waitForElementTextPresent(actual, expectedToken);
     }
-
 }

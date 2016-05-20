@@ -28,10 +28,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
 public class JavaTokenProviderDefTest extends StyleTestCase {
-    public JavaTokenProviderDefTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testProviderBasic() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF));

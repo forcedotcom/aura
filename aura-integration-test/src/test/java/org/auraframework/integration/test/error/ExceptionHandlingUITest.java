@@ -20,10 +20,10 @@ import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -40,9 +40,6 @@ import com.google.common.base.Function;
  */
 @UnAdaptableTest
 public class ExceptionHandlingUITest extends WebDriverTestCase {
-    public ExceptionHandlingUITest(String name) {
-        super(name);
-    }
 
     private static final String baseAppTag = "<aura:application access='GLOBAL' %s>%s</aura:application>";
 

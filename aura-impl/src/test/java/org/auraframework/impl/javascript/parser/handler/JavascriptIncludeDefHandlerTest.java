@@ -23,11 +23,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 public class JavascriptIncludeDefHandlerTest extends DefinitionTest<IncludeDef> {
-
-    public JavascriptIncludeDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Mock
     DefDescriptor<IncludeDef> descriptor;
     private String filename = "dummyPath";

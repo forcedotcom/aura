@@ -95,10 +95,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     @Mock
     Cache<String, String> mockAccessCheckCache;
 
-    public MasterDefRegistryImplTest(String name) {
-        super(name);
-    }
-
     private MasterDefRegistryImplOverride getDefRegistry(boolean asMocks) {
         Collection<RegistryAdapter> providers = AuraImpl.getRegistryAdapters();
         List<DefRegistry<?>> mdrregs = Lists.newArrayList();

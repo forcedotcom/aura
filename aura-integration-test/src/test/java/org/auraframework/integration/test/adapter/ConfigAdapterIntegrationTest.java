@@ -49,11 +49,6 @@ import com.google.common.collect.Sets;
  * Tests for ConfigAdapterImpl requiring Aura services to be available
  */
 public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
-
-    public ConfigAdapterIntegrationTest(String name) {
-        super(name);
-    }
-
     private void validateTimezoneIds(String[] timezonesToCheck) throws Exception {
         ConfigAdapterImpl configAdapter = new ConfigAdapterImpl();
         ResourceLoader loader = Aura.getConfigAdapter().getResourceLoader();

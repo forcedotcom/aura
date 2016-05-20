@@ -32,11 +32,6 @@ import org.junit.Test;
  * @see ServiceLoader
  */
 public class AuraServicesAndAdaptersTest extends AuraImplTestCase {
-
-    public AuraServicesAndAdaptersTest(String name) {
-        super(name);
-    }
-
     @UnAdaptableTest
     @Test
     public void testServicesAndAdaptersRegistered() {

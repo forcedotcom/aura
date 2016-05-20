@@ -23,11 +23,6 @@ import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
 
 public class DefDescriptorImplTest extends AuraImplTestCase {
-
-    public DefDescriptorImplTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testControllerDescriptorString() {
         DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl.getInstance("java://foo.Bar", ControllerDef.class);

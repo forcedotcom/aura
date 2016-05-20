@@ -29,10 +29,6 @@ import org.junit.Test;
 /**
 */
 public class RegisterEventDefTest extends AuraImplTestCase {
-    public RegisterEventDefTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGetEventDescriptor() {
         assertEquals(

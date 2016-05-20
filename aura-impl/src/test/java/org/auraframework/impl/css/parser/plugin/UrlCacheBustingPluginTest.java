@@ -23,10 +23,6 @@ import com.salesforce.omakase.ast.declaration.UrlFunctionValue;
 
 public class UrlCacheBustingPluginTest extends AuraImplTestCase {
 
-    public UrlCacheBustingPluginTest(String name) {
-        super(name);
-    }
-
     private void assertBustedUrl(String expectedFormat, String initialValue) throws Exception {
         UrlCacheBustingPlugin acb = new UrlCacheBustingPlugin(true);
         UrlFunctionValue ufv = new UrlFunctionValue(initialValue);

@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
-import org.auraframework.test.util.AuraHttpTestCase;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 
@@ -73,7 +73,7 @@ public class AuraArchetypeSimpleTestMANUAL extends AuraHttpTestCase {
 
     private AuraArchetypeSimpleTestMANUAL(String name, String testMethod, MavenArtifact archetype,
             MavenArtifact project, String projectPackage) {
-        super(testMethod);
+        super();
         this.archetype = archetype;
         this.project = project;
         this.projectPackage = projectPackage;

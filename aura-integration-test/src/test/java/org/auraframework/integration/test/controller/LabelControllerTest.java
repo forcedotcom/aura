@@ -31,9 +31,7 @@ import org.junit.Test;
 import com.google.common.collect.Maps;
 
 /**
- * 
  * Unit Tests for LabelController.
- * 
  */
 @UnAdaptableTest
 // Missing labels behave differently in SFDC stack
@@ -42,10 +40,6 @@ public class LabelControllerTest extends AuraImplTestCase {
             "java://org.auraframework.impl.controller.LabelController", ControllerDef.class);
     String getLabelDesc = "java://org.auraframework.impl.controller.LabelController/ACTION$getLabel";
     String placeholder = "FIXME - LocalizationAdapter.getLabel() needs implementation!";
-
-    public LabelControllerTest(String name) {
-        super(name);
-    }
 
     @Test
     public void testLabelController() throws Exception {

@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test.components.ui.inputText;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -27,11 +27,6 @@ import org.openqa.selenium.WebElement;
  * UI Tests for inputSearch Component
  */
 public class InputCutCopyPasteUITest extends WebDriverTestCase {
-
-    public InputCutCopyPasteUITest(String name) {
-        super(name);
-
-    }
 
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
             BrowserType.SAFARI })

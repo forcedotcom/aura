@@ -20,6 +20,7 @@ import java.util.List;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.Aura;
+import org.auraframework.AuraConfiguration;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext.Authentication;
@@ -30,9 +31,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletConfig;
+import org.springframework.mock.web.MockServletContext;
+import org.springframework.web.context.support.GenericWebApplicationContext;
 
 public class AuraServletTest extends UnitTestCase {
 
@@ -47,15 +52,21 @@ public class AuraServletTest extends UnitTestCase {
         private static final long serialVersionUID = 411181168049748986L;
     }
 
-    public AuraServletTest() {
-        super(AuraServletTest.class.getName());
-    }
-
     @Override
     public void setUp() throws Exception {
         super.setUp();
+
+        MockServletContext servletContext = new MockServletContext();
+        MockServletConfig servletConfig = new MockServletConfig(servletContext);
+
+        AnnotationConfigApplicationContext appContext = new AnnotationConfigApplicationContext(AuraConfiguration.class);
+        DefaultListableBeanFactory dlbf = new DefaultListableBeanFactory(appContext.getBeanFactory());
+        GenericWebApplicationContext gwac = new GenericWebApplicationContext(dlbf);
+        servletContext.setAttribute(GenericWebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, gwac);
+        gwac.setServletContext(servletContext);
+        gwac.refresh();
+
         servlet = new AuraServlet(servletUtilAdapter);
-        MockServletConfig servletConfig = new MockServletConfig();
         servlet.init(servletConfig);
     }
 

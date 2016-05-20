@@ -24,7 +24,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.test.util.AuraHttpTestCase;
+import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
@@ -38,16 +38,8 @@ import org.junit.Test;
  * by the AuraServlet. A CSRF token is generated with the very first request and
  * sent back to the Client. Every subsequent request from the client has the
  * CSRF token embedded as a request parameter.
- * 
- * @hierarchy Aura.Security
- * @priority high
- * @userStory a07B0000000DV9S
  */
 public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
-    public CSRFTokenValidationHttpTest(String name) {
-        super(name);
-    }
-
     private Map<String, String> makeBasePostParams() {
         Map<String, Object> message = new HashMap<>();
         Map<String, Object> actionInstance = new HashMap<>();

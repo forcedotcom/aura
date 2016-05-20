@@ -67,8 +67,8 @@ import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends RootDefinitionTest<T> {
 
-    public BaseComponentDefTest(String name, Class<T> defClass, String tag) {
-        super(name, defClass, tag);
+    public BaseComponentDefTest(Class<T> defClass, String tag) {
+        super(defClass, tag);
     }
 
     @Test

@@ -28,17 +28,9 @@ import org.junit.Test;
 
 /**
  * This class has automation for JavaRendererDefFactory. This factory fetches definitions of renderers defined in Java.
- * 
- * @hierarchy Aura.Components.Renderer
- * @priority high
- * @userStory a07B0000000Doob
  */
 public class JavaRendererDefFactoryTest extends AuraImplTestCase {
     JavaRendererDefFactory factory;
-
-    public JavaRendererDefFactoryTest(String name) {
-        super(name);
-    }
 
     @Override
     public void setUp() throws Exception {

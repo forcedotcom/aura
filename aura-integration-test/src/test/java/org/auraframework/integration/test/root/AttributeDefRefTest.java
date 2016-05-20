@@ -38,10 +38,6 @@ public class AttributeDefRefTest extends AuraImplTestCase {
 
     private static final String testAttributeDescriptorName = "testAttribute";
 
-    public AttributeDefRefTest(String name) {
-        super(name);
-    }
-
     private AttributeDefRefImpl assertParsedValue(Object original, String typeDefDesc, Object expected)
             throws Exception {
         AttributeDefRefImpl adr = vendor.makeAttributeDefRef(testAttributeDescriptorName, original, null);

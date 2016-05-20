@@ -32,10 +32,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
 public class FlavorIncludeDefHandlerTest extends StyleTestCase {
-    public FlavorIncludeDefHandlerTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testReadsSourceAttribute() throws Exception {
         DefDescriptor<ComponentDef> cmp = addComponentDef();

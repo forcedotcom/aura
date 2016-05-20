@@ -32,6 +32,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Assert;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -44,12 +45,8 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
 	private final String outputDivClass = "div_output";
 	private final String testLibButtonClass = "button_tryOutLibs";
 	
-	public MarkupCaseSensitivityUITest(String name) {
-		super(name);
-	}
-
-
-	public void testDummy() {
+    @Test
+    public void testDummy() {
 		return;
 	}
 	

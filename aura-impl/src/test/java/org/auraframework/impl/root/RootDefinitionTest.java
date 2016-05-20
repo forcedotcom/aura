@@ -37,8 +37,7 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
     private final Class<T> defClass;
     protected final String baseTag;
 
-    public RootDefinitionTest(String name, Class<T> defClass, String tag) {
-        super(name);
+    public RootDefinitionTest(Class<T> defClass, String tag) {
         this.defClass = defClass;
         this.baseTag = "<" + tag + " %s>%s</" + tag + ">";
     }

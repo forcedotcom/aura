@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test.components.ui.inputMultiSelect;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -29,7 +29,7 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
     private final String optionLocatorString = "//select[1]/option[text()='%s']";
 
     public BaseInputMultiSelect(String urlPath) {
-        super(urlPath);
+    	this.setName(urlPath);
         this.URL = urlPath;
     }
 

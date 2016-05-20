@@ -27,8 +27,8 @@ public abstract class AuraValidationTestCase extends AuraImplTestCase {
 
     protected static final Log LOG = LogFactory.getLog(AuraValidationTestCase.class);
 
-    public AuraValidationTestCase(String name) {
-        super(name, false);
+    public AuraValidationTestCase() {
+    	this.setShouldSetupContext(false);
     }
 
     @Override

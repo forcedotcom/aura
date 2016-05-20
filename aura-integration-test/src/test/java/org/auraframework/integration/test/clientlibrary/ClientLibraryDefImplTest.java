@@ -23,8 +23,6 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
-import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ClientLibraryDef.Type;
 import org.auraframework.def.ComponentDef;
@@ -45,18 +43,6 @@ import org.junit.Test;
  * Unit tests for {@link ClientLibraryDefImpl}
  */
 public class ClientLibraryDefImplTest extends AuraImplTestCase {
-    ClientLibraryService service;
-
-    public ClientLibraryDefImplTest(String name) {
-        super(name);
-    }
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        service = Aura.getClientLibraryService();
-    }
-
     @Test
     public void testValidationNullName() throws Exception {
         String name = null;

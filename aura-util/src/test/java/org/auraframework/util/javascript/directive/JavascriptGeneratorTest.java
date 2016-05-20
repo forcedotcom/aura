@@ -22,10 +22,6 @@ import org.junit.Test;
  */
 public class JavascriptGeneratorTest extends UnitTestCase {
 
-    public JavascriptGeneratorTest(String name) {
-        super(name);
-    }
-
     @Test
     public void testGeneration() throws Exception {
         TestGroup g = new TestGroup(getResourceFile("/testdata/directive/testGeneration.js"));

@@ -14,53 +14,55 @@
  * limitations under the License.
  */
 ({
- 	doServerError : function(component, event) {
-		var action = component.get("c.throwsException");
-		action.setParams({
-            errorMsg : "Error Happens!"
+    doServerError: function(cmp, event, helper) {
+        helper.fireServerErrorAction(cmp, function(errors) {
+            helper.setErrors(cmp, errors);
+            helper.setErrorOutputStatus(cmp);
         });
+    },
 
-        action.setCallback(component, function(response){
-        	if (action.getState() === "SUCCESS") {
-        		var retValue = response.getReturnValue();
-	        	component.find("outputStatus").set("v.value", "EXPECTED ERROR but got: " + retValue);
+    doErrorNoEventFire: function(cmp, event, helper) {
+        helper.setErrors(cmp, [{message:"Error Happens!"}]);
+        helper.setErrorOutputStatus(cmp);
+    },
 
-                var inputCmp = component.find("inputCmp");
-                inputCmp.set("v.errors", null);
-	        } else {
-	        	var errors = response.getError();
-	        	var inputCmp = component.find("inputCmp");
-	    		inputCmp.set("v.errors", errors);
+    doErrorNoErrorMsg: function(cmp, event, helper) {
+        helper.setErrors(cmp, true);
+        helper.setErrorOutputStatus(cmp);
+    },
 
-                component.find("outputStatus").set("v.value", "Got Error");
-	        }
+    clearErrors: function(cmp, event, helper) {
+        helper.setErrors(cmp, null);
+        helper.setClearOutputStatus(cmp);
+    },
+
+    doServerErrorFireOnErrorEvent: function(cmp, event, helper) {
+        helper.fireServerErrorAction(cmp, function(errors) {
+            // triggers handleError
+            helper.fireOnErrorEvent(cmp, errors);
         });
+    },
 
-        $A.enqueueAction(action);
-	},
+    clearErrorFireOnClearErrorsEvent: function(cmp, event, helper) {
+        // triggers handleClearError
+        helper.fireOnClearErrorsEvent(cmp);
+    },
 
-	doErrorNoEventFire : function(component) {
-		var inputCmp = component.find("inputCmp");
-		inputCmp.set("v.errors", [{message:"Error Happens!"}]);
-		component.find("outputStatus").set("v.value", "Got Error");
-	},
+    handleCustomErrors: function(cmp, event, helper){
+        var errorMsgObjs = event.getParam("errors");
+        if (errorMsgObjs) {
+            // setting custom error messages
+            for (var i = 0; i < errorMsgObjs.length; i++) {
+                errorMsgObjs[i].message = "Custom Error Msg: " + errorMsgObjs[i].message;
+            }
+            // show the messages
+            helper.createCustomErrors(cmp, errorMsgObjs);
+            helper.setErrorOutputStatus(cmp);
+        }
+    },
 
-	clearErrorNoEventFire : function(component) {
-		var inputCmp = component.find("inputCmp");
-		inputCmp.set("v.errors", null);
-		component.find("outputStatus").set("v.value", "Cleared error");
-	},
-
-	doErrorNoErrorMsg : function(component) {
-		var inputCmp = component.find("inputCmp");
-		inputCmp.set("v.errors", true);
-		component.find("outputStatus").set("v.value", "Got Error");
-	},
-
-	// TODO(tbliss): Adding a null error here still adds an entry to the errors object so the error is not cleared.
-	clearErrorNullErrorMsg : function(component) {
-		var inputCmp = component.find("inputCmp");
-        inputCmp.set("v.errors", null);
-	   	component.find("outputStatus").set("v.value", "Cleared error");
-	}
+    handleClearCustomErrors: function(cmp, event, helper) {
+        helper.clearCustomErrors(cmp);
+        helper.setClearOutputStatus(cmp);
+    }
 })

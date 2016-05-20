@@ -16,13 +16,29 @@
 
 -->
 <aura:component controller="java://org.auraframework.components.test.java.controller.JavaTestController">
-	<ui:inputText aura:id="inputCmp" value=""/> <br/>
-	Error Status: <ui:outputText aura:id="outputStatus" value=""/> <br/><br/>
-	
-	<div id="ErrorServer"><ui:button label="Error - From server" press="{!c.doServerError}"/></div>
-    <div id="ErrorNoEvent"><ui:button label="Error - No event fire" press="{!c.doErrorNoEventFire}"/></div>
-    <div id="ClearNoEvent"><ui:button label="Clear error - No event fire" press="{!c.clearErrorNoEventFire}"/></div>
-    <div id="ErrorNoErrMsg"><ui:button label="Error - No error message" press="{!c.doErrorNoErrorMsg}"/></div>
-    <div id="ClearNullErrMsg"><ui:button label="Clear error - Null errors message" press="{!c.clearErrorNullErrorMsg}"/></div>
 
+    <aura:attribute name="errorType" type="string" default="none"/>
+
+    <!-- Handy links to set test input cmp for manual tests -->
+    <ul>
+        <li><a href="/uitest/inputError_Test.cmp?errorType=native">Test Native Errors</a></li>
+        <li><a href="/uitest/inputError_Test.cmp?errorType=custom">Test Custom Errors</a></li>
+    </ul>
+
+    Error Status: <ui:outputText aura:id="outputStatus" value=""/><br/>
+    <br/>
+
+    <aura:if isTrue="{! v.errorType == 'native' }">
+        <ui:inputText aura:id="inputCmp" value=""/> <br/>
+        <ui:button aura:id="errorServer" label="Error - From server" press="{!c.doServerError}"/><br/>
+        <ui:button aura:id="errorNoEvent" label="Error - No event fire" press="{!c.doErrorNoEventFire}"/><br/>
+        <ui:button aura:id="errorNoErrMsg" label="Error - No error message" press="{!c.doErrorNoErrorMsg}"/><br/>
+        <ui:button aura:id="clearErrors" label="Clear Errors" press="{!c.clearErrors}"/><br/>
+    </aura:if>
+
+    <aura:if isTrue="{! v.errorType == 'custom' }">
+        <ui:inputText aura:id="inputCmp" value="" onError="{!c.handleCustomErrors}" onClearErrors="{!c.handleClearCustomErrors}"/> <br/>
+        <ui:button aura:id="errorFireOnErrorEvent" label="Custom Error - Server Error Fire onError event" press="{!c.doServerErrorFireOnErrorEvent}"/><br/>
+        <ui:button aura:id="clearFireOnClearErrrorsEvent" label="Clear Custom Error - Fire onClearErrors event" press="{!c.clearErrorFireOnClearErrorsEvent}"/><br/>
+    </aura:if>
 </aura:component>

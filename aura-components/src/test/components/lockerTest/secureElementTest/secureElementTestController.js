@@ -159,5 +159,11 @@
         for (var prop in expected) {
             testUtils.assertEquals(expected[prop], bbox[prop], "Unexpected attribute value returned from getBBox() for <" + prop + ">");
         }
+    },
+    
+    testScalarExpression: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var element = cmp.find("scalarExpression").getElement();
+        testUtils.assertEquals("A scalar expression", element.innerHTML);
     }
 })

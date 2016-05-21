@@ -78,10 +78,11 @@
         var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.innerHTML = '<defs> <text id="text" x="50" y="50">SVG</text> </defs>' +
                         '<use xlink:href="#text"></use>';
- 
-        var elements = svg.getElementsByTagName('use');
-        testUtils.assertEquals(1, elements.length, "Failed to find expected use element");
-        testUtils.assertEquals('#text', elements[0].getAttribute('xlink:href'));
+
+        var actual = svg.innerHTML;
+        // partially matching the tag, since browsers may insert attributes in the tag
+        testUtils.assertTrue(actual.indexOf('xlink:href="#text"></use>') > -1,
+                "use tag should not be removed by DOMPurify: " + actual);
     },
 
     testTextContent: function(cmp) {
@@ -101,10 +102,10 @@
             testUtils.assertEquals("innerText content", element.testInnerText);
         }
     },
-    
+
     testAddEventListenerMultipleCalls : function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
-        
+
         var counter = 0;
         var handler1 = function() {
             counter += 0.3;
@@ -112,21 +113,21 @@
         var handler2 = function() {
             counter += 1;
         }
-        
+
         var element = cmp.find("title").getElement();
         element.addEventListener("click", handler1);
-        
+
         // additional handlers should be allowed
         element.addEventListener("click", handler2);
-        
+
         // adding an existing handler should not error out
         element.addEventListener("click", handler1);
-        
+
         // again, no error on adding an existing handler
         element.addEventListener("click", handler2);
-        
+
         testUtils.clickOrTouch(element);
-        
+
         // each handler above should have been invoked once only
         testUtils.assertEquals(1.3, counter);
     },

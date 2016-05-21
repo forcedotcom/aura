@@ -100,9 +100,8 @@
 
         var element = document.createElementNS('http://www.w3.org/2000/svg', 'SVG');
 
-        var elementString = element.toString();
-        testUtils.assertTrue(elementString.indexOf('object SVGElement') > -1,
-                "Expecting a SVGElement, but actual: " + elementString);
+        var tagName = element.tagName.toLowerCase();
+        testUtils.assertEquals("svg", tagName, "Expecting a SVG Element");
     },
 
     testGetElementsByTagNameForScriptTag: function(cmp) {

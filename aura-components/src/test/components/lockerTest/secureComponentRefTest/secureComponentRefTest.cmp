@@ -28,5 +28,5 @@
 
     <div>SecureComponentRef test</div>
     <ui:button label="ui:button component" aura:id="facet"/>
-    <lockertest:eventSource aura:id="eventSource" foo="{!c.doFoo}"/>
+    <lockerTest:eventSource aura:id="eventSource" foo="{!c.doFoo}"/>
 </aura:component>

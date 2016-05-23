@@ -59,7 +59,6 @@ textarea, input {
   padding: .5rem .75rem;
 }
 
-/*.new_chaos_run, .old_chaos_run, .replaying_status, .newrun_status, .load_chaos_run_from_file{*/
 .card{
   background-color: #ffffff;
   border: 1px solid #e0e5ee;
@@ -703,7 +702,7 @@ button.toggle:focus {
 /*
   ChaosTab Start
 */
-.chaos_tab {
+.chaosTab {
   height: 100%;
   /* .slds-grid  { */
   display: -webkit-box;
@@ -714,7 +713,7 @@ button.toggle:focus {
   /* } */
   overflow: hidden;
 }
-.chaos_run_options, .chaos_run_result {
+.chaosRunOptions, .chaosRunResult {
   -webkit-overflow-scrolling: touch;
   max-height: 100%;
   overflow-x: hidden;
@@ -727,7 +726,7 @@ button.toggle:focus {
 
   width: 50%;
 }
-.chaos_run_options {
+.chaosRunOptions {
   border-right: none;
   margin-right: 0;
   padding-right: 0;
@@ -736,24 +735,17 @@ button.toggle:focus {
   border-right:1px solid #d8dde6;
   z-index: 1;
 }
-.stop_all_chaos_run {
+.stopAllChaosRun {
   float: right;
   margin-top: -.25rem;
 }
 
-.chaos_run_result {
+.chaosRunResult {
   border-bottom: 1px solid #d8dde6;
   padding-bottom: .5rem;
   background-color: #f4f6f9;
 }
-/*.chaos_run_result .chaos_card {
-  border: 1px solid #e0e5ee;
-  border-radius: .25rem;
-  margin: .5rem;
-  padding-bottom: .5rem;
-  display: block;
-  background-color: #fff;
-}*/
+
 
 /*
   ChaosTab End

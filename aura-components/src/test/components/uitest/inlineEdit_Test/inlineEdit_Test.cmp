@@ -18,6 +18,7 @@
 <aura:component>
 	
 	<aura:attribute name="items" type="Object[]" />
+    <aura:attribute name="lastEdited" type="Object" />
 	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
@@ -28,7 +29,9 @@
 		<ui:inlineEditGrid
 		    aura:id="grid"        class="inline-edit-grid"
 		    itemVar="row"         items="{!v.items}"
-		    rowHeaderIndex="1"    delegatedEvents="click,keydown,mouseover">
+		    rowHeaderIndex="1"    delegatedEvents="click,keydown,mouseover"
+            
+            onEdit="{!c.onEdit}">
 		    
 			<aura:set attribute="headerColumns">
 				<ui:dataGridColumn name="id"	label="Id" sortable="true"/>
@@ -49,6 +52,13 @@
 				</ui:inlineEditCell>
 			</aura:set>
 		</ui:inlineEditGrid>
+        
+        <div aura:id="lastEdited">
+            <span>Last Edited: </span><br/>
+            Index: <span>{!v.lastEdited.index}</span><br/>
+            Key: <span>{!v.lastEdited.key}</span><br/>
+            Value: <span>{!v.lastEdited.value}</span><br/>
+        </div>
 		
 		<div class="manager">
 	        <ui:panelManager2 aura:id="pm">

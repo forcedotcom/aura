@@ -25,7 +25,7 @@
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
 	<div>
-		<ui:inlineEditGrid aura:id="grid" class="inline-edit-example" items="{!v.items}">
+		<ui:inlineEditGrid aura:id="grid" class="inline-edit-example" items="{!v.items}" onEdit="{!c.onEdit}" >
 			<aura:set attribute="headerColumns">
 				<ui:dataGridColumn name="id"	label="Id" sortable="true"/>
 				<ui:dataGridColumn name="name"	label="Name"/>

@@ -314,37 +314,6 @@
 		this.shadowRoot.querySelector("#select_dropOrModify").value = "dropAction";
 	}
 
-	function dropNextAction() {
-		var actionId = this.getAttribute("id");
-		var actionName = this.getAttribute("name");
-		var actionParameter = this.getAttribute("parameters");
-		var actionIsStorable = this.getAttribute("isStorable");
-
-		if(actionId) {
-			var actionParameter = JSON.parse(actionParameter);//obj
-			var dataToPublish = {
-							'actionName': actionName,//necessary, as we use this as key in actionsToWatch AuraInspectorInjectedScript.js
-							'actionParameter':actionParameter,
-							'actionId': actionId.substring(12, actionId.length), //action_card_713;a --> 713;a
-							'actionIsStorable': actionIsStorable,
-							//'actionStorageKey': actionStorageKey, //it's not parse-able by Json, as it's not Json to begin with
-                            'nextResponse': undefined,
-                        	'nextErrorMsg': undefined};
-            dataToPublish = JSON.stringify(dataToPublish);
-            //console.log('dropNextAction, dataToPublish = ', dataToPublish);
-            //call AuraInspectorActionsView_OnEnqueueNextResponseForAction in AuraInspectorActionsView
-            var command = `
-               window[Symbol.for('AuraDevTools')].Inspector.
-                	publish("AuraInspector:EnqueueNextResponseForAction", '${dataToPublish}');
-            `;
-            chrome.devtools.inspectedWindow.eval(command, function (response, exception) {
-	            if (exception) {
-	            	console.log('ERROR from dropNextAction, CMD:', command, exception);
-	            }
-	        });
-		}
-	}
-
 	function editNextResponse() {
 		//make the textara writable
 	    this.shadowRoot.querySelector("#textarea_actionResultValue").removeAttribute('readonly');

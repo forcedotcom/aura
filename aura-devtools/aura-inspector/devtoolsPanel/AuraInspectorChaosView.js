@@ -23,67 +23,65 @@ function AuraInspectorChaosView(devtoolsPanel) {
     var _chaosCardList;
 
     var markup = `
-		<div class="chaos_tab">
-			<div class="chaos_run_options">
-        <section class="new_chaos_run">
-          <h1 class="">${labels.newChaosRun}</h1>
-          <div class="p-around--x-small m-horizontal--x-small">
-            <div>
-              <label class="label"> ${labels.samplingIntervalInSecond} </label>
-            	<input id="samplingInterval" type="number" size="2" maxsize="2" placeholder="4" min="0"/>
+<div class="chaosTab">
+    <div class="chaosRunOptions">
+        <section>
+            <h1 class="">${labels.newChaosRun}</h1>
+            <div class="p-around--x-small m-horizontal--x-small">
+                <div>
+                    <label class="label"> ${labels.samplingIntervalInSecond} </label>
+                    <input id="samplingInterval" type="number" size="2" maxsize="2" placeholder="4" min="0"/>
+                </div>
+                <div>
+                    <label class="label m-top--x-small"> ${labels.dropActionByPercentage} </label>
+                    <input id="actionDropPercentage" type="number" size="2" maxsize="3" placeholder="0" min="0" max="100"/>
+                </div>
+                <div class="m-top--x-small">
+                    <button id="startChaosRun" class="text-button">${labels.buttonStart}</button>
+                    <button id="stopChaosRun" class="text-button hidden">${labels.buttonStop}</button>
+                    <button id="saveChaosRun" class="text-button hidden">${labels.buttonSave}</button>
+                </div>
+                <div class="hidden label m-top--x-small" id="newrunStatus"></div>
             </div>
-            <div>
-             <label class="label m-top--x-small"> ${labels.dropActionByPercentage} </label>
-             <input id="actionDropPercentage" type="number" size="2" maxsize="3" placeholder="0" min="0" max="100"/>
-            </div>
-            <div class="m-top--x-small">
-              <button id="start_chaos_run" class="start_chaos_run text-button">${labels.buttonStart}</button>
-              <button id="stop_chaos_run" class="stop_chaos_run text-button hidden">${labels.buttonStop}</button>
-              <button id="save_chaos_run" class="save_chaos_run text-button hidden">${labels.buttonSave}</button>
-            </div>
-            <div class="newrun_status hidden label m-top--x-small" id="newrun_status"></div>
-          </div>
         </section>
         <section class="old_chaos_run">
-          <h1 class="">${labels.oldChaosRun}</h1>
-          <div class="p-around--x-small m-horizontal--x-small">
-            <div class="load_chaos_run_from_file">
-              <input type="file" id="choose_chaos_run_file" name="files[]"/>
+            <h1 class="">${labels.oldChaosRun}</h1>
+            <div class="p-around--x-small m-horizontal--x-small">
+                <div>
+                    <input type="file" id="chooseChaosRunFile" name="files[]"/>
+                </div>
+                <div class="m-top--x-small">
+                    <button id="replayChaosRun" class="text-button hidden">${labels.buttonReplay}</button>
+                    <button id="cancelTheLoadedChaosRun" class="text-button hidden">${labels.buttonCancel}</button>
+                </div>
+                <div class="hidden label m-top--x-small" id="replayingStatus"></div>
             </div>
-            <div class="m-top--x-small">
-              <button id="replay_chaos_run" class="replay_chaos_run text-button hidden">${labels.buttonReplay}</button>
-              <button id="cancel_the_loaded_chaos_run" class="cancel_the_loaded_chaos_run text-button hidden">${labels.buttonCancel}</button>
-            </div>
-            <div class="replaying_status hidden label m-top--x-small" id="replaying_status"></div>
-          </div>
         </section>
-      </div>
-			<section class="chaos_run_result dark">
-				<h1 class="">${labels.chaosRunResult}
-          <button id="stop_all_chaos_run" class="stop_all_chaos_run button--brand"> ${labels.stopAllRuns} </button>
+    </div>
+	<section class="chaosRunResult dark">
+		<h1 class="">${labels.chaosRunResult}
+            <button id="stopAllChaosRun" class="button--brand"> ${labels.stopAllRuns} </button>
         </h1>
-
-				<div id="chaos_actions_list">
-        </div>
-			</section>
-		</div>
+		<div id="chaosActionsList"></div>
+	</section>
+</div>
 	`;
 
     this.init = function(tabBody) {
         tabBody.innerHTML = markup;
 
-        _chaosCardList = tabBody.querySelector("#chaos_actions_list");
+        _chaosCardList = tabBody.querySelector("#chaosActionsList");
 
         // Attach event handlers
-        tabBody.querySelector("#start_chaos_run").addEventListener("click", startChaosRun.bind(this));
-        tabBody.querySelector("#stop_chaos_run").addEventListener("click", stopChaosRun.bind(this));
-        tabBody.querySelector("#save_chaos_run").addEventListener("click", saveChaosRun.bind(this));
+        tabBody.querySelector("#startChaosRun").addEventListener("click", startChaosRun.bind(this));
+        tabBody.querySelector("#stopChaosRun").addEventListener("click", stopChaosRun.bind(this));
+        tabBody.querySelector("#saveChaosRun").addEventListener("click", saveChaosRun.bind(this));
 
-        tabBody.querySelector("#replay_chaos_run").addEventListener("click", replayChaosRun.bind(this));
-        tabBody.querySelector("#cancel_the_loaded_chaos_run").addEventListener("click", cancelTheLoadedChaosRun.bind(this));
+        tabBody.querySelector("#replayChaosRun").addEventListener("click", replayChaosRun.bind(this));
+        tabBody.querySelector("#cancelTheLoadedChaosRun").addEventListener("click", cancelTheLoadedChaosRun.bind(this));
 
-        tabBody.querySelector("#stop_all_chaos_run").addEventListener("click", stopAllChaosRun.bind(this));
-        tabBody.querySelector('#choose_chaos_run_file').addEventListener('change', handleFileSelect.bind(this), false);
+        tabBody.querySelector("#stopAllChaosRun").addEventListener("click", stopAllChaosRun.bind(this));
+        tabBody.querySelector('#chooseChaosRunFile').addEventListener('change', handleFileSelect.bind(this), false);
 
 
         // Start listening for events to draw
@@ -108,13 +106,13 @@ function AuraInspectorChaosView(devtoolsPanel) {
 
     this.refresh = function() {
         removeAllCards();
-        document.querySelector("#stop_chaos_run").classList.add("hidden");
-        document.querySelector("#start_chaos_run").classList.remove("hidden");
-        document.querySelector("#save_chaos_run").classList.add("hidden");
-        document.querySelector("#replay_chaos_run").classList.add("hidden");
-        document.querySelector("#stop_all_chaos_run").classList.remove("hidden");
-        document.querySelector("#newrun_status").classList.add("hidden");
-        document.querySelector("#replaying_status").classList.add("hidden");
+        document.querySelector("#stopChaosRun").classList.add("hidden");
+        document.querySelector("#startChaosRun").classList.remove("hidden");
+        document.querySelector("#saveChaosRun").classList.add("hidden");
+        document.querySelector("#replayChaosRun").classList.add("hidden");
+        document.querySelector("#stopAllChaosRun").classList.remove("hidden");
+        document.querySelector("#newrunStatus").classList.add("hidden");
+        document.querySelector("#replayingStatus").classList.add("hidden");
         console.log("chaosView.refresh");
     };
 
@@ -124,9 +122,9 @@ function AuraInspectorChaosView(devtoolsPanel) {
     */
     function AuraInspectorChaosView_OnReplayChaosRunNewStatus(status) {
         if (status && status.message) {
-            var div_replaying_status = document.querySelector("#replaying_status");
-            div_replaying_status.classList.remove("hidden");
-            div_replaying_status.textContent = status.message;
+            var div_replayingStatus = document.querySelector("#replayingStatus");
+            div_replayingStatus.classList.remove("hidden");
+            div_replayingStatus.textContent = status.message;
         }
     }
 
@@ -136,9 +134,9 @@ function AuraInspectorChaosView(devtoolsPanel) {
     */
     function AuraInspectorChaosView_OnNewChaosRunNewStatus(status) {
         if (status && status.message) {
-            var div_replaying_status = document.querySelector("#newrun_status");
-            div_replaying_status.classList.remove("hidden");
-            div_replaying_status.textContent = status.message;
+            var div_replayingStatus = document.querySelector("#newrunStatus");
+            div_replayingStatus.classList.remove("hidden");
+            div_replayingStatus.textContent = status.message;
         }
     }
 
@@ -170,10 +168,10 @@ function AuraInspectorChaosView(devtoolsPanel) {
         var chaosCard = createChaosCard(finishMessage, "");
         _chaosCardList.appendChild(chaosCard);
 
-        document.querySelector("#start_chaos_run").classList.remove("hidden");
-        document.querySelector("#stop_chaos_run").classList.add("hidden");
+        document.querySelector("#startChaosRun").classList.remove("hidden");
+        document.querySelector("#stopChaosRun").classList.add("hidden");
 
-        document.querySelector("#replay_chaos_run").classList.remove("hidden");
+        document.querySelector("#replayChaosRun").classList.remove("hidden");
     }
 
     /*
@@ -192,22 +190,22 @@ function AuraInspectorChaosView(devtoolsPanel) {
             devtoolsPanel.publish("AuraInspector:OnContinueChaosRun", {});
             InTheMiddleOfAChaosRun = false;
 
-            document.querySelector("#stop_chaos_run").classList.add("hidden");
-            document.querySelector("#start_chaos_run").classList.add("hidden");
-            document.querySelector("#save_chaos_run").classList.add("hidden");
+            document.querySelector("#stopChaosRun").classList.add("hidden");
+            document.querySelector("#startChaosRun").classList.add("hidden");
+            document.querySelector("#saveChaosRun").classList.add("hidden");
 
-            document.querySelector("#replay_chaos_run").classList.add("hidden");
-            document.querySelector("#replaying_status").classList.remove("hidden");
+            document.querySelector("#replayChaosRun").classList.add("hidden");
+            document.querySelector("#replayingStatus").classList.remove("hidden");
         } else {
-            document.querySelector("#stop_chaos_run").classList.add("hidden");
-            document.querySelector("#start_chaos_run").classList.remove("hidden");
-            document.querySelector("#save_chaos_run").classList.add("hidden");
+            document.querySelector("#stopChaosRun").classList.add("hidden");
+            document.querySelector("#startChaosRun").classList.remove("hidden");
+            document.querySelector("#saveChaosRun").classList.add("hidden");
 
-            document.querySelector("#replay_chaos_run").classList.remove("hidden");
-            document.querySelector("#replaying_status").classList.add("hidden");
+            document.querySelector("#replayChaosRun").classList.remove("hidden");
+            document.querySelector("#replayingStatus").classList.add("hidden");
         }
 
-        document.querySelector("#stop_all_chaos_run").classList.remove("hidden");
+        document.querySelector("#stopAllChaosRun").classList.remove("hidden");
     }
 
 
@@ -352,14 +350,14 @@ function AuraInspectorChaosView(devtoolsPanel) {
 
     function startChaosRun(event) {
         //hide Start button, display Stop button
-        document.querySelector("#stop_chaos_run").classList.remove("hidden");
-        document.querySelector("#start_chaos_run").classList.add("hidden");
-        document.querySelector("#save_chaos_run").classList.add("hidden");
-        document.querySelector("#newrun_status").classList.remove("hidden");
+        document.querySelector("#stopChaosRun").classList.remove("hidden");
+        document.querySelector("#startChaosRun").classList.add("hidden");
+        document.querySelector("#saveChaosRun").classList.add("hidden");
+        document.querySelector("#newrunStatus").classList.remove("hidden");
 
-        document.querySelector("#stop_all_chaos_run").classList.remove("hidden");
-        document.querySelector("#replay_chaos_run").classList.add("hidden");
-        document.querySelector("#replaying_status").classList.add("hidden");
+        document.querySelector("#stopAllChaosRun").classList.remove("hidden");
+        document.querySelector("#replayChaosRun").classList.add("hidden");
+        document.querySelector("#replayingStatus").classList.add("hidden");
 
         //clear up all cards
         removeAllCards();
@@ -371,17 +369,17 @@ function AuraInspectorChaosView(devtoolsPanel) {
             samplingInterval = 4000;
             var msg = "Invalid input: samplingInterval must be a number between bigger than 0, gonna use the default value:4000(ms) instead";
             console.warn(msg);
-            document.querySelector("#newrun_status").textContent = msg;
+            document.querySelector("#newrunStatus").textContent = msg;
         }
 
         var actionDropPercentage = document.querySelector("#actionDropPercentage").value * 1; //5
         if (actionDropPercentage < 0 || actionDropPercentage >= 100) {
             var msg = "Invalid input: percentage to drop action must be a number between 0 and 100, gonna use the default value:5 instead";
             console.warn(msg);
-            document.querySelector("#newrun_status").textContent = msg;
+            document.querySelector("#newrunStatus").textContent = msg;
             actionDropPercentage = 5;
         } else {
-            document.querySelector("#newrun_status").textContent =
+            document.querySelector("#newrunStatus").textContent =
                 "New chaos run start with samplingInterval=" + samplingInterval + "(ms), actionDropPercentage=" + actionDropPercentage;
         }
 
@@ -399,9 +397,9 @@ function AuraInspectorChaosView(devtoolsPanel) {
     */
     function stopChaosRun(runResult) {
         //hide Stop button, display Start button
-        document.querySelector("#start_chaos_run").classList.remove("hidden");
-        document.querySelector("#stop_chaos_run").classList.add("hidden");
-        document.querySelector("#save_chaos_run").classList.remove("hidden");
+        document.querySelector("#startChaosRun").classList.remove("hidden");
+        document.querySelector("#stopChaosRun").classList.add("hidden");
+        document.querySelector("#saveChaosRun").classList.remove("hidden");
 
         //call AuraInspectorInjectedScript.StopChaosRun
         devtoolsPanel.publish("AuraInspector:OnStopChaosRun", {});
@@ -413,7 +411,7 @@ function AuraInspectorChaosView(devtoolsPanel) {
         } else {
             finishMessage = finishMessage + "SUCCESS !"
         }
-        document.querySelector("#newrun_status").textContent = finishMessage;
+        document.querySelector("#newrunStatus").textContent = finishMessage;
         var chaosCard = createChaosCard(finishMessage, "");
         _chaosCardList.appendChild(chaosCard);
     }
@@ -423,18 +421,20 @@ function AuraInspectorChaosView(devtoolsPanel) {
         //clear up all cards
         removeAllCards();
 
-        //if(InTheMiddleOfAChaosRun === true) {
-        //    InTheMiddleOfAChaosRun = false;
-        document.querySelector("#replaying_status").textContent = "Someone just pushed the Panic Button, replay stopped";
-        //}
+        document.querySelector("#startChaosRun").classList.remove("hidden");
+        document.querySelector("#stopChaosRun").classList.add("hidden");
+        document.querySelector("#saveChaosRun").classList.add("hidden");
+
+        document.querySelector("#replayingStatus").classList.remove("hidden");
+        document.querySelector("#replayingStatus").textContent = "Someone just pushed the Panic Button, replay stopped";
 
         //call AuraInspectorInjectedScript.StopAllChaosRun to stop all intervals, and clear up localStorage
         devtoolsPanel.publish("AuraInspector:OnStopAllChaosRun", {});
     }
 
     function saveChaosRun(event) {
-        document.querySelector("#stop_chaos_run").classList.add("hidden");
-        document.querySelector("#start_chaos_run").classList.remove("hidden");
+        document.querySelector("#stopChaosRun").classList.add("hidden");
+        document.querySelector("#startChaosRun").classList.remove("hidden");
 
         // Collect run parameter
         var samplingInterval = document.querySelector("#samplingInterval").value; //4000;
@@ -445,7 +445,7 @@ function AuraInspectorChaosView(devtoolsPanel) {
         if (actionDropPercentage < 0 || actionDropPercentage >= 100) {
             actionDropPercentage = 5; //default
         }
-        document.querySelector("#newrun_status").classList.textContent =
+        document.querySelector("#newrunStatus").classList.textContent =
             "Chaos run saved with samplingInterval=" + samplingInterval + "(ms), actionDropPercentage=" + actionDropPercentage;
         samplingInterval = samplingInterval * 1000;
         //call AuraInspectorInjectedScript.SaveChaosRun
@@ -455,7 +455,7 @@ function AuraInspectorChaosView(devtoolsPanel) {
         });
     }
 
-    //event handler for clicking choose_chaos_run_file
+    //event handler for clicking chooseChaosRunFile
     function handleFileSelect(evt) {
         var files = evt.target.files;
         var fileReader = new FileReader();
@@ -471,14 +471,14 @@ function AuraInspectorChaosView(devtoolsPanel) {
         };
         fileReader.readAsText(files[0]);
 
-        document.querySelector("#replay_chaos_run").classList.remove("hidden");
-        document.querySelector("#cancel_the_loaded_chaos_run").classList.remove("hidden");
+        document.querySelector("#replayChaosRun").classList.remove("hidden");
+        document.querySelector("#cancelTheLoadedChaosRun").classList.remove("hidden");
 
-        document.querySelector("#stop_all_chaos_run").classList.add("hidden");
+        document.querySelector("#stopAllChaosRun").classList.add("hidden");
 
-        document.querySelector("#stop_chaos_run").classList.add("hidden");
-        document.querySelector("#start_chaos_run").classList.add("hidden");
-        document.querySelector("#save_chaos_run").classList.add("hidden");
+        document.querySelector("#stopChaosRun").classList.add("hidden");
+        document.querySelector("#startChaosRun").classList.add("hidden");
+        document.querySelector("#saveChaosRun").classList.add("hidden");
 
     }
 
@@ -486,7 +486,7 @@ function AuraInspectorChaosView(devtoolsPanel) {
         //WARNING MAGIC !
         InTheMiddleOfAChaosRun = true;
 
-        document.querySelector("#stop_all_chaos_run").classList.remove("hidden");
+        document.querySelector("#stopAllChaosRun").classList.remove("hidden");
 
         // Collect run parameter
         var samplingInterval = document.querySelector("#samplingInterval").value;
@@ -507,8 +507,8 @@ function AuraInspectorChaosView(devtoolsPanel) {
     }
 
     function cancelTheLoadedChaosRun() {
-        document.querySelector("#replay_chaos_run").classList.add("hidden");
-        document.querySelector("#start_chaos_run").classList.remove("hidden");
+        document.querySelector("#replayChaosRun").classList.add("hidden");
+        document.querySelector("#startChaosRun").classList.remove("hidden");
 
         removeAllCards();
 

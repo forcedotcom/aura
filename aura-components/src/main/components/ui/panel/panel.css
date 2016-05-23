@@ -106,12 +106,13 @@
 
 .THIS .panel-content {
     overflow: auto;
+    /* this rule enable native scrolling on iOS */
     -webkit-overflow-scrolling: touch;
     height: 100%;
 }
 
-
-.THIS .panel-content > * {
+/* That's a fix for iOS and native scrolling */
+.THIS .IOS.container .panel-content * {
     transform : translate3d(0, 0, 0);
 }
 

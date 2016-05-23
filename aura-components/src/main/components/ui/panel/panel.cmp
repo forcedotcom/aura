@@ -62,7 +62,7 @@
          aria-labelledby="{!'title_' + globalId}"
          aura:flavorable="true">
 
-        <div aura:id="content" class="container">
+        <div aura:id="content" class="{! join(' ',$Browser.isIOS ? 'IOS' : '','container') }">
             <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
             <aura:if isTrue="{! v.header.length || !empty(v.title) }">

@@ -22,6 +22,5 @@
     <aura:method name="update"/>
 
     <aura:handler event="ui:updateSize" action="{!c.updateSize}" description="The event fired when a component is resized."/>
-    <aura:handler event="aura:doneWaiting" action="{!c.updateSize}" description="The event fired when the client is done waiting for a response to a server request."/>
 
 </aura:component>

@@ -27,7 +27,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX })
+@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE11 })
 public class DraggableUITest extends WebDriverTestCase{
 
     private static final String DRAGANDDROPTEST_APP = "/uitest/dragAndDrop_Test.cmp";

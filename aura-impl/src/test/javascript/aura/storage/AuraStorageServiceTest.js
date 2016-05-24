@@ -117,6 +117,47 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
         }
 
         [Fact]
+        function NotInitDuplicateStorages() {
+            var storageName = "testStorage";
+            var expected = "Storage named 'testStorage' already exists";
+            var actual;
+
+            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+                assert: function(value, msg) {
+                    if (!value) {
+                        throw new Error(msg);
+                    }
+                },
+                util: {
+                    isString: function(obj) { return typeof obj === 'string'; },
+                    isObject: function(obj) { return typeof obj === "object" && obj !== null && !Array.isArray(obj); }
+                }
+            });
+
+            targetService.storages[storageName] = true;
+            mockAssert(function() {
+                try {
+                    targetService.initStorage( {name:storageName} );
+                    Assert.Fail("Error should've been thrown");
+                } catch (e) {
+                    actual = e.toString();
+                }
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function NameRespectsArgument() {
+            var expected = "name";
+            mockA(function() {
+                targetService.initStorage({name:expected});
+            });
+
+            Assert.Equal(expected, configPassedToAuraStorage.name);
+        }
+
+        [Fact]
         function PersistentDefaultsFalse() {
             mockA(function() {
                 targetService.initStorage({name:"name"});
@@ -125,6 +166,7 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
             Assert.False(configPassedToAuraStorage.persistent);
         }
 
+        [Fact]
         function PersistentRespectsArgument() {
             mockA(function() {
                 targetService.initStorage({name:"name", persistent:true});
@@ -292,8 +334,29 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
 
             Assert.Equal(expected, configPassedToAuraStorage.version);
         }
-    }
 
+        [Fact]
+        function VersionDefaultForFalsyValue() {
+            var expected = "expected";
+            targetService.version = expected;
+            mockA(function() {
+                targetService.initStorage({name:"name", version:""});
+            });
+
+            Assert.Equal(expected, configPassedToAuraStorage.version);
+        }
+
+        [Fact]
+        function IsolationKeyNotUseConfigProperty() {
+            var expected = "expected";
+            targetService.isolationKey = expected;
+            mockA(function() {
+                targetService.initStorage({name:"name", isolationKey:"shouldIgnore"});
+            });
+
+            Assert.Equal(expected, configPassedToAuraStorage.isolationKey);
+        }
+    }
 
     [Fixture]
     function selectAdapter() {

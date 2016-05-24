@@ -82,7 +82,6 @@ public final class SauceUtil {
 
     // For Appium
     private static final String PLATFORM_VERSION = "8.1";
-    private static final String APPIUM_VERSION = "1.3.6";
     private static final String IOS_IPHONE_DEVICE = "iPhone 5s";
     private static final String IOS_IPAD_DEVICE = "iPad Simulator"; // Ipad Simulator will launch iPad2
 
@@ -105,7 +104,6 @@ public final class SauceUtil {
             String platformVersion) {
         capabilities.setCapability("browserName", app);
         capabilities.setCapability("platformVersion", platformVersion);
-        capabilities.setCapability("appiumVersion", APPIUM_VERSION);
         capabilities.setCapability("platformName", "iOS");
         capabilities.setCapability("deviceName", deviceName);
         capabilities.setCapability("orientation", "portrait");

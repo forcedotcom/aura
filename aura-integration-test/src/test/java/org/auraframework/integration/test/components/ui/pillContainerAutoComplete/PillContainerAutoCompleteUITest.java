@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 package org.auraframework.integration.test.components.ui.pillContainerAutoComplete;
-
 import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 
-@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX })
+@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE11 })
 public class PillContainerAutoCompleteUITest extends BasePillContainerAutoComplete{
 
 	public PillContainerAutoCompleteUITest() {

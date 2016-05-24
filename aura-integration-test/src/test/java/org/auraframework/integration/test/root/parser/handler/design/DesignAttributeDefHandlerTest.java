@@ -21,6 +21,7 @@ import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -221,12 +222,14 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
     }
 
     private DefDescriptor<ComponentDef> createAuraDefinitionWithDesignFile(String cmpAttributes, String designSource, boolean isInternal) {
-        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":",
+        NamespaceAccess access = isInternal?NamespaceAccess.INTERNAL:NamespaceAccess.CUSTOM;
+        String namespace = isInternal?StringSourceLoader.DEFAULT_NAMESPACE:StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE;
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(namespace + ":",
                 ComponentDef.class, null);
-        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpAttributes), isInternal);
+        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpAttributes), access);
         DefDescriptor<DesignDef> desc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
-        getAuraTestingUtil().addSourceAutoCleanup(desc, designSource, isInternal);
+        getAuraTestingUtil().addSourceAutoCleanup(desc, designSource, access);
         return cmpDesc;
     }
 }

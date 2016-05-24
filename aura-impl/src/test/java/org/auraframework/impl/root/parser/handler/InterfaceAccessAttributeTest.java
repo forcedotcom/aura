@@ -24,12 +24,17 @@ import org.auraframework.system.Parser;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
+
 @UnAdaptableTest("when run in core, we throw error with different type.")
 public class InterfaceAccessAttributeTest extends AuraImplTestCase {
+
+    private StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
+
 	/***********************************************************************************
      ******************* Tests for Internal Namespace start ****************************
      ************************************************************************************/
@@ -41,8 +46,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -56,8 +61,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -77,8 +82,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -98,8 +103,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -121,8 +126,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -143,8 +148,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
             DefDescriptor<InterfaceDef> descriptor = 
                     getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                     intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-            true);
-            Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+            Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
             
             Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
             Definition def = parser.parse(descriptor, source);
@@ -165,8 +170,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -190,8 +195,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -203,8 +208,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -217,8 +222,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -237,8 +242,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -250,8 +255,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -269,8 +274,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -282,8 +287,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -296,8 +301,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -309,8 +314,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -322,8 +327,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -341,8 +346,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -364,8 +369,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -382,8 +387,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -401,8 +406,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -426,8 +431,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -450,8 +455,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -473,8 +478,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -498,8 +503,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -517,8 +522,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -536,8 +541,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -555,8 +560,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -574,8 +579,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_NAMESPACE+":testInterface",
-        true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.INTERNAL);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -602,8 +607,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -617,8 +622,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -638,8 +643,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -659,8 +664,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -682,8 +687,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -704,8 +709,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
             DefDescriptor<InterfaceDef> descriptor = 
                     getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                     intfSource, "privilegedNS:testInterface",
-            false, true);
-            Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+            Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
             
             Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
             Definition def = parser.parse(descriptor, source);
@@ -726,8 +731,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -752,8 +757,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -765,8 +770,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -778,8 +783,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -798,8 +803,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -818,8 +823,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -836,8 +841,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -855,8 +860,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -874,8 +879,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -893,8 +898,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -912,8 +917,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -937,8 +942,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -960,8 +965,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -978,8 +983,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -997,8 +1002,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1022,8 +1027,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1046,8 +1051,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1069,8 +1074,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1093,8 +1098,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1112,8 +1117,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1131,8 +1136,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1150,8 +1155,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1169,8 +1174,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1200,8 +1205,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1215,8 +1220,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1236,8 +1241,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1257,8 +1262,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1280,8 +1285,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1302,8 +1307,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
             DefDescriptor<InterfaceDef> descriptor = 
                     getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                     intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-            false);
-            Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+            Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
             
             Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
             Definition def = parser.parse(descriptor, source);
@@ -1324,8 +1329,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1349,8 +1354,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1362,8 +1367,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1375,8 +1380,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1395,8 +1400,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1415,8 +1420,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1439,8 +1444,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1458,8 +1463,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1477,8 +1482,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1496,8 +1501,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1515,8 +1520,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1539,8 +1544,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1561,8 +1566,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1579,8 +1584,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1599,8 +1604,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, "privilegedNS:testInterface",
-        false, true);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.PRIVILEGED);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1623,8 +1628,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1646,8 +1651,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1669,8 +1674,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1692,8 +1697,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1711,8 +1716,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1730,8 +1735,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1749,8 +1754,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1768,8 +1773,8 @@ public class InterfaceAccessAttributeTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = 
                 getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class,
                 intfSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testInterface",
-        false);
-        Source<InterfaceDef> source = StringSourceLoader.getInstance().getSource(descriptor);
+                        NamespaceAccess.CUSTOM);
+        Source<InterfaceDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<InterfaceDef> parser = ParserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);

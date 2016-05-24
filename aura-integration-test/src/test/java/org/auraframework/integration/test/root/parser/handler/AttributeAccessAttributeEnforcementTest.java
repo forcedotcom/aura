@@ -21,12 +21,11 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
-@UnAdaptableTest("namespace start with c means something special in core")
 public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     /**
      * Privileged access tests start.
@@ -37,11 +36,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Privileged'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
         descriptor.getDef();
     }
     @Test
@@ -49,11 +48,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Privileged'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
         descriptor.getDef();
     }
     @Test
@@ -61,11 +60,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Privileged'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testcomponnet", NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
         descriptor.getDef();
     }
     
@@ -74,11 +73,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Privileged'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     @Test
@@ -86,11 +85,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Privileged'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     @Test
@@ -98,11 +97,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Privileged'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.OTHER_NAMESPACE + ":testapplication", NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -111,11 +110,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Privileged'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
         try {
         	descriptor.getDef();
          	fail("application of custom namespace shouldn't be able to access attribute of system namespace with privileged");
@@ -131,11 +130,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Privileged'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
         try {
         	descriptor.getDef();
          	fail("application of custom namespace shouldn't be able to access attribute of privileged namespace with privileged");
@@ -159,11 +158,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         descriptor.getDef();
     }
     @Test
@@ -171,11 +172,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         try {
         	descriptor.getDef();
          	fail("application of privileged namespace shouldn't be able to access attribute of another privileged namespace");
@@ -191,11 +194,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         try {
         	descriptor.getDef();
          	fail("application of privileged namespace shouldn't be able to access attribute of system application namespace");
@@ -211,11 +216,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Internal'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         try {
         	descriptor.getDef();
          	fail("application of privileged namespace shouldn't be able to access attribute of system application namespace");
@@ -231,11 +238,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         try {
         	descriptor.getDef();
         	fail("application of privileged namespace shouldn't be able to access attribute of custom application namespace");
@@ -251,11 +260,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         try {
         	descriptor.getDef();
         	fail("application of custom namespace shouldn't be able to access attribute of privileged application namespace");
@@ -271,11 +282,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
 
@@ -286,12 +299,14 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testApplicationWithSystemNamespaceHasComponentWithSameSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     @Test
@@ -299,11 +314,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Internal'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -314,12 +331,14 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testApplicationWithSystemNamespaceHasComponentWithOtherSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet", true);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     @Test
@@ -327,11 +346,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Internal'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -342,16 +363,18 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testApplicationWithCustomNamespaceHasComponentWithSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
-        try{
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
+        try {
         	descriptor.getDef();
         	fail("application of custom namespace shouldn't be able to set attribute of component with system namespace");
-        } catch(Exception e) {
+        } catch (Exception e) {
         	//expect 
     		//System.out.println(e.getMessage());
     		//Access to attribute 'string:testcomponnet1.testattribute' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
@@ -362,11 +385,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Internal'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         try{
         	descriptor.getDef();
         	fail("application of custom namespace shouldn't be able to set attribute of component with system namespace");
@@ -384,12 +409,14 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testApplicationWithCustomNamespaceHasComponentWithSameCustomNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         descriptor.getDef();
     }
     
@@ -400,16 +427,18 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testApplicationWithCustomNamespaceHasComponentWithOtherCustomNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         try {
         	descriptor.getDef();
         	fail("application of custom namespace shouldn't be able to set attribute of component with other custom namespace");
-        } catch(Exception e) {
+        } catch (Exception e) {
         	//expect 
     		//System.out.println(e.getMessage());
         	//Access to attribute 'cstring:testcomponnet1.testattribute' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
@@ -423,12 +452,14 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testApplicationWithSystemNamespaceHasComponentWithCustomNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -440,12 +471,14 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testComponentWithSystemNamespaceHasComponentWithSameSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     @Test
@@ -453,11 +486,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Global'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -469,12 +504,14 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testComponentWithSystemNamespaceHasComponentWitOtherSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet", true);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -485,16 +522,18 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testComponentWithCustomNamespaceHasComponentWithSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2", false);
-        try{
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.CUSTOM);
+        try {
         	descriptor.getDef();
         	fail("component of custom namespace shouldn't be able to set attribute of component with system namespace");
-        } catch(Exception e) {
+        } catch (Exception e) {
         	//expect 
     		//System.out.println(e.getMessage());
     		//Access to attribute 'string:testcomponnet1.testattribute' from namespace 'cstring' in 'markup://cstring:testcomponnet22(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
@@ -508,12 +547,14 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testComponentWithCustomNamespaceHasComponentWithSameCustomNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.CUSTOM);
         descriptor.getDef();
     }
     
@@ -524,16 +565,18 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testComponentWithCustomNamespaceHasComponentWithOtherCustomNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponnet2", false);
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.CUSTOM);
         try {
         	descriptor.getDef();
         	fail("component of custom namespace shouldn't be able to set attribute of component with other custom namespace");
-        } catch(Exception e) {
+        } catch (Exception e) {
         	//expect 
     		//System.out.println(e.getMessage());
     		//Access to attribute 'cstring:testcomponnet1.testattribute' from namespace 'cstring1' in 'markup://cstring1:testcomponnet22(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
@@ -547,16 +590,16 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testComponentWithSystemNamespaceHasComponentWithCustomNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
-    
-    
     
     
     /**
@@ -572,7 +615,6 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
      */
 
     
-   
     /**
      * Public access tests start
      */
@@ -584,11 +626,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         descriptor.getDef();
     }
     @Test
@@ -596,11 +640,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         try {
         	descriptor.getDef();
          	fail("application of privileged namespace shouldn't be able to access attribute of another privileged namespace");
@@ -616,11 +662,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         try {
         	descriptor.getDef();
          	fail("application of privileged namespace shouldn't be able to access attribute of system application namespace");
@@ -636,11 +684,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         try {
         	descriptor.getDef();
         	fail("application of privileged namespace shouldn't be able to access attribute of custom application namespace");
@@ -656,11 +706,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         try {
         	descriptor.getDef();
         	fail("application of custom namespace shouldn't be able to access attribute of privileged application namespace");
@@ -676,11 +728,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -692,11 +746,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -708,11 +764,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -724,11 +782,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         try{
         	descriptor.getDef();
         	fail("application of custom namespace shouldn't be able to set attribute of component with system namespace");
@@ -747,11 +807,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         descriptor.getDef();
     }
     
@@ -763,11 +825,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         try {
         	descriptor.getDef();
         	fail("application of custom namespace shouldn't be able to set attribute of component with other custom namespace");
@@ -786,11 +850,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -803,11 +869,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -819,11 +887,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -835,11 +905,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.CUSTOM);
         try{
         	descriptor.getDef();
         	fail("component of custom namespace shouldn't be able to set attribute of component with system namespace");
@@ -858,11 +930,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.CUSTOM);
         descriptor.getDef();
     }
     
@@ -874,11 +948,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponnet2", false);
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.CUSTOM);
         try {
         	descriptor.getDef();
         	fail("component of custom namespace shouldn't be able to set attribute of component with other custom namespace");
@@ -897,11 +973,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -921,11 +999,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         descriptor.getDef();
     }
     @Test
@@ -933,11 +1013,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         	descriptor.getDef();
     }
     @Test
@@ -945,11 +1027,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         	descriptor.getDef();
     }
     @Test
@@ -957,11 +1041,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         	descriptor.getDef();
     }
     @Test
@@ -969,11 +1055,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         	descriptor.getDef();
     }
     @Test
@@ -981,11 +1069,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -998,11 +1088,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -1014,11 +1106,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -1030,11 +1124,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         	descriptor.getDef();
     }
     
@@ -1046,11 +1142,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         descriptor.getDef();
     }
     
@@ -1062,11 +1160,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         	descriptor.getDef();
     }
     
@@ -1078,11 +1178,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -1095,11 +1197,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -1111,11 +1215,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -1127,11 +1233,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.CUSTOM);
         	descriptor.getDef();
     }
     
@@ -1143,11 +1251,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.CUSTOM);
         descriptor.getDef();
     }
     
@@ -1158,12 +1268,14 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testComponentWithCustomNamespaceHasComponentWithOtherCustomNamespaceInMarkupAccessGlobal() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponnet2", false);
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.CUSTOM);
         	descriptor.getDef();
     }
     
@@ -1174,12 +1286,14 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     public void testComponentWithSystemNamespaceHasComponentWithCustomNamespaceInMarkupAccessGlobal() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
-        DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+        DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create component with above component in markup, set the attribute
         String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:component>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -1194,11 +1308,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         try {
             descriptor.getDef();
             fail("Attribute marked as PRIVATE cannot be accessed even in the same privileged namespace");
@@ -1212,11 +1328,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         try {
         	descriptor.getDef();
          	fail("application of privileged namespace shouldn't be able to access attribute of another privileged namespace");
@@ -1232,11 +1350,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         try {
         	descriptor.getDef();
          	fail("application of privileged namespace shouldn't be able to access attribute of system application namespace");
@@ -1252,11 +1372,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", false, true);
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
+                        NamespaceAccess.PRIVILEGED);
         try {
         	descriptor.getDef();
         	fail("application of privileged namespace shouldn't be able to access attribute of custom application namespace");
@@ -1272,11 +1394,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         try {
         	descriptor.getDef();
         	fail("application of custom namespace shouldn't be able to access attribute of privileged application namespace");
@@ -1292,11 +1416,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet", false, true);
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.PRIVILEGED);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -1308,11 +1434,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.OTHER_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -1324,11 +1452,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -1337,11 +1467,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
+                        NamespaceAccess.INTERNAL);
         descriptor.getDef();
     }
     
@@ -1350,13 +1482,14 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         try {
-            cmpDescriptor.getDef();
             descriptor.getDef();
             fail("Attribute marked as PRIVATE cannot be accessed even in the same custom namespace");
         } catch(NoAccessException e) {
@@ -1373,18 +1506,20 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.CUSTOM);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         try {
-            descriptor.getDef();
-            fail("application of custom namespace shouldn't be able to set attribute of component with other custom namespace with access='Private'");
+        	descriptor.getDef();
+        	fail("application of custom namespace shouldn't be able to set attribute of component with other custom namespace with access='Private'");
         } catch (NoAccessException expected) {
-            //expect
-            //System.out.println(e.getMessage());
-            //Access to attribute 'cstring:testcomponnet1.testattribute' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+        	//expect 
+    		//System.out.println(e.getMessage());
+        	//Access to attribute 'cstring:testcomponnet1.testattribute' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
         }
     }
     
@@ -1393,11 +1528,13 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor= getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
-                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet", true);
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet",
+                        NamespaceAccess.INTERNAL);
         //create application with above component in markup, set the attribute
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
-                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", false);
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
+                        NamespaceAccess.CUSTOM);
         try{
         	descriptor.getDef();
         	fail("application of custom namespace shouldn't be able to set attribute of component with system namespace");

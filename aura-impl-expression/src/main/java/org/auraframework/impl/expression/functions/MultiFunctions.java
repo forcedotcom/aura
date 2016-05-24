@@ -15,11 +15,6 @@
  */
 package org.auraframework.impl.expression.functions;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.auraframework.expression.Expression;
-
 /**
  * functions that can have multiple different types of arguments
  */
@@ -33,13 +28,11 @@ public class MultiFunctions {
     public static final Function LESS_THAN = new LessThan();
     public static final Function LESS_THAN_OR_EQUAL = new LessThanOrEqual();
 
-    private static abstract class BinaryComparisonFunction implements Function {
+    private static abstract class BinaryComparisonFunction extends BaseBinaryFunction {
         private static final long serialVersionUID = -1225813696832918245L;
 
         @Override
-        public Object evaluate(List<Object> args) {
-            Object o1 = args.get(0);
-            Object o2 = args.get(1);
+        public Object evaluate(Object o1, Object o2) {
             Number a1, a2;
 
             if ((o1 instanceof String || o2 instanceof String) && !(o1 instanceof Number || o2 instanceof Number)) {
@@ -60,50 +53,40 @@ public class MultiFunctions {
     /**
      * add is special because it can also be used to concatenate 2 strings
      */
-    public static class Add implements Function {
+    public static class Add extends BaseBinaryFunction {
         private static final long serialVersionUID = -2912682621623213084L;
 
         @Override
-        public Object evaluate(List<Object> args) {
-            Object a1 = args.get(0);
-            Object a2 = args.get(1);
-            if ((a1 instanceof Number || a1 == null)  && (a2 instanceof Number || a2 == null)) {
-                if (a1 == null) {
-                    a1 = Double.valueOf(0);
+        public Object evaluate(Object o1, Object o2) {
+            if ((o1 instanceof Number || o1 == null)  && (o2 instanceof Number || o2 == null)) {
+                if (o1 == null) {
+                    o1 = Double.valueOf(0);
                 }
-                if (a2 == null) {
-                    a2 = Double.valueOf(0);
+                if (o2 == null) {
+                    o2 = Double.valueOf(0);
                 }
-                return JavascriptHelpers.getNumber(((Number) a1).doubleValue() + ((Number) a2).doubleValue());
+                return JavascriptHelpers.getNumber(((Number) o1).doubleValue() + ((Number) o2).doubleValue());
             } else {
-                return JavascriptHelpers.stringify(a1)+JavascriptHelpers.stringify(a2);
+                return JavascriptHelpers.stringify(o1)+JavascriptHelpers.stringify(o2);
             }
+        }
+
+        @Override
+    	public String getJsFunction() {
+			return "fn.add";
         }
 
         @Override
         public String[] getKeys() {
             return new String[] { "add", "concat" };
         }
-
-        @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append(JS_FN_ADD);
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append(",");
-        	args.get(1).compile(out);
-        	out.append(")");
-        }
     }
 
-    public static class Equals implements Function {
+    public static class Equals extends BaseBinaryFunction {
         private static final long serialVersionUID = 8488913551076190333L;
 
         @Override
-        public Boolean evaluate(List<Object> args) {
-            Object o1 = args.get(0);
-            Object o2 = args.get(1);
-
+        public Boolean evaluate(Object o1, Object o2) {
             if (o1 == o2) {
                 return Boolean.TRUE;
             } else if (o1 instanceof Number && o2 instanceof Number) {
@@ -115,42 +98,32 @@ public class MultiFunctions {
         }
 
         @Override
+    	public String getJsFunction() {
+			return "fn.eq";
+        }
+
+        @Override
         public String[] getKeys() {
             return new String[] { "eq", "equals" };
         }
-
-        @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append(JS_FN_EQUAL);
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append(",");
-        	args.get(1).compile(out);
-        	out.append(")");
-        }
     }
 
-    public static class NotEquals implements Function {
+    public static class NotEquals extends BaseBinaryFunction {
         private static final long serialVersionUID = -3069271109822863820L;
 
         @Override
-        public Boolean evaluate(List<Object> args) {
-            return Boolean.valueOf(!EQUALS.evaluate(args).booleanValue());
+        public Boolean evaluate(Object o1, Object o2) {
+            return !EQUALS.evaluate(o1, o2);
+        }
+
+        @Override
+    	public String getJsFunction() {
+			return "fn.ne";
         }
 
         @Override
         public String[] getKeys() {
             return new String[] { "ne", "notequals" };
-        }
-
-        @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append(JS_FN_NOT_EQUAL);
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append(",");
-        	args.get(1).compile(out);
-        	out.append(")");
         }
     }
 
@@ -163,17 +136,13 @@ public class MultiFunctions {
         }
 
         @Override
-        public String[] getKeys() {
-            return new String[] { "gt", "greaterthan" };
+    	public String getJsOperator() {
+			return ">";
         }
 
         @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append(">");
-        	args.get(1).compile(out);
-        	out.append(")");
+        public String[] getKeys() {
+            return new String[] { "gt", "greaterthan" };
         }
     }
 
@@ -186,17 +155,13 @@ public class MultiFunctions {
         }
 
         @Override
-        public String[] getKeys() {
-            return new String[] { "ge", "greaterthanorequal" };
+    	public String getJsOperator() {
+			return ">=";
         }
 
         @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append(">=");
-        	args.get(1).compile(out);
-        	out.append(")");
+        public String[] getKeys() {
+            return new String[] { "ge", "greaterthanorequal" };
         }
     }
 
@@ -209,17 +174,13 @@ public class MultiFunctions {
         }
 
         @Override
-        public String[] getKeys() {
-            return new String[] { "lt", "lessthan" };
+    	public String getJsOperator() {
+			return "<";
         }
 
         @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append("<");
-        	args.get(1).compile(out);
-        	out.append(")");
+        public String[] getKeys() {
+            return new String[] { "lt", "lessthan" };
         }
     }
 
@@ -232,17 +193,13 @@ public class MultiFunctions {
         }
 
         @Override
-        public String[] getKeys() {
-            return new String[] { "le", "lessthanorequal" };
+    	public String getJsOperator() {
+			return "<=";
         }
 
         @Override
-    	public void compile(Appendable out, List<Expression> args) throws IOException {
-        	out.append("(");
-        	args.get(0).compile(out);
-           	out.append("<=");
-        	args.get(1).compile(out);
-        	out.append(")");
+        public String[] getKeys() {
+            return new String[] { "le", "lessthanorequal" };
         }
     }
 }

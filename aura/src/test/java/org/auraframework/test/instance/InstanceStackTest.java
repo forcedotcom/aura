@@ -15,7 +15,13 @@
  */
 package org.auraframework.test.instance;
 
-import com.google.common.collect.Lists;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -26,16 +32,10 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import com.google.common.collect.Lists;
 
 /**
  * Unit tests for InstanceStack.java.
@@ -44,8 +44,8 @@ public class InstanceStackTest extends UnitTestCase {
 
     private ConfigAdapter mci;
 
-    @Before
-    public void setup() {
+    @Override
+    public void setUp() {
         mci = Mockito.mock(ConfigAdapter.class);
         Mockito.when(mci.isInternalNamespace((String) Mockito.any())).thenReturn(true);
     }

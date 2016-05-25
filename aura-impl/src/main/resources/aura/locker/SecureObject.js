@@ -43,13 +43,17 @@ SecureObject.isDOMElementOrNode = function(el) {
 		(typeof el.nodeType === "number" && typeof el.nodeName === "string"));
 };
 
-var rawToSecureObjectCache = typeof WeakMap !== "undefined" ? new WeakMap() : {
-	/* WeakMap dummy polyfill */
-	"get": function () { 
-		return undefined; 
-	},
-	"set": function () {}
-};
+function newWeakMap() {
+	return typeof WeakMap !== "undefined" ? new WeakMap() : {
+		/* WeakMap dummy polyfill */
+		"get": function () { 
+			return undefined; 
+		},
+		"set": function () {}
+	};
+}
+
+var rawToSecureObjectCache = newWeakMap();
 
 SecureObject.addToCache = function(raw, so) {
 	rawToSecureObjectCache.set(raw, so);
@@ -163,45 +167,65 @@ SecureObject.filterEverything = function (st, raw, options) {
 	}
 };
 
-SecureObject.unfilterEverything = function(st, value) {
+SecureObject.unfilterEverything = function(st, value, visited) {
 	"use strict";
-
+	
+	function memoize(visitedCache, v, unfiltered) {
+		visitedCache.set(v, unfiltered);
+		
+		return unfiltered;
+	}
+	
 	var t = typeof value;
 	if (!value || (t !== "object" && t !== "function")) {
 		// ignoring falsy, nully references, non-objects and non-functions
 		return value;
 	}
-	
+
 	var raw = getLockerSecret(value, "ref");
 	if (raw) {
 		// returning the raw value stored in the secure reference, which means
 		// this value was original produced in system-mode
 		return raw;
 	}
+	
+	// Handle cyclic refs and duplicate object refs
+	if (visited) {		
+		var previous = visited.get(value);
+		if (previous) {
+			return previous;
+		}
+	} else {
+		visited = newWeakMap();
+	}
+
 	if (t === "function") {
 		// wrapping functions to guarantee that they run in user-mode, usually
 		// callback functions privided by non-privilege code.
-		return function () {
+		return memoize(visited, value, function () {
 			var filteredArguments = SecureObject.filterEverything(st, SecureObject.ArrayPrototypeSlice.call(arguments));
 			var fnReturnedValue = value.apply(SecureObject.filterEverything(st, this), filteredArguments);
-			return SecureObject.unfilterEverything(st, fnReturnedValue);
-		};
-	}
-	if (Array.isArray(value)) {
-		return value.map(function (v) {
-			return SecureObject.unfilterEverything(st, v);
+			return SecureObject.unfilterEverything(st, fnReturnedValue, visited);
 		});
 	}
-	if (t === "object") {
-		var proxy = {};
-		var mutated = false;
+	
+	var proxy;
+	if (Array.isArray(value)) {
+		proxy = memoize(visited, value, []);
+		
+		value.forEach(function (v) {
+			proxy.push(SecureObject.unfilterEverything(st, v, visited));
+		});
+		
+		return proxy;
+	} else if (t === "object") {
+		proxy = memoize(visited, value, {});
+		
 		for (var prop in value) {
-			proxy[prop] = SecureObject.unfilterEverything(st, value[prop]);
-			mutated = mutated || (value[prop] !== proxy[prop]);
+			proxy[prop] = SecureObject.unfilterEverything(st, value[prop], visited);
 		}
-		if (mutated) {
-			return proxy;
-		}
+		
+		return proxy;
 	}
 
 	return value;

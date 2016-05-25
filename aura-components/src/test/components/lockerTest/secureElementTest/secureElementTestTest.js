@@ -435,6 +435,18 @@
         }
     },
 
+    testInnerHTMLForExistingElement: {
+        test: function(cmp) {
+            cmp.testInnerHTML("ExistingElement");
+        }
+    },
+
+    testInnerHTMLForCreatedElement: {
+        test: function(cmp) {
+            cmp.testInnerHTML("CreatedElement");
+        }
+    },
+
     testAddEventListenerMultipleCalls: {
         test: function(cmp) {
             cmp.testAddEventListenerMultipleCalls();
@@ -452,7 +464,7 @@
             cmp.testScalarExpression();
         }
     },
-    
+
     testElementCache: {
         test: function(cmp) {
             cmp.testElementCache();

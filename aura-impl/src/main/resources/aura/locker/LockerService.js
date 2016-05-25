@@ -123,12 +123,21 @@ function LockerService() {
 			}
 			return secret;
 		}
+		
 		if (typeof st !== "object" && typeof st !== "function") {
 			throw new TypeError("Secrets can only be retrieved from Objects and Functions.");
 		}
+		
 		if (typeof st["$ls" + type] === 'function') {
+			var existingSecret = getLockerSecret(st, type);
+			if (existingSecret === secret) {
+				// We allow NOOPs
+				return;
+			}
+			
 			throw new Error("Re-setting of " + type + " is prohibited");
 		}
+		
 		validLockSet["add"](lock);
 		Object.defineProperty(st, "$ls" + type, {
 			value : lock

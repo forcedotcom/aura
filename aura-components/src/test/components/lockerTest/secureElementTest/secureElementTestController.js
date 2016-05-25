@@ -98,12 +98,28 @@
         var element = document.createElement("div");
         // Node.innerText is not supported on all browsers
         if ("innerText" in element) {
-            element.testInnerText = "innerText content";
-            testUtils.assertEquals("innerText content", element.testInnerText);
+            element.innerText = "innerText content";
+            testUtils.assertEquals("innerText content", element.innerText);
         }
     },
 
-    testAddEventListenerMultipleCalls: function(cmp, event, helper) {
+
+    testInnerHTML: function(cmp, event) {
+        var testUtils = cmp.get("v.testUtils");
+        var targetElement = event.getParam("arguments").targetElement;
+        var element;
+        if(targetElement === "ExistingElement") {
+            element = document.querySelector('.title');
+        } else if (targetElement === "CreatedElement") {
+            element = document.createElement("div");
+        }
+
+        element.innerHTML = "innerHTML content";
+        console.log(element.innerHTML);
+        testUtils.assertEquals("innerHTML content", element.innerHTML);
+    },
+
+    testAddEventListenerMultipleCalls : function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
 
         var counter = 0;
@@ -160,7 +176,7 @@
             testUtils.assertEquals(expected[prop], bbox[prop], "Unexpected attribute value returned from getBBox() for <" + prop + ">");
         }
     },
-    
+
     testScalarExpression: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var element = cmp.find("scalarExpression").getElement();

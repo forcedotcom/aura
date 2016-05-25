@@ -30,5 +30,15 @@
 				descriptor : 'markup://ui:inputNumber'
 			}
 		}
+	},
+	
+	updateLastEdited : function(cmp, params) {
+	    var lastEdited = {};
+	    
+	    lastEdited.index = params.index;
+	    lastEdited.key = params.key;
+	    lastEdited.value = params.value;
+	    
+	    cmp.set("v.lastEdited", lastEdited);
 	}
 })// eslint-disable-line semi

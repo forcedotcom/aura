@@ -1,0 +1,22 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:event type="COMPONENT" description="Event fired when an item or part of an item in a collection has been changed">
+    <aura:attribute name="index"    type="Integer"  description="The index of the item in the collection" />
+    <aura:attribute name="key"      type="String"   description="The key of the specific attribute that was changed." />
+    <aura:attribute name="value"    type="Object"   description="The new value of the key in the object." />
+</aura:event>

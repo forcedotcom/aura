@@ -38,6 +38,8 @@
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="gridAction" event="ui:gridAction" action="{!c.handleGridAction}"/>
 	
+    <aura:registerEvent name="onEdit"   type="ui:collectionValueChanged"    description="Event fired when a cell of the grid has been edited" />
+    
 	<!-- Events passed from the virtualDataGrid -->
 	<aura:registerEvent name="onSort"          type="ui:sort"      description="The event fired when a column is sorted."/>
 	<aura:registerEvent name="onColumnResize"  type="ui:resize"    description="The event fired when a column is resized."/>

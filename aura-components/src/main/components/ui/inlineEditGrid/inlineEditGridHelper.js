@@ -133,5 +133,12 @@
 	/* UTILITY FUNCTIONS */
 	bubbleEvent : function(cmp, evt, eventName) {
 		cmp.getEvent(eventName).setParams(evt.getParams()).fire();
+	},
+	fireEditEvent : function(cmp, params) {
+	    cmp.getEvent("onEdit").setParams({
+            index : params.index,
+            key : params.key,
+            value : params.value
+        }).fire();
 	}
 })// eslint-disable-line semi

@@ -49,5 +49,9 @@
 		    	errors : {}
 		    }
 		]);
+	},
+	
+	onEdit : function(cmp, evt, helper) {
+	    helper.updateLastEdited(cmp, evt.getParams());
 	}
 })// eslint-disable-line semi

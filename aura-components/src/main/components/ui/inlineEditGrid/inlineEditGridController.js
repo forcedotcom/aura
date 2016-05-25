@@ -99,6 +99,8 @@
 		
 		cmp.set("v.items", items);
 		cmp._panelCmp.hide();
+		
+		helper.fireEditEvent(cmp, payload);
 	},
 	
 	/* Passthrough handlers & methods */

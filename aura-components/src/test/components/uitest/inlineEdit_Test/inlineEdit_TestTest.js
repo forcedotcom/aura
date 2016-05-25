@@ -15,9 +15,12 @@
  */
  ({
 	 browsers: ["-IE7","-IE8"],
+	 colIds: ["id", "name", "grade"],
 	 
 	 /**
-	  * Test that triggering an edit moves focus into an inputElement
+	  * Test basic flow:
+      *  - triggering an edit moves focus into an inputElement
+      *  - changing the value in the input element triggers an onEdit event
 	  */
 	 testEditTrigger : {
 		test : [function(cmp) {
@@ -27,6 +30,22 @@
 				var activeElement = $A.test.getActiveElement();
 				return activeElement.tagName === 'INPUT';
 			}, "Input element should be focused.");
+		}, function(cmp) {
+		    // Trigger submit on the edit panel with new value
+		    var input = cmp.find("grid")._panelBody.get("v.inputComponent")[0];
+		    input.set("v.value", 5);
+		    input.getEvent("keydown").setParams({
+		        keyCode : 13,
+		        domEvent : {
+		            type : "keydown",
+		            preventDefault : function() {}
+		        }
+		    }).fire();
+		}, function(cmp) {
+		    $A.test.addWaitForWithFailureMessage(5, function() {
+		        var lastEdited = cmp.get("v.lastEdited");
+		        return lastEdited && lastEdited.value;
+		    }, "The lastEdited attribute should be updated with the last edited value");
 		}]
 	 },
 	 

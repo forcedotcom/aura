@@ -231,6 +231,9 @@ Aura.Event.Event.prototype.getParams = function(){
     return this.params;
 };
 
+//#if {"modes" : ["STATS"]}
+Aura.Event.Event.prototype.statsIndex = [];
+//#end
 
 /**
  * Convenience function to determine which kind of event execution should be used
@@ -323,6 +326,12 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
             }
         }
     }
+
+    //#if {"modes" : ["STATS"]}
+    if(res.done) {
+        Aura.Event.Event.prototype.statsIndex.push({'event': this, 'startTime': this.startTime, 'endTime': (new Date()).getTime()});
+    }
+    //#end
 };
 
 /**
@@ -363,6 +372,9 @@ Aura.Event.Event.prototype.fire = function(params) {
     if (params) {
         this.setParams(params);
     }
+    //#if {"modes" : ["STATS"]}
+    this.startTime = (new Date()).getTime();
+    //#end
 
     $A.run(function() {
         self.fired = true;

@@ -67,6 +67,39 @@
     },
 
     /**
+     * Update an existing tab item in the tabBar
+     */
+    updateTab: function (cmp, index, tab, callback, name) {
+
+        var tabs = cmp.get("v.tabHeaders"),
+            existingTab;
+
+        //Prioritize finding a tab by name rather than index
+        if(name) {
+            existingTab = tabs.filter(function(tabHeader) {
+                return tabHeader.get("v.name") === name;
+            })[0];
+        } else if($A.util.isNumber(index) && index >= 0 && index < tabs.length) {
+            existingTab = tabs[index];
+        }
+
+        if(existingTab) {
+            tab.title && existingTab.set("v.title", tab.title);
+
+            if(tab.icon) {
+                $A.componentService.newComponentAsync(this, function(newCmp) {
+                    existingTab.set("v.icon", newCmp);
+                    if(typeof callback === "function") {
+                        callback(existingTab);
+                    }
+                }, tab.icon);
+            } else if(typeof callback === "function") {
+                callback(existingTab);
+            }
+        }
+    },
+
+    /**
      * @private
      * Deactivate the active tab
      */

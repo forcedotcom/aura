@@ -18,6 +18,7 @@
         tabsetcmp : 'tabSet',
         tabitem: '.uiTabItem',
         tabitem_anchor : '.uiTabItem .tabHeader',
+        tabitem_icon : '.uiTabItem .tabHeader :first-child',
         tabitem_active: '.uiTabItem.active',
         tabbody: '.uiTab.active',
         tabbody_active: '.uiTab.active',
@@ -65,6 +66,114 @@
 
                 self.selectedTabByIndex(tabSet, 0);
                 self.verifySelectedTabContent('tab content 0');
+            }
+        ]
+    },
+
+    /**
+     * Test updating existing tabs 
+     */
+    testUpdateTab: {
+        attributes: {
+            "renderItem": "testUpdateTab"
+        },
+        test: [
+            //Update title
+            function(cmp) {
+                var self = this,
+                tabSet = cmp.find(self.SELECTOR.tabsetcmp),
+                newTitle = "Updated Title",
+                tab0Name = "tab0";
+
+                self.updateTab(tabSet, undefined, tab0Name, {title: newTitle});
+
+                $A.test.addWaitForWithFailureMessage(
+                    newTitle,
+                    function() {
+                        return $A.test.select(self.SELECTOR.tabitem_anchor)[0].title;
+                    },
+                    "Title should be " + newTitle
+                );
+            },
+            //Update icon
+            function(cmp) {
+                var self = this,
+                tabSet = cmp.find(self.SELECTOR.tabsetcmp),
+                newIconText = "T",
+                //Using aura:text just to confirm icon was updated since it's of type Aura.Component[]
+                newIcon = [{
+                    "componentDef": {
+                        descriptor: "markup://aura:text"
+                    },
+                    "attributes": {
+                        "values": {
+                            "value": newIconText
+                        }
+                    }
+                }];
+
+                self.updateTab(tabSet, 0, undefined, {icon: newIcon});
+
+                $A.test.addWaitForWithFailureMessage(
+                    newIconText,
+                    function() {
+                        return $A.test.select(self.SELECTOR.tabitem_icon)[0].innerText;
+                    },
+                    "Icon should be " + newIconText
+                );
+            },
+            //Update body
+            function(cmp) {
+                var self = this,
+                tabSet = cmp.find(self.SELECTOR.tabsetcmp),
+                newBodyText = "Body Updated!",
+                newBody = [{
+                    "componentDef": {
+                        descriptor: "markup://aura:text"
+                    },
+                    "attributes": {
+                        "values": {
+                            "value": newBodyText
+                        }
+                    }
+                }];
+
+                self.updateTab(tabSet, 0, undefined, {body: newBody});
+
+                $A.test.addWaitForWithFailureMessage(
+                    newBodyText,
+                    function() {
+                        return $A.test.select(self.SELECTOR.tabbody)[0].innerText;
+                    },
+                    "Body should be " + newBodyText
+                );
+            },
+            //Confirm we are updating the right tab
+            function(cmp) {
+                var self = this,
+                tabSet = cmp.find(self.SELECTOR.tabsetcmp),
+                newTitle0 = "Title 0 Updated!",
+                newTitle1 = "Title 1 Updated!",
+                tab1Name = "tab1";
+
+                self.updateTab(tabSet, 0, undefined, {title: newTitle0});
+                self.updateTab(tabSet, undefined, tab1Name, {title: newTitle1});
+
+                $A.test.addWaitForWithFailureMessage(
+                    newTitle0,
+                    function() {
+                        return $A.test.select(self.SELECTOR.tabitem_anchor)[0].title;
+                    },
+                    "Title of tab 0 should be " + newTitle0 
+                );
+
+                $A.test.addWaitForWithFailureMessage(
+                    newTitle1,
+                    function() {
+                        return $A.test.select(self.SELECTOR.tabitem_anchor)[1].title;
+                    },
+                    "Title of tab 1 should be " + newTitle1 
+                );
             }
         ]
     },
@@ -534,6 +643,19 @@
                     }
                 }]
             }
+        });
+        e.fire();
+    },
+
+    /**
+     * Update the specified tab
+     */
+    updateTab: function(tabSet, tabIndex, tabName, updatedTab) {
+        var e = tabSet.get("e.updateTab");
+        e.setParams({
+            name: tabName,
+            index: tabIndex,
+            tab: updatedTab
         });
         e.fire();
     },

@@ -74,6 +74,35 @@
         });
     },
     /**
+     * Update existing tab
+     * @param {Number} [index] The index of the new tab to insert to. FIXME
+     * @param {Object} tab The configuration for the updated tab
+     */
+    updateTab: function (cmp, index, tab, callback, name) {
+        var e = cmp.find("tabBar").get("e.updateTab");
+        e.setParams({
+            "index": index,
+            "name": name,
+            "tab": tab,
+            "callback": callback
+        }).setComponentEvent().fire();
+
+        //Prioritize finding a tab by name rather than index
+        var tabIndex = name ? cmp._tabCollection.getTabIndex({name: name}) : index,
+            existingTab = cmp._tabCollection.getTab(tabIndex);
+
+        if(existingTab && tab.body) {
+            $A.componentService.newComponentAsync(this, function(newCmp) {
+                existingTab.set("v.body", newCmp);
+                if (typeof callback === "function") {
+                    callback({"tab": existingTab});
+                }
+            }, tab.body);
+        } else if (typeof callback === "function") {
+            callback({"tab": existingTab});
+        }
+    },
+    /**
      * Remove tab
      * @param {Component} cmp
      * @param {Integer} index Index position of tab to remove

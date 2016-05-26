@@ -43,7 +43,7 @@
 	},
 
 	/**
-	 * This action is invoked from parent component to close a tabItem.
+	 * This action is invoked from the parent component to close a tabItem.
 	 */
 	closeTab: function(cmp, evt, helper) {
 		var succeed = helper.closeTab(cmp, evt.getParam("index"), evt.getParam("tab"));
@@ -51,6 +51,13 @@
 		if (typeof callback === "function") {
 			callback(succeed);
 		}
+	},
+
+	/**
+	 * This action is invoked from the parent component to update a tabItem.
+	 */
+	updateTab: function(cmp, evt, helper) {
+		helper.updateTab(cmp, evt.getParam("index"), evt.getParam("tab"), evt.getParam("callback"), evt.getParam("name"));
 	},
 
 	/**

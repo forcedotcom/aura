@@ -30,6 +30,8 @@
 				errors : {}
 			});
 		}
+		items[5].data.name = '';
+		items[5].data.grade = '';
 		
 		cmp.set("v.items", items);
 		

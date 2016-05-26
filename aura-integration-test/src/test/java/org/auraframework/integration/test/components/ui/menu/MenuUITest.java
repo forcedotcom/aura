@@ -100,13 +100,13 @@ public class MenuUITest extends WebDriverTestCase {
         openMenu(menuLabel, actionMenu);
 
         getAuraUITestingUtil().setHoverOverElement(menuItem3);
-        waitForFocusOnMenuActionItem(actionItem3Element);
+        waitForFocusOnElement(actionItem3Element);
 
         assertTrue("Item 2 in the menu List is should be visible on the page", actionItem2.isDisplayed());
 
         // actionItem2 text starts with the letter F so pressing that key should switch focus to it
         actionItem3Element.sendKeys("f");
-        waitForFocusOnMenuActionItem(actionItem2Element);
+        waitForFocusOnElement(actionItem2Element);
 
         // actionItem2 is not clickable as it's disabled via markup
         try {
@@ -188,13 +188,13 @@ public class MenuUITest extends WebDriverTestCase {
         menuLabel.sendKeys(Keys.DOWN);
 
         // focus should be one the first item
-        waitForFocusOnMenuActionItem(actionItem1Element);
+        waitForFocusOnElement(actionItem1Element);
 
         actionItem1Element.sendKeys(Keys.DOWN, Keys.DOWN);
 
         // verify focus on action item3
         getAuraUITestingUtil().setHoverOverElement(menuItem3);
-        waitForFocusOnMenuActionItem(actionItem3Element);
+        waitForFocusOnElement(actionItem3Element);
 
         actionItem3Element.click();
         if (verifyLabelUpdate) {
@@ -203,11 +203,11 @@ public class MenuUITest extends WebDriverTestCase {
 
         openMenu(menuLabel, actionMenu);
         getAuraUITestingUtil().setHoverOverElement(menuItem4);
-        waitForFocusOnMenuActionItem(actionItem4Element);
+        waitForFocusOnElement(actionItem4Element);
 
         actionItem4Element.sendKeys(Keys.UP);
         // verify focus on action item3
-        waitForFocusOnMenuActionItem(actionItem3Element);
+        waitForFocusOnElement(actionItem3Element);
 
         // press space key and check if item3 got selected
         actionItem3Element.sendKeys(Keys.SPACE);
@@ -217,7 +217,7 @@ public class MenuUITest extends WebDriverTestCase {
 
         openMenu(menuLabel, actionMenu);
         getAuraUITestingUtil().setHoverOverElement(menuItem1);
-        waitForFocusOnMenuActionItem(actionItem1Element);
+        waitForFocusOnElement(actionItem1Element);
         actionItem1Element.sendKeys(Keys.ESCAPE);
         waitForMenuClose(actionMenu);
     }
@@ -245,11 +245,11 @@ public class MenuUITest extends WebDriverTestCase {
         else {
         	focusAfterOpenElement = getAnchor(focusAfterOpenItem);
             openMenu(menuLabel, actionMenu, openKey);
-            waitForFocusOnMenuActionItem(focusAfterOpenElement);
+            waitForFocusOnElement(focusAfterOpenElement);
         }
           
         focusAfterOpenElement.sendKeys(Keys.DOWN, Keys.DOWN);
-        waitForFocusOnMenuActionItem(expectedItemElement);
+        waitForFocusOnElement(expectedItemElement);
     }
 
     @PerfTest
@@ -345,9 +345,9 @@ public class MenuUITest extends WebDriverTestCase {
 
         // check if focus changes when you use up and down arrow using keyboard
         item3Element.sendKeys(Keys.DOWN);
-        waitForFocusOnMenuActionItem(item4Element);
+        waitForFocusOnElement(item4Element);
         item4Element.sendKeys(Keys.UP);
-        waitForFocusOnMenuActionItem(item3Element);
+        waitForFocusOnElement(item3Element);
 
         // press Tab to close to menu
         item3Element.sendKeys(Keys.TAB);
@@ -590,11 +590,11 @@ public class MenuUITest extends WebDriverTestCase {
 
         // verify focus on action item3
         getAuraUITestingUtil().setHoverOverElement(menuItem3);
-        waitForFocusOnMenuActionItem(actionItem3Element);
+        waitForFocusOnElement(actionItem3Element);
 
         // use send key("f") to move to actionItem2
         actionItem3Element.sendKeys("f");
-        waitForFocusOnMenuActionItem(actionItem2Element);
+        waitForFocusOnElement(actionItem2Element);
     }
 
     /**
@@ -632,6 +632,38 @@ public class MenuUITest extends WebDriverTestCase {
         openMenu(menuLabel, actionMenu);
         assertNull("Event should not bubble up to parent div when StopPropogoation is set on menu",
             getAuraUITestingUtil().getEval(valueExpression));
+    }
+    
+    /**
+     * Test case for W-2958313 to check focus after tabbing out of menu
+     */
+    @Test
+    public void testFocusWhenTabOnOpenMenu() throws Exception {
+        open(MENUTEST_APP);
+        WebDriver driver = this.getDriver();
+        WebElement menuElm = driver.findElement(By.className("actionMenu"));
+        WebElement item1Elm = driver.findElement(By.className("actionItem1"));
+        WebElement triggerElm = driver.findElement(By.className("trigger"));
+        WebElement nextFocusableElm = driver.findElement(By.className("checkboxMenuLabel"));
+
+        // open menu and make sure focus is on the trigger label
+        openMenu(triggerElm, menuElm);
+        waitForFocusOnElement(triggerElm);
+
+        // move the focus to the menuList by moving to the first item
+        triggerElm.sendKeys(Keys.DOWN);
+        waitForFocusOnElement(item1Elm);
+
+        // tab out to close the menu and check the focus is set to the right element
+        if (getBrowserType().equals(BrowserType.FIREFOX)) {
+            // firefox closes the menu on the first tab, but the focus is still on the item
+            // need a second tab to get to the next element
+            getAnchor(item1Elm).sendKeys(Keys.TAB, Keys.TAB);
+        } else {
+            getAuraUITestingUtil().pressTab(getAnchor(item1Elm));
+        }
+
+        waitForFocusOnElement(nextFocusableElm);
     }
 
     /**
@@ -681,14 +713,14 @@ public class MenuUITest extends WebDriverTestCase {
     /**
      * Wait for focus to be on a certain menu action item by checking the current active element.
      *
-     * @param actionItemElement The WebElement on which to wait for focus
+     * @param element The WebElement on which to wait for focus
      */
-    private void waitForFocusOnMenuActionItem(final WebElement actionItemElement) {
-        String text = actionItemElement.toString();
+    private void waitForFocusOnElement(final WebElement element) {
+        String text = element.toString();
         getAuraUITestingUtil().waitUntil(check -> {
-            String actionItemText = actionItemElement.getText();
+            String elementText = element.getText();
             String activeElementText = getAuraUITestingUtil().getActiveElementText();
-            return actionItemText.equals(activeElementText);
+            return elementText.equals(activeElementText);
         }, "Focus hasn't switched to WebElement <" + text + ">");
     }
 

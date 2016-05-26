@@ -103,7 +103,7 @@
         }
     },
 
-    testAddEventListenerMultipleCalls : function(cmp, event, helper) {
+    testAddEventListenerMultipleCalls: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
 
         var counter = 0;
@@ -159,5 +159,41 @@
         for (var prop in expected) {
             testUtils.assertEquals(expected[prop], bbox[prop], "Unexpected attribute value returned from getBBox() for <" + prop + ">");
         }
+    },
+    
+    testScalarExpression: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var element = cmp.find("scalarExpression").getElement();
+        testUtils.assertEquals("A scalar expression", element.innerHTML);
+    },
+        
+    testElementCache: function(cmp, event, helper) {
+        var testUtils = cmp.get("v.testUtils");
+        
+        // Verify that we get the same SE from multiple calls to SecureComponent.getElement()
+        var e = cmp.find("cacheTestA").getElement();
+        testUtils.assertDefined(e);
+        testUtils.assertTrue(e === cmp.find("cacheTestA").getElement());
+        
+        // Verify that we get the same SE for multiple calls to document.getElementById()
+        var cacheTestA = document.getElementById("cacheTestA");
+        testUtils.assertDefined(cacheTestA);
+        testUtils.assertTrue(cacheTestA === document.getElementById("cacheTestA"));
+
+        // Add a new element, reparent it, and verify that we get the same SE
+        var child = document.createElement("div");
+        child.id = "reparentTest";
+        child.innerHTML = "Dynamically Created Child";
+        cacheTestA.appendChild(child);
+        testUtils.assertTrue(child === cacheTestA.children[0]);
+
+        var cacheTestB = document.getElementById("cacheTestB");
+        cacheTestB.appendChild(child);
+        testUtils.assertTrue(child === cacheTestB.children[0]);
+                
+        cacheTestB.innerHTML = "<span>Removed Children</span>"
+        
+        cacheTestA.appendChild(child);
+        testUtils.assertTrue(child === cacheTestA.children[0]);        
     }
 })

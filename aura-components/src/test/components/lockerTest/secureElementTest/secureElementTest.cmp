@@ -20,7 +20,8 @@
 
     <aura:attribute name="testInRenderer" type="String"/>
     <aura:attribute name="text" type="String"/>
-
+    <aura:attribute name="scalarExpression" type="String" default="A scalar expression"/>
+    
     <aura:method name="testElementProperties" action="{!c.testElementProperties}">
         <aura:attribute name="auraId" type="String"/>
         <aura:attribute name="elementPropertiesWhitelist" type="List"/>
@@ -40,12 +41,18 @@
     <aura:method name="testInnerHTMLSupportsUseTagForSvgElement" action="{!c.testInnerHTMLSupportsUseTagForSvgElement}"/>
     <aura:method name="testTextContent" action="{!c.testTextContent}"/>
     <aura:method name="testInnerText" action="{!c.testInnerText}"/>
-    <aura:method name="testAddEventListenerMultipleCalls" action="{!c.testAddEventListenerMultipleCalls}">
-    </aura:method>
+    <aura:method name="testAddEventListenerMultipleCalls" action="{!c.testAddEventListenerMultipleCalls}"/>
     <aura:method name="testSvgGetBBox" action="{!c.testSvgGetBBox}"/>r
+    <aura:method name="testScalarExpression" action="{!c.testScalarExpression}"/>
+
+    <aura:method name="testElementCache" action="{!c.testElementCache}"/>
+    
+    <aura:method name="getDiv" action="{!c.getDiv}"/>
 
     <lockerTest:facet/>
+    
     <div aura:id="title">SecureElement test</div>
+
     <input type="text" aura:id="input" value="input" />
     <textarea aura:id="textarea" value="textarea" />
     <button aura:id="button" value="button" >button</button>
@@ -63,4 +70,9 @@
             <td aura:id="td">td</td>
         </tr>
     </table>
+    
+  	<div aura:id="scalarExpression">{!v.scalarExpression}</div>
+    
+  	<div aura:id="cacheTestA" id="cacheTestA"></div>
+  	<div aura:id="cacheTestB" id="cacheTestB"></div>
 </aura:component>

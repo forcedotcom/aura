@@ -809,6 +809,7 @@ Component.prototype.isRenderedAndValid = function() {
  * Execute the super components render method.
  * @protected
  * @export
+ * @platform
  */
 Component.prototype.superRender = function() {
     if (this.superComponent) {
@@ -820,6 +821,7 @@ Component.prototype.superRender = function() {
  * Execute the super components afterRender method.
  * @protected
  * @export
+ * @platform
  */
 Component.prototype.superAfterRender = function() {
     if (this.superComponent) {
@@ -831,6 +833,7 @@ Component.prototype.superAfterRender = function() {
  * Execute the super components rerender method.
  * @protected
  * @export
+ * @platform
  */
 Component.prototype.superRerender = function() {
     if (this.superComponent) {
@@ -842,6 +845,7 @@ Component.prototype.superRerender = function() {
  * Execute the super components superUnrender method.
  * @protected
  * @export
+ * @platform
  */
 Component.prototype.superUnrender = function() {
     if (this.superComponent) {

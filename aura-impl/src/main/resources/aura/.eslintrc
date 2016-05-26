@@ -104,12 +104,14 @@
     "SecureWindow": true,
     "SecureDocument": true,
     "SecureElement": true,
+    "SecureElementCache": true,
     "SecureScriptElement": true,
     "SecureIFrameElement": true,
     "SecureAction": true,
     "SecureDOMEvent": true,
     "SecureAuraEvent": true,
-    "DOMPurify": true
+    "DOMPurify": true,
+    "lazyInitInlinedSafeEvalWorkaround": true
   },
 
   "rules": {

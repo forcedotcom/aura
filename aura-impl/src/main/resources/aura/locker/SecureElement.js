@@ -43,23 +43,35 @@ function SecureElement(el, key) {
             trustNodes(child, child.childNodes);
         }
     }
+    
+	var o = SecureObject.getCached(el);
+	if (o) {
+		return o;
+	}
 
-    // A secure element can have multiple forms, this block allows us to apply
-    // some polymorphic behavior to SecureElement depending on the tagName
-    var tagName = el.tagName && el.tagName.toUpperCase();
-    switch (tagName) {
-    case "FRAME":
-        throw new $A.auraError("The deprecated FRAME element is not supported in LockerService!");
+	// A secure element can have multiple forms, this block allows us to apply
+	// some polymorphic behavior to SecureElement depending on the tagName
+	var tagName = el.tagName && el.tagName.toUpperCase();
+	switch (tagName) {
+	case "FRAME":
+		throw new $A.auraError("The deprecated FRAME element is not supported in LockerService!");
 
-    case "IFRAME":
-        return SecureIFrameElement(el, key);
+	case "IFRAME":
+		o = SecureIFrameElement(el, key);
+		break;
 
-    case "SCRIPT":
-        return SecureScriptElement(key, el);
-    }
+	case "SCRIPT":
+		o = SecureScriptElement(key, el);
+		break;
+	}
+	
+	if (o) {
+		SecureObject.addToCache(el, o);
+		return o;
+	}
 
     // SecureElement is it then!
-    var o = Object.create(null, {
+    o = Object.create(null, {
         toString : {
             value : function() {
                 return "SecureElement: " + el + "{ key: " + JSON.stringify(key) + " }";
@@ -240,6 +252,8 @@ function SecureElement(el, key) {
 
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", el);
+    
+	SecureObject.addToCache(el, o);
 
     return o;
 }

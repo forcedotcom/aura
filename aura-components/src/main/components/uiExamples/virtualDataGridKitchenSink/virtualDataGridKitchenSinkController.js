@@ -29,6 +29,7 @@
 			var payload = evt.getParam("payload");
 			var prefix = payload.value ? 'Selected' : 'Deselected';
 			
+			helper.updateSelectedItems(cmp, prefix, index);
 			alert(prefix + ' ' + payload.selectedItem.subject + ' @ ' + index);
 		} else {
 			alert(evt);
@@ -96,5 +97,38 @@
 			state : "State",
 			error : {}
 		});
+	},
+
+	updateItem: function(cmp, event, helper){
+		
+		var grid = cmp.find('grid');
+		var selectedItems = cmp.get('v.gridSelectedItems');
+
+		if (selectedItems.length === 0){
+			alert('Please select a row to update!');
+		} else {
+			var index, visualIndex;
+			
+			for (var i=0;i<selectedItems.length;i++){
+				index = selectedItems[i];
+				visualIndex = index+1;	
+				var item = {
+	                id           : visualIndex,
+	                subject      : 'Changed ' + visualIndex, 
+	                activityDate : helper.generateRandomDateString().toString(),
+	                who          : {
+	                    name : 'Changed ' + visualIndex,
+	                    id   : '00' + visualIndex
+	                },
+	                what: {
+	                    name : 'Acme' + visualIndex,
+	                    id   : '00' + visualIndex
+	                },
+	                url: 'https://www.google.com'
+				}
+			
+				grid.updateItem(item,index);
+			}
+		}
 	}
 })

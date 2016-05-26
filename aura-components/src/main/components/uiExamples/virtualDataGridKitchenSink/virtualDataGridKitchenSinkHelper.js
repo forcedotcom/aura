@@ -53,5 +53,31 @@
 					}
 				}
 		}
-	}
+	},
+	updateSelectedItems: function(cmp, state, index) {
+		var gridSelectedItems = cmp.get('v.gridSelectedItems');
+		
+		if (state ==='Selected'){
+			gridSelectedItems.push(index);
+		} else if (state === 'Deselected'){
+			gridSelectedItems = this.removeArrayItem(gridSelectedItems,index);
+		}
+
+		cmp.set('v.gridSelectedItems', gridSelectedItems);
+	},
+
+	/* Utility Functions */
+	removeArrayItem: function(arr, item){
+		var index = arr.indexOf(item);
+    	return (index > -1) ? arr.splice(index, 1) : arr;
+		
+	},
+
+	generateRandomDateString: function(){
+		var start = new Date(2014, 0, 1),
+			end = new Date();
+
+    	var _date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+    	return _date.getFullYear() + '-' + ('0' + (_date.getMonth()+1)).slice(-2) + '-' + ('0' + _date.getDate()).slice(-2);
+    }
 })

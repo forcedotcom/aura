@@ -44,7 +44,7 @@ function SecureElement(el, key) {
         }
     }
     
-	var o = SecureObject.getCached(el);
+	var o = SecureObject.getCached(el, key);
 	if (o) {
 		return o;
 	}
@@ -66,7 +66,7 @@ function SecureElement(el, key) {
 	}
 	
 	if (o) {
-		SecureObject.addToCache(el, o);
+		SecureObject.addToCache(el, o, key);
 		return o;
 	}
 
@@ -253,7 +253,7 @@ function SecureElement(el, key) {
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", el);
     
-	SecureObject.addToCache(el, o);
+	SecureObject.addToCache(el, o, key);
 
     return o;
 }

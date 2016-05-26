@@ -53,20 +53,29 @@ function newWeakMap() {
 	};
 }
 
-var rawToSecureObjectCache = newWeakMap();
+var rawToSecureObjectCaches = newWeakMap();
 
-SecureObject.addToCache = function(raw, so) {
+SecureObject.addToCache = function(raw, so, key) {
+	// Keep SecureObject's segregated by key
+	var rawToSecureObjectCache = rawToSecureObjectCaches.get(key);
+	if (!rawToSecureObjectCache) {
+		rawToSecureObjectCache = newWeakMap();
+		rawToSecureObjectCaches.set(key, rawToSecureObjectCache);
+	}
+	
 	rawToSecureObjectCache.set(raw, so);
 };
 
-SecureObject.getCached = function(raw) {
-	return rawToSecureObjectCache.get(raw);
+SecureObject.getCached = function(raw, key) {
+	var rawToSecureObjectCache = rawToSecureObjectCaches.get(key);
+	return rawToSecureObjectCache ? rawToSecureObjectCache.get(raw) : undefined;
 };
 
 SecureObject.filterEverything = function (st, raw, options) {
 	"use strict";
 	
-	var cached = SecureObject.getCached(raw);
+	var key = getLockerSecret(st, "key");
+	var cached = SecureObject.getCached(raw, key);
 	if (cached) {
 		return cached;
 	}
@@ -89,9 +98,9 @@ SecureObject.filterEverything = function (st, raw, options) {
 	} else if (t === "object") {
 		var isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
 		if (raw === window) {
-			return $A.lockerService.getEnv(getLockerSecret(st, "key"));
+			return $A.lockerService.getEnv(key);
 		} else if (raw === document) {
-			return $A.lockerService.getEnv(getLockerSecret(st, "key")).document;
+			return $A.lockerService.getEnv(key).document;
 		} else if (Array.isArray(raw) || isNodeList) {
 			swallowed = [];
 			for (var n = 0; n < raw.length; n++) {
@@ -117,7 +126,6 @@ SecureObject.filterEverything = function (st, raw, options) {
 				});
 			}
 		} else {
-			var key = getLockerSecret(st, "key");
 			var hasAccess = $A.lockerService.util.hasAccess(st, raw);
 			$A.assert(key, "A secure object should always have a key.");
 
@@ -160,7 +168,7 @@ SecureObject.filterEverything = function (st, raw, options) {
 	}
 	
 	if (mutated) {
-		SecureObject.addToCache(raw, swallowed);
+		SecureObject.addToCache(raw, swallowed, key);
 		return swallowed;
 	} else {
 		return raw;

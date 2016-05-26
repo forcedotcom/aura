@@ -20,7 +20,6 @@
 	
 	<aura:attribute name="class"       type="String" />
 	<aura:attribute name="editLayouts" type="Object"/>
-    <aura:attribute name="editedItems" type="Object" access="PRIVATE"/>
 	
 	<!-- Attributes used by the virtualDataGrid -->
 	<aura:attribute name="items"           type="Object[]"                 description="A list of objects representing the rows of data in the grid"/>
@@ -76,9 +75,5 @@
 			onsort="{!c.handleSort}"
 			onColumnResize="{!c.handleColumnResize}"/>
 		
-		<div class="footer">
-			<ui:button label="Cancel" press="{!c.cancel}"/>
-			<ui:button label="Save" press="{!c.save}"/>
-		</div>
 	</div>
 </aura:component>

@@ -85,7 +85,8 @@
      *
      * Ignored in IE7 because ie7 handles bounding rectangle differently and the datepicker ends up be askewed
      */
-    testCheckDatePickerPosition: {
+     //this is a flapper, please fix and then enable, W-3169820
+    _testCheckDatePickerPosition: {
         browsers: ["-IE7"],
         test: [
             function(cmp) {

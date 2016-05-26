@@ -43,7 +43,7 @@ SecureObject.isDOMElementOrNode = function(el) {
 		(typeof el.nodeType === "number" && typeof el.nodeName === "string"));
 };
 
-function newWeakMap() {
+function newWeakMap() {	
 	return typeof WeakMap !== "undefined" ? new WeakMap() : {
 		/* WeakMap dummy polyfill */
 		"get": function () { 
@@ -53,21 +53,23 @@ function newWeakMap() {
 	};
 }
 
-var rawToSecureObjectCaches = newWeakMap();
+var rawToSecureObjectCaches = {};
 
 SecureObject.addToCache = function(raw, so, key) {
 	// Keep SecureObject's segregated by key
-	var rawToSecureObjectCache = rawToSecureObjectCaches.get(key);
+	var psuedoKeySymbol = JSON.stringify(key);
+	var rawToSecureObjectCache = rawToSecureObjectCaches[psuedoKeySymbol];
 	if (!rawToSecureObjectCache) {
 		rawToSecureObjectCache = newWeakMap();
-		rawToSecureObjectCaches.set(key, rawToSecureObjectCache);
+		rawToSecureObjectCaches[psuedoKeySymbol] = rawToSecureObjectCache;
 	}
 	
 	rawToSecureObjectCache.set(raw, so);
 };
 
 SecureObject.getCached = function(raw, key) {
-	var rawToSecureObjectCache = rawToSecureObjectCaches.get(key);
+	var psuedoKeySymbol = JSON.stringify(key);
+	var rawToSecureObjectCache = rawToSecureObjectCaches[psuedoKeySymbol];
 	return rawToSecureObjectCache ? rawToSecureObjectCache.get(raw) : undefined;
 };
 

@@ -277,7 +277,6 @@ function LockerService() {
 	};
 
 	service.util = (function() {
-
 		var util = {
 			getKeyForNamespace : function(namespace) {
 				// Get the locker key for this namespace

@@ -39,7 +39,7 @@ import com.google.common.collect.Maps;
 /**
  */
 @Model
-public class TopicsModel {
+public class DocsTopicsModel {
 
     private final List<Node> applications;
     private final List<Node> components;
@@ -48,7 +48,7 @@ public class TopicsModel {
     private final List<Node> librariesList;
     private final List<Node> tests;
 
-    public TopicsModel() throws QuickFixException {
+    public DocsTopicsModel() throws QuickFixException {
 
         applications = makeNodes("markup", DefType.APPLICATION);
         components = makeNodes("markup", DefType.COMPONENT);

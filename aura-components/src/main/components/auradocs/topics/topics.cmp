@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.docs.TopicsModel">
+<aura:component model="java://org.auraframework.docs.DocsTopicsModel">
         <aura:iteration items="{!m.components}" var="namespace">
             {!namespace.title}<br/>
             <ul>

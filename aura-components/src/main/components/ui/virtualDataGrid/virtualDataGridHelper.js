@@ -273,8 +273,9 @@
     _rerenderDirtyElement: function (cmp, item, target, index) {
         var gridBody     = this.getGridBody(cmp),
             virtualItems = cmp._virtualItems,
-            index     = (!$A.util.isUndefinedOrNull(index)) ? index : this._findVirtualElementPosition(virtualItems, target),
             updatedRow   = this._generateVirtualRow(cmp, item, index);
+        
+        index = (!$A.util.isUndefinedOrNull(index)) ? index : this._findVirtualElementPosition(virtualItems, target);
 
         if (!$A.util.isUndefinedOrNull(gridBody) && !$A.util.isUndefined(index) && index >= 0 && index < virtualItems.length) {
             if (!target) {
@@ -364,7 +365,7 @@
         cmp._updating = true;
         var updatedItems = cmp.get('v.items');
         updatedItems[index] = item;
-        cmp.set('v.items', updatedItems);
+        cmp.set('v.items', updatedItems, true);
         cmp._updating = false;
     },
     _getRootComponent: function (cmp) {

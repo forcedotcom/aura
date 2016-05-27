@@ -19,7 +19,7 @@
                 secure: false,
                 maxSize: 1024
             });
-            storage.put(key, expected)
+            storage.set(key, expected)
                 .then(function() {
                     return storage.adapter.getItem(cmp.DELIMITER + key);
                 })
@@ -48,7 +48,7 @@
                 secure: false,
                 maxSize: 1024
             });
-            storage.put(key, expected)
+            storage.set(key, expected)
                 .then(function() {
                     return storage.adapter.getItem(isolationKey + cmp.DELIMITER + key);
                 })

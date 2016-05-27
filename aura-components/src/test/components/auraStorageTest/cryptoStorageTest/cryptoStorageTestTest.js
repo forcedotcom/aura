@@ -247,7 +247,7 @@
             var that = this;
             var completed = false;
             var failTest = function(cmp, error) { cmp._storageLib.failTest(cmp, error); }
-            this.storage.put("testErrorValue", new Error("hello, error"))
+            this.storage.set("testErrorValue", new Error("hello, error"))
                 .then(function() {
                     completed = true;
                 }, function(e) {
@@ -287,7 +287,7 @@
                 var storage = $A.storageService.getStorage("crypto-store");
                 storage.remove("valueTooLarge")
                     .then(function () {
-                        return storage.put("valueTooLarge", new Array(32768).join("x"));
+                        return storage.set("valueTooLarge", new Array(32768).join("x"));
                     }).then(function() {
                         $A.test.fail("Successfully stored value that is too large");
                         completed = true;

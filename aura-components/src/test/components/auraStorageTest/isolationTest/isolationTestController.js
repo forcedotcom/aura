@@ -8,7 +8,7 @@
             secure: false,
             maxSize: 1024
         });
-        storage.put("keyA",cmp.get("v.storageItemValue"))
+        storage.set("keyA",cmp.get("v.storageItemValue"))
             .then(function() {
                 cmp.set("v.status", "Done Adding");
             })

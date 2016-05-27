@@ -327,7 +327,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
         // Mock action storage returned by the mockAction service when getStorage("action") is invoked.
         // This object has a setup method which allows the test to assert what parameters should be passed into its
-        // get, put and remove functions.
+        // get, set and remove functions.
         var mockActionStorage = new (function MockActionStorage() {
 
             this.setup = function(stubs) {
@@ -353,17 +353,17 @@ Test.Aura.AuraClientServiceTest = function() {
                 });
             };
 
-            this.put = function(key, value) {
+            this.set = function(key, value) {
                 var that = this;
                 return new Promise(function(success, error) {
-                    if (that._stubs && that._stubs.put) {
-                        if (value === that._stubs.put[key]) {
+                    if (that._stubs && that._stubs.set) {
+                        if (value === that._stubs.set[key]) {
                             success();
                         } else {
-                            error("put stub not found for key: " + key);
+                            error("set stub not found for key: " + key);
                         }
                     } else {
-                        throw "actionsStorage.put(..) called before it was stubbed out.";
+                        throw "actionsStorage.set(..) called before it was stubbed out.";
                     }
                 });
             };
@@ -659,7 +659,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 access[Action.getStorageKey(descriptor, params)] = stored;
                 storage.setup({
                     get: access,
-                    put: access
+                    set: access
                 });
 
                 // don't worry about async, the mocks do everything synchronously.
@@ -689,7 +689,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 access[Action.getStorageKey("DESCRIPTOR", {params: "PARAMS"})] = "STORED";
                 storage.setup({
                     get: access,
-                    put: access
+                    set: access
                 });
 
                 // don't worry about async, the mocks do everything synchronously.
@@ -1714,7 +1714,7 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal([mockXhr], target.availableXHRs);
         }
     }
-    
+
     [Fixture]
     function runWhenXHRIdle() {
         [Fact]

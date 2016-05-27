@@ -134,7 +134,7 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
     }
 
     var that = this;
-    return this.definitionStorage.put(this.TRANSACTION_SENTINEL_KEY, {})
+    return this.definitionStorage.set(this.TRANSACTION_SENTINEL_KEY, {})
         .then(function() {
         var promises = [];
         var descriptor, encodedConfig, i;
@@ -143,19 +143,19 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
             descriptor = cmpConfigs[i]["descriptor"];
             cmpConfigs[i]["uuid"] = context.findLoaded(descriptor);
             encodedConfig = $A.util.json.encode(cmpConfigs[i]);
-                promises.push(that.definitionStorage.put(descriptor, encodedConfig));
+                promises.push(that.definitionStorage.set(descriptor, encodedConfig));
         }
 
         for (i = 0; i < libConfigs.length; i++) {
             descriptor = libConfigs[i]["descriptor"];
             encodedConfig = $A.util.json.encode(libConfigs[i]);
-                promises.push(that.definitionStorage.put(descriptor, encodedConfig));
+                promises.push(that.definitionStorage.set(descriptor, encodedConfig));
         }
 
         for (i = 0; i < evtConfigs.length; i++) {
             descriptor = evtConfigs[i]["descriptor"];
             encodedConfig = $A.util.json.encode(evtConfigs[i]);
-                promises.push(that.definitionStorage.put(descriptor, encodedConfig));
+                promises.push(that.definitionStorage.set(descriptor, encodedConfig));
         }
 
         return Promise["all"](promises).then(
@@ -194,7 +194,7 @@ ComponentDefStorage.prototype.removeDefs = function(descriptors) {
     }
 
     var that = this;
-    return this.definitionStorage.put(this.TRANSACTION_SENTINEL_KEY, {})
+    return this.definitionStorage.set(this.TRANSACTION_SENTINEL_KEY, {})
         .then(function() {
             var promises = [];
             for (var i = 0; i < descriptors.length; i++) {

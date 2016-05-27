@@ -197,14 +197,14 @@ AuraStorage.prototype.getAll = function(includeExpired) {
  * @returns {Promise} A Promise that will put the value in storage.
  * @export
  */
-AuraStorage.prototype.put = function(key, value) {
+AuraStorage.prototype.set = function(key, value) {
     // For the size calculation, consider only the inputs to the storage layer: key and value
     // Ignore all the extras in the item object below
     var size = $A.util.estimateSize(key) + $A.util.estimateSize(value);
     if (size > this.maxSize) {
         var maxSize = this.maxSize;
         var finalReject = function() {
-            return Promise["reject"](new Error("AuraStorage.put() cannot store " + key + " of size " + size + "b because it's over the max size of " + maxSize + "b"));
+            return Promise["reject"](new Error("AuraStorage.set() cannot store " + key + " of size " + size + "b because it's over the max size of " + maxSize + "b"));
         };
         return this.remove(key, true).then(finalReject, finalReject);
     }

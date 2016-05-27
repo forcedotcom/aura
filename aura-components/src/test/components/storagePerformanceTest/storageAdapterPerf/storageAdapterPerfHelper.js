@@ -76,7 +76,7 @@
             var promises = [];
 
             for (var i = 0; i < entries; i++) {
-                promises.push(cmp._storage.put("initial" + i, payload));
+                promises.push(cmp._storage.set("initial" + i, payload));
             }
 
             promise = promise.then(function() {
@@ -338,7 +338,7 @@
     doOperation : function(op, storage, key, payload) {
         switch (op) {
         case "put":
-            return storage.put(key, payload);
+            return storage.set(key, payload);
         case "get":
             return storage.get(key);
         case "remove":

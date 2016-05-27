@@ -49,8 +49,8 @@ function storageTest () {
     function runUnsureKey(cmp, storage, key) {
         var completed = false;
         var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
-        append(cmp, "put("+key+",value);");
-        storage.put(key, "value")
+        append(cmp, "set("+key+",value);");
+        storage.set(key, "value")
             .then(function() {
                 append(cmp, "get("+key+");");
                 return storage.get(key);
@@ -75,8 +75,8 @@ function storageTest () {
     function runFullCycle(cmp, storage, key, value) {
         var completed = false;
         var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
-        append(cmp, "put("+key+","+value+");");
-        storage.put(key, value)
+        append(cmp, "set("+key+","+value+");");
+        storage.set(key, value)
             .then(function() {
                 append(cmp, "get("+key+");");
                 return storage.get(key);
@@ -198,7 +198,7 @@ function storageTest () {
         /**
          * Tests storing an item of value error works.
          */
-        testGetErrorValue: function(cmp, storage, putFails) {
+        testGetErrorValue: function(cmp, storage) {
             runFullCycle(cmp, storage, "testValues_Error", new Error("hello, error"));
         },
 
@@ -218,11 +218,11 @@ function storageTest () {
             var result = "";
             var sizeTooBig = (storage.getMaxSize() - 1) * 1024;
 
-            storage.put("overSize", { "value" : { "LittleMac" : new Array(sizeTooBig).join("x") } })
+            storage.set("overSize", { "value" : { "LittleMac" : new Array(sizeTooBig).join("x") } })
                 .then(
                     function() { completed = true; },
                     function(error) {
-                        failTest(cmp, "Promise to put item under max size should not reject");
+                        failTest(cmp, "Promise to set item under max size should not reject");
                     }
                 );
 
@@ -235,12 +235,12 @@ function storageTest () {
             var key = "overSize";
             var result = "";
             var sizeTooBig = (storage.getMaxSize() + 1) * 1024;
-            var expected = "AuraStorage.put() cannot store " + key;
+            var expected = "AuraStorage.set() cannot store " + key;
 
             var completed = false;
-            storage.put(key, { "value" : { "BigMac" : new Array(sizeTooBig).join("x") } })
+            storage.set(key, { "value" : { "BigMac" : new Array(sizeTooBig).join("x") } })
                 .then(
-                    function() { failTest(cmp, "Promise to put item too large should not be resolved"); },
+                    function() { failTest(cmp, "Promise to set item too large should not be resolved"); },
                     function(error) {
                         completed = true;
                         result = error.toString();
@@ -273,10 +273,10 @@ function storageTest () {
             .then(function() {
                 return Promise.all([
                     // a = key*2+1, b = a+1
-                    storage.put("2", { "a" : 5, "b" : 6 }),
-                    storage.put("0", { "a" : 1, "b" : 2 }),
-                    storage.put("3", { "a" : 7, "b" : 8 }),
-                    storage.put("1", { "a" : 3, "b" : 4 })
+                    storage.set("2", { "a" : 5, "b" : 6 }),
+                    storage.set("0", { "a" : 1, "b" : 2 }),
+                    storage.set("3", { "a" : 7, "b" : 8 }),
+                    storage.set("1", { "a" : 3, "b" : 4 })
                 ]);
             })
              .then(function() { return storage.getAll(); })
@@ -305,12 +305,12 @@ function storageTest () {
             var itemTooLarge = new Array(sizeTooBig).join("x");
 
             var completed = false;
-            var expected = "AuraStorage.put() cannot store " + key;
+            var expected = "AuraStorage.set() cannot store " + key;
 
-            storage.put(key, "ORIGINAL")
+            storage.set(key, "ORIGINAL")
                 .then(function() { return storage.get("testReplaceExistingWithEntryTooLarge"); })
                 .then(function(value) { $A.test.assertEquals("ORIGINAL", value); })
-                .then(function() { return storage.put("testReplaceExistingWithEntryTooLarge", itemTooLarge); })
+                .then(function() { return storage.set("testReplaceExistingWithEntryTooLarge", itemTooLarge); })
                 .then(function(){
                         $A.test.fail("Should not be able to save an item above the maxSize");
                      },
@@ -327,7 +327,7 @@ function storageTest () {
             var completed = false;
 
             storage.get("testReplaceExistingWithEntryTooLarge")
-                .then(function(value) { $A.test.assertUndefined(value, "Entry should be empty after attemping to put item too large"); })
+                .then(function(value) { $A.test.assertUndefined(value, "Entry should be empty after attemping to set item too large"); })
                 .then(function(){ completed = true;}, function(err) { failTest(cmp, err)});
 
             $A.test.addWaitFor(true, function() { return completed; });
@@ -345,7 +345,7 @@ function storageTest () {
             var completed = false;
             var stuff = { "a": 2 };
             stuff["b"] = stuff;
-            storage.put("testCyclicObject", stuff)
+            storage.set("testCyclicObject", stuff)
                 .then(
                     function() {
                         $A.test.fail("Expecting JSON stringify error. JSON should NOT be able to encode circular references");
@@ -369,7 +369,7 @@ function storageTest () {
             var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
             var completed = false;
             var stuff = { "changeling": 2 };
-            storage.put("testModifyObject", stuff)
+            storage.set("testModifyObject", stuff)
                 .then(function() {
                     stuff["changeling"] = 3;
                     return storage.get("testModifyObject");
@@ -386,7 +386,7 @@ function storageTest () {
             var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
             var completed = false;
             var stuff = { "changeling": 2 };
-            storage.put("testModifyObject", stuff)
+            storage.set("testModifyObject", stuff)
                 .then(function() {
                     return storage.getAll();
                 })
@@ -407,10 +407,10 @@ function storageTest () {
             var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
             var completed = false;
 
-            storage.put("testUpdate", "ORIGINAL")
+            storage.set("testUpdate", "ORIGINAL")
                 .then(function() { return storage.get("testUpdate"); })
                 .then(function(value) { $A.test.assertEquals("ORIGINAL", value); })
-                .then(function() { return storage.put("testUpdate", "DUPLICATE"); })
+                .then(function() { return storage.set("testUpdate", "DUPLICATE"); })
                 .then(function() { return storage.get("testUpdate"); })
                 .then(function(value) {
                     $A.test.assertEquals("DUPLICATE", value);
@@ -440,11 +440,11 @@ function storageTest () {
                     + " large to properly test overflow");
 
             Promise.all([
-                storage.put("testOverflow.1", chunk),
-                storage.put("testOverflow.2", chunk),
-                storage.put("testOverflow.3", chunk),
-                storage.put("testOverflow.4", chunk),
-                storage.put("testOverflow.5", chunk)
+                storage.set("testOverflow.1", chunk),
+                storage.set("testOverflow.2", chunk),
+                storage.set("testOverflow.3", chunk),
+                storage.set("testOverflow.4", chunk),
+                storage.set("testOverflow.5", chunk)
             ])
             .then(function() {
                 // IndexedDB has funky size calculation that doesn't properly get size until after a getAll
@@ -487,7 +487,7 @@ function storageTest () {
             var failTest = function(error) { completed=true; this.failTest(cmp, error); }.bind(this);
             var completed = false;
 
-            storage.put("key1" , new Array(1024).join("x"))
+            storage.set("key1" , new Array(1024).join("x"))
                 .then(function() {
                     append(cmp, "added item");
                     return storage.getSize();

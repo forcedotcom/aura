@@ -87,11 +87,11 @@
                 this);
     },
 
-    testPutFails: {
+    testSetFails: {
         test: [
            function doFailedStorageOperationAndVerifyError(cmp) {
                var storage = $A.storageService.getStorage(this.storageName);
-               var promise = storage.put("hi", "bye");
+               var promise = storage.set("hi", "bye");
                this.doFailedActionAndVerifyError(promise, "Error: CryptoAdapter '" + this.storageName + "' adapter failed to initialize");
            },
            function verifyExpectedLogs(cmp) {

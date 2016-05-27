@@ -32,10 +32,10 @@ import org.openqa.selenium.interactions.Actions;
 /**
  * UI automation to verify Action, checkbox and radio Menu using mouse and keyboard interaction .
  *
- * @userStory a07B0000000TG3R Excluding the test from IE due to know issue related to mouseOver Excluding it from touch
- * browsers due to to W-1478819 and mouse over related issues
+ * @userStory a07B0000000TG3R Excluding some tests from IE due to know issue related to mouseOver
+ * Excluding it from touch browsers due to to W-1478819 and mouse over related issues
  */
-@TargetBrowsers({BrowserType.GOOGLECHROME, BrowserType.FIREFOX})
+@TargetBrowsers({BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE11})
 public class MenuUITest extends WebDriverTestCase {
 
     public static final String MENUTEST_APP = "/uitest/menu_Test.app";
@@ -47,6 +47,7 @@ public class MenuUITest extends WebDriverTestCase {
      * Test that verify's interaction with Action Menu.
      */
     @Test
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testActionMenu() throws Exception {
         testActionMenuForApp(MENUTEST_APP, "");
     }
@@ -55,11 +56,13 @@ public class MenuUITest extends WebDriverTestCase {
      * Test that verify's interaction with Action Menu with image is trigger link.
      */
     @Test
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testActionMenuWithImageTrigger() throws Exception {
         testActionMenuForApp(MENUTEST_APP, "Image", false);
     }
 
     @Test
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testActionMenuNestedMenuItems() throws Exception {
         testActionMenuForApp(MENUTEST_APP, "Nested");
     }
@@ -67,11 +70,13 @@ public class MenuUITest extends WebDriverTestCase {
     // Test case for W-2181713
     @Flapper
     @Test
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testActionMenuAttachToBodySet() throws Exception {
         testActionMenuForApp(MENUTEST_ATTACHTOBODY_APP, "");
     }
 
     @Test
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testActionMenuGeneratedFromMetaData() throws Exception {
         testActionMenuForApp(MENUTEST_METADATA_APP, "");
     }
@@ -112,7 +117,8 @@ public class MenuUITest extends WebDriverTestCase {
         try {
             actionItem2Element.click();
             // The Firefox used in autobuild environments does not throw an exception. Passes locally on Firefox 42.
-            if (getBrowserType() != BrowserType.FIREFOX) {
+            // IE11 doesn't throw an exception either
+            if (getBrowserType() != BrowserType.FIREFOX && getBrowserType() != BrowserType.IE11) {
                 fail("Expected exception trying to click an unclickable element");
             }
         } catch (Exception e) {
@@ -127,17 +133,20 @@ public class MenuUITest extends WebDriverTestCase {
     }
 
     @Test
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testActionMenuWithImageTriggerViaKeyboardInteraction() throws Exception {
         testActionMenuViaKeyboardInteractionForApp(MENUTEST_APP, "Image", false);
     }
 
     @Test
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testActionMenuViaKeyboardInteraction() throws Exception {
         testActionMenuViaKeyboardInteractionForApp(MENUTEST_APP, "");
     }
 
     // Test case for W-2234265
     @Test
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testActionMenuAttachToBodySetViaKeyboardInteraction() throws Exception {
         testActionMenuViaKeyboardInteractionForApp(MENUTEST_ATTACHTOBODY_APP, "");
     }
@@ -153,6 +162,7 @@ public class MenuUITest extends WebDriverTestCase {
     }
     
     // TODO: W-2406307: remaining Halo test failure
+    @ExcludeBrowsers({BrowserType.IE11})
     public void _testActionMenuGeneratedFromMetaDataViaKeyboardInteraction() throws Exception {
         testActionMenuViaKeyboardInteractionForApp(MENUTEST_METADATA_APP, "");
     }
@@ -253,15 +263,11 @@ public class MenuUITest extends WebDriverTestCase {
     }
 
     @PerfTest
-    // Timing issue on firefox when trying to click on non clickable element
-    @ExcludeBrowsers({BrowserType.FIREFOX})
     @Test
     public void testCheckboxMenu() throws Exception {
         testMenuCheckboxForApp(MENUTEST_APP);
     }
 
-    // Timing issue on firefox when trying to click on non clickable element
-    @ExcludeBrowsers({BrowserType.FIREFOX})
     @Test
     public void testCheckboxMenuGeneratedFromMetaData() throws Exception {
         testMenuCheckboxForApp(MENUTEST_METADATA_APP);
@@ -308,7 +314,11 @@ public class MenuUITest extends WebDriverTestCase {
         // item4Element is not clickable as it's disabled via markup
         try {
             item4Element.click();
-            fail("Expected exception trying to click an unclickable element");
+            // The Firefox used in autobuild environments does not throw an exception. Passes locally on Firefox 42.
+            // IE11 doesn't throw an exception either
+            if (getBrowserType() != BrowserType.FIREFOX && getBrowserType() != BrowserType.IE11) {
+                fail("Expected exception trying to click an unclickable element");
+            }
         } catch (Exception e) {
             checkExceptionContains(e, WebDriverException.class, "Element is not clickable");
         }
@@ -451,10 +461,12 @@ public class MenuUITest extends WebDriverTestCase {
     // 
     // W-3140286
     // 
-    // This fails in jenkins now and passes locally. 
+    // This fails in jenkins now and passes locally.
+    // Excluding IE11 since setSize doesn't work for IE11
     @UnAdaptableTest
     @Flapper
     @Test
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testMenuPositionWhenMenuItemAttachToBody() throws Exception {
         open(MENUTEST_ATTACHTOBODY_APP);
 
@@ -570,6 +582,7 @@ public class MenuUITest extends WebDriverTestCase {
      * Test case for W-2315592 Components extends menuItem get's focus
      */
     @Test
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testFocusForExtendedMenuItem() throws Exception {
         open("/uitest/menu_extendMenuItem.app");
         WebDriver driver = this.getDriver();

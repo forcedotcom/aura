@@ -42,5 +42,11 @@
         test: function(cmp) {
             cmp.testGetComponentEvent();
         }
+    },
+    
+    testAuraMethod: {
+        test: function(cmp) {
+            cmp.testAuraMethod();
+        }
     }
 })

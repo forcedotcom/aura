@@ -25,8 +25,9 @@
     <aura:method name="testGetCThrowsError" action="{!c.testGetCThrowsError}"/>
     <aura:method name="testGetFacetActionThrowsError" action="{!c.testGetFacetActionThrowsError}"/>
     <aura:method name="testGetComponentEvent" action="{!c.testGetComponentEvent}"/>
+    <aura:method name="testAuraMethod" action="{!c.testAuraMethod}"/>
 
     <div>SecureComponentRef test</div>
     <ui:button label="ui:button component" aura:id="facet"/>
-    <lockerTest:eventSource aura:id="eventSource" foo="{!c.doFoo}"/>
+    <lockerTestOtherNamespace:eventSource aura:id="eventSource" foo="{!c.doFoo}"/>
 </aura:component>

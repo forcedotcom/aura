@@ -248,10 +248,10 @@ Aura.Utils.Util.prototype.isBoolean = function(obj){
 /**
  * Checks if the object is undefined.
  *
- * @platform
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is undefined, or false otherwise.
  * @export
+ * @platform
  */
 Aura.Utils.Util.prototype.isUndefined = function(obj){
     return obj === undefined;
@@ -263,6 +263,7 @@ Aura.Utils.Util.prototype.isUndefined = function(obj){
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is undefined or null, or return false otherwise.
  * @export
+ * @platform
  */
 Aura.Utils.Util.prototype.isUndefinedOrNull = function(obj){
     return obj === undefined || obj === null;

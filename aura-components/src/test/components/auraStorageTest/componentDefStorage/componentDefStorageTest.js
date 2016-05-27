@@ -44,7 +44,11 @@
                  // If defs are being pruned because the defs have gone over the storage maxSize we need to tweak the
                  // size of ComponentDefStorage in the test template.
                  var defs = undefined;
-                 $A.storageService.getStorage("ComponentDefStorage").getAll(true)
+                 var storage = $A.storageService.getStorage("ComponentDefStorage");
+                 if (!storage) {
+                     $A.test.fail("ComponentDefStorage store does not exist");
+                 }
+                 storage.getAll(true)
                      .then(function(items) {
                          items = items || [];
                          items = items.map(function(item) {

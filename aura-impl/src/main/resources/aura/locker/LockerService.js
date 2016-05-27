@@ -137,6 +137,10 @@ function LockerService() {
 	
 	// defining LockerService as a service
 	var service = {
+		isEnabled : function() {
+			return $A.getContext().isLockerServiceEnabled;
+		},
+		
 		createForDef : function(code, def) {
 			var descriptor = def.getDescriptor();
 			var namespace = descriptor.getNamespace();
@@ -207,6 +211,10 @@ function LockerService() {
 		},
 
 		wrapComponent : function(component) {
+			if (!$A.lockerService.isEnabled()) {
+				return component;
+			}
+			
 			if (typeof component !== "object") {
 				return component;
 			}
@@ -225,9 +233,14 @@ function LockerService() {
 		},
 
 		wrapComponentEvent : function(component, event) {
+			if (!$A.lockerService.isEnabled()) {
+				return event;
+			}
+			
 			if (typeof event !== "object" || typeof component !== "object" || !$A.lockerService.util.isKeyed(component)) {
 				return event;
 			}
+			
 			// if the component is secure, the event have to be secure.
 			var key = getLockerSecret(component, "key");
 			return event instanceof Aura.Event.Event ? SecureAuraEvent(event, key) : SecureDOMEvent(event, key);

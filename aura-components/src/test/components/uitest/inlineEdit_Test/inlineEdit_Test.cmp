@@ -37,6 +37,7 @@
 				<ui:dataGridColumn name="id"	label="Id" sortable="true"/>
 				<ui:dataGridColumn name="name"	label="Name"/>
 				<ui:dataGridColumn name="grade" label="Grade"/>
+                <ui:dataGridColumn name="linkLabel"  label="Link"/>
 				<ui:dataGridColumn name=""      label="Actions" hideLabel="true"/>
 			</aura:set>
 			
@@ -50,6 +51,9 @@
 				<ui:inlineEditCell name="grade" edited="{!row.status.grade}">
 					<ui:outputText value="{!row.data.grade}"/>
 				</ui:inlineEditCell>
+                <ui:inlineEditCell name="linkLabel" edited="{!row.status.linkLabel}" valueAttribute="label">
+                    <ui:outputURL value="http://www.google.com" label="{!row.data.linkLabel}" />
+                </ui:inlineEditCell>
 			</aura:set>
 		</ui:inlineEditGrid>
         

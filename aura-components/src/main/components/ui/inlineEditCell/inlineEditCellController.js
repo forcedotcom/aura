@@ -16,15 +16,19 @@
 ({
 	trigger : function(cmp) {
 		// TODO: Checks to make sure we can retrieve a value here.
-		var value = cmp.get("v.body")[0].get("v.value");
-
-		cmp.getEvent("gridAction").setParams({
-			action : "edit",
-			payload : {
-				targetElement : cmp.getElement(),
-				name : cmp.get("v.name"),
-				value : value
-			}
-		}).fire();
+		var outputCmp = cmp.get("v.body")[0];
+		
+		if (outputCmp) {
+		    var value = outputCmp.get("v." + cmp.get("v.valueAttribute"));
+		    
+		    cmp.getEvent("gridAction").setParams({
+                action : "edit",
+                payload : {
+                    targetElement : cmp.getElement(),
+                    name : cmp.get("v.name"),
+                    value : value
+                }
+            }).fire();
+		}
 	}
 })// eslint-disable-line semi

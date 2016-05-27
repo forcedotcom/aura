@@ -23,7 +23,8 @@
 				data : {
 					id : i,
 					name : "Name" + i,
-					grade : i
+					grade : i,
+					linkLabel : "Link" + i
 				},
 				status : {},
 				errors : {}

@@ -15,6 +15,11 @@
  */
 ({
     update : function(cmp, event, helper){
+        var eventStorageName = event.getParam("name");
+        var storageName = cmp.get("v.storageName");
+        if (eventStorageName !== storageName) {
+            return;
+        }
         helper.update(cmp);
     },
 
@@ -48,5 +53,5 @@
             }
         }));
     }
-    
+
 })// eslint-disable-line semi

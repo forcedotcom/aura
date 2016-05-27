@@ -99,6 +99,10 @@
 
     /** Handle auraStorage:modified */
     storageModified: function(cmp, evt, helper) {
+        var eventStorageName = evt.getParam("name");
+        if (eventStorageName !== "ComponentDefStorage") {
+            return;
+        }
         helper.logComponentDefStorage(cmp)
     },
 

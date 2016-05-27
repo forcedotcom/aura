@@ -15,5 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" support="BETA" description="Indicates that the contents of storage have been changed.">
+<aura:event type="APPLICATION" support="BETA" description="Indicates that the contents of storage have changed.">
+    <aura:attribute name="name" type="String" description="The name of the storage that was changed"/>
 </aura:event>

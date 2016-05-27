@@ -16,7 +16,7 @@
 Function.RegisterNamespace("Test.Aura.Storage");
 
 [Fixture]
-Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
+Test.Aura.Storage.AuraStorageServiceTest = function() {
     var $A = {};
     var Aura = {Services: {} };
 

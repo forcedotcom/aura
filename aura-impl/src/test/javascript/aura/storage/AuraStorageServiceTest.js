@@ -49,9 +49,9 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
             "$A": {
                 assert: function() {},
                 util: {
-                    isBoolean: function(obj) { return typeof obj === 'boolean'; },
-                    isFiniteNumber: function(obj) { return typeof obj === 'number' && isFinite(obj); },
-                    isString: function(obj) { return typeof obj === 'string'; },
+                    isBoolean: function(obj) { return typeof obj === "boolean"; },
+                    isFiniteNumber: function(obj) { return typeof obj === "number" && isFinite(obj); },
+                    isString: function(obj) { return typeof obj === "string"; },
                     isObject: function(obj) { return typeof obj === "object" && obj !== null && !Array.isArray(obj); }
                 }
             },
@@ -70,7 +70,7 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
                     }
                 },
                 util: {
-                    isString: function(obj) { return typeof obj === 'string'; },
+                    isString: function(obj) { return typeof obj === "string"; },
                     isObject: function(obj) { return typeof obj === "object" && obj !== null && !Array.isArray(obj); }
                 }
             });
@@ -99,7 +99,7 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
                     }
                 },
                 util: {
-                    isString: function(obj) { return typeof obj === 'string'; },
+                    isString: function(obj) { return typeof obj === "string"; },
                     isObject: function(obj) { return typeof obj === "object" && obj !== null && !Array.isArray(obj); }
                 }
             });
@@ -129,7 +129,7 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
                     }
                 },
                 util: {
-                    isString: function(obj) { return typeof obj === 'string'; },
+                    isString: function(obj) { return typeof obj === "string"; },
                     isObject: function(obj) { return typeof obj === "object" && obj !== null && !Array.isArray(obj); }
                 }
             });
@@ -373,7 +373,7 @@ Test.Aura.Storage.Adapters.AuraStorageServiceTest = function() {
                     if (!condition) { throw new Error(assertMessage); }
                 },
                 util: {
-                    isString: function(obj) { return typeof obj === 'string'; },
+                    isString: function(obj) { return typeof obj === "string"; },
                     isFunction: function(obj) { return true; }
                 }
             },

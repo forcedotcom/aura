@@ -38,12 +38,17 @@
                 "host",
                 "hostname",
                 "href",
-                "origin",
                 "pathname",
                 "port",
                 "protocol",
                 "search"
             ];
+
+            // Exclude the properties for unsupported browser
+            if(!$A.get("$Browser").isIE11) {
+                linkProperties.push("origin");
+            }
+
             cmp.testElementProperties("link", this.ElementPropertiesWhitelist,  this.ElementPropertiesBlacklist);
             cmp.testElementProperties("link", this.HTMLPropertiesWhitelist, this.HTMLPropertiesBlacklist);
             cmp.testElementProperties("link", linkProperties, []);
@@ -69,7 +74,7 @@
             cmp.testElementProperties("area", areaProperties, []);
         }
     },
-    
+
     //FIXME: goliver  "AUDIO" : [ "autoplay", "buffered", "controls", "loop", "muted", "played", "preload", "src", "volume" ],
 
     //FIXME: goliver  "BASE" : [ "href", "target" ],
@@ -89,7 +94,7 @@
                 "formNoValidate",
                 "formTarget",
                 "name",
-                "type" 
+                "type"
             ];
             cmp.testElementProperties("button", this.ElementPropertiesWhitelist,  this.ElementPropertiesBlacklist);
             cmp.testElementProperties("button", this.HTMLPropertiesWhitelist, this.HTMLPropertiesBlacklist);
@@ -112,7 +117,7 @@
     //FIXME: goliver  "EMBED" : [ "height", "src", "type", "width" ],
 
     //FIXME: goliver  "FIELDSET" : [ "disabled", "form", "name" ],
-    
+
     testFormProperties: {
         test: function(cmp) {
             var formProperties = [
@@ -139,12 +144,20 @@
                 "height",
                 "isMap",
                 "longDesc",
-                "sizes",
                 "src",
-                "srcset",
                 "width",
                 "useMap"
             ];
+
+            // Exclude the properties for unsupported browser
+            var browser = $A.get("$Browser");
+            if(!browser.isIE11 && !browser.isPhone) {
+                imgProperties.push("sizes");
+            }
+            if(!browser.isIE11) {
+                imgProperties.push("srcset");
+            }
+
             cmp.testElementProperties("img", this.ElementPropertiesWhitelist,  this.ElementPropertiesBlacklist);
             cmp.testElementProperties("img", this.HTMLPropertiesWhitelist, this.HTMLPropertiesBlacklist);
             cmp.testElementProperties("img", imgProperties, []);
@@ -181,13 +194,19 @@
                 "placeholder",
                 "readOnly",
                 "required",
-                "selectionDirection",
                 "size",
                 "src",
                 "step",
                 "tabIndex",
                 "value",
-                "width"];
+                "width"
+            ];
+
+            // Exclude the properties for unsupported browser
+            if(!$A.get("$Browser").isIE11) {
+                inputProperties.push("selectionDirection");
+            }
+
             cmp.testElementProperties("input", this.ElementPropertiesWhitelist,  this.ElementPropertiesBlacklist);
             cmp.testElementProperties("input", this.HTMLPropertiesWhitelist, this.HTMLPropertiesBlacklist);
             cmp.testElementProperties("input", inputProperties, []);
@@ -297,11 +316,16 @@
                 "readOnly",
                 "required",
                 "rows",
-                "selectionDirection",
                 "selectionEnd",
                 "selectionStart",
                 "wrap"
             ];
+
+            // Exclude the properties for unsupported browser
+            if(!$A.get("$Browser").isIE11) {
+                textareaProperties.push("selectionDirection");
+            }
+
             cmp.testElementProperties("textarea", this.ElementPropertiesWhitelist,  this.ElementPropertiesBlacklist);
             cmp.testElementProperties("textarea", this.HTMLPropertiesWhitelist, this.HTMLPropertiesBlacklist);
             cmp.testElementProperties("textarea", textareaProperties, []);
@@ -398,13 +422,13 @@
             cmp.testInnerHTMLSupportsUseTagForSvgElement();
         }
     },
-    
+
     testTextContent: {
         test: function(cmp) {
             cmp.testTextContent();
         }
     },
-    
+
     testInnerText: {
         test: function(cmp) {
             cmp.testInnerText();

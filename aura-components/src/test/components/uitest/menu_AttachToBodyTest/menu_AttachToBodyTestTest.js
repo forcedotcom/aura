@@ -23,9 +23,10 @@
 	 * which has attachToBody attribute set
 	 * using AURA API  
 	 * TODO: Disabling test in IE7&8, bug W-2320774
+	 * Flapping in Safari
 	 */
 	testActionMenuWithAttachToBodySet:{
-		browsers: ["-IE7","-IE8"],
+		browsers: ["-IE7","-IE8", "-SAFARI"],
 		test: [function(cmp) {
 				actionMenu = cmp.find("actionMenuAttachToBody");
 	        	menuLabel = cmp.find("triggerAttachToBody");
@@ -40,7 +41,6 @@
 	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"uiMenuList"), "Class name should be just uiMenuList");
 	        	$A.test.assertFalse($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should not contain visible");
 	        	this.clickAnchor(menuLabel);
-
 	            //Check if secondItem in the menu is disabled
 	            $A.test.addWaitForWithFailureMessage(true, function(){return cmp.find(item2).get("v.disabled");}, "Check if Item2 in the menu is disabled");
 			}, function(cmp) {
@@ -49,12 +49,14 @@
 				var actionMenuParentElement = actionMenu.getElement().parentNode;
 				var bodyElement = document.getElementsByTagName("body")[0];
 	            $A.test.assertEquals(actionMenuParentElement, bodyElement,"Menu Item List should be attached to body");
-	    		
+	         }, function(cmp) {   
 	            //Make sure horizontal alignment of menuItem is correct with reference to triggerElement
-	            var actionMenuLeftPostionValue = Math.floor(actionMenu.getElement().getBoundingClientRect().left);
-	            var triggerLeftPositonValue = Math.floor(menuLabel.getElement().getBoundingClientRect().left);
-	            $A.test.assertEquals(actionMenuLeftPostionValue, triggerLeftPositonValue,"Menu Item is not alligned properly wrt to trigger it should be at left:"+triggerLeftPositonValue);
-	    		
+	            $A.test.addWaitForWithFailureMessage(true, function() {
+	        	var actionMenuLeftPostionValue = parseInt($A.test.getStyle(actionMenu.getElement(),"left"));
+		        var triggerLeftPositonValue = Math.floor(menuLabel.getElement().getBoundingClientRect().left);
+		            return actionMenuLeftPostionValue === triggerLeftPositonValue;
+	            }, "Menu Item is not alligned properly wrt to trigger it should be at left");
+	                
 	            var disableAttrValue = cmp.find(item1).get("v.disabled");
 				$A.test.assertFalse(disableAttrValue,"Menu item 1 should be clickable");
 				

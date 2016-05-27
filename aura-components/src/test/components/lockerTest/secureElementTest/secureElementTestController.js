@@ -103,7 +103,6 @@
         }
     },
 
-
     testInnerHTML: function(cmp, event) {
         var testUtils = cmp.get("v.testUtils");
         var targetElement = event.getParam("arguments").targetElement;
@@ -115,7 +114,6 @@
         }
 
         element.innerHTML = "innerHTML content";
-        console.log(element.innerHTML);
         testUtils.assertEquals("innerHTML content", element.innerHTML);
     },
 
@@ -182,15 +180,15 @@
         var element = cmp.find("scalarExpression").getElement();
         testUtils.assertEquals("A scalar expression", element.innerHTML);
     },
-        
+
     testElementCache: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
-        
+
         // Verify that we get the same SE from multiple calls to SecureComponent.getElement()
         var e = cmp.find("cacheTestA").getElement();
         testUtils.assertDefined(e);
         testUtils.assertTrue(e === cmp.find("cacheTestA").getElement());
-        
+
         // Verify that we get the same SE for multiple calls to document.getElementById()
         var cacheTestA = document.getElementById("cacheTestA");
         testUtils.assertDefined(cacheTestA);
@@ -206,10 +204,10 @@
         var cacheTestB = document.getElementById("cacheTestB");
         cacheTestB.appendChild(child);
         testUtils.assertTrue(child === cacheTestB.children[0]);
-                
+
         cacheTestB.innerHTML = "<span>Removed Children</span>"
-        
+
         cacheTestA.appendChild(child);
-        testUtils.assertTrue(child === cacheTestA.children[0]);        
+        testUtils.assertTrue(child === cacheTestA.children[0]);
     }
 })

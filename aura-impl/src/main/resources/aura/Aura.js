@@ -53,6 +53,7 @@ Aura.Method     = {};
 Aura.L10n       = {};
 Aura.Services   = {};
 Aura.Storage    = {};
+Aura.Locker     = {};
 
 /**
  * @description This, $A, is supposed to be our ONLY window-polluting top-level variable.

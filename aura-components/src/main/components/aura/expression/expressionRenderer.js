@@ -19,15 +19,15 @@
         if($A.util.isUndefinedOrNull(value)){
             value = "";
         }
-        
+
         if(!($A.util.isComponent(value) || $A.util.isArray(value))){
             // JBUCH: HALO: TODO: MIGHT BE ABLE TO RETURN THIS TO SIMPLE TEXTNODE MANAGEMENT
             component._lastRenderedValue = value = $A.createComponentFromConfig({ descriptor:'markup://aura:text', attributes:{ value: value } });
 
-	    	var parent = component.getComponentValueProvider();
-	    	$A.lockerService.trust(parent, value);
+            var parent = component.getComponentValueProvider();
+            $A.lockerService.trust(parent, value);
         }
-        
+
         return $A.renderingService.renderFacet(component,value);
     },
 

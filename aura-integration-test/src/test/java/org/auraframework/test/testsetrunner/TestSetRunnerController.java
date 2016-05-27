@@ -28,7 +28,7 @@ import org.auraframework.integration.test.util.TestExecutor.TestRun;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.test.perf.util.PerfExecutorTest;
+import org.auraframework.test.perf.util.PerfExecutorTestCase;
 
 /**
  * This controller handles the execution and result collection of test cases on behalf of client-initiated requests.
@@ -129,8 +129,8 @@ public class TestSetRunnerController {
             // Perf special handling
             // @dval: This makes no sense here because it exposes a perf Class
             // Remove all this once we refactor the perfRunner.
-            if (finished && test instanceof PerfExecutorTest) {
-            	testRunnerState.setTestProp(testName, "perfInfo", ((PerfExecutorTest)test).getLastCollectedMetrics().toString());
+            if (finished && test instanceof PerfExecutorTestCase) {
+            	testRunnerState.setTestProp(testName, "perfInfo", ((PerfExecutorTestCase)test).getLastCollectedMetrics().toString());
             }
             
             return result;

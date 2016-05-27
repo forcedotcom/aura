@@ -15,17 +15,10 @@
  */
 package org.auraframework.test.perf.util;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
@@ -35,32 +28,32 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.AuraFiles;
-import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.PerfTestSuite;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
-import org.auraframework.util.test.util.TestInventory;
-import org.auraframework.util.test.util.TestInventory.Type;
 
 import com.google.common.collect.ImmutableList;
 
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 @UnAdaptableTest
 @PerfTestSuite
-public class PerfEngineTestSuite extends TestSuite implements PerfTestFramework {
+public class PerfEngineUITest extends TestSuite implements PerfTestFramework {
 
     private PerfConfigUtil perfConfigUtil;
     private static String DB_INSTANCE = System.getProperty("dbURI");
-    private static final Logger LOG = Logger.getLogger(PerfEngineTestSuite.class.getSimpleName());
+    private static final Logger LOG = Logger.getLogger(PerfEngineUITest.class.getSimpleName());
 
     public static TestSuite suite() throws Exception {
-        return new PerfEngineTestSuite();
+        return new PerfEngineUITest();
     }
 
-    public PerfEngineTestSuite() throws Exception {
+    public PerfEngineUITest() throws Exception {
         this("Component Perf tests");
     }
 
-    public PerfEngineTestSuite(String name) throws Exception {
+    public PerfEngineUITest(String name) throws Exception {
         LOG.info("ComponentPerfTestEngine: " + name);
         setName(name);
         init();
@@ -92,47 +85,35 @@ public class PerfEngineTestSuite extends TestSuite implements PerfTestFramework 
         return defs;
     }
 
-    private ContextService establishAuraContext() {
-        ContextService contextService = Aura.getContextService();
-        if (!contextService.isEstablished()) {
-            contextService.startContext(Mode.PTEST, Format.JSON, Authentication.AUTHENTICATED);
-        }
-        return contextService;
-    }
-
-    private class ComponentTestSuite extends TestSuite {
-        ComponentTestSuite(DefDescriptor<BaseComponentDef> defDescriptor, final PerfConfig config) {
+	private class ComponentTestSuite extends TestSuite {
+        ComponentTestSuite(DefDescriptor<BaseComponentDef> defDescriptor, final PerfConfig config) throws Exception {
             super(defDescriptor.getName());
-            ContextService contextService = establishAuraContext();
-            TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraTestInventory");
-            Vector<Class<? extends Test>> testClasses = inventory.getTestClasses(Type.PERFCMP);
+            ContextService contextService = Aura.getContextService();
+            boolean doEndContext = false;
+            if (!contextService.isEstablished()) {
+                contextService.startContext(Mode.PTEST, Format.JSON, Authentication.AUTHENTICATED);
+                doEndContext = true;
+            }
+            try {
 
-            for (Class<? extends Test> testClass : testClasses) {
-                try {
-                    Constructor<? extends Test> constructor = testClass.getConstructor(DefDescriptor.class,
-                            PerfConfig.class, String.class);
-                    PerfExecutorTest test = (PerfExecutorTest) constructor.newInstance(defDescriptor, config, DB_INSTANCE);
-                    test.setPerfMetricsComparator(new PerfMetricsComparator() {
-                        @Override
-                        protected int getAllowedVariability(String metricName) {
-                            if (config.getVariability(metricName) != null) {
-                                return config.getVariability(metricName);
-                            }
-                            // Use default variability, if variability is not set in config
-                            return super.getAllowedVariability(metricName);
-                        }
-                    });
-                    addTest(patchPerfComponentTestCase(test, defDescriptor));
-                } catch (Exception e) {
-                    LOG.log(Level.WARNING, "exception instantiating " + testClass.getName(), e);
-                } finally {
-                    if (contextService.isEstablished()) {
-                        contextService.endContext();
+                PerfExecutorTestCase test = new PerfExecutorTestCase(defDescriptor, config, DB_INSTANCE);
+                test.setPerfMetricsComparator(new PerfMetricsComparator() {
+                    @Override
+                    protected int getAllowedVariability(String metricName) {
+                        if (config.getVariability(metricName) != null) { return config.getVariability(metricName); }
+                        // Use default variability, if variability is
+                        // not set in config
+                        return super.getAllowedVariability(metricName);
                     }
+                });
+                addTest(patchPerfComponentTestCase(test, defDescriptor));
+            } finally {
+                if (doEndContext) {
+                    contextService.endContext();
                 }
             }
         }
-    }
+	}
 
     /**
      * @return the list of namespaces to create tests for
@@ -141,7 +122,7 @@ public class PerfEngineTestSuite extends TestSuite implements PerfTestFramework 
         return ImmutableList.of("PerformanceTest");
     }
     
-    private String resolveGoldFilePath(PerfExecutorTest test) {
+    private String resolveGoldFilePath(PerfExecutorTestCase test) {
         String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/";
         String componentPath = test.getComponentDef().getNamespace() + "/" + test.getComponentDef().getName();
         String fullPath = path + componentPath;
@@ -153,9 +134,8 @@ public class PerfEngineTestSuite extends TestSuite implements PerfTestFramework 
      * @param test
      * @param descriptor
      * @return return test
-     * @throws Exception
      */
-	protected TestCase patchPerfComponentTestCase(PerfExecutorTest test,
+	protected TestCase patchPerfComponentTestCase(PerfExecutorTestCase test,
 			DefDescriptor<BaseComponentDef> descriptor) throws Exception {
 		test.setExplicitGoldResultsFolder(resolveGoldFilePath(test));
 		return test;

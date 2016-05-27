@@ -28,14 +28,14 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
 public class PerfMetricsUtil {
-    private final PerfExecutorTest test;
+    private final PerfExecutorTestCase test;
     private final PerfConfig config;
     private RDPAnalyzer rdpAnalyzer;
     private List<RDPNotification> notifications;
     private Map<String, Map<String, Map<String, Object>>> auraStats;
     private String dbURI;
 
-    public PerfMetricsUtil(PerfExecutorTest test, String dbURI, PerfConfig config) {
+    public PerfMetricsUtil(PerfExecutorTestCase test, String dbURI, PerfConfig config) {
         this.test = test;
         this.dbURI = dbURI;
         this.config = config;

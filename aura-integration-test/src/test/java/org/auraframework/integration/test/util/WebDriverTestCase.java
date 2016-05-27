@@ -53,7 +53,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.perf.PerfResultsUtil;
 import org.auraframework.test.perf.PerfWebDriverUtil;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
-import org.auraframework.test.perf.util.PerfExecutorTest;
+import org.auraframework.test.perf.util.PerfExecutorTestCase;
 import org.auraframework.test.util.AuraUITestingUtil;
 import org.auraframework.test.util.SauceUtil;
 import org.auraframework.test.util.WebDriverProvider;
@@ -641,7 +641,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             description.append("\nTest failed before WebDriver was initialized");
         } else {
 
-            if (this instanceof PerfExecutorTest) {
+            if (this instanceof PerfExecutorTestCase) {
                 JSONArray json = this.getLastCollectedMetrics();
                 description.append("\nPerfMetrics: " + json + ';');
             }

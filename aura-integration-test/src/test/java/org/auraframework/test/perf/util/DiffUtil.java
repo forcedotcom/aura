@@ -25,7 +25,7 @@ public interface DiffUtil<T> {
     /**
      * @return the test this DiffUtils is used for
      */
-    public PerfExecutorTest getTest();
+    public PerfExecutorTestCase getTest();
 
     /**
      * @param testResults actual test results

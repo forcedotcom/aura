@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * 
+ *
  * @constructor
  * @export
  */
@@ -38,7 +38,7 @@ Aura.Utils.Style.prototype.getHead = function(){
 /**
  * Applies a CSS style to an element using the HTML style element.
  * Appends the HTML style element as a child of the head element.
- * 
+ *
  * @param {String} styleText The HTML style element, including the type attribute.
  * @returns {Object} The style element
  * @private
@@ -84,30 +84,17 @@ Aura.Utils.Style.prototype.include = function(href) {
 /**
  * Gets the CSS property of an element.
  * note for "background": if we specify "background" in  CSS, Firefox will use "background-color" as key
- * IE8 will use "backgroundColor", IE9+ are good with "background-color". 
+ * IE8 will use "backgroundColor", IE9+ are good with "background-color".
  * @param {HTMLElement} el The HTML element
  * @param {String} cssprop The CSS property to be retrieved
  * @export
  */
 Aura.Utils.Style.prototype.getCSSProperty = function(el, cssprop) {
-    var elcsIE = el.currentStyle;
-    if (elcsIE){ //IE
-    	//IE8
-        if(elcsIE[cssprop]!=undefined) {//eslint-disable-line eqeqeq
-            return elcsIE[cssprop];
-        }
-        //IE9 or up
-        else if(elcsIE.getPropertyValue!=undefined){//eslint-disable-line eqeqeq
-            return elcsIE.getPropertyValue(cssprop);
-        }
-    }else if (document.defaultView && document.defaultView.getComputedStyle){ //Firefox
-        var elcsFF = document.defaultView.getComputedStyle(el, "");
-        if(elcsFF[cssprop]!=undefined) {//eslint-disable-line eqeqeq
-            return elcsFF[cssprop];
-        }else if(elcsFF.getPropertyValue(cssprop)!=undefined){//eslint-disable-line eqeqeq
-            return elcsFF.getPropertyValue(cssprop);
-        }
-    }else{ //try and get inline style
-        return el.style[cssprop];
+    // standard, IE9+
+    if (window.getComputedStyle) {
+        var style = window.getComputedStyle(el);
+        return style && style.getPropertyValue(cssprop);
     }
+    // non-standard, IE6+
+    return el.currentStyle && el.currentStyle[cssprop];
 };

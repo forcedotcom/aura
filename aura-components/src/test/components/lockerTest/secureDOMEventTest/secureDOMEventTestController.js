@@ -18,20 +18,19 @@
         testUtils.assertEquals("number", typeof domEvent.timeStamp);
     },
 
-    testEventViewThrowsError: function(cmp, event, helper) {
+    testEventView: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
         var domEvent;
         var element = cmp.find("title").getElement();
         element.addEventListener("click", function(e) {
             domEvent = e;
         });
+        
         element.click(); 
-        try {
-        	domEvent.view;
-            testUtils.fail("Expected event.view to throw an Error");
-        } catch (e) {
-            testUtils.assertStartsWith("Access denied for insecure", e.message, "Unexpected error accessing event.view");
-        }
+
+    	debugger
+        
+    	testUtils.assertTrue(domEvent.view == window);
     },
 
     testMarkupDefinedClickHandler: function(cmp, event, helper) {

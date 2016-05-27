@@ -1,3 +1,6 @@
 <aura:component implements="aura:requireLocker">
+	<aura:attribute name="message" type="string"/>
     <aura:registerevent name="foo" type="lockerTest:fooEvent"/>
+    
+   	<aura:method name="sayHello" action="{!c.sayHello}"/>
 </aura:component>

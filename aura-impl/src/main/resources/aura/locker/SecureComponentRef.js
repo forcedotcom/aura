@@ -46,6 +46,15 @@ function SecureComponentRef(component, key) {
             }
         }
     });
+    
+    // The shape of the component depends on the methods exposed in the definitions:
+    var defs = component.getDef().methodDefs;
+    if (defs) {
+        defs.forEach(function(method) {
+        	var descriptor = new DefDescriptor(method.name);
+    		SecureObject.addMethodIfSupported(o, component, descriptor.getName());
+        }, o);
+    }
 
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", component);

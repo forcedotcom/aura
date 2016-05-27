@@ -17,9 +17,9 @@
         }
     },
 
-    testEventViewThrowsError: {
+    testEventView: {
         test: function(cmp) {
-            cmp.testEventViewThrowsError();
+            cmp.testEventView();
         }
     },
 

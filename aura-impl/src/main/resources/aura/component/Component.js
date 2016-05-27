@@ -458,8 +458,8 @@ Component.prototype.implementsDirectly = function(type) {
  * @param {String}
  *            phase The target event phase; defaults to "bubble"
  * @public
- * @platform
  * @export
+ * @platform
  */
 Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert, phase) {
     var dispatcher = this.getEventDispatcher(this);
@@ -493,6 +493,7 @@ Component.prototype.addHandler = function(eventName, valueProvider, actionExpres
  *            (e.g. "c.myAction").
  * @public
  * @export
+ * @platform
  */
 Component.prototype.addValueHandler = function(config) {
     var value = config["value"];

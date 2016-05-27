@@ -68,10 +68,12 @@ function SecureComponent(component, key) {
         "superAfterRender": SecureObject.createFilteredMethod(o, component, "superAfterRender"),
         "superRerender": SecureObject.createFilteredMethod(o, component, "superRerender"),
         "superUnrender": SecureObject.createFilteredMethod(o, component, "superUnrender"),
+        
         // component @platform methods
         "isValid": SecureObject.createFilteredMethod(o, component, "isValid"),
         "isInstanceOf": SecureObject.createFilteredMethod(o, component, "isInstanceOf"),
         "addHandler": SecureObject.createFilteredMethod(o, component, "addHandler"),
+        "addValueHandler": SecureObject.createFilteredMethod(o, component, "addValueHandler"),
         "destroy": SecureObject.createFilteredMethod(o, component, "destroy"),
         "isRendered": SecureObject.createFilteredMethod(o, component, "isRendered"),
         "getGlobalId": SecureObject.createFilteredMethod(o, component, "getGlobalId"),

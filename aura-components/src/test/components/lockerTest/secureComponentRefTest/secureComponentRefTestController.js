@@ -40,12 +40,23 @@
     testGetComponentEvent: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var eventSource = cmp.find("eventSource");
+        testUtils.assertStartsWith("SecureComponentRef", eventSource.toString());
         
         var foo = eventSource.get("e.foo");
         testUtils.assertDefined(foo);
 
         foo = eventSource.getEvent("foo");
         testUtils.assertDefined(foo);
+    },
+    
+    testAuraMethod: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        
+        var eventSource = cmp.find("eventSource");
+        testUtils.assertStartsWith("SecureComponentRef", eventSource.toString());
+        
+        eventSource.sayHello();
+        testUtils.assertEquals("Hello from sayHello()", eventSource.get("v.message"));
     },
     
     doFoo: function(cmp) {

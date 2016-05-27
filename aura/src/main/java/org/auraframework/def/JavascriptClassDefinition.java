@@ -15,16 +15,16 @@
  */
 package org.auraframework.def;
 
-import java.util.List;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
-public interface LibraryDef extends RootDefinition, HasJavascriptReferences {
+public interface JavascriptClassDefinition {
 
-	@Override
-    DefDescriptor<LibraryDef> getDescriptor();
-    
     /**
-     * Gets the list of included JS files.
-     * @return {@link List} of included resources.
+     * Gets the client JavaScript code, normally a client class.
+     * Will initialize the class if it was not pre-initialized.
+     * @param minify whether to return minified code or not.
+     * @return the client JavaScript code.
+     * @throws QuickFixException
      */
-    List<IncludeDefRef> getIncludes();
+    String getCode(boolean minify) throws QuickFixException;
 }

@@ -123,12 +123,17 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
 
     @Override
     public void validateReferences() throws QuickFixException {
-        for (IncludeDefRef include : includes) {
-            include.validateDefinition();
-            include.validateReferences();
-        }
+    	validateReferences(false);
     }
 
+    @Override
+    public void validateReferences(boolean minify) throws QuickFixException {
+        for (IncludeDefRef include : includes) {
+            include.validateDefinition();
+            include.validateReferences(minify);
+        }
+    }
+    
     @Override
     public void appendDependencies(java.util.Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);

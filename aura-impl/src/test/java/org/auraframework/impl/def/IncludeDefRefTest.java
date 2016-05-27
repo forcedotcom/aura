@@ -148,7 +148,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         IncludeDefRef def = builder.build();
 
         try {
-            def.validateReferences();
+            def.validateReferences(true);
             fail("Invalid breaking JS wasn't validated");
         } catch (InvalidDefinitionException t) {
             assertExceptionMessageContains(t, InvalidDefinitionException.class,
@@ -173,7 +173,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         IncludeDefRef def = builder.build();
 
         try {
-            def.validateReferences();
+            def.validateReferences(true);
             fail("Invalid unclosed JS wasn't validated");
         } catch (InvalidDefinitionException t) {
             assertExceptionMessageContains(t, InvalidDefinitionException.class,
@@ -199,7 +199,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         IncludeDefRef def = builder.build();
 
         try {
-            def.validateReferences();
+            def.validateReferences(true);
             fail("Invalid unclosed JS wasn't validated");
         } catch (InvalidDefinitionException t) {
             assertExceptionMessageContains(t, InvalidDefinitionException.class,

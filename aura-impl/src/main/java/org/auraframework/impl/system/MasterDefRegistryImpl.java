@@ -39,6 +39,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.HasJavascriptReferences;
 import org.auraframework.def.ParentedDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
@@ -688,7 +689,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                             // throw new
                             // AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
                         }
-                        cd.def.validateReferences();
+                        // Validate, including JavaScript if we can cache 
+                    	if (cd.cacheable && cd.def instanceof HasJavascriptReferences) {
+                    		((HasJavascriptReferences) cd.def).validateReferences(true);
+                    	} else {
+                    		cd.def.validateReferences();
+                    	}
                         cd.validated = true;
                     }
                 } finally {

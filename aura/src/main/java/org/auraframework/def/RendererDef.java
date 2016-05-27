@@ -23,7 +23,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
-public interface RendererDef extends CodeDefinition {
+public interface RendererDef extends RemotableDefinition {
     @Override
     DefDescriptor<RendererDef> getDescriptor();
 

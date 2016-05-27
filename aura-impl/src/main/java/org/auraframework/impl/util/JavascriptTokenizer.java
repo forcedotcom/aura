@@ -18,8 +18,8 @@ package org.auraframework.impl.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.auraframework.builder.JavascriptCodeBuilder;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.JavascriptCodeBuilder;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.DependencyDefImpl;

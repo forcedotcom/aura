@@ -15,7 +15,7 @@
  */
 package org.auraframework.def;
 
-public interface IncludeDef extends CodeDefinition {
+public interface IncludeDef extends RemotableDefinition {
 
 	@Override
     DefDescriptor<IncludeDef> getDescriptor();

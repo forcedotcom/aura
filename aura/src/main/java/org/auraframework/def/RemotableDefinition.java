@@ -16,9 +16,9 @@
 package org.auraframework.def;
 
 /**
- * Interface for definitions that can have Java or JavaScript code.
+ * Interface for definitions that can have a Java or a JavaScript implementation.
  */
-public interface CodeDefinition extends Definition {
+public interface RemotableDefinition extends Definition {
 
     /**
      * Get the source JavaScript for this component.

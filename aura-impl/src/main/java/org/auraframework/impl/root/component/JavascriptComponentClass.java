@@ -92,6 +92,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
             return out.toString();
         }
 
+        @Override
         public JavascriptComponentClass build() throws QuickFixException {
             finish();
             return new JavascriptComponentClass(this);

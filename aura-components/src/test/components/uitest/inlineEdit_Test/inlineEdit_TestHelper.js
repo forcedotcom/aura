@@ -29,6 +29,11 @@
 			componentDef : {
 				descriptor : 'markup://ui:inputNumber'
 			}
+		},
+		linkLabel : {
+		    componentDef : {
+		        descriptor : 'markup://ui:inputText'
+		    }
 		}
 	},
 	

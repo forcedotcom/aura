@@ -23,6 +23,7 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.JsonSerializerAdapter;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.context.AuraContextImpl;
+import org.auraframework.impl.context.AuraContextJsonSerializer;
 import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ActionWithKeyOverride;
@@ -50,7 +51,7 @@ public class JsonSerializerAdapterImpl implements JsonSerializerAdapter {
     public Map<String, JsonSerializer<?>> lookupSerializers() {
         Map<String, JsonSerializer<?>> m = Maps.newLinkedHashMap();
         m.putAll(JsonSerializers.MAPPY_FASTY);
-        m.put(AuraContextImpl.class.getName(), AuraContextImpl.FULL_SERIALIZER);
+        m.put(AuraContextImpl.class.getName(), new AuraContextJsonSerializer());
         m.put(JavaAction.class.getName(), Action.SERIALIZER);
         m.put(ActionWithKeyOverride.class.getName(), Action.SERIALIZER);
         m.put(BigDecimal.class.getName(), JsonSerializers.BIGDECIMAL);

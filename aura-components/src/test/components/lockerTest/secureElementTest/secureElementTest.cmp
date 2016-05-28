@@ -21,7 +21,7 @@
     <aura:attribute name="testInRenderer" type="String"/>
     <aura:attribute name="text" type="String"/>
     <aura:attribute name="scalarExpression" type="String" default="A scalar expression"/>
-    
+
     <aura:method name="testElementProperties" action="{!c.testElementProperties}">
         <aura:attribute name="auraId" type="String"/>
         <aura:attribute name="elementPropertiesWhitelist" type="List"/>
@@ -46,12 +46,16 @@
     <aura:method name="testScalarExpression" action="{!c.testScalarExpression}"/>
 
     <aura:method name="testElementCache" action="{!c.testElementCache}"/>
-    
+
     <aura:method name="getDiv" action="{!c.getDiv}"/>
 
+    <aura:method name="testInnerHTML" action="{!c.testInnerHTML}">
+        <aura:attribute name="targetElement" type="String"/>
+    </aura:method>
+
     <lockerTest:facet/>
-    
-    <div aura:id="title">SecureElement test</div>
+
+    <div aura:id="title" class="title">SecureElement test</div>
 
     <input type="text" aura:id="input" value="input" />
     <textarea aura:id="textarea" value="textarea" />
@@ -70,9 +74,9 @@
             <td aura:id="td">td</td>
         </tr>
     </table>
-    
-  	<div aura:id="scalarExpression">{!v.scalarExpression}</div>
-    
-  	<div aura:id="cacheTestA" id="cacheTestA"></div>
-  	<div aura:id="cacheTestB" id="cacheTestB"></div>
+
+    <div aura:id="scalarExpression">{!v.scalarExpression}</div>
+
+    <div aura:id="cacheTestA" id="cacheTestA"></div>
+    <div aura:id="cacheTestB" id="cacheTestB"></div>
 </aura:component>

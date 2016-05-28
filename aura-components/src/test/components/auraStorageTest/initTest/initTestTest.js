@@ -38,34 +38,6 @@
         }
     },
 
-    /**
-     * Register two auraStorage:init components with the same name but different
-     * config, establish which one stands W-1560182: Is it okay that we allow
-     * duplicate registration using auraStorage:init with same name but, we do
-     * not allow dups using $A.storageService.initStorage()? we do not allow dup
-     * named auraStorage:init in templates?
-     */
-    // auraErrorsExpectedDuringInit is not supported.
-    // TODO - this test should pass
-    _testDuplicateNamedStorage : {
-        auraErrorsExpectedDuringInit : ["Storage named 'dupNamedStorage' already exists!"],
-        attributes : {
-            dupNamedStorage : true
-        },
-        test : [
-            function(cmp) {
-                $A.test.assertTruthy(cmp.find("dupNamedStorage1"));
-                $A.test.assertTruthy(cmp.find("dupNamedStorage2"),
-                                "Duplicate named storage not registered using auraStorage:init");
-            },
-            function(cmp) {
-                //FIXME: W-1689002
-                //var storage = $A.storageService.getStorage("dupNamedStorage");
-                //$A.test.assertEquals(9999, storage.getMaxSize(),
-                //                "storage config was overriden by duplicate registrations.");
-            } ]
-    },
-
     testActionStorageProperties : {
         test : [
             function(cmp) {

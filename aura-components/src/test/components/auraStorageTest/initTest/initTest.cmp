@@ -11,13 +11,13 @@
 
     <!--Control the values per test case-->
     <auraStorage:init debugLoggingEnabled="true"
-	    name="actions"
-	    secure="true"
-	    persistent="{!v.persistent}"
-	    clearStorageOnInit="{!v.clearStorageOnInit}"
-	    defaultExpiration="{!v.defaultExpiration}"
-	    defaultAutoRefreshInterval="{!v.defaultAutoRefreshInterval}"
-	    version="{!v.version}"/>
+        name="actions"
+        secure="true"
+        persistent="{!v.persistent}"
+        clearStorageOnInit="{!v.clearStorageOnInit}"
+        defaultExpiration="{!v.defaultExpiration}"
+        defaultAutoRefreshInterval="{!v.defaultAutoRefreshInterval}"
+        version="{!v.version}"/>
 
 
     <ui:button label="Run action at Server Always" press="{!c.forceActionAtServer}" aura:id="ForceActionAtServer"/>
@@ -54,9 +54,5 @@
 
     <!-- Named storage test setup-->
     <auraStorage:init name="defaultAdapter"/>
-    <aura:attribute name="dupNamedStorage" type="Boolean" default="false"/>
-    <auraStorage:init name="dupNamedStorage" maxSize="9999" aura:id="dupNamedStorage1"/>
-    <aura:if isTrue="{!v.dupNamedStorage}">
-        <auraStorage:init name="dupNamedStorage" maxSize="6666" aura:id="dupNamedStorage2"/>
-    </aura:if>
+
 </aura:component>

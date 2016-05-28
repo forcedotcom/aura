@@ -16,6 +16,8 @@
 package org.auraframework.impl.css.token;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -39,6 +41,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.salesforce.omakase.data.Property;
+import com.salesforce.omakase.util.Properties;
 
 public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements TokenDef {
     private static final String INVALID_NAME = "Invalid token name: '%s'";
@@ -196,9 +199,19 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
             return this;
         }
 
-        public Builder setAllowedProperties(String allowedProperties) {
-            Iterable<String> split = Splitter.on(",").omitEmptyStrings().trimResults().split(allowedProperties.toLowerCase());
-            this.allowedProperties = Sets.newHashSet(split);
+        public Builder setAllowedProperties(String rawString) {
+            allowedProperties = new LinkedHashSet<>();
+
+            for (String name : Splitter.on(",").trimResults().split(rawString.toLowerCase())) {
+                if (name.length() > 1 && name.contains("*")) { // handle wildcards
+                    for (Property property : Properties.expand(name)) {
+                        allowedProperties.add(property.toString());
+                    }
+                } else {
+                    allowedProperties.add(name);
+                }
+            }
+
             return this;
         }
 
@@ -213,7 +226,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         }
     }
 
-    private boolean validateTokenName(String name){
+    private boolean validateTokenName(String name) {
         Pattern p = Pattern.compile("^[a-zA-Z_](\\.?[-a-zA-Z0-9_]*)*$");
         Matcher m = p.matcher(name);
         return m.find();

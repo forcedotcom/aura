@@ -24,8 +24,6 @@ import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.TokenDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.base.Optional;
-import com.salesforce.omakase.ast.CssAnnotation;
 import com.salesforce.omakase.ast.declaration.Declaration;
 import com.salesforce.omakase.broadcast.annotation.Validate;
 import com.salesforce.omakase.error.ErrorLevel;
@@ -36,9 +34,7 @@ import com.salesforce.omakase.plugin.Plugin;
  * Checks that tokens are used on the correct property.
  */
 public final class TokenPropertyValidationPlugin implements Plugin {
-    private static final String BYPASS_ANNOTATION = "reviewed-violation";
     private static final String MSG = "the '%s' token cannot be used with the %s property.\nAllowed properties: %s";
-    private static final String MISSING_EXPLANATION = "missing explanation for " + BYPASS_ANNOTATION + " annotation";
 
     private final TokenValueProvider tokenProvider;
 
@@ -55,17 +51,8 @@ public final class TokenPropertyValidationPlugin implements Plugin {
             for (TokenDef def : defs) {
                 Set<String> allowed = def.getAllowedProperties();
                 if (!allowed.isEmpty() && !allowed.contains(property)) {
-                    // check for bypass annotation
-                    Optional<CssAnnotation> annotation = declaration.annotation(BYPASS_ANNOTATION);
-                    if (annotation.isPresent()) {
-                        // must have explanation
-                        if (annotation.get().arguments().size() == 0) {
-                            em.report(ErrorLevel.FATAL, declaration, MISSING_EXPLANATION);
-                        }
-                    } else {
-                        // report the violation
-                        em.report(ErrorLevel.FATAL, function, String.format(MSG, def.getName(), property, allowed));
-                    }
+                    // report the violation
+                    em.report(ErrorLevel.FATAL, function, String.format(MSG, def.getName(), property, allowed));
                 }
             }
         }

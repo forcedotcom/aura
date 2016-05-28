@@ -66,7 +66,7 @@ public class StyleAdapterImpl implements StyleAdapter {
 
     @Override
     public boolean tokenPropertyValidation(DefDescriptor<? extends BaseStyleDef> style) {
-        // validate all non-internal namespaces. later can change this to include internal as well.
+        // validate all non-internal namespaces.
         return !Aura.getConfigAdapter().isInternalNamespace(style.getNamespace());
     }
 

@@ -86,7 +86,7 @@ public class AuraTestFilter implements Filter {
     private static final int DEFAULT_JSTEST_TIMEOUT = 30;
     private static final String BASE_URI = "/aura";
     private static final String GET_URI = BASE_URI
-            + "?aura.tag=%s:%s&aura.format=HTML&aura.deftype=%s&aura.mode=%s&aura.access=%s";
+            + "?aura.tag=%s:%s&aura.deftype=%s&aura.mode=%s&aura.format=%s&aura.access=%s";
 
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
 
@@ -223,7 +223,7 @@ public class AuraTestFilter implements Filter {
                     }
 
                     String newUri = createURI("aurajstest", "jstest", DefType.APPLICATION, mode,
-                            Authentication.AUTHENTICATED.name(), qs);
+                            Format.HTML, Authentication.AUTHENTICATED.name(), qs);
                     RequestDispatcher dispatcher = servletContext.getContext(newUri).getRequestDispatcher(newUri);
                     if (dispatcher != null) {
                         dispatcher.forward(req, res);
@@ -315,7 +315,8 @@ public class AuraTestFilter implements Filter {
                 TestCaseDef.class));
     }
 
-    private String createURI(String namespace, String name, DefType defType, Mode mode, String access, String qs) {
+    private String createURI(String namespace, String name, DefType defType, Mode mode, Format format, String access,
+            String qs) {
         if (mode == null) {
             try {
                 mode = Aura.getContextService().getCurrentContext().getMode();
@@ -324,7 +325,7 @@ public class AuraTestFilter implements Filter {
             }
         }
 
-        String ret = String.format(GET_URI, namespace, name, defType.name(), mode.toString(), access);
+        String ret = String.format(GET_URI, namespace, name, defType.name(), mode.toString(), format, access);
         if (qs != null) {
             ret = String.format("%s&%s", ret, qs);
         }
@@ -385,7 +386,7 @@ public class AuraTestFilter implements Filter {
             }
             String qs = URLEncodedUtils.format(newParams, "UTF-8") + hash;
             return createURI(targetDescriptor.getNamespace(), targetDescriptor.getName(),
-                    targetDescriptor.getDefType(), null, Authentication.AUTHENTICATED.name(), qs);
+                    targetDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED.name(), qs);
         } else {
             // Free-form tests will load only the target component's template.
             // TODO: Allow specifying the template on the test.
@@ -421,7 +422,7 @@ public class AuraTestFilter implements Filter {
                     testDef.getQualifiedName());
             testContext.getLocalDefs().add(targetDef);
             return createURI(newDescriptor.getNamespace(), newDescriptor.getName(),
-                    newDescriptor.getDefType(), null, Authentication.AUTHENTICATED.name(), null);
+                    newDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED.name(), null);
         }
     }
 
@@ -462,10 +463,10 @@ public class AuraTestFilter implements Filter {
         }
 
         // Inject tag to load and execute test.
-        String suiteSrcUrl = String.format("/%s/%s.%s?aura.jstestrun=%s&aura.format=JS&aura.testTimeout=%s&aura.nonce=%s",
-                targetDescriptor.getNamespace(), targetDescriptor.getName(),
-                targetDescriptor.getDefType() == DefType.APPLICATION ? "app" : "cmp", testName, timeout,
+        String qs = String.format("aura.jstestrun=%s&aura.testTimeout=%s&aura.nonce=%s", testName, timeout,
                 System.nanoTime());
+        String suiteSrcUrl = createURI(targetDescriptor.getNamespace(), targetDescriptor.getName(),
+                targetDescriptor.getDefType(), null, Format.JS, Authentication.AUTHENTICATED.name(), qs);
         tag = tag + String.format("\n<script src='%s'%s></script>\n", suiteSrcUrl, defer);
         return tag;
     }

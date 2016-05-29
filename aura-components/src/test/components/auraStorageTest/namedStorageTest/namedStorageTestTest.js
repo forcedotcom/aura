@@ -9,8 +9,8 @@
                 var foo = $A.storageService.initStorage({name: "foo"});
                 var bar = $A.storageService.initStorage({name: "bar"});
 
-                foo.put("key1", "value1")
-                    .then(function() { return bar.put("key2", "value2"); })
+                foo.set("key1", "value1")
+                    .then(function() { return bar.set("key2", "value2"); })
                     .then(function() { return foo.get("key1"); })
                     .then(function(v) { cmp._fooValue1 = v; })
                     // Insure that foo and bar are truly isolated stores and do

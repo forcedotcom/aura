@@ -16,12 +16,12 @@
 Function.RegisterNamespace("Test.Components.Ui.Scroller");
 
 [Fixture]
-Test.Components.Ui.Scroller.EndlessPluginTests=function(){
+Test.Components.Ui.Scroller.InfiniteLoadingTests=function(){
 
 	var targetHelper,
 		plugins,
 		windowMock=Test.Mocks.NeededMocks.getWindowMock();
-	
+
 	windowMock(function(){
 		var callback = function (path, fn) {fn();};
 		ImportJson("aura-components/src/main/components/ui/scrollerLib/bootstrap.js", callback);
@@ -47,10 +47,10 @@ Test.Components.Ui.Scroller.EndlessPluginTests=function(){
 				expected=false;
 
 			windowMock(function(){
-				infiniteLoadingPlugin = new plugins.InfiniteLoading();	
+				infiniteLoadingPlugin = new plugins.InfiniteLoading();
 				infiniteLoadingPlugin.opts={
 					infiniteLoadingConfig:{
-						dataProvider:function(){expected=true;}	
+						dataProvider:function(){expected=true;}
 					}
 				};
 				infiniteLoadingPlugin._setState = function(){};
@@ -68,12 +68,12 @@ Test.Components.Ui.Scroller.EndlessPluginTests=function(){
 				itemsLength;
 
 			windowMock(function(){
-				infiniteLoadingPlugin = new plugins.InfiniteLoading();	
+				infiniteLoadingPlugin = new plugins.InfiniteLoading();
 				infiniteLoadingPlugin.opts={
 					infiniteLoadingConfig:{
 						dataProvider:function(a,b){
 							callback=arguments[0];
-						}	
+						}
 					}
 				};
 				infiniteLoadingPlugin._setState = function(){};
@@ -101,7 +101,7 @@ Test.Components.Ui.Scroller.EndlessPluginTests=function(){
 					infiniteLoadingConfig:{
 						dataProvider:function(a,b){
 							callback=arguments[0];
-						}	
+						}
 					}
 				};
 				infiniteLoadingPlugin._setState = function(){};

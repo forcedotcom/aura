@@ -79,7 +79,12 @@
 
     verifyDefsRestored: function(cmp, evt, helper) {
         helper.setStatus(cmp, "Verifying Defs Restored");
-        $A.storageService.getStorage('ComponentDefStorage').getAll(true)
+        var storage = $A.storageService.getStorage("ComponentDefStorage");
+        if (!storage) {
+            helper.setStatus(cmp, "Defs Not Restored");
+            return;
+        }
+        storage.getAll(true)
             .then(function(items) {
                 if (items.length > 0) {
                     helper.setStatus(cmp, "Verified Defs Restored");
@@ -94,6 +99,10 @@
 
     /** Handle auraStorage:modified */
     storageModified: function(cmp, evt, helper) {
+        var eventStorageName = evt.getParam("name");
+        if (eventStorageName !== "ComponentDefStorage") {
+            return;
+        }
         helper.logComponentDefStorage(cmp)
     },
 

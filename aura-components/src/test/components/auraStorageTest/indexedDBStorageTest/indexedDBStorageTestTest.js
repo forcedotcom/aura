@@ -182,7 +182,7 @@
             stuff["b"] = stuff;
 
             var that = this;
-            this.storage.put("testCyclicObject", stuff)
+            this.storage.set("testCyclicObject", stuff)
                 .then(function() { return that.storage.get("testCyclicObject"); })
                 .then(function(value) {
                     $A.test.assertEquals(2, value["a"], "testCyclicObject: constant is wrong");
@@ -252,7 +252,7 @@
             var that = this;
             var completed = false;
             var failTest = function(cmp, error) { cmp._storageLib.failTest(cmp, error); }
-            this.storage.put("testErrorValue", new Error("hello, error"))
+            this.storage.set("testErrorValue", new Error("hello, error"))
                 .then(function() {
                     completed = true;
                     $A.test.fail("Expected put() to fail but it succeeded");
@@ -276,7 +276,7 @@
         test: function(cmp) {
             var completed = false;
             var that = this;
-            this.storage.put("testFunctionValue", function(x){})
+            this.storage.set("testFunctionValue", function(x){})
                 .then(
                     function() {
                         completed = true;
@@ -315,7 +315,7 @@
         }, function(cmp){
             var completed = false;
 
-            cmp._storage.put("testGetSize.key1", new Array(1024).join("x"))  // 1kb
+            cmp._storage.set("testGetSize.key1", new Array(1024).join("x"))  // 1kb
                 .then(function() { return cmp._storage.get("testGetSize.key1"); })
                 .then(function(value) { $A.test.assertDefined(value, "Fail item."); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
@@ -333,7 +333,7 @@
             var completed = false;
 
             //Two value to see that size is recalculated
-            cmp._storage.put("testGetSize.key2" , new Array(3072).join("y")) //5kb
+            cmp._storage.set("testGetSize.key2" , new Array(3072).join("y")) //5kb
                 .then(function() { return cmp._storage.get("testGetSize.key2"); })
                 .then(function(value) { $A.test.assertDefined(value, "testGetSize: Fail - item undefined."); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
@@ -350,7 +350,7 @@
 
             // Overwrite previous key2
             // Careful... this does not calculate size correctly.
-            cmp._storage.put("testGetSize.key2" , new Array(1024).join("z")) //1kb
+            cmp._storage.set("testGetSize.key2" , new Array(1024).join("z")) //1kb
                 .then(function() { return cmp._storage.get("testGetSize.key2"); })
                 .then(function(value) { $A.test.assertDefined(value); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
@@ -568,19 +568,19 @@
            },
            function insertEntries(cmp) {
                var completed = false;
-               cmp._storage.put(cmp._prefix.key, cmp._prefix.value)
+               cmp._storage.set(cmp._prefix.key, cmp._prefix.value)
                    .then(function() {
                        var promises = [];
                        for (var i = 0; i < cmp._actionsBlacklist.length; i++) {
-                           promises.push(cmp._storage.put(cmp._actionsBlacklist[i], cmp._expected));
+                           promises.push(cmp._storage.set(cmp._actionsBlacklist[i], cmp._expected));
                        }
                        return Promise.all(promises);
                    })
                    .then(function() {
-                       return cmp._storage.put(cmp._suffix1.key, cmp._prefix.value);
+                       return cmp._storage.set(cmp._suffix1.key, cmp._prefix.value);
                    })
                    .then(function() {
-                       return cmp._storage.put(cmp._suffix2.key, cmp._prefix.value);
+                       return cmp._storage.set(cmp._suffix2.key, cmp._prefix.value);
                    })
                    .then(function() {
                        completed = true;

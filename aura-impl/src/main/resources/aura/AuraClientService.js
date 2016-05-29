@@ -579,7 +579,7 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
                 if (this.persistedActionFilter) {
                     this.persistedActionFilter[key] = true;
                 }
-                storage.put(key, toStore).then(
+                storage.set(key, toStore).then(
                     function() {},
                     function(error){
                         $A.run(function() {
@@ -1311,7 +1311,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
 
                             // Fires applicationRefreshed only after the new response is saved
                             // Guarantees the new action response is there before page reloads
-                            storage.put(key, toStore).then(storeCallback, storeCallback);
+                            storage.set(key, toStore).then(storeCallback, storeCallback);
                         }
                     }
             }, "SUCCESS");
@@ -2754,7 +2754,7 @@ AuraClientService.prototype.revalidateAction = function(descriptor, params, call
     storage.get(key, true).then(
         function(value) {
             if (value) {
-                storage.put(key, value).then(
+                storage.set(key, value).then(
                     function() { callback(true); },
                     function(/*error*/) { callback(false); }
                 );

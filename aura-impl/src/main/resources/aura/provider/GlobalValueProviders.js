@@ -165,7 +165,7 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                             $A.warning("GlobalValueProvider.merge(), merging from storage failed, overwriting, error:" + err);
                         }
                     }
-                    return storage.put(that.STORAGE_KEY, toStore);
+                    return storage.set(that.STORAGE_KEY, toStore);
                 })
                 .then(
                     function() {

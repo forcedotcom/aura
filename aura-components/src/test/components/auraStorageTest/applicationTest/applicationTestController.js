@@ -21,7 +21,7 @@
 
     addToStorage: function(cmp) {
         cmp.set("v.status", "Adding");
-        cmp._storage.put(cmp._key,
+        cmp._storage.set(cmp._key,
             {
                 'components': [], // components is undefined instead is real response
                 'returnValue': {

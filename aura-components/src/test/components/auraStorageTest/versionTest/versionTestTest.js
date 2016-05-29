@@ -25,7 +25,7 @@
             var version = cmp.get("v.version");
 
             var storage = $A.storageService.getStorage("cmpStorage");
-            storage.put(key, expected)
+            storage.set(key, expected)
                 .then(function() {
                     return storage.adapter.getItem(version + cmp.DELIMITER + key);
                 })
@@ -99,7 +99,7 @@
             function populateStorageVersionA(cmp) {
                 var completed = false;
                 var storage = $A.storageService.initStorage({name: "getAllIsolation", version:"A"});
-                storage.put("keyA","valueA")
+                storage.set("keyA","valueA")
                     .then(function() {
                         completed = true;
                     })

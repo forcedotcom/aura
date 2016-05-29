@@ -14,7 +14,7 @@
             var checkingGauge2 = cmp.find("checkingGauge2");
             $A.test.assertTruthy(checkingGauge1);
             $A.test.assertTruthy(checkingGauge2);
-            $A.test.assertTrue(checkingGauge1.getGlobalId() !== checkingGauge2.getGlobalId(), 
+            $A.test.assertTrue(checkingGauge1.getGlobalId() !== checkingGauge2.getGlobalId(),
                      "Duplicate fuel gauge for same storage object should be allowed.");
         }
     },
@@ -32,5 +32,46 @@
             $A.test.assertTruthy(noName);
             $A.test.assertFalse(noName.get('v.enabled'))
         }
-    }
+    },
+
+    testFuelGaugeUnaffectedByOtherStores:{
+        test:[
+            function captureCurrentValues(cmp){
+                var actionsGauge = cmp.find("actionsGauge");
+                cmp._actionsValue = actionsGauge.get("v.value");
+                var savingsGauge = cmp.find("savingsGauge");
+                cmp._savingsValue = savingsGauge.get("v.value");
+                var checkingGauge1 = cmp.find("checkingGauge1");
+                cmp._checkingValue = checkingGauge1.get("v.value");
+            },
+            function updateStores(cmp) {
+                var completed = false;
+                $A.storageService.getStorage("actions").set("big", new Array(4096).join("x"))
+                    .then(function() {
+                        return $A.storageService.getStorage("savings").set("small", new Array(512).join("x"))
+                    })
+                    .then(function() {
+                        completed = true;
+                    })["catch"](function(e) {
+                        $A.test.fail("storage error thrown", e);
+                    });
+
+                $A.test.addWaitFor(true, function() { return completed; });
+            },
+            function verifyUpatedValues(cmp) {
+                var actionsGauge = cmp.find("actionsGauge");
+                var actionsValue = actionsGauge.get("v.value");
+                var savingsGauge = cmp.find("savingsGauge");
+                var savingsValue = savingsGauge.get("v.value");
+                var checkingGauge1 = cmp.find("checkingGauge1");
+                var checkingValue = checkingGauge1.get("v.value");
+
+                $A.test.assertNotEquals(cmp._actionsValue, actionsValue, "actions guage not updated");
+                $A.test.assertNotEquals(cmp._savingsValue, savingsValue, "savings guage not updated");
+                $A.test.assertEquals(cmp._checkingValue, checkingValue, "checking guage should not have changed");
+                $A.test.assertTrue(actionsValue > savingsValue, "actions guage should be larger than savings guage");
+
+            }
+        ]
+    },
 })

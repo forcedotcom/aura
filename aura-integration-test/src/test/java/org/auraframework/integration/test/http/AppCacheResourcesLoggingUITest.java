@@ -395,9 +395,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
                 ControllerDef.class,
                 String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, app.namespace, storageCmpName),
                 "{ addToStorage: function(cmp) { "
-                        + "  $A.storageService.getStorage('actions').put('testkey','testvalue')"
+                        + "  $A.storageService.getStorage('actions').set('testkey','testvalue')"
                         + "    .then(function(){"
-                        + "      return $A.storageService.getStorage('ComponentDefStorage').put('testkey','{2:1}');"
+                        + "      return $A.storageService.getStorage('ComponentDefStorage').set('testkey','{2:1}');"
                         + "    }).then(function() {"
                         + "      cmp.set('v.storageOutput','Storage Done')"
                         + "    })"

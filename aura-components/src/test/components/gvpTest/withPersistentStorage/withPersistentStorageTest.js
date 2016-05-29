@@ -63,7 +63,7 @@
                             gvps[i]["values"]["Related_Lists"]["task_mode_today"] = "Updated";
                         }
                     }
-                    return storage.put("globalValueProviders", gvps);
+                    return storage.set("globalValueProviders", gvps);
                 })
                 .then(function() { completed = true; })
                 ["catch"](failTest);

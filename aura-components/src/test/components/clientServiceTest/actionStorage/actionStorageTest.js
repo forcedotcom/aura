@@ -130,7 +130,7 @@
                     "error handler didn't get called",
                     function() {
                         $A.test.assertTrue(
-                            errorHandled.message.indexOf("AuraStorage.put() cannot store") === 0,
+                            errorHandled.message.indexOf("AuraStorage.set() cannot store") === 0,
                             "Should have returned error indicating cannot store"
                         );
                         $A.test.assertTrue(

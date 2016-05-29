@@ -147,13 +147,6 @@ AuraStorageService.prototype.getAdapterConfig = function(adapter) {
     return this.adapters[adapter];
 };
 
-AuraStorageService.prototype.fireModified = function() {
-    var e = $A.eventService.getNewEvent("markup://auraStorage:modified");
-    if (e) {
-        e.fire();
-    }
-};
-
 /**
  * Selects an adapter based on the given configuration. Some configuration is a hard requirement;
  * other is best effort.

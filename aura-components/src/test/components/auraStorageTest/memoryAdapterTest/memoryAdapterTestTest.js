@@ -255,7 +255,7 @@
         test : function(cmp) {
             var that = this;
             var completed = false;
-            that.storage.put("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
+            that.storage.set("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(50, size*1024); })
             .then( function() { completed = true; })
@@ -272,12 +272,12 @@
             var size2 = NaN;
             var size3 = NaN;
             var completed = false;
-            this.storage.put("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" }})
+            this.storage.set("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" }})
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { size1 = size; })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { size2 = size; })
-                .then(function() { return that.storage.put("key2", {}); })
+                .then(function() { return that.storage.set("key2", {}); })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { size3 = size; })
                 .then(
@@ -303,10 +303,10 @@
             var that = this;
             var originalSize = NaN;
             var completed = false;
-            this.storage.put("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
+            this.storage.set("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { originalSize = size; })
-                .then(function() { return that.storage.put("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } }); })
+                .then(function() { return that.storage.set("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } }); })
                 // the size should not have changed
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { $A.test.assertEquals(originalSize, size); })
@@ -322,10 +322,10 @@
         test : function(cmp) {
             var that = this;
             var completed = false;
-            this.storage.put("key1", {"value" : {"alpha":"beta", "gamma":"delta" } })
+            this.storage.set("key1", {"value" : {"alpha":"beta", "gamma":"delta" } })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(50, size*1024); })
-                .then(function() { return that.storage.put("key1", {"value" : {"alpha":"epsilon", "gamma":"zeta", "now" : true }}); })
+                .then(function() { return that.storage.set("key1", {"value" : {"alpha":"epsilon", "gamma":"zeta", "now" : true }}); })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(63, size*1024); })
                 .then(function() { completed = true; })
@@ -340,25 +340,25 @@
             var that = this;
             var completed = false;
             Promise.all([
-                    that.storage.put("key1", {
+                    that.storage.set("key1", {
                             "value" : {
                                 "alpha" : "beta",
                                 "gamma" : "delta"
                             }
                     }),
-                    that.storage.put("key2", {
+                    that.storage.set("key2", {
                             "value" : {
                                 "alpha" : "epsilon",
                                 "gamma" : "zeta"
                             }
                     }),
-                    that.storage.put("key3", {
+                    that.storage.set("key3", {
                             "value" : {
                                 "alpha" : "eta",
                                 "gamma" : "theta"
                             }
                     }),
-                    that.storage.put("key4", {
+                    that.storage.set("key4", {
                             "value" : {
                                 "alpha" : "iota",
                                 "gamma" : "kappa"
@@ -379,8 +379,8 @@
             var that = this;
             var completed = false;
             Promise.all([
-                that.storage.put("key1", {"value" : {"alpha" : "beta","gamma" : "delta"}}),
-                that.storage.put("key2", {"value" : {"alpha" : "iota","gamma" : "kappa"}})
+                that.storage.set("key1", {"value" : {"alpha" : "beta","gamma" : "delta"}}),
+                that.storage.set("key2", {"value" : {"alpha" : "iota","gamma" : "kappa"}})
             ])
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(100, size*1024); })
@@ -389,7 +389,7 @@
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(50, size*1024); })
                 // put a new item with same key, different object
-                .then(function() { return that.storage.put("key1", {"value" : {"alpha" : "epsilon", "gamma" : "zeta"}}); })
+                .then(function() { return that.storage.set("key1", {"value" : {"alpha" : "epsilon", "gamma" : "zeta"}}); })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(102, size*1024); })
                 .then(function() { completed = true; })
@@ -416,13 +416,13 @@
 
             var that = this;
             var completed = false;
-            this.storage.put("key1", {"value" : {"foo" : new Array(256).join("x")}})
+            this.storage.set("key1", {"value" : {"foo" : new Array(256).join("x")}})
                 .then(function() { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(":key1", mru.toString()); })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(283, size*1024); })
 
-                .then(function() { return that.storage.put("key2", { "value" : { "bar" : new Array(512).join("y")}}); })
+                .then(function() { return that.storage.set("key2", { "value" : { "bar" : new Array(512).join("y")}}); })
                 .then(function() { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key1", "key2"]), mru.toString()); })
                 .then(function() { return that.storage.getSize(); })
@@ -435,7 +435,7 @@
 
                 // add another item to push out the oldest item
                 // oldest (key2) item should have been evicted
-                .then(function() { return that.storage.put("key3", {"value" : {"baz" : new Array(3300).join("z")}}); })
+                .then(function() { return that.storage.set("key3", {"value" : {"baz" : new Array(3300).join("z")}}); })
                 .then(function() { return that.storage.get("key2"); })
                 .then(function(value) { $A.util.isUndefined(value); })
                 .then(function() { return that.adapter.getMRU(); })
@@ -445,7 +445,7 @@
 
                 // complete eviction
                 // add a new key which would require all the current entries to be evicted
-                .then(function() { return that.storage.put("key4", { "value" : { "buz" : new Array(4000).join("w") }}); })
+                .then(function() { return that.storage.set("key4", { "value" : { "buz" : new Array(4000).join("w") }}); })
                 .then(function() { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key4"]), mru.toString()); } )
                 .then(function() { return that.storage.getSize(); })
@@ -479,21 +479,21 @@
             var almostMaxSizeChunk = Math.floor((maxSize-.1)/2*1024);
 
             var chunk = new Array(quarterMaxSizeChunk).join("x");
-            this.storage.put(key1, chunk)
+            this.storage.set(key1, chunk)
             .then(function() {
                 // Use same key to verify MRU in adapter updates existing entry
                 var value = new Array(halfMaxSizeChunk).join("x");
-                return that.storage.put(key1, value);
+                return that.storage.set(key1, value);
             })
             .then(function() {
                 // Force previously added items to be evicted
                 var value = new Array(almostMaxSizeChunk).join("x");
-                return that.storage.put("forceEvict", value);
+                return that.storage.set("forceEvict", value);
             })
             .then(function() {
                 // Force another eviction to verify no lingering references to first key we just evicted
                 var value = new Array(almostMaxSizeChunk).join("x");
-                return that.storage.put("forceEvictAgain", value);
+                return that.storage.set("forceEvictAgain", value);
             })
             .then(function() {
                 return that.storage.getAll();
@@ -556,7 +556,7 @@
 
             var completed = false;
             var key = "key1";
-            storage.put(key, { "value" : { "alpha" : "beta", "gamma" : "delta" } })
+            storage.set(key, { "value" : { "alpha" : "beta", "gamma" : "delta" } })
                 .then(function() {
                     // get() triggers an async sweep so loop until get()
                     // returns undefined indicating sweep has run

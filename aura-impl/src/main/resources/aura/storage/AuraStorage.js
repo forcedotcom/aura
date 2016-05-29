@@ -197,14 +197,14 @@ AuraStorage.prototype.getAll = function(includeExpired) {
  * @returns {Promise} A Promise that will put the value in storage.
  * @export
  */
-AuraStorage.prototype.put = function(key, value) {
+AuraStorage.prototype.set = function(key, value) {
     // For the size calculation, consider only the inputs to the storage layer: key and value
     // Ignore all the extras in the item object below
     var size = $A.util.estimateSize(key) + $A.util.estimateSize(value);
     if (size > this.maxSize) {
         var maxSize = this.maxSize;
         var finalReject = function() {
-            return Promise["reject"](new Error("AuraStorage.put() cannot store " + key + " of size " + size + "b because it's over the max size of " + maxSize + "b"));
+            return Promise["reject"](new Error("AuraStorage.set() cannot store " + key + " of size " + size + "b because it's over the max size of " + maxSize + "b"));
         };
         return this.remove(key, true).then(finalReject, finalReject);
     }
@@ -222,7 +222,7 @@ AuraStorage.prototype.put = function(key, value) {
         .then(
             function () {
                 that.log("put() - key: " + key + ", value: " + item);
-                $A.storageService.fireModified();
+                that.fireModified();
             },
             function (e) {
                 that.logError({ "operation": "put", "error": e });
@@ -238,7 +238,7 @@ AuraStorage.prototype.put = function(key, value) {
 /**
  * Asynchronously removes the item from storage corresponding to the specified key.
  * @param {String} key The key of the item to remove.
- * @param {Boolean} doNotFireModified A bool indicating whether or not to fire the modified event on item removal.
+ * @param {Boolean} doNotFireModified Whether to fire the modified event on item removal.
  * @returns {Promise} A Promise that will remove the item from storage.
  * @private
  */
@@ -248,7 +248,7 @@ AuraStorage.prototype.remove = function(key, doNotFireModified) {
         .then(function(){
             that.log("remove(): key " + key);
             if (!doNotFireModified) {
-                $A.storageService.fireModified();
+                that.fireModified();
             }
         }, function (e) {
             that.logError({ "operation": "remove", "error": e });
@@ -283,13 +283,14 @@ AuraStorage.prototype.sweep = function() {
 
     // prevent concurrent sweeps
     this._sweepingInProgress = true;
-
     var that = this;
-    function doneSweeping() {
+    function doneSweeping(doNotFireModified) {
         that.log("sweep() - complete");
         that._sweepingInProgress = false;
         that.lastSweepTime = new Date().getTime();
-        $A.storageService.fireModified();
+        if (!doNotFireModified) {
+            that.fireModified();
+        }
     }
 
     // if adapter can do its own sweeping
@@ -299,7 +300,8 @@ AuraStorage.prototype.sweep = function() {
                 undefined, // noop
                 function(e) {
                     that.logError({ "operation": "sweep", "error": e });
-                    // do not rethrow to move to resolve state
+                    // do not rethrow to move to resolve state. return true to not fire modified
+                    return true;
                 }
             )
             .then(doneSweeping, doneSweeping);
@@ -322,10 +324,11 @@ AuraStorage.prototype.sweep = function() {
             // adapter to avoid re-adding the key prefix.
 
             if (expired.length === 0) {
-                return;
+                // return true to not fire modified
+                return true;
             }
 
-            function noop() {}
+            function noop() { return true; }
             var promiseSet = [];
             var key, promise;
 
@@ -340,8 +343,9 @@ AuraStorage.prototype.sweep = function() {
                 promiseSet.push(promise);
             }
 
-            return Promise.all(promiseSet).then(doneSweeping, doneSweeping); // eslint-disable-line consistent-return
-        });
+            return Promise.all(promiseSet); // eslint-disable-line consistent-return
+        })
+        .then(doneSweeping, doneSweeping);
 };
 
 /**
@@ -474,6 +478,17 @@ AuraStorage.prototype.deleteStorage = function() {
  */
 AuraStorage.prototype.generateKeyPrefix = function(isolationKey, version) {
     return "" + isolationKey + version + AuraStorage.KEY_DELIMITER;
+};
+
+/**
+ * Fires an auraStorage:modified event for this storage.
+ * @private
+ */
+AuraStorage.prototype.fireModified = function() {
+    var e = $A.eventService.getNewEvent("markup://auraStorage:modified");
+    if (e) {
+        e.fire({"name": this.name});
+    }
 };
 
 

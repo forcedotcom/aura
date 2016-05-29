@@ -103,11 +103,11 @@
         // def store is not created until a dynamic def is received. if it doesn't exist
         // in aura storage service then create it, clear it (to clear the underlying persistent
         // store), then remove it.
-        var def = $A.storageService.getStorage("ComponentDefStorage");
-        var defCreated = false;
-        if (!def) {
-            defCreated = true;
-            def = $A.storageService.initStorage({
+        var defs = $A.storageService.getStorage("ComponentDefStorage");
+        var defsCreated = false;
+        if (!defs) {
+            defsCreated = true;
+            defs = $A.storageService.initStorage({
                 name: "ComponentDefStorage",
                 persistent: true,
                 secure: false,
@@ -118,10 +118,10 @@
             });
         }
 
-        return Promise.all([$A.storageService.getStorage("actions").clear(), def.clear()])
+        return Promise.all([$A.storageService.getStorage("actions").clear(), defs.clear()])
             .then(
                 function() {
-                    if (defCreated) {
+                    if (defsCreated) {
                         $A.storageService.deleteStorage("ComponentDefStorage");
                     }
                 }

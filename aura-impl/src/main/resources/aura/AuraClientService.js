@@ -1328,9 +1328,9 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                         storage.get(key).then(
                             function(value) {
                                 if (value) {
-                                    storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE, using stored action response.", [a, value.value]);
+                                    storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE, using stored action response.", [a, value]);
                                     $A.run(function() {
-                                        action.updateFromResponse(value.value);
+                                        action.updateFromResponse(value);
                                         action.finishAction($A.getContext());
                                     });
                                 } else {

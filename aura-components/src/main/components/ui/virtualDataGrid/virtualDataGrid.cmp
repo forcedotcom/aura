@@ -25,7 +25,10 @@
     <aura:method name="appendItems">
         <aura:attribute name="items" type="Object"/>
     </aura:method>
-    
+    <aura:method name="updateItem">
+        <aura:attribute name="item" type="Object" required="true" description="Updated item to be placed in the grid at the specified index."/>
+        <aura:attribute name="index" type="Integer" required="true" description="Index of the target row within the grid."/>
+    </aura:method>        
     <aura:method name="resizeColumns" description="Resizes columns if the plugin is enabled.">
     	<aura:attribute name="widths" type="Integer[]"/>
     </aura:method>
@@ -37,13 +40,13 @@
     </aura:method>
 
     <!-- ATTRIBUTES -->
-    <aura:attribute name="class"			type="String"										 description="CSS class to be applied to the table element"/>
+    <aura:attribute name="class"		   type="String"										 description="CSS class to be applied to the table element"/>
     <aura:attribute name="items"           type="List"                                  		 description="A list of objects representing the rows of data in the grid"/>
     <aura:attribute name="headerColumns"   type="Aura.Component[]"                      		 description="Components used as the header elements of the table"/>
     <aura:attribute name="columns"         type="Aura.ComponentDefRef[]"                		 description="Components used as the template for each row"/>
-    <aura:attribute name="columnsEdit"     type="Aura.ComponentDefRef[]"                />
+    <aura:attribute name="columnsEdit"     type="Aura.ComponentDefRef[]" />
     <aura:attribute name="dataModel"       type="Aura.Component[]"                      		 description="Optional component to provide data for the grid"/>
-    <aura:attribute name="_dirty"           type="Integer"                              		 description="Internal attribute for evaluating whether the grid should be rerendered"/>
+    <aura:attribute name="_dirty"          type="Integer"                              		     description="Internal attribute for evaluating whether the grid should be rerendered"/>
     <aura:attribute name="itemVar"         type="String"                 default="item" 		 description="The name of the variable to use for each item inside the grid"/>
     <aura:attribute name="delegatedEvents" type="String"				 default="click,keydown" description="List of events the grid should delegate, separated by comma."/>
     
@@ -75,7 +78,8 @@
         </thead>
         <tfoot aura:id="tfoot"></tfoot>
         <tbody aura:id="tbody"></tbody>
-    </table>    
+    </table>
+
 
 </aura:component>
 

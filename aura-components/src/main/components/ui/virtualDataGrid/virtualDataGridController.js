@@ -29,9 +29,10 @@
         helper.markDirty(cmp);
 
         cmp._initializing = false;
+        
     },
     handleItemsChange: function (cmp, event, helper) {
-        if (cmp._initializing || cmp._appending) {
+        if (cmp._initializing || cmp._appending || cmp._updating) {
             return;
         }
 
@@ -76,6 +77,16 @@
     	// if a handler is directly attached to the source component by a parent component.
     	cmp.getEvent("gridAction").setParams(params).fire();
     },
+
+    updateItem: function (cmp, event, helper) {
+        var params  = event.getParam('arguments'),
+            index   = params.index,
+            item     = params.item;
+        
+        cmp = helper._getRootComponent(cmp);
+        
+        helper.updateItem(cmp, item, index);
+    },     
     
     /*
      * =========================

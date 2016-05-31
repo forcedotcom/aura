@@ -250,16 +250,16 @@
             }
 
             if (ptv.dirty) {
-                this._rerenderDirtyElement(cmp, item, target);
+                this._rerenderDirtyElement(cmp, item, target, null); // (cmp, item, target, index)
             }
             
             delete templates[position].getElement;
             ptv.ignoreChanges = true;
         }
     },
-    _findVirtualElementPosition: function (items, elmt) {
+    _findVirtualElementPosition: function (items, target) {
         for (var i = 0; i < items.length; i++) {
-            if (items[i] === elmt) {
+            if (items[i] === target) {
                 return i;
             }
         }
@@ -270,15 +270,20 @@
     		parent.replaceChild(newChild, oldChild);
     	}
     },
-    _rerenderDirtyElement: function (cmp, item, oldElement) {
-        var listRoot  = this.getGridBody(cmp),
-            items     = cmp._virtualItems,
-            position  = this._findVirtualElementPosition(items, oldElement);
+    _rerenderDirtyElement: function (cmp, item, target, index) {
+        var gridBody     = this.getGridBody(cmp),
+            virtualItems = cmp._virtualItems,
+            updatedRow   = this._generateVirtualRow(cmp, item, index);
         
-        if (!$A.util.isUndefinedOrNull(position)) {
-        	var rendered  = this._generateVirtualRow(cmp, item, position);
-        	items[position] = rendered;
-            this._replaceDOMElement(listRoot, rendered, oldElement);
+        index = (!$A.util.isUndefinedOrNull(index)) ? index : this._findVirtualElementPosition(virtualItems, target);
+
+        if (!$A.util.isUndefinedOrNull(gridBody) && !$A.util.isUndefined(index) && index >= 0 && index < virtualItems.length) {
+            if (!target) {
+                target = virtualItems[index];
+            }
+
+            virtualItems[index] = updatedRow;
+            this._replaceDOMElement(gridBody, updatedRow, target);
         }
     },
     _generateVirtualRow: function (cmp, item, index) {
@@ -348,14 +353,31 @@
             $A.metricsService.markEnd(this.NS, this.NAME + ".createVirtualRows");
         }        
     },
-    
     selectRow: function(cmp, index, value) {
     	var row = cmp._virtualItems[index];
     	
     	var op = value ? 'add' : 'remove';
     	row.classList[op]('selected');
     },
-    
+
+    updateItem: function (cmp, item, index) {
+        this._rerenderDirtyElement(cmp, item, null, index); // (cmp, item, target, index)
+        cmp._updating = true;
+        var updatedItems = cmp.get('v.items');
+        updatedItems[index] = item;
+        cmp.set('v.items', updatedItems, true);
+        cmp._updating = false;
+    },
+    _getRootComponent: function (cmp) {
+        var superCmp   = cmp.getSuper(),
+            isExtended = superCmp.getDef().getDescriptor().getName() !== 'component';
+
+        if (isExtended) {
+            cmp = superCmp;
+        }
+        return cmp;
+    },
+
     /*
      * =========================
      * SORTING

@@ -38,11 +38,13 @@
 		<div class="header">
 		    <ui:button class="kitchenButton" label="Change Columns" press="{!c.switchColumn}"/>
 			<ui:button class="kitchenButton" label="Re-fire datagrid's provide" press="{!c.replaceData}"/>
-		    <ui:button class="kitchenButton" label="Fire Data Provider With Empty Data" press="{!c.emptyData}"/>         
+		    <ui:button class="kitchenButton" label="Fire Data Provider With Empty Data" press="{!c.emptyData}"/>
+		    <ui:button class="kitchenButton" label="Update the selected row (with random data)" press="{!c.updateItem}"/>         
 			<br/>
 			<ui:button class="kitchenButton" label="Focus Next" press="{!c.focusNext}"/>
 			<ui:inputCheckbox label="Provide no data" value="{!v.provideNoData}"/> 
 			<ui:outputText label="Sorting By:" value="{!v.sortBy}"/>
+
 		</div>
 	
 		<ui:virtualDataGrid aura:id="grid" class="longGrid" aura:flavor="{!v.tableFlavor}" onsort="{!c.onsort}" rowHeaderIndex="1" fixedHeader="true">
@@ -78,5 +80,6 @@
 	    <aura:iteration aura:id="items" var="item" items="{!v.gridItems}">
 	    	<ui:outputText value="{!item.id + ':' + item.subject + ':' + item.who.name + ':' + item.what.name + ':' + item.activityDate}"/><br/>
 	    </aura:iteration>
+        
 	</div>
 </aura:component>

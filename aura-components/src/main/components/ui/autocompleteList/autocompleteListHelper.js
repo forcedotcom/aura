@@ -496,8 +496,6 @@
         for (var i = 0; i < itemCmps.length; i++) {
             $A.util.toggleClass(itemCmps[i], "force");
         }
-
-
     },
 
     matchText: function (component, items) {
@@ -522,14 +520,10 @@
 
     toggleListVisibility: function (component, items) {
         var showEmptyListContent = !$A.util.isEmpty(component.get("v.emptyListContent")) && !$A.util.isEmpty(component.get("v.keyword"));
-
         var hasVisibleOption = this.hasVisibleOption(items);
-
-        // Should no longer be necessary, as the class attribute is now adds "visible" if v.visible is true.
-        //var list = component.find("list");
-        //$A.util.toggleClass(list, "visible", hasVisibleOption);
-
-        component.set("v.visible", hasVisibleOption || showEmptyListContent);
+        var hasVisibleHeader =  this.getHeader(component) && component.get("v.showListHeader");
+        var hasVisibleFooter =  this.getFooter(component) && component.get("v.showListFooter");
+        component.set("v.visible", hasVisibleOption || showEmptyListContent || hasVisibleHeader || hasVisibleFooter);
     },
 
     updateAriaAttributesFromIdAttribute: function (component, highlightedCmp) {

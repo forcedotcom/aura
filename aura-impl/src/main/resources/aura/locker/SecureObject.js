@@ -181,7 +181,9 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 	"use strict";
 
 	function memoize(visitedCache, v, unfiltered) {
-		visitedCache.set(v, unfiltered);
+		try {
+			visitedCache.set(v, unfiltered);
+		} catch (ignore) { /* ignored */ }
 		
 		return unfiltered;
 	}

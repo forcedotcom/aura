@@ -15,9 +15,7 @@
  */
 package org.auraframework.test.source;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
@@ -29,38 +27,16 @@ import javax.annotation.Nullable;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.def.FlavorsDef;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.IncludeDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.LibraryDef;
-import org.auraframework.def.ModelDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RendererDef;
-import org.auraframework.def.SVGDef;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.TokensDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
+import org.auraframework.system.*;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 /**
  * This source loader allows tests to load and unload source from strings.
@@ -516,6 +492,7 @@ public class StringSourceLoaderImpl implements StringSourceLoader {
      * @param namespace namespace
      * @return true if included in {@link #privilegedNamespaces}
      */
+    @Override
     public boolean isPrivilegedNamespace(String namespace) {
         if (namespace == null) {
             return false;

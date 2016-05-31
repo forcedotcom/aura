@@ -111,14 +111,12 @@
                 var transaction = new AuraInspectorTransactionView(this);
                 var actions = new AuraInspectorActionsView(this);
                 var storage = new AuraInspectorStorageView(this);
-                var chaos = new AuraInspectorChaosView(this);
-
+                
                 this.addPanel("component-tree", tree, chrome.i18n.getMessage("tabs_componenttree"));
                 this.addPanel("performance", perf, chrome.i18n.getMessage("tabs_performance"));
                 this.addPanel("transaction", transaction, chrome.i18n.getMessage("tabs_transactions"));
                 this.addPanel("event-log", eventLog, chrome.i18n.getMessage("tabs_eventlog"));
                 this.addPanel("actions", actions, chrome.i18n.getMessage("tabs_actions"));
-                this.addPanel("chaos", chaos, "Chaos");
                 this.addPanel(storage.panelId, storage, chrome.i18n.getMessage("tabs_storage"));
 
                 // Sidebar Panel

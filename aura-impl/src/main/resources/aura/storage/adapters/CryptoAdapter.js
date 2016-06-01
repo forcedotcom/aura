@@ -121,11 +121,19 @@ CryptoAdapter["setKey"] = function(rawKey) {
 
     var resolve = CryptoAdapter._keyResolve;
     var reject = CryptoAdapter._keyReject;
+    var log;
 
     // only allow one invocation and
     delete CryptoAdapter["setKey"];
     delete CryptoAdapter._keyResolve;
     delete CryptoAdapter._keyReject;
+
+    if (!rawKey instanceof ArrayBuffer) {
+        log = "CryptoAdapter cannot import key of wrong type (" + typeof rawKey + "), rejecting";
+        $A.warning(log);
+        reject(new Error(log));
+        return;
+    }
 
     CryptoAdapter.engine["importKey"](
         "raw",                  // format
@@ -138,7 +146,7 @@ CryptoAdapter["setKey"] = function(rawKey) {
             // it's possible for key import to fail, which we treat as a fatal
             // error. all pending and future operations will fail.
             if (!key) {
-                var log = "CryptoAdapter crypto.importKey() returned no key, rejecting";
+                log = "CryptoAdapter crypto.importKey() returned no key, rejecting";
                 $A.warning(log);
                 reject(new Error(log));
                 return;
@@ -147,7 +155,7 @@ CryptoAdapter["setKey"] = function(rawKey) {
             resolve(key);
         },
         function(e) {
-            var log = "CryptoAdapter crypto.importKey() failed, rejecting: " + e;
+            log = "CryptoAdapter crypto.importKey() failed, rejecting: " + e;
             $A.warning(log);
             reject(new Error(log));
         }

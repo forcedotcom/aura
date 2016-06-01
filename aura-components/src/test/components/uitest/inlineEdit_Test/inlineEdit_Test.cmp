@@ -24,21 +24,28 @@
 
 	<div>
         <div class="toolbar">
+        	<ui:inputText aura:id="inputTxt" class="inputTxt"/>
             <ui:button aura:id="appendButton" label="Append Item" press="{!c.appendItem}" />
         </div>
 		<ui:inlineEditGrid
-		    aura:id="grid"        class="inline-edit-grid"
-		    itemVar="row"         items="{!v.items}"
-		    rowHeaderIndex="1"    delegatedEvents="click,keydown,mouseover"
-            
-            onEdit="{!c.onEdit}">
+		    aura:id="grid"        
+		    class="inline-edit-grid"
+		    itemVar="row"         
+		    items="{!v.items}"
+		    rowHeaderIndex="1"    
+		    delegatedEvents="click,keydown,mouseover"
+		    onEdit="{!c.onEdit}">
 		    
 			<aura:set attribute="headerColumns">
-				<ui:dataGridColumn name="id"	label="Id" sortable="true"/>
-				<ui:dataGridColumn name="name"	label="Name"/>
-				<ui:dataGridColumn name="grade" label="Grade"/>
-                <ui:dataGridColumn name="linkLabel"  label="Link"/>
-				<ui:dataGridColumn name=""      label="Actions" hideLabel="true"/>
+				<ui:dataGridColumn name="id"	  label="Id" sortable="true"/>
+				<ui:dataGridColumn name="name"	  label="Name"/>
+				<ui:dataGridColumn name="grade"   label="Grade"/>
+                		<ui:dataGridColumn name="linkLabel"  label="Link"/>
+				<ui:dataGridColumn name="issueDate" label="Issue Date"/>
+				<ui:dataGridColumn name="passing" label="Passing"/>
+				<ui:dataGridColumn name="notes"   label="Notes"/>
+				<ui:dataGridColumn name="modDateTime"   label="Modified"/>
+				<ui:dataGridColumn name=""        label="Actions" hideLabel="true"/>
 			</aura:set>
 			
 			<aura:set attribute="columns">
@@ -51,9 +58,21 @@
 				<ui:inlineEditCell name="grade" edited="{!row.status.grade}">
 					<ui:outputText value="{!row.data.grade}"/>
 				</ui:inlineEditCell>
-                <ui:inlineEditCell name="linkLabel" edited="{!row.status.linkLabel}" valueAttribute="label">
-                    <ui:outputURL value="http://www.google.com" label="{!row.data.linkLabel}" />
-                </ui:inlineEditCell>
+                		<ui:inlineEditCell name="linkLabel" edited="{!row.status.linkLabel}" valueAttribute="label">
+                    			<ui:outputURL value="http://www.google.com" label="{!row.data.linkLabel}" />
+                		</ui:inlineEditCell>
+				<ui:inlineEditCell name="issueDate" edited="{!row.status.issueDate}">
+					<ui:outputText value="{!row.data.issueDate}"/>
+				</ui:inlineEditCell>
+				<ui:inlineEditCell name="passing" edited="{!row.status.isPassing}">
+					<ui:outputText value="{!row.data.isPassing}"/>
+				</ui:inlineEditCell>
+				<ui:inlineEditCell name="notes" edited="{!row.status.notes}">
+					<ui:outputText value="{!row.data.notes}"/>
+				</ui:inlineEditCell>
+				<ui:inlineEditCell name="modDateTime" edited="{!row.status.modDateTime}">
+					<ui:outputText value="{!row.status.modDateTime}"/>
+				</ui:inlineEditCell>
 			</aura:set>
 		</ui:inlineEditGrid>
         

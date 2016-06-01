@@ -34,6 +34,26 @@
 		    componentDef : {
 		        descriptor : 'markup://ui:inputText'
 		    }
+		},
+		issueDate : {
+			componentDef : {
+				descriptor : 'markup://ui:inputDate'
+			}
+		},
+		passing : {
+			componentDef : {
+				descriptor : 'markup://ui:inputCheckbox'
+			}
+		},
+		notes : {
+			componentDef : {
+				descriptor : 'markup://ui:inputTextArea'
+			}
+		},
+		modDateTime : {
+			componentDef : {
+				descriptor : 'markup://ui:inputDateTime'
+			}
 		}
 	},
 	

@@ -166,8 +166,28 @@
     },
 
     clickDate: function(cmp, date) {
-        date = (date - 1).toString(); // internal date representation starts with 0
-        var dateElm = this.getDPMDatePicker(cmp).find("grid").find(date).getElement();
+        var grid = this.getDPMDatePicker(cmp).find("grid");
+        var start = false; // start search, the first few dates can be from previous month
+        var dateElm = null;
+        
+        // go through each cell and check to see if label matches date
+        for (var i=0; i<42; i++) {
+            var dateCmp = grid.find(i);
+            var targetDate = dateCmp.get('v.label');
+            
+            // on dates that are in previous month?
+            if (!start && targetDate === 1) {
+                start = true;
+            }
+            
+            if (start) {
+                if (targetDate === date) {
+                    dateElm = dateCmp.getElement();
+                    break;
+                }
+            }
+        }
+        
         $A.test.clickOrTouch(dateElm);
     },
 

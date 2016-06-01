@@ -621,6 +621,108 @@ Test.Aura.Storage.AuraStorageTest = function() {
 
 
         [Fact]
+        function CallsSetItemWithKey() {
+            var expected = "key";
+            var actual;
+
+            AdapterClass.prototype.setItem = function(key, item, size) {
+                actual = key;
+                return new ResolvePromise();
+            };
+
+            mockA(function() {
+                Aura.Storage.AuraStorage.prototype.generateKeyPrefix = function() {
+                    return "";
+                };
+
+                var target = new Aura.Storage.AuraStorage(config);
+                target.sweep = function() {};
+                target.set(expected, "value");
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function CallsSetItemWithItemDotValue() {
+            var expected = "value";
+            var actual;
+
+            AdapterClass.prototype.setItem = function(key, item, size) {
+                actual = item;
+                return new ResolvePromise();
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.sweep = function() {};
+                target.set("key", expected);
+            });
+
+            Assert.Equal(expected, actual.value);
+        }
+
+
+        [Fact]
+        function CallsSetItemWithItemDotCreated() {
+            var actual;
+
+            AdapterClass.prototype.setItem = function(key, item, size) {
+                actual = item;
+                return new ResolvePromise();
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.sweep = function() {};
+                target.set("key", "value");
+            });
+
+            Assert.Equal("number", typeof actual.created);
+        }
+
+
+        [Fact]
+        function CallsSetItemWithItemDotExpires() {
+            var actual;
+
+            AdapterClass.prototype.setItem = function(key, item, size) {
+                actual = item;
+                return new ResolvePromise();
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.sweep = function() {};
+                target.set("key", "value");
+            });
+
+            Assert.Equal("number", typeof actual.expires);
+        }
+
+
+        [Fact]
+        function CallsSetItemWithSize() {
+            var expected = 7;
+            var actual;
+
+            AdapterClass.prototype.setItem = function(key, item, size) {
+                actual = size;
+                return new ResolvePromise();
+            };
+
+            mockA(function() {
+                $A.util.estimateSize = function() { return expected; };
+                var target = new Aura.Storage.AuraStorage(config);
+                target.sweep = function() {};
+                target.set("key", "value");
+            });
+
+            Assert.Equal(expected * 2, actual); // key + value are included in size so x 2
+        }
+
+
+        [Fact]
         function SuccessfulSetFiresModified() {
             firedEvents = [];
 
@@ -655,6 +757,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             Assert.Equal(0, firedEvents.length);
         }
     }
+
 
     [Fixture]
     function remove() {

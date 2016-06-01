@@ -95,7 +95,7 @@
                this.doFailedActionAndVerifyError(promise, "Error: CryptoAdapter '" + this.storageName + "' adapter failed to initialize");
            },
            function verifyExpectedLogs(cmp) {
-               this.verifyLogs("put");
+               this.verifyLogs("set");
            }
         ]
     },

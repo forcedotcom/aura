@@ -486,19 +486,13 @@ IndexedDBAdapter.prototype.walkInternal = function(resolve, reject, sendResult) 
  * @param {Function} reject promise resolve function
  */
 IndexedDBAdapter.prototype.setItemInternal = function(key, item, size, resolve, reject) {
-    var expires = +item["expires"];
     var that = this;
 
-    // TODO W-2795489 AuraStorage should always provide an expires value so each adapter
-    // doesn't set its own default
-    if (!expires) {
-        expires = new Date().getTime() + 60000;
-    }
     var storable = {
         "key":key,
         "item":item,
         "size":size,
-        "expires": expires
+        "expires": item["expires"]
     };
 
     // maxSize check happens in AuraStorage.

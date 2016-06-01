@@ -17,7 +17,8 @@
         
         // List of inspectors we want to pair with.
         var EXTERNAL_INSPECTOR_EXTENSION_IDS = {
-            "hmoenmfdbkbjcpiibpfakppdpahlfnpo": true // Sfdc Inspector
+            "hmoenmfdbkbjcpiibpfakppdpahlfnpo": true, // Dev Sfdc Inspector,
+            "mmhofgmpfhjnekcfjelmdkjogjildhji": true // Chrome Webstore Sfdc Inspector
         };
 
         this.init = function() {

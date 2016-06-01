@@ -22,23 +22,11 @@
 		for (var i = 0; i < columns.length; i++) {
 			helper.initializeCellStates(columns[i], itemVar);
 		}
-		
-		cmp.set("v.editedItems", {});
-		
+				
 		cmp.find("grid").set("v.columns", columns);
 		cmp.find("grid").set("v.headerColumns", headers);
 	},
-	
-	/* TODO: save and cancel footer is being moved out of this component */
-	save : function() {
-		// Fire save event
-		// TODO: Implement
-	},
-	
-	cancel : function(cmp, evt, helper) {
-		helper.reset(cmp);
-	},
-	
+
 	handleGridAction : function(cmp, evt, helper) {
 		var action = evt.getParam("action");
 		
@@ -80,10 +68,7 @@
 		
 		// TODO: Move into preprocessing logic when items are initially set
 		item.status = item.status || {};
-		
-		// Save copy old item for reset
-		helper.cacheEditedItem(cmp, item, payload.index);
-		
+
 		// Update UI
 		// TODO: Better status passing from container to cell
 		item.data[payload.key] = payload.value;

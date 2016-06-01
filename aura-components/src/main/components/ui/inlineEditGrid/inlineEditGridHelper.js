@@ -90,46 +90,6 @@
 		//}
 	},
 	
-	/* TODO: caching and reset functionality is being moved to data manager */
-	cacheEditedItem : function(cmp, item, index) {
-		var editedItems = cmp.get("v.editedItems");
-
-		if (!editedItems[index]) {
-			editedItems[index] = JSON.parse(JSON.stringify(item));
-		}
-		
-		cmp.set("v.editedItems", editedItems);
-	},
-	
-	reset : function(cmp) {
-		this.resetStatuses(cmp);
-		this.popAllEditedItems(cmp);
-	},
-	
-	resetStatuses : function(cmp) {
-		var items = cmp.get("v.items");
-		
-		for (var i = 0; i < items.length; i++) {
-			for (var key in items[i].status) {
-				items[i].status[key].edited = false;
-				items[i].status[key].hasErrors = false;
-			}
-			items[i].errors = {};
-		}
-	},
-	
-	popAllEditedItems : function(cmp) {
-		var items = cmp.get("v.items");
-		var editedItems = cmp.get("v.editedItems");
-		
-		for (var index in editedItems) {
-			items[index] = editedItems[index];
-		}
-		
-		cmp.set("v.items", items);
-		cmp.set("v.editedItems", {});
-	},
-	
 	/* UTILITY FUNCTIONS */
 	bubbleEvent : function(cmp, evt, eventName) {
 		cmp.getEvent(eventName).setParams(evt.getParams()).fire();

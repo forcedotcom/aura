@@ -99,5 +99,11 @@
         test: function(cmp) {
             cmp.testGetElementsByTagNameForScriptTag();
         }
+    },
+
+    testCreateEvent: {
+        test: function(cmp) {
+            cmp.testCreateEvent();
+        }
     }
 })

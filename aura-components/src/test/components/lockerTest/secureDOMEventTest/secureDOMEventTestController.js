@@ -18,6 +18,21 @@
         testUtils.assertEquals("number", typeof domEvent.timeStamp);
     },
 
+    testInitEvent: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var domEvent;
+        var element = document.createElement("div");
+        element.addEventListener("click", function(e) {
+            domEvent = e;
+        });
+        var event = document.createEvent("MouseEvents");
+        event.initEvent("click");
+        element.dispatchEvent(event);
+
+        testUtils.assertDefined(domEvent, "Event handler never called after firing event created via document.createEvent");
+    },
+
     testEventView: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
         var domEvent;
@@ -25,12 +40,10 @@
         element.addEventListener("click", function(e) {
             domEvent = e;
         });
-        
+
         element.click(); 
 
-    	debugger
-        
-    	testUtils.assertTrue(domEvent.view == window);
+        testUtils.assertTrue(domEvent.view == window);
     },
 
     testMarkupDefinedClickHandler: function(cmp, event, helper) {

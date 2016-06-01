@@ -34,6 +34,7 @@
     <aura:method name="testCreateElementCoersionExploit" action="{!c.testCreateElementCoersionExploit}"/>
     <aura:method name="testCreateElementNSForSVGElement" action="{!c.testCreateElementNSForSVGElement}"/>
     <aura:method name="testGetElementsByTagNameForScriptTag" action="{!c.testGetElementsByTagNameForScriptTag}"/>
+    <aura:method name="testCreateEvent" action="{!c.testCreateEvent}"/>
 
     <div id="title">SecureDocument test</div>
 

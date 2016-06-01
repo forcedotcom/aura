@@ -116,5 +116,11 @@
         testUtils.assertEquals(1, elements.length, "Expecting 1 script element");
         testUtils.assertEquals(expectedSrc, elements[0].src,
                 "getElementsByTagName failed to return expected script elements");
+    },
+
+    testCreateEvent: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var event = document.createEvent("MouseEvents");
+        testUtils.assertStartsWith("SecureDOMEvent", event.toString(), "Unexpected object type from document.createEvent");
     }
 })

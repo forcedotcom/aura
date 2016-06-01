@@ -7,7 +7,7 @@
         $A.storageService.getStorage('actions').remove('aura://ComponentController/ACTION$getApplication:{"name":"auraStorageTest:noGetApplicationCache"}');
     },
 
-    // TODO(W-2942362): Need to figure out a better to emulate offline. Locker fails if host is invalid.
+    // TODO(W-3110067): Need to figure out a better to emulate offline. Locker fails if host is invalid.
     _testOfflineLaunch: {
         // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
         labels: ["flapper"],

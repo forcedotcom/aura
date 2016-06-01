@@ -259,25 +259,27 @@ function SecureElement(el, key) {
 }
 
 SecureElement.addSecureProperties = function(se, raw) {
-    [
-    // Standard Element interface represents an object of a Document.
-    // https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
-    'childElementCount', 'classList', 'className', 'id', 'tagName', 'namespaceURI',
-    // Note: ignoring 'firstElementChild', 'lastElementChild',
-    // 'nextElementSibling' and 'previousElementSibling' from the list
-    // above.
+	[
+	// Standard Element interface represents an object of a Document.
+	// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
+	'childElementCount', 'classList', 'className', 'id', 'tagName', 'namespaceURI',
+	// Note: ignoring 'firstElementChild', 'lastElementChild',
+	// 'nextElementSibling' and 'previousElementSibling' from the list
+	// above.
 
-    // Standard HTMLElement interface represents any HTML element
-    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
-    'accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable', 'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang',
-            'spellcheck', 'style', 'tabIndex', 'title', 'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth', 'clientWidth',
-            'clientHeight', 'clientLeft', 'clientTop', 'nodeValue'
+	// Standard HTMLElement interface represents any HTML element
+	// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
+	'accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable', 'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang',
+			'spellcheck', 'style', 'tabIndex', 'title', 'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth', 'clientWidth',
+			'clientHeight', 'clientLeft', 'clientTop', 'nodeValue'
 
-    // DCHASMAN TODO This list needs to be revisted as it is missing a ton of
-    // valid attributes!
-    ].forEach(function(name) {
-        SecureObject.addPropertyIfSupported(se, raw, name);
-    });
+	// DCHASMAN TODO This list needs to be revisted as it is missing a ton of
+	// valid attributes!
+	].forEach(function(name) {
+		SecureObject.addPropertyIfSupported(se, raw, name, {
+			filterOpaque : true
+		});
+	});
 };
 
 SecureElement.addSecureGlobalEventHandlers = function(se, raw, key) {
@@ -361,32 +363,36 @@ SecureElement.createAddEventListener = function(st, el, key) {
 };
 
 SecureElement.addElementSpecificProperties = function(se, el) {
-    var tagName = el.tagName && el.tagName.toUpperCase();
-    if (tagName) {
-        var whitelist = SecureElement.elementSpecificAttributeWhitelists[tagName];
-        if (whitelist) {
-            whitelist.forEach(function(name) {
-                SecureObject.addPropertyIfSupported(se, el, $A.util.hyphensToCamelCase(name));
-            });
-        }
+	var tagName = el.tagName && el.tagName.toUpperCase();
+	if (tagName) {
+		var whitelist = SecureElement.elementSpecificAttributeWhitelists[tagName];
+		if (whitelist) {
+			whitelist.forEach(function(name) {
+				SecureObject.addPropertyIfSupported(se, el, $A.util.hyphensToCamelCase(name), {
+					filterOpaque : true
+				});
+			});
+		}
 
-        // Special handling for SVG elements
-        if (el.namespaceURI === "http://www.w3.org/2000/svg") {
-            SecureObject.addMethodIfSupported(se, el, "getBBox");
-        }
-    }
+		// Special handling for SVG elements
+		if (el.namespaceURI === "http://www.w3.org/2000/svg") {
+			SecureObject.addMethodIfSupported(se, el, "getBBox");
+		}
+	}
 };
 
 SecureElement.addElementSpecificMethods = function(se, el) {
-    var tagName = el.tagName && el.tagName.toUpperCase();
-    if (tagName) {
-        var whitelist = SecureElement.elementSpecificMethodWhitelists[tagName];
-        if (whitelist) {
-            whitelist.forEach(function(name) {
-                SecureObject.addMethodIfSupported(se, el, name);
-            });
-        }
-    }
+	var tagName = el.tagName && el.tagName.toUpperCase();
+	if (tagName) {
+		var whitelist = SecureElement.elementSpecificMethodWhitelists[tagName];
+		if (whitelist) {
+			whitelist.forEach(function(name) {
+				SecureObject.addMethodIfSupported(se, el, name, {
+					filterOpaque : true
+				});
+			});
+		}
+	}
 };
 
 SecureElement.elementSpecificAttributeWhitelists = {

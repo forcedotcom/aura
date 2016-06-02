@@ -46,8 +46,8 @@ SecureObject.isDOMElementOrNode = function(el) {
 function newWeakMap() {	
 	return typeof WeakMap !== "undefined" ? new WeakMap() : {
 		/* WeakMap dummy polyfill */
-		"get": function () { 
-			return undefined; 
+		"get": function () {
+			return undefined;
 		},
 		"set": function () {}
 	};
@@ -63,7 +63,7 @@ SecureObject.addToCache = function(raw, so, key) {
 		rawToSecureObjectCache = newWeakMap();
 		rawToSecureObjectCaches[psuedoKeySymbol] = rawToSecureObjectCache;
 	}
-	
+
 	rawToSecureObjectCache.set(raw, so);
 };
 
@@ -75,7 +75,7 @@ SecureObject.getCached = function(raw, key) {
 
 SecureObject.filterEverything = function (st, raw, options) {
 	"use strict";
-	
+
 	var key = getLockerSecret(st, "key");
 	var cached = SecureObject.getCached(raw, key);
 	if (cached) {
@@ -107,18 +107,18 @@ SecureObject.filterEverything = function (st, raw, options) {
 			swallowed = [];
 			for (var n = 0; n < raw.length; n++) {
 				var newValue = SecureObject.filterEverything(st, raw[n]);
-				
+
 				// TODO: NaN !== NaN
-				
+
 				if (!options || options.filterOpaque !== true || !$A.lockerService.isOpaque(newValue)) {
 					swallowed.push(newValue);
 				}
-				
+
 				mutated = mutated || (newValue !== raw[n]);
 			}
-			
+
 			setLockerSecret(swallowed, "ref", raw);
-			
+
 			// Decorate with .item() to preserve NodeList shape
 			if (isNodeList) {
 				Object.defineProperty(swallowed, "item", {
@@ -168,7 +168,7 @@ SecureObject.filterEverything = function (st, raw, options) {
 			}
 		}
 	}
-	
+
 	if (mutated) {
 		SecureObject.addToCache(raw, swallowed, key);
 		return swallowed;
@@ -179,13 +179,13 @@ SecureObject.filterEverything = function (st, raw, options) {
 
 SecureObject.unfilterEverything = function(st, value, visited) {
 	"use strict";
-	
+
 	function memoize(visitedCache, v, unfiltered) {
 		visitedCache.set(v, unfiltered);
 		
 		return unfiltered;
 	}
-	
+
 	var t = typeof value;
 	if (!value || (t !== "object" && t !== "function")) {
 		// ignoring falsy, nully references, non-objects and non-functions
@@ -198,9 +198,9 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 		// this value was original produced in system-mode
 		return raw;
 	}
-	
+
 	// Handle cyclic refs and duplicate object refs
-	if (visited) {		
+	if (visited) {
 		var previous = visited.get(value);
 		if (previous) {
 			return previous;
@@ -218,23 +218,24 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 			return SecureObject.unfilterEverything(st, fnReturnedValue, visited);
 		});
 	}
-	
+
 	var proxy;
 	if (Array.isArray(value)) {
 		proxy = memoize(visited, value, []);
-		
+
 		value.forEach(function (v) {
 			proxy.push(SecureObject.unfilterEverything(st, v, visited));
 		});
-		
+
 		return proxy;
 	} else if (t === "object") {
+
 		proxy = memoize(visited, value, {});
-		
+
 		for (var prop in value) {
 			proxy[prop] = SecureObject.unfilterEverything(st, value[prop], visited);
 		}
-		
+
 		return proxy;
 	}
 
@@ -292,7 +293,7 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
 
 	descriptor.get = function() {
 		var value = raw[propertyName];
-		
+
 		if (options && options.afterGetCallback) {
 			// The caller wants to handle the property value
 			return options.afterGetCallback(value);
@@ -338,3 +339,5 @@ SecureObject.addMethodIfSupported = function(st, raw, name, options) {
 
 SecureObject.FunctionPrototypeBind = Function.prototype.bind;
 SecureObject.ArrayPrototypeSlice = Array.prototype.slice;
+
+Aura.Locker.SecureObject = SecureObject;

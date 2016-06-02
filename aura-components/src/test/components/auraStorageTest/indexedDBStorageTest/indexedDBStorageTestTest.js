@@ -310,8 +310,8 @@
                 debugLogging: true
             });
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testGetSize"); });
-            cmp._failTest = function(error) { cmp._storageLib.failTest(cmp, error); }.bind(this);
-            cmp._append = function(string) { cmp._storageLib.appendLine(cmp, string); }.bind(this);
+            cmp._failTest = function(error) { cmp._storageLib.failTest(cmp, error); };
+            cmp._append = function(string) { cmp._storageLib.appendLine(cmp, string); };
         }, function(cmp){
             var completed = false;
 
@@ -430,7 +430,7 @@
     testDeleteDatabase: {
         test: [
         function deleteDatabase(cmp) {
-            var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); };
             var dbName = "browserdb";
             var completed = false;
             var results;
@@ -466,7 +466,7 @@
     testDeleteDatabaseTwice: {
         test: [
         function deleteDatabaseTwice(cmp) {
-            var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); };
             var completed = false;
             var dbName = "browserdb";
 
@@ -487,7 +487,7 @@
     testDeleteAndRecreateDatabase: {
         test: [
         function deleteAndRecreateDatabase(cmp) {
-            var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); }.bind(this);
+            var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); };
             var completed = false;
             cmp._dbName = "browserdb";
 

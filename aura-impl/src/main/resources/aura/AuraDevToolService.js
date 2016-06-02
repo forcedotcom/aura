@@ -939,6 +939,43 @@ var AuraDevToolService = function() {
                   }
                   return errorArray;
                },
+               
+               /**
+                * Method that takes in a list of buttons and makes sure that they do not have any duplicate text in them
+                * @param   - All buttons that are on the page
+                * @returns - Array of all the errors
+                */
+               buttonDuplicateTextAide : function(buttons) {
+            	   var errorArray = [];
+            	   var button = null;
+            	   var text = null;
+            	   var dict = {};
+        		   var descendants = null;
+        		   var descendant = null;
+            	   for(var i = 0; i < buttons.length; i++) {
+            		   dict = [];
+            		   button = buttons[i];
+            		   descendants = button.getElementsByTagName("*");
+            		   for(var j = 0; j < descendants.length; j++) {
+            			   text = null;
+            			   descendant = descendants[j];
+            			   text = $A.util.getText(descendant);
+            			   if(descendant.tagName ===  "IMG") {
+            				   text = descendant.getAttribute("alt");
+            			   }
+            			   text = text.toLowerCase();
+            			   
+            			   if(dict.indexOf(text) >= 0) {
+            				   errorArray.push(button);
+            			   }
+            			   else {
+            				   dict.push(text);
+            			   }
+            		   }
+            	   }
+            	   return errorArray;
+               },
+               
                /**
                 * Method that goes through all tables present on the page and makes sure the tags underneath them have either an id or scope associated with them
                 * @param   tables        - The tags to find
@@ -1114,10 +1151,13 @@ var AuraDevToolService = function() {
                 "tag"  : "A11Y_DOM_03",
                 "func" : function(domElem){
                     var buttonLabelErrorMsg = "[A11Y_DOM_03] Buttons must have non-empty text labels.\n  More info http://sfdc.co/a11y_dom_03";
+                    var errorArray = [];
                     var accessAideFuncs = aura.devToolService.accessbilityAide;
                     var buttonTags = domElem.getElementsByTagName('button');
-
-                    return accessAideFuncs.formatOutput(buttonLabelErrorMsg, accessAideFuncs.buttonLabelAide(buttonTags));
+                    
+                    errorArray = errorArray.concat(accessAideFuncs.buttonLabelAide(buttonTags));
+                    errorArray = errorArray.concat(accessAideFuncs.buttonDuplicateTextAide(buttonTags));
+                    return accessAideFuncs.formatOutput(buttonLabelErrorMsg, errorArray);
                }
             },
 

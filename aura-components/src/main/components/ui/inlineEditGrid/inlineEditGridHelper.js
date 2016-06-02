@@ -89,7 +89,10 @@
 				});
 		//}
 	},
-	
+	updateItem: function(cmp, item, index){
+		cmp.find('grid').updateItem(item, index);
+	},
+
 	/* UTILITY FUNCTIONS */
 	bubbleEvent : function(cmp, evt, eventName) {
 		cmp.getEvent(eventName).setParams(evt.getParams()).fire();

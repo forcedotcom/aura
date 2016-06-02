@@ -64,7 +64,8 @@
 	handlePanelSubmit : function(cmp, evt, helper) {
 		var payload = evt.getParam("payload");
 		var items = cmp.get("v.items");
-		var item = items[payload.index];
+		var index = payload.index;
+		var item = items[index];
 		
 		// TODO: Move into preprocessing logic when items are initially set
 		item.status = item.status || {};
@@ -82,7 +83,8 @@
 			item.status[payload.key].hasErrors = true;
 		}
 		
-		cmp.set("v.items", items);
+		// Update only the specified item (using VDG methods)
+		helper.updateItem(cmp, item, index);
 		cmp._panelCmp.hide();
 		
 		helper.fireEditEvent(cmp, payload);

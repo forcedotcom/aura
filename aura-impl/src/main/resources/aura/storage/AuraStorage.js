@@ -119,27 +119,32 @@ AuraStorage.prototype.clear = function() {
 
 /**
  * Asynchronously gets an item from storage corresponding to the specified key.
- * @param {String} key The item key. This is the key used when the item was added to storage using <code>put()</code>.
+ * @param {String} key The item key. This is the key used when the item was added to storage using <code>set()</code>.
  * @param {Boolean} includeExpired True to return expired items, falsey to not return expired items.
  * @returns {Promise} A Promise that resolves to the stored item or undefined if the key is not found.
  * @export
  */
 AuraStorage.prototype.get = function(key, includeExpired) {
     this.getOperationsInFlight += 1;
-    var that = this;
-    var promise = this.adapter.getItem(this.keyPrefix + key).then(function(item) {
-        that.log("get() " + (item ? "HIT" : "MISS") + " - key: " + key + ", value: " + item);
-        that.getOperationsInFlight -= 1;
 
-        if (!item || (!includeExpired && new Date().getTime() > item["expires"])) {
-            return undefined;
-        }
-        return item["value"];
-    },function (e) {
-        that.logError({ "operation": "get", "error": e });
-        that.getOperationsInFlight -= 1;
-        throw e;
-    });
+    var that = this;
+    var promise = this.adapter.getItem(this.keyPrefix + key)
+        .then(
+            function(item) {
+                that.log("get() " + (item ? "HIT" : "MISS") + " - key: " + key + ", value: " + item);
+                that.getOperationsInFlight -= 1;
+
+                if (!item || (!includeExpired && new Date().getTime() > item["expires"])) {
+                    return undefined;
+                }
+                return item["value"];
+            },
+            function (e) {
+                that.logError({ "operation": "get", "error": e });
+                that.getOperationsInFlight -= 1;
+                throw e;
+            }
+        );
 
     this.sweep();
 
@@ -165,27 +170,30 @@ AuraStorage.prototype.inFlightOperations = function() {
  */
 AuraStorage.prototype.getAll = function(includeExpired) {
     var that = this;
-    return this.adapter.getAll().then(function(items) {
-        var length = items.length ? items.length : 0;
+    return this.adapter.getAll()
+        .then(
+            function(items) {
+                var length = items.length ? items.length : 0;
 
-        var now = new Date().getTime();
-        var results = [];
-        for (var i = 0; i < length; i++) {
-            var item = items[i];
-            if (item["key"].indexOf(that.keyPrefix) === 0 && (includeExpired || now < item["expires"])) {
-                var key = item["key"].replace(that.keyPrefix, "");
-                results.push({ "key": key, "value": item["value"] });
+                var now = new Date().getTime();
+                var results = [];
+                for (var i = 0; i < length; i++) {
+                    var item = items[i];
+                    if (item["key"].indexOf(that.keyPrefix) === 0 && (includeExpired || now < item["expires"])) {
+                        var key = item["key"].replace(that.keyPrefix, "");
+                        results.push({ "key": key, "value": item["value"] });
+                    }
+                    // wrong isolationKey/version or item is expired so ignore the entry
+                    // TODO - capture entries to be removed async
+                }
+
+                that.log("getAll() - found " + results.length + " items");
+                return results;
+            }, function (e) {
+                that.logError({ "operation": "getAll", "error": e });
+                throw e;
             }
-            // wrong isolationKey/version or item is expired so ignore the entry
-            // TODO - capture entries to be removed async
-        }
-
-        that.log("getAll() - found " + results.length + " items");
-        return results;
-    }, function (e) {
-        that.logError({ "operation": "getAll", "error": e });
-        throw e;
-    });
+        );
 };
 
 /**
@@ -221,11 +229,11 @@ AuraStorage.prototype.set = function(key, value) {
     var promise = this.adapter.setItem(this.keyPrefix + key, item, size)
         .then(
             function () {
-                that.log("put() - key: " + key + ", value: " + item);
+                that.log("set() - key: " + key + ", value: " + item);
                 that.fireModified();
             },
             function (e) {
-                that.logError({ "operation": "put", "error": e });
+                that.logError({ "operation": "set", "error": e });
                 throw e;
             }
         );
@@ -394,7 +402,7 @@ AuraStorage.prototype.log = function() {
 /**
  * Logs an error to the server.
  * @param {Object} payload The error payload object.
- * @param {String} payload.operation The operation which errored (eg get, put)
+ * @param {String} payload.operation The operation which errored (eg get, set)
  * @param {Error=} payload.error Optional error object
  * @private
  */

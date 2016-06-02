@@ -15,22 +15,16 @@
  */
 package org.auraframework.util.test.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
 
-import org.auraframework.AuraConfiguration;
+import junit.framework.TestCase;
+
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
@@ -39,31 +33,24 @@ import org.auraframework.util.test.annotation.UnitTest;
 import org.auraframework.util.test.diff.GoldFileUtils;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.*;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestContextManager;
-import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.*;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import com.google.common.collect.Sets;
-
-import junit.framework.TestCase;
 
 /**
  * Base class for all aura tests.
  */
 @UnitTest
 @RunWith(BlockJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AuraConfiguration.class})
+@ContextConfiguration(locations = {"/applicationContext.xml"})
 @TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class})
 @ActiveProfiles("auraTest")
 public abstract class UnitTestCase extends TestCase {
@@ -134,6 +121,11 @@ public abstract class UnitTestCase extends TestCase {
 
     @Override
     public void runBare() throws Throwable {
+        if (applicationContext == null) {
+            TestContextManager testContextManager = new TestContextManager(getClass());
+            testContextManager.prepareTestInstance(this);
+        }
+        
         logger.info(String.format("Running: %s.%s", getClass().getName(), getName()));
         super.runBare();
     }

@@ -18,6 +18,7 @@ package org.auraframework.renderer;
 import java.io.IOException;
 import java.util.List;
 
+import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.Aura;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
@@ -26,6 +27,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
+@ServiceComponentRenderer
 public class ComponentRenderer implements Renderer {
 
     @SuppressWarnings("unchecked")

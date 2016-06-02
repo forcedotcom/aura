@@ -17,12 +17,14 @@ package org.auraframework.impl.renderer.sampleJavaRenderers;
 
 import java.io.IOException;
 
+import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+@ServiceComponentRenderer
 public class TestRendererThrowsQFEDuringRender implements Renderer {
 
     @Override

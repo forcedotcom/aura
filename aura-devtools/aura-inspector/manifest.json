@@ -32,7 +32,9 @@
 	"externally_connectable": {
 		"ids": [
 			// Sfdc Inspector (Dev mode)
-			"hmoenmfdbkbjcpiibpfakppdpahlfnpo"
+			"hmoenmfdbkbjcpiibpfakppdpahlfnpo",
+            // Sfdc Inspector (Chrome Webstore)
+            "mmhofgmpfhjnekcfjelmdkjogjildhji"
 		]
 	},
 

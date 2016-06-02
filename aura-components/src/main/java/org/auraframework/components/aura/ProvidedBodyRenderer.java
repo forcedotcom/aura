@@ -16,6 +16,8 @@
 package org.auraframework.components.aura;
 
 import java.io.IOException;
+
+import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRefArray;
 import org.auraframework.def.Renderer;
@@ -29,6 +31,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * 
  * @since 0.0.234
  */
+@ServiceComponentRenderer
 public class ProvidedBodyRenderer implements Renderer {
     @Override
     public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {

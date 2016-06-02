@@ -17,6 +17,7 @@ package org.auraframework.components.aura;
 
 import java.io.IOException;
 
+import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.Aura;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
@@ -26,6 +27,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * Renders client side registration and key retrieval of CryptoAdapter for auraStorage:crypto
  */
+@ServiceComponentRenderer
 public class CryptoAdapterRegistrationRenderer implements Renderer {
     @Override
     public void render(BaseComponent<?, ?> component, RenderContext renderContext) throws IOException, QuickFixException {

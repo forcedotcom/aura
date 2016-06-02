@@ -18,6 +18,7 @@ package org.auraframework.renderer;
 import java.io.IOException;
 import java.util.List;
 
+import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.Renderer;
@@ -28,6 +29,7 @@ import org.auraframework.service.RenderingService;
 import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+@ServiceComponentRenderer
 public class ExpressionRenderer implements Renderer {
     @Override
     public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {

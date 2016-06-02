@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
@@ -31,6 +32,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
+@ServiceComponentRenderer
 public class HtmlRenderer implements Renderer {
     private static final ComponentRenderer componentRenderer = new ComponentRenderer();
 

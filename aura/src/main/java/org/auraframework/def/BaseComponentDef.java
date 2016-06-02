@@ -15,10 +15,7 @@
  */
 package org.auraframework.def;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
@@ -87,6 +84,7 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
     ControllerDef getControllerDef() throws QuickFixException;
     HelperDef getHelperDef() throws QuickFixException;
     RendererDef getRendererDef() throws QuickFixException;
+    @Override
     ProviderDef getProviderDef() throws QuickFixException;
 
     ControllerDef getLocalControllerDef() throws QuickFixException;

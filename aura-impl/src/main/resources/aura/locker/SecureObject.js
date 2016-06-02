@@ -160,11 +160,13 @@ SecureObject.filterEverything = function (st, raw, options) {
 				mutated = true;
 			} else {
 				swallowed = {};
+				setLockerSecret(swallowed, "ref", raw);
+				SecureObject.addToCache(raw, swallowed, key);
+
 				for (var prop in raw) {
 					swallowed[prop] = SecureObject.filterEverything(st, raw[prop]);
 					mutated = mutated || (raw[prop] !== swallowed[prop]);
-				}
-				setLockerSecret(swallowed, "ref", raw);
+				}				
 			}
 		}
 	}

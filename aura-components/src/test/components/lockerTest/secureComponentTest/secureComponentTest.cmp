@@ -17,7 +17,8 @@
 -->
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
-
+	<aura:attribute name="cyclicObject" type="Object"/>
+	
     <aura:method name="testBlockedAPI" action="{!c.testBlockedAPI}"/>
     <aura:method name="testFindReturnsSecureComponent" action="{!c.testFindReturnsSecureComponent}"/>
     <aura:method name="testGetElementReturnsSecureElement" action="{!c.testGetElementReturnsSecureElement}"/>
@@ -25,6 +26,7 @@
     <aura:method name="testGetCThrowsError" action="{!c.testGetCThrowsError}"/>
     <aura:method name="testAddValueProviderExploit" action="{!c.testAddValueProviderExploit}"/>
     <aura:method name="testAuraMethod" action="{!c.testAuraMethod}"/>
+   	<aura:method name="testCyclicObject" action="{!c.testCyclicObject}"/>
 
     <aura:registerevent name="press" type="ui:press"/>
     

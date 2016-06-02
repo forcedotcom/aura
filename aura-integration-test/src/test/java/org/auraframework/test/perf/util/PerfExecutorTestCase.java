@@ -49,9 +49,9 @@ import com.google.gson.Gson;
 
 @PerfCmpTest
 @TargetBrowsers({ BrowserType.GOOGLECHROME })
-public abstract class PerfExecutorTest extends WebDriverTestCase {
+public class PerfExecutorTestCase extends WebDriverTestCase {
 
-    private static final Logger logger = Logger.getLogger(PerfExecutorTest.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(PerfExecutorTestCase.class.getSimpleName());
     private DefDescriptor<BaseComponentDef> def;
     private PerfConfig config;
     private PerfMetricsUtil perfMetricsUtil;
@@ -62,7 +62,7 @@ public abstract class PerfExecutorTest extends WebDriverTestCase {
     private static String RUNNER_BASE_URL = "/performance/runner.app?";
     private static int DEFAULT_TIMEOUT = 60; // Webdriver timeout of 60 secs
     
-    public PerfExecutorTest(DefDescriptor<BaseComponentDef> def, PerfConfig config, String db) {
+    public PerfExecutorTestCase(DefDescriptor<BaseComponentDef> def, PerfConfig config, String db) {
     	this.setName("perf_" + def.getDescriptorName());
         this.def = def;
         this.config = config;

@@ -29,9 +29,9 @@ import javax.annotation.concurrent.ThreadSafe;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.auraframework.integration.test.ComponentJSTestSuite.ComponentTestCase;
+import org.auraframework.integration.test.ComponentJSUITest.ComponentTestCase;
 import org.auraframework.system.AuraContext;
-import org.auraframework.test.perf.util.PerfExecutorTest;
+import org.auraframework.test.perf.util.PerfExecutorTestCase;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
@@ -179,7 +179,7 @@ public class TestSetRunnerState {
                 testWithProps.put("exception", "");
                 testWithProps.put("isHidden", "");
                 testWithProps.put("type", testCasesType.get(t.toString()).toString().toLowerCase());
-                testWithProps.put("isPerf", t instanceof PerfExecutorTest);
+                testWithProps.put("isPerf", t instanceof PerfExecutorTestCase);
                 testWithProps.put("perfInfo", "");
 
                 String url = "";
@@ -187,8 +187,8 @@ public class TestSetRunnerState {
                     url = ((ComponentTestCase) t).getAppUrl();
                 }
 
-                if (t instanceof PerfExecutorTest) {
-                	List<String> urls = ((PerfExecutorTest) t).generateUrl();
+                if (t instanceof PerfExecutorTestCase) {
+                	List<String> urls = ((PerfExecutorTestCase) t).generateUrl();
                 	url = urls.get(0);
                 }
 

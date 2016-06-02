@@ -26,13 +26,13 @@ function SecureComponentRef(component, key) {
         }
     });
     Object.defineProperties(o, {
-        "isValid": SecureObject.createFilteredMethod(o, component, "isValid"),
-        "isInstanceOf": SecureObject.createFilteredMethod(o, component, "isInstanceOf"),
-        "isRendered": SecureObject.createFilteredMethod(o, component, "isRendered"),
+        "addValueProvider": SecureObject.createFilteredMethod(o, component, "addValueProvider"),
         "getGlobalId": SecureObject.createFilteredMethod(o, component, "getGlobalId"),
         "getLocalId": SecureObject.createFilteredMethod(o, component, "getLocalId"),
-        "addValueProvider": SecureObject.createFilteredMethod(o, component, "addValueProvider"),
         "getEvent": SecureObject.createFilteredMethod(o, component, "getEvent"),
+        "isInstanceOf": SecureObject.createFilteredMethod(o, component, "isInstanceOf"),
+        "isRendered": SecureObject.createFilteredMethod(o, component, "isRendered"),
+        "isValid": SecureObject.createFilteredMethod(o, component, "isValid"),
         "set": SecureObject.createFilteredMethod(o, component, "set"),
         "get": {
             enumerable: true,
@@ -54,6 +54,11 @@ function SecureComponentRef(component, key) {
         	var descriptor = new DefDescriptor(method.name);
     		SecureObject.addMethodIfSupported(o, component, descriptor.getName());
         }, o);
+    }
+    
+    // DCHASMAN TODO Workaround for ui:button redfining addHandler using aura:method!!!
+    if (!("addHandler" in o)) {
+		SecureObject.addMethodIfSupported(o, component, "addHandler");
     }
 
     setLockerSecret(o, "key", key);

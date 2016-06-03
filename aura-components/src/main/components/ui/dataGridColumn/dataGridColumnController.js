@@ -16,17 +16,17 @@
 ({
 	init: function (cmp) {
 		var concrete = cmp.getConcreteComponent(),
-			hlp = concrete.getDef().getHelper();
+			helper = concrete.getDef().getHelper();
 
-		hlp.intialize(cmp);
+		helper.initialize(cmp);
 	},
 
-	handleClick: function (cmp, evt, hlp) {
+	handleClick: function (cmp, evt, helper) {
 		if ($A.util.getBooleanValue(cmp.get("v.disabled"))) {
             event.preventDefault();
             return false;
         }
-        hlp.toggleSort(cmp);
+        helper.toggleSort(cmp);
         return true;
 	},
 	

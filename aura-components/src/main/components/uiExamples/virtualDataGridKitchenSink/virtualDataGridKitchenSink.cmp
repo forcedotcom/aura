@@ -54,6 +54,9 @@
 				<ui:dataGridColumn name="who.name" 		label="Name"/>
 				<ui:dataGridColumn name="what.name" 	label="Related To"/>
 				<ui:dataGridColumn name="activityDate" 	label="Due Date"/>
+                <ui:dataGridColumn>
+                    [<uiExamples:gridActionCell />]
+                </ui:dataGridColumn>
 				<uiExamples:headerGridActionCell />
 			</aura:set>
 			
@@ -64,6 +67,7 @@
 				<ui:outputText value="{!item.what.name}"/>
 				<ui:outputText value="{!item.activityDate}"/>
 				<uiExamples:gridActionCell />
+                <uiExamples:gridActionCell />
 			</aura:set>
 			
 			<aura:set attribute="dataModel">

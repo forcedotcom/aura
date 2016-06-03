@@ -19,11 +19,11 @@
 		'descending' : 'ascending'
 	},
 
-	intialize: function (cmp) {
-		this.intializeDefaultOutputComponent(cmp);
+	initialize: function (cmp) {
+		this.initializeDefaultOutputComponent(cmp);
 	},
 
-	intializeDefaultOutputComponent: function (cmp) {
+	initializeDefaultOutputComponent: function (cmp) {
 		var outputComponent = cmp.get('v.outputComponent')[0];
 
 		// Wire up default outputComponent if not explicitly set.
@@ -39,16 +39,17 @@
 	},
 
 	wireComponentDefRef: function (cmp, defRef) {
-		var name = cmp.get('v.name'),
-			namePath = name.split('.'),
-			// propertyReference = this.createPropertyReference('value', ['row', 'item'].concat(namePath));
-			propertyReference = this.createPropertyReference('value', ['item'].concat(namePath));
-
-		defRef.attributes = {
-			values: {
-				value: propertyReference
-			}
-		};
+		var name = cmp.get('v.name');
+		if (name) {
+		    var namePath = name.split('.'),
+		        propertyReference = this.createPropertyReference('value', ['item'].concat(namePath));
+		    
+		    defRef.attributes = {
+		        values: {
+                    value: propertyReference
+                }
+		    };
+		}
 	},
 
 	createPropertyReference: function (descriptor, path) {

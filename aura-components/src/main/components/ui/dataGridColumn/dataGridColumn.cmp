@@ -51,21 +51,24 @@
 	
 	<th scope="{!v.scope}" class="{! v.class + ' ' + (v.disabled ? 'disabled' : v.direction) }" title="{!v.title}"
 						   style="{! (v.width gt 0) ? 'width:' + v.width + 'px' : ''}">
-		<!-- Conditionally insert link for column sorting. -->
-		<aura:if isTrue="{!v.sortable}">
-			<a class="{! 'toggle ' + (v.disabled ? 'disabled' : '')}" onclick="{!c.handleClick}">
-				<span class="assistiveText">{! (v.disabled ? '' : v.assistiveSortText) + ' '
-												+ (v.hideLabel ? v.label : '') } </span>
-				{!(!v.hideLabel) ? v.label : ''}
-				<span class="assistiveText">{! v.disabled ? ''
-												: ((v.direction == 'ascending') ? v.ascLabel 
-													: ((v.direction == 'descending') ? v.descLabel : v.direction))}</span>
-			</a>
-			
-			<aura:set attribute="else">
-				{!(!v.hideLabel) ? v.label : ''}
-				<span class="assistiveText">{! (v.hideLabel ? v.label : '') }</span>
-			</aura:set>
-		</aura:if>
+        <aura:if isTrue="{! v.body.length == 0 }">
+            <!-- Conditionally insert link for column sorting. -->
+            <aura:if isTrue="{!v.sortable}">
+                <a class="{! 'toggle ' + (v.disabled ? 'disabled' : '')}" onclick="{!c.handleClick}">
+                    <span class="assistiveText">{! (v.disabled ? '' : v.assistiveSortText) + ' '
+                                                    + (v.hideLabel ? v.label : '') } </span>
+                    {!(!v.hideLabel) ? v.label : ''}
+                    <span class="assistiveText">{! v.disabled ? ''
+                                                    : ((v.direction == 'ascending') ? v.ascLabel 
+                                                        : ((v.direction == 'descending') ? v.descLabel : v.direction))}</span>
+                </a>
+                
+                <aura:set attribute="else">
+                    {!(!v.hideLabel) ? v.label : ''}
+                    <span class="assistiveText">{! (v.hideLabel ? v.label : '') }</span>
+                </aura:set>
+            </aura:if>
+        </aura:if>
+        {!v.body}
 	</th>
 </aura:component>

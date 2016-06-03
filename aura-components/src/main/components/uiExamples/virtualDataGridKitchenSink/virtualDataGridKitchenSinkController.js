@@ -25,16 +25,19 @@
 	
 	handleGridEvents : function(cmp, evt, helper) {
 		if (evt.getParam("action") === 'select') {
-			var index = evt.getParam("index");
+			var index = evt.getParam("index") || -1;
 			var payload = evt.getParam("payload");
+			
 			var prefix = payload.value ? 'Selected' : 'Deselected';
+			var subject = payload.selectedItem ? payload.selectedItem.subject : "Header"
 			
 			helper.updateSelectedItems(cmp, prefix, index);
-			alert(prefix + ' ' + payload.selectedItem.subject + ' @ ' + index);
+			alert(prefix + ' ' + subject + ' @ ' + index);
 		} else {
 			alert(evt);
 		}
 	},
+
 	init : function(cmp, evt, helper) {
 		$A.metricsService.enablePlugins();
 		helper.generateColumnConfigs(cmp);

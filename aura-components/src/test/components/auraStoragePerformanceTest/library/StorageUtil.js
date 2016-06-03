@@ -32,23 +32,25 @@ function() {
      */
     StorageUtil.prototype.createStorage = function(adapterName, name, maxSize, initialSize) {
         return new Promise(function(resolve, reject) {
-            var adapterSettings = this.getAdapterSettings(adapterName);
-
             // delete any existing instance
             var storage = $A.storageService.getStorage(name);
             if (storage) {
                 $A.storageService.deleteStorage(name);
             }
 
-            storage = $A.storageService.initStorage({
-                name: name,
-                persistent: adapterSettings.persistent,
-                secure: adapterSettings.secure,
-                maxSize: maxSize,
-                expiration: 10000,
-                debugLogging: true,
-                version: "1"
-            });
+            // force specific adapter selection
+            $A.installOverride("StorageService.selectAdapter", function(){ return adapterName; }, this);
+            try {
+                storage = $A.storageService.initStorage({
+                    name: name,
+                    maxSize: maxSize,
+                    expiration: 10000,
+                    debugLogging: true,
+                    version: "1"
+                });
+            } catch (e) {
+                throw new Error("Possible invalid adapter specified (" + adapterName + "). AuraStorageService.initStorage() threw: " + e);
+            }
 
             if (storage.getName() !== adapterName) {
                 reject(new Error("Aura Storage Service did not select desired adapter. Wanted " + adapterName + ", got " + storage.getName()));
@@ -56,7 +58,7 @@ function() {
             }
 
             if (initialSize) {
-                this.populate(storage, initialSize)
+                this._populate(storage, initialSize)
                     .then(function() {
                         resolve(storage);
                     });
@@ -69,48 +71,13 @@ function() {
 
 
     /**
-     * Gets settings, to be used with AuraStorageService.initStorage(), based a desired adapter name.
-     * @param {String} adapterName the name of the adapter whose settings are desired.
-     * @return {Object} settings object for the adapter.
-     */
-    StorageUtil.prototype.getAdapterSettings = function(adapterName) {
-        // this is a hard-coded list of adapters. not ideal but no other means in prod.
-        var adapters = {
-            "memory" : {
-                persistent : false,
-                secure : true
-            },
-            "indexeddb" : {
-                persistent : true,
-                secure : false
-            },
-            "crypto" : {
-                persistent : true,
-                secure : true
-            },
-            "smartstore" : {
-                persistent : true,
-                secure : true
-            }
-        };
-
-        var adapter = adapters[adapterName];
-        if (!adapter) {
-            $A.error("Couldn't find adapter: " + adapterName + ". Available adapters: " + Object.keys(adapters));
-            return;
-        }
-        return adapter;
-    };
-
-
-    /**
      * Populates a storage with data.
      * @param {AuraStorage} storage the storage to populate.
      * @param {Number} size the total size of the data to populate (bytes).
      * @param {Number=} entries the number of entries to populate. If unspecified defaults to StorageUtil.POPULATE_ENTRIES.
      * @return {Promise} promise that resolves when population is complete.
      */
-    StorageUtil.prototype.populate = function(storage, size, entries) {
+    StorageUtil.prototype._populate = function(storage, size, entries) {
         entries = entries || StorageUtil.POPULATE_ENTRIES;
 
         var entrySize = Math.ceil(size / entries);

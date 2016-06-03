@@ -8,6 +8,7 @@
     },
     
      /***************************************************************************************************************************************************
+    	test for nested component
     	this test create a component in a different custom ns(testCustomNS1): componentWithGlobalAccessHasComponentWithDefaultAccessInMarkup
     	the component itself has global access. 
     	it has another component with default access in its markup : componentWithDefaultAccess2
@@ -85,6 +86,7 @@
     },
     
     /***************************************************************************************************************************************************
+    	test for nested component
     	this test create a component in a different custom ns(testCustomNS1): componentWithGlobalAccessHasComponentWithPublicAccessInMarkup
     	the component itself has global access. 
     	it has another component with public access in its markup : componentWithPublicAccess
@@ -148,6 +150,7 @@
     },
     
      /***************************************************************************************************************************************************
+    	test for nested component
     	this test create a component in a different custom ns(testCustomNS1): componentWithGlobalAccessHasComponentWithGlobalAccessInMarkup
     	the component itself has global access. 
     	it has another component with global access in its markup : componentWithGlobalAccess

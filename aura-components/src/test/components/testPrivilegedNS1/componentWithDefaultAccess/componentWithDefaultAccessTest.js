@@ -22,6 +22,168 @@
 		this.componentCreated = undefined;
     },
     
+     /**************************************************************************************************
+	    Test for creating component belong to a custom namespace starts
+	***************************************************************************************************/
+	
+	testCreateComponentWithDefaultAccessOfCustomNS:{
+        test:[
+        function cannotCreateComponentWithDefaultAccess(cmp){ 
+        	var completed = false;
+        	$A.test.expectAuraError("Access Check Failed!");
+            $A.createComponent(
+            	"markup://testCustomNS1:componentWithDefaultAccess", 
+            	{}, 
+            	function(newCmp){
+            		completed = true;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        }
+    	]
+    },
+    
+    testCreateComponentWithPublicAccessOfCustomNS:{
+        test:[
+        function cannotCreateComponentWithPublicAccess(cmp){ 
+        	var completed = false;
+        	$A.test.expectAuraError("Access Check Failed!");
+            $A.createComponent(
+            	"markup://testCustomNS1:componentWithPublicAccess", 
+            	{}, 
+            	function(newCmp){
+            		completed = true;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        }
+    	]
+    },
+    
+    testCreateComponentWithGlobalAccessOfCustomNS:{
+        test:[
+        function canCreateComponentWithGlobalAccess(cmp){ 
+        	var completed = false;
+        	var that = this;
+        	var that = this;
+            $A.createComponent(
+            	"markup://testCustomNS2:componentWithGlobalAccess", 
+            	{}, 
+            	function(newCmp){
+            		$A.test.assertEquals(newCmp.getName(),"testCustomNS2$componentWithGlobalAccess");
+            		that.componentCreated = newCmp;
+            		completed = true;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+        //tests for attribute
+        function cannotAccessPrivateAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.privateAttribute");
+        },
+        function cannotAccessPublicAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.publicAttribute");
+        },
+        function canAccessGlobalAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.globalAttribute");
+        	$A.test.assertEquals(actual, "GLOBAL");
+        }, 
+         /*********************************** tests for method ******************************************/
+        function canNotAccessPrivateMethod(cmp) {
+			$A.test.expectAuraError("Access Check Failed!");
+        	this.componentCreated.privateMethod();
+        },
+        function canNotAccessPublicMethod(cmp) {
+			$A.test.expectAuraError("Access Check Failed!");
+        	this.componentCreated.publicMethod();
+        },
+        function canAccessGlobalMethod(cmp) {
+        	this.componentCreated.globalMethod();
+        	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'globalMethod', "get unexpected outcome from calling global method");
+        },
+        /*********************************** test for component event ****************************************/
+        //some of these tests are disabled because of W-2999718 W-3015661 
+        //we register event(testCustomNS2:componentEventWithDefaultAccess) in component we just created (testCustomNS2:componentWithGlobalAccess) 
+        //the event itself is defined with default access
+        /*function cannotAccessDefaultEventRegisteredWithDefaultAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("NS2eventWithDefaultAccessRegisteredWithGlobalAccess");
+        	$A.test.assertTrue(evt.getName() === 'NS2eventWithDefaultAccessRegisteredWithGlobalAccess', "get unexpected event name");
+        },
+        function cannotAccessDefaultEventRegisteredWithPrivateAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS2eventWithDefaultAccessRegisteredWithPrivateAccess");
+        },
+        function cannotAccessDefaultEventRegisteredWithPublicAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS2eventWithDefaultAccessRegisteredWithPublicAccess");
+        },
+        function canAccessDefaultEventRegisteredWithGlobalAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("NS2eventWithDefaultAccessRegisteredWithGlobalAccess");
+        	$A.test.assertTrue(evt.getName() === 'NS2eventWithDefaultAccessRegisteredWithGlobalAccess', "get unexpected event name");
+        },*/
+        
+        //we register event(testCustomNS2:componentEventWithPublicAccess) in component we just created (testCustomNS2:componentWithGlobalAccess) 
+        //the event itself is defined with access='Public'
+        function cannotAccessPublicEventRegisteredWithDefaultAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS2eventWithPublicAccessRegisteredWithDefaultAccess");
+        },
+        function cannotAccessPublicEventRegisteredWithPrivateAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS2eventWithPublicAccessRegisteredWithPrivateAccess");
+        },
+        function cannotAccessPublicEventRegisteredWithPublicAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS2eventWithPublicAccessRegisteredWithPublicAccess");
+        },
+        /*function canAccessPublicEventRegisteredWithGlobalAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("NS2eventWithPublicAccessRegisteredWithGlobalAccess");
+        	$A.test.assertTrue(evt.getName() === 'NS2eventWithPublicAccessRegisteredWithGlobalAccess', "get unexpected event name");
+        },*/
+        
+        //we register event(testCustomNS2:componentEventWithGlobalAccess) in component we just created (testCustomNS2:componentWithGlobalAccess) 
+        //the event itself is defined with access='Global'
+        function canAccessGlobalEventRegisteredWithDefaultAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("NS2eventWithGlobalAccessRegisteredWithDefaultAccess");
+        	$A.test.assertTrue(evt.getName() === 'NS2eventWithGlobalAccessRegisteredWithDefaultAccess', "get unexpected event name");
+        },
+        function canAccessGlobalEventRegisteredWithGlobalAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("NS2eventWithGlobalAccessRegisteredWithGlobalAccess");
+        	$A.test.assertTrue(evt.getName() === 'NS2eventWithGlobalAccessRegisteredWithGlobalAccess', "get unexpected event name");
+        },
+        /*function cannotAccessGlobalEventRegisteredWithPublicAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS2eventWithGlobalAccessRegisteredWithPublicAccess");
+        },
+        function cannotAccessGlobalEventRegisteredWithPrivateAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS2eventWithGlobalAccessRegisteredWithPrivateAccess");
+        },*/
+        
+        //we register event(testCustomNS1:componentEventWithGlobalAccess) in component we just created (testCustomNS2:componentWithGlobalAccess) 
+        //the event itself is defined with global access
+        function canAccessGlobalEventRegisteredWithDefaultAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("NS1eventWithGlobalAccessRegisteredWithDefaultAccess");
+        	$A.test.assertTrue(evt.getName() === 'NS1eventWithGlobalAccessRegisteredWithDefaultAccess', "get unexpected event name");
+        },
+        function canAccessGlobalEventRegisteredWithGlobalAccess(cmp) {
+        	var evt = this.componentCreated.getEvent("NS1eventWithGlobalAccessRegisteredWithGlobalAccess");
+        	$A.test.assertTrue(evt.getName() === 'NS1eventWithGlobalAccessRegisteredWithGlobalAccess', "get unexpected event name");
+        },
+        /*function canAccessGlobalEventRegisteredWithPublicAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS1eventWithGlobalAccessRegisteredWithPublicAccess");
+        },
+        function canAccessGlobalEventRegisteredWithPrivateAccess(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var evt = this.componentCreated.getEvent("NS1eventWithGlobalAccessRegisteredWithPrivateAccess");
+        }*/
+        
+    	]
+    },
+    
 	/*****************************************************************************************
 	    Test for creating component belong to a DIFFERENT privileged namespace starts
 	******************************************************************************************/
@@ -556,7 +718,7 @@
     //we cannot create component with default access in internal/system namespace
 	testCreateComponentWithDefaultAccessOfSystemNS:{
         test:[
-        function canCreateComponentWithDefaultAccess(cmp){
+        function cannotCreateComponentWithDefaultAccess(cmp){
         	$A.test.expectAuraError("Access Check Failed!");
         	var completed = false;
             $A.createComponent(

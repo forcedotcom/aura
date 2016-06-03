@@ -113,8 +113,7 @@ public class MockingUtilUITest extends WebDriverTestCase {
     }
 
     @Test
-    // TODO(W-3178863): New bootstrap sequence needs to handle errors during boot better
-    public void _testMockModelChain() throws Exception {
+    public void testMockModelChain() throws Exception {
         if (!Aura.getContextService().isEstablished()) {
             Aura.getContextService().startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);
         }

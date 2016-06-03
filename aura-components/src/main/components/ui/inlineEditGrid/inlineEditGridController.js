@@ -43,20 +43,21 @@
 			if (editLayout) {
 				// TODO: Need check that editLayout follows a certain interface so we can attach the appropriate
 				// attributes and events.
-				var attributes = editLayout.attributes || {};
 				
-				attributes.value = payload.value;
-				attributes.updateOn = 'input';
+				if (!editLayout.attributes) {
+				    editLayout.attributes = { values : {} };
+				}
 				
-				$A.createComponent(editLayout.componentDef.descriptor, attributes, function (inputComponent) {
-					var panelBodyAttributes = {
-							index : index,
-							key : payload.name,
-							inputComponent : inputComponent
-					};
-					
-					helper.displayEditPanel(cmp, panelBodyAttributes, payload.targetElement);
-				});
+				editLayout.attributes.values.value = payload.value;
+				editLayout.attributes.values.updateOn = 'input';
+				
+				var panelBodyAttributes = {
+				        index : index,
+				        key : payload.name,
+				        inputComponent : $A.createComponentFromConfig(editLayout)
+				};
+				
+				helper.displayEditPanel(cmp, panelBodyAttributes, payload.targetElement);
 			}
 		}
 	},

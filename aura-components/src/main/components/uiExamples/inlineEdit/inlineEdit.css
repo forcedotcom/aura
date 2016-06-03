@@ -50,7 +50,8 @@
 	padding: 0;
 }
 
-.THIS .panel-content input {
+.THIS .panel-content input,
+.THIS .panel-content select {
 	box-sizing: border-box;
 	padding: 0 1rem 0 0.75rem;
 	width: 90%;
@@ -61,7 +62,8 @@
 }
 
 .THIS .inline-edit-example tr td .content,
-.THIS .panel-content input {
+.THIS .panel-content input,
+.THIS .panel-content select {
 	background-color: white;
     color: #16325c;
     display: inline-block;

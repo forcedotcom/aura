@@ -18,7 +18,7 @@
 <aura:component>
 	<aura:dependency resource="markup://ui:inputText" type="COMPONENT" />
 	<aura:dependency resource="markup://ui:inputNumber" type="COMPONENT" />
-	<aura:dependency resource="markup://ui:inputDate" type="COMPONENT" />
+	<aura:dependency resource="markup://ui:inputSelect" type="COMPONENT" />
 	
 	<aura:attribute name="items" type="Object[]" />
 
@@ -27,11 +27,10 @@
 	<div>
 		<ui:inlineEditGrid aura:id="grid" class="inline-edit-example" items="{!v.items}" onEdit="{!c.onEdit}" >
 			<aura:set attribute="headerColumns">
-				<ui:dataGridColumn name="id"	label="Id" sortable="true"/>
-				<ui:dataGridColumn name="name"	label="Name"/>
-				<ui:dataGridColumn name="grade" label="Grade"/>
-				<ui:dataGridColumn name="date"  label="Date"/>
-				<ui:dataGridColumn name=""      label="Actions" hideLabel="true"/>
+				<ui:dataGridColumn name="id"	     label="Id" sortable="true"/>
+				<ui:dataGridColumn name="name"	     label="Name"/>
+				<ui:dataGridColumn name="bloodtype"  label="Blood Type"/>
+				<ui:dataGridColumn name="phone"      label="Phone"/>
 			</aura:set>
 			
 			<aura:set attribute="columns">
@@ -41,15 +40,12 @@
 				<ui:inlineEditCell name="name">
 					<ui:outputText value="{!item.data.name}"/>
 				</ui:inlineEditCell>
-				<ui:inlineEditCell name="grade">
-					<ui:outputText value="{!item.data.grade}"/>
+				<ui:inlineEditCell name="bloodtype">
+					<ui:outputText value="{!item.data.bloodtype}"/>
 				</ui:inlineEditCell>
-				<ui:inlineEditCell name="date">
-					<ui:outputDate value="{!item.data.date}"/>
+				<ui:inlineEditCell name="phone">
+					<ui:outputDate value="{!item.data.phone}"/>
 				</ui:inlineEditCell>
-				<div>
-					<span>.</span>
-				</div>
 			</aura:set>
 		</ui:inlineEditGrid>
 		

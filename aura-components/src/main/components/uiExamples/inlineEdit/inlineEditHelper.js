@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 ({
+    BLOOD_TYPES : ["A", "B", "AB", "O"],
+    
 	EDIT_LAYOUTS : {
 		id : {
 			componentDef : {
@@ -25,17 +27,24 @@
 				descriptor : 'markup://ui:inputText'
 			}
 		},
-		grade : {
+		bloodtype : {
 			componentDef : {
-				descriptor : 'markup://ui:inputNumber'
-			}
-		},
-		date : {
-			componentDef : {
-				descriptor : 'markup://ui:inputDate'
+				descriptor : 'markup://ui:inputSelect'
 			},
 			attributes : {
-				displayDatePicker : true
+			    values : {
+			        options : [
+			            { label : "A", value : "A" },
+			            { label : "B", value : "B" },
+			            { label : "AB", value : "AB" },
+			            { label : "O", value : "O" }
+			        ]
+			    }
+			}
+		},
+		phone : {
+			componentDef : {
+				descriptor : 'markup://ui:inputPhone'
 			}
 		}
 	},
@@ -48,8 +57,8 @@
 				data : {
 					id : i,
 					name : "Name" + i,
-					grade : i,
-					date : "2016-3-" + (i + 1)
+					bloodtype : this.BLOOD_TYPES[Math.floor(Math.random() * 3)],
+					phone : '3' + i + '2-4' + i + '6' + i
 				},
 				status : { 
 					name : {

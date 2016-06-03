@@ -84,9 +84,9 @@
             helper.setStatus(cmp, "Defs Not Restored");
             return;
         }
-        storage.getAll(true)
+        storage.getAll([], true)
             .then(function(items) {
-                if (items.length > 0) {
+                if (Object.keys(items).length > 0) {
                     helper.setStatus(cmp, "Verified Defs Restored");
                 } else {
                     helper.setStatus(cmp, "Defs Not Restored");

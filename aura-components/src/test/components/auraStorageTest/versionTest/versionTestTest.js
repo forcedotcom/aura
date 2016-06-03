@@ -27,19 +27,18 @@
             var storage = $A.storageService.getStorage("cmpStorage");
             storage.set(key, expected)
                 .then(function() {
-                    return storage.adapter.getItem(version + cmp.DELIMITER + key);
+                    return storage.adapter.getItems([version + cmp.DELIMITER + key]);
                 })
-                .then(function(item) {
-                    $A.test.assertEquals(expected, item["value"], "Storage with prefixed key should return correct value");
+                .then(function(items) {
+                    $A.test.assertEquals(1, Object.keys(items).length, "Adapter should have only one item");
+                    $A.test.assertEquals(expected, items[version + cmp.DELIMITER + key]["value"], "Adapter.getItems() should return prefixed key");
                 })
                 .then(function() {
                     return storage.getAll();
                 })
                 .then(function(items) {
-                    $A.test.assertEquals(1, items.length, "Storage should only have one item");
-                    $A.test.assertEquals(key, items[0]["key"], "Key should not have prefix when returned to user");
-                    $A.test.assertEquals(expected, items[0]["value"], "Item with prefixed key should correct value");
-
+                    $A.test.assertEquals(1, Object.keys(items).length, "Storage should have only one item");
+                    $A.test.assertEquals(expected, items[key], "AuraStorage.getAll() should return unprefixed key");
                     completed = true;
                 })
                 ["catch"](function(error) { $A.test.fail(error.toString()); });
@@ -113,7 +112,7 @@
                 var storage = $A.storageService.getStorage("getAllIsolation");
                 storage.getAll()
                     .then(function(items) {
-                        $A.test.assertEquals(0, items.length, "storage.getAll() should've returned zero items");
+                        $A.test.assertEquals(0, Object.keys(items).length, "storage.getAll() should've returned zero items");
                     })
                     ["catch"](function(error) { $A.test.fail(error.toString()); });
             }

@@ -47,74 +47,66 @@ MemoryAdapter.prototype.reset = function() {
 };
 
 /**
- * Returns the name of the adapter.
- * @returns {String} name of adapter
+ * Gets the name of the adapter.
+ * @returns {String} Name of adapter
  */
 MemoryAdapter.prototype.getName = function() {
     return MemoryAdapter.NAME;
 };
 
 /**
- * Returns adapter size.
- * @returns {Promise} a promise that resolves with the size in bytes
+ * Gets the adapter's size.
+ * @returns {Promise} A promise that resolves with the size in bytes.
  */
 MemoryAdapter.prototype.getSize = function() {
     return Promise["resolve"](this.cachedSize);
 };
 
 /**
- * Retrieves an item from storage.
- * @param {String} key key for item to retrieve
- * @returns {Promise} a promise that resolves with the item or undefined if not found
+ * Retrieves items from storage.
+ * @param {String[]} [keys] The set of keys to retrieve. Undefined to retrieve all items.
+ * @param {Boolean} [includeExpired] True to return expired items, false to not return expired items.
+ * @returns {Promise} A promise that resolves with an array of the items.
  */
-MemoryAdapter.prototype.getItem = function(key) {
-    var that = this;
-    return new Promise(function(resolve) {
-        var value = that.backingStore[key];
-        if (value) {
-            // Update the MRU
-            that.updateMRU(key);
-            resolve(value.getItem());
-        } else {
-            resolve();
-        }
-    });
-};
-
-/**
- * Gets all items in storage.
- * @returns {Promise} a promise that resolves with the an array of all items
- */
-MemoryAdapter.prototype.getAll = function() {
+MemoryAdapter.prototype.getItems = function(keys /* , includeExpired*/) {
+    // TODO - optimize by respecting includeExpired
     var that = this;
     return new Promise(function(resolve) {
         var store = that.backingStore;
-        var values = [];
-        var value, innerItem, innerItemValue;
-        for (var key in store) {
-            if (store.hasOwnProperty(key)) {
-                value = store[key];
-                if (value) {
-                    innerItem = value.getItem();
+        var updateMru = true;
 
-                    // deep-copy to avoid handing out a pointer to the internal version
-                    try {
-                        // note that json.encode() will throw on cyclic graphs so caller must handle it.
-                        innerItemValue = JSON.parse($A.util.json.encode(innerItem["value"]));
-                    } catch (ignore) {
-                        // should never happen: creation of MemoryAdapter.Item does a deep copy
-                    }
+        // if keys not specified return all items and do not update mru
+        if (!Array.isArray(keys) || keys.length === 0) {
+            keys = Object.keys(store);
+            updateMru = false;
+        }
 
-                    values.push({
-                        "key": key,
-                        "value": innerItemValue,
-                        "expires": innerItem["expires"]
-                    });
+
+        var results = {};
+        var key, value, innerItem;
+
+        for (var i = 0; i < keys.length; i++) {
+            key = keys[i];
+            value = store[key];
+            if (value) {
+                innerItem = value.getItem();
+
+                // deep-copy to avoid handing out a pointer to the internal version
+                try {
+                    // note that json.encode() will throw on cyclic graphs so caller must handle it.
+                    innerItem = JSON.parse($A.util.json.encode(innerItem));
+                } catch (ignore) {
+                    // should never happen: creation of MemoryAdapter.Item does a deep copy
+                }
+
+                results[key] = innerItem;
+
+                if (updateMru) {
                     that.updateMRU(key);
                 }
             }
         }
-        resolve(values);
+        resolve(results);
     });
 };
 
@@ -131,37 +123,48 @@ MemoryAdapter.prototype.updateMRU = function(key) {
 };
 
 /**
- * Stores an item in storage.
- * @param {String} key key for item
- * @param {Object} item item to store
- * @param {Number} size size of key + item in bytes
- * @returns {Promise} a promise that resolves when the item is stored
+ * Stores items in storage.
+ * @param {Array} tuples An array of key-value-size pairs. Eg <code>[ [key1, value1, size1], [key2, value2, size2] ]</code>.
+ * @returns {Promise} A promise that resolves when the items are stored.
  */
-MemoryAdapter.prototype.setItem = function(key, item, size) {
+MemoryAdapter.prototype.setItems = function(tuples) {
     var that = this;
+
     return new Promise(function(resolve) {
-        var existingItem = that.backingStore[key];
-        var existingItemSize = existingItem ? existingItem.getSize() : 0;
-        var itemSize = size - existingItemSize;
-        var spaceNeeded = itemSize + that.cachedSize - that.maxSize;
+        var key, item, size;
+        var existingItem, mruIndex;
+        var sizeDelta = 0;
 
-        that.backingStore[key] = new MemoryAdapter.Entry(item, size);
+        for (var i = 0; i < tuples.length; i++) {
+            key = tuples[i][0];
+            item = tuples[i][1];
+            size = tuples[i][2];
 
-        // update the MRU
-        var index = that.mru.indexOf(key);
-        if (index > -1) {
-            that.mru.splice(index, 1);
+            existingItem = that.backingStore[key];
+            sizeDelta += size - (existingItem ? existingItem.getSize() : 0);
+
+            that.backingStore[key] = new MemoryAdapter.Entry(item, size);
+
+            // update the MRU
+            mruIndex = that.mru.indexOf(key);
+            if (mruIndex > -1) {
+                that.mru.splice(mruIndex, 1);
+            }
+            that.mru.push(key);
         }
-        that.mru.push(key);
 
-        that.cachedSize += itemSize;
+        that.cachedSize += sizeDelta;
+        var spaceNeeded = that.cachedSize - that.maxSize;
 
         // async evict
         if (spaceNeeded > 0) {
             that.expireCache(spaceNeeded)
-                .then(undefined, function(e) {
-                    that.log(MemoryAdapter.LOG_LEVEL.WARNING, "setItem(): error during eviction", e);
-                });
+                .then(
+                    undefined,
+                    function(e) {
+                        that.log(MemoryAdapter.LOG_LEVEL.WARNING, "setItems(): error during eviction", e);
+                    }
+                );
         }
 
         resolve();
@@ -169,14 +172,16 @@ MemoryAdapter.prototype.setItem = function(key, item, size) {
 };
 
 /**
- * Removes an item from storage.
- * @param {String} key key for item to remove
- * @returns {Promise} a promise that resolves when the item is removed
+ * Removes items from storage.
+ * @param {String[]} keys Keys of the values to remove.
+ * @returns {Promise} A promise that resolves when the values are moved.
  */
-MemoryAdapter.prototype.removeItem = function(key) {
+MemoryAdapter.prototype.removeItems = function(keys) {
     var that = this;
     return new Promise(function(resolve) {
-        that.removeItemInternal(key);
+        for (var i = 0; i < keys.length; i++) {
+            that.removeItemInternal(keys[i]);
+        }
         resolve();
     });
 };
@@ -190,7 +195,7 @@ MemoryAdapter.prototype.removeItemInternal = function(key) {
 
     if (item) {
         var index = this.mru.indexOf(key);
-        if (index >= 0) {
+        if (index > -1) {
             this.mru.splice(index, 1);
         }
 
@@ -231,8 +236,7 @@ MemoryAdapter.prototype.expireCache = function(spaceNeeded) {
     var that = this;
     return new Promise(function(resolve) {
         var spaceReclaimed = 0;
-        var key;
-        var item;
+        var key, item;
 
         // first evict expired items
         var now = new Date().getTime();

@@ -3,7 +3,7 @@
     <aura:set attribute="auraPreInitBlock">
         <script>
             // a global place so tests can inspect the adapter
-            window.mockStorageAdapter = window.mockStorageAdapter || { getItemInvocations: {} };
+            window.mockStorageAdapter = window.mockStorageAdapter || { getItemsInvocations: {} };
 
             // implement the simplest storage adapter so we can customize the behavior of getItem
             // for these tests.
@@ -17,33 +17,41 @@
                 return new Promise(function(success, error) { success(0); });
             };
 
-            MockStorageAdapter.prototype.getItem = function(key) {
+            MockStorageAdapter.prototype.getItems = function(keys) {
                 return new Promise(function(success, error) {
                     // use setTimeout() to trigger a context switch. 1500 is chosen because it's
                     // long enough for aura to initialize if it's not correctly waiting for the callback.
                     setTimeout(function() {
-                        // strip AuraStorage.KEY_DELIMITER
-                        key = key.slice(key.indexOf(":") + 1);
+                        var results = {};
+                        var key, prefixlessKey;
+                        for (var i = 0; keys &amp;&amp; i &lt; keys.length; i++) {
+                            key = keys[i];
 
-                        // record which keys had their callbacks invoked
-                        window.mockStorageAdapter.getItemInvocations[key] = true;
+                            // strip AuraStorage.KEY_DELIMITER
+                            prefixlessKey = key.slice(key.indexOf(":") + 1);
 
-                        var result = { value: null, expires: new Date().getTime() };
-	                    // return a well-known value for the GVP. this is tested in loadFromStorageTest.js.
-	                    if (key === "globalValueProviders") {
-	                        result.value = [{type:"$Custom", values:{foo:"bar"} }];
-	                    }
+                            // record which keys had their callbacks invoked
+                            window.mockStorageAdapter.getItemsInvocations[prefixlessKey] = true;
 
-                        success(result);
+                            // return a well-known value for the GVP. this is tested in loadFromStorageTest.js.
+                            if (prefixlessKey === "globalValueProviders") {
+                                results[key] = {
+                                    value: [{type:"$Custom", values:{foo:"bar"} }],
+                                    expires: new Date().getTime()
+                                };
+                            }
+                        }
+
+                        success(results);
                     }, 1500);
                 });
             };
 
-            MockStorageAdapter.prototype.setItem = function(key, item) {
+            MockStorageAdapter.prototype.setItems = function(key, item) {
                 return new Promise(function(success, error) { success(); });
             };
 
-            MockStorageAdapter.prototype.removeItem = function(key) {
+            MockStorageAdapter.prototype.removeItems = function(key) {
                 return new Promise(function(success, error) { success(); });
             };
 
@@ -56,7 +64,7 @@
             };
 
             MockStorageAdapter.prototype.getAll = function() {
-                return new Promise(function(success, error) { success([]); });
+                return new Promise(function(success, error) { success({}); });
             };
 
             // register the mock adapter. must be persistent for GVP storage to be used.

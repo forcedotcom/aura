@@ -48,12 +48,11 @@ var AuraStorage = function AuraStorage(config) {
     this.adapter.clear = this.adapter.clear || this.adapter["clear"];
     this.adapter.getExpired = this.adapter.getExpired || this.adapter["getExpired"];
     this.adapter.sweep = this.adapter.sweep || this.adapter["sweep"];
-    this.adapter.getItem = this.adapter.getItem || this.adapter["getItem"];
     this.adapter.getName = this.adapter.getName || this.adapter["getName"];
     this.adapter.getSize = this.adapter.getSize || this.adapter["getSize"];
-    this.adapter.removeItem = this.adapter.removeItem || this.adapter["removeItem"];
-    this.adapter.setItem = this.adapter.setItem || this.adapter["setItem"];
-    this.adapter.getAll = this.adapter.getAll || this.adapter["getAll"];
+    this.adapter.setItems = this.adapter.setItems || this.adapter["setItems"];
+    this.adapter.getItems = this.adapter.getItems || this.adapter["getItems"];
+    this.adapter.removeItems = this.adapter.removeItems || this.adapter["removeItems"];
     this.adapter.deleteStorage = this.adapter.deleteStorage || this.adapter["deleteStorage"];
     this.adapter.isSecure = this.adapter.isSecure || this.adapter["isSecure"];
     this.adapter.isPersistent = this.adapter.isPersistent || this.adapter["isPersistent"];
@@ -64,10 +63,9 @@ var AuraStorage = function AuraStorage(config) {
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     // for storage adapter testing
     this["adapter"] = this.adapter;
-    this.adapter["getItem"] = this.adapter.getItem;
+    this.adapter["getItems"] = this.adapter.getItems;
     this.adapter["getMRU"] = this.adapter.getMRU;
     this.adapter["getSize"] = this.adapter.getSize;
-    this.adapter["getAll"] = this.adapter.getAll;
     this.adapter["sweep"] = this.adapter.sweep;
     //#end
 };
@@ -83,7 +81,7 @@ AuraStorage.prototype.getName = function() {
 
 /**
  * Gets the current storage size in KB.
- * @returns {Promise} A Promise that resolves to the current storage size in KB.
+ * @returns {Promise} A promise that resolves to the current storage size in KB.
  * @export
  */
 AuraStorage.prototype.getSize = function() {
@@ -102,7 +100,7 @@ AuraStorage.prototype.getMaxSize = function() {
 
 /**
  * Returns a promise that clears the storage.
- * @returns {Promise} A Promise that will clear storage.
+ * @returns {Promise} A promise that will clear storage.
  * @export
  */
 AuraStorage.prototype.clear = function() {
@@ -119,36 +117,21 @@ AuraStorage.prototype.clear = function() {
 
 /**
  * Asynchronously gets an item from storage corresponding to the specified key.
- * @param {String} key The item key. This is the key used when the item was added to storage using <code>set()</code>.
- * @param {Boolean} includeExpired True to return expired items, falsey to not return expired items.
- * @returns {Promise} A Promise that resolves to the stored item or undefined if the key is not found.
+ * @param {String} key The key of the item to retrieve.
+ * @param {Boolean=} includeExpired True to return expired items, false to not return expired items.
+ * @returns {Promise} A promise that resolves to the stored item or undefined if the key is not found.
  * @export
  */
 AuraStorage.prototype.get = function(key, includeExpired) {
-    this.getOperationsInFlight += 1;
-
-    var that = this;
-    var promise = this.adapter.getItem(this.keyPrefix + key)
+    return this.getAll([key], includeExpired)
         .then(
-            function(item) {
-                that.log("get() " + (item ? "HIT" : "MISS") + " - key: " + key + ", value: " + item);
-                that.getOperationsInFlight -= 1;
-
-                if (!item || (!includeExpired && new Date().getTime() > item["expires"])) {
-                    return undefined;
+            function(items) {
+                if (items) {
+                    return items[key];
                 }
-                return item["value"];
-            },
-            function (e) {
-                that.logError({ "operation": "get", "error": e });
-                that.getOperationsInFlight -= 1;
-                throw e;
+                return undefined;
             }
         );
-
-    this.sweep();
-
-    return promise;
 };
 
 
@@ -162,77 +145,136 @@ AuraStorage.prototype.inFlightOperations = function() {
 };
 
 /**
- * Asynchronously gets all items from storage.
+ * Asynchronously gets multiple items from storage.
+ * @param {String[]} [keys] The set of keys to retrieve. Empty array or non-array to retrieve all items.
  * @param {Boolean} [includeExpired] True to return expired items, falsey to not return expired items.
- * @returns {Promise} A Promise that resolves to an array of objects in storage. Each
+ * @returns {Promise} A promise that resolves to an array of objects in storage. Each
  *      object consists of {key: String, value: *}.
  * @export
  */
-AuraStorage.prototype.getAll = function(includeExpired) {
+AuraStorage.prototype.getAll = function(keys, includeExpired) {
+    var prefixedKeys = undefined;
+
+    if (Array.isArray(keys) && keys.length > 0) {
+        prefixedKeys = [];
+        for (var i = 0; i < keys.length; i++) {
+            prefixedKeys.push(this.keyPrefix + keys[i]);
+        }
+    }
+
+    this.getOperationsInFlight += 1;
     var that = this;
-    return this.adapter.getAll()
+    return this.adapter.getItems(prefixedKeys, includeExpired)
         .then(
             function(items) {
-                var length = items.length ? items.length : 0;
+                that.getOperationsInFlight -= 1;
+
+                if (!items) {
+                    return {};
+                }
 
                 var now = new Date().getTime();
-                var results = [];
-                for (var i = 0; i < length; i++) {
-                    var item = items[i];
-                    if (item["key"].indexOf(that.keyPrefix) === 0 && (includeExpired || now < item["expires"])) {
-                        var key = item["key"].replace(that.keyPrefix, "");
-                        results.push({ "key": key, "value": item["value"] });
+                var results = {};
+                var item;
+                var key;
+                for (var k in items) {
+                    item = items[k];
+                    if (k.indexOf(that.keyPrefix) === 0 && (includeExpired || now < item["expires"])) {
+                        key = k.substring(that.keyPrefix.length);
+                        results[key] = item["value"];
                     }
                     // wrong isolationKey/version or item is expired so ignore the entry
                     // TODO - capture entries to be removed async
                 }
 
-                that.log("getAll() - found " + results.length + " items");
                 return results;
             }, function (e) {
                 that.logError({ "operation": "getAll", "error": e });
+                that.getOperationsInFlight -= 1;
                 throw e;
             }
         );
 };
 
 /**
- * Asynchronously stores the value in storage using the specified key.
- * Calculates the approximate size of the data and provides it to adapter.
- *
+ * Builds the payload to store in the adapter.
  * @param {String} key The key of the item to store.
  * @param {*} value The value of the item to store.
- * @returns {Promise} A Promise that will put the value in storage.
+ * @param {Number} now The current time (milliseconds).
+ * @returns {Array} A key-value-size tuple to pass to the adapter's setItems.
+ * @private
+ */
+AuraStorage.prototype.buildPayload = function(key, value, now) {
+    // For the size calculation, consider only the inputs to the storage layer: key and value.
+    // Ignore all the extras in the item object below.
+    var size = $A.util.estimateSize("" + key) + $A.util.estimateSize(value);
+    if (size > this.maxSize) {
+        throw new Error("AuraStorage.set() cannot store " + key + " of size " + size + "b because it's over the max size of " + this.maxSize + "b");
+    }
+
+    return [
+        this.keyPrefix + key,
+        {
+            "value": value,
+            "created": now,
+            "expires": now + this.expiration
+        },
+        size
+    ];
+};
+
+
+/**
+ * Asynchronously stores the value in storage using the specified key.
+ * @param {String} key The key of the item to store.
+ * @param {*} value The value of the item to store.
+ * @returns {Promise} A promise that resolves when are stored.
  * @export
  */
 AuraStorage.prototype.set = function(key, value) {
-    // For the size calculation, consider only the inputs to the storage layer: key and value
-    // Ignore all the extras in the item object below
-    var size = $A.util.estimateSize(key) + $A.util.estimateSize(value);
-    if (size > this.maxSize) {
-        var maxSize = this.maxSize;
-        var finalReject = function() {
-            return Promise["reject"](new Error("AuraStorage.set() cannot store " + key + " of size " + size + "b because it's over the max size of " + maxSize + "b"));
-        };
-        return this.remove(key, true).then(finalReject, finalReject);
+    return this.setAll([[key, value]]);
+};
+
+/**
+ * Asynchronously stores multiple values in storage. All or none of the values are stored.
+ * @param {Array} tuples An array of key-value pairs. Eg <code>[ [key1, value1], [key2, value2] ]</code>.
+ * @returns {Promise} A promise that resolves when all of the key-values are stored.
+ * @export
+ */
+AuraStorage.prototype.setAll = function(tuples) {
+    var now = new Date().getTime();
+    var storablesSize = 0;
+    var storables = [];
+    var storable;
+    try {
+        for (var i = 0; i < tuples.length; i++) {
+            storable = this.buildPayload(tuples[i][0], tuples[i][1], now);
+            storables.push(storable);
+            storablesSize += storable[2];
+
+        }
+    } catch (e) {
+        this.logError({ "operation": "set", "error": e });
+        return Promise["reject"](e);
     }
 
-    var now = new Date().getTime();
-
-    var item = {
-        "value": value,
-        "created": now,
-        "expires": now + this.expiration
-    };
+    if (storablesSize > this.maxSize) {
+        var e2 = new Error("AuraStorage.set() cannot store " + tuples.length + " items of total size " + storablesSize + "b because it's over the max size of " + this.maxSize + "b");
+        this.logError({ "operation": "set", "error": e2 });
+        return Promise["reject"](e2);
+    }
 
     var that = this;
-    var promise = this.adapter.setItem(this.keyPrefix + key, item, size)
+    var promise = this.adapter.setItems(storables)
         .then(
-            function () {
-                that.log("set() - key: " + key + ", value: " + item);
+            function() {
+                for (i = 0; i < tuples.length; i++) {
+                    that.log("set() - key: " + tuples[i][0]);
+                }
+
                 that.fireModified();
             },
-            function (e) {
+            function(e) {
                 that.logError({ "operation": "set", "error": e });
                 throw e;
             }
@@ -244,29 +286,53 @@ AuraStorage.prototype.set = function(key, value) {
 };
 
 /**
- * Asynchronously removes the item from storage corresponding to the specified key.
- * @param {String} key The key of the item to remove.
+ * Asynchronously removes the value from storage corresponding to the specified key.
+ * @param {String} key The key of the value to remove.
  * @param {Boolean} doNotFireModified Whether to fire the modified event on item removal.
- * @returns {Promise} A Promise that will remove the item from storage.
- * @private
+ * @returns {Promise} A promise that will remove the value from storage.
+ * @export
  */
 AuraStorage.prototype.remove = function(key, doNotFireModified) {
-    var that = this;
-    return this.adapter.removeItem(this.keyPrefix + key)
-        .then(function(){
-            that.log("remove(): key " + key);
-            if (!doNotFireModified) {
-                that.fireModified();
-            }
-        }, function (e) {
-            that.logError({ "operation": "remove", "error": e });
-            throw e;
-        }
-    );
+    return this.removeAll([key], doNotFireModified);
 };
 
 /**
- * Asynchronously removes all expired items.
+ * Asynchronously removes multiple values from storage. All or none of the values are removed.
+ * @param {String[]} keys The keys of the values to remove.
+ * @param {Boolean=} doNotFireModified Whether to fire the modified event on item removal.
+ * @returns {Promise} A promise that resolves when all of the values are removed.
+ * @export
+ */
+AuraStorage.prototype.removeAll = function(keys, doNotFireModified) {
+    var prefixedKeys = [];
+    for (var i = 0; i < keys.length; i++) {
+        prefixedKeys.push(this.keyPrefix + keys[i]);
+    }
+
+    var that = this;
+    return this.adapter.removeItems(prefixedKeys)
+        .then(
+            function() {
+                if (that.debugLogging) {
+                    for (i = 0; i < prefixedKeys.length; i++) {
+                        that.log("remove() - key " + prefixedKeys[i]);
+                    }
+                }
+
+                if (!doNotFireModified) {
+                    that.fireModified();
+                }
+            },
+            function(e) {
+                that.logError({ "operation": "remove", "error": e });
+                throw e;
+            }
+        );
+};
+
+
+/**
+ * Asynchronously sweeps the store to remove expired items.
  * @private
  */
 AuraStorage.prototype.sweep = function() {
@@ -292,6 +358,7 @@ AuraStorage.prototype.sweep = function() {
     // prevent concurrent sweeps
     this._sweepingInProgress = true;
     var that = this;
+
     function doneSweeping(doNotFireModified) {
         that.log("sweep() - complete");
         that._sweepingInProgress = false;
@@ -325,7 +392,7 @@ AuraStorage.prototype.sweep = function() {
                 return [];
             }
         )
-        .then(function (expired) {
+        .then(function(expired) {
             // note: expired includes any key prefix. and it may
             // include items with different key prefixes which
             // we want to expire first. thus remove directly from the
@@ -417,7 +484,7 @@ AuraStorage.prototype.logError = function(payload) {
 
 /**
  * Whether the storage implementation is persistent.
- * @returns {boolean} true if persistent
+ * @returns {boolean} True if persistent.
  * @export
  */
 AuraStorage.prototype.isPersistent = function() {
@@ -426,7 +493,7 @@ AuraStorage.prototype.isPersistent = function() {
 
 /**
  * Whether the storage implementation is secure.
- * @returns {boolean} true if secure
+ * @returns {boolean} True if secure.
  * @export
  */
 AuraStorage.prototype.isSecure = function() {
@@ -435,7 +502,7 @@ AuraStorage.prototype.isSecure = function() {
 
 /**
  * Returns the storage version.
- * @returns {String} storage version.
+ * @returns {String} The storage version.
  * @export
  */
 AuraStorage.prototype.getVersion  = function() {
@@ -444,7 +511,7 @@ AuraStorage.prototype.getVersion  = function() {
 
 /**
  * Returns the expiration in seconds.
- * @returns {number} The expiration in seconds.
+ * @returns {Number} The expiration in seconds.
  * @export
  */
 AuraStorage.prototype.getExpiration = function() {
@@ -453,7 +520,7 @@ AuraStorage.prototype.getExpiration = function() {
 
 /**
  * Returns the auto-refresh interval in seconds.
- * @returns {number} The auto-refresh interval in seconds.
+ * @returns {Number} The auto-refresh interval in seconds.
  */
 AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
     return this.autoRefreshInterval;
@@ -469,7 +536,7 @@ AuraStorage.prototype.deleteStorage = function() {
         return this.adapter.deleteStorage()
             .then(
                 undefined,
-                function (e) {
+                function(e) {
                     that.logError({ "operation": "deleteStorage", "error": e });
                     throw e;
                 }

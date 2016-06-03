@@ -49,11 +49,11 @@
                 return realStorage.adapter.getSize.apply(realStorage.adapter, arguments);
             };
 
-            MockStorageAdapter.prototype.getItem = function() {
-                if (window.mockComponentDefStorage.failAll || window.mockComponentDefStorage.failGetItem) {
-                    return Promise.reject(new Error("getItem(): mock always fails"));
+            MockStorageAdapter.prototype.getItems = function() {
+                if (window.mockComponentDefStorage.failAll || window.mockComponentDefStorage.failGetItems) {
+                    return Promise.reject(new Error("getItems(): mock always fails"));
                 }
-                return realStorage.adapter.getItem.apply(realStorage.adapter, arguments);
+                return realStorage.adapter.getItems.apply(realStorage.adapter, arguments);
             };
 
             MockStorageAdapter.prototype.getAll = function() {
@@ -63,18 +63,18 @@
                 return realStorage.adapter.getAll.apply(realStorage.adapter, arguments);
             };
 
-            MockStorageAdapter.prototype.setItem = function() {
-                if (window.mockComponentDefStorage.failAll || window.mockComponentDefStorage.failSetItem) {
-                    return Promise.reject(new Error("setItem(): mock always fails"));
+            MockStorageAdapter.prototype.setItems = function() {
+                if (window.mockComponentDefStorage.failAll || window.mockComponentDefStorage.failSetItems) {
+                    return Promise.reject(new Error("setItems(): mock always fails"));
                 }
-                return realStorage.adapter.setItem.apply(realStorage.adapter, arguments);
+                return realStorage.adapter.setItems.apply(realStorage.adapter, arguments);
             };
 
-            MockStorageAdapter.prototype.removeItem = function() {
-                if (window.mockComponentDefStorage.failAll  || window.mockComponentDefStorage.failRemoveItem) {
-                    return Promise.reject(new Error("removeItem(): mock always fails"));
+            MockStorageAdapter.prototype.removeItems = function() {
+                if (window.mockComponentDefStorage.failAll  || window.mockComponentDefStorage.failRemoveItems) {
+                    return Promise.reject(new Error("removeItems(): mock always fails"));
                 }
-                return realStorage.adapter.removeItem.apply(realStorage.adapter, arguments);
+                return realStorage.adapter.removeItems.apply(realStorage.adapter, arguments);
             };
 
             MockStorageAdapter.prototype.clear = function() {

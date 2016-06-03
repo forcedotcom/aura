@@ -19,12 +19,14 @@
                 secure: false,
                 maxSize: 1024
             });
+
+            var prefixedKey = cmp.DELIMITER + key;
             storage.set(key, expected)
                 .then(function() {
-                    return storage.adapter.getItem(cmp.DELIMITER + key);
+                    return storage.adapter.getItems([prefixedKey]);
                 })
-                .then(function(item) {
-                    $A.test.assertEquals(expected, item["value"], "preIsolation storage key should not include an isolation key");
+                .then(function(items) {
+                    $A.test.assertEquals(expected, items[prefixedKey]["value"], "preIsolation storage key should not include an isolation key");
                     completed = true;
                 })
                 ["catch"](function(error) { $A.test.fail(error.toString()); });
@@ -48,17 +50,19 @@
                 secure: false,
                 maxSize: 1024
             });
+
+            var prefixedKey = isolationKey + cmp.DELIMITER + key;
             storage.set(key, expected)
                 .then(function() {
-                    return storage.adapter.getItem(isolationKey + cmp.DELIMITER + key);
+                    return storage.adapter.getItems([prefixedKey]);
                 })
-                .then(function(item) {
-                    $A.test.assertEquals(expected, item["value"], "key with isolation key did not return value");
+                .then(function(items) {
+                    $A.test.assertEquals(expected, items[prefixedKey]["value"], "key with isolation key did not return value");
 
                     // try without the isolation key
-                    return storage.adapter.getItem(cmp.DELIMITER + key);
-                }).then(function(item) {
-                    $A.test.assertUndefined(item, "key without isolation key returned value");
+                    return storage.adapter.getItems([cmp.DELIMITER + key]);
+                }).then(function(items) {
+                    $A.test.assertFalse(items.hasOwnProperty(cmp.DELIMITER + key), "key without isolation key returned value");
                     completed = true;
                 })
                 ["catch"](function(error) { $A.test.fail(error.toString()); });
@@ -93,8 +97,8 @@
                 return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
             }, function() {
                 var items = iframeCmp.get("v.items");
-                $A.test.assertEquals(1, items.length, "Unexpected number of items returned from storage.getAll()");
-                $A.test.assertEquals("valueB", items[0].value, "Unexpected value returned from storage");
+                $A.test.assertEquals(1, Object.keys(items).length, "Unexpected number of items returned from storage.getAll()");
+                $A.test.assertEquals("valueB", items["keyA"], "Unexpected value returned from storage");
             });
         }]
     }

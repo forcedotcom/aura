@@ -127,25 +127,26 @@ function iframeTest() {
                     return;
                 }
 
-                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll(true).then(function(items) {
-                    items = items || [];
-                    for (var i = 0; i < items.length; i++) {
-                        // wait for transaction key to disappear
-                        if (items[i]["key"] === that.TRANSACTION_SENTINEL_KEY) {
+                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll([], true)
+                    .then(
+                        function(items) {
+                            // wait for transaction key to disappear
+                            if (items[that.TRANSACTION_SENTINEL_KEY]) {
+                                checkDefStorage(desc);
+                                return;
+                            }
+
+                            if (items["markup://" + desc]) {
+                                found = true;
+                                return;
+                            }
+
                             checkDefStorage(desc);
-                            return;
+                        },
+                        function(e) {
+                            $A.test.fail("ComponentDefStorage.getAll() failed: " + e);
                         }
-                    }
-
-                    for (var i = 0; i < items.length; i++) {
-                        if (items[i]["key"] === "markup://" + desc) {
-                            found = true;
-                            return;
-                        }
-                    }
-
-                    checkDefStorage(desc);
-                });
+                    );
             }
 
             checkDefStorage(desc);
@@ -170,18 +171,21 @@ function iframeTest() {
                 }
 
 
-                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll(true).then(function(items) {
-                    items = items || [];
-                    for (var i = 0; i < items.length; i++) {
-                        // if transaction key or def is present, recurse
-                        if (items[i]["key"] === that.TRANSACTION_SENTINEL_KEY || items[i]["key"] === "markup://" + desc) {
-                            checkDefStorage(desc);
-                            return;
-                        }
-                    }
+                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll([], true)
+                    .then(
+                        function(items) {
+                            // if transaction key or def is present, recurse
+                            if (items[that.TRANSACTION_SENTINEL_KEY] || items["markup://" + desc]) {
+                                checkDefStorage(desc);
+                                return;
+                            }
 
-                    removed = true;
-                });
+                            removed = true;
+                        },
+                        function(e) {
+                            $A.test.fail("ComponentDefStorage.getAll() failed: " + e);
+                        }
+                    );
             }
 
             checkDefStorage(desc);

@@ -235,8 +235,48 @@
         }]
     },
 
+    testBulkGetInnerItemNotInStorage: {
+        test: function(cmp) {
+            cmp._storageLib.testBulkGetInnerItemNotInStorage(cmp, this.storage);
+        }
+    },
+
+    testBulkGetOuterItemsNotInStorage: {
+        test: function(cmp) {
+            cmp._storageLib.testBulkGetOuterItemsNotInStorage(cmp, this.storage);
+        }
+    },
+
+    testBulkSet: {
+        test: function(cmp) {
+            cmp._storageLib.testBulkSet(cmp, this.storage);
+        }
+    },
+
+    testBulkSetLargerThanMaxSize: {
+        test: function(cmp) {
+            // Due to differences in size calculation between adapters, pass in a storage with the correct size to
+            // fill up the storage after 5 entries of a 512 character string.
+            var storage = this.createStorage("crypto-store-overflow", 5000, 2000, 3000);
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store-overflow"); });
+            cmp._storageLib.testBulkSetLargerThanMaxSize(cmp, storage);
+        }
+    },
+
+    testBulkRemoveInnerItemNotInStorage: {
+        test: function(cmp) {
+            cmp._storageLib.testBulkRemoveInnerItemNotInStorage(cmp, this.storage);
+        }
+    },
+
+    testBulkRemoveOuterItemsNotInStorage: {
+        test: function(cmp) {
+            cmp._storageLib.testBulkRemoveOuterItemsNotInStorage(cmp, this.storage);
+        }
+    },
+
     /**
-     * Tests that verify behavior specific to IndexedDB.
+     * Tests that verify behavior specific to CryptoAdapter.
      */
 
     /**

@@ -48,13 +48,9 @@
                  if (!storage) {
                      $A.test.fail("ComponentDefStorage store does not exist");
                  }
-                 storage.getAll(true)
+                 storage.getAll([], true)
                      .then(function(items) {
-                         items = items || [];
-                         items = items.map(function(item) {
-                             return item["key"];
-                         });
-                         defs = items;
+                         defs = Object.keys(items);
                      });
                  $A.test.addWaitForWithFailureMessage(true,
                      function() { return defs !== undefined; },
@@ -84,14 +80,11 @@
                 return;
             }
 
-            storage.getAll(true)
+            storage.getAll([], true)
                 .then(function(items) {
-                    items = items || [];
-                    for (var i = 0; i < items.length; i++) {
-                        if (items[i]["key"] === "markup://" + desc) {
-                            found = true;
-                            return;
-                        }
+                    if (items["markup://" + desc]) {
+                        found = true;
+                        return;
                     }
                     checkDefStorage(desc);
                 });

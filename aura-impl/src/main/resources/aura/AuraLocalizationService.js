@@ -1272,7 +1272,7 @@ AuraLocalizationService.prototype.getWallTimeFromUTC = function(d, timezone) {
 AuraLocalizationService.prototype.init = function() {
     // Set global default language locale
     var defaultLangLocale = $A.get("$Locale.langLocale");
-    if (defaultLangLocale) {
+    if (typeof moment !== "undefined" && defaultLangLocale) {
         moment.locale(this.getNormalizedLangLocale(defaultLangLocale));
     }
 };

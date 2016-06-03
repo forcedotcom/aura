@@ -113,7 +113,7 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/version.prop</include>
+                    <include>**/*</include>
                 </includes>
             </resource>
         </resources>

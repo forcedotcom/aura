@@ -292,11 +292,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public List<String> getScripts(AuraContext context, boolean safeInlineJs, Map<String,Object> attributes)
+    public List<String> getScripts(AuraContext context, boolean safeInlineJs, boolean ignoreBootstrap, Map<String,Object> attributes)
             throws QuickFixException {
         List<String> ret = Lists.newArrayList();
         ret.addAll(getBaseScripts(context, attributes));
-        ret.addAll(getFrameworkScripts(context, safeInlineJs, attributes));
+        ret.addAll(getFrameworkScripts(context, safeInlineJs, ignoreBootstrap, attributes));
         return ret;
     }
 
@@ -366,7 +366,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * Get the set of base scripts for a context.
      */
     @Override
-    public List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, Map<String,Object> attributes)
+    public List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, boolean ignoreBootstrap, Map<String,Object> attributes)
         throws QuickFixException {
         String contextPath = context.getContextPath();
         List<String> ret = Lists.newArrayList();
@@ -379,7 +379,13 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             addAttributes(defs, attributes);
             ret.add(defs.toString());
         }
-
+        if (!ignoreBootstrap) {
+	        defs = new StringBuilder(contextPath).append("/l/");
+	        defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));
+	        defs.append("/bootstrap.js");
+	        addAttributes(defs, attributes);
+	        ret.add(defs.toString());
+        }
 
         defs = new StringBuilder(contextPath).append("/l/");
         defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));

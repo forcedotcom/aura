@@ -17,11 +17,11 @@
 
 // -- Aura Bootstrap ------------------------------------------------------------
 
-if (typeof Aura !== 'undefined') {//eslint-disable-line no-use-before-define
-    Aura._Aura = Aura;
+
+var Aura = window["Aura"];
+if (typeof Aura === "undefined") {//eslint-disable-line no-use-before-define
+    Aura = window["Aura"] = {};
 }
-var Aura = {};
-window["Aura"] = Aura;
 
 // -- Aura inlinning bootstrap
 Aura.time = window.performance && window.performance.now ? window.performance.now.bind(performance) : function(){return Date.now();};
@@ -628,98 +628,90 @@ AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; 
  * }
  * @public
  */
+
+/*
+ * Execute all the functions that have been injected before the framework is initialized
+ * An example of injection is the code that a user can write in the template as part of the preInitBlock
+*/
+AuraInstance.prototype.beforeInitHooks = function () {
+    var fncs = Aura["beforeFrameworkInit"];
+    if (fncs && fncs.length) {
+        for (var i = 0; i < fncs.length; i++) {
+            fncs[i]();
+        }
+    }
+};
+
+/*
+ * Execute all the functions that have been injected after the framework is initialized 
+ * (the app component tree has been created and rendered)
+*/
+AuraInstance.prototype.afterInitHooks = function () {
+    var fncs = Aura["afterFrameworkInit"];
+    if (fncs && fncs.length) {
+        for (var i = 0; i < fncs.length; i++) {
+            fncs[i]();
+        }
+    }
+};
+
 AuraInstance.prototype.initAsync = function(config) {
     Aura.bootstrapMark("initAsync");
+    this.beforeInitHooks();
 
-    var regexpDetectURLProcotolSegment = /^(.*?:)?\/\//;
-
-    function createAuraContext() {
-        // Context is created async because of the GVPs go though async storage checks
-        $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
-            //
-            // This hook is to allow for reloading after aura is initialized, including
-            // any storage setup, as we may well have to clear persistent storage.
-            //
-            $A.context = context;
-            $A.clientService.reloadPointPassed = true;
-            if ($A.clientService.reloadFunction) {
-                $A.clientService.reloadFunction();
-                return;
-            }
-
-            if (config["safeEvalWorker"] && !window["$$safe-eval$$"] && !regexpDetectURLProcotolSegment.test(config["host"])) {
-                throw new $A.auraError("Aura(): Failed to initialize locker worker.", null, $A.severity.QUIET);
-            }
-
-            $A.clientService.initHost(config["host"]);
-            $A.setLanguage();
-
-            $A.metricsService.initialize();
-
-
-            // the final step in initAsync: trigger the getApplication action
-            function getApplication() {
-                $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
-            }
-
-            // actions depend on defs depend on GVP (labels). so load them in dependency order and skip
-            // loading depending items if anything fails to load.
-
-            // start by enabling the actions filter if relevant. populatePersistedActionsFilter() populates it,
-            // called only if GVP + defs are loaded.
-            $A.clientService.setupPersistedActionsFilter();
-
-            if (!context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE) {
-                $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");
-                getApplication();
-            } else {
-                $A.componentService.restoreDefsFromStorage(context)
-                    .then(function() {
-                        return $A.clientService.populatePersistedActionsFilter();
-                    })
-                    .then(
-                        undefined, /* noop */
-                        function(e) {
-                            $A.log("Aura.initAsync: failed to load defs or actions from storage", e);
-                            // do not rethrow
-                        }
-                    )
-                    .then(getApplication, getApplication);
-            }
-        });
-    }
-
-    // DCHASMAN We are temporarily allowing config["safeEvalWorker"] to determine if we use safeEval
-    if (config["safeEvalWorker"] && !window['$$safe-eval$$'] && !regexpDetectURLProcotolSegment.test(config["host"])) {
-        // safe eval worker is an iframe that enables the page to run arbitrary evaluation,
-        // if this iframe is still loading, we should wait for it before continue with
-        // initialization, in the other hand, if the iframe is not available, we create it,
-        // and wait for it to be ready.
-        var el = document.getElementById("safeEvalWorker");
-        if (!el) {
-            if (!config["safeEvalWorker"]) {
-                throw new $A.auraError("Aura(): Missing 'safeEvalWorker' configuration.", null, $A.severity.QUIET);
-            }
-            el = document.createElement("iframe");
-            el.setAttribute("src", config["safeEvalWorker"]);
-            el.setAttribute("width", "0");
-            el.setAttribute("height", "0");
-            el.setAttribute("tabIndex", "-1");
-            el.setAttribute("aria-hidden", "true");
-            el.setAttribute("title", "scripts");
-            el.setAttribute("id", "safeEvalWorker");
-            el.style.display = "none";
-            document.body.appendChild(el);
+    // Context is created async because of the GVPs go though async storage checks
+    $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
+        //
+        // This hook is to allow for reloading after aura is initialized, including
+        // any storage setup, as we may well have to clear persistent storage.
+        //
+        $A.context = context;
+        $A.clientService.reloadPointPassed = true;
+        if ($A.clientService.reloadFunction) {
+            $A.clientService.reloadFunction();
+            return;
         }
-        $A.util.on(el, "load", createAuraContext);
-        $A.util.on(el, "error", function () {
-            throw new $A.auraError("Aura(): Failed to load locker worker.", null, $A.severity.QUIET);
-        });
-    } else {
-        // provision for an alternative safe evaluation. This will open the door to do some
-        // performance optimization.
-        createAuraContext();
-    }
+
+        if (config["safeEvalWorker"] && !window["$$safe-eval$$"]) {
+            throw new $A.auraError("Aura(): Failed to initialize locker worker.", null, $A.severity.QUIET);
+        }
+
+        $A.clientService.initHost(config["host"]);
+        $A.setLanguage();
+
+        $A.metricsService.initialize();
+
+
+        // the final step in initAsync: trigger the getApplication action
+        function getApplication() {
+            $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
+        }
+
+        // actions depend on defs depend on GVP (labels). so load them in dependency order and skip
+        // loading depending items if anything fails to load.
+
+        // start by enabling the actions filter if relevant. populatePersistedActionsFilter() populates it,
+        // called only if GVP + defs are loaded.
+        $A.clientService.setupPersistedActionsFilter();
+
+        if (!context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE) {
+            $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");
+            getApplication();
+        } else {
+            $A.componentService.restoreDefsFromStorage(context)
+                .then(function() {
+                    return $A.clientService.populatePersistedActionsFilter();
+                })
+                .then(
+                    undefined, /* noop */
+                    function(e) {
+                        $A.log("Aura.initAsync: failed to load defs or actions from storage", e);
+                        // do not rethrow
+                    }
+                )
+                .then(getApplication, getApplication);
+        }
+    });
 };
 
 /**
@@ -776,15 +768,24 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
  */
 AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
     if (!$A["hasErrors"]) {
-        Aura.bootstrapMark("createAndRenderAppInit");
-        $A.addTearDownHandler();
-        var app = $A.clientService["init"](config, token, $A.util.getElement(container));
-        $A.setRoot(app);
-        Aura.bootstrapMark("createAndRenderAppReady");
-        if (!$A.initialized) {
-            $A.initialized = true;
-            $A.addDefaultErrorHandler(app);
-            $A.finishInit(doNotInitializeServices);
+
+        if (Aura["frameworkLibrariesReady"]) {
+            $A.addTearDownHandler();
+            Aura.bootstrapMark("createAndRenderAppInit");
+            var app = $A.clientService["init"](config, token, $A.util.getElement(container));
+            $A.setRoot(app);
+            Aura.bootstrapMark("createAndRenderAppReady");
+
+            if (!$A.initialized) {
+                $A.initialized = true;
+                $A.addDefaultErrorHandler(app);
+                $A.afterInitHooks();
+                $A.finishInit(doNotInitializeServices);
+            }
+
+        } else {
+            Aura["afterLibrariesLoaded"] = Aura["afterLibrariesLoaded"] || [];
+            Aura["afterLibrariesLoaded"].push($A.initPriv.bind(null, config, token, container, doNotInitializeServices));
         }
     }
 };
@@ -1480,6 +1481,16 @@ window['aura'] = window['$A'];
 // #include aura.metrics.plugins.DomHandlersPlugin
 
 // #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.metrics.plugins.ComponentServiceMetricsPlugin"}
-
 // #include aura.Logging
-//#include {"modes" : ["DOC","TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"], "path" : "aura.test.Test"}
+// #include {"modes" : ["DOC","TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"], "path" : "aura.test.Test"}
+
+/* 
+ * Async Bootstrap dependency
+ * The scripts are loaded with no order, which means 
+ * we need to call iniAsync in case it was already evaluated
+*/
+Aura["frameworkJsReady"] = true;
+if (Aura["initConfig"]) {
+  $A.initAsync(Aura["initConfig"]);
+}
+

@@ -288,7 +288,7 @@ public class IntegrationImpl implements Integration {
             attributes.put("auraStyleTags", sb.toString());
 
             sb.setLength(0);
-            templateUtil.writeInlineHtmlScripts(context, servletUtilAdapter.getScripts(context, false, null), sb);
+            templateUtil.writeInlineHtmlScripts(context, servletUtilAdapter.getScripts(context, false, false, null), sb);
             attributes.put("auraScriptTags", sb.toString());
 
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();

@@ -99,9 +99,10 @@ public interface ServletUtilAdapter extends AuraAdapter {
      *
      * @param context the aura context to use.
      * @param safeInlineJs should we include 'inline.js' to allow for CSP protection?
+     * @param ignoreBootstrap should we include 'bootstrap.js' in the mix?
      * @return the list of scripts.
      */
-    List<String> getScripts(AuraContext context, boolean safeInlineJs, Map<String,Object> attributes)
+    List<String> getScripts(AuraContext context, boolean safeInlineJs, boolean ignoreBootstrap, Map<String,Object> attributes)
         throws QuickFixException;
 
     /**
@@ -132,7 +133,7 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * @param safeInlineJs should we include 'inline.js' to allow for CSP protection?
      * @return the list of scripts.
      */
-    List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, Map<String,Object> attributes)
+    List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, boolean ignoreBootstrap, Map<String,Object> attributes)
         throws QuickFixException;
 
     /**

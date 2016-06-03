@@ -113,6 +113,7 @@
             };
             
             //now we can add the custom value provider. or you can do it in test
+            window.CustomGlobalValueProvider = CustomGlobalValueProvider;
             var cgvp = new CustomGlobalValueProvider();
             $A.addValueProvider('$CustomInitInTemplate', cgvp);
             

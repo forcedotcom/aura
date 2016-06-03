@@ -71,7 +71,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             attributes.put("auraStyleTags", sb.toString());
 
             sb.setLength(0);
-            writeHtmlScripts(context, servletUtilAdapter.getScripts(context, true, componentAttributes), false, sb);
+            writeHtmlScripts(context, servletUtilAdapter.getScripts(context, true, false, componentAttributes), false, sb);
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
                 attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());

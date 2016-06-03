@@ -58,7 +58,7 @@ public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDe
         attribs.put("auraStyleTags", sb.toString());
 
         sb = new StringBuilder();
-        writeHtmlScripts(context, servletUtilAdapter.getScripts(context, true, attributes), false, sb);
+        writeHtmlScripts(context, servletUtilAdapter.getScripts(context, true, false, attributes), false, sb);
         attribs.put("auraScriptTags", sb.toString());
 
         sb = new StringBuilder();

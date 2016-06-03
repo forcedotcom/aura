@@ -60,30 +60,28 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     private final static String COOKIE_NAME = "%s_%s_%s_lm";
     private final static String TOKEN = "@@@TOKEN@@@";
 
-    private final static String SRC_COMPONENT =
-            "<aura:component>"
-                + "<aura:attribute name='output' type='String'/>"
-                + "<div class='clickableme' onclick='{!c.cssalert}'>@@@TOKEN@@@</div>"
-                + "<div class='attroutput'>{!v.output}</div>"
+    private final static String SRC_COMPONENT = "<aura:component>"
+            + "<aura:attribute name='output' type='String'/>"
+            + "<div class='clickableme' onclick='{!c.cssalert}'>@@@TOKEN@@@</div>"
+            + "<div class='attroutput'>{!v.output}</div>"
             + "</aura:component>";
-    private final static String SRC_CONTROLLER =
-            "{ cssalert:function(c){"
-                    + "function getStyle(elem, style){"
-                    + "var val = '';"
-                    + "if(document.defaultView && document.defaultView.getComputedStyle){"
-                    + "val = document.defaultView.getComputedStyle(elem, '').getPropertyValue(style);"
-                    + "} else if(elem.currentStyle){"
-                    + "style = style.replace(/\\-(\\w)/g, function (s, ch){"
-                    + "return ch.toUpperCase();"
-                    + "});"
-                    + "val = elem.currentStyle[style];"
-                    + "}"
-                    + "return val;"
-                    + "};"
-                    + "var style = getStyle(c.getElement(),'background-image');"
-                    + "c.set('v.output','@@@TOKEN@@@' + style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')')-1)"
-                    + "+ ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));"
-                    + "}}";
+    private final static String SRC_CONTROLLER = "{ cssalert:function(c){"
+            + "function getStyle(elem, style){"
+            + "var val = '';"
+            + "if(document.defaultView && document.defaultView.getComputedStyle){"
+            + "val = document.defaultView.getComputedStyle(elem, '').getPropertyValue(style);"
+            + "} else if(elem.currentStyle){"
+            + "style = style.replace(/\\-(\\w)/g, function (s, ch){"
+            + "return ch.toUpperCase();"
+            + "});"
+            + "val = elem.currentStyle[style];"
+            + "}"
+            + "return val;"
+            + "};"
+            + "var style = getStyle(c.getElement(),'background-image');"
+            + "c.set('v.output','@@@TOKEN@@@' + style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')')-1)"
+            + "+ ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));"
+            + "}}";
 
     private enum Status {
         UNCACHED, IDLE, CHECKING, DOWNLOADING, UPDATEREADY, OBSOLETE;
@@ -126,7 +124,6 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         }
     }
 
-
     /**
      * Opening cached app will only query server for the manifest and the component load.
      *
@@ -134,7 +131,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
-    //@Ignore("W-2944620")
+    // @Ignore("W-2944620")
     // TODO(W-2944620): Adding safeEval.html to manifest causing unnecessary manifest requests
     public void _testNoChanges() throws Exception {
         AppDescription app = new AppDescription();
@@ -172,7 +169,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
         expectedChange.add(new Request(getUrl(app), null, 302)); // hard refresh
-        expectedChange.add(new Request(2, "/auraResource", "js", 200)); // JS
+        expectedChange.add(new Request(4, "/auraResource", "js", 200)); // JS
         switch (getBrowserType()) {
         case GOOGLECHROME:
             expectedChange.add(new Request(3, "/auraResource", "manifest", 200));
@@ -182,9 +179,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
             expectedChange.add(new Request("/auraResource", "manifest", 200));
             expectedChange.add(new Request(getUrl(app), null, 200));
             expectedChange.add(new Request("/auraResource", "css", 200));
-            //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
-            //there should be an app.js and an inline.js here.
-            //expectedChange.add(new Request("/auraResource", "js", 200));
+            // FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+            // there should be an app.js and an inline.js here.
+            // expectedChange.add(new Request("/auraResource", "js", 200));
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -212,9 +209,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
         expectedChange.add(new Request("/auraResource", "css", 200));
-        //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
-        //there should be an app.js and an inline.js here.
-        //expectedChange.add(new Request("/auraResource", "js", 200));
+        // FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+        // there should be an app.js and an inline.js here.
+        // expectedChange.add(new Request("/auraResource", "js", 200));
         expectedChange.add(new Request(2, "/auraResource", "js", 200));
         switch (getBrowserType()) {
         case GOOGLECHROME:
@@ -254,7 +251,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
 
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
         expectedChange.add(new Request(getUrl(app), null, 302)); // hard refresh
-        expectedChange.add(new Request(2, "/auraResource", "js", 200));
+        expectedChange.add(new Request(4, "/auraResource", "js", 200));
         switch (getBrowserType()) {
         case GOOGLECHROME:
             expectedChange.add(new Request(3, "/auraResource", "manifest", 200));
@@ -264,9 +261,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
             expectedChange.add(new Request("/auraResource", "manifest", 200));
             expectedChange.add(new Request(getUrl(app), null, 200));
             expectedChange.add(new Request("/auraResource", "css", 200));
-            //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
-            //expectedChange.add(new Request("/auraResource", "js", 200), there should be an app.js and an
-            //inline.js here.
+            // FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+            // expectedChange.add(new Request("/auraResource", "js", 200), there should be an app.js and an
+            // inline.js here.
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -282,7 +279,8 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     public void testComponentCssChange() throws Exception {
         AppDescription app = new AppDescription();
         String src_style = ".THIS {background-image: url('/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@');}";
-        DefDescriptor<StyleDef> styleDesc = createDef(StyleDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, app.namespace, app.cmpName),src_style);
+        DefDescriptor<StyleDef> styleDesc = createDef(StyleDef.class,
+                String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, app.namespace, app.cmpName), src_style);
 
         List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, TOKEN, TOKEN);
 
@@ -307,8 +305,8 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     }
 
     /**
-     * Opening cached app after namespace controller change will trigger cache update.
-     * TODO(W-2955424) : un-comment the last 4 lines, and update what we should be expecting.
+     * Opening cached app after namespace controller change will trigger cache update. TODO(W-2955424) : un-comment the
+     * last 4 lines, and update what we should be expecting.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     @ThreadHostileTest("changing component")
@@ -326,15 +324,15 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         assertRequests(getExpectedChangeRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
 
-//        logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
-//        List<Request> expected = Lists.newArrayList(new Request("/auraResource", "manifest", 200));
-//        assertRequests(expected, logs);
-//        assertAppCacheStatus(Status.IDLE);
+        // logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
+        // List<Request> expected = Lists.newArrayList(new Request("/auraResource", "manifest", 200));
+        // assertRequests(expected, logs);
+        // assertAppCacheStatus(Status.IDLE);
     }
 
     /**
-     * Opening cached app after component markup change will trigger cache update.
-     * TODO(W-2955424) : un-comment the last 4 lines, and update what we should be expecting.
+     * Opening cached app after component markup change will trigger cache update. TODO(W-2955424) : un-comment the last
+     * 4 lines, and update what we should be expecting.
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     @ThreadHostileTest("depends on cache state")
@@ -350,10 +348,11 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         logs = loadMonitorAndValidateApp(app, replacement, TOKEN, "", TOKEN);
         assertRequests(getExpectedChangeRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
- /*       logs = loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);
-        List<Request> expected = Lists.newArrayList(new Request("/auraResource", "manifest", 200));
-        assertRequests(expected, logs);
-        assertAppCacheStatus(Status.IDLE);*/
+        /*
+         * logs = loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN); List<Request> expected =
+         * Lists.newArrayList(new Request("/auraResource", "manifest", 200)); assertRequests(expected, logs);
+         * assertAppCacheStatus(Status.IDLE);
+         */
     }
 
     /**
@@ -375,7 +374,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
 
         DefDescriptor<ComponentDef> templateDesc = createDef(ComponentDef.class,
                 String.format("%s:%s", app.namespace, templateName),
-                        "<aura:component isTemplate='true' extends='aura:template'>"
+                "<aura:component isTemplate='true' extends='aura:template'>"
                         + "  <aura:set attribute='auraPreInitBlock'>"
                         + "    <auraStorage:init name='actions' persistent='true' secure='false' clearStorageOnInit='false' debugLoggingEnabled='true' defaultExpiration='60' defaultAutoRefreshInterval='60'/>"
                         + "    <auraStorage:init name='ComponentDefStorage' persistent='true' secure='false' clearStorageOnInit='false' debugLoggingEnabled='true' defaultExpiration='60'/>"
@@ -650,19 +649,22 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
 
     /**
      *
-     * @return url of test app, looks like this "/appCacheResourcesUITest1456791509755/cacheapplication.app",
-     * where 1456791509755 is a nonce
+     * @return url of test app, looks like this "/appCacheResourcesUITest1456791509755/cacheapplication.app", where
+     *         1456791509755 is a nonce
      */
     private String getUrl(AppDescription app) {
         return String.format("/%s/%s.app", app.namespace, app.appName);
     }
 
     /**
-     * This is a parser function.
-     * log we get looks like this:
-     * auraRequestURI: /auraResource;auraRequestQuery: aura.format=css&aura.context={"mode":"SELENIUM","app":"appCacheResourcesUITest1456791509755:cacheapplication","fwuid":"zKeYfSKoRXBpmic1IVMhXA","loaded":{"APPLICATION@markup://appCacheResourcesUITest1456791509755:cacheapplication":"SzdCQENYrJ4SPJGNxpzPLQ"},"styleContext":{"c":"webkit"}}&aura.type=app;cmpCount: 0;defCount: 49;requestMethod: GET;httpStatus: 200;defDescriptorCount: 0;
-     * we parse it into list of Request like this:
-     * httpStatus=200, format=null, URI=/appCacheResourcesUITest1456865997501/cacheapplication.app
+     * This is a parser function. log we get looks like this: auraRequestURI: /auraResource;auraRequestQuery:
+     * aura.format=css&aura.context={"mode":"SELENIUM","app":"appCacheResourcesUITest1456791509755:cacheapplication",
+     * "fwuid":"zKeYfSKoRXBpmic1IVMhXA","loaded":{
+     * "APPLICATION@markup://appCacheResourcesUITest1456791509755:cacheapplication":"SzdCQENYrJ4SPJGNxpzPLQ"},
+     * "styleContext":{"c":"webkit"}}&aura.type=app;cmpCount: 0;defCount: 49;requestMethod: GET;httpStatus:
+     * 200;defDescriptorCount: 0; we parse it into list of Request like this: httpStatus=200, format=null,
+     * URI=/appCacheResourcesUITest1456865997501/cacheapplication.app
+     *
      * @param loggingEvents
      * @return
      */
@@ -670,32 +672,34 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         List<Request> logs = Lists.newLinkedList();
 
         String message;
-        for(LoggingEvent le : loggingEvents) {
+        for (LoggingEvent le : loggingEvents) {
             message = le.getMessage().toString();
-            if(message.contains("requestMethod: GET")) {
-                //System.out.println("MESSAGE: "+message);
+            if (message.contains("requestMethod: GET")) {
+                // System.out.println("MESSAGE: "+message);
                 Request toAdd;
-                String auraRequestURI="";
-                String auraRequestQuery="";
-                int httpStatus=-1;
-                for(String part : message.split(";")) {
-                    //httpStatus: 200
-                    if(part.startsWith("httpStatus")) {
-                        httpStatus = Integer.parseInt( part.substring(part.indexOf(":")+2, part.length()) );
+                String auraRequestURI = "";
+                String auraRequestQuery = "";
+                int httpStatus = -1;
+                for (String part : message.split(";")) {
+                    // httpStatus: 200
+                    if (part.startsWith("httpStatus")) {
+                        httpStatus = Integer.parseInt(part.substring(part.indexOf(":") + 2, part.length()));
                     }
-                    //auraRequestURI: /auraResource
-                    if(part.startsWith("auraRequestURI")) {
-                        auraRequestURI = part.substring(part.indexOf(":")+2, part.length());
+                    // auraRequestURI: /auraResource
+                    if (part.startsWith("auraRequestURI")) {
+                        auraRequestURI = part.substring(part.indexOf(":") + 2, part.length());
                     }
-                    //auraRequestQuery: aura.format=manifest&aura.context={"mode":"SELENIUM","app":"appCacheResourcesUITest1456791509755:cacheapplication"}&aura.type=app
-                    if(part.startsWith("auraRequestQuery")) {
-                        auraRequestQuery = part.substring(part.indexOf(":")+2, part.length());
+                    // auraRequestQuery:
+                    // aura.format=manifest&aura.context={"mode":"SELENIUM","app":"appCacheResourcesUITest1456791509755:cacheapplication"}&aura.type=app
+                    if (part.startsWith("auraRequestQuery")) {
+                        auraRequestQuery = part.substring(part.indexOf(":") + 2, part.length());
                     }
                 }
-                if(auraRequestURI.length() > 0 && auraRequestQuery.length() > 0 && httpStatus != -1) {
-                    toAdd = new Request(auraRequestURI, null, httpStatus);//create request with format=null
-                    for(String qpart : auraRequestQuery.split("&")) {
-                        if(qpart.startsWith("aura.format")) {//then update it with format, for example, aura.format=manifest
+                if (auraRequestURI.length() > 0 && auraRequestQuery.length() > 0 && httpStatus != -1) {
+                    toAdd = new Request(auraRequestURI, null, httpStatus);// create request with format=null
+                    for (String qpart : auraRequestQuery.split("&")) {
+                        if (qpart.startsWith("aura.format")) {// then update it with format, for example,
+                                                              // aura.format=manifest
                             String[] qpartParameters = qpart.split("=", 2);
                             String v = qpartParameters[1];
                             toAdd.put("format", (v != null && !v.isEmpty()) ? v : null);
@@ -738,9 +742,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
                     new Request(5, "/auraResource", "manifest", 200),
                     new Request(2, getUrl(app), null, 200), // rest are cache updates
                     new Request(2, "/auraResource", "css", 200),
-                    //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
-                    //there should be an app.js and an inline.js here.
-                    //new Request(2, "/auraResource", "js", 200),
+                    // FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+                    // there should be an app.js and an inline.js here.
+                    // new Request(2, "/auraResource", "js", 200),
                     new Request(4, "/auraResource", "js", 200));
         default:
             /*
@@ -757,9 +761,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
                     new Request("/auraResource", "manifest", 200),
                     new Request(2, getUrl(app), null, 200), // rest are cache updates
                     new Request(2, "/auraResource", "css", 200),
-                    //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
-                    //there should be an app.js and an inline.js here.
-                    //new Request(2, "/auraResource", "js", 200),
+                    // FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+                    // there should be an app.js and an inline.js here.
+                    // new Request(2, "/auraResource", "js", 200),
                     new Request(4, "/auraResource", "js", 200));
         }
     }
@@ -783,9 +787,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
             return ImmutableList.of(new Request(2, getUrl(app), null, 200),
                     new Request(2, "/auraResource", "manifest", 200),
                     new Request(2, "/auraResource", "css", 200),
-                    //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
-                    //there should be an app.js and an inline.js here.
-                    //new Request(2, "/auraResource", "js", 200),
+                    // FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+                    // there should be an app.js and an inline.js here.
+                    // new Request(2, "/auraResource", "js", 200),
                     new Request(4, "/auraResource", "js", 200));
         default:
             /*
@@ -797,9 +801,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
             return ImmutableList.of(new Request(1, getUrl(app), null, 200),
                     new Request(1, "/auraResource", "manifest", 200),
                     new Request(2, "/auraResource", "css", 200),
-                    //FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
-                    //there should be an app.js and an inline.js here.
-                    //new Request(2, "/auraResource", "js", 200),
+                    // FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
+                    // there should be an app.js and an inline.js here.
+                    // new Request(2, "/auraResource", "js", 200),
                     new Request(4, "/auraResource", "js", 200));
         }
     }

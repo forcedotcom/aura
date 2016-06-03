@@ -502,12 +502,12 @@ public class AuraTestFilter implements Filter {
             out.append(String.format("$A.test.run('%s',{},1,'%s');", testName, e.getMessage()));
             return;
         }
+        
 
         // TODO: Inject test framework here, before the test suite code, separately from framework code.
-        out.append(String.format("(function(suite){$A.test.run('%s',suite,%s);})(", testName,
-                testTimeout));
+        out.append(String.format("(function testBootstrap(suiteProps) {\n\tif (!window.Aura || !window.Aura.frameworkJsReady) {\n\t\twindow.Aura || (window.Aura = {});\n\t\twindow.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || [];\n\t\twindow.Aura.beforeFrameworkInit.push(testBootstrap.bind(null, suiteProps));\n\t} else {\n\t\t$A.test.run('%s', suiteProps, '%s');\n\t}\n}(", testName,testTimeout));
         out.append(suiteDef.getCode());
-        out.append("\n);"); // handle trailing single-line comments with newline
+        out.append("\n));"); // handle trailing single-line comments with newline
     }
 
     private DefDescriptor<?> getTargetDescriptor(HttpServletRequest request) {

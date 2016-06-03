@@ -32,6 +32,7 @@ public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T> {
 
     protected static final String name = "HTML";
 
+
     @Override
     public String getFormatName() {
         return name;

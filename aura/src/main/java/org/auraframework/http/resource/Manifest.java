@@ -154,7 +154,7 @@ public class Manifest extends AuraResourceImpl {
                 sw.write('\n');
             }
 
-            for (String s : servletUtilAdapter.getScripts(context, true, attributes)) {
+            for (String s : servletUtilAdapter.getScripts(context, true, true, attributes)) {
                 sw.write(s);
                 sw.write('\n');
             }

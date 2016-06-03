@@ -18,6 +18,7 @@ package org.auraframework.impl.expression.parser;
 import com.google.common.collect.Lists;
 import org.auraframework.impl.expression.AuraImplExpressionTestCase;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -30,6 +31,7 @@ import java.util.List;
  * Shotgun tests for special chars. Tokens shouldn't contain these chars. Remaining special chars have their own tests
  * in ExpressionParserTest.
  */
+@UnAdaptableTest
 @RunWith(Parameterized.class)
 public class ExpressionParserSpecialCharactersTest extends AuraImplExpressionTestCase {
     private static final String validChars = "oO0_";

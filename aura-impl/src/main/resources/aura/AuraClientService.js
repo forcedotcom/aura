@@ -1208,7 +1208,7 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
             var gvpList = boot["context"]["globalValueProviders"];
 
             // Filter out providers without refs
-            for (i = gvpList.length - 1; i >= 0; i--) {
+            for (var i = gvpList.length - 1; i >= 0; i--) {
                 if (gvpList[i]["hasRefs"] !== true) {
                     saved.push(gvpList.splice(i, 1)[0]);
                 }

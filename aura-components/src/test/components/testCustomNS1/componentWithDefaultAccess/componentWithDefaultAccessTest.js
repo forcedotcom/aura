@@ -236,7 +236,7 @@
         	$A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'globalMethod', "get unexpected outcome from calling global method");
         },
          /*********************************** test for component event ****************************************/
-        //some of these tests are disabled because of W-3015661
+        //some of these tests are disabled because of W-2999718 W-3015661 
         
         //we register event(testCustomNS2:componentEventWithDefaultAccess) in component we just created (testCustomNS2:componentWithGlobalAccess) 
         //the event itself is defined with default access

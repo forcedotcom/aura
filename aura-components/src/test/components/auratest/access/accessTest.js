@@ -302,6 +302,103 @@
        ]
    },
    
+    /**************************************************************************************************
+	    Test for creating component belong to custom namespace starts
+	***************************************************************************************************/
+   testCreateComponentWithDefaultAccessOfCustomNS:{
+        test:[
+        function canCreateComponentWithDefaultAccess(cmp){
+        	var completed = false;
+        	var that = this;
+            $A.createComponent(
+            	"markup://testCustomNS2:componentWithDefaultAccess", 
+            	{}, 
+            	function(newCmp){
+            		$A.test.assertEquals(newCmp.getName(),"testCustomNS2$componentWithDefaultAccess");
+            		that.componentCreated = newCmp;
+            		completed = true;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+        function cannotAccessPrivateAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.privateAttribute");
+        },
+        function canAccessPublicAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.publicAttribute");
+        	$A.test.assertEquals(actual, "PUBLIC");
+        },
+        function canAccessGlobalAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.globalAttribute");
+        	$A.test.assertEquals(actual, "GLOBAL");
+        }
+        ]
+    },
+    
+    testCreateComponentWithPublicAccessOfCustomNS:{
+        test:[
+        function canCreateComponentWithPublicAccess(cmp){
+        	var completed = false;
+        	var that = this;
+            $A.createComponent(
+            	"markup://testCustomNS2:componentWithPublicAccess", 
+            	{}, 
+            	function(newCmp){
+            		$A.test.assertEquals(newCmp.getName(),"testCustomNS2$componentWithPublicAccess");
+            		that.componentCreated = newCmp;
+            		completed = true;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+        function cannotAccessPrivateAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.privateAttribute");
+        },
+        function canAccessPublicAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.publicAttribute");
+        	$A.test.assertEquals(actual, "PUBLIC");
+        },
+        function canAccessGlobalAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.globalAttribute");
+        	$A.test.assertEquals(actual, "GLOBAL");
+        }
+        ]
+    },
+    
+    testCreateComponentWithGlobalAccessOfCustomNS:{
+        test:[
+        function canCreateComponentWithGlobalAccess(cmp){
+        	var completed = false;
+        	var that = this;
+            $A.createComponent(
+            	"markup://testCustomNS2:componentWithGlobalAccess", 
+            	{}, 
+            	function(newCmp){
+            		$A.test.assertEquals(newCmp.getName(),"testCustomNS2$componentWithGlobalAccess");
+            		that.componentCreated = newCmp;
+            		completed = true;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+        function cannotAccessPrivateAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.get("v.privateAttribute");
+        },
+        function canAccessPublicAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.publicAttribute");
+        	$A.test.assertEquals(actual, "PUBLIC");
+        },
+        function canAccessGlobalAttribute(cmp) {
+        	var actual = this.componentCreated.get("v.globalAttribute");
+        	$A.test.assertEquals(actual, "GLOBAL");
+        }
+        ]
+    },
+    
+   
    /**************************************************************************************************
 	    Test for creating component belong to Privileged namespace starts
 	***************************************************************************************************/
@@ -401,8 +498,7 @@
     
     
     
-	
-	
+
 
    testSetNonExistentAttribute: {
        test: function(cmp) {
@@ -494,4 +590,6 @@
            $A.test.assertUndefined(cmp.find("remote").get("v.output"));
        }
    }
+   
+    
 })

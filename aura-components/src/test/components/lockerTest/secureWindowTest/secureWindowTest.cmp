@@ -28,6 +28,7 @@
     <aura:method name="testWhitelistedGlobalAttributeExposedOnWindow" action="{!c.testWhitelistedGlobalAttributeExposedOnWindow}"/>
     <aura:method name="testHostedDefinedGlobalsExposedOnWindow" action="{!c.testHostedDefinedGlobalsExposedOnWindow}"/>
     <aura:method name="testObjectExposedOnWindow" action="{!c.testObjectExposedOnWindow}"/>
+    <aura:method name="testTimerReturns" action="{!c.testTimerReturns}"/>
 
     <div>SecureWindow test</div>
 </aura:component>

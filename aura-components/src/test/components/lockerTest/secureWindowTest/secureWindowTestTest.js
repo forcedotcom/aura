@@ -66,5 +66,11 @@
         test: function(cmp) {
             cmp.testHostedDefinedGlobalsExposedOnWindow();
         }
+    },
+
+    testTimerReturns: {
+        test: function(cmp) {
+            cmp.testTimerReturns();
+        }
     }
 })

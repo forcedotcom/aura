@@ -81,7 +81,7 @@ LibraryIncludeRegistry.prototype.getLibraryInclude = function(descriptor) {
         instance = this.instance[descriptor];
     } else {
 
-        // Reset the queue from amy passed failed run.
+        // Reset the queue from any previous failed runs.
         this.clearDependencyQueue();
 
         // If we don't have an instance, schedule it for addition.

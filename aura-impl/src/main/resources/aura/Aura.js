@@ -1135,7 +1135,7 @@ AuraInstance.prototype.installOverride = function(name, fn, scope, priority) {
 };
 
 /**
- * Remore an override in aura.
+ * Remove an override in aura.
  *
  * @public
  */

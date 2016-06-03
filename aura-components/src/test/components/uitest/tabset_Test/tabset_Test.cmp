@@ -20,6 +20,10 @@
     <aura:attribute name="lazyRender"      type="Boolean" default="true"/>
     <aura:attribute name="closable"        type="Boolean" default="false"/>
     <aura:attribute name="conditionalShow" type="Boolean" default="true"/>
+    <aura:attribute name="lastTabEventFired"  type="String" default="none"/>
+
+    <aura:handler name="onTabHover" event="ui:onTabHover" action="{!c.handleEvent}"/>
+    <aura:handler name="onTabUnhover" event="ui:onTabHover" action="{!c.handleEvent}"/>
     
     <aura:if isTrue="{! v.renderItem == 'basic' || v.renderItem == 'all'}">
 	    <div class="block">    
@@ -192,10 +196,11 @@
 		<div>
 			<h2>Test Variables</h2>
 			<div>
-				<div><b>renderItem:</b> {!v.renderItem}</div>
-				<div><b>lazyRender:</b> {!v.lazyRender}</div>
-				<div><b>closable:</b> {!v.closable}</div>
-				<div><b>conditionalShow:</b> {!v.conditionalShow}</div>
+				<div><b>renderItem: </b>{!v.renderItem}</div>
+				<div><b>lazyRender: </b>{!v.lazyRender}</div>
+				<div><b>closable: </b>{!v.closable}</div>
+				<div><b>conditionalShow: </b>{!v.conditionalShow}</div>
+				<div><b>lastTabEventFired: </b>{!v.lastTabEventFired}</div>
 			</div>
 		</div>
 		<aura:if isTrue="{! v.renderItem == 'none'}">

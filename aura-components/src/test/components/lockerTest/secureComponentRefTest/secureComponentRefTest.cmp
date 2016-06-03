@@ -17,6 +17,7 @@
 -->
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+	<aura:attribute name="message" type="string"/>
 
     <aura:method name="testFacetFromAnotherNamespaceIsSecureComponentRef" action="{!c.testFacetFromAnotherNamespaceIsSecureComponentRef}"/>
     <aura:method name="testUnexposedPlatformAPIs" action="{!c.testUnexposedPlatformAPIs}">
@@ -26,8 +27,9 @@
     <aura:method name="testGetFacetActionThrowsError" action="{!c.testGetFacetActionThrowsError}"/>
     <aura:method name="testGetComponentEvent" action="{!c.testGetComponentEvent}"/>
     <aura:method name="testAuraMethod" action="{!c.testAuraMethod}"/>
+    <aura:method name="testAddHandler" action="{!c.testAddHandler}"/>
 
     <div>SecureComponentRef test</div>
     <ui:button label="ui:button component" aura:id="facet"/>
-    <lockerTestOtherNamespace:eventSource aura:id="eventSource" foo="{!c.doFoo}"/>
+    <lockerTestOtherNamespace:eventSource aura:id="eventSource" foo="{!c.doFoo}"/>    
 </aura:component>

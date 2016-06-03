@@ -31,6 +31,8 @@ function SecureDOMEvent(event, key) {
         target: SecureObject.createFilteredProperty(o, event, "target"),
         currentTarget: SecureObject.createFilteredProperty(o, event, "currentTarget"),
 
+        initEvent: SecureObject.createFilteredMethod(o, event, "initEvent"),
+
         // Touch Events are special on their own:
         // https://developer.mozilla.org/en-US/docs/Web/API/Touch
         touches: SecureDOMEvent.filterTouchesDescriptor(o, event, "touch"),

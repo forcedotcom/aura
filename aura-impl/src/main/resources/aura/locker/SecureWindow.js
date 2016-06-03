@@ -31,8 +31,8 @@
 function SecureWindow(win, key, globalAttributeWhitelist) {
 	"use strict";
 	
-    var hostedDefinedGlobals = ["alert", "clearInterval", "clearTimeout", "confirm", "console", "DOMParser", 
-                                "location", "Node", "requestAnimationFrame", "cancelAnimationFrame"];
+    var hostedDefinedGlobals = ["alert", "clearInterval", "clearTimeout", "confirm", "console", "DOMParser", "FileReader",
+                                "location", "Node", "requestAnimationFrame", "cancelAnimationFrame", "atob", "btoa"];
 
 	var o = Object.create(null, {
 		document: {
@@ -61,13 +61,13 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 		setTimeout: {
 			enumerable: true,
 			value: function (callback) {
-				setTimeout.apply(win, [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(SecureObject.ArrayPrototypeSlice.call(arguments, 1)));
+				return setTimeout.apply(win, [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(SecureObject.ArrayPrototypeSlice.call(arguments, 1)));
 			}
 		},
 		setInterval: {
 			enumerable: true,
 			value: function (callback) {
-				setInterval.apply(win, [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(SecureObject.ArrayPrototypeSlice.call(arguments, 1)));
+				return setInterval.apply(win, [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(SecureObject.ArrayPrototypeSlice.call(arguments, 1)));
 			}
 		},
 		toString: {

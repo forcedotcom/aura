@@ -90,6 +90,8 @@ function SecureDocument(doc, key) {
         body: SecureObject.createFilteredProperty(o, doc, "body"),
         head: SecureObject.createFilteredProperty(o, doc, "head"),
 
+        createEvent: SecureObject.createFilteredMethod(o, doc, "createEvent"),
+
         childNodes: SecureObject.createFilteredProperty(o, doc, "childNodes", { filterOpaque: true }),
 
         nodeType: SecureObject.createFilteredProperty(o, doc, "nodeType"),

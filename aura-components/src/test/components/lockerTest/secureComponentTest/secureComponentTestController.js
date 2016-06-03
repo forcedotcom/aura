@@ -53,6 +53,17 @@
         testUtils.assertEquals("Hello from sayHello()", cmp.find("message").textContent);
     },
     
+    testCyclicObject: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        
+        var cyclicObject = {};
+        cyclicObject.parent = cyclicObject;
+                
+        cmp.set("v.cyclicObject", cyclicObject);
+                
+        cmp.get("v.cyclicObject");
+    },  
+    
     sayHello: function(cmp) {
 		cmp.find("message").textContent = "Hello from sayHello()";
 	}

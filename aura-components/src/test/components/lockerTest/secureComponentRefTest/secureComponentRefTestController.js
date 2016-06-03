@@ -59,6 +59,20 @@
         testUtils.assertEquals("Hello from sayHello()", eventSource.get("v.message"));
     },
     
+    testAddHandler: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        
+        var eventSource = cmp.find("eventSource");
+        eventSource.addHandler("foo", cmp, "c.onFooDynamic");
+        eventSource.get("e.foo").fire();
+        
+        testUtils.assertEquals("Hello from onFooDynamic()", cmp.get("v.message"));       
+    },
+    
+    onFooDynamic: function(cmp) {
+    	cmp.set("v.message", "Hello from onFooDynamic()");	
+    },
+    
     doFoo: function(cmp) {
     	// Do nothing
     }

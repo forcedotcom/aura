@@ -70,214 +70,216 @@ function SecureElement(el, key) {
 		return o;
 	}
 
-    // SecureElement is it then!
-    o = Object.create(null, {
-        toString : {
-            value : function() {
-                return "SecureElement: " + el + "{ key: " + JSON.stringify(key) + " }";
-            }
-        },
+	// SecureElement is it then!
+	o = Object.create(null, {
+		toString : {
+			value : function() {
+				return "SecureElement: " + el + "{ key: " + JSON.stringify(key) + " }";
+			}
+		},
 
-        appendChild : {
-            value : function(child) {
-                $A.lockerService.util.verifyAccess(o, child, {
-                    verifyNotOpaque : true
-                });
+		appendChild : {
+			value : function(child) {
+				$A.lockerService.util.verifyAccess(o, child, {
+					verifyNotOpaque : true
+				});
 
-                if (!runIfRunnable(child)) {
-                    el.appendChild(getLockerSecret(child, "ref"));
-                }
+				if (!runIfRunnable(child)) {
+					el.appendChild(getLockerSecret(child, "ref"));
+				}
 
-                return child;
-            }
-        },
+				return child;
+			}
+		},
 
-        replaceChild : {
-            value : function(newChild, oldChild) {
-                $A.lockerService.util.verifyAccess(o, newChild, {
-                    verifyNotOpaque : true
-                });
-                $A.lockerService.util.verifyAccess(o, oldChild, {
-                    verifyNotOpaque : true
-                });
+		replaceChild : {
+			value : function(newChild, oldChild) {
+				$A.lockerService.util.verifyAccess(o, newChild, {
+					verifyNotOpaque : true
+				});
+				$A.lockerService.util.verifyAccess(o, oldChild, {
+					verifyNotOpaque : true
+				});
 
-                if (!runIfRunnable(newChild)) {
-                    el.replaceChild(getLockerSecret(newChild, "ref"), getLockerSecret(oldChild, "ref"));
-                }
+				if (!runIfRunnable(newChild)) {
+					el.replaceChild(getLockerSecret(newChild, "ref"), getLockerSecret(oldChild, "ref"));
+				}
 
-                return oldChild;
-            }
-        },
+				return oldChild;
+			}
+		},
 
-        insertBefore : {
-            value : function(newNode, referenceNode) {
-                $A.lockerService.util.verifyAccess(o, newNode, {
-                    verifyNotOpaque : true
-                });
+		insertBefore : {
+			value : function(newNode, referenceNode) {
+				$A.lockerService.util.verifyAccess(o, newNode, {
+					verifyNotOpaque : true
+				});
 
-                if (referenceNode) {
-                    $A.lockerService.util.verifyAccess(o, referenceNode, {
-                        verifyNotOpaque : true
-                    });
-                }
+				if (referenceNode) {
+					$A.lockerService.util.verifyAccess(o, referenceNode, {
+						verifyNotOpaque : true
+					});
+				}
 
-                if (!runIfRunnable(newNode)) {
-                    el.insertBefore(getLockerSecret(newNode, "ref"), referenceNode ? getLockerSecret(referenceNode, "ref") : null);
-                }
+				if (!runIfRunnable(newNode)) {
+					el.insertBefore(getLockerSecret(newNode, "ref"), referenceNode ? getLockerSecret(referenceNode, "ref") : null);
+				}
 
-                return newNode;
-            }
-        }
-    });
+				return newNode;
+			}
+		}
+	});
+	
+	Object.defineProperties(o, {
+		removeChild : SecureObject.createFilteredMethod(o, el, "removeChild", {
+			beforeCallback : function(child) {
+				// Verify that the passed in child is not opaque!
+				$A.lockerService.util.verifyAccess(o, child, {
+					verifyNotOpaque : true
+				});
+			}
+		}),
 
-    Object.defineProperties(o, {
-        removeChild : SecureObject.createFilteredMethod(o, el, "removeChild", {
-            beforeCallback : function(child) {
-                // Verify that the passed in child is not opaque!
-                $A.lockerService.util.verifyAccess(o, child, {
-                    verifyNotOpaque : true
-                });
-            }
-        }),
+		cloneNode : {
+			value : function(deep) {
+				// We need to clone only nodes that can be accessed to and prune
+				// the rest
+				var root = el.cloneNode(false);
 
-        cloneNode : {
-            value : function(deep) {
-                // We need to clone only nodes that can be accessed to and prune
-                // the rest
-                var root = el.cloneNode(false);
+				function cloneChildren(parent, parentClone) {
+					var childNodes = parent.childNodes;
+					for (var i = 0; i < childNodes.length; i++) {
+						var child = childNodes[i];
+						if ($A.lockerService.util.hasAccess(o, child, {
+							verifyNotOpaque : true
+						})) {
+							var childClone = child.cloneNode(false);
+							parentClone.appendChild(childClone);
+							$A.lockerService.trust(o, childClone);
+							cloneChildren(child, childClone);
+						}
+					}
+				}
 
-                function cloneChildren(parent, parentClone) {
-                    var childNodes = parent.childNodes;
-                    for (var i = 0; i < childNodes.length; i++) {
-                        var child = childNodes[i];
-                        if ($A.lockerService.util.hasAccess(o, child, {
-                            verifyNotOpaque : true
-                        })) {
-                            var childClone = child.cloneNode(false);
-                            parentClone.appendChild(childClone);
-                            $A.lockerService.trust(o, childClone);
-                            cloneChildren(child, childClone);
-                        }
-                    }
-                }
+				if (deep) {
+					cloneChildren(el, root);
+				}
 
-                if (deep) {
-                    cloneChildren(el, root);
-                }
+				return SecureElement(root, key);
+			}
+		},
 
-                return SecureElement(root, key);
-            }
-        },
+		textContent : SecureObject.createFilteredProperty(o, el, "textContent", {
+			afterGetCallback : function() {
+				return getLockerSecret(o.cloneNode(true), "ref").textContent;
+			},
+			afterSetCallback : function() {
+				trustNodes(undefined, el.childNodes);
+			}
+		})
+	});
 
-        textContent : SecureObject.createFilteredProperty(o, el, "textContent", {
-            afterGetCallback : function() {
-                return getLockerSecret(o.cloneNode(true), "ref").textContent;
-            },
-            afterSetCallback : function() {
-                trustNodes(undefined, el.childNodes);
-            }
-        })
-    });
+	// Conditionally add things that not all Node types support
+	SecureObject.addPropertyIfSupported(o, el, "attributes", {
+		writable : false,
+		afterGetCallback : function(attributes) {
+			// Secure attributes
+			var secureAttributes = [];
+			for (var i = 0; i < attributes.length; i++) {
+				var attribute = attributes[i];
+				secureAttributes.push({
+					name : attribute.name,
+					value : SecureObject.filterEverything(o, attribute.value)
+				});
+			}
 
-    // Conditionally add things that not all Node types support
-    SecureObject.addPropertyIfSupported(o, el, "attributes", {
-        writable : false,
-        afterGetCallback : function(attributes) {
-            // Secure attributes
-            var secureAttributes = [];
-            for (var i = 0; i < attributes.length; i++) {
-                var attribute = attributes[i];
-                secureAttributes.push({
-                    name : attribute.name,
-                    value : SecureObject.filterEverything(o, attribute.value)
-                });
-            }
+			return secureAttributes;
+		}
+	});
 
-            return secureAttributes;
-        }
-    });
+	SecureObject.addPropertyIfSupported(o, el, "innerText", {
+		afterGetCallback : function() {
+			return getLockerSecret(o.cloneNode(true), "ref").innerText;
+		},
+		afterSetCallback : function() {
+			trustNodes(undefined, el.childNodes);
+		}
+	});
 
-    SecureObject.addPropertyIfSupported(o, el, "innerText", {
-        afterGetCallback : function() {
-            return getLockerSecret(o.cloneNode(true), "ref").innerText;
-        },
-        afterSetCallback : function() {
-            trustNodes(undefined, el.childNodes);
-        }
-    });
+	[ "childNodes", "children", "firstChild", "lastChild", "nodeName", "nodeType", "parentNode", "parentElement", "ownerDocument"].forEach(function(name) {
+		SecureObject.addPropertyIfSupported(o, el, name, {
+			filterOpaque : true
+		});
+	});
 
-    [ "childNodes", "children", "firstChild", "lastChild", "getAttribute", "nodeName", "nodeType", "parentNode", "parentElement", "ownerDocument",
-            "setAttribute", "removeAttribute", "getAttributeNS", "setAttributeNS", "removeAttributeNS" ].forEach(function(name) {
-        SecureObject.addPropertyIfSupported(o, el, name, {
-            filterOpaque : true
-        });
-    });
+	[ "compareDocumentPosition", "getElementsByClassName", "getElementsByTagName", "getElementsByTagNameNS", "querySelector", "querySelectorAll",
+			"getBoundingClientRect", "getClientRects", "blur", "click", "focus", 
+			"getAttribute", "hasAttribute", "setAttribute", "removeAttribute", "getAttributeNS", "hasAttributeNS", "setAttributeNS", "removeAttributeNS" ].forEach(function(name) {
+		SecureObject.addMethodIfSupported(o, el, name, {
+			filterOpaque : true
+		});
+	});
 
-    [ "compareDocumentPosition", "getElementsByClassName", "getElementsByTagName", "getElementsByTagNameNS", "querySelector", "querySelectorAll",
-            "getBoundingClientRect", "getClientRects", "blur", "click", "focus" ].forEach(function(name) {
-                SecureObject.addMethodIfSupported(o, el, name, {
-                    filterOpaque : true
-                });
-            });
+	SecureObject.addPropertyIfSupported(o, el, "innerHTML", {
+		afterGetCallback : function() {
+			return getLockerSecret(o.cloneNode(true), "ref").innerHTML;
+		},
+		beforeSetCallback : function(value) {
+			// Do not allow innerHTML on shared elements (body/head)
+			if (isSharedElement(el)) {
+				throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
+			}
 
-    SecureObject.addPropertyIfSupported(o, el, "innerHTML", {
-        afterGetCallback : function() {
-            return getLockerSecret(o.cloneNode(true), "ref").innerHTML;
-        },
-        beforeSetCallback : function(value) {
-            // Do not allow innerHTML on shared elements (body/head)
-            if (isSharedElement(el)) {
-                throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
-            }
+			// Allow SVG <use> element 
+			var config = {
+				"ADD_TAGS" : [ "use" ]
+			};
+			
+			return DOMPurify["sanitize"](value, config);
+		},
+		afterSetCallback : function() {
+			trustNodes(undefined, el.childNodes);
+		}
+	});
 
-            // Allow SVG <use> element
-            var config = {
-                "ADD_TAGS" : [ "use" ]
-            };
+	// applying standard secure element properties
+	SecureElement.addSecureProperties(o, el);
+	SecureElement.addSecureGlobalEventHandlers(o, el, key);
+	SecureElement.addEventTargetMethods(o, el, key);
 
-            return DOMPurify["sanitize"](value, config);
-        },
-        afterSetCallback : function() {
-            trustNodes(undefined, el.childNodes);
-        }
-    });
+	SecureElement.addElementSpecificProperties(o, el);
+	SecureElement.addElementSpecificMethods(o, el);
 
-    // applying standard secure element properties
-    SecureElement.addSecureProperties(o, el);
-    SecureElement.addSecureGlobalEventHandlers(o, el, key);
-    SecureElement.addEventTargetMethods(o, el, key);
-
-    SecureElement.addElementSpecificProperties(o, el);
-    SecureElement.addElementSpecificMethods(o, el);
-
-    setLockerSecret(o, "key", key);
-    setLockerSecret(o, "ref", el);
-    
+	setLockerSecret(o, "key", key);
+	setLockerSecret(o, "ref", el);
+	
 	SecureObject.addToCache(el, o, key);
 
     return o;
 }
 
 SecureElement.addSecureProperties = function(se, raw) {
-    [
-    // Standard Element interface represents an object of a Document.
-    // https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
-    'childElementCount', 'classList', 'className', 'id', 'tagName', 'namespaceURI',
-    // Note: ignoring 'firstElementChild', 'lastElementChild',
-    // 'nextElementSibling' and 'previousElementSibling' from the list
-    // above.
+	[
+	// Standard Element interface represents an object of a Document.
+	// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
+	'childElementCount', 'classList', 'className', 'id', 'tagName', 'namespaceURI',
+	// Note: ignoring 'firstElementChild', 'lastElementChild',
+	// 'nextElementSibling' and 'previousElementSibling' from the list
+	// above.
 
-    // Standard HTMLElement interface represents any HTML element
-    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
-    'accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable', 'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang',
-            'spellcheck', 'style', 'tabIndex', 'title', 'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth', 'clientWidth',
-            'clientHeight', 'clientLeft', 'clientTop', 'nodeValue'
+	// Standard HTMLElement interface represents any HTML element
+	// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
+	'accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable', 'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang',
+			'spellcheck', 'style', 'tabIndex', 'title', 'offsetHeight', 'offsetLeft', 'offsetParent', 'offsetTop', 'offsetWidth', 'clientWidth',
+			'clientHeight', 'clientLeft', 'clientTop', 'nodeValue'
 
-    // DCHASMAN TODO This list needs to be revisted as it is missing a ton of
-    // valid attributes!
-    ].forEach(function(name) {
-        SecureObject.addPropertyIfSupported(se, raw, name);
-    });
+	// DCHASMAN TODO This list needs to be revisted as it is missing a ton of
+	// valid attributes!
+	].forEach(function(name) {
+		SecureObject.addPropertyIfSupported(se, raw, name, {
+			filterOpaque : true
+		});
+	});
 };
 
 SecureElement.addSecureGlobalEventHandlers = function(se, raw, key) {
@@ -361,32 +363,36 @@ SecureElement.createAddEventListener = function(st, el, key) {
 };
 
 SecureElement.addElementSpecificProperties = function(se, el) {
-    var tagName = el.tagName && el.tagName.toUpperCase();
-    if (tagName) {
-        var whitelist = SecureElement.elementSpecificAttributeWhitelists[tagName];
-        if (whitelist) {
-            whitelist.forEach(function(name) {
-                SecureObject.addPropertyIfSupported(se, el, $A.util.hyphensToCamelCase(name));
-            });
-        }
+	var tagName = el.tagName && el.tagName.toUpperCase();
+	if (tagName) {
+		var whitelist = SecureElement.elementSpecificAttributeWhitelists[tagName];
+		if (whitelist) {
+			whitelist.forEach(function(name) {
+				SecureObject.addPropertyIfSupported(se, el, $A.util.hyphensToCamelCase(name), {
+					filterOpaque : true
+				});
+			});
+		}
 
-        // Special handling for SVG elements
-        if (el.namespaceURI === "http://www.w3.org/2000/svg") {
-            SecureObject.addMethodIfSupported(se, el, "getBBox");
-        }
-    }
+		// Special handling for SVG elements
+		if (el.namespaceURI === "http://www.w3.org/2000/svg") {
+			SecureObject.addMethodIfSupported(se, el, "getBBox");
+		}
+	}
 };
 
 SecureElement.addElementSpecificMethods = function(se, el) {
-    var tagName = el.tagName && el.tagName.toUpperCase();
-    if (tagName) {
-        var whitelist = SecureElement.elementSpecificMethodWhitelists[tagName];
-        if (whitelist) {
-            whitelist.forEach(function(name) {
-                SecureObject.addMethodIfSupported(se, el, name);
-            });
-        }
-    }
+	var tagName = el.tagName && el.tagName.toUpperCase();
+	if (tagName) {
+		var whitelist = SecureElement.elementSpecificMethodWhitelists[tagName];
+		if (whitelist) {
+			whitelist.forEach(function(name) {
+				SecureObject.addMethodIfSupported(se, el, name, {
+					filterOpaque : true
+				});
+			});
+		}
+	}
 };
 
 SecureElement.elementSpecificAttributeWhitelists = {

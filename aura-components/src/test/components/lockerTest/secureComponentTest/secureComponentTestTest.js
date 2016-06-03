@@ -51,5 +51,11 @@
         test: function(cmp) {
             cmp.testAuraMethod();
         }
-    }
+    },
+    
+    testCyclicObject: {
+        test: function(cmp) {
+            cmp.testCyclicObject();
+        }
+    }  
 })

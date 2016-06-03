@@ -265,7 +265,7 @@
                     $A.test.addWaitFor(true, function() { return completed; });
             }, function(cmp) {
                 var storage = $A.storageService.getStorage("crypto-store");
-                var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); }.bind(this);
+                var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); }
                 var completed = false;
                 storage.get("valueTooLarge")
                     .then(function(value) {

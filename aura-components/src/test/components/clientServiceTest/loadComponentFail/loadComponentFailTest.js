@@ -5,7 +5,7 @@
      * See the template file of the component loaded in the iframe for logic relevant to emulating offline behavior
      * and how the storage is set up.
      */
-	// TODO(W-2942362): Need to figure out a better to emulate offline. Locker fails if host is invalid.
+	// TODO(W-3110067): Need to figure out a better to emulate offline. Locker fails if host is invalid.
     _testOfflineLaunchFailureDisplaysError: {
         test: [
             function loadIframe(cmp) {

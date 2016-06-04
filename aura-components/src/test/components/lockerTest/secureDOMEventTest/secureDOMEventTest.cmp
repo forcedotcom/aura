@@ -22,6 +22,7 @@
     <aura:method name="testClickEvent" action="{!c.testClickEvent}"/>
     <aura:method name="testEventView" action="{!c.testEventView}"/>
     <aura:method name="testMarkupDefinedClickHandler" action="{!c.testMarkupDefinedClickHandler}"/>
+    <aura:method name="testInitEvent" action="{!c.testInitEvent}"/>
 
     <div aura:id="title">SecureDOMEvent test</div>
     <button aura:id="button" onclick="{!c.onclick}">Test click handler</button>

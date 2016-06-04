@@ -64,5 +64,15 @@
         testUtils.assertDefined(window.alert, "window.alert() not exposed");
 
         testUtils.assertTrue(window.alert === alert, "window.alert and alert should reference to same thing.");
+    },
+
+    testTimerReturns: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var setIntervalReturn = setInterval(function(){}, 1000);
+        var setTimeoutReturn = setTimeout(function(){}, 1000);
+        testUtils.assertTrue(typeof setIntervalReturn === "number", "setInterval did not return a number");
+        testUtils.assertTrue(typeof setTimeoutReturn === "number", "setInterval did not return a number");
+        clearInterval(setIntervalReturn);
+        clearTimeout(setTimeoutReturn);
     }
 })

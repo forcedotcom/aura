@@ -587,8 +587,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * Verify Aura default error handler can handle systemError event when there is an invalid component.
      */
     @Test
-    // TODO(W-3178863): New bootstrap sequence needs to handle errors during boot better
-    public void _testDefaultHandleInvalidComponentErrorWhenMarkEventHandled() throws Exception {
+    public void testDefaultHandleInvalidComponentErrorWhenMarkEventHandled() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true&addInvalidComponent=true", Mode.PROD, false);
 
         String actualMessage = findErrorMessage();

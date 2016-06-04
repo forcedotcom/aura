@@ -52,11 +52,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
+import aQute.bnd.annotation.component.Component;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
-
-import aQute.bnd.annotation.component.Component;
 
 @Component (provide=AuraServiceProvider.class)
 public class ServerServiceImpl implements ServerService {
@@ -331,7 +331,7 @@ public class ServerServiceImpl implements ServerService {
         // Append component classes.
         Collection<BaseComponentDef> componentDefs = filterAndLoad(BaseComponentDef.class, dependencies, null);
         for (BaseComponentDef def : componentDefs) {
-        	sb.append(def.getCode(minify));
+            sb.append(def.getCode(minify));
             masterDefRegistry.setClientClassLoaded(def.getDescriptor(), true);
         }
 

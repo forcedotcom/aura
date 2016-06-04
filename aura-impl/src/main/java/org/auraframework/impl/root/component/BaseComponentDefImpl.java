@@ -377,7 +377,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     @Override
     public void validateReferences(boolean minify) throws QuickFixException {
-    	validateReferences();
+        validateReferences();
         initializeJavascriptClass(minify);
     }
 
@@ -1104,15 +1104,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     	if (minify) {
     		js = javascriptClass.getMinifiedCode();
     	}
-    	
+
     	if (js == null) {
     		js = javascriptClass.getCode();
     	}
-    	
+
     	if (isLockerRequired()) {
     		js = convertToLocker(js);
     	}
-    	
+
     	return js;
     }
 

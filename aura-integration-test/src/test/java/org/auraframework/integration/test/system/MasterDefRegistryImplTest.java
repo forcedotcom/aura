@@ -959,7 +959,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         libDefs = mdr.getClientLibraries(cntx.getUid(appDesc));
 
-        // 1 from clientLibraryTest:testDependencies 
+        // 1 from clientLibraryTest:testDependencies
         // Update this number when you add new aura:clientLibrary tags to these components
         assertEquals(3, libDefs.size());
     }
@@ -1035,7 +1035,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""), StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testComp",
                         NamespaceAccess.CUSTOM);
-        
+
         when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn(null);
 
         MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) getAuraMDR();
@@ -1343,7 +1343,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * verify we cache dependency for descriptor start with compound
      * notice that we actually cache dependency for it twice, once with Uid, once not.
      * other special case includes apex, I won't test it here.
-     * @throws Exception 
+     * @throws Exception
      */
     @Test
     public void testDepsCacheCompound() throws Exception {
@@ -1351,19 +1351,19 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     	DefDescriptor<ComponentDef> internalCmpWithCompound = getAuraTestingUtil().addSourceAutoCleanup(
                 ComponentDef.class, String.format(baseComponentTag, "access='global'", auraIf), null,
                         NamespaceAccess.INTERNAL);
-    	
+
         MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
          MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
-         
+
          instanceService.getInstance(internalCmpWithCompound, null);
          assertTrue(isInDepsCache(null, "compound://aura.if", mdri));
     }
-    
+
     /**
      * we have a component in non-internal NameSpace , it depends on some component on a internal NameSpace
      * test verify getting def of non-internal one won't add itself, or the internal component into dependency cache
      * also verify getting def of internal one will add itself to dependency cache
-     * 
+     *
      * we also have a component in internal NameSpace which depends on a component on a non-internal NameSpace
      * test verify getting def of the internal one will throw error, and it won't add itself or non-internal component
      * into dependency cache.
@@ -1510,6 +1510,45 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         }
 
         return map;
+    }
+
+    @Test
+    public void testGetDefNotValidateJsCodeForCustomComponent() throws Exception {
+        String cmpName = StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testNotValidateCustomComponent";
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().addSourceAutoCleanup(
+                ComponentDef.class, "<aura:component></aura:component>", cmpName, NamespaceAccess.CUSTOM);
+        DefDescriptor<ControllerDef> controllerDesc = definitionService.getDefDescriptor(cmpDesc,
+                DefDescriptor.JAVASCRIPT_PREFIX, ControllerDef.class);;
+
+        String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
+        getAuraTestingUtil().addSourceAutoCleanup(controllerDesc, controllerCode, NamespaceAccess.CUSTOM);
+
+        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
+        ComponentDef cmpDef = mdr.getDef(cmpDesc);
+
+        assertEquals(cmpDesc.getQualifiedName(), cmpDef.getDescriptor().getQualifiedName());
+    }
+
+    @Test
+    public void testGetDefValidateJsCodeForCacheableComponent() throws Exception {
+        // Components under internal namespace are cachable
+        String cmpName = StringSourceLoader.DEFAULT_NAMESPACE+":testGetDefValidateJsCodeForCacheableComponent";
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().addSourceAutoCleanup(
+                ComponentDef.class, "<aura:component></aura:component>", cmpName, NamespaceAccess.INTERNAL);
+        DefDescriptor<ControllerDef> controllerDesc = definitionService.getDefDescriptor(cmpDesc,
+                DefDescriptor.JAVASCRIPT_PREFIX, ControllerDef.class);;
+
+        String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
+        getAuraTestingUtil().addSourceAutoCleanup(controllerDesc, controllerCode, NamespaceAccess.INTERNAL);
+
+        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
+        try {
+            mdr.getDef(cmpDesc);
+            fail("Expecting an InvalidDefinitionException");
+        } catch(Exception e) {
+            String expectedMsg = String.format("JS Processing Error: %s", cmpDesc.getQualifiedName());
+            this.assertExceptionMessageContains(e, InvalidDefinitionException.class, expectedMsg);
+        }
     }
 
     private MasterDefRegistry getAuraMDR() {

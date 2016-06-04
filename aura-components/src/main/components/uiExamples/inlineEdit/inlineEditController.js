@@ -25,5 +25,12 @@
 	
 	onEdit : function(cmp, evt) {
 	    // TODO: onEdit handler
+	},
+
+	handleEditableChange: function(cmp, evt, helper){
+
+		var editable = cmp.get('v.editable');
+		cmp.set('v.editable', !editable);
+		
 	}
 })// eslint-disable-line semi

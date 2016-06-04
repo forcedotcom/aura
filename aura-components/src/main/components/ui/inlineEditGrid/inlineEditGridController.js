@@ -29,11 +29,19 @@
 
 	handleGridAction : function(cmp, evt, helper) {
 		var action = evt.getParam("action");
-		
+
 		/**
 		 * If the bubbled event is an edit, send an edit panel to the cell
 		 */
 		if (action === 'edit') {
+
+			// Prevent inline edit if editable is false	
+			if (!cmp.get('v.editable')){
+				evt.preventDefault();
+				evt.stopPropagation();
+				return;
+			}
+
 			var index = evt.getParam("index");
 			var payload = evt.getParam("payload");
 			

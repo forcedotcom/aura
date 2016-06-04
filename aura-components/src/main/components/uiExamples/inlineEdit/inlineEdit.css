@@ -36,8 +36,8 @@
 	text-align: left;
 }
 
-.THIS .inline-edit-example th:hover,
-.THIS .inline-edit-example td:hover {
+.THIS .inline-edit-enabled .inline-edit-example th:hover,
+.THIS .inline-edit-enabled .inline-edit-example td:hover {
 	background-color: rgb(244, 246, 249)
 }
 
@@ -92,4 +92,8 @@
     font-size: inherit;
     font-weight: 400;
     line-height: 1.75em;
+}
+
+.THIS .inlineEdit--disabled .triggerContainer {
+	display: none;
 }

@@ -60,6 +60,12 @@ function SecureIFrameElement(el, key) {
 		Object.defineProperty(o, name, SecureObject.createFilteredProperty(o, el, name));
 	});
     
+	[ "getAttribute", "hasAttribute", "setAttribute", "removeAttribute", "getAttributeNS", "hasAttributeNS", "setAttributeNS", "removeAttributeNS" ].forEach(function(name) {
+		SecureObject.addMethodIfSupported(o, el, name, {
+			filterOpaque : true
+		});
+	});
+    
     // applying standard secure element properties
     SecureElement.addSecureProperties(o, el);
 

@@ -94,6 +94,7 @@ function SecureDocument(doc, key) {
 
         childNodes: SecureObject.createFilteredProperty(o, doc, "childNodes", { filterOpaque: true }),
 
+        defaultView: SecureObject.createFilteredProperty(o, doc, "defaultView"),
         nodeType: SecureObject.createFilteredProperty(o, doc, "nodeType"),
 
         getElementById: SecureObject.createFilteredMethod(o, doc, "getElementById", { filterOpaque: true }),

@@ -263,6 +263,27 @@
             //'uiInput',
             'uiPill'
         ];
+/*
+Uncaught Error in $A.getCallback() [TypeError: Cannot read property 'isOriginBeacon' of null]
+throws at https://ap1.lightning.mobile1.t.force.com/auraFW/javascript/CEHQhQk8YyvH45BIO6rcRw/aura_proddebug.js:15116:9
+    at Object.onpostmessage (https://ap1.lightning.mobile1.t.force.com/l/%7B%22mode%22%3A%22PRODDEBUG%22…CN%22%2C%22zh%22%2C%22zh_TW%22%5D%2C%22ls%22%3A%22E%22%7D/app.js:183298:21)
+    ...
+    at https://ap1.lightning.mobile1.t.force.com/auraFW/javascript/CEHQhQk8YyvH45BIO6rcRw/aura_proddebug.js:15102:23
+
+Uncaught Action failed: ui$inputSelect$controller$doInit [TypeError: Cannot read property 'Salutation' of null]
+throws at https://ap1.lightning.mobile2.t.force.com/auraFW/javascript/9ZyVfeyJDnAYJljZRNLqqg/aura_prod.js:1:27
+at cz.y.set (https://ap1.lightning.mobile2.t.force.com/auraFW/javascript/9ZyVfeyJDnAYJljZRNLqqg/aura_prod.js:291:221)
+...
+at Object.helper.updateValueFromOptions 
+*/
+        this.errorsToIgnore = [
+            
+        ];
+
+        this.errosToCatchAndReport = [
+            "Uncaught Action failed",
+            "Uncaught Error in $A.getCallback()"
+        ];
 
         this.configuration = {
             'defaultMaxTry' : 10,//sometimes we need to wait for some element to show up
@@ -353,7 +374,7 @@
     };
 
     /*
-        event handler for AuraInspector:OnStartChaosRun , called from AuraInspectorChaosView.startChaosRun
+        event handler for AuraInspector:OnStartChaosRun , called from InspectorPanelSfdcChaos.StartChaosRun_OnClick
         { 'samplingInterval': number like 4000, 'actionDropPercentage': number between 0 to 100 };
     */
     chaosManager.prototype.startChaosRun = function(data) {
@@ -381,7 +402,7 @@
                     //console.log("Save timeMachine:", currentChaosRunTimeMachine);
                 } else {
                     var msg = "We only support chaos run start from one.app main page for now";
-                    //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
+                    //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in InspectorPanelSfdcChaos.js
                     $Aura.Inspector.publish("AuraInspector:OnNewChaosRunNewStatus", {'message': msg});
                     console.error(msg);
                     return;
@@ -404,7 +425,7 @@
     };
 
 
-    //event handler for AuraInspector:stopChaosRun, called by AuraInspectorChaosView.stopChaosRun
+    //event handler for AuraInspector:stopChaosRun, called by InspectorPanelSfdcChaos.StopChaosRun_OnClick
     chaosManager.prototype.stopChaosRun = function(data) {
             this.configuration.actionDropPercentage = 0;
 
@@ -417,7 +438,7 @@
             //console.log("ChaosRun Stopped");
     };
     
-    //event handler for AuraInspector:stopAllChaosRun, called by AuraInspectorChaosView.stopAllChaosRun
+    //event handler for AuraInspector:stopAllChaosRun, called by InspectorPanelSfdcChaos.StopAllChaosRun_OnClick
     chaosManager.prototype.stopAllChaosRun = function(data) {
 
             //and stop all intervals
@@ -442,14 +463,14 @@
     };
 
     /*
-            event handler for AuraInspector:saveChaosRun, called by AuraInspectorChaosView.saveChaosRun
+            event handler for AuraInspector:saveChaosRun, called by InspectorPanelSfdcChaos.SaveChaosRun_OnClick
             {'samplingInterval': number like 4000, 'actionDropPercentage': number between 0 and 100}
     */
     chaosManager.prototype.saveChaosRun = function(data) {
             this.currentChaosRun = Object.assign(this.currentChaosRun, data);
             this.currentChaosRun["currentChaosRunSteps"] = this.currentChaosRunSteps;
 
-            //this will call AuraInspectorChaosView_OnChaosRunSaved in AuarInspectorChaosView, just to clear out chaos cards
+            //this will call AuraInspectorChaosView_OnChaosRunSaved in InspectorPanelSfdcChaos.js, just to clear out chaos cards
             $Aura.Inspector.publish("AuraInspector:OnChaosRunSaved", {});
 
             //save the run to local file
@@ -471,7 +492,7 @@
             this.currentChaosRun = {};
     };
 
-    //event handler for AuraInspector:OnLoadChaosRun, called by AuraInspectorChaosView.loadChaosRun
+    //event handler for AuraInspector:OnLoadChaosRun, called by InspectorPanelSfdcChaos.ChooseChaosRunFile_OnClick
     //{ 'chaosRunFromFile': string }
     chaosManager.prototype.loadChaosRun = function(data) {
             if(data && data.chaosRunFromFile) {
@@ -483,7 +504,7 @@
                     //store it in localStorage
                     sessionStorage.setItem("chaosRunToReplay", chaosRunFromFile);
 
-                    //call AuraInspectorChaosView_OnChaosRunLoaded in AuarInspectorChaosView to display steps of the chaosRun
+                    //call AuraInspectorChaosView_OnChaosRunLoaded in InspectorPanelSfdcChaos to display steps of the chaosRun
                     $Aura.Inspector.publish("AuraInspector:OnChaosRunLoaded", JSON.parse(chaosRunFromFile));
                 } else {
                     console.error("No localStorage found");
@@ -494,7 +515,7 @@
     };
 
     /*
-        event handler for AuraInspector:OnCancelTheLoadedChaosRun, called by AuraInspectorChaosView.cancelTheLoadedChaosRun
+        event handler for AuraInspector:OnCancelTheLoadedChaosRun, called by InspectorPanelSfdcChaos.CancelTheLoadedChaosRun_OnClick
     */
     chaosManager.prototype.cancelTheLoadedChaosRun = function() {
             if(typeof(Storage) !== "undefined" && sessionStorage && sessionStorage.getItem("chaosRunToReplay")) {
@@ -504,7 +525,7 @@
     };
 
     /*
-            event handler for AuraInspector:OnReplayChaosRun, called by AuraInspectorChaosView.replayChaosRun
+            event handler for AuraInspector:OnReplayChaosRun, called by InspectorPanelSfdcChaos.ReplayChaosRun_OnClick
             build time machine, replay the loaded chaos run
             {'samplingInterval': number like 4000}
     */
@@ -525,7 +546,7 @@
                     //clear up all aura storage
                     this.clearAllAuraStorages(
                         function() {
-                            //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
+                            //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in InspectorPanelSfdcChaos.js
                             $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': "All aura storage cleared"});
 
                             var newLocation = JSON.parse(sessionStorage.getItem("chaosRunToReplay")).currentChaosRunTimeMachine.startUrl;
@@ -563,7 +584,7 @@
     };
 
     /*
-            event handler for 'AuraInspector:OnContinueChaosRun', called from AuraInspectorChaosView_OnBootstrap of AuraInspectorChaosView
+            event handler for 'AuraInspector:OnContinueChaosRun', called from AuraInspectorChaosView_OnBootstrap of InspectorPanelSfdcChaos
             this happen after browser refresh with the new location set by above function 'AuraDevToolService.ReplayChaosRun'
     */
     chaosManager.prototype.continueChaosRun = function(data) {
@@ -581,7 +602,7 @@
 
                     var message = "We are in the middle of the replaying a chaos run, samplingInterval="+samplingInterval;
                     //console.log(message, chaosRunToReplay);
-                    //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
+                    //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in InspectorPanelSfdcChaos.js
                     $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
 
                     this.waitForElementInNextStepInterval = 
@@ -646,7 +667,7 @@
 
             var message = "schedule action:"+nextStep.actionName+" to "+nextStep.actionOperation;
             //console.log(message, nextStep);
-            //call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
+            //call AuarInspectorChaosView_OnReplayChaosRunNewStatus in InspectorPanelSfdcChaos.js 
             $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
 
             //add the action to watch list
@@ -681,14 +702,14 @@
             var message = "Replay step "+this.chaosRunToReplay.indexOfStep+": "+step.textContent
             +", try count: "+this.count_waitForElementFromAStepToAppear;
             //console.log(message, step);
-            //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
+            //this will call AuarInspectorChaosView_OnReplayChaosRunNewStatus in InspectorPanelSfdcChaos.js
             $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
 
             //meh
             if(this.count_waitForElementFromAStepToAppear > this.configuration.defaultMaxTry) {
                 clearInterval(this.waitForElementInNextStepInterval);
                 var errMsg = "We have to stop replaying chaos run because an element on the next step wouldn't show up";
-                //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in AuarInspectorChaosView
+                //this will call AuarInspectorChaosView_OnReplayChaosRunFinished in InspectorPanelSfdcChaos 
                 $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {'error': errMsg});
                 console.error(errMsg, step);
             }
@@ -712,9 +733,9 @@
 
                         var message = "Chaos run finished";
                         //console.log(message);
-                        //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in AuarInspectorChaosView
+                        //this will call AuarInspectorChaosView_OnReplayChaosRunNewStatus in InspectorPanelSfdcChaos.js
                         $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
-                        //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in AuarInspectorChaosView
+                        //this will call AuarInspectorChaosView_OnReplayChaosRunFinished in InspectorPanelSfdcChaos.js
                         $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {});
 
                     } else {
@@ -722,7 +743,7 @@
 
                         var errMsg = "Chaos run stopped because step "+this.chaosRunToReplay.indexOfStep+" is out of bound";
                         console.error(errMsg, chaosRunToReplay["currentChaosRunSteps"]);
-                        //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in AuarInspectorChaosView
+                        //this will call AuarInspectorChaosView_OnReplayChaosRunFinished in InspectorPanelSfdcChaos
                         $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {'error': errMsg});
                     }
                 }
@@ -735,7 +756,7 @@
 
             var errMsg = "Chaos Run Stop because indexOfStep="+this.chaosRunToReplay.indexOfStep+" is bogus";
             console.error(errMsg, this.chaosRunToReplay["currentChaosRunSteps"]);
-            //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in AuarInspectorChaosView
+            //this will call AuarInspectorChaosView_OnReplayChaosRunFinished in InspectorPanelSfdcChaos.js
             $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {'error': errMsg});
         }
     }
@@ -750,7 +771,7 @@
 
                 if(elementToClick) {
                     //console.log("click on "+step.textContent, step);
-                    //this will call AuraInspectorChaosView_OnClickSomeElement in AuarInspectorChaosView to create chaos card
+                    //this will call AuarInspectorChaosView_OnClickSomeElement in InspectorPanelSfdcChaos.js to create chaos card
                     $Aura.Inspector.publish("AuraInspector:OnClickSomeElement", step);
 
                     //highlight then actually click on the element
@@ -762,7 +783,7 @@
                 } else {
                     var errMsg = "Chaos run stopped because we cannot find the element to click";
                     console.error(errMsg, step);
-                    //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in AuarInspectorChaosView
+                    //this will call AuarInspectorChaosView_OnReplayChaosRunFinished in InspectorPanelSfdcChaos.js
                     $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {'error': errMsg});
 
                     return -1;
@@ -831,15 +852,30 @@
     /****************************************** functions for a new chaos run *************************************/
 
     //when we click through the app, if the page load slowly, need to wait till at least one aura-rendered element show up
-    chaosManager.prototype.waitAnyAuraRenderedElementPresent = function() {
+    chaosManager.prototype.waitAnyAuraRenderedElementPresent = function(errorHandlingFunction) {
         if(this.count_waitAnyAuraRenderedElementPresent > this.configuration.defaultMaxTry) {
+            this.count_waitAnyAuraRenderedElementPresent = 0;
             clearInterval(this.waitForAnyAuraRenderedElementInterval);
             var errMsg = "We have to stop the new chaos run because aura rendered element is missing";
-            //ask chaos tab to create a chaos card, this will call stopChaosRun in AuraInspectorChaosView
+            //ask chaos tab to create a chaos card, this will call stopChaosRun in InspectorPanelSfdcChaos
             $Aura.Inspector.publish("AuraInspector:OnStopNewChaosRunWithError", {'error': errMsg});
             //above will end up calling "AuraDevToolService.StopChaosRun" here to clear up waitForAnyAuraRenderedElementInterval
             console.error(errMsg);
         }
+        if(typeof errorHandlingFunction === "function") {
+            var stopNewChaosRun = errorHandlingFunction();
+            if(stopNewChaosRun === true) { 
+                var errMsg = "We will stop the new chaos run because we just run into error we want to report";
+                //ask chaos tab to create a chaos card, this will call stopChaosRun in InspectorPanelSfdcChaos
+                $Aura.Inspector.publish("AuraInspector:OnStopNewChaosRunWithError", {'error': errMsg});
+                //above will end up calling "AuraDevToolService.StopChaosRun" here to clear up waitForAnyAuraRenderedElementInterval
+                
+                this.count_waitAnyAuraRenderedElementPresent = 0;
+                clearInterval(this.waitForAnyAuraRenderedElementInterval);
+                return;
+            }
+        }
+        //we need to wait till at least one aura rendered element to show up before try to click on anything
         var selector = '[data-aura-rendered-by]';
         var elementNodeList = document.querySelectorAll(selector);
         if(elementNodeList.length > 0) {
@@ -853,12 +889,37 @@
 
     }
 
+    /*
+        W I P : 
+        get the error message (if any), return true if we see error we care, false other wise.
+        and click on 'OK' button if we don't care about the error ? 
+     */
+    chaosManager.prototype.defaultErrorHandlingFunction = function() {
+        var errorMsgSelector = "div.oneApplicationError > div > textarea[readonly][placeholder]";
+        var allErrorTextAreas = document.querySelectorAll(errorMsgSelector);
+        if(Array.isArray(allErrorTextAreas) && allErrorTextAreas.length > 0) {
+            for(var idx in allErrorTextAreas) {
+                errorText = allErrorTextAreas[0].innerHTML;
+                if( errorText && errorText.length > 0 ) {
+                    for(var idx in this.errosToCatchAndReport) {
+                        if(errorText.indexOf(this.errosToCatchAndReport[idx]) >= 0) {
+                            //stop the new chaos run, log a bug maybe?
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        //TODO: click on 'OK' button if we don't care about the error ?
+        return false;
+    }
+
     //click on a random element. this is called during a new chaos run
     chaosManager.prototype.clickRandomClickableElement = function() {
         var elementToClickObj = this.getRandomClickableAuraElement();
         if(!elementToClickObj) {//we get into a place where we cannot find clickable element, stop chaos run
             var errMsg = "We have to stop the new chaos run because we couldn't find any clickable elements";
-            //ask chaos tab to create a chaos card, this will call stopChaosRun in AuraInspectorChaosView
+            //ask chaos tab to create a chaos card, this will call stopChaosRun in InspectorPanelSfdcChaos
             $Aura.Inspector.publish("AuraInspector:OnStopNewChaosRunWithError", {'error': errMsg});
             //above will end up calling "AuraDevToolService.StopChaosRun" here to clear up waitForAnyAuraRenderedElementInterval
 
@@ -866,14 +927,14 @@
             return;
         } else {
             var elementToClick = elementToClickObj.element;
-            //ask AuraInspectorChaosView to create a chaos card
+            //ask InspectorPanelSfdcChaos to create a chaos card
             var data = {
                 'textContent': elementToClick.textContent,
                 'locator': elementToClickObj.locator,
                 'cssPath': elementToClickObj.cssPath
             };
             this.currentChaosRunSteps.push(data);
-            //this will call AuraInspectorChaosView_OnClickSomeElement in AuarInspectorChaosView to create a chaos card
+            //this will call InspectorPanelSfdcChaos_OnClickSomeElement in AuarInspectorChaosView to create a chaos card
             $Aura.Inspector.publish("AuraInspector:OnClickSomeElement", data);
             //acutally click the element
             this.highlightElement(elementToClick);

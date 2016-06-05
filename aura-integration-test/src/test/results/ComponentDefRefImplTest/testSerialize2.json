@@ -240,6 +240,7 @@
                       ]
                     }
                   ],
+                  "hasServerDeps":true,
                   "componentClass":"function(){$A.componentService.addComponentClass(\"markup://test:parent\",function() {\nvar test$parent = {\n  \"meta\":{\n    \"name\":\"test$parent\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\nreturn test$parent;\n});\n}"
                 }
               }
@@ -300,6 +301,7 @@
           ]
         }
       ],
+      "hasServerDeps":true,
       "componentClass":"function(){$A.componentService.addComponentClass(\"markup://test:text\",function() {\nvar test$text = {\n  \"meta\":{\n    \"name\":\"test$text\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\nreturn test$text;\n});\n}"
     }
   }

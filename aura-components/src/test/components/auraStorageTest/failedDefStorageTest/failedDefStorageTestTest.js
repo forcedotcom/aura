@@ -29,7 +29,7 @@
         }
     },
 
-    testDynamicallyCreatingComponentOnServer: {
+    _testDynamicallyCreatingComponentOnServer: {
         test: [
         function createComponentOnServer(cmp) {
             cmp._expectedCmp = "test:text";

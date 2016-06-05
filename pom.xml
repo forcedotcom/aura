@@ -479,6 +479,8 @@
                         <app>XML_STYLE</app>
                         <intf>XML_STYLE</intf>
                         <evt>XML_STYLE</evt>
+                        <tokens>XML_STYLE</tokens>
+                        <flavors>XML_STYLE</flavors>
                         <auradoc>XML_STYLE</auradoc>
                         <lib>XML_STYLE</lib>
                         <apt>DOUBLETILDE_STYLE</apt>

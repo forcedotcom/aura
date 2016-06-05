@@ -195,9 +195,19 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 		// ignoring falsy, nully references, non-objects and non-functions
 		return value;
 	}
+	
+	var isArray = Array.isArray(value);
 
 	var raw = getLockerSecret(value, "ref");
 	if (raw) {
+		// If this is an array make sure that the backing array is updated to match the system mode proxy that might have been manipulated
+		if (isArray) {
+			raw.length = 0;
+			value.forEach(function (v) {
+				raw.push(SecureObject.unfilterEverything(st, v, visited));
+			});
+		}
+		
 		// returning the raw value stored in the secure reference, which means
 		// this value was original produced in system-mode
 		return raw;
@@ -224,7 +234,7 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 	}
 
 	var proxy;
-	if (Array.isArray(value)) {
+	if (isArray) {
 		proxy = memoize(visited, value, []);
 
 		value.forEach(function (v) {
@@ -233,7 +243,6 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 
 		return proxy;
 	} else if (t === "object") {
-
 		proxy = memoize(visited, value, {});
 
 		for (var prop in value) {

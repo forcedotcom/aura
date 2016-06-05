@@ -15,10 +15,10 @@
 	};
 
 	/*
-		New Action Card created, update it's body
+		New Chaos Card created, update it's body
 	 */
 	chaosCard.createdCallback = function(){
-    	var template = ownerDocument.querySelector("#chaosCardTemplate");
+    	var template = ownerDocument.querySelector("template");
     	//console.log(template);
 
     	var clone = document.importNode(template.content, true);

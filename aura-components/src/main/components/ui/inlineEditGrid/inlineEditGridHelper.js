@@ -89,6 +89,7 @@
 				});
 		//}
 	},
+
 	updateItem: function(cmp, item, index){
 		cmp.find('grid').updateItem(item, index);
 	},

@@ -92,7 +92,7 @@
 			item.status[payload.key].hasErrors = true;
 		}
 		
-		// Update only the specified item (using VDG methods)
+		// Update only the specified item
 		helper.updateItem(cmp, item, index);
 		cmp._panelCmp.hide();
 		
@@ -121,5 +121,9 @@
 	sort : function(cmp, evt) {
 		var sortBy = evt.getParam('arguments').sortBy;
 		cmp.find("grid").sort(sortBy);
-	}
+	},
+    updateItem: function (cmp, event, helper) {
+        var params = event.getParam('arguments');
+        helper.updateItem(cmp, params.item, params.index);
+    }    	
 })// eslint-disable-line semi

@@ -78,5 +78,9 @@
             }, index: -1});
         e.fire();
         cmp._counter++;
+    },
+
+    handleEvent: function(cmp, evt) {
+        cmp.set("v.lastTabEventFired", evt.getName());
     }
 })

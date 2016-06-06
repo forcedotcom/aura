@@ -232,6 +232,34 @@
         }]
     },
 
+    testFocusBlurToggleTabHover: {
+        attributes: {"renderItem": "tab"},
+        test: [function(cmp) {
+            tabItem = $A.test.select(".uiTabItem a")[0];
+            $A.test.assertEquals("none", cmp.get("v.lastTabEventFired"));
+            $A.test.fireDomEvent(tabItem, "focus");
+        }, function(cmp) {
+            $A.test.assertEquals("onTabHover", cmp.get("v.lastTabEventFired"));
+            $A.test.fireDomEvent(tabItem, "blur");
+        }, function(cmp) {
+            $A.test.assertEquals("onTabUnhover", cmp.get("v.lastTabEventFired"));
+        }]
+    },
+
+    testMouseOverOutToggleTabHover: {
+        attributes: {"renderItem": "tab"},
+        test: [function(cmp) {
+            tabItem = $A.test.select(".uiTabItem a")[0];
+            $A.test.assertEquals("none", cmp.get("v.lastTabEventFired"));
+            $A.test.fireDomEvent(tabItem, "mouseover");
+        }, function(cmp) {
+            $A.test.assertEquals("onTabHover", cmp.get("v.lastTabEventFired"));
+            $A.test.fireDomEvent(tabItem, "mouseout");
+        }, function(cmp) {
+            $A.test.assertEquals("onTabUnhover", cmp.get("v.lastTabEventFired"));
+        }]
+    },
+
 	/*************************************************************************************************************
      * HELPER FUNCTIONS
      ************************************************************************************************************/

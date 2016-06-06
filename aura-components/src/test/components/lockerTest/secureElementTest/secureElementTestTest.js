@@ -152,7 +152,7 @@
 
             // Exclude the properties for unsupported browser
             var browser = $A.get("$Browser");
-            if(!browser.isIE11 && !browser.isPhone) {
+            if(!browser.isIE11 && !browser.isPhone && !browser.isTablet) {
                 imgProperties.push("sizes");
             }
             if(!browser.isIE11) {

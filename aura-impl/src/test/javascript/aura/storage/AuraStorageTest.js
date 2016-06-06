@@ -130,7 +130,6 @@ Test.Aura.Storage.AuraStorageTest = function() {
         }
     }
 
-
     [Fixture]
     function getMaxSize() {
         var AdapterClass = function() {};
@@ -601,7 +600,10 @@ Test.Aura.Storage.AuraStorageTest = function() {
                 util: {
                     format: function() {},
                     isUndefinedOrNull: function(obj) { return obj === undefined || obj === null; },
-                    estimateSize: function() { return 0; }
+                    estimateSize: function(obj) {
+                        if(obj === "size5") { return 5; }
+                        return 0;
+                    }
                 },
                 eventService: {
                     getNewEvent: function(name) {
@@ -619,6 +621,30 @@ Test.Aura.Storage.AuraStorageTest = function() {
             }
         });
 
+        [Fact]
+        function CallsRemoveItemWithPrefixAndKeyWhenKeyValuePairLargerThanMax() {
+            var actual;
+            var keyPrefix = "prefix";
+            var expected = keyPrefix + "key";
+
+            AdapterClass.prototype.removeItem = function(key) {
+                actual = key;
+                return new ResolvePromise();
+            };
+
+            mockA(function() {
+                Aura.Storage.AuraStorage.prototype.generateKeyPrefix = function() {
+                    return keyPrefix;
+                };
+
+                var target = new Aura.Storage.AuraStorage(config);
+                target.maxSize = 1;
+                // set a key-value pair with size of 5
+                target.set("key", "size5");
+            });
+
+            Assert.Equal(expected, actual);
+        }
 
         [Fact]
         function CallsSetItemWithKey() {

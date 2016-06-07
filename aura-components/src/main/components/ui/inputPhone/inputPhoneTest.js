@@ -101,7 +101,7 @@
      */
     testAccessible: {
         attributes: {label: "test"},
-        test: function(cmp) {
+        test: function() {
             $A.test.assertAccessible();
         }
     },

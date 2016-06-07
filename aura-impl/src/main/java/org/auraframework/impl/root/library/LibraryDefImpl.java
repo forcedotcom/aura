@@ -73,16 +73,16 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
     public void serialize(Json json) throws IOException {
     	try {
 	        json.writeMapBegin();
-	
+
 	        json.writeMapEntry("descriptor", getDescriptor());
-	
+
 	        json.writeMapKey("includes");
 	        json.writeMapBegin();
 	        for (IncludeDefRef defRef : includes) {
 	            json.writeMapEntry(defRef.getName(), JavascriptIncludeClass.getClientDescriptor(defRef.getDescriptor()));
 	        }
 	        json.writeMapEnd();
-	
+
 	        // Process Libraries with a lower granularity level, to prevent duplication of external includes.
 	        StringBuilder sb = new StringBuilder();
 	        AuraContext context = contextService.getCurrentContext();
@@ -96,7 +96,7 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
 	        if (sb.length() > 0) {
 	        	json.writeMapEntry("includeClasses", "function(){" + sb.toString() + "}");
 	        }
-	
+
 	        json.writeMapEnd();
         } catch (QuickFixException e) {
             throw new AuraUnhandledException("unhandled exception", e);
@@ -123,7 +123,7 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
 
     @Override
     public void validateReferences() throws QuickFixException {
-    	validateReferences(false);
+        validateReferences(false);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
             include.validateReferences(minify);
         }
     }
-    
+
     @Override
     public void appendDependencies(java.util.Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);

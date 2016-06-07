@@ -116,8 +116,8 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
     @Test
     public void testValidateDefintionExportIsJs() throws Exception {
         String name = "invalidSource";
-        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().addSourceAutoCleanup(IncludeDef.class,
-                "function(){}", name);
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().addSourceAutoCleanup(
+                IncludeDef.class, "function(){}", name);
         builder.setDescriptor(includeDesc);
         builder.setExport("(function(){alert('boo!')})()");
         IncludeDefRef def = builder.build();
@@ -125,87 +125,102 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         try {
             def.validateDefinition();
             fail("IncludeDefRef with invalid export not validated");
-        } catch (InvalidDefinitionException t) {
-            assertExceptionMessageEndsWith(
-                    t,
-                    InvalidDefinitionException.class,
-                    String.format("%s 'export' attribute must be a valid javascript identifier",
-                            IncludeDefRefHandler.TAG));
+        } catch (Exception t) {
+            String expectedMsg = String.format("%s 'export' attribute must be a valid javascript identifier",
+                    IncludeDefRefHandler.TAG);
+            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class, expectedMsg);
         }
     }
 
     @Test
-    public void testInvalidTryToBreakOut() throws Exception {
+    public void testValidateReferencesWithUnmatchedParens() throws Exception {
         String source = "function(){\n}}) alert('watch out')";
 
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
-        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("dummy",
-                IncludeDef.class, libDesc);
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                null, LibraryDef.class,null);
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                "dummy", IncludeDef.class, libDesc);
         addSourceAutoCleanup(includeDesc, source);
-
-        builder.setDescriptor(includeDesc.getDef().getDescriptor());
+        builder.setDescriptor(includeDesc);
         IncludeDefRef def = builder.build();
 
         try {
             def.validateReferences(true);
             fail("Invalid breaking JS wasn't validated");
-        } catch (InvalidDefinitionException t) {
-            assertExceptionMessageContains(t, InvalidDefinitionException.class,
-                    String.format(
-                            "JS Processing Error: %s (line 2, char 1) : %s:2: ERROR - Parse error. missing ) after argument list\n",
-                            includeDesc, includeDesc));
+        } catch (Exception t) {
+            String expectedMsg = String.format( "JS Processing Error: %s (line 2, char 1) : %s:2: ERROR - Parse error. missing ) after argument list\n",
+                    includeDesc, includeDesc);
+            assertExceptionMessageContains(t, InvalidDefinitionException.class, expectedMsg);
         }
     }
 
     @Test
-    public void testExtraCurlyBrace() throws Exception {
+    public void testValidateReferencesWithExtraCurlyBrace() throws Exception {
         String source = "var a=66;\n}";
 
         // source will have an extra curly brace at the end
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
-        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("dummy",
-                IncludeDef.class, libDesc);
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                null, LibraryDef.class, null);
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                "dummy", IncludeDef.class, libDesc);
         addSourceAutoCleanup(includeDesc, source);
-
-        builder.setDescriptor(includeDesc.getDef().getDescriptor());
-        IncludeDefRef def = builder.build();
+        builder.setDescriptor(includeDesc);
+        IncludeDefRef includeDefRef = builder.build();
 
         try {
-            def.validateReferences(true);
+            includeDefRef.validateReferences(true);
             fail("Invalid unclosed JS wasn't validated");
-        } catch (InvalidDefinitionException t) {
-            assertExceptionMessageContains(t, InvalidDefinitionException.class,
-                    String.format(
-                            "JS Processing Error: %s (line 2, char 0) : %s:2: ERROR - Parse error. syntax error\n",
-                            includeDesc, includeDesc));
+        } catch (Exception t) {
+            String expectedMsg = String.format("JS Processing Error: %s (line 2, char 0) : %s:2: ERROR - Parse error. syntax error\n",
+                    includeDesc, includeDesc);
+            assertExceptionMessageContains(t, InvalidDefinitionException.class, expectedMsg);
+
         }
     }
 
     @Test
-    public void testUnClosed() throws Exception {
+    public void testValidateReferencesWithUnclosedCurlyBrace() throws Exception {
         // Put the error online to to avoid running into fluctuation in client descriptor length.
         // During hrh course of the test, several "dummy" descriptors are created an not cleaned.
         String source = "function(){\nreturn 66;";
 
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
-        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("dummy",
-                IncludeDef.class, libDesc);
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                null, LibraryDef.class, null);
+        DefDescriptor<IncludeDef> includeDesc = this.getAuraTestingUtil().createStringSourceDescriptor(
+                "dummy", IncludeDef.class, libDesc);
         addSourceAutoCleanup(includeDesc, source);
 
-        builder.setDescriptor(includeDesc.getDef().getDescriptor());
+        builder.setDescriptor(includeDesc);
         IncludeDefRef def = builder.build();
 
         try {
             def.validateReferences(true);
             fail("Invalid unclosed JS wasn't validated");
-        } catch (InvalidDefinitionException t) {
-            assertExceptionMessageContains(t, InvalidDefinitionException.class,
-                    String.format(
-                            "JS Processing Error: %s (line 3, char 2) : %s:3: ERROR - Parse error. missing } after function body\n",
-                            includeDesc, includeDesc));
+        } catch (Exception t) {
+            String expectedMsg = String.format("JS Processing Error: %s (line 3, char 2) : %s:3: ERROR - Parse error. missing } after function body\n",
+                    includeDesc, includeDesc);
+            assertExceptionMessageContains(t, InvalidDefinitionException.class, expectedMsg);
+        }
+    }
+
+    @Test
+    public void testValidateReferencesNotValidateWhenMinifyIsFalse() throws Exception {
+        String source = "function test() {\n" +
+                        "    var k = {a:};" +
+                        "}";
+
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                null, LibraryDef.class, null);
+        DefDescriptor<IncludeDef> includeDesc = this.getAuraTestingUtil().createStringSourceDescriptor(
+                "dummy", IncludeDef.class, libDesc);
+        addSourceAutoCleanup(includeDesc, source);
+
+        builder.setDescriptor(includeDesc);
+        IncludeDefRef def = builder.build();
+        try {
+            def.validateReferences(false);
+        } catch(Exception e) {
+            fail("Unexpected exception is thrown: " + e.toString());
         }
     }
 
@@ -219,11 +234,104 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
                 IncludeDef.class, libDesc);
         addSourceAutoCleanup(includeDesc, source);
 
-        builder.setDescriptor(includeDesc.getDef().getDescriptor());
+        builder.setDescriptor(includeDesc);
         IncludeDefRef def = builder.build();
 
         def.validateReferences();
         assertEquals(String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s\n);\n",
                 JavascriptIncludeClass.getClientDescriptor(includeDesc), source), def.getCode(false));
+    }
+
+    @Test
+    public void testGetCodeWithMinifyIsFalse() throws Exception {
+        String source = "function test() {\n" +
+                        "    return 'x'\n" +
+                        "}";
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                null, LibraryDef.class, null);
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                "dummy", IncludeDef.class, libDesc);
+        addSourceAutoCleanup(includeDesc, source);
+
+        builder.setDescriptor(includeDesc);
+        IncludeDefRef includeDefRef = builder.build();
+
+        String actual = includeDefRef.getCode(false);
+
+        String expected = String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s\n);\n",
+                JavascriptIncludeClass.getClientDescriptor(includeDesc), source);
+        assertEquals(expected, actual);
+    }
+
+    /**
+     * Verify that when javascriptClass gets initiated in getCode(), getCode() doesn't validate Js code,
+     * even if when minify is true. Because we enforce javascriptClass not to compile Js code when javascriptClass
+     * is initiated in getCode().
+     */
+    @Test
+    public void testGetCodeNotValidateJsCodeWhenMinifyIsTrue() throws Exception {
+        String source = "function test() {\n" +
+                        "    var k = {a:};" +
+                        "}";
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                null, LibraryDef.class, null);
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                "dummy", IncludeDef.class, libDesc);
+        addSourceAutoCleanup(includeDesc, source);
+
+        builder.setDescriptor(includeDesc);
+        IncludeDefRef includeDefRef = builder.build();
+
+        String actual = includeDefRef.getCode(true);
+
+        String expected = String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s\n);\n",
+                JavascriptIncludeClass.getClientDescriptor(includeDesc), source);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetCodeWithMinifyIsTrue() throws Exception {
+        String source = "function test() {\n" +
+                        "    return 'x'\n" +
+                        "}";
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                null, LibraryDef.class, null);
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                "dummy", IncludeDef.class, libDesc);
+        addSourceAutoCleanup(includeDesc, source);
+
+        builder.setDescriptor(includeDesc);
+        IncludeDefRef includeDefRef = builder.build();
+
+        String actual = includeDefRef.getCode(true);
+
+        String expected = String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s\n);\n",
+                JavascriptIncludeClass.getClientDescriptor(includeDesc), source);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetCodeWithTrueMinifyWhenJavascriptClassWithTrueMinify() throws Exception {
+        String source = "function test() {\n" +
+                        "    return 'x'\n" +
+                        "}";
+        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                null, LibraryDef.class, null);
+        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(
+                "dummy", IncludeDef.class, libDesc);
+        addSourceAutoCleanup(includeDesc, source);
+
+        builder.setDescriptor(includeDesc);
+        IncludeDefRef includeDefRef = builder.build();
+
+        // validateReferences initiates a JavascriptIncludeClass with true minify
+        includeDefRef.validateReferences(true);
+        // getCode uses the existed JavascriptIncludeClass
+        String actual = includeDefRef.getCode(true);
+
+        // since minified code doesn't exist, we expect non-minified code
+        String expected = String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s);",
+                JavascriptIncludeClass.getClientDescriptor(includeDesc), "function(){return\"x\"}");
+        assertEquals(expected, actual);
     }
 }

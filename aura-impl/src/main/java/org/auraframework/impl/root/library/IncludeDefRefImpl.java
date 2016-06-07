@@ -84,9 +84,9 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
     }
 
     private void initializeJavascriptClass(boolean minify) throws QuickFixException {
-    	if (javascriptClass == null) {
+        if (javascriptClass == null) {
             javascriptClass = new JavascriptIncludeClass.Builder().setDefinition(this).setMinify(minify).build();
-    	}
+        }
     }
 
     @Override
@@ -123,11 +123,11 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
 
     @Override
     public void validateReferences(boolean minify) throws QuickFixException {
-    	validateReferences();
+        validateReferences();
         initializeJavascriptClass(minify);
     }
 
-	@Override
+    @Override
     public void validateReferences() throws QuickFixException {
         IncludeDef includeDef = descriptor.getDef();
         includeDef.validateDefinition();

@@ -1,14 +1,14 @@
 {
 	"manifest_name": {
-		"message": "Aura Inspector",
+		"message": "Salesforce Lightning Inspector",
 		"description": "Public title that shows up in the list of extensions the user has installed."
 	},
 	"manifest_description": {
-		"message": "For inspecting Aura apps",
+		"message": "For inspecting Lightning apps",
 		"description": "Description that shows up in the list of extensions the user has installed."
 	},
 	"devtools_tabname": {
-		"message": "Aura",
+		"message": "Lightning",
 		"description": "The tab that shows up in the chrome devtools"
 	},
 	"tabs_componenttree": {

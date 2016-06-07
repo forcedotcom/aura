@@ -1,6 +1,9 @@
 {
 	"help" : [
-		{ "text": "Reference App", "href":"/auradocs/reference.app" }
+		{ "text": "Lightning Components Developer Guide", "href": "https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/"},
+		{ "text": "API Documentation", "href":"/auradocs/reference.app" },
+		{ "text": "Salesforce Lightning Inspector Community", "href": "https://success.salesforce.com/_ui/core/chatter/groups/GroupProfilePage?g=0F9300000004fsv" },
+		{ "text": "Chrome Store Listing", "href": "https://chrome.google.com/webstore/detail/salesforce-lightning-insp/pcpmcffcomlcjgpcheokdfcjipanjdpc" },
+		{ "text": "Lightning Discussion Forums", "href": "https://developer.salesforce.com/forums/#!/feedtype=RECENT&dc=Lightning&criteria=ALLQUESTIONS"}
 	]
 }
-

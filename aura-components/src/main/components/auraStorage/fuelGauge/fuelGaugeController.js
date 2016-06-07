@@ -14,17 +14,26 @@
  * limitations under the License.
  */
 ({
-    update : function(cmp, event, helper){
-        var eventStorageName = event.getParam("name");
-        var storageName = cmp.get("v.storageName");
-        if (eventStorageName !== storageName) {
-            return;
+    init: function(cmp, event, helper) {
+        var enabled = helper.isEnabled(cmp);
+        cmp.set("v.enabled", enabled);
+        if (enabled) {
+            $A.eventService.addHandler({
+                "event": "markup://auraStorage:modified",
+                "globalId": cmp.getGlobalId(),
+                "handler": function(e) {
+                    var eventStorageName = e.getParam("name");
+                    var storageName = cmp.get("v.storageName");
+                    if (eventStorageName !== storageName) {
+                        return;
+                    }
+                    helper.update(cmp);
+                }
+            });
         }
-        helper.update(cmp);
     },
 
     showStats : function(cmp){
-
         var storage = $A.storageService.getStorage(cmp.get("v.storageName"));
 
         storage.getSize().then(

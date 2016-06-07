@@ -15,12 +15,14 @@
     limitations under the License.
 
 -->
-<aura:component support="GA">
+<aura:component support="GA">  
     <aura:attribute name="storageName" type="String" required="true"/>
     <aura:attribute name="value" type="Decimal" default="0.0"/>
     <aura:attribute name="enabled" type="Boolean"/>
-    <aura:handler event="auraStorage:modified" action="{!c.update}"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+   
     <aura:if isTrue="{!v.enabled}">
         <ui:stamp aura:id="stamp" severity="success" onclick="{!c.showStats}">{!v.value} KB</ui:stamp>
-       </aura:if>
+    </aura:if>
 </aura:component>

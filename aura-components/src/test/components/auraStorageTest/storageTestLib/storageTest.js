@@ -450,14 +450,37 @@ function storageTest () {
                 // IndexedDB has funky size calculation that doesn't properly get size until after a getAll
                 return storage.getAll();
             })
-            .then(function(items) {
+            .then(function() {
                 return storage.getSize();
             })
-            .then(function(size) {
-                completed = true;
-                $A.test.assertTrue(size < storageMax, "Size of storage is over the max size- items not properly evicted"
-                        + " on overflow.");
+            .then(function() {
+                // many adapters perform async sweeping when the size is detected as too large. therefore
+                // loop until the test passes or times out waiting for the async sweep to occur.
+
+                return new Promise(function(resolve, reject) {
+                    function checkSize() {
+                        // short-circuit once the test times out
+                        if ($A.test.isComplete()) {
+                            reject(new Error("Test timed out"));
+                        }
+                        storage.getSize()
+                            .then(function(size) {
+                                if (size < storageMax) {
+                                    resolve();
+                                    return;
+                                }
+                                // pause then recurse
+                                window.setTimeout(function() { checkSize(); }, 250);
+                            });
+                    }
+
+                    checkSize();
+                });
             })
+            .then(function() {
+                completed = true;
+            })
+
             ['catch'](failTest);
 
             $A.test.addWaitFor(true, function() { return completed; });

@@ -59,18 +59,19 @@
                 $A.test.addWaitFor(true, function() { return completed; });
             },
             function verifyUpatedValues(cmp) {
-                var actionsGauge = cmp.find("actionsGauge");
-                var actionsValue = actionsGauge.get("v.value");
-                var savingsGauge = cmp.find("savingsGauge");
-                var savingsValue = savingsGauge.get("v.value");
-                var checkingGauge1 = cmp.find("checkingGauge1");
-                var checkingValue = checkingGauge1.get("v.value");
-
-                $A.test.assertNotEquals(cmp._actionsValue, actionsValue, "actions guage not updated");
-                $A.test.assertNotEquals(cmp._savingsValue, savingsValue, "savings guage not updated");
-                $A.test.assertEquals(cmp._checkingValue, checkingValue, "checking guage should not have changed");
-                $A.test.assertTrue(actionsValue > savingsValue, "actions guage should be larger than savings guage");
-
+                $A.test.addWaitForWithFailureMessage(true, function() {
+                     var actionsValue = cmp.find("actionsGauge").get("v.value");
+                     var savingsValue = cmp.find("savingsGauge").get("v.value");
+                     return cmp._actionsValue !== actionsValue && cmp._savingsValue !== savingsValue;
+                },
+                "actions gauge or savings gauge not updated",
+                function() {
+                    var actionsValue = cmp.find("actionsGauge").get("v.value");
+                    var savingsValue = cmp.find("savingsGauge").get("v.value");
+                    var checkingValue = cmp.find("checkingGauge1").get("v.value");
+                    $A.test.assertEquals(cmp._checkingValue, checkingValue, "checking guage should not have changed");
+                    $A.test.assertTrue(actionsValue > savingsValue, "actions guage should be larger than savings guage");
+                });
             }
         ]
     },

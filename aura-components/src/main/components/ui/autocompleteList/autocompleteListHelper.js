@@ -259,8 +259,8 @@
         }
 
         //create section for autocomplete footer
-        var footer = this.getFooter(component),
-            unselectable = (footer && footer.isInstanceOf('ui:autocompleteListSelectable') && !footer.get("v.selectable"));
+        var footer = this.getFooter(component);
+        unselectable = (footer && footer.isInstanceOf('ui:autocompleteListSelectable') && !footer.get("v.selectable"));
         if (footer && component.get("v.showListFooter") && !unselectable) {
             var footerSection = this._createBasicKeyboardTraversalSection();
             footerSection.deselect = function () {

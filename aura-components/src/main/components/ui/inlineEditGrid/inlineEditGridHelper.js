@@ -16,6 +16,17 @@
 ({
 	cellStatuses : ['edited', 'disabled', 'hasErrors'],
 	
+	initializeColumns : function(cmp) {
+	    var columns = cmp.get("v.columns");
+	    var itemVar = cmp.get("v.itemVar");
+	    
+	    for (var i = 0; i < columns.length; i++) {
+            this.initializeCellStates(columns[i], itemVar);
+        }
+        
+        cmp.find("grid").set("v.columns", columns);
+	},
+	
 	initializeCellStates : function(cellComponentDef, itemVar) {
 		var values = cellComponentDef.attributes.values;
 		
@@ -92,6 +103,9 @@
 
 	updateItem: function(cmp, item, index){
 		cmp.find('grid').updateItem(item, index);
+	},
+	updateHeaderColumns: function(cmp) {
+	    cmp.find("grid").set("v.headerColumns", cmp.get("v.headerColumns"));
 	},
 
 	/* UTILITY FUNCTIONS */

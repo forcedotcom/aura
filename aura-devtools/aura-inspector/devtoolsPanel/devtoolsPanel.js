@@ -575,7 +575,7 @@
                 event.stopPropagation();
                 event.preventDefault();
                 var url = event.target.getAttribute("href");
-                this.openTab(url);
+                panel.openTab(url);
             }
         }
 

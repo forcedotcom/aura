@@ -1,0 +1,95 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+
+    <aura:attribute name="items" type="Object[]" />
+    <aura:attribute name="prevResize" type="Object" />
+    <aura:attribute name="initialWidths" type="Integer[]" default="[200, 400, 100]" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <div>
+        <div class="toolbar">
+            <ui:inputText aura:id="inputTxt" class="inputTxt"/>
+        </div>
+        <ui:inlineEditGrid
+            aura:id="grid"        
+            class="inline-edit-grid"
+            itemVar="row"         
+            items="{!v.items}"
+            rowHeaderIndex="1"    
+            delegatedEvents="click,keydown,mouseover"
+            onEdit="{!c.onEdit}"
+            enableResizableColumns="true"
+            onColumnResize="{!c.onResize}">
+            
+            <aura:set attribute="headerColumns">
+                <ui:dataGridColumn name="id"      label="Id" sortable="true"/>
+                <ui:dataGridColumn name="name"    label="Name" sortable="true"/>
+                <ui:dataGridColumn name="grade"   label="Grade"/>
+                <ui:dataGridColumn name="linkLabel"  label="Link"/>
+                <ui:dataGridColumn name="issueDate" label="Issue Date"/>
+                <ui:dataGridColumn name="passing" label="Passing"/>
+                <ui:dataGridColumn name="notes"   label="Notes"/>
+                <ui:dataGridColumn name="modDateTime"   label="Modified"/>
+                <ui:dataGridColumn name=""        label="Actions" hideLabel="true"/>
+            </aura:set>
+            
+            <aura:set attribute="columns">
+                <ui:inlineEditCell name="id" edited="{!row.status.id}">
+                    <ui:outputText value="{!row.data.id}"/>
+                </ui:inlineEditCell>
+                <ui:inlineEditCell name="name" edited="{!row.status.name}">
+                    <ui:outputText value="{!row.data.name}"/>
+                </ui:inlineEditCell>
+                <ui:inlineEditCell name="grade" edited="{!row.status.grade}">
+                    <ui:outputText value="{!row.data.grade}"/>
+                </ui:inlineEditCell>
+                    <ui:inlineEditCell name="linkLabel" edited="{!row.status.linkLabel}" valueAttribute="label">
+                        <ui:outputURL value="http://www.google.com" label="{!row.data.linkLabel}" />
+                    </ui:inlineEditCell>
+                <ui:inlineEditCell name="issueDate" edited="{!row.status.issueDate}">
+                    <ui:outputText value="{!row.data.issueDate}"/>
+                </ui:inlineEditCell>
+                <ui:inlineEditCell name="passing" edited="{!row.status.isPassing}">
+                    <ui:outputText value="{!row.data.isPassing}"/>
+                </ui:inlineEditCell>
+                <ui:inlineEditCell name="notes" edited="{!row.status.notes}">
+                    <ui:outputText value="{!row.data.notes}"/>
+                </ui:inlineEditCell>
+                <ui:inlineEditCell name="modDateTime" edited="{!row.status.modDateTime}">
+                    <ui:outputText value="{!row.status.modDateTime}"/>
+                </ui:inlineEditCell>
+            </aura:set>
+        </ui:inlineEditGrid>
+        
+        <div>
+            Column: <ui:outputText aura:id="srcColumn" value="{!v.prevResize.src.label}"/> <br/>
+            Index: <ui:outputText aura:id="srcIndex" value="{!v.prevResize.src.index}"/> <br />
+            Width: <ui:outputText aura:id="srcWidth" value="{!v.prevResize.width}"/> 
+        </div>
+        
+        <div class="manager">
+            <ui:panelManager2 aura:id="pm">
+                <aura:set attribute="registeredPanels">
+                   <ui:panel alias="panel"/>
+                </aura:set>
+            </ui:panelManager2>
+        </div>
+    </div>
+</aura:component>

@@ -4,6 +4,8 @@
 		{ "text": "API Documentation", "href":"/auradocs/reference.app" },
 		{ "text": "Salesforce Lightning Inspector Community", "href": "https://success.salesforce.com/_ui/core/chatter/groups/GroupProfilePage?g=0F9300000004fsv" },
 		{ "text": "Chrome Store Listing", "href": "https://chrome.google.com/webstore/detail/salesforce-lightning-insp/pcpmcffcomlcjgpcheokdfcjipanjdpc" },
-		{ "text": "Lightning Discussion Forums", "href": "https://developer.salesforce.com/forums/#!/feedtype=RECENT&dc=Lightning&criteria=ALLQUESTIONS"}
+		{ "text": "Lightning Discussion Forums", "href": "https://developer.salesforce.com/forums/#!/feedtype=RECENT&dc=Lightning&criteria=ALLQUESTIONS"},
+        { "text": "Lightning Dev Center", "href": "https://developer.salesforce.com/devcenter/lightning" },
+        { "text": "Lightning Components Trailhead", "href": "https://developer.salesforce.com/trailhead/module/lex_dev_lc_basics" } 
 	]
 }

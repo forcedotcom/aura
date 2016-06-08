@@ -205,7 +205,7 @@
                 listElement = list.getElement();
             }
             if (maxLines > 0 && listElement) {
-                var listItems = listElement.querySelectorAll('li');
+                var listItems = listElement.querySelectorAll('li.pillContainerListItem');
                 if (!$A.util.isEmpty(listItems)) {
 
                     //find the height of a pill

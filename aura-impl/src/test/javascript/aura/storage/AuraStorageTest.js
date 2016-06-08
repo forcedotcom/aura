@@ -60,8 +60,12 @@ Test.Aura.Storage.AuraStorageTest = function() {
     // any testing using firedEvents must first reset it.
     var firedEvents = [];
     var AuraEvent = function AuraEvent() {};
-    AuraEvent.prototype.fire = function() {
-        firedEvents.push(this);
+    AuraEvent.prototype.fire = function(param) {
+        if(!param) {
+            firedEvents.push(this);
+        } else {
+            firedEvents.push(param);
+        }
     };
 
 
@@ -504,6 +508,32 @@ Test.Aura.Storage.AuraStorageTest = function() {
             Assert.Equal(1, firedEvents.length);
         }
 
+        [Fact]
+        function AdapterSweepFiresModifiedWithStorageName() {
+            firedEvents = [];
+            var expected = "storageName";
+
+            var config = makeConfigAndAdapter();
+            // set config such that max interval applies
+            config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
+            config.adapterClass.prototype.sweep = function() {
+                return new ResolvePromise();
+            };
+
+            mockTime(function() { mockA(function() {
+                time = 0;
+                var target = new Aura.Storage.AuraStorage(config);
+                target.name = expected;
+
+                // advance time to exactly max sweep interval
+                time = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX;
+
+                target.sweep();
+            }); });
+
+            var params = firedEvents[0];
+            Assert.Equal(expected, params["name"]);
+        }
 
         [Fact]
         function AdapterSweepRejectsDoesNotFireModified() {
@@ -765,6 +795,25 @@ Test.Aura.Storage.AuraStorageTest = function() {
             Assert.Equal(1, firedEvents.length);
         }
 
+        [Fact]
+        function SetFiresModifiedWithStorageName() {
+            firedEvents = [];
+            var expected = "storageName";
+
+            AdapterClass.prototype.setItem = function() {
+                return new ResolvePromise();
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.name = expected;
+                target.sweep = function() {};
+                target.set("key", "value");
+            });
+
+            var params = firedEvents[0];
+            Assert.Equal(expected, params["name"]);
+        }
 
         [Fact]
         function FailedSetDoesNotFireModified() {
@@ -777,7 +826,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             mockA(function() {
                 var target = new Aura.Storage.AuraStorage(config);
                 target.sweep = function() {};
-                    target.set("key", "value");
+                target.set("key", "value");
             });
 
             Assert.Equal(0, firedEvents.length);
@@ -822,7 +871,6 @@ Test.Aura.Storage.AuraStorageTest = function() {
             }
         });
 
-
         [Fact]
         function SuccessfulRemoveFiresModified() {
             firedEvents = [];
@@ -840,6 +888,25 @@ Test.Aura.Storage.AuraStorageTest = function() {
             Assert.Equal(1, firedEvents.length);
         }
 
+        [Fact]
+        function RemoveFiresModifiedWithStorageName() {
+            firedEvents = [];
+            var expected = "storageName";
+
+            AdapterClass.prototype.removeItem = function() {
+                return new ResolvePromise();
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.name = expected;
+                target.sweep = function() {};
+                target.remove("key");
+            });
+
+            var params = firedEvents[0];
+            Assert.Equal(expected, params["name"]);
+        }
 
         [Fact]
         function FailedRemoveDoesNotFireModified() {
@@ -852,7 +919,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             mockA(function() {
                 var target = new Aura.Storage.AuraStorage(config);
                 target.sweep = function() {};
-                    target.remove("key");
+                target.remove("key");
             });
 
             Assert.Equal(0, firedEvents.length);

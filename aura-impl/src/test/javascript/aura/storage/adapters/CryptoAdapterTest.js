@@ -65,9 +65,34 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
         });
     });
 
-    var mockCrypto = Mocks.GetMocks(Object.Global(), { 
+    var mockCrypto = Mocks.GetMocks(Object.Global(), {
         CryptoAdapter: Aura.Storage.CryptoAdapter
     });
+
+    [Fixture]
+    function setKey(){
+
+        [Fact]
+        function RejectWithErrorForInvalidKey(){
+            var expected = "CryptoAdapter cannot import key of wrong type (undefined), rejecting"
+            var actual;
+            var mockA = Mocks.GetMock(Object.Global(), "$A", {
+                warning: function(){}
+            });
+
+            Aura.Storage.CryptoAdapter._keyReject = function(error) {
+                actual = error;
+            };
+
+            mockCrypto(function() {
+                mockA(function() {
+                    Aura.Storage.CryptoAdapter.setKey();
+                });
+            });
+
+            Assert.Equal(expected, actual.toString());
+        }
+    }
 
     [Fixture]
     function register(){

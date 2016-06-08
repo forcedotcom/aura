@@ -128,7 +128,7 @@ CryptoAdapter["setKey"] = function(rawKey) {
     delete CryptoAdapter._keyResolve;
     delete CryptoAdapter._keyReject;
 
-    if (!rawKey instanceof ArrayBuffer) {
+    if (!(rawKey instanceof ArrayBuffer)) {
         log = "CryptoAdapter cannot import key of wrong type (" + typeof rawKey + "), rejecting";
         $A.warning(log);
         reject(new Error(log));

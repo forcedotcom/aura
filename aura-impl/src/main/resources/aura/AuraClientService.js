@@ -1200,7 +1200,13 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
         var boot = Aura["appBootstrap"];
 
         if (boot["error"]) {
-            throw new $A.auraError("Aura.loadComponent(): Failed to initialize application.\n" + boot["error"].message);
+            if (boot["error"]["exceptionEvent"]) {
+                $A.util.json.resolveRefsObject(boot);
+                this.throwExceptionEvent(boot["error"]);
+                return;
+            } else {
+                throw new $A.auraError("Aura.loadComponent(): Failed to initialize application.\n" + boot["error"].message);
+            }
         }
 
         this._token = boot["token"];

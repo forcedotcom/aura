@@ -18,11 +18,14 @@
 <aura:component extends="ui:input" support="proto" extensible="true" defaultFlavor="default, lookup" description="Represents an input field that suggests a list of values from the data provider as you type.">
     <aura:attribute name="inputClass" type="String" description="The css class for input component."/>
     <aura:attribute name="inputType" type="String" default="inputText" description="The type of input component (inputText or inputTextArea)."/>
+    <aura:attribute name="inputFlavor" type="String" default="default, input" description="Optional aura:flavor override for the input component."/>
 
     <aura:attribute name="placeholder" type="String" default="" description="Text that is displayed when the input field is empty, to prompt the user for a valid entry."/>
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     <aura:attribute name="autocompleteButton" type="Aura.Component[]" description="Optional button to render with this component."/>
     <aura:attribute name="usePanel" type="boolean" default="false"/>
+    <aura:attribute name="maxlength" type="Integer" description="The maximum number of characters allowed in the inputTextForAutocomplete"/>
+    <aura:attribute name="inputTitle" type="String" description="The title/tooltip for the input component."/>
 
     <!-- START - the following attributes are only used when using the default list -->
     <aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components"/>
@@ -53,7 +56,10 @@
 
     <aura:registerEvent name="fetchData" type="ui:fetchData" description="The event indicates we need to fetch data through a data provider."/>
     <aura:handler name="fetchData" action="{!c.fetchData}"/>
-    
+
+    <aura:registerEvent name="abortFetchData" type="ui:abortFetchData" description="This event indicates that we want to abort a fetch data request sent by a data provider."/>
+    <aura:handler name="abortFetchData" action="{!c.abortFetchData}"/>
+
     <aura:registerEvent name="matchText" type="ui:matchText" description="The event fired when a text match occurs."/>
     <aura:handler name="matchText" action="{!c.matchText}"/>
     
@@ -61,18 +67,26 @@
     <aura:handler name="listExpand" event="ui:autocompleteListExpand" action="{!c.handleListExpand}"/>
 
     <aura:if isTrue="{!v.inputType == 'inputTextArea'}">
-        <ui:inputTextAreaForAutocomplete aura:id="input" 
+        <ui:inputTextAreaForAutocomplete aura:id="input"
+                                         aura:flavor="{!v.inputFlavor}"
                                          class="{!v.inputClass+' '+v.theme}"
+                                         value="{!v.value}"
+                                         inputTitle="{!v.inputTitle}"
                                          placeholder="{!v.placeholder}"
+                                         maxlength="{!v.maxlength}"
                                          updateOn="{!v.updateOn}"
                                          ariaDescribedBy="{!v.ariaDescribedBy}"
                                          autocompleteButton="{!v.autocompleteButton}"
                                          disabled="{!v.disabled}"
                                          domId="{!v.domId}"/>
         <aura:set attribute="else">
-            <ui:inputTextForAutocomplete aura:id="input" 
+            <ui:inputTextForAutocomplete aura:id="input"
+                                         aura:flavor="{!v.inputFlavor}"
                                          class="{!v.inputClass+' '+v.theme}"
+                                         value="{!v.value}"
+                                         inputTitle="{!v.inputTitle}"
                                          placeholder="{!v.placeholder}"
+                                         maxlength="{!v.maxlength}"
                                          updateOn="{!v.updateOn}"
                                          ariaDescribedBy="{!v.ariaDescribedBy}"
                                          autocompleteButton="{!v.autocompleteButton}"

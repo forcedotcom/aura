@@ -26,29 +26,40 @@
             isExtended = superCmp.getDef().getDescriptor().getName() !== 'component',
             argumentsParam  = event.getParam('arguments'),
             options    = argumentsParam.options,
-            index      = argumentsParam.index;
+            index      = argumentsParam.index,
+            targetCmp;
 
         if (isExtended) {
-            component = superCmp;
+            targetCmp = superCmp;
+        }  else {
+            targetCmp = component;
         }
 
-        // Show loading indicator
-        helper.showLoading(component, true);
+        // Show loading indicator, using a delay when specified
+        var loadingIndicatorDelay = targetCmp.get("v.loadingIndicatorDelay");
+        if (loadingIndicatorDelay > 0) {
+            if (component._loadingTimer) {
+                clearTimeout(component._loadingTimer);
+            }
+            component._loadingTimer = setTimeout($A.getCallback(function() {
+                helper.showLoading(targetCmp, true);
+            }), loadingIndicatorDelay);
+        } else {
+            helper.showLoading(targetCmp, true);
+        }
+
         if (options) {
-            component.set("v.keyword", options.keyword);
+            targetCmp.set("v.keyword", options.keyword);
         }
 
-        // fire dataProvide event
-        var dataProviders = component.get("v.dataProvider");
-        if (!index) {
-            index = 0;
-        }
-        var provideEvent = dataProviders[index].get("e.provide");
-        provideEvent.setParams({
-            parameters: options
-        });
-        provideEvent.fire();
+        helper.fireDataProvideEvent(targetCmp, options, index);
+    },
 
+    abortFetchData: function(component, event, helper) {
+        var argumentsParam  = event.getParam('arguments'),
+            options = argumentsParam.options,
+            index = argumentsParam.index;
+        helper.fireAbortEvent(component, options, index);
     },
 
     handleClick: function(component, event, helper) {
@@ -62,7 +73,12 @@
         }
     },
 
-    handleHeaderClick: function(component) {
+    handleHeaderClick: function(component, event, helper) {
+        var header = helper.getHeader(component),
+            unselectable = (header && header.isInstanceOf('ui:autocompleteListSelectable') && !header.get("v.selectable"));
+        if (unselectable) {
+            return;
+        }
         var selectEvt = component.get("e.selectListOption");
         selectEvt.setParams({
             option: component.get("v.listHeader")[0],
@@ -71,7 +87,12 @@
         selectEvt.fire();
     },
 
-    handleFooterClick: function(component) {
+    handleFooterClick: function(component, event, helper) {
+        var footer = helper.getFooter(component),
+            unselectable = (footer && footer.isInstanceOf('ui:autocompleteListSelectable') && !footer.get("v.selectable"));
+        if (unselectable) {
+            return;
+        }
         var selectEvt = component.get("e.selectListOption");
         selectEvt.setParams({
             option: component.get("v.listFooter")[0],

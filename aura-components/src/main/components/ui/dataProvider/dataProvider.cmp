@@ -22,6 +22,7 @@
     <!-- these belong on the dataProviderInterface, but were not working there... -->    
 	<aura:registerEvent name="provide" type="ui:dataProvide" description="The event fired when the list is intialized."/>
 	<aura:registerEvent name="onchange" type="ui:dataChanged" description="The event fired when the list data changes."/>
+    <aura:registerEvent name="abort" type="ui:abortFetchData" description="The event fired when aborting a data request."/>
 	
 	<aura:registerEvent name="error" type="ui:dataProvideError" description="The event fired when there is an error during data fetching."/>
 

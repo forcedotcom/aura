@@ -34,6 +34,10 @@
         <aura:attribute name="options" type="Object" description="The options to be passed into the provider"/>
         <aura:attribute name="index" type="Integer" description="The data provider to be used to fetch data"/>
     </aura:method>
+    <aura:method name="abortFetchData">
+        <aura:attribute name="options" type="Object" description="The options to be passed into the provider"/>
+        <aura:attribute name="index" type="Integer" description="The index corresponding to the data provider whose request should be aborted"/>
+    </aura:method>
 
 </aura:interface>
 

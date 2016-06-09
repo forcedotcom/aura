@@ -47,8 +47,8 @@
                     'actionId': string, //action_card_713;a --> 713;a
                     'actionIsStorable': boolean,
                     'actionStorageKey': obj,
-                    'nextResponse': obj,
-                    'nextError': obj
+                    'nextResponse': obj, or undefined
+                    'nextError': obj  {"message":String, "stack":String}, or undefined
                     'byChaosRun' boolean //true if we add action for replay chaos run
                     };
         */
@@ -94,8 +94,12 @@
 
             //ask chaos view to create a chaos card
             if(data.byChaosRun) {
+                var aname = data.actionName;
+                if (aname.indexOf("ACTION$") >= 0) {//action could be long, make it more readable
+                    aname = aname.substr(aname.indexOf("ACTION$") + 7, aname.length - 1);
+                }
                 $Aura.Inspector.publish("AuraInspector:OnCreateChaosCard",
-                    {"message": "add action "+data.actionName+" to watch list"} );
+                    {"message": "add action "+aname+" to watch list"} );
             }
         },
 
@@ -263,19 +267,8 @@
             //'uiInput',
             'uiPill'
         ];
-/*
-Uncaught Error in $A.getCallback() [TypeError: Cannot read property 'isOriginBeacon' of null]
-throws at https://ap1.lightning.mobile1.t.force.com/auraFW/javascript/CEHQhQk8YyvH45BIO6rcRw/aura_proddebug.js:15116:9
-    at Object.onpostmessage (https://ap1.lightning.mobile1.t.force.com/l/%7B%22mode%22%3A%22PRODDEBUG%22…CN%22%2C%22zh%22%2C%22zh_TW%22%5D%2C%22ls%22%3A%22E%22%7D/app.js:183298:21)
-    ...
-    at https://ap1.lightning.mobile1.t.force.com/auraFW/javascript/CEHQhQk8YyvH45BIO6rcRw/aura_proddebug.js:15102:23
 
-Uncaught Action failed: ui$inputSelect$controller$doInit [TypeError: Cannot read property 'Salutation' of null]
-throws at https://ap1.lightning.mobile2.t.force.com/auraFW/javascript/9ZyVfeyJDnAYJljZRNLqqg/aura_prod.js:1:27
-at cz.y.set (https://ap1.lightning.mobile2.t.force.com/auraFW/javascript/9ZyVfeyJDnAYJljZRNLqqg/aura_prod.js:291:221)
-...
-at Object.helper.updateValueFromOptions 
-*/
+//Error Handling session
         this.errorsToIgnore = [
             
         ];
@@ -285,10 +278,15 @@ at Object.helper.updateValueFromOptions
             "Uncaught Error in $A.getCallback()"
         ];
 
+        this.spinnerClass = 'loadingIndicator';
+//Error Handling session ends
+
+
         this.configuration = {
             'defaultMaxTry' : 10,//sometimes we need to wait for some element to show up
-            'defaultSamplingInterval' : 4000,
-            'actionDropPercentage' : 0 //out of 100
+            'defaultSamplingInterval' : 4000,//ms
+            'actionDropPercentage' : 0, //out of 100
+            'actionErrorPercentage' : 0 //out of 100
         }; 
         
         this.configuration = Object.assign(this.configuration, config);
@@ -299,6 +297,10 @@ at Object.helper.updateValueFromOptions
 
         this.count_waitForElementFromAStepToAppear = 0;
         this.count_waitAnyAuraRenderedElementPresent = 0;
+
+        this.errorResponseDuringNewChaosRun = [{
+            "message":"random error response for Chaos Run", "stack":"from Chaos Run"
+        }];
     
 
         //temp place to store chaos run. before we save them to local, or server
@@ -319,7 +321,7 @@ at Object.helper.updateValueFromOptions
                     'cssPath': string like "body > button + button > span"
                     //if it's an action drop operation
                     'actionName': string,
-                    'actionOperation': string //"Drop",
+                    'actionOperation': string //"Drop" or "ErrorResponse"
                     'actionId': string //why we care
                     'actionParameter': string //"{..}"
                     'actionIsStorable': boolean
@@ -343,9 +345,11 @@ at Object.helper.updateValueFromOptions
     
 
     /*
-        event handler for "AuraInspector:OnSomeActionGetDropped",
-        called from ActionsView's AuraInspectorActionsView_OnDropActionInChaosRun
+        event handler for "AuraInspector:OnSomeActionOperationDuringChaosRun",
+        called from ActionsView's AuraInspectorActionsView_OnActionOperationInChaosRun
         {
+                'actionOperation': 'Drop' or 'ErrorResponse'
+                'nextError': {'message':string, 'stack':string} <-- this.errorResponseDuringNewChaosRun
                 'id': string like "969;a",
                 'defName': string like "serviceComponent://ui.force.bla/ACTION$getRecord",
                 'params': string "{"recrodDescriptor":"bla", "$serId$":4767}"
@@ -355,12 +359,13 @@ at Object.helper.updateValueFromOptions
                 'background': boolean
         }
     */
-    chaosManager.prototype.recordDroppedAction = function(data) {
+    chaosManager.prototype.recordActionOperationDuringChaosRun = function(data) {
         if(data && data.defName) {
             this.currentChaosRunSteps.push(
             {
                         'actionName': data.defName,
-                        'actionOperation': 'Drop',
+                        'actionOperation': data.actionOperation,
+                        'nextError': this.errorResponseDuringNewChaosRun,
                         'actionId': data.id,
                         'actionParameter': data.params,
                         'actionIsStorable': data.storable,
@@ -369,13 +374,13 @@ at Object.helper.updateValueFromOptions
                         'actionIsBackground': data.background
             });
             //let chaos view know
-            $Aura.Inspector.publish("AuraInspector:OnRecordActionDropForChaosRun", data);
+            $Aura.Inspector.publish("AuraInspector:OnRecordActionOperationForChaosRun", data);
         }
     };
 
     /*
         event handler for AuraInspector:OnStartChaosRun , called from InspectorPanelSfdcChaos.StartChaosRun_OnClick
-        { 'samplingInterval': number like 4000, 'actionDropPercentage': number between 0 to 100 };
+        { 'samplingInterval': number like 4000, 'actionDropPercentage': number between 0 to 100, 'actionErrorPercentage': number between 0 to 100 };
     */
     chaosManager.prototype.startChaosRun = function(data) {
             this.configuration = Object.assign(this.configuration, data);
@@ -428,6 +433,7 @@ at Object.helper.updateValueFromOptions
     //event handler for AuraInspector:stopChaosRun, called by InspectorPanelSfdcChaos.StopChaosRun_OnClick
     chaosManager.prototype.stopChaosRun = function(data) {
             this.configuration.actionDropPercentage = 0;
+            this.configuration.actionErrorPercentage = 0;
 
             clearInterval(this.waitForAnyAuraRenderedElementInterval);
             this.waitForAnyAuraRenderedElementInterval = undefined;
@@ -451,6 +457,7 @@ at Object.helper.updateValueFromOptions
 
             //clean up
             this.configuration.actionDropPercentage = 0;
+            this.configuration.actionErrorPercentage = 0;
             this.removeActionFromWatchListAfterChaosRunStop();
             this.currentChaosRun = {};
             this.currentChaosRunSteps = [];
@@ -464,7 +471,7 @@ at Object.helper.updateValueFromOptions
 
     /*
             event handler for AuraInspector:saveChaosRun, called by InspectorPanelSfdcChaos.SaveChaosRun_OnClick
-            {'samplingInterval': number like 4000, 'actionDropPercentage': number between 0 and 100}
+            {'samplingInterval': number like 4000, 'actionDropPercentage': number between 0 and 100, 'actionErrorPercentage': number between 0 and 100}
     */
     chaosManager.prototype.saveChaosRun = function(data) {
             this.currentChaosRun = Object.assign(this.currentChaosRun, data);
@@ -530,7 +537,10 @@ at Object.helper.updateValueFromOptions
             {'samplingInterval': number like 4000}
     */
     chaosManager.prototype.replayChaosRun = function(data) {
+    
             this.configuration.actionDropPercentage = 0;//make sure we don't drop action randomly when replaying
+            this.configuration.actionErrorPercentage = 0;//make sure we don't error response action randomly when replaying
+            
             if(typeof(Storage) !== "undefined" && sessionStorage && sessionStorage.getItem("chaosRunToReplay")) {
                 this.chaosRunToReplay = JSON.parse(sessionStorage.getItem("chaosRunToReplay"));
                 //console.log("replay chaos run from sessionStorage: ", chaosRunToReplay);
@@ -631,7 +641,7 @@ at Object.helper.updateValueFromOptions
             'cssPath': string like "body > button + button > span"
             //if it's action operation
             'actionName': string,
-            'actionOperation': string //"Drop",
+            'actionOperation': string //"Drop" or "ErrorResponse"
             'actionId': string //why we care
             'actionParameter': string //"{..}"
             'actionIsStorable': boolean
@@ -671,23 +681,23 @@ at Object.helper.updateValueFromOptions
             $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
 
             //add the action to watch list
-            if(nextStep.actionOperation === 'Drop') {
-                var actionToDrop = {
-                        'actionName': nextStep.actionName,
-                        'actionParameter': nextStep.actionParameter,
-                        'actionId': nextStep.actionId, //713;a
-                        'actionIsStorable': nextStep.actionIsStorable,
-                        'actionStorageKey': nextStep.actionStorageKey,
-                        'actionIsAbortable': nextStep.actionIsAbortable,
-                        'actionIsBackground': nextStep.actionIsBackground,
-                        'nextResponse': undefined //this has to be undefined
-                }
-                //call AuraInspectorActionsView's AuraInspectorActionsView_OnEnqueueNextDropForChaosReplay
-                $Aura.Inspector.publish("AuraInspector:EnqueueNextDropForChaosReplay", actionToDrop);
-
-                //action scheduled to be drop, now remove the step
-                this.chaosRunToReplay["currentChaosRunSteps"].splice(nextStepIndex,1);
+            var actionToAdd = {
+                    'actionName': nextStep.actionName,
+                    'actionParameter': nextStep.actionParameter,
+                    'actionId': nextStep.actionId, //713;a
+                    'actionIsStorable': nextStep.actionIsStorable,
+                    'actionStorageKey': nextStep.actionStorageKey,
+                    'actionIsAbortable': nextStep.actionIsAbortable,
+                    'actionIsBackground': nextStep.actionIsBackground,
+                    'nextResponse': undefined, //this has to be undefined
+                    'nextError': (nextStep.actionOperation === 'ErrorResponse') ? this.errorResponseDuringNewChaosRun : undefined,
             }
+            //call AuraInspectorActionsView's AuraInspectorActionsView_OnEnqueueNextDropForChaosReplay
+            $Aura.Inspector.publish("AuraInspector:EnqueueNextDropForChaosReplay", actionToAdd);
+
+            //action scheduled to be drop, now remove the step
+            this.chaosRunToReplay["currentChaosRunSteps"].splice(nextStepIndex,1);
+            
         }
     }
 
@@ -1213,7 +1223,7 @@ at Object.helper.updateValueFromOptions
     $Aura.Inspector.subscribe("AuraInspector:OnReplayChaosRun", $Aura.chaos.replayChaosRun.bind($Aura.chaos));
     $Aura.Inspector.subscribe("AuraInspector:OnContinueChaosRun", $Aura.chaos.continueChaosRun.bind($Aura.chaos));
     $Aura.Inspector.subscribe("AuraInspector:OnStopAllChaosRun", $Aura.chaos.stopAllChaosRun.bind($Aura.chaos));
-    $Aura.Inspector.subscribe("AuraInspector:OnSomeActionGetDropped", $Aura.chaos.recordDroppedAction.bind($Aura.chaos));
+    $Aura.Inspector.subscribe("AuraInspector:OnSomeActionOperationDuringChaosRun", $Aura.chaos.recordActionOperationDuringChaosRun.bind($Aura.chaos));
 
 
     function AuraInspector() {
@@ -1987,18 +1997,19 @@ at Object.helper.updateValueFromOptions
                                 var actionsFromOldResponse = oldResponseObj.actions;
                                 for(var i = 0; i < actionsFromOldResponse.length; i++) {
                                     if(actionsFromOldResponse[i] && actionsFromOldResponse[i].id) {
-                                            //console.log("drop action by request of new Chaos Run.", actionsFromOldResponse[i]);
-                                            //push this action to actionsWatched, so actionTab know what to do
-                                            actionsFromOldResponse[i]['idtoWatch'] = actionsFromOldResponse[i].id;
-                                            actionsFromOldResponse[i]['nextError'] = undefined;//these 2 are useful against howDidWeModifyResponse
-                                            actionsFromOldResponse[i]['nextResponse'] = undefined;
-                                            actionsWatched[actionsFromOldResponse[i].id] = actionsFromOldResponse[i];
-                                            //call AuraInspectorActionsView_OnDropActionInChaosRun in AuraInspectorActionsView
-                                            $Aura.Inspector.publish("AuraInspector:DropActionInChaosRun",
-                                                {
-                                                    'id': actionsFromOldResponse[i].id
-                                                }
-                                            );
+                                        //console.log("drop action by request of new Chaos Run.", actionsFromOldResponse[i]);
+                                        //push this action to actionsWatched, so actionTab know what to do
+                                        actionsFromOldResponse[i]['idtoWatch'] = actionsFromOldResponse[i].id;
+                                        actionsFromOldResponse[i]['nextError'] = undefined;//these 2 are useful against howDidWeModifyResponse
+                                        actionsFromOldResponse[i]['nextResponse'] = undefined;
+                                        actionsWatched[actionsFromOldResponse[i].id] = actionsFromOldResponse[i];
+                                        //call AuraInspectorActionsView_OnActionOperationInChaosRun in AuraInspectorActionsView
+                                        $Aura.Inspector.publish("AuraInspector:ActionOperationInChaosRun",
+                                            {
+                                                'id': actionsFromOldResponse[i].id,
+                                                'actionOperation': 'Drop'
+                                            }
+                                        );
                                     }
                                 }
                             }
@@ -2008,6 +2019,67 @@ at Object.helper.updateValueFromOptions
                     }
                 }//end of actionDropPercentage allow us to drop the current action
             }//end of we are dropping action for new chaos run
+            //if we are in a chaosRun and we would like to return error response
+            if( !responseWithError && $Aura.chaos.configuration.actionErrorPercentage ) {
+                var r = Math.random() * 100;
+                if( r < $Aura.chaos.configuration.actionErrorPercentage ) {
+                    if( oldResponseText.startsWith("while(1);") ) {
+                        //parse oldResponseObj out of oldResponseText
+                        try {
+                                var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
+                                //replace returnValue in oldResponseObj's actions
+                                if( oldResponseObj && Array.isArray(oldResponseObj.actions) && oldResponseObj.actions.length > 0) {
+                                    responseWithError = true;
+                                    //if response is ERROR, we shouldn't have any SERIAL_REFID or SERIAL_ID related object in context, or our real decode will explode
+                                    if(oldResponseObj.context && oldResponseObj.context.globalValueProviders) {
+                                        var newGVP = [];
+                                        for(var j = 0; j < oldResponseObj.context.globalValueProviders.length; j++) {
+                                            var gvpj = oldResponseObj.context.globalValueProviders[j];
+                                            if( isTrueObject(gvpj) && gvpj.type ) {
+                                                if(gvpj.type === "$Locale" || gvpj.type === "$Browser" || gvpj.type === "$Global") {
+                                                    //we keep Local, Browser and Global ONLY
+                                                    newGVP.push(gvpj);
+                                                } else {
+                                                    //get rid of others
+                                                }
+                                            }
+                                        }
+                                        oldResponseObj.context.globalValueProviders = newGVP;
+                                    }
+                                    var actionsFromOldResponse = oldResponseObj.actions;
+                                    for(var i = 0; i < actionsFromOldResponse.length; i++) {
+                                        //console.log("decode action#"+actionsFromOldResponse[i].id, actionsFromOldResponse[i]);
+                                        //if(actionsFromOldResponse[i].id && actionsFromOldResponse[i].id === actionWatchedId) {
+                                            //if(actionWatched.nextError) {//we would like to return error response
+                                        //for aura framework to receive the error response
+                                        actionsFromOldResponse[i].state = "ERROR";
+                                        //when action return with error, returnValue should be null
+                                        actionsFromOldResponse[i].returnValue = null;
+                                        actionsFromOldResponse[i].error = $Aura.chaos.errorResponseDuringNewChaosRun;
+                                        //for ActionTab to move action card around
+                                        actionsFromOldResponse[i]['idtoWatch'] = actionsFromOldResponse[i].id;
+                                        actionsFromOldResponse[i]['nextError'] = errsArr;//these 2 are useful against howDidWeModifyResponse
+                                        actionsFromOldResponse[i]['nextResponse'] = undefined;
+                                        actionsWatched[actionsFromOldResponse[i].id] = actionsFromOldResponse[i];
+                                        //call AuraInspectorActionsView_OnActionOperationInChaosRun in AuraInspectorActionsView
+                                        $Aura.Inspector.publish("AuraInspector:ActionOperationInChaosRun",
+                                            {
+                                                'id': actionsFromOldResponse[i].id,
+                                                'actionOperation': 'ErrorResponse'
+                                            }
+                                        );
+                                    }
+                                    //update actions
+                                    oldResponseObj.actions = actionsFromOldResponse;
+                                    newResponseText = "while(1);\n"+JSON.stringify(oldResponseObj);
+                                    
+                                }
+                        } catch (e) {
+                                console.warn("Drop action encountered an error while parsing response from server. ", e);
+                        }
+                    }//end of oldResponseText start with "while(1)"
+                }//end of we do want to error reponse for action
+            }//end of we are returning error response for action during new chaos run
 
             if(responseWithIncomplete) {
                 oldResponse.status = 0;//so AuraClientService.isDisconnectedOrCancelled will return true

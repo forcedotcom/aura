@@ -395,6 +395,10 @@
 		"message": "Drop Actions By Percentage",
 		"description": "drop action randomly, by some percentage"
 	},
+	"chaosview_error_action_by_percentage": {
+		"message": "Error Response for Actions By Percentage",
+		"description": "return error response for action randomly, by some percentage"
+	},
 	"chaosview_buton_stop_all_runs": {
 		"message": "Panic Button : Stop Chaos Run",
 		"description": "push this to force all chaos run to stop"

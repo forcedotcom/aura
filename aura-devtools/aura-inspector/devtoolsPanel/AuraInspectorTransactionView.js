@@ -92,7 +92,7 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 	};
 
 	this.summarizeActions = function (t) {
-		var serverActions = t.marks.serverActions || [];
+		var serverActions = t.marks && Array.isArray(t.marks.serverActions) ? t.marks.serverActions : [];
 		// Should be this, but it has issues too such as m.context.ids being null.
 		//var serverActions = t.marks.serverActions || t.marks.queuedActions || t.marks.actions || [];
 		return (serverActions.filter(function (m) {

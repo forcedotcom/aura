@@ -115,8 +115,9 @@ function AuraInspectorActionsView(devtoolsPanel) {
         devtoolsPanel.subscribe("AuraInspector:EnqueueNextResponseForAction", AuraInspectorActionsView_OnEnqueueNextResponseForAction.bind(this));
         devtoolsPanel.subscribe("AuraInspector:EnqueueNextErrorForAction", AuraInspectorActionsView_OnEnqueueNextErrorForAction.bind(this));
 
-        devtoolsPanel.subscribe("AuraInspector:DropActionInChaosRun", AuraInspectorActionsView_OnDropActionInChaosRun.bind(this));
+        devtoolsPanel.subscribe("AuraInspector:ActionOperationInChaosRun", AuraInspectorActionsView_OnActionOperationInChaosRun.bind(this));
         devtoolsPanel.subscribe("AuraInspector:EnqueueNextDropForChaosReplay", AuraInspectorActionsView_OnEnqueueNextDropForChaosReplay.bind(this));
+        
 
 
 
@@ -311,7 +312,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
                     }
                     card.parentNode.removeChild(card);
                 } else {
-                    console.err("cannot find previously created actionCard for action#"+action.id, action);
+                    console.error("cannot find previously created actionCard for action#"+action.id, action);
                 }
             }
         }
@@ -485,6 +486,15 @@ function AuraInspectorActionsView(devtoolsPanel) {
         }
     }
 
+    /*
+        event handler for AuraInspector:EnqueueNextErrorForAction, called from saveErrorResponse in actionCard.js
+        actionInfo:{
+                'actionName': this.getAttribute("name"),//necessary, as we use this as key in actionsToWatch AuraInspectorInjectedScript.js
+                'actionId': actionId.substring(12, actionId.length), //action_card_713;a --> 713;a
+                'nextResponse': undefined,
+                'nextError': {'message':string, 'stack':string}
+        }
+    */
     function AuraInspectorActionsView_OnEnqueueNextErrorForAction(actionInfo) {
         //console.log("AuraInspectorActionsView_OnEnqueueNextErrorForAction:", actionInfo);
         var actionInfoObj = JSON.parse(actionInfo);
@@ -524,9 +534,26 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
     /*
         event handler for AuraInspector:DropActionInChaosRun
-        called by onDecode in AuraInspectionInjectedScript
+        called by onDecode in AuraInspectionInjectedScript 
+        data:{'id': actionsFromOldResponse[i].id, 'actionOperation': 'Drop' or 'ErrorResponse'}
     */
-    function AuraInspectorActionsView_OnDropActionInChaosRun(data) {
+    function AuraInspectorActionsView_OnActionOperationInChaosRun(data) {
+        if(data && data.id) {
+            if(!actions.has(data.id)) {
+                console.err("Chaos run just request to drop an action that's not in action list of Action View", data, actions);
+            }
+            //we need tell Chaos Tab to draw a chaos card with action name
+            var action = actions.get(data.id);
+            action['actionOperation'] = data.actionOperation;
+            //call AuraDevToolService.RecordActionOperation in AuraInspectionInjectedScript.js
+            devtoolsPanel.publish("AuraInspector:OnSomeActionOperationDuringChaosRun", action);
+        }
+    }
+
+    /*
+        event handler for AuraInspector:ErrorActionInChaosRun
+    */
+    function AuraInspectorActionsView_OnErrorActionInChaosRun(data) {
         if(data && data.id) {
             if(!actions.has(data.id)) {
                 console.err("Chaos run just request to drop an action that's not in action list of Action View", data, actions);
@@ -542,7 +569,6 @@ function AuraInspectorActionsView(devtoolsPanel) {
         event handler for "AuraInspector:EnqueueNextDropForChaosReplay".
         called by scheduleActionOperationForNextStep in AuraInspectorInjectedScript
         actionObj: { 'actionName': string,
-            'actionOperation': string //"Drop",
             'actionId': string //we need this to move action from watch list to processed
             'actionParameter': string //"{..}"
             'actionIsStorable': boolean
@@ -550,6 +576,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
             'actionIsAbortable': boolean
             'actionIsBackground': boolean
             'nextResponse': undefined
+            'nextError': obj ($A.chaos.errorResponseDuringNewChaosRun) or undefined
         }
     */
     function AuraInspectorActionsView_OnEnqueueNextDropForChaosReplay(actionObj) {

@@ -108,24 +108,28 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         if (adapterClassName.equals("org.auraframework.impl.adapter.ConfigAdapterImpl")
                 || adapterClassName.equals("org.auraframework.impl.adapter.MockConfigAdapterImpl")) {
             Header[] headers = response.getHeaders("X-FRAME-OPTIONS");
-            if (guarded) {
-                Map<String, String> csp = getCSP(response);
-                assertEquals("frame-ancestors is wrong", "'self'", csp.get("frame-ancestors"));
 
+            if (guarded) {
+                assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
+                Map<String, String> csp = getCSP(response);
                 AuraContext context = Aura.getContextService().getCurrentContext();
                 boolean testMode = context != null && context.isTestMode();
                 if (testMode || allowInline) {
+                    assertEquals("frame-ancestors is wrong", "*", csp.get("frame-ancestors"));
                     assertEquals("script-src is wrong", "'self' chrome-extension: 'unsafe-eval'",
                             csp.get("script-src"));
                     assertEquals("style-src is wrong", "'self' chrome-extension: 'unsafe-inline'",
                             csp.get("style-src"));
+                    assertEquals("ALLOWALL", headers[0].getValue());
                 } else {
+                    assertEquals("frame-ancestors is wrong", "'self'", csp.get("frame-ancestors"));
                     assertEquals("script-src is wrong",
                             "'self' chrome-extension:",
                             csp.get("script-src"));
                     assertEquals("style-src is wrong",
                             "'self' chrome-extension: 'unsafe-inline'",
                             csp.get("style-src"));
+                    assertEquals("SAMEORIGIN", headers[0].getValue());
                 }
 
                 // These maybe aren't strictly "anti-clickjacking", but since
@@ -137,9 +141,6 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 assertEquals("object-src is wrong", "'self'", csp.get("object-src"));
                 assertEquals("connect-src is wrong",
                         "'self' http://invalid.salesforce.com http://offline https://offline", csp.get("connect-src"));
-
-                assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
-                assertEquals("SAMEORIGIN", headers[0].getValue());
             } else {
                 headers = response.getHeaders("Content-Security-Policy");
                 assertEquals(0, headers.length);

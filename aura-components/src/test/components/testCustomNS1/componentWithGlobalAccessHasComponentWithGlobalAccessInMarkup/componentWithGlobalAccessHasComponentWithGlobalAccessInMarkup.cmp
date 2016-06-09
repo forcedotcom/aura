@@ -23,4 +23,8 @@
     <aura:method name="callPublicMethodInComponentWithGlobalAccess" action="{!c.callPublicMethodInComponentWithGlobalAccess}" access="GLOBAL"/>
     <aura:method name="callPrivateMethodInComponentWithGlobalAccess" action="{!c.callPrivateMethodInComponentWithGlobalAccess}" access="GLOBAL"/>
 	
+	<aura:method name="setGlobalAttributeInComponentWithGlobalAccess" action="{!c.setGlobalAttributeInComponentWithGlobalAccess}" access="GLOBAL"/>
+	<aura:method name="setPublicAttributeInComponentWithGlobalAccess" action="{!c.setPublicAttributeInComponentWithGlobalAccess}" access="GLOBAL"/>
+	<aura:method name="setPrivateAttributeInComponentWithGlobalAccess" action="{!c.setPrivateAttributeInComponentWithGlobalAccess}" access="GLOBAL"/>
+	
 </aura:component>

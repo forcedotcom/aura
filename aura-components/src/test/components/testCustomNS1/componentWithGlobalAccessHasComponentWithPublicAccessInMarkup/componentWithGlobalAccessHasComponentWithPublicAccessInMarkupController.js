@@ -24,5 +24,17 @@
     
     callPrivateMethodInComponentWithPublicAccess: function(component, event, helper){
     	component.find("componentWithPublicAccess").privateMethod();
+    },
+    
+    setGlobalAttributeInComponentWithPublicAccess: function(component, event, helper) {
+    	component.find("componentWithPublicAccess").set("v.globalAttribute", "new global");
+    },
+    
+    setPublicAttributeInComponentWithPublicAccess: function(component, event, helper) {
+    	component.find("componentWithPublicAccess").set("v.publicAttribute", "new public");
+    },
+    
+    setPrivateAttributeInComponentWithPublicAccess: function(component, event, helper) {
+    	component.find("componentWithPublicAccess").set("v.privateAttribute", "new private");
     }
 })

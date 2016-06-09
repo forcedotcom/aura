@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    callGlobalMethodInComponentWithDefaultlAccess: function(component, event, helper){
+({  
+    callGlobalMethodInComponentWithDefaultAccess: function(component, event, helper){
     	component.find("componentWithDefaultAccess").globalMethod();
     },
     

@@ -49,6 +49,11 @@
 	   <aura:attribute name="items" type="Object"/>
 	</aura:method>
 	
+    <aura:method name="updateItem">
+        <aura:attribute name="item" type="Object" required="true" description="Updated item to be placed in the grid at the specified index."/>
+        <aura:attribute name="index" type="Integer" required="true" description="Index of the target row within the grid."/>
+    </aura:method>  
+	
 	<aura:method name="resizeColumns" description="Resizes columns if the plugin is enabled.">
 	   <aura:attribute name="widths" type="Integer[]"/>
 	</aura:method>

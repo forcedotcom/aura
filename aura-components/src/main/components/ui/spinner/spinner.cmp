@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="BETA" description="A loading spinner to be used while the real component body is being loaded">
+<aura:component access="GLOBAL" description="A loading spinner to be used while the real component body is being loaded">
     <aura:attribute access="GLOBAL" name="isVisible" type="Boolean" default="true" description="Specifies whether or not this spinner should be visible. Defaults to true."/>
     <aura:attribute access="GLOBAL" name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component."/>
     <aura:registerEvent access="GLOBAL" name="toggle" type="ui:toggleLoadingIndicator" description="The event fired when the spinner is toggled."/>

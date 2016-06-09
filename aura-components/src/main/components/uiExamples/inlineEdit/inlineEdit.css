@@ -97,3 +97,51 @@
 .THIS .inlineEdit--disabled .triggerContainer {
 	display: none;
 }
+
+.THIS span:first-child {
+	flex-grow: 1;
+} 
+ 
+.THIS.cellContainer {
+	display:flex;
+	position: relative;
+	padding: 0.5rem;
+}
+
+.THIS.cellContainer.edited {
+	background-color: #faffbd;
+}
+
+.THIS.cellContainer.errors {
+	border: 1px solid red;
+}
+
+.THIS .triggerContainer {
+	flex: none;
+	margin-left: 1rem;
+}
+
+.THIS .trigger {
+	background-color: white;
+    color: #16325c;
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+    transition: border 0.1s linear, background-color 0.1s linear;
+    display: inline-block;
+    padding: 0 1rem 0 0.75rem;
+    font-size: inherit;
+    font-weight: 400;
+    line-height: 1.75em;
+    max-height: calc(1.875rem - 2px);
+    min-height: 21px;
+	width: 100%;
+	text-align:left;
+}
+
+.THIS .trigger.disabled {
+	background-color: black;
+}
+
+.THIS.blue {
+	border: 1px solid blue;
+}

@@ -15,16 +15,15 @@
  */
 ({
 	init : function(cmp, evt, helper) {
-		var columns = cmp.get("v.columns");
-		var headers = cmp.get("v.headerColumns");
-		var itemVar = cmp.get("v.itemVar");
-		
-		for (var i = 0; i < columns.length; i++) {
-			helper.initializeCellStates(columns[i], itemVar);
-		}
-				
-		cmp.find("grid").set("v.columns", columns);
-		cmp.find("grid").set("v.headerColumns", headers);
+		helper.initializeColumns(cmp);
+	},
+	
+	handleColumnsChange : function(cmp, evt, helper) {
+	    helper.initializeColumns(cmp);
+	},
+	
+	handleHeadersChange : function(cmp, evt, helper) {
+	    helper.updateHeaderColumns(cmp);
 	},
 
 	handleGridAction : function(cmp, evt, helper) {

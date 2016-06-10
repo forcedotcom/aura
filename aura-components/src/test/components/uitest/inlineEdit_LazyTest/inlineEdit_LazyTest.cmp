@@ -1,0 +1,67 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component description="Tests lazily setting attributes on the ui:inlineEditGrid component">
+    <aura:dependency resource="markup://ui:dataGridColumn" type="COMPONENT"/>
+	<aura:dependency resource="markup://ui:inputNumber" type="COMPONENT"/>
+    <aura:dependency resource="markup://ui:inputText" type="COMPONENT"/>
+    
+    <aura:attribute name="totalColumns" type="Integer" default="0" />
+    <aura:attribute name="lastEdited" type="Object" access="PRIVATE" />
+    
+    <aura:attribute name="columnDefs" type="Aura.ComponentDefRef[]" description="Columns to be added into the grid lazily">
+        <ui:inlineEditCell name="id" isPsuedoInput="true">
+            <ui:outputText value="{!row.data.id}" />
+        </ui:inlineEditCell>
+        <ui:inlineEditCell name="name">
+            <ui:outputText value="{!row.data.name}" />
+        </ui:inlineEditCell>
+        <ui:inlineEditCell name="id">
+            <ui:outputText value="{!row.data.id}" />
+        </ui:inlineEditCell>
+    </aura:attribute>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.changeItems}"/>
+    
+    <div>
+        <div class="toolbar">
+            <ui:inputText aura:id="totalColumns" value="{!v.totalColumns}" label="Total Columns (0-3):"/>
+            <ui:button aura:id="changeColsButton" label="Change columns" press="{!c.changeColumns}" />
+            <ui:button label="Change items" press="{!c.changeItems}" />
+        </div>
+        
+        <div class="info">
+            <span>Last Edited: </span><br/>
+            <span>Index: {!v.lastEdited.index}</span><br/>
+            <span>Key: {!v.lastEdited.key}</span><br/>
+            <span>Value: {!v.lastEdited.value}</span><br/>
+        </div>
+
+        <div class="content">
+            <ui:inlineEditGrid aura:id="grid" class="inline-edit-grid" itemVar="row" onEdit="{!c.onEdit}"/>
+        </div>
+    </div>
+	
+    <div class="manager">
+        <ui:panelManager2 aura:id="pm">
+            <aura:set attribute="registeredPanels">
+                    <ui:panel alias="panel"/>
+            </aura:set>
+        </ui:panelManager2>
+    </div>
+    
+</aura:component>

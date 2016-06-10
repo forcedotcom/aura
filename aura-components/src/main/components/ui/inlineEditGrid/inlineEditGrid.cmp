@@ -35,9 +35,12 @@
 	<aura:attribute name="enableResizableColumns" type="Boolean"   description="Enables the column resize plugin. The default is false."/>
 	<aura:attribute name="resizableColumnsConfig" type="Object"    description="The column resize configuration. If not provided, the default configuration is used."/>
 	
-	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <!-- Event handlers -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="gridAction" event="ui:gridAction" action="{!c.handleGridAction}"/>
-	
+    <aura:handler name="change" value="{!v.columns}" action="{!c.handleColumnsChange}"/>
+	<aura:handler name="change" value="{!v.headerColumns}" action="{!c.handleHeadersChange}"/>
+    
     <aura:registerEvent name="onEdit"   type="ui:collectionValueChanged"    description="Event fired when a cell of the grid has been edited" />
     
 	<!-- Events passed from the virtualDataGrid -->
@@ -69,7 +72,6 @@
             aura:id="grid"
             class="{!v.class}"
             items="{!v.items}"
-            columns="{!v.columns}"
 			headerColumns="{!v.headerColumns}"
 			itemVar="{!v.itemVar}"
 							

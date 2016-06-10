@@ -65,5 +65,39 @@
             items = cmp.find('grid').get('v.items');
         items.splice(index, count);
         cmp.find('grid').set('v.items', items);
+    },
+    
+    handleUpdate: function (cmp, evt, hlp) {
+        var index = cmp.get('v.index') || 0
+            count = cmp.get('v.count') || 0;
+        var item;
+        
+        // different test cases
+        if (count == 0) { // Empty item object
+            item = {};
+        } else if (count == 1) { // Normal update
+            item = {
+                    name : 'Updated at ' + index,
+                    phone : '555-' + index,
+                    balance : '$' + index
+            };
+        } else if (count == 2) { // Empty/blank item data
+            item = {
+                    name : '',
+                    phone : '',
+                    balance : ''
+            };
+        } else if (count == 3) { // Invalid item data
+            item = {
+                    someone : 'invalid arg',
+                    place : '123456789',
+            }
+        } else if (count == 4) { // Partial update
+            item = {
+                    phone : '000-' + index,
+            };
+        }
+        
+        cmp.find('grid').updateItem(item, index);
     }
 })

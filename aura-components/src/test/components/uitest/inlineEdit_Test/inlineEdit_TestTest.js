@@ -119,6 +119,23 @@
 		 }]
 	 },
 	 
+	 /**
+	  * Test update item on inline edit.
+	  */
+	 testUpdateItem : {
+	     attributes : {'index': 4},
+	     test : [function(cmp) {
+	         cmp.find('updateButton').get('e.press').fire();
+	         this.waitForCellContent(cmp, 4, 1, 'updated at 4');
+	     }, function(cmp) {
+	         this.verifyCellContent(cmp, 4, 0, '999');
+	         this.verifyCellContent(cmp, 4, 2, '999');
+	         this.verifyCellContent(cmp, 4, 3, 'new link');
+	         this.verifyCellContent(cmp, 4, 4, '');
+	         this.verifyCellContent(cmp, 4, 5, '');
+	     }]
+	 },
+	 
 	 triggerEditOnCell : function(cmp, rowIndex, colIndex) {
 		 var tbody = document.getElementsByTagName("tbody")[0];
 		 var trs = this.getOnlyTrs(tbody.children);		 

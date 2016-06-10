@@ -30,8 +30,10 @@
 				errors : {}
 			});
 		}
+		// empty row
 		items[5].data.name = '';
 		items[5].data.grade = '';
+		items[5].data.linkLabel = '';
 		
 		cmp.set("v.items", items);
 		
@@ -52,6 +54,24 @@
 		    	errors : {}
 		    }
 		]);
+	},
+	
+	updateItem : function(cmp) {
+	    var index = cmp.get('v.index');
+	    index = index ? index : cmp.find('inputTxt').get('v.value');
+	    
+	    var item = {
+	            data : {
+	                id : 999,
+	                name : 'updated at ' + index,
+	                grade : 999,
+	                linkLabel : 'new link'
+	            },
+	            status : {},
+	            errors : {},
+	    }
+	    
+	    cmp.find('grid').updateItem(item, index);
 	},
 	
 	onEdit : function(cmp, evt, helper) {

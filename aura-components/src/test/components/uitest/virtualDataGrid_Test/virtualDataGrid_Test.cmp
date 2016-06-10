@@ -30,7 +30,8 @@
     <ui:inputText aura:id="count" label="count" labelPosition="hidden" placeholder="count" value="{!v.count}"/>
     <ui:button aura:id="addRow" label="Add row" press="{!c.handleAddRow}"/>
     <ui:button aura:id="insert" label="Insert" press="{!c.handleInsert}"/>
-    <ui:button aura:id="remove" label="Remove" press="{!c.handleRemove}"/><br/>
+    <ui:button aura:id="remove" label="Remove" press="{!c.handleRemove}"/>
+    <ui:button aura:id="update" label="Update" press="{!c.handleUpdate}"/><br/>
     
     <ui:virtualDataGrid aura:id="grid" fixedHeader="{!v.testFixedHeader}">      
         <aura:set attribute="headerColumns">

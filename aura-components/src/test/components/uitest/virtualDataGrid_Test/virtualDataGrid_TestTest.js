@@ -18,6 +18,7 @@
 	DOM    : 0,
     ITEMS  : 1,
     doNotWrapInAuraRun : true,
+    UPDATE_ITEM_TESTCASE : {EMPTY_ITEM: 0, UPDATE: 1, BLANK_DATA: 2, INVALID_DATA: 3, PARTIAL: 4},
     
     /**
      *  Test virtual data grid is loaded with fixed header.
@@ -139,6 +140,61 @@
             $A.test.assertEquals(100, elements[this.DOM][100]._index, "Insert failed (index check): Cached index incorrect");
         }]
     },
+ 
+    /**
+     * Update item to blank data set
+     */
+    testUpdateItemToBlankData : {
+        attributes : {'index' : 4, 'count' : 2},
+        test : function(cmp){
+            this.pressUpdateItemButton(cmp);
+            this.waitForItemUpdated(cmp, 4, this.UPDATE_ITEM_TESTCASE.BLANK_DATA);
+        }
+    },
+    
+    /**
+     * Update item to empty object 
+     */
+    testUpdateItemWithEmptyItemObject : {
+        attributes : {'index' : 4, 'count' : 0},
+        test : function(cmp){
+            this.pressUpdateItemButton(cmp);
+            this.waitForItemUpdated(cmp, 4, this.UPDATE_ITEM_TESTCASE.EMPTY_ITEM);
+        }
+    },
+    
+    /**
+     * Update item to some new value
+     */
+    testUpdateItem : {
+        attributes : {'index' : 4, 'count' : 1},
+        test : function(cmp){
+            this.pressUpdateItemButton(cmp);
+            this.waitForItemUpdated(cmp, 4, this.UPDATE_ITEM_TESTCASE.UPDATE);
+        }
+    },
+    
+    /**
+     * Update item to invalid data set
+     */
+    testUpdateItemWithInvalidItemData : {
+        attributes : {'index' : 4, 'count' : 3},
+        test : function(cmp){
+            this.pressUpdateItemButton(cmp);
+            this.waitForItemUpdated(cmp, 4, this.UPDATE_ITEM_TESTCASE.INVALID_DATA);
+        }
+    },
+
+    /**
+     * Update with partial data updated
+     */
+    testUpdateItemWithPartialDataUpdated : {
+        attributes : {'index' : 4, 'count' : 4},
+        test : function(cmp){
+            this.pressUpdateItemButton(cmp);
+            this.waitForItemUpdated(cmp, 4, this.UPDATE_ITEM_TESTCASE.PARTIAL);
+        }
+    },
     
     setValue : function(cmp, cmpName, value){
         cmp.find(cmpName).set("v.value", value);
@@ -154,6 +210,10 @@
     
     pressAddRowButton : function(cmp) {
     	cmp.find("addRow").get("e.press").fire();
+    },
+    
+    pressUpdateItemButton : function(cmp) {
+        cmp.find('update').get('e.press').fire();
     },
     
     pressFireDataProviderButton : function(cmp) {
@@ -197,5 +257,38 @@
             var trs = that.getOnlyTrs(tbody.children);
     		return trs.length;
 		}, "Number of items expected is incorrect.");
+    },
+    
+    waitForItemUpdated : function(cmp, index, testCase) {
+        var that = this;
+        var expectedName = '';
+        var expectedPhone = '';
+        var expectedBalance = '';
+        
+        if (testCase == this.UPDATE_ITEM_TESTCASE.UPDATE) {
+            expectedName = 'Updated at ' + index;
+            expectedPhone = '555-' + index;
+            expectedBalance = '$' + index;
+        } else if (testCase == this.UPDATE_ITEM_TESTCASE.PARTIAL) {
+            expectedName = '';
+            expectedPhone = '000-' + index;
+            expectedBalance = '';
+        }
+        
+        $A.test.addWaitForWithFailureMessage(true, function(){
+            var tbody = document.getElementsByTagName("tbody")[0];
+            var trs = that.getOnlyTrs(tbody.children);
+            var cells = trs[index].getElementsByTagName('td');
+            var actualName = $A.test.getText(cells[0]);
+            var actualPhone = $A.test.getText(cells[1]);
+            var actualBalance = $A.test.getText(cells[2]);
+            return ((expectedName == actualName) && 
+                    (expectedPhone == actualPhone) &&
+                    (expectedBalance == actualBalance));
+        }, 'Incorrect {name,phone,balance} expected index@' + index + '{' 
+            + expectedName + ', ' +
+            + expectedPhone + ', ' +
+            + expectedBalance + ', ' + '}' 
+        );
     }
 })

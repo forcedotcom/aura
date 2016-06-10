@@ -99,10 +99,11 @@ public interface ServletUtilAdapter extends AuraAdapter {
      *
      * @param context the aura context to use.
      * @param safeInlineJs should we include 'inline.js' to allow for CSP protection?
-     * @param ignoreBootstrap should we include 'bootstrap.js' in the mix?
+     * @param ignoreNonCacheableScripts. Flag to ignore scripts that are dynamic so we don't potentially cache them such as bootstrap.js
+     * This parameter will mostly be false but for calls from manifest or other caching calls alike.
      * @return the list of scripts.
      */
-    List<String> getScripts(AuraContext context, boolean safeInlineJs, boolean ignoreBootstrap, Map<String,Object> attributes)
+    List<String> getScripts(AuraContext context, boolean safeInlineJs, boolean ignoreNonCacheableScripts, Map<String,Object> attributes)
         throws QuickFixException;
 
     /**

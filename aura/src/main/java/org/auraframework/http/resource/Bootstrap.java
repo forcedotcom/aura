@@ -47,7 +47,7 @@ public class Bootstrap extends AuraResourceImpl {
     }
 
     private final static String PREPEND_JS = "window.Aura || (window.Aura = {});\nwindow.Aura.bootstrap || (window.Aura.bootstrap = {});\nwindow.Aura.appBootstrap = ";
-    private final static String APPEND_JS = "(function () {\n\twindow.Aura.bootstrap.execBootstrapJs = window.performance && window.performance.now ? window.performance.now() : Date.now();\n\twindow.Aura.appBootstrapReady = true;\n\tif (window.Aura.afterBootstrapReady && window.Aura.afterBootstrapReady.length){\n\t\t for (var i = 0; i < window.Aura.afterBootstrapReady.length; i++) {\n\t\t\twindow.Aura.afterBootstrapReady[i]();\n\t\t}\n\t}\n}());";
+    private final static String APPEND_JS = ";\n(function () {\n\twindow.Aura.bootstrap.execBootstrapJs = window.performance && window.performance.now ? window.performance.now() : Date.now();\n\twindow.Aura.appBootstrapReady = true;\n\tif (window.Aura.afterBootstrapReady && window.Aura.afterBootstrapReady.length){\n\t\t for (var i = 0; i < window.Aura.afterBootstrapReady.length; i++) {\n\t\t\twindow.Aura.afterBootstrapReady[i]();\n\t\t}\n\t}\n}());";
 
     public Boolean loadLabels() throws QuickFixException {
         AuraContext ctx = Aura.getContextService().getCurrentContext();
@@ -89,11 +89,11 @@ public class Bootstrap extends AuraResourceImpl {
             json.writeArrayBegin();
             json.writeValue(appInstance);
             json.writeArrayEnd();
+            json.writeMapEntry("md5", out.getMD5());
             json.writeMapEntry("context", context);
             json.writeMapEntry("token", Aura.getConfigAdapter().getCSRFToken());
-            json.writeMapEntry("md5", out.getMD5());
             json.writeMapEnd();
-            out.append(";\n" + APPEND_JS);
+            out.append(APPEND_JS);
         } catch (Throwable t) {
             t = Aura.getExceptionAdapter().handleException(t);
             writeError(t, response, context);

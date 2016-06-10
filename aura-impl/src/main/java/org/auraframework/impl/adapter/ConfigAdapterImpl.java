@@ -465,10 +465,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      * Returns default aura url for encryption key
      */
     @Override
-    public String getEncryptionKeyURL() {
+    public String getEncryptionKeyURL(Boolean jsFormat) {
         AuraContext context = contextService.getCurrentContext();
         String contextPath = context.getContextPath();
-        return String.format("%s/l/{}/app.encryptionkey", contextPath);
+        return String.format("%s/l/{}/app.encryptionkey" + (jsFormat ? ".js" : ""), contextPath);
     }
 
     /**

@@ -807,8 +807,8 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
 
     // We cache it after the first call
     if (!pageStartTime) {
-        for (var m in Aura.bootstrap) {
-            bootstrap[m] = Math.round(Aura.bootstrap[m] * 100) / 100;
+        for (var m in Aura["bootstrap"]) {
+            bootstrap[m] = Math.round(Aura["bootstrap"][m] * 100) / 100;
         }
 
         pageStartTime = this.getPageStartTime();
@@ -848,6 +848,7 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
 
             if (performance.getEntries) {
                 var frameworkRequests = {};
+                var tmp = {};
                 var bootstrapRequests = ($A.util.filter(performance.getEntries(),
                     function (resource) {
                         return resource.responseEnd < bootstrap["bootstrapEPT"];
@@ -864,20 +865,23 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
                     }
                 );
 
-                frameworkRequests["appCSS"] = bootstrapRequests.filter(function (r) { return r.name.indexOf('app.css') !== -1; })[0];
-                frameworkRequests["appJS"]  = bootstrapRequests.filter(function (r) { return r.name.indexOf('app.js') !== -1; })[0];
-                frameworkRequests["auraJS"] = bootstrapRequests.filter(function (r) { return r.name.indexOf('/aura_') !== -1; })[0];
+                frameworkRequests["bootstrapJs"] = bootstrapRequests.filter(function (r) { return r.name.indexOf('bootstrap.js') !== -1; })[0];
+                frameworkRequests["inlineJs"]    = bootstrapRequests.filter(function (r) { return r.name.indexOf('inline.js') !== -1; })[0];
+                frameworkRequests["appCss"]      = bootstrapRequests.filter(function (r) { return r.name.indexOf('app.css') !== -1; })[0];
+                frameworkRequests["appJs"]       = bootstrapRequests.filter(function (r) { return r.name.indexOf('app.js') !== -1; })[0];
+                frameworkRequests["auraJs"]      = bootstrapRequests.filter(function (r) { return r.name.indexOf('/aura_') !== -1; })[0];
+                frameworkRequests["auraLibs"]    = bootstrapRequests.filter(function (r) { return r.name.indexOf('/libs_') !== -1; })[0];
 
                 for (var i in frameworkRequests) {
                     var entry = frameworkRequests[i];
                     if (entry) {
-                        bootstrap[i + 'Init'] = Math.round(entry["startTime"] * 100) / 100;
-                        bootstrap[i + 'Ready'] = Math.round(entry["responseEnd"] * 100) / 100;
+                        tmp[i + 'Init'] = Math.round(entry["startTime"] * 100) / 100;
+                        tmp[i + 'Duration'] = Math.round((entry["responseEnd"] - entry["startTime"]) * 100) / 100;
                     }
                 }
 
-
-                bootstrap["requests"] = bootstrapRequests;
+                bootstrap["coreRequests"] = tmp;
+                bootstrap["allRequests"] = bootstrapRequests;
             }
         }
     }

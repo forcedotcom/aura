@@ -25,13 +25,10 @@ if (typeof Aura === "undefined") {//eslint-disable-line no-use-before-define
 
 // -- Aura inlinning bootstrap
 Aura.time = window.performance && window.performance.now ? window.performance.now.bind(performance) : function(){return Date.now();};
-Aura.bootstrap = {};
+Aura["bootstrap"] = Aura["bootstrap"] || {};
 Aura.bootstrapMark = function (mark, value) {
-    this.bootstrap[mark] = value || this.time();
+    this["bootstrap"][mark] = value || this.time();
 };
-
-Aura.bootstrapMark('frameworkInit');
-
 
 // -- Namespaces ------------------------------------------------------------
 Aura.Utils      = {};
@@ -656,7 +653,7 @@ AuraInstance.prototype.afterInitHooks = function () {
 };
 
 AuraInstance.prototype.initAsync = function(config) {
-    Aura.bootstrapMark("initAsync");
+    Aura.bootstrapMark("initAsyncCall");
     this.beforeInitHooks();
 
     // Context is created async because of the GVPs go though async storage checks
@@ -1461,7 +1458,7 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
      * @borrows AuraInstance#reportError as $A.reportError
      */
     window['$A'] = new AuraInstance();
-    Aura.bootstrapMark("frameworkReady");
+    Aura.bootstrapMark("execAuraJs");
 
 })();
 

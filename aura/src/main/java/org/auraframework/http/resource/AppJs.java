@@ -16,9 +16,7 @@
 
 package org.auraframework.http.resource;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Set;
@@ -26,7 +24,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.util.IOUtil;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
@@ -42,7 +39,6 @@ import com.google.common.io.Resources;
 public class AppJs extends AuraResourceImpl {
     private ServerService serverService = Aura.getServerService();
     private ConfigAdapter configAdapter = Aura.getConfigAdapter();
-    private String bootstrapJsPayload = "";
 
     public AppJs() {
         super("app.js", Format.JS);

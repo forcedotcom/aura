@@ -16,8 +16,10 @@
 
 if (typeof Aura === "undefined" || !Aura.frameworkJsReady) {
     // Initialize Aura global object if we are the first
-    window.Aura = window.Aura || {};
+    window.Aura || (window.Aura = {});
+    window.Aura.bootstrap || (window.Aura.bootstrap = {});
     window.$A = window.$A || {};
+
 
     // -- Framework is not ready yet, so implement the minimum set of functiosn to run!
     window.Aura.ApplicationDefs = {
@@ -197,3 +199,5 @@ if (typeof Aura === "undefined" || !Aura.frameworkJsReady) {
         }
     };
 }
+
+window.Aura.bootstrap.execAppJs = window.performance && window.performance.now ? window.performance.now() : Date.now();

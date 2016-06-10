@@ -653,7 +653,7 @@ AuraInstance.prototype.afterInitHooks = function () {
 };
 
 AuraInstance.prototype.initAsync = function(config) {
-    Aura.bootstrapMark("initAsyncCall");
+    Aura.bootstrapMark("runInitAsync");
     this.beforeInitHooks();
 
     // Context is created async because of the GVPs go though async storage checks
@@ -764,8 +764,9 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
  * @private
  */
 AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
-    if (!$A["hasErrors"]) {
+    Aura.bootstrapMark("runInitPriv");
 
+    if (!$A["hasErrors"]) {
         if (Aura["frameworkLibrariesReady"]) {
             $A.addTearDownHandler();
             Aura.bootstrapMark("createAndRenderAppInit");

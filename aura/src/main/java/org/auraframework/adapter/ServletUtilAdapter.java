@@ -109,6 +109,24 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * Get the manifest url.
      */
     String getManifestUrl(AuraContext context, Map<String,Object> attributes);
+    
+    /**
+     * Get bootstrap url.
+     */
+    
+    String getBootstrapUrl(AuraContext context, Map<String,Object> attributes);
+    
+    
+    /**
+     * Get inline.js url.
+     */
+    
+    String getInlineJsUrl(AuraContext context, Map<String,Object> attributes);
+    
+    /**
+     * Get app.js url.
+     */
+    String getAppJsUrl(AuraContext context, Map<String, Object> attributes);
 
     /**
      * Get the full set of styles for the current context.
@@ -116,6 +134,7 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * @param context the aura context to use.
      * @return the list of css includes
      */
+    	
     List<String> getStyles(AuraContext context) throws QuickFixException;
 
     /**
@@ -175,4 +194,6 @@ public interface ServletUtilAdapter extends AuraAdapter {
 
     Set<DefDescriptor<?>> verifyTopLevel(HttpServletRequest request, HttpServletResponse response,
             AuraContext context) throws IOException;
+
+	
 }

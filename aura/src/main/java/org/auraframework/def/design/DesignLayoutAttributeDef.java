@@ -15,9 +15,9 @@
  */
 package org.auraframework.def.design;
 
-import org.auraframework.def.Definition;
+import org.auraframework.def.BaseXmlElement;
 
-public interface DesignLayoutAttributeDef extends Definition {
+public interface DesignLayoutAttributeDef extends BaseXmlElement {
     /**
      * Get the attribute name to add in a layout. This name corresponds to an design:attribute
      * @return The name of the item, may be null

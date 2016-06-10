@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.def.design;
 
-import org.auraframework.def.Definition;
-
-public interface DesignOptionDef extends Definition {
+public interface DesignOptionDef {
+    String NAME = "name";
+    String VALUE = "value";
+    String ACCESS = "access";
     /**
      * Get the name of the option
      * @return a string, will not be null

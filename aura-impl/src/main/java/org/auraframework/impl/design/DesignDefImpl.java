@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.impl.design;
 
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import org.auraframework.Aura;
 import org.auraframework.builder.design.DesignDefBuilder;
 import org.auraframework.def.AttributeDef;
@@ -41,6 +41,9 @@ import org.auraframework.def.design.DesignOptionDef;
 import org.auraframework.def.design.DesignSectionDef;
 import org.auraframework.def.design.DesignTemplateDef;
 import org.auraframework.def.design.DesignTemplateRegionDef;
+import org.auraframework.def.genericxml.GenericXmlElement;
+import org.auraframework.def.genericxml.GenericXmlValidator;
+import org.auraframework.impl.root.GenericXmlElementImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -50,26 +53,40 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import javax.annotation.Nonnull;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements DesignDef {
     private static final long serialVersionUID = -8621907027705407577L;
     private final Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attributeDesignDefs;
     private final Map<String, DesignLayoutDef> layoutDesignDefs;
     private final DesignTemplateDef template;
-    private final Map<String, List<DesignOptionDef>> options;
+    private final Multimap<String, DesignOptionDef> options;
     private final String label;
+    private final Multimap<Class<? extends GenericXmlValidator>, GenericXmlElement> tags;
 
 
     protected DesignDefImpl(Builder builder) {
         super(builder);
         this.attributeDesignDefs = AuraUtil.immutableMap(builder.attributeDesignMap);
         this.layoutDesignDefs = AuraUtil.immutableMap(builder.layoutDesignMap);
-        this.options = AuraUtil.immutableMap(builder.options);
+        this.tags = builder.tags;
         this.label = builder.label;
         this.template = builder.template;
+
+        ImmutableMultimap.Builder<String, DesignOptionDef> optionsBuilder = ImmutableMultimap.builder();
+        for (GenericXmlElement option : tags.get(DesignOptionsValidator.class)) {
+            optionsBuilder.put(option.getAttribute(DesignOptionDef.NAME), new DesignOptionDefImpl(option));
+        }
+
+        this.options = optionsBuilder.build();
+
     }
 
     @Override
@@ -142,6 +159,10 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
         if (template != null) {
             template.validateDefinition();
         }
+
+        for (GenericXmlElement element : tags.values()) {
+            element.validateDefinition();
+        }
     }
 
     @Override
@@ -196,7 +217,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
 
     @Override
     public List<DesignOptionDef> getOption(String key) {
-        return options.get(key);
+        return ImmutableList.copyOf(options.get(key));
     }
 
     @Override
@@ -209,6 +230,18 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
         return template;
     }
 
+    @Nonnull
+    @Override
+    public Set<GenericXmlElement> getGenericTags() {
+        return ImmutableSet.copyOf(tags.values());
+    }
+
+    @Nonnull
+    @Override
+    public Set<GenericXmlElement> getGenericTags(Class<? extends GenericXmlValidator> validatorClass) {
+        return ImmutableSet.copyOf(tags.get(validatorClass));
+    }
+
     @Override
     public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
         return DefDescriptorImpl.compare(descriptor, other) == 0;
@@ -216,8 +249,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
 
     @Override
     public List<DefDescriptor<?>> getBundle() {
-        List<DefDescriptor<?>> ret = Lists.newArrayList();
-        return ret;
+        return Collections.emptyList();
     }
 
     @Override
@@ -228,8 +260,8 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
         private final LinkedHashMap<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attributeDesignMap = new LinkedHashMap<>();
         private final LinkedHashMap<String, DesignLayoutDef> layoutDesignMap = Maps.newLinkedHashMap();
         private DesignTemplateDef template;
-        private Map<String, List<DesignOptionDef>> options = Maps.newHashMap();
         private String label;
+        private Multimap<Class<? extends GenericXmlValidator>, GenericXmlElement> tags = HashMultimap.create();
 
         public Builder() {
             super(DesignDef.class);
@@ -277,22 +309,18 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
             return this;
         }
 
-        @Override
-        public DesignDefBuilder addOption(DesignOptionDef value) {
-            String key = value.getKey();
-            if (options.containsKey(key)) {
-                options.get(key).add(value);
-            } else {
-                List<DesignOptionDef> option = Lists.newArrayList();
-                option.add(value);
-                options.put(key, option);
-            }
-
-            return this;
-        }
-
         public DesignTemplateDef getDesignTemplateDef() {
             return template;
+        }
+
+        public DesignDefBuilder addGenericElement(GenericXmlElementImpl tag) {
+            if (this.tags.containsEntry(tag.getValidatorClass(), tag)) {
+                setParseError(new InvalidDefinitionException(
+                        String.format("Element <%s> already exists", tag.getName()), getLocation()));
+            } else {
+                this.tags.put(tag.getValidatorClass(), tag);
+            }
+            return this;
         }
     }
 }

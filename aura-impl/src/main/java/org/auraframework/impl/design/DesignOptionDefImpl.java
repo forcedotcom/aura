@@ -13,65 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.impl.design;
 
-import java.io.IOException;
-
 import org.auraframework.def.design.DesignOptionDef;
-import org.auraframework.impl.system.DefinitionImpl;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
+import org.auraframework.def.genericxml.GenericXmlElement;
 
-public class DesignOptionDefImpl extends DefinitionImpl<DesignOptionDef> implements DesignOptionDef {
+public class DesignOptionDefImpl implements DesignOptionDef {
 
     private static final long serialVersionUID = -990356785176000885L;
-    private final String key, value, access;
-    protected DesignOptionDefImpl(Builder builder) {
-        super(builder);
-        this.key = builder.key;
-        this.value = builder.value;
-        this.access = builder.access;
+    private final GenericXmlElement tag;
+
+    protected DesignOptionDefImpl(GenericXmlElement tag) {
+        this.tag = tag;
     }
 
     @Override
     public String getKey() {
-        return key;
+        return tag.getAttributes().get(NAME);
     }
 
     @Override
     public String getValue() {
-        return value;
+        return tag.getAttributes().get(VALUE);
     }
 
     @Override
     public String getAccessString() {
-        return access;
-    }
-
-    @Override
-    public void serialize(Json json) throws IOException { }
-
-    public static class Builder extends DefinitionImpl.BuilderImpl<DesignOptionDef> {
-        private String key, value, access;
-        public Builder() {
-            super(DesignOptionDef.class);
-        }
-
-        @Override
-        public DesignOptionDef build() throws QuickFixException {
-            return new DesignOptionDefImpl(this);
-        }
-
-        public void setKey(String key) {
-            this.key = key;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public void setAccess(String value) {
-            this.access = value;
-        }
+        return tag.getAttributes().get(ACCESS);
     }
 }

@@ -13,27 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.impl.root.parser.handler.design;
 
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import org.auraframework.def.design.DesignDef;
+import com.google.common.collect.ImmutableSet;
 import org.auraframework.def.design.DesignLayoutAttributeDef;
 import org.auraframework.impl.design.DesignLayoutAttributeDefImpl;
-import org.auraframework.impl.root.parser.handler.ContainerTagHandler;
-import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.root.parser.handler.BaseXMLElementHandler;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
-public class DesignLayoutAttributeDefHandler extends ParentedTagHandler<DesignLayoutAttributeDef, DesignDef>{
+public class DesignLayoutAttributeDefHandler extends BaseXMLElementHandler {
     public final static String TAG = "design:layoutattribute";
     private final static String ITEM_ATTRIBUTE = "name";
 
@@ -41,14 +37,10 @@ public class DesignLayoutAttributeDefHandler extends ParentedTagHandler<DesignLa
 
     private DesignLayoutAttributeDefImpl.Builder builder = new DesignLayoutAttributeDefImpl.Builder();
 
-    public DesignLayoutAttributeDefHandler() {
-        super();
-    }
 
-    public DesignLayoutAttributeDefHandler(ContainerTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(parentHandler, xmlReader, source);
-        builder.setDescriptor(DefDescriptorImpl.getAssociateDescriptor(getParentDefDescriptor(), DesignLayoutAttributeDef.class,
-                TAG));
+    public DesignLayoutAttributeDefHandler(XMLStreamReader xmlReader, Source<?> source) {
+        super(xmlReader, source);
+        builder.setTagName(getTagName());
     }
 
     @Override
@@ -84,8 +76,8 @@ public class DesignLayoutAttributeDefHandler extends ParentedTagHandler<DesignLa
         return TAG;
     }
 
-    @Override
-    protected DesignLayoutAttributeDef createDefinition() throws QuickFixException {
+    protected DesignLayoutAttributeDef createElement() throws QuickFixException, XMLStreamException {
+        readElement();
         return builder.build();
     }
 }

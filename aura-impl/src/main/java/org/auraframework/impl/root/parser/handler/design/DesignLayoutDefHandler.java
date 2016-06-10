@@ -13,48 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.impl.root.parser.handler.design;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import org.auraframework.def.design.DesignDef;
+import com.google.common.collect.ImmutableSet;
 import org.auraframework.def.design.DesignLayoutDef;
 import org.auraframework.def.design.DesignSectionDef;
 import org.auraframework.impl.design.DesignLayoutDefImpl;
-import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
-import org.auraframework.impl.root.parser.handler.RootTagHandler;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.root.parser.handler.BaseXMLElementHandler;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
-public class DesignLayoutDefHandler extends ParentedTagHandler<DesignLayoutDef, DesignDef> {
+public class DesignLayoutDefHandler extends BaseXMLElementHandler {
     public static final String TAG = "design:layout";
     private static final String ATTRIBUTE_NAME = "name";
     private final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME);
-    private DesignLayoutDefImpl.Builder builder = new DesignLayoutDefImpl.Builder();
+    private final boolean isInternalNamespace;
+    private final DesignLayoutDefImpl.Builder builder = new DesignLayoutDefImpl.Builder();
 
-    public DesignLayoutDefHandler() {
-        super();
-    }
 
-    public DesignLayoutDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
-                                  Source<?> source) {
-        super(parentHandler, xmlReader, source);
-        builder.setDescriptor(DefDescriptorImpl.getAssociateDescriptor(getParentDefDescriptor(), DesignLayoutDef.class,
-                TAG));
+    public DesignLayoutDefHandler(XMLStreamReader xmlReader,
+                                  Source<?> source, boolean isInternalNamespace) {
+        super(xmlReader, source);
+        builder.setTagName(getTagName());
+        this.isInternalNamespace = isInternalNamespace;
     }
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (DesignSectionDefHandler.TAG.equalsIgnoreCase(tag)) {
-            DesignSectionDef section = new DesignSectionDefHandler(getParentHandler(), xmlReader, source).getElement();
+            DesignSectionDef section = new DesignSectionDefHandler(xmlReader, source, isInternalNamespace).createElement();
             builder.addSection(section);
         } else {
             throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));
@@ -88,8 +82,8 @@ public class DesignLayoutDefHandler extends ParentedTagHandler<DesignLayoutDef, 
         return TAG;
     }
 
-    @Override
-    protected DesignLayoutDef createDefinition() throws QuickFixException {
+    public DesignLayoutDef createElement() throws QuickFixException, XMLStreamException {
+        readElement();
         return builder.build();
     }
 }

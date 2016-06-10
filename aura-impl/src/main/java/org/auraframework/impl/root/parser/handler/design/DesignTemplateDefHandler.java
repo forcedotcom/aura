@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.impl.root.parser.handler.design;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignTemplateDef;
 import org.auraframework.def.design.DesignTemplateRegionDef;
@@ -31,7 +28,9 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateDef, DesignDef> {
     public static final String TAG = "design:template";
@@ -46,7 +45,7 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
     }
 
     public DesignTemplateDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
-            Source<?> source) {
+                                    Source<?> source) {
         super(parentHandler, xmlReader, source);
     }
 

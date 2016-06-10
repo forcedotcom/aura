@@ -17,6 +17,7 @@ package org.auraframework.def.design;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.def.genericxml.GenericXmlCapableDef;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ import java.util.Map;
  * DesignDef handles .design files within the component bundle
  *
  */
-public interface DesignDef extends RootDefinition {
+public interface DesignDef extends RootDefinition, GenericXmlCapableDef {
     @Override
     DefDescriptor<DesignDef> getDescriptor();
 

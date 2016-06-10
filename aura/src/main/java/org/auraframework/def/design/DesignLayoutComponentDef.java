@@ -15,11 +15,11 @@
  */
 package org.auraframework.def.design;
 
+import org.auraframework.def.BaseXmlElement;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
 
-public interface DesignLayoutComponentDef extends Definition {
+public interface DesignLayoutComponentDef extends BaseXmlElement {
     /**
      * Gets the defDescriptor of a component
      * @return

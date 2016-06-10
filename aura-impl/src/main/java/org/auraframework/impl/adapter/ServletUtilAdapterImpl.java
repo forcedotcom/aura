@@ -366,31 +366,44 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * Get the set of base scripts for a context.
      */
     @Override
+    public String getBootstrapUrl(AuraContext context, Map<String,Object> attributes) {
+    	return commonJsUrl("/bootstrap.js", context, attributes);
+    }
+    
+    @Override
+    public String getInlineJsUrl(AuraContext context, Map<String,Object> attributes) {
+    	return commonJsUrl("/inline.js", context, attributes);
+    }
+    
+    @Override
+    public String getAppJsUrl(AuraContext context, Map<String,Object> attributes) {
+        return commonJsUrl("/app.js", context, attributes);
+    }
+    
+    private String commonJsUrl (String filepath, AuraContext context, Map<String,Object> attributes) {
+    	StringBuilder url = new StringBuilder(context.getContextPath()).append("/l/");
+        url.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));
+        url.append(filepath);
+        if (attributes != null) {
+        	addAttributes(url, attributes);
+        }
+        return url.toString();
+    }
+
+    @Override
     public List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, boolean ignoreBootstrap, Map<String,Object> attributes)
         throws QuickFixException {
-        String contextPath = context.getContextPath();
         List<String> ret = Lists.newArrayList();
-        StringBuilder defs;
 
         if (safeInlineJs) {
-            defs = new StringBuilder(context.getContextPath()).append("/l/");
-            defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));
-            defs.append("/inline.js");
-            addAttributes(defs, attributes);
-            ret.add(defs.toString());
+            ret.add(getInlineJsUrl(context, attributes));
         }
+        
         if (!ignoreBootstrap) {
-	        defs = new StringBuilder(contextPath).append("/l/");
-	        defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));
-	        defs.append("/bootstrap.js");
-	        addAttributes(defs, attributes);
-	        ret.add(defs.toString());
+	        ret.add(getBootstrapUrl(context, attributes));
         }
 
-        defs = new StringBuilder(contextPath).append("/l/");
-        defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));
-        defs.append("/app.js");
-        ret.add(defs.toString());
+        ret.add(getAppJsUrl(context, null));
 
         return ret;
     }

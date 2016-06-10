@@ -1127,7 +1127,6 @@ AuraClientService.prototype.areActionsWaiting = function() {
  */
 
 AuraClientService.prototype.initDefs = function(config, resolved) {
-    Aura.bootstrapMark("metadataInit");
     var i;
 
     if (resolved) {
@@ -1177,9 +1176,7 @@ AuraClientService.prototype.initDefs = function(config, resolved) {
             }
         }
     }
-
-    Aura.bootstrapMark("metadataReady");
-
+    
     var defObservers = Aura["afterAppDefsReady"] || [];
 
     // Let any interested parties know that defs have been initialized
@@ -1285,7 +1282,9 @@ AuraClientService.prototype.runAfterInitDefs = function(callback) {
  * @private
  */
 AuraClientService.prototype.loadComponent = function(descriptor, attributes, callback, defType) {
+    Aura.bootstrapMark("runLoadComponent");
     var acs = this;
+
     this.loadTokenFromStorage().then(
         function (value) {
             if (value && value["token"]) {
@@ -1305,11 +1304,12 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
     );
 
     this.runAfterInitDefs(function () {
+        Aura.bootstrapMark("runAfterInitDefsCall");
+        
         acs.runAfterBootstrapReady(function (bootConfig) {
-            Aura.bootstrapMark("loadApplicationInit");
+            Aura.bootstrapMark("runAfterBootstrapCall");
 
             $A.run(function() {
-                
                 if (bootConfig) {
                     callback(bootConfig);
                     return;

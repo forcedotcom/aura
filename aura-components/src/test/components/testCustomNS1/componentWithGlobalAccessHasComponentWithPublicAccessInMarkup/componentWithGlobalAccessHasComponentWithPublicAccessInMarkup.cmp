@@ -15,6 +15,8 @@
     limitations under the License.
 
 -->
+<!-- we use this for ACF test around nested component, this component has another component in the markup, with local id componentWithPublicAccess-->
+
 <aura:component access='Global'>
 	
 	<testCustomNS1:componentWithPublicAccess aura:id='componentWithPublicAccess'/>
@@ -22,5 +24,9 @@
 	<aura:method name="callGlobalMethodInComponentWithPublicAccess" action="{!c.callGlobalMethodInComponentWithPublicAccess}" access="GLOBAL"/>
     <aura:method name="callPublicMethodInComponentWithPublicAccess" action="{!c.callPublicMethodInComponentWithPublicAccess}" access="GLOBAL"/>
     <aura:method name="callPrivateMethodInComponentWithPublicAccess" action="{!c.callPrivateMethodInComponentWithPublicAccess}" access="GLOBAL"/>
+	
+	<aura:method name="setGlobalAttributeInComponentWithPublicAccess" action="{!c.setGlobalAttributeInComponentWithPublicAccess}" access="GLOBAL"/>
+	<aura:method name="setPublicAttributeInComponentWithPublicAccess" action="{!c.setPublicAttributeInComponentWithPublicAccess}" access="GLOBAL"/>
+	<aura:method name="setPrivateAttributeInComponentWithPublicAccess" action="{!c.setPrivateAttributeInComponentWithPublicAccess}" access="GLOBAL"/>
 	
 </aura:component>

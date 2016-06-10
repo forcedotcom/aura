@@ -268,8 +268,9 @@ public class MenuUITest extends WebDriverTestCase {
         testMenuCheckboxForApp(MENUTEST_APP);
     }
 
+    //it's a flapper on jenkins, fix and enable please. W-3188508
     @Test
-    public void testCheckboxMenuGeneratedFromMetaData() throws Exception {
+    public void _testCheckboxMenuGeneratedFromMetaData() throws Exception {
         testMenuCheckboxForApp(MENUTEST_METADATA_APP);
     }
 

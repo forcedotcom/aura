@@ -13,7 +13,7 @@
                 cmp.set("v.actionDone", true);
                 cmp.set("v.isTextFromCache", result.isFromStorage());
             } else if(state === "INCOMPLETE" || state === "ERROR") {
-                throw new $A.auraError("Failed to get text from server: "+response.getError());
+                throw new Error("Failed to get text from server: "+response.getError());
             }
         });
         $A.enqueueAction(a);
@@ -26,7 +26,7 @@
                 cmp.set("v.text", result.getReturnValue());
                 cmp.set("v.actionDone", true);
             } else if(state === "INCOMPLETE" || state === "ERROR") {
-                throw new $A.auraError("Failed to get Calling Descriptor from server: "+response.getError());
+                throw new Error("Failed to get Calling Descriptor from server: "+response.getError());
             }
         });
         $A.enqueueAction(a);

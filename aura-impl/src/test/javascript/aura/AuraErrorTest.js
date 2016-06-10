@@ -99,6 +99,47 @@ Test.Aura.AuraErrorTest = function() {
             // error id length is 36, e.g: 10fdb86c-6868-43ba-b464-347057f3b316
             Assert.Equal(36, actual.length);
         }
+
+        [Fact]
+        function ReturnsInnerErrorName() {
+            var actual;
+            var innerError = new TypeError();
+            var expected = innerError.name;
+
+            windowMock(function() {
+                actual = new Aura.Errors.AuraError(null, innerError).name;
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsInnerErrorMessage() {
+            var actual;
+            var innerError = new TypeError("from inner error");
+            var message = "from ctor";
+            var expected = message + " [" + innerError.toString() + "]";
+
+            windowMock(function() {
+                actual = new Aura.Errors.AuraError(message, innerError).message;
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsInnerErrorSeverity() {
+            var actual;
+            var innerError = new Error();
+            innerError.severity = "TEST";
+            var expected = innerError.severity;
+
+            windowMock(function() {
+                actual = new Aura.Errors.AuraError(null, innerError).severity;
+            });
+
+            Assert.Equal(expected, actual);
+        }
     }
 
     [Fixture]

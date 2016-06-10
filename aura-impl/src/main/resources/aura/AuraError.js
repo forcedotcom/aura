@@ -21,7 +21,6 @@
  * @param {String} message - the detail message about the error.
  * @param {Object} innerError - an Error object whose properties are to be placed into AuraError.
  * @param {String} severity - the severity of the error. Aura built-in values are defined in $A.severity.
- * @export
  */
 function AuraError() {
     this.name       = "AuraError";
@@ -100,7 +99,7 @@ function AuraError() {
         this.number = error.number;
         this.message = message + (innerError ? " [" + innerError.toString() + "]" : "");
         this.stackTrace = getStackTrace(error);
-        this.severity = severity;
+        this.severity = innerError ? (innerError.severity || severity) : severity;
     }
 
     AuraErrorInternal.apply(this,arguments);

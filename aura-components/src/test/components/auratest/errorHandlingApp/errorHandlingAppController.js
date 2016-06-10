@@ -41,12 +41,6 @@
         $A.assert(false, "Assert failed in app client controller");
     },
 
-    throwAuraErrorFromClientController: function(cmp) {
-        // severity is undefined by default
-        var severity = cmp.get("v.severity");
-        throw new AuraError("AuraError from app client controller", undefined, severity);
-    },
-
     throwAuraFriendlyErrorFromClientController: function(cmp) {
         var afe = new $A.auraFriendlyError("AuraFriendlyError from app client controller");
         afe.data = {"friendlyMessage": "Friendly Error Message from data"};

@@ -6,7 +6,7 @@
                 helper.updateVersion(cmp, action.getReturnValue());
                 cmp.set("v.actionDone", true);
             } else if(state === "INCOMPLETE" || state === "ERROR") {
-                throw new $A.auraError("Failed to get version from server: "+response.getError());
+                throw new Error("Failed to get version from server: "+response.getError());
             }
         });
         $A.enqueueAction(a);
@@ -27,7 +27,7 @@
                 helper.updateText(cmp, action.getReturnValue());
                 cmp.set("v.actionDone", true);
             } else if(state === "INCOMPLETE" || state === "ERROR") {
-                throw new $A.auraError("Failed to get Calling Descriptor from server: "+response.getError());
+                throw new Error("Failed to get Calling Descriptor from server: "+response.getError());
             }
         });
         $A.enqueueAction(a);

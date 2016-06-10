@@ -60,7 +60,7 @@
 
                 // KRIS
                 // Lets cause this to fail so we can give a better error message.
-                throw new $A.auraError("Layout Failed for the docs app.");
+                throw new Error("Layout Failed for the docs app.");
             }
         });
 

@@ -64,7 +64,7 @@
             if(state === "SUCCESS") {
                 component.set("v.text", result.getReturnValue());
             } else if(state === "INCOMPLETE" || state === "ERROR") {
-                throw new $A.auraError("Failed to get calling descriptor from server: "+result.getError());
+                throw new Error("Failed to get calling descriptor from server: "+result.getError());
             }
         });
         $A.enqueueAction(action);

@@ -19,7 +19,7 @@
 	     if (stringAttr) {
 	    	 cmp.set("v.outputStringAttr",stringAttr+", return from methodInParent");
 	     } else {
-	    	 throw new $A.auraError("did not get the value for stringAttrChild");
+	    	 throw new Error("did not get the value for stringAttrChild");
 	     }
 	}
 })

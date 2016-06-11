@@ -15,7 +15,8 @@
     limitations under the License.
 
 -->
-<!-- we use this for ACF test around nested component, this component has another component in the markup, with local id componentWithDefaultAccess-->
+<!-- we use this for ACF test around nested component, this component has another component in the markup, 
+the component:componentWithDefaultAccess2 is in the same namespace, with local id componentWithDefaultAccess-->
 <aura:component access='Global'>
 	
 	<testCustomNS1:componentWithDefaultAccess2 aura:id='componentWithDefaultAccess'/>

@@ -83,8 +83,7 @@
         e.setParams({
             "index": index,
             "name": name,
-            "tab": tab,
-            "callback": callback
+            "tab": tab
         }).setComponentEvent().fire();
 
         //Prioritize finding a tab by name rather than index

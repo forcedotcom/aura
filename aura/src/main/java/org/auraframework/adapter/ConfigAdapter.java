@@ -128,4 +128,5 @@ public interface ConfigAdapter extends AuraAdapter {
 	
 	boolean isLockerServiceEnabled();
 	boolean requireLocker(RootDefinition def);
+	String getLockerServiceCacheBuster();
 }

@@ -68,15 +68,15 @@
             if (newTab.get("v.active")) {
                 this.setActiveTabBody(cmp, {"index": index, "tab": newTab, "active": true});
             }
-            if (typeof callback === "function") {
+            if ($A.util.isFunction(callback)) {
                 callback({"tab": newTab});
             }
         });
     },
     /**
      * Update existing tab
-     * @param {Number} [index] The index of the new tab to insert to. FIXME
-     * @param {Object} tab The configuration for the updated tab
+     * @param {Number} [index] The index of the existing tab to update.
+     * @param {Object} [tab] The configuration for the updated tab
      */
     updateTab: function (cmp, index, tab, callback, name) {
         var e = cmp.find("tabBar").get("e.updateTab");
@@ -92,13 +92,10 @@
             existingTab = cmp._tabCollection.getTab(tabIndex);
 
         if(existingTab && tab.body) {
-            $A.componentService.newComponentAsync(this, function(newCmp) {
-                existingTab.set("v.body", newCmp);
-                if (typeof callback === "function") {
-                    callback({"tab": existingTab});
-                }
-            }, tab.body);
-        } else if (typeof callback === "function") {
+            existingTab.set("v.body", tab.body);
+        }
+
+        if($A.util.isFunction(callback)) {
             callback({"tab": existingTab});
         }
     },

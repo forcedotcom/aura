@@ -82,7 +82,7 @@ public interface ConfigAdapter extends AuraAdapter {
      * Returns URL of GET request for encryption key
      * @return URL for encryption key
      */
-    String getEncryptionKeyURL();
+    String getEncryptionKeyURL(Boolean jsFormat);
 
     /**
      * Returns the encryption key for the Crypto Adapter. The key must be a

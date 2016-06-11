@@ -292,11 +292,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public List<String> getScripts(AuraContext context, boolean safeInlineJs, boolean ignoreBootstrap, Map<String,Object> attributes)
+    public List<String> getScripts(AuraContext context, boolean safeInlineJs, boolean ignoreNonCacheableScripts, Map<String,Object> attributes)
             throws QuickFixException {
         List<String> ret = Lists.newArrayList();
         ret.addAll(getBaseScripts(context, attributes));
-        ret.addAll(getFrameworkScripts(context, safeInlineJs, ignoreBootstrap, attributes));
+        ret.addAll(getFrameworkScripts(context, safeInlineJs, ignoreNonCacheableScripts, attributes));
         return ret;
     }
 
@@ -391,7 +391,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, boolean ignoreBootstrap, Map<String,Object> attributes)
+    public List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, boolean ignoreNonCacheableScripts, Map<String,Object> attributes)
         throws QuickFixException {
         List<String> ret = Lists.newArrayList();
 
@@ -399,7 +399,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             ret.add(getInlineJsUrl(context, attributes));
         }
         
-        if (!ignoreBootstrap) {
+        if (!ignoreNonCacheableScripts) {
 	        ret.add(getBootstrapUrl(context, attributes));
         }
 

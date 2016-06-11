@@ -27,6 +27,7 @@ import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.http.resource.AppCss;
 import org.auraframework.http.resource.AppJs;
 import org.auraframework.http.resource.EncryptionKey;
+import org.auraframework.http.resource.EncryptionKeyJs;
 import org.auraframework.http.resource.Bootstrap;
 import org.auraframework.http.resource.InlineJs;
 import org.auraframework.http.resource.Manifest;
@@ -63,6 +64,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
         addResource(new ResourceSvg());
         addResource(new Bootstrap());
         addResource(new EncryptionKey());
+        addResource(new EncryptionKeyJs());
         addResource(new InlineJs());
         addResource(new TemplateHtml());
     }

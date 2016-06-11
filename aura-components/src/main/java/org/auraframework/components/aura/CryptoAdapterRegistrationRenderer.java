@@ -29,65 +29,20 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 @ServiceComponentRenderer
 public class CryptoAdapterRegistrationRenderer implements Renderer {
+	private final String INLINE_JS = "\n\tfunction buildStreamKey (key) {\n\t\tvar buffer = new ArrayBuffer(key.length);\n\t\tvar view = new Uint8Array(buffer);\n\t\tview.set(key);\n\t\treturn buffer;\n\t}\n\n\tfunction fetchKey (url, callback) {\n\t\tvar request = new XMLHttpRequest();\n\t\trequest.addEventListener('load', function(event) {\n\t\t\tvar key, validKey;\n\t\t\ttry {\n\t\t\t\tkey = JSON.parse(this.responseText);\n\t\t\t} catch (e) {};\n\n\t\t\tif (Array.isArray(key) && (key.length === 32 || key.length === 16)) {\n\t\t\t\tcallback(key);\n\t\t\t} else {\n\t\t\t\t$A.log('CryptoAdapter received invalid key; calling CryptoAdapter.setKey()');\n\t\t\t\tcallback();\n\t\t\t}\n\t\t});\n\n\t\trequest.addEventListener('error', function(event) {\n\t\t\t$A.log('CryptoAdapter key fetch errored; calling CryptoAdapter.setKey()');\n\t\t\tcallback();\n\t\t});\n\n\t\trequest.addEventListener('abort', function(event) {\n\t\t\t$A.log('CryptoAdapter key fetch aborted; calling CryptoAdapter.setKey()');\n\t\t\tcallback();\n\t\t});\n\n\t\trequest.open('GET', url, true);\n\t\trequest.send();\n\t}\n\n\tfunction setCryptoKey (key) {\n\t\tvar streamKey = buildStreamKey(key);\n\t\tCryptoAdapter.setKey(streamKey);\n\t}\n\n\tdebug && $A.log('CryptoAdapter registering');\n\tvar CryptoAdapter = $A.storageService.CryptoAdapter;\n\tCryptoAdapter.register();\n\t\n\tif (!$A.storageService.isRegisteredAdapter(CryptoAdapter.NAME)) {\n\t\t$A.log('CryptoAdapter was not registered');\n\t\treturn;\n\t}\n\n\tif (fetch) {\n\t\tfetchKey(url, setCryptoKey);\n\t} else {\n\t\twindow.Aura || (window.Aura = {});\n\n\t\tif (window.Aura.Crypto && window.Aura.Crypto.key) {\n\t\t\tsetCryptoKey(window.Aura.Crypto.key);\n\t\t} else {\n\t\t\tAura.afterEncryptionKeyReady = function () {\n\t\t\t\tsetCryptoKey(window.Aura.Crypto.key);\n\t\t\t};\n\t\t}\n\t}\n";
+	
     @Override
     public void render(BaseComponent<?, ?> component, RenderContext renderContext) throws IOException, QuickFixException {
 
         Boolean debug = (Boolean) component.getAttributes().getValue("debugLoggingEnabled");
-
-        String encryptionKeyUrl = Aura.getConfigAdapter().getEncryptionKeyURL();
+        Boolean fetchRemoteKey = (Boolean) component.getAttributes().getValue("fetchRemoteKey");
+        
+        String encryptionKeyUrl = Aura.getConfigAdapter().getEncryptionKeyURL(false);
         renderContext.pushScript();
         renderContext.getCurrent()
-            .append("(function(){\n")
-                .append(debug ? "  $A.log('CryptoAdapter registering');\n" : "")
-            .append("  var CryptoAdapter = $A.storageService.CryptoAdapter;\n")
-            .append("  CryptoAdapter.register();\n")
-            .append("  if (!$A.storageService.isRegisteredAdapter(CryptoAdapter.NAME)) {\n")
-                .append(debug ? "    $A.log('CryptoAdapter was not registered');\n" : "")
-            .append("    return;\n")
-            .append("  }\n")
-
-            .append("  var url = '").append(encryptionKeyUrl).append("';\n")
-            .append("  var request = new XMLHttpRequest();\n")
-
-            // XHR success handler
-            .append("  request.addEventListener('load', function(event) {\n")
-            .append("    var key;\n")
-            .append("    try { key = JSON.parse(this.responseText); } catch (e) { };\n")
-            .append("    var validKey = Array.isArray(key) && (key.length === 32 || key.length === 16);\n")
-                .append(debug
-                        ? "    $A.log('CryptoAdapter received ' + (validKey ? 'valid' : 'invalid') + ' key; calling CryptoAdapter.setKey()');\n"
-                        : "")
-            .append("    if (!validKey) {\n")
-            .append("      CryptoAdapter.setKey();\n") // set an invalid key to unblock crypto adapter asap
-            .append("      return;\n")
-            .append("    }\n")
-            .append("    var buffer = new ArrayBuffer(key.length);\n")
-            .append("    var view = new Uint8Array(buffer);\n")
-            .append("    view.set(key);\n")
-            .append("    CryptoAdapter.setKey(buffer);\n")
-            .append("  });\n")
-
-            // XHR error handler
-            .append("  request.addEventListener('error', function(event) {\n")
-                .append(debug
-                        ? "    $A.log('CryptoAdapter key fetch errored; calling CryptoAdapter.setKey()');\n"
-                        : "")
-            .append("    CryptoAdapter.setKey();\n") // set an invalid key to unblock crypto adapter asap
-            .append("  });\n")
-
-            // XHR abort handler
-            .append("  request.addEventListener('abort', function(event) {\n")
-                .append(debug
-                        ? "    $A.log('CryptoAdapter key fetch aborted; calling CryptoAdapter.setKey()');\n"
-                        : "")
-            .append("    CryptoAdapter.setKey();\n") // set an invalid key to unblock crypto adapter asap
-            .append("  });\n")
-
-            // send the XHR
-                .append(debug ? "  $A.log('CryptoAdapter requesting key');\n" : "")
-            .append("  request.open('GET', url, true);\n")
-            .append("  request.send();\n")
-            .append("}());\n");
+            .append("(function(debug, fetch, url){\n")
+            .append(INLINE_JS)
+            .append("\n}("+ debug + "," + fetchRemoteKey + ", \"" + encryptionKeyUrl + "\"));");
         renderContext.popScript();
     }
 }

@@ -47,9 +47,20 @@
                 });
             },
             function verifyStorageGets(cmp) {
-                // One get: GVP
+                // Two gets: GVP loading and GVP merging
                 var gets = document.getElementById("myFrame").contentWindow._storageGets;
-                $A.test.assertEquals(1, gets.length, "More than one storage.get() on reload! " + JSON.stringify(gets));
+                if(gets.length > 2) {
+                    $A.test.fail("More than two storage.get() on reload! " + JSON.stringify(gets));
+                }
+
+                // Mutex may delay the second call during GVP merging
+                $A.test.addWaitForWithFailureMessage(2,
+                    function() { return gets.length; },
+                    "storage.get() should be called twice, " + JSON.stringify(gets),
+                    function() {
+                        $A.test.assertEquals("globalValueProviders", gets[0]);
+                        $A.test.assertEquals("globalValueProviders", gets[1]);
+                    });
             }
         ]
     }

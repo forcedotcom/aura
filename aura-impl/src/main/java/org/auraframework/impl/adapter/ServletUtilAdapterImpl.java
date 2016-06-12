@@ -302,17 +302,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
 
     @Override
     public List<String> getStyles(AuraContext context) throws QuickFixException {
-        String contextPath = context.getContextPath();
-
         Set<String> ret = Sets.newLinkedHashSet();
 
-        // add css client libraries
-        ret.addAll(getClientLibraryUrls(context, ClientLibraryDef.Type.CSS));
-
-        StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-        defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Css));
-        defs.append("/app.css");
-        ret.add(defs.toString());
+        // Add css client libraries
+        ret.addAll(getCssClientLibraryUrls(context));
+        ret.add(getAppCssUrl(context));
 
         return new ArrayList<>(ret);
     }
@@ -337,23 +331,68 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     public List<String> getBaseScripts(AuraContext context, Map<String,Object> attributes) throws QuickFixException {
         Set<String> ret = Sets.newLinkedHashSet();
-
-        String html5ShivURL = configAdapter.getHTML5ShivURL();
-        if (html5ShivURL != null) {
-            ret.add(html5ShivURL);
-        }
-
-        ret.add(configAdapter.getJSLibsURL());
         
-        ret.addAll(getClientLibraryUrls(context, ClientLibraryDef.Type.JS));
-        // framework js should be after other client libraries
-        ret.add(configAdapter.getAuraJSURL());
+        String shiv = getHTML5ShivUrl();
+        if (shiv != null) {
+            ret.add(shiv);
+        }
+        
+        // Dependent libraries for framework (moment, promises,...)
+        ret.add(getFrameworkLibUrl());
+        
+        // Client libraries
+        ret.addAll(getJsClientLibraryUrls(context));
+        
+        // Aura framework
+        ret.add(getFrameworkUrl()); 
 
         return new ArrayList<>(ret);
     }
+    
+    @Override
+    public List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, boolean ignoreNonCacheableScripts, Map<String,Object> attributes)
+        throws QuickFixException {
+        List<String> ret = Lists.newArrayList();
 
+        if (safeInlineJs) {
+            ret.add(getInlineJsUrl(context, attributes));
+        }
+        
+        if (!ignoreNonCacheableScripts) {
+	        ret.add(getBootstrapUrl(context, attributes));
+        }
 
-    private void addAttributes(StringBuilder builder, Map<String,Object> attributes) {
+        ret.add(getAppJsUrl(context, null));
+
+        return ret;
+    }
+    
+    @Override
+    public  Set<String> getJsClientLibraryUrls (AuraContext context) throws QuickFixException {
+    	return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
+    }
+    
+    @Override
+    public  Set<String> getCssClientLibraryUrls (AuraContext context) throws QuickFixException {
+    	return getClientLibraryUrls(context, ClientLibraryDef.Type.CSS);
+    }
+    
+    @Override
+    public String getFrameworkLibUrl() {
+    	return configAdapter.getJSLibsURL();
+    }
+    
+    @Override
+    public String getFrameworkUrl() {
+    	return configAdapter.getAuraJSURL();
+    }
+
+    @Override
+    public String getHTML5ShivUrl() {
+    	return configAdapter.getHTML5ShivURL();
+	}
+
+	private void addAttributes(StringBuilder builder, Map<String,Object> attributes) {
         //
         // This feels a lot like a hack.
         //
@@ -380,6 +419,15 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         return commonJsUrl("/app.js", context, attributes);
     }
     
+    @Override
+    public String getAppCssUrl(AuraContext context) {
+    	String contextPath = context.getContextPath();
+        StringBuilder defs = new StringBuilder(contextPath).append("/l/");
+        defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Css));
+        defs.append("/app.css");
+        return defs.toString();
+    }
+    
     private String commonJsUrl (String filepath, AuraContext context, Map<String,Object> attributes) {
     	StringBuilder url = new StringBuilder(context.getContextPath()).append("/l/");
         url.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));
@@ -388,24 +436,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         	addAttributes(url, attributes);
         }
         return url.toString();
-    }
-
-    @Override
-    public List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, boolean ignoreNonCacheableScripts, Map<String,Object> attributes)
-        throws QuickFixException {
-        List<String> ret = Lists.newArrayList();
-
-        if (safeInlineJs) {
-            ret.add(getInlineJsUrl(context, attributes));
-        }
-        
-        if (!ignoreNonCacheableScripts) {
-	        ret.add(getBootstrapUrl(context, attributes));
-        }
-
-        ret.add(getAppJsUrl(context, null));
-
-        return ret;
     }
 
     /**

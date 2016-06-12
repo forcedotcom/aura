@@ -117,6 +117,15 @@ public interface ServletUtilAdapter extends AuraAdapter {
     
     String getBootstrapUrl(AuraContext context, Map<String,Object> attributes);
     
+    /**
+     * Get html5Shiv url.
+     */
+    String getHTML5ShivUrl();
+    
+    /**
+     * Aura libraries
+     */
+    String getFrameworkLibUrl();
     
     /**
      * Get inline.js url.
@@ -128,6 +137,26 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * Get app.js url.
      */
     String getAppJsUrl(AuraContext context, Map<String, Object> attributes);
+    
+    /**
+     * Get app.css url.
+     */
+    String getAppCssUrl(AuraContext context);
+    
+    /**
+     * Get JS client libraries urls
+     */
+    Set<String> getJsClientLibraryUrls (AuraContext context) throws QuickFixException;
+    
+    /**
+     * Get CSS client libraries urls
+     */
+    Set<String> getCssClientLibraryUrls (AuraContext context) throws QuickFixException;
+    
+    /**
+     * Get aura framework
+     */
+    String getFrameworkUrl();
 
     /**
      * Get the full set of styles for the current context.

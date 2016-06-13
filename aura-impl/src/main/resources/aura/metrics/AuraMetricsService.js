@@ -814,7 +814,8 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
         pageStartTime = this.getPageStartTime();
         bootstrap["pageStartTime"] = pageStartTime;
         bootstrap["cache"] = {
-            "appCache": !!$A.clientService.appCacheNoUpdate
+            "appCache": !!$A.clientService.appCacheNoUpdate,
+            "bootstrapCache" : !!Aura["appBootstrapFromCache"]
         };
 
         if (window.performance && performance.timing && performance.navigation) {

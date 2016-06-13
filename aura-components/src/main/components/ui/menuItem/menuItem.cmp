@@ -27,11 +27,13 @@
 
     <aura:attribute access="GLOBAL" name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component."/>
 
+    <aura:attribute name="role" type="String" default="menuitem" description="Defines the accessibility role of the menu item. Defaults to 'menuitem'."/>
+
     <!-- menuSelect should be used instead -->
     <aura:registerEvent access="GLOBAL" name="click" type="ui:click" description="The event fired when the user clicks on the component."/>
 
     <aura:method name="select" action="{!c.select}"/>
-    <aura:method name="focus" action="{!c.focus}"/>
+    <aura:method name="setFocus" action="{!c.setFocus}"/>
 
     {!v.body}
 

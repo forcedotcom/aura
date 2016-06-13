@@ -19,12 +19,15 @@
                 dynamicallyFlavorable="true" description="A menu component that contains menu items.">
     <aura:attribute access="GLOBAL" name="menuItems" type="List" description="A list of menu items set explicitly using instances of the Java class: aura.​components.​ui.MenuItem."/>
     <aura:attribute access="GLOBAL" name="visible" type="Boolean" default="{!false}" description="Controls the visibility of the menu. The default is false, which hides the menu."/>
+    <!-- TODO: Remove the below attribute -->
     <aura:attribute name="focusItemIndex" type="Integer" default="0"
                     description="The index of the item which should be on focus when the menu displays. 0 means the first item and -1 refers to the last."/>
     <aura:attribute name="focusTrigger" type="Aura.Action" description="The action is invoked to set focus to the menu trigger." />
     <aura:attribute name="headerText" type="String" description="If set, shows a non-selectable header text." />
 
     <aura:attribute name="childMenuItems" type="Aura.Component[]" description="a read-only attribute pointing to child components."/>
+
+    <aura:attribute name="role" type="String" default="menu" description="Defines the accessibility role of the menu. Defaults to 'menu'."/>
 
     <aura:registerEvent access="GLOBAL" name="menuCollapse" type="ui:collapse" description="The event fired when the menu list collapses."/>
     <aura:registerEvent access="GLOBAL" name="menuExpand" type="ui:expand" description="The event fired when the menu list displays."/>
@@ -38,7 +41,7 @@
     <aura:handler name="refresh" action="{!c.update}"/>
     <aura:handler name="change" value="{!v.body}" action="{!c.update}"/>
 
-    <div class="{!v.class}" aura:id="menu" role="menu">
+    <div class="{!v.class}" aura:id="menu" role="{!v.role}">
         <aura:if isTrue="{!v.headerText != null}">
             <div class="menu__header">
                 <span class="text-heading--label">{!v.headerText}</span>

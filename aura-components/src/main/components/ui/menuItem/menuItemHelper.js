@@ -39,7 +39,7 @@
         var concreteComponent = component.getConcreteComponent();
 
         if (event.type === "mouseover") {
-            concreteComponent.focus();
+            concreteComponent.setFocus();
         } else if (event.type === "keydown") {
             if (event.keyCode === 32 || event.keyCode === 13) {  // space or enter key
                 event.preventDefault();

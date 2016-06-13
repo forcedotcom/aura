@@ -25,9 +25,6 @@
             index = 0;
         }
         var pressEvent = component.get("e.menuTriggerPress");
-        pressEvent.setParams({
-            focusItemIndex: index
-        }); 
         pressEvent.fire();
     }
 })// eslint-disable-line semi

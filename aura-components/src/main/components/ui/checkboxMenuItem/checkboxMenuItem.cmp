@@ -18,11 +18,13 @@
 <aura:component access="GLOBAL" support="GA" extends="ui:menuItem" extensible="true"
                 description="​A menu item with a checkbox that supports multiple selection and can be used to invoke an action. This component is nested in a ui:menu component.">
 
+    <aura:attribute name="role" type="String" default="menuitemcheckbox" description="Defines the accessibility role of the menu item. Defaults to 'menuitemcheckbox'."/>
+
     <aura:method name="select" action="{!c.select}"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
     <li role="presentation" class="{!v.class}">
-        <a aura:id="anchor" role="menuitemcheckbox" onclick="{!c.onClick}"/>
+        <a aura:id="anchor" onclick="{!c.onClick}"/>
     </li>
 </aura:component>

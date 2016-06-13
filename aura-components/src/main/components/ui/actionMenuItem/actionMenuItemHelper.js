@@ -19,6 +19,11 @@
         var label = cmp.get("v.label");
         var isDisabled = cmp.get("v.disabled");
 
+        var role = cmp.get("v.role");
+        if (role) {
+            anchorElement.setAttribute("role", role);
+        }
+
         anchorElement.setAttribute("aria-disabled", isDisabled);
         anchorElement.setAttribute("tabindex", isDisabled ? "-1" : "0");
         anchorElement.setAttribute("title", label);

@@ -53,7 +53,7 @@
 	    	<div class="body">            	           
 				<ui:menu aura:id="sorterMenu" class="sorterMenu">
 					<ui:menuList aura:id="sorterMenuList" manualPosition="{!modal ? false : true}" closeOnTabKey="false" visible="{!v.visible}" class="sorterMenuList scrollable"
-								 menuSelect="{!c.onMenuSelected}" menuExpand="{!c.onMenuExpand}" menuCollapse="{!c.onMenuCollapse}" closeOnClickOutside="false">
+								 menuSelect="{!c.onMenuSelected}" menuExpand="{!c.onMenuExpand}" menuCollapse="{!c.onMenuCollapse}" closeOnClickOutside="false" role="presentation">
 						<aura:iteration items="{!v.items}" var="{!v.rowVar}" body="{!v.rowDef}" iterationComplete="{!c.iterationComplete}"/>
 			    	</ui:menuList>
 				</ui:menu>

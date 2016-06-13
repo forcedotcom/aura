@@ -175,9 +175,10 @@ var pageStartTime = (new Date()).getTime();</script>
         });
     }
 
-    initLocker();
-
     evalFinish = time();
+
+    initLocker();
+    
 }());
 
     </script>

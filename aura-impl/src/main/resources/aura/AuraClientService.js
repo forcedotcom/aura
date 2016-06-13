@@ -218,6 +218,8 @@ AuraClientService = function AuraClientService () {
 
 };
 
+AuraClientService.BOOTSTRAP_KEY = "appBootstrap";
+
 /**
  * set the queue size.
  *
@@ -1192,6 +1194,9 @@ AuraClientService.prototype.initDefs = function(config, resolved) {
 };
 
 AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
+    Aura["afterBootstrapReady"] = Aura["afterBootstrapReady"] || [];
+
+    // If bootstrap has finished already (either js or from cache)
     if (Aura["appBootstrapReady"]) {
         var context = $A.getContext();
         var boot = Aura["appBootstrap"];
@@ -1209,33 +1214,61 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
         this._token = boot["token"];
         this.saveTokenToStorage(); // async fire-and-forget
 
-        // Prevent collision between $Label value provider and serRefId properties (typically "s" and "r").
-        if (boot["context"] && boot["context"]["globalValueProviders"]) {
-            var saved = [];
-            var gvpList = boot["context"]["globalValueProviders"];
+        // If is not coming from cache we need to clean the payload
+        if (!Aura["appBootstrapFromCache"]) {
+            // Prevent collision between $Label value provider and serRefId properties (typically "s" and "r").
+            if (boot["context"] && boot["context"]["globalValueProviders"]) {
+                var saved = [];
+                var gvpList = boot["context"]["globalValueProviders"];
 
-            // Filter out providers without refs
-            for (var i = gvpList.length - 1; i >= 0; i--) {
-                if (gvpList[i]["hasRefs"] !== true) {
-                    saved.push(gvpList.splice(i, 1)[0]);
+                // Filter out providers without refs
+                for (var i = gvpList.length - 1; i >= 0; i--) {
+                    if (gvpList[i]["hasRefs"] !== true) {
+                        saved.push(gvpList.splice(i, 1)[0]);
+                    }
                 }
+
+                $A.util.json.resolveRefsObject(boot);
+
+                // Restore original provider (order doesn't matter)
+                boot["context"]["globalValueProviders"] = gvpList.concat(saved);
+            } else {
+                $A.util.json.resolveRefsObject(boot);
             }
 
-            $A.util.json.resolveRefsObject(boot);
+            $A.componentService.saveDefsToStorage(boot["context"], context);
 
-            // Restore original provider (order doesn't matter)
-            boot["context"]["globalValueProviders"] = gvpList.concat(saved);
+            if (this._useBootstrapCache) {
+                var actionStorage = Action.getStorage();
+                if (actionStorage) {
+                    actionStorage.set(AuraClientService.BOOTSTRAP_KEY, boot);
+                }
+            }
         } else {
-            $A.util.json.resolveRefsObject(boot);
+            Aura["afterBootstrapReady"].push(function () {
+                $A.log('Checking bootstrap signature');
+                Aura["bootstrapUpgrade"] = boot["md5"] !== Aura["appBootstrap"]["md5"];
+            });
         }
 
-        context['merge'](boot["context"]);
-        $A.componentService.saveDefsToStorage(boot["context"], context);
+        // We just have bootstrap data processed either from js or from cache
+
+        try { 
+            // We can have a missmatch if we are upgrading framework or mode
+            context['merge'](boot["context"]); 
+        } catch(e) {
+            // Abort caching and wait for bootstrap.js to arrive
+            $A.warning('Bootstrap cache missmatch, waiting for bootstrap.js');
+            Aura["appBootstrapFromCache"] = false;
+            Aura["afterBootstrapReady"].push(this.runAfterBootstrapReady.bind(this, callback));
+            return;
+        }
 
         callback.call(this, boot["actions"][0]);
+        
 
+    // Wait for bootstrap.js to arrive
     } else {
-        Aura["afterBootstrapReady"] = Aura["afterBootstrapReady"] || [];
         Aura["afterBootstrapReady"].push(this.runAfterBootstrapReady.bind(this, callback));
     }
 };
@@ -1281,7 +1314,7 @@ AuraClientService.prototype.runAfterInitDefs = function(callback) {
  * @memberOf AuraClientService
  * @private
  */
-AuraClientService.prototype.loadComponent = function(descriptor, attributes, callback, defType) {
+AuraClientService.prototype.loadComponent = function(descriptor, attributes, callback /*,defType*/) {
     Aura.bootstrapMark("runLoadComponent");
     var acs = this;
 
@@ -1310,148 +1343,10 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             Aura.bootstrapMark("runAfterBootstrapCall");
 
             $A.run(function() {
-                if (bootConfig) {
-                    callback(bootConfig);
-                    return;
-                }
-
-                var desc   = new DefDescriptor(descriptor);
-                var tag    = desc.getNamespace() + ":" + desc.getName();
-                var method = defType === "APPLICATION" ? "getApplication" : "getComponent";
-                var action = $A.get("c.aura://ComponentController." + method);
-                if(acs.getUseBootstrapCache()) {
-                    action.setStorable({ "refresh": 0 });
-                } else {
-                    action.setStorable({ "ignoreExisting": true });
-                }
-
-                // we've respected the value so clear it
-                acs.clearDisableBootstrapCacheOnNextLoad();
-
-                action.setParams({ "name": tag, "attributes": attributes, "chainLoadLabels": true });
-                //
-                // we use stored and loaded here to track the various race conditions and prevent
-                // them.
-                // * stored === true means that we have either succeeded or are still in process to initialize
-                //   from storage.
-                // * loaded === undefined means that nothing has returned an error.
-                // * loaded === false means that something has failed.
-                // * loaded truthy means we have initialized.
-                //
-                var stored = false;
-                var storage = Action.getStorage();
-                var loaded;
-
-                var failCallback = function (force, err) {
-                    //
-                    // The first failure here means just mark loaded so that the second failure will
-                    // post an error. The second error dies.
-                    //
-                    if (loaded === false || force) {
-                        err = err || "";
-                        $A.reportError("Aura.loadComponent(): Failed to initialize application.\n" + err);
-                        return;
-                    }
-
-                    if (!loaded) {
-                        loaded = false;
-                    }
-                };
-
-                //
-                // SUCCESS callback cases
-                // (1) From storage: Get the token from storage, and if successful, initialize the app. Note that
-                // this has a race condition with the server. If we initialize the app from storage, remember
-                // that we have.
-                // (2) Server callback, storage incomplete. Save the token and initialize the app.
-                // (3) Server callback, storage completed initialization. Save the token, fire an event to
-                // allow the app to give the user the chance to refresh. This should only happen if the response
-                // has changed.
-                //
-                action.setCallback(acs,
-                    function (a) {
-                        Aura.bootstrapMark("loadApplicationReady");
-                        if (storage && a.isFromStorage()) {
-                            stored = true;
-                            if (!loaded) {
-                                loaded = "STORAGE";
-                                callback(a.getReturnValue());
-                            }
-                        } else {
-                            if (!loaded) {
-                                loaded = "SERVER";
-                                callback(a.getReturnValue());
-                            } else {
-                                var key = a.getStorageKey(),
-                                    toStore = a.getStored();
-                                var storeCallback = function() {
-                                    $A.log("getApplication response changed. Firing aura:applicationRefreshed event");
-                                    $A.getEvt("markup://aura:applicationRefreshed").fire();
-                                };
-
-                                // Fires applicationRefreshed only after the new response is saved
-                                // Guarantees the new action response is there before page reloads
-                                storage.set(key, toStore).then(storeCallback, storeCallback);
-                            }
-                        }
-            }, "SUCCESS");
-            //
-            // INCOMPLETE: If we did not initialize from storage, flag an error, otherwise it is a no-op.
-            //
-            action.setCallback(acs,
-                function (a) {
-
-                    // Even if bootstrap cache is disabled we still want to load from cache
-                    // if action fails as "INCOMPLETE" for offline launch
-                    if (!acs.getUseBootstrapCache() && storage) {
-                        var key = a.getStorageKey();
-                        storage.get(key).then(
-                            function(value) {
-                                if (value) {
-                                    storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE, using stored action response.", [a, value]);
-                                    $A.run(function() {
-                                        action.updateFromResponse(value);
-                                        action.finishAction($A.getContext());
-                                    });
-                                } else {
-                                    failCallback(true, " : No connection to server");
-                                }
-                            },
-                            function() {
-                                failCallback(true, " : No connection to server");
-                            }
-                        );
-                    } else {
-                        failCallback(!stored, " : No connection to server");
-                    }
-
-                    }, "INCOMPLETE");
-                //
-                // ERROR: this is generally trouble, but if we already initialized, we won't flag it. We also don't flag
-                // errors that are ClientSideEventExceptions sent down from the server, which are identified by a specific
-                // message string on the error.
-                //
-                action.setCallback(acs,
-                    function (a) {
-                        // This should only be called in the case of a refresh action that fails for some
-                        // reason. In this case, we really would like to gack, and act as if nothing happened.
-                        var errors = a.getError();
-                        var errorStr = "";
-
-                        if (errors && errors[0] && errors[0].message) {
-                            errorStr = errors[0].message;
-                        }
-                        $A.log("$A.loadComponent(): Refresh failed:\n" + errorStr);
-                        var forceError = !stored && (errorStr !== "Received exception event from server");
-                        failCallback(forceError, errorStr);
-                    }, "ERROR");
-
-                acs.enqueueAction(action);
-            }, "loadComponent");
+                callback(bootConfig);
+            });
         }); 
     });
-
-    
 };
 
 /**
@@ -3103,8 +2998,16 @@ AuraClientService.prototype.populatePersistedActionsFilter = function() {
         .then(function(all) {
             if (all) {
                 for (var i in all) {
-                    acs.persistedActionFilter[all[i]["key"]] = true;
+                    var key = all[i]["key"];
+                    acs.persistedActionFilter[key] = true;
+                    // Get it from storage if bootstrap.js hasnt arrived yet
+                    if (key === AuraClientService.BOOTSTRAP_KEY && !Aura["appBootstrap"]) {
+                        Aura["appBootstrapReady"] = true;
+                        Aura["appBootstrapFromCache"] = true;
+                        Aura["appBootstrap"] = all[i]["value"];
+                    }
                 }
+
                 $A.log("AuraClientSevice: restored " + all.length + " actions");
             }
         });

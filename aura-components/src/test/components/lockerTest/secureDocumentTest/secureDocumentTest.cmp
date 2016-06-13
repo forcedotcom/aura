@@ -35,6 +35,7 @@
     <aura:method name="testCreateElementNSForSVGElement" action="{!c.testCreateElementNSForSVGElement}"/>
     <aura:method name="testGetElementsByTagNameForScriptTag" action="{!c.testGetElementsByTagNameForScriptTag}"/>
     <aura:method name="testCreateEvent" action="{!c.testCreateEvent}"/>
+    <aura:method name="testDefaultView" action="{!c.testDefaultView}"/>
 
     <div id="title">SecureDocument test</div>
 

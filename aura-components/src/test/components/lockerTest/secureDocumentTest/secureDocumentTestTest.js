@@ -105,5 +105,11 @@
         test: function(cmp) {
             cmp.testCreateEvent();
         }
+    },
+
+    testDefaultView: {
+        test: function(cmp) {
+            cmp.testDefaultView();
+        }
     }
 })

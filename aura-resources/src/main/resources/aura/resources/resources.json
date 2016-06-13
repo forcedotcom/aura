@@ -9,5 +9,12 @@
         "libraryBootstrap/libraryBootstrap.js"
     ],
 
-    "walltimeLocaleDir": "walltime-js/olson"
+    "walltimeLocaleDir": "walltime-js/olson",
+
+    "cdn": {
+        "host": "http://sfdc.azureedge.net/assetsblob/%s",
+        "files": {
+            "aura" : "/js/aura/aura_%s.js"
+        }
+    }
 }

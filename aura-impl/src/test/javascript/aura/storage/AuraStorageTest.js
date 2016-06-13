@@ -32,11 +32,15 @@ Test.Aura.Storage.AuraStorageTest = function() {
     var ResolvePromise = function ResolvePromise(value) {
         return {
             then: function(resolve, reject) {
+                if(!resolve) {
+                    return ResolvePromise(value);
+                }
+
                 try {
-                    var newValue = resolve && resolve(value);
-                    return new ResolvePromise(newValue);
+                    var newValue = resolve(value);
+                    return ResolvePromise(newValue);
                 } catch (e) {
-                    return new RejectPromise(e);
+                    return RejectPromise(e);
                 }
             }
         };
@@ -45,16 +49,19 @@ Test.Aura.Storage.AuraStorageTest = function() {
     var RejectPromise = function RejectPromise(error) {
         return {
             then: function(resolve, reject) {
+                if(!reject) {
+                    return RejectPromise(error);
+                }
+
                 try {
-                    var value = reject && reject(error);
-                    return new ResolvePromise(value);
+                    var value = reject(error);
+                    return ResolvePromise(value);
                 } catch (newError) {
-                  return new RejectPromise(newError);
+                  return RejectPromise(newError);
                 }
             }
         };
     };
-
 
     // aura event mocks + collector for fired aura events.
     // any testing using firedEvents must first reset it.
@@ -62,20 +69,55 @@ Test.Aura.Storage.AuraStorageTest = function() {
     var AuraEvent = function AuraEvent() {};
     AuraEvent.prototype.fire = function(param) {
         if(!param) {
-            firedEvents.push(this);
+            firedEvents.push({});
         } else {
             firedEvents.push(param);
         }
     };
 
+    // makes an adapter + config. new class definition prevents cross-test contamination.
+    var makeConfigAndAdapter = function() {
+        var AdapterClass = function() {};
+        AdapterClass.prototype.getName = function() {};
+        return {
+            adapterClass: AdapterClass
+        };
+    };
+
+    [Fixture]
+    function constructor() {
+
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                util: {
+                    format: function() {}
+                }
+            },
+            "AuraStorage": Aura.Storage.AuraStorage
+        });
+
+        [Fact]
+        function SetsKeyPrefix() {
+            var version = 1;
+            var isolationKey = "isolationKey";
+            var delimiter = Aura.Storage.AuraStorage.KEY_DELIMITER;
+            var expected = isolationKey + version + delimiter;
+            var config = makeConfigAndAdapter();
+            config.version = version;
+            config.isolationKey = isolationKey;
+
+            var target;
+            mockA(function() {
+                target = new Aura.Storage.AuraStorage(config);
+            });
+
+            Assert.Equal(expected, target.keyPrefix);
+        }
+
+    }
 
     [Fixture]
     function getName() {
-        var AdapterClass = function() {};
-        AdapterClass.prototype.getName = function() {};
-        var config = {
-            adapterClass: AdapterClass
-        };
 
         var mockA = Mocks.GetMocks(Object.Global(), {
             "$A": {
@@ -90,8 +132,9 @@ Test.Aura.Storage.AuraStorageTest = function() {
         function DelegatesToAdapter() {
             var expected = "name";
             var actual;
+            var config = makeConfigAndAdapter();
 
-            AdapterClass.prototype.getName = function() {return expected;};
+            config.adapterClass.prototype.getName = function() {return expected;};
             mockA(function() {
                 var target = new Aura.Storage.AuraStorage(config);
                 actual = target.getName();
@@ -104,11 +147,6 @@ Test.Aura.Storage.AuraStorageTest = function() {
 
     [Fixture]
     function getExpiration() {
-        var AdapterClass = function() {};
-        AdapterClass.prototype.getName = function() {};
-        var config = {
-            adapterClass: AdapterClass
-        };
 
         var mockA = Mocks.GetMocks(Object.Global(), {
             "$A": {
@@ -123,8 +161,9 @@ Test.Aura.Storage.AuraStorageTest = function() {
         function RespectsConstructorConfig() {
             var expected = 1;
             var actual;
-
+            var config = makeConfigAndAdapter();
             config.expiration = expected;
+
             mockA(function() {
                 var target = new Aura.Storage.AuraStorage(config);
                 actual = target.getExpiration();
@@ -136,11 +175,6 @@ Test.Aura.Storage.AuraStorageTest = function() {
 
     [Fixture]
     function getMaxSize() {
-        var AdapterClass = function() {};
-        AdapterClass.prototype.getName = function() {};
-        var config = {
-            adapterClass: AdapterClass
-        };
 
         var mockA = Mocks.GetMocks(Object.Global(), {
             "$A": {
@@ -155,8 +189,9 @@ Test.Aura.Storage.AuraStorageTest = function() {
         function RespectsConstructorConfig() {
             var expected = 1; // output as KB
             var actual;
-
+            var config = makeConfigAndAdapter();
             config.maxSize = expected * 1024; // input as bytes
+
             mockA(function() {
                 var target = new Aura.Storage.AuraStorage(config);
                 actual = target.getMaxSize();
@@ -165,7 +200,6 @@ Test.Aura.Storage.AuraStorageTest = function() {
             Assert.Equal(expected, actual);
         }
     }
-
 
     [Fixture]
     function getVersion() {
@@ -199,17 +233,488 @@ Test.Aura.Storage.AuraStorageTest = function() {
         }
     }
 
+    [Fixture]
+    function get() {
+
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                util: {
+                    format: function() {},
+                    isUndefinedOrNull: function(obj) {
+                        return obj === undefined || obj === null;
+                    },
+                    isBoolean: function(obj) {
+                        return typeof obj === 'boolean';
+                    },
+                    isString: function(obj){
+                        return typeof obj === 'string';
+                    }
+                },
+                metricsService: {},
+                assert: function(condition, message){
+                    if (!condition) {
+                        throw new Error(message);
+                    }
+                }
+            },
+            "AuraStorage": {
+                KEY_DELIMITER: ":"
+            }
+        });
+
+        [Fact]
+        function ThrowsErrorWhenKeyIsNotString() {
+            var config = makeConfigAndAdapter();
+            var actual;
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+
+                try {
+                    target.get([]);
+                } catch (e) {
+                    actual = e.toString();
+                }
+            });
+
+            var expected = "AuraStorage.get(): 'key' must be a String.";
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ThrowsErrorWhenIncludeExpiredIsNotBoolean() {
+            var config = makeConfigAndAdapter();
+            var actual;
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+
+                try {
+                    target.get("key", "string");
+                } catch (e) {
+                    actual = e.toString();
+                }
+            });
+
+            var expected = "AuraStorage.get(): 'includeExpired' must be a Boolean.";
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function RespectsIncludeExpired() {
+            var config = makeConfigAndAdapter();
+            var actual;
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.getAll = function(keys, includeExpired) {
+                    actual = includeExpired;
+                    return ResolvePromise({});
+                };
+
+                target.get("key", true);
+            });
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsPromiseThatResolvesToStoredItem() {
+            var config = makeConfigAndAdapter();
+            var expected = "expected";
+            var storedItem = {
+                value: expected,
+                expires: new Date().getTime() + 1000
+            };
+            var actual;
+            config.adapterClass.prototype.getItems = function() {
+                return ResolvePromise({"key": storedItem});
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.keyPrefix = "";
+
+                target.get("key").then(function(value) {
+                    actual = value;
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsPromiseThatResolvesToUndefinedWhenKeyNotExists() {
+            var config = makeConfigAndAdapter();
+            config.adapterClass.prototype.getItems = function() {
+                return ResolvePromise({});
+            };
+            var actual;
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.keyPrefix = "";
+
+                target.get("NotExist").then(function(value) {
+                    actual = value;
+                });
+            });
+
+            Assert.Undefined(actual);
+        }
+
+        [Fact]
+        function ReturnsRejectPromiseWithError() {
+            var config = makeConfigAndAdapter();
+            var expected = new Error();
+            var actual;
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.getAll = function() {
+                    return RejectPromise(expected);
+                };
+
+                target.get("key").then(undefined, function(e) {
+                    actual = e;
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+    }
+
+    [Fixture]
+    function getAll() {
+
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                util: {
+                    format: function() {},
+                    isUndefinedOrNull: function(obj) {
+                        return obj === undefined || obj === null;
+                    },
+                    isBoolean: function(obj) {
+                        return typeof obj === 'boolean';
+                    }
+                },
+                metricsService: {},
+                assert: function(condition, message){
+                    if (!condition) {
+                        throw new Error(message);
+                    }
+                }
+            },
+            "AuraStorage": {
+                KEY_DELIMITER: ":"
+            }
+        });
+
+        [Fact]
+        function ThrowsErrorWhenKeysIsNotArrayOrFalsy() {
+            var config = makeConfigAndAdapter();
+            var actual;
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+
+                try {
+                    target.getAll("string");
+                } catch (e) {
+                    actual = e.toString();
+                }
+            });
+
+            var expected = "AuraStorage.getAll(): 'keys' must be an Array.";
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ThrowsErrorWhenIncludeExpiredIsNotBoolean() {
+            var config = makeConfigAndAdapter();
+            var actual;
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+
+                try {
+                    target.getAll([], "string");
+                } catch (e) {
+                    actual = e.toString();
+                }
+            });
+
+            var expected = "AuraStorage.getAll(): 'includeExpired' must be a Boolean.";
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function GetItemsFromAdapterWithPrefixedKeys() {
+            var config = makeConfigAndAdapter();
+            var keyPrefix = "prefix";
+            var expected = keyPrefix + "key";
+            var keys;
+            config.adapterClass.prototype.getItems = function(prefixedKeys) {
+                keys = prefixedKeys;
+                return ResolvePromise();
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.keyPrefix = keyPrefix;
+
+                target.getAll(["key"]);
+            });
+
+            var actual = keys[0];
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsPromiseThatResolvesToArrayOfStoredItems() {
+            var config = makeConfigAndAdapter();
+            var expected = "expected";
+            var storedItem = {
+                value: expected,
+                expires: new Date().getTime() + 1000
+            };
+            var results;
+            config.adapterClass.prototype.getItems = function() {
+                return ResolvePromise( {"key": storedItem} );
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.keyPrefix = "";
+
+                target.getAll(["key"]).then(function(items) {
+                    results = items;
+                });
+            });
+
+            var actual = results["key"];
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function IncludesAllStoredItemsWhenKeysIsFalsy() {
+            var config = makeConfigAndAdapter();
+            var storedItem = {
+                value: "value",
+                expires: new Date().getTime() + 1000
+            };
+            var results;
+            config.adapterClass.prototype.getItems = function() {
+                return ResolvePromise( {"key": storedItem} );
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.keyPrefix = "";
+
+                target.getAll().then(function(items) {
+                    results = items;
+                });
+            });
+
+            Assert.Equal(1, Object.keys(results).length);
+        }
+
+        [Fact]
+        function IncludesAllStoredItemsWhenKeysIsEmptyArray() {
+            var config = makeConfigAndAdapter();
+            var storedItem = {
+                value: "value",
+                expires: new Date().getTime() + 1000
+            };
+            var results;
+            config.adapterClass.prototype.getItems = function() {
+                return ResolvePromise( {"key": storedItem} );
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.keyPrefix = "";
+
+                target.getAll([]).then(function(items) {
+                    results = items;
+                });
+            });
+
+            Assert.Equal(1, Object.keys(results).length);
+        }
+
+        [Fact]
+        function ExcludesKeyPrefixInResult() {
+            var config = makeConfigAndAdapter();
+            var expected = "key";
+            var keyPrefix = "prefix";
+            var storedItem = {
+                value: "value",
+                expires: new Date().getTime() + 1000
+            };
+            var results;
+            config.adapterClass.prototype.getItems = function() {
+                // in storage adapter, the key is prefixed
+                return ResolvePromise( {"prefixkey": storedItem} );
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.keyPrefix = keyPrefix;
+
+                target.getAll([expected]).then(function(items) {
+                    results = items;
+                });
+            });
+
+            var actual = Object.keys(results)[0];
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ExcludesItemsWithDifferentKeyPrefix() {
+            var config = makeConfigAndAdapter();
+            var results;
+            config.adapterClass.prototype.getItems = function() {
+                return ResolvePromise( { "diffPrefixkey": {value:"value"}} );
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.keyPrefix = "prefix";
+
+                target.getAll([], true).then(function(items) {
+                    results = items;
+                });
+            });
+
+            Assert.Equal(0, Object.keys(results).length);
+        }
+
+        [Fact]
+        function IncludeExpiredItemsWhenIncludeExpiredIsTrue() {
+            var config = makeConfigAndAdapter();
+            var storedItem = {
+                value: "value",
+                expires: 0
+            };
+            config.adapterClass.prototype.getItems = function() {
+                return ResolvePromise( {"key": storedItem});
+            };
+
+            var results;
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.keyPrefix = "";
+
+                target.getAll(["key"], true).then(function(items) {
+                    results = items;
+                });
+            });
+
+            Assert.Equal(1, Object.keys(results).length);
+        }
+
+        [Fact]
+        function ExcludeExpiredItemsWhenIncludeExpiredIsFalse() {
+            var config = makeConfigAndAdapter();
+            var storedItem = {
+                value: "value",
+                expires: 0
+            };
+            config.adapterClass.prototype.getItems = function() {
+                return ResolvePromise({key: storedItem});
+            };
+
+            var results;
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.keyPrefix = "";
+
+                target.getAll([], false).then(function(items) {
+                    results = items;
+                });
+            });
+
+            Assert.Equal(0, Object.keys(results).length);
+        }
+
+        [Fact]
+        function ExcludesExpiredByDefault() {
+            var config = makeConfigAndAdapter();
+            var storedItem = {
+                value: "value",
+                expires: 0
+            };
+            config.adapterClass.prototype.getItems = function() {
+                return ResolvePromise({key: storedItem});
+            };
+
+            var results;
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.keyPrefix = "";
+
+                target.getAll().then(function(items) {
+                    results = items;
+                });
+            });
+
+            Assert.Equal(0, Object.keys(results).length);
+        }
+
+        [Fact]
+        function ReturnsRejectPromiseWithError() {
+            var config = makeConfigAndAdapter();
+            var expected = new Error();
+            var actual;
+            config.adapterClass.prototype.getItems = function() {
+                return RejectPromise(expected);
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.sweep = function() {};
+                target.logError = function() {};
+
+                target.getAll().then([], function(e) {
+                    actual = e;
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function LogErrorWhenGetAllRejects() {
+            var config = makeConfigAndAdapter();
+            var expected = "test error message";
+            var metricConfig;
+            config.adapterClass.prototype.getItems = function() {
+                return RejectPromise(new Error(expected));
+            };
+
+            mockA(function() {
+                var target = new Aura.Storage.AuraStorage(config);
+                target.keyPrefix = "";
+                target.sweep = function() {};
+                $A.metricsService.transaction = function(ns, name, config) {
+                    metricConfig = config;
+                };
+
+                target.getAll();
+            });
+
+            var actual = metricConfig["context"]["error"];
+            Assert.Equal(expected, actual);
+        }
+
+    }
 
     [Fixture]
     function sweep() {
-        // makes an adapter + config. new class definition prevents cross-test contamination.
-        var makeConfigAndAdapter = function() {
-            var AdapterClass = function() {};
-            AdapterClass.prototype.getName = function() {};
-            return {
-                adapterClass: AdapterClass
-            };
-        };
 
         var NoopPromise = function NoopPromise() {
           return {
@@ -265,7 +770,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             var config = makeConfigAndAdapter();
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return new NoopPromise();
+                return NoopPromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -290,7 +795,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             var config = makeConfigAndAdapter();
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return new NoopPromise();
+                return NoopPromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -314,7 +819,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             var config = makeConfigAndAdapter();
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return new NoopPromise();
+                return NoopPromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -338,7 +843,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             var config = makeConfigAndAdapter();
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return new NoopPromise();
+                return NoopPromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -365,7 +870,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             config.expiration = 1;
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return new NoopPromise();
+                return NoopPromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -391,7 +896,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             config.expiration = 1;
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return new NoopPromise();
+                return NoopPromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -418,7 +923,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return new NoopPromise();
+                return NoopPromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -445,7 +950,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return new NoopPromise();
+                return NoopPromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -468,7 +973,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             // set config such that max interval applies
             config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
             config.adapterClass.prototype.sweep = function() {
-                return new RejectPromise();
+                return RejectPromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -492,7 +997,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             // set config such that max interval applies
             config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
             config.adapterClass.prototype.sweep = function() {
-                return new ResolvePromise();
+                return ResolvePromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -514,16 +1019,16 @@ Test.Aura.Storage.AuraStorageTest = function() {
             var expected = "storageName";
 
             var config = makeConfigAndAdapter();
+            config.name = expected;
             // set config such that max interval applies
             config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
             config.adapterClass.prototype.sweep = function() {
-                return new ResolvePromise();
+                return ResolvePromise();
             };
 
             mockTime(function() { mockA(function() {
                 time = 0;
                 var target = new Aura.Storage.AuraStorage(config);
-                target.name = expected;
 
                 // advance time to exactly max sweep interval
                 time = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX;
@@ -543,7 +1048,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             // set config such that max interval applies
             config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
             config.adapterClass.prototype.sweep = function() {
-                return new RejectPromise();
+                return RejectPromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -570,7 +1075,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             // do not define adapter.sweep(). this forces getExpired() to be used.
             config.adapterClass.prototype.getExpired = function() {
                 actual = true
-                return new ResolvePromise(); // do not return the expected array
+                return ResolvePromise(); // do not return the expected array
             };
 
             mockTime(function() { mockA(function() {
@@ -593,7 +1098,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             // set config such that max interval applies
             config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
             config.adapterClass.prototype.getExpired = function() {
-                return new ResolvePromise(); // do not return the expected array
+                return ResolvePromise(); // do not return the expected array
             };
 
             mockTime(function() { mockA(function() {
@@ -777,14 +1282,15 @@ Test.Aura.Storage.AuraStorageTest = function() {
         function SetFiresModifiedWithStorageName() {
             firedEvents = [];
             var expected = "storageName";
+            var config = makeConfigAndAdapter();
+            config.name = expected;
 
-            AdapterClass.prototype.setItems = function() {
-                return new ResolvePromise();
+            config.adapterClass.prototype.setItems = function() {
+                return ResolvePromise();
             };
 
             mockA(function() {
                 var target = new Aura.Storage.AuraStorage(config);
-                target.name = expected;
                 target.sweep = function() {};
                 target.set("key", "value");
             });
@@ -874,14 +1380,15 @@ Test.Aura.Storage.AuraStorageTest = function() {
         function RemoveFiresModifiedWithStorageName() {
             firedEvents = [];
             var expected = "storageName";
+            var config = makeConfigAndAdapter();
+            config.name = expected;
 
-            AdapterClass.prototype.removeItems = function() {
-                return new ResolvePromise();
+            config.adapterClass.prototype.removeItems = function() {
+                return ResolvePromise();
             };
 
             mockA(function() {
                 var target = new Aura.Storage.AuraStorage(config);
-                target.name = expected;
                 target.sweep = function() {};
                 target.remove("key");
             });

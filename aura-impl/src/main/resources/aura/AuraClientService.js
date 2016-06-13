@@ -1256,13 +1256,16 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
         try { 
             // We can have a missmatch if we are upgrading framework or mode
             context['merge'](boot["context"]); 
-            callback.call(this, boot["actions"][0]);
         } catch(e) {
             // Abort caching and wait for bootstrap.js to arrive
             $A.warning('Bootstrap cache missmatch, waiting for bootstrap.js');
             Aura["appBootstrapFromCache"] = false;
             Aura["afterBootstrapReady"].push(this.runAfterBootstrapReady.bind(this, callback));
+            return;
         }
+
+        callback.call(this, boot["actions"][0]);
+        
 
     // Wait for bootstrap.js to arrive
     } else {

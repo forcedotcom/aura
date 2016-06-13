@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 ({
-    focus: function(component, event, helper) {
-        helper.focus(component);
-    },
-
-    // XXX: Some clients call explicitly .get("e.setFocus").fire();
-    // We should remove this method once we move to .focus() instead
     setFocus: function(component, event, helper) {
         helper.focus(component);
     },

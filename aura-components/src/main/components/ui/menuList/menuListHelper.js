@@ -70,7 +70,7 @@
     setMenuItemFocus: function(component, index) {
         var menuItem = this.getMenuItem(component, index);
         if (menuItem && menuItem.isValid() && menuItem.getElement()) {
-            menuItem.focus();
+            menuItem.setFocus();
             this.fireMenuFocusChangeEvent(component, null, menuItem);
             component._focusOnRender = false;
         }
@@ -153,16 +153,16 @@
             for (var i = 0; i < menuItems.length; i++) {
                 if (srcComponent === menuItems[i]) {
                     nextIndex = ++i;
-                    break;
-                }
-            }
+                            break;
+                        }
+                    }
             if (nextIndex >= menuItems.length) {
                 nextIndex = 0;
             }
         }
 
         var nextFocusCmp = menuItems[nextIndex];
-        nextFocusCmp.focus();
+        nextFocusCmp.setFocus();
 
         this.fireMenuFocusChangeEvent(component, srcComponent, nextFocusCmp);
     },
@@ -181,7 +181,7 @@
             previousIndex = menuItems.length - 1;
         }
         var previousFocusCmp = menuItems[previousIndex];
-        previousFocusCmp.focus();
+        previousFocusCmp.setFocus();
         
         this.fireMenuFocusChangeEvent(component, srcComponent, previousFocusCmp);
     },
@@ -229,7 +229,7 @@
             var c = menuItems[i];
             var text = c.get("v.label");
             if(text && text.toLowerCase().indexOf(matchText) === 0) {
-                c.focus();
+                c.setFocus();
                 this.fireMenuFocusChangeEvent(component, srcComponent, c);
                 break;
             }

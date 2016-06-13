@@ -20,12 +20,14 @@
     <!-- Overrides the default value of 'true' -->
     <aura:attribute access="GLOBAL" name="hideMenuAfterSelected" type="Boolean" default="false" description="Set to true to hide menu after the menu item is selected." />
 
+    <aura:attribute name="role" type="String" default="menuitemradio" description="Defines the accessibility role of the menu item. Defaults to 'menuitemradio'."/>
+
     <aura:method name="select" action="{!c.select}"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
     <li aura:id="listitem" class="{!v.class}" role="presentation">
-        <a aura:id="anchor" role="menuitemradio" onclick="{!c.onClick}"/>
+        <a aura:id="anchor" onclick="{!c.onClick}"/>
     </li>
 
 </aura:component>

@@ -117,11 +117,6 @@
 			this.setSelectedItems(cmp, selected);
 			//select menu item
 			this.selectMenuItem(cmp, selected);
-			//focus on the first selected default item 
-			var index = selected[0].index;
-			if (items[index]) {
-				cmp.find('sorterMenuList').set("v.focusItemIndex", index);
-			}
 		}
 		cmp.set('v.visible', true);
 		this.appendElementToBody(cmp);
@@ -410,9 +405,17 @@
     },
     
     refreshMenu : function(cmp) {
-    	var sorterMenu = cmp.find('sorterMenu');
+		var sorterMenu = cmp.find('sorterMenuList');
+
     	if (sorterMenu) {
     		sorterMenu.get('e.refresh').fire();
+			var items = sorterMenu.get("v.childMenuItems");
+
+			// Resets the roles of the menu items to not be 'menuitem', as although ui:listSorter is using
+			// ui:menu/ui:*menuItem components, it doesn't look like one.
+			for (var i = 0; i < items.length; i++) {
+				items[i].set("v.role", null);
+			}
     	}
 	}
 })// eslint-disable-line semi

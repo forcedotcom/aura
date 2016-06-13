@@ -2058,7 +2058,8 @@
                                         actionsFromOldResponse[i].error = $Aura.chaos.errorResponseDuringNewChaosRun;
                                         //for ActionTab to move action card around
                                         actionsFromOldResponse[i]['idtoWatch'] = actionsFromOldResponse[i].id;
-                                        actionsFromOldResponse[i]['nextError'] = errsArr;//these 2 are useful against howDidWeModifyResponse
+                                        //these 2 are useful against howDidWeModifyResponse
+                                        actionsFromOldResponse[i]['nextError'] = $Aura.chaos.errorResponseDuringNewChaosRun;
                                         actionsFromOldResponse[i]['nextResponse'] = undefined;
                                         actionsWatched[actionsFromOldResponse[i].id] = actionsFromOldResponse[i];
                                         //call AuraInspectorActionsView_OnActionOperationInChaosRun in AuraInspectorActionsView

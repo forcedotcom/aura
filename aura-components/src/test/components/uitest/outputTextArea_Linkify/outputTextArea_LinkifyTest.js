@@ -158,6 +158,18 @@
             this.assertTextNotPresent(cmp, "src=\"&lt;a href=\"");
         }
     },
+    
+    testNonString : {
+        attributes : {textValue: false},
+        test: [function(cmp) {
+        		   this.assertLinksPresent(cmp, "false");
+        	   },
+        	   function(cmp) {
+        		   cmp.set('v.textValue', true);
+        		   this.assertLinksPresent(cmp, "true");
+        	   }
+        ]
+    },
 
     assertLinksPresent: function(cmp, hrefText, checkValue) {
         $A.test.addWaitForWithFailureMessage(true,

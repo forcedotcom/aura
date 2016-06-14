@@ -342,7 +342,115 @@
 
     }
 
-    
+    /* didWeAlreadyDecideToDropTheAction <-- responseWithIncomplete
+       return responseWithIncomplete
+    */
+    chaosManager.prototype.randomlyDropAction = function(didWeAlreadyDecideToDropTheAction, oldResponseText) {
+        var responseWithIncomplete = didWeAlreadyDecideToDropTheAction;
+        //if we are in a new chaos run, and user would like to drop action randomly
+            if( !didWeAlreadyDecideToDropTheAction && this.configuration.actionDropPercentage ) {
+                   if( oldResponseText.startsWith("while(1);") ) {
+                        //parse oldResponseObj out of oldResponseText
+                        try {
+                            var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
+                            //replace returnValue in oldResponseObj's actions
+                            if(oldResponseObj && oldResponseObj.actions && oldResponseObj.actions.length > 0) {
+                                responseWithIncomplete = true;
+                                var actionsFromOldResponse = oldResponseObj.actions;
+                                for(var i = 0; i < actionsFromOldResponse.length; i++) {
+                                    if(actionsFromOldResponse[i] && actionsFromOldResponse[i].id) {
+                                        //console.log("drop action by request of new Chaos Run.", actionsFromOldResponse[i]);
+                                        //push this action to actionsWatched, so actionTab know what to do
+                                        actionsFromOldResponse[i]['idtoWatch'] = actionsFromOldResponse[i].id;
+                                        actionsFromOldResponse[i]['nextError'] = undefined;//these 2 are useful against howDidWeModifyResponse
+                                        actionsFromOldResponse[i]['nextResponse'] = undefined;
+                                        actionsWatched[actionsFromOldResponse[i].id] = actionsFromOldResponse[i];
+                                        //call AuraInspectorActionsView_OnActionOperationInChaosRun in AuraInspectorActionsView
+                                        $Aura.Inspector.publish("AuraInspector:ActionOperationInChaosRun",
+                                            {
+                                                'id': actionsFromOldResponse[i].id,
+                                                'actionOperation': 'Drop'
+                                            }
+                                        );
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.warn("Drop action encountered an error while parsing response from server. ", e);
+                        }
+                    }
+            }//end of we are dropping action for new chaos run
+
+        return responseWithIncomplete;
+    };
+
+    /*
+        didWeAlreadyDecideToErrorResponseTheAction <-- responseWithError
+        return {'responseWithError': responseWithError, 'newResponseText': newResponseText}
+    */
+    chaosManager.prototype.randomlyReturnErrorResponseForAction = function(didWeAlreadyDecideToErrorResponseTheAction, oldResponseText) {
+        var responseWithError = didWeAlreadyDecideToErrorResponseTheAction;
+        var newResponseText = oldResponseText;
+        if( !didWeAlreadyDecideToErrorResponseTheAction && this.configuration.actionErrorPercentage ) {
+                    if( oldResponseText.startsWith("while(1);") ) {
+                        //parse oldResponseObj out of oldResponseText
+                        try {
+                                var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
+                                //replace returnValue in oldResponseObj's actions
+                                if( oldResponseObj && Array.isArray(oldResponseObj.actions) && oldResponseObj.actions.length > 0) {
+                                    responseWithError = true;
+                                    //if response is ERROR, we shouldn't have any SERIAL_REFID or SERIAL_ID related object in context, or our real decode will explode
+                                    if(oldResponseObj.context && oldResponseObj.context.globalValueProviders) {
+                                        var newGVP = [];
+                                        for(var j = 0; j < oldResponseObj.context.globalValueProviders.length; j++) {
+                                            var gvpj = oldResponseObj.context.globalValueProviders[j];
+                                            if( isTrueObject(gvpj) && gvpj.type ) {
+                                                if(gvpj.type === "$Locale" || gvpj.type === "$Browser" || gvpj.type === "$Global") {
+                                                    //we keep Local, Browser and Global ONLY
+                                                    newGVP.push(gvpj);
+                                                } else {
+                                                    //get rid of others
+                                                }
+                                            }
+                                        }
+                                        oldResponseObj.context.globalValueProviders = newGVP;
+                                    }
+                                    var actionsFromOldResponse = oldResponseObj.actions;
+                                    for(var i = 0; i < actionsFromOldResponse.length; i++) {
+                                        //console.log("decode action#"+actionsFromOldResponse[i].id, actionsFromOldResponse[i]);
+                                        //if(actionsFromOldResponse[i].id && actionsFromOldResponse[i].id === actionWatchedId) {
+                                            //if(actionWatched.nextError) {//we would like to return error response
+                                        //for aura framework to receive the error response
+                                        actionsFromOldResponse[i].state = "ERROR";
+                                        //when action return with error, returnValue should be null
+                                        actionsFromOldResponse[i].returnValue = null;
+                                        actionsFromOldResponse[i].error = $Aura.chaos.errorResponseDuringNewChaosRun;
+                                        //for ActionTab to move action card around
+                                        actionsFromOldResponse[i]['idtoWatch'] = actionsFromOldResponse[i].id;
+                                        //these 2 are useful against howDidWeModifyResponse
+                                        actionsFromOldResponse[i]['nextError'] = $Aura.chaos.errorResponseDuringNewChaosRun;
+                                        actionsFromOldResponse[i]['nextResponse'] = undefined;
+                                        actionsWatched[actionsFromOldResponse[i].id] = actionsFromOldResponse[i];
+                                        //call AuraInspectorActionsView_OnActionOperationInChaosRun in AuraInspectorActionsView
+                                        $Aura.Inspector.publish("AuraInspector:ActionOperationInChaosRun",
+                                            {
+                                                'id': actionsFromOldResponse[i].id,
+                                                'actionOperation': 'ErrorResponse'
+                                            }
+                                        );
+                                    }
+                                    //update actions
+                                    oldResponseObj.actions = actionsFromOldResponse;
+                                    newResponseText = "while(1);\n"+JSON.stringify(oldResponseObj);
+                                    
+                                }
+                        } catch (e) {
+                                console.warn("Drop action encountered an error while parsing response from server. ", e);
+                        }
+                    }//end of oldResponseText start with "while(1)"
+            }//end of we are returning error response for action during new chaos run
+            return {'responseWithError': responseWithError, 'newResponseText': newResponseText};
+    };
 
     /*
         event handler for "AuraInspector:OnSomeActionOperationDuringChaosRun",
@@ -719,7 +827,7 @@
             if(this.count_waitForElementFromAStepToAppear > this.configuration.defaultMaxTry) {
                 clearInterval(this.waitForElementInNextStepInterval);
                 var errMsg = "We have to stop replaying chaos run because an element on the next step wouldn't show up";
-                //this will call AuarInspectorChaosView_OnReplayChaosRunFinished in InspectorPanelSfdcChaos 
+                //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in InspectorPanelSfdcChaos 
                 $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {'error': errMsg});
                 console.error(errMsg, step);
             }
@@ -1983,104 +2091,20 @@
                     return ret;
             }
 
-            //if we are in a new chaos run, and user would like to drop action randomly
-            if( !responseWithIncomplete && $Aura.chaos.configuration.actionDropPercentage ) {
-                var r = Math.random() * 100;
-                if( r < $Aura.chaos.configuration.actionDropPercentage ) {
-                    if( oldResponseText.startsWith("while(1);") ) {
-                        //parse oldResponseObj out of oldResponseText
-                        try {
-                            var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
-                            //replace returnValue in oldResponseObj's actions
-                            if(oldResponseObj && oldResponseObj.actions && oldResponseObj.actions.length > 0) {
-                                responseWithIncomplete = true;
-                                var actionsFromOldResponse = oldResponseObj.actions;
-                                for(var i = 0; i < actionsFromOldResponse.length; i++) {
-                                    if(actionsFromOldResponse[i] && actionsFromOldResponse[i].id) {
-                                        //console.log("drop action by request of new Chaos Run.", actionsFromOldResponse[i]);
-                                        //push this action to actionsWatched, so actionTab know what to do
-                                        actionsFromOldResponse[i]['idtoWatch'] = actionsFromOldResponse[i].id;
-                                        actionsFromOldResponse[i]['nextError'] = undefined;//these 2 are useful against howDidWeModifyResponse
-                                        actionsFromOldResponse[i]['nextResponse'] = undefined;
-                                        actionsWatched[actionsFromOldResponse[i].id] = actionsFromOldResponse[i];
-                                        //call AuraInspectorActionsView_OnActionOperationInChaosRun in AuraInspectorActionsView
-                                        $Aura.Inspector.publish("AuraInspector:ActionOperationInChaosRun",
-                                            {
-                                                'id': actionsFromOldResponse[i].id,
-                                                'actionOperation': 'Drop'
-                                            }
-                                        );
-                                    }
-                                }
-                            }
-                        } catch (e) {
-                            console.warn("Drop action encountered an error while parsing response from server. ", e);
-                        }
-                    }
-                }//end of actionDropPercentage allow us to drop the current action
-            }//end of we are dropping action for new chaos run
-            //if we are in a chaosRun and we would like to return error response
-            if( !responseWithError && $Aura.chaos.configuration.actionErrorPercentage ) {
-                var r = Math.random() * 100;
-                if( r < $Aura.chaos.configuration.actionErrorPercentage ) {
-                    if( oldResponseText.startsWith("while(1);") ) {
-                        //parse oldResponseObj out of oldResponseText
-                        try {
-                                var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
-                                //replace returnValue in oldResponseObj's actions
-                                if( oldResponseObj && Array.isArray(oldResponseObj.actions) && oldResponseObj.actions.length > 0) {
-                                    responseWithError = true;
-                                    //if response is ERROR, we shouldn't have any SERIAL_REFID or SERIAL_ID related object in context, or our real decode will explode
-                                    if(oldResponseObj.context && oldResponseObj.context.globalValueProviders) {
-                                        var newGVP = [];
-                                        for(var j = 0; j < oldResponseObj.context.globalValueProviders.length; j++) {
-                                            var gvpj = oldResponseObj.context.globalValueProviders[j];
-                                            if( isTrueObject(gvpj) && gvpj.type ) {
-                                                if(gvpj.type === "$Locale" || gvpj.type === "$Browser" || gvpj.type === "$Global") {
-                                                    //we keep Local, Browser and Global ONLY
-                                                    newGVP.push(gvpj);
-                                                } else {
-                                                    //get rid of others
-                                                }
-                                            }
-                                        }
-                                        oldResponseObj.context.globalValueProviders = newGVP;
-                                    }
-                                    var actionsFromOldResponse = oldResponseObj.actions;
-                                    for(var i = 0; i < actionsFromOldResponse.length; i++) {
-                                        //console.log("decode action#"+actionsFromOldResponse[i].id, actionsFromOldResponse[i]);
-                                        //if(actionsFromOldResponse[i].id && actionsFromOldResponse[i].id === actionWatchedId) {
-                                            //if(actionWatched.nextError) {//we would like to return error response
-                                        //for aura framework to receive the error response
-                                        actionsFromOldResponse[i].state = "ERROR";
-                                        //when action return with error, returnValue should be null
-                                        actionsFromOldResponse[i].returnValue = null;
-                                        actionsFromOldResponse[i].error = $Aura.chaos.errorResponseDuringNewChaosRun;
-                                        //for ActionTab to move action card around
-                                        actionsFromOldResponse[i]['idtoWatch'] = actionsFromOldResponse[i].id;
-                                        //these 2 are useful against howDidWeModifyResponse
-                                        actionsFromOldResponse[i]['nextError'] = $Aura.chaos.errorResponseDuringNewChaosRun;
-                                        actionsFromOldResponse[i]['nextResponse'] = undefined;
-                                        actionsWatched[actionsFromOldResponse[i].id] = actionsFromOldResponse[i];
-                                        //call AuraInspectorActionsView_OnActionOperationInChaosRun in AuraInspectorActionsView
-                                        $Aura.Inspector.publish("AuraInspector:ActionOperationInChaosRun",
-                                            {
-                                                'id': actionsFromOldResponse[i].id,
-                                                'actionOperation': 'ErrorResponse'
-                                            }
-                                        );
-                                    }
-                                    //update actions
-                                    oldResponseObj.actions = actionsFromOldResponse;
-                                    newResponseText = "while(1);\n"+JSON.stringify(oldResponseObj);
-                                    
-                                }
-                        } catch (e) {
-                                console.warn("Drop action encountered an error while parsing response from server. ", e);
-                        }
-                    }//end of oldResponseText start with "while(1)"
-                }//end of we do want to error reponse for action
-            }//end of we are returning error response for action during new chaos run
+            var r1 = Math.random() * 100;
+            if( $Aura.chaos.configuration.actionDropPercentage && r1 < $Aura.chaos.configuration.actionDropPercentage ) {
+                //if we are in a new chaos run and user would like to drop action randomly
+                responseWithIncomplete = $Aura.chaos.randomlyDropAction(responseWithIncomplete, oldResponseText); 
+            }
+            var r2 = Math.random() * 100;
+            if( $Aura.chaos.configuration.actionErrorPercentage && r2 < $Aura.chaos.configuration.actionErrorPercentage ) {
+                //if we are in a new chaos run and we would like to return error response randomly
+                resObj = $Aura.chaos.randomlyReturnErrorResponseForAction(responseWithIncomplete, oldResponseText);
+                responseWithError = resObj.responseWithError;
+                newResponseText = resObj.newResponseText;
+            }
+            
+            
 
             if(responseWithIncomplete) {
                 oldResponse.status = 0;//so AuraClientService.isDisconnectedOrCancelled will return true

@@ -963,13 +963,15 @@ var AuraDevToolService = function() {
             			   if(descendant.tagName ===  "IMG") {
             				   text = descendant.getAttribute("alt");
             			   }
-            			   text = text.toLowerCase();
+            			   text = text.toLowerCase().trim();
             			   
-            			   if(dict.indexOf(text) >= 0) {
-            				   errorArray.push(button);
-            			   }
-            			   else {
-            				   dict.push(text);
+            			   if(text !== "") {
+            				   if(dict.indexOf(text) >= 0) {
+                				   errorArray.push(button);
+                			   }
+                			   else {
+                				   dict.push(text);
+                			   }
             			   }
             		   }
             	   }

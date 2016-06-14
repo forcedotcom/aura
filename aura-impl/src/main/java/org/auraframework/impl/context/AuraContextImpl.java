@@ -703,9 +703,7 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
             
-            if (Aura.getConfigAdapter().isLockerServiceEnabled()) {
-                json.writeMapEntry("ls", "E");
-            }
+            json.writeMapEntry("ls", Aura.getConfigAdapter().getLockerServiceCacheBuster());
             
             json.writeMapEnd();
         } catch (IOException ioe) {

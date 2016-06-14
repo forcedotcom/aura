@@ -126,27 +126,19 @@
             function(cmp) {
                 var self = this,
                 tabSet = cmp.find(self.SELECTOR.tabsetcmp),
-                newBodyText = "Body Updated!",
-                newBody = [{
-                    "componentDef": {
-                        descriptor: "markup://aura:text"
-                    },
-                    "attributes": {
-                        "values": {
-                            "value": newBodyText
-                        }
-                    }
-                }];
+                newBodyText = "Body Updated!";
 
-                self.updateTab(tabSet, 0, undefined, {body: newBody});
+                $A.createComponent("aura:text", { "value": newBodyText }, function(newCmp) {
+                    self.updateTab(tabSet, 0, undefined, {body: newCmp});
 
-                $A.test.addWaitForWithFailureMessage(
-                    newBodyText,
-                    function() {
-                        return $A.test.select(self.SELECTOR.tabbody)[0].innerText;
-                    },
-                    "Body should be " + newBodyText
-                );
+                    $A.test.addWaitForWithFailureMessage(
+                        newBodyText,
+                        function() {
+                            return $A.test.select(self.SELECTOR.tabbody)[0].innerText;
+                        },
+                        "Body should be " + newBodyText
+                    );
+                })
             },
             //Confirm we are updating the right tab
             function(cmp) {

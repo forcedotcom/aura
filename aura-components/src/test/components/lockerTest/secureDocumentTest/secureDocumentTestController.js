@@ -122,5 +122,12 @@
         var testUtils = cmp.get("v.testUtils");
         var event = document.createEvent("MouseEvents");
         testUtils.assertStartsWith("SecureDOMEvent", event.toString(), "Unexpected object type from document.createEvent");
+    },
+
+    testDefaultView: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var actual = document.defaultView;
+        testUtils.assertTrue(actual === window,
+            "defaultView should return the SecureWindow: " + actual);
     }
 })

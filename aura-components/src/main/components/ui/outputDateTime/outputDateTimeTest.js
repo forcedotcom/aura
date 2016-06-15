@@ -132,7 +132,7 @@
      * Verify behavior when 'langLocale' is assigned garbage.
      */
     testInvalidLangLocale:{
- 	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT', langLocale: 'kk'},
+ 	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT', langLocale: 'zz'},
 	test: function(component){
 	        $A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());

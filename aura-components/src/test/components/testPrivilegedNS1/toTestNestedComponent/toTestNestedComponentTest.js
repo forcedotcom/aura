@@ -24,21 +24,21 @@
     
     /**************************************************************************************************
 	    Test for nested components.
-		we create a component in system namespace with privileged access as container component (accessPrivilegedComponentWithaccessDefaultComponentInMarkup)
+		we create a component in system namespace with privileged access as container component (accessPrivilegedComponentWithAccessDefaultComponentInMarkup)
 		the container component has another component(accessDefaultComponent) in its markup. 
 		accessDefaultComponent is a component in system namespace with default access
+		for attribute,  we can access global one only
 	***************************************************************************************************/
 	testCreateComponentWithPrivilegedAccessInSystemNSWithDefaultAccessComponentInMarkup:{
         test:[
-        function cannotCreateComponentWithDefaultAccess(cmp){ 
+        function canCreateComponentWithDefaultAccess(cmp){ 
         	var completed = false;
         	var that = this;
-        	//$A.test.expectAuraError("Access Check Failed!");
-            $A.createComponent(
-            	"markup://auratest:accessPrivilegedComponentWithaccessDefaultComponentInMarkup", 
+        	$A.createComponent(
+            	"markup://auratest:accessPrivilegedComponentWithAccessDefaultComponentInMarkup", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"auratest$accessPrivilegedComponentWithaccessDefaultComponentInMarkup");
+            		$A.test.assertEquals(newCmp.getName(),"auratest$accessPrivilegedComponentWithAccessDefaultComponentInMarkup");
             		completed = true;
             		that.componentCreated = newCmp;
             	}
@@ -67,21 +67,21 @@
     
     /**************************************************************************************************
 	    Test for nested components.
-		we create a component in system namespace with privileged access as container component (accessPrivilegedComponentWithaccessPrivilegedComponentInMarkup)
+		we create a component in system namespace with privileged access as container component (accessPrivilegedComponentWithAccessPrivilegedComponentInMarkup)
 		the container component has another component(accessPrivilegedComponent) in its markup. 
-		accessPrivilegedComponent is a component in system namespace with default access
+		accessPrivilegedComponent is a component in system namespace with privileged access
+		for attribute,  we can access global and privileged only
 	***************************************************************************************************/
 	testCreateComponentWithPrivilegedAccessInSystemNSWithPrivilegedAccessComponentInMarkup:{
         test:[
-        function cannotCreateComponentWithDefaultAccess(cmp){ 
+        function canCreateComponentWithPrivilegedAccess(cmp){ 
         	var completed = false;
         	var that = this;
-        	//$A.test.expectAuraError("Access Check Failed!");
-            $A.createComponent(
-            	"markup://auratest:accessPrivilegedComponentWithaccessPrivilegedComponentInMarkup", 
+        	$A.createComponent(
+            	"markup://auratest:accessPrivilegedComponentWithAccessPrivilegedComponentInMarkup", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"auratest$accessPrivilegedComponentWithaccessPrivilegedComponentInMarkup");
+            		$A.test.assertEquals(newCmp.getName(),"auratest$accessPrivilegedComponentWithAccessPrivilegedComponentInMarkup");
             		completed = true;
             		that.componentCreated = newCmp;
             	}
@@ -101,8 +101,94 @@
         	var actual = this.componentCreated.find("accessPrivilegedComponent").get("v.globalAttribute");
         	$A.test.assertEquals(actual, "GLOBAL");
         },
-        function cannotAccessPrivilegedAttribute(cmp) {
+        function canAccessPrivilegedAttribute(cmp) {
         	var actual = this.componentCreated.find("accessPrivilegedComponent").get("v.privilegedAttribute");
+        	$A.test.assertEquals(actual, "PRIVILEGED");
+        },
+    	]
+    },
+    
+     /**************************************************************************************************
+	    Test for nested components.
+		we create a component in system namespace with privileged access as container component (accessPrivilegedComponentWithAccessPublicComponentInMarkup)
+		the container component has another component(accessPublicComponent) in its markup. 
+		accessPublicComponent is a component in system namespace with public access
+		for attribute,  we can access global only
+	***************************************************************************************************/
+	testCreateComponentWithPrivilegedAccessInSystemNSWithPublicAccessComponentInMarkup:{
+        test:[
+        function canCreateComponentWithPublicAccess(cmp){ 
+        	var completed = false;
+        	var that = this;
+        	$A.createComponent(
+            	"markup://auratest:accessPrivilegedComponentWithAccessPublicComponentInMarkup", 
+            	{}, 
+            	function(newCmp){
+            		$A.test.assertEquals(newCmp.getName(),"auratest$accessPrivilegedComponentWithAccessPublicComponentInMarkup");
+            		completed = true;
+            		that.componentCreated = newCmp;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+        /************************************************* test for attribute ************************************/
+        function cannotAccessPrivateAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.find("accessPublicComponent").get("v.privateAttribute");
+        },
+        function cannotAccessPublicAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.find("accessPublicComponent").get("v.publicAttribute");
+        },
+        function canAccessGlobalAttribute(cmp) {
+        	var actual = this.componentCreated.find("accessPublicComponent").get("v.globalAttribute");
+        	$A.test.assertEquals(actual, "GLOBAL");
+        },
+        function cannotAccessPrivilegedAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.find("accessPublicComponent").get("v.privilegedAttribute");
+        },
+    	]
+    },
+    
+     /**************************************************************************************************
+	    Test for nested components.
+		we create a component in system namespace with privileged access as container component (accessPrivilegedComponentWithAccessPublicComponentInMarkup)
+		the container component has another component(accessPublicComponent) in its markup. 
+		accessPublicComponent is a component in system namespace with global access
+		for attribute,  we can access global and privileged only
+	***************************************************************************************************/
+	testCreateComponentWithPrivilegedAccessInSystemNSWithGlobalAccessComponentInMarkup:{
+        test:[
+        function canCreateComponentWithGlobalAccess(cmp){ 
+        	var completed = false;
+        	var that = this;
+        	$A.createComponent(
+            	"markup://auratest:accessPrivilegedComponentWithAccessGlobalComponentInMarkup", 
+            	{}, 
+            	function(newCmp){
+            		$A.test.assertEquals(newCmp.getName(),"auratest$accessPrivilegedComponentWithAccessGlobalComponentInMarkup");
+            		completed = true;
+            		that.componentCreated = newCmp;
+            	}
+            );
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+        /************************************************* test for attribute ************************************/
+        function cannotAccessPrivateAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.find("accessGlobalComponent").get("v.privateAttribute");
+        },
+        function cannotAccessPublicAttribute(cmp) {
+        	$A.test.expectAuraError("Access Check Failed!");
+        	var actual = this.componentCreated.find("accessGlobalComponent").get("v.publicAttribute");
+        },
+        function canAccessGlobalAttribute(cmp) {
+        	var actual = this.componentCreated.find("accessGlobalComponent").get("v.globalAttribute");
+        	$A.test.assertEquals(actual, "GLOBAL");
+        },
+        function canAccessPrivilegedAttribute(cmp) {
+        	var actual = this.componentCreated.find("accessGlobalComponent").get("v.privilegedAttribute");
         	$A.test.assertEquals(actual, "PRIVILEGED");
         },
     	]

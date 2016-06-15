@@ -217,6 +217,23 @@
       this.verifyRow(body_rendered, expectedElements ,body_internal, assertFunc, isDecending);
   },
 
+  verifyColumnDescriptor : function(columnIndex, expectedDescriptor) {
+      var columns = document.getElementsByTagName("th");
+      var column = $A.componentService.getRenderingComponentForElement(
+              columns[columnIndex].children[0]).
+              getComponentValueProvider().getConcreteComponent();
+      var columnType = column.getDef().getDescriptor().getQualifiedName();
+      $A.test.assertEquals(expectedDescriptor, columnType, 'Column header descriptor is incorrect');
+  },
+  
+  verifyCellDescriptor : function(rowIndex, columnIndex, expectedDescriptor) {
+      var rows = this.getOnlyTrs(document.getElementsByTagName("tbody")[0].children);
+      var cell = $A.componentService.getRenderingComponentForElement(
+              rows[rowIndex].children[columnIndex].children[0]).
+              getComponentValueProvider().getConcreteComponent();
+      var cellType = cell.getDef().getDescriptor().getQualifiedName();
+      $A.test.assertEquals(expectedDescriptor, cellType, 'Cell descriptor is incorrect');
+  },
 
 
   /**************************************************HELPER FUNCTIONS END**************************************************/
@@ -304,6 +321,20 @@
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData(), null, true);
 	  }]
+  },
+  
+  /**
+   * Test a column where ui:dataGridColumn's body is set
+   */
+  testColumnWithCustomBody : {
+      test : function() {
+          this.verifyColumnDescriptor(1, 'markup://ui:dataGridColumn');
+          this.verifyCellDescriptor(0, 1, 'markup://ui:outputText');
+          this.verifyColumnDescriptor(5, 'markup://uitest:virtualDataGridItem');
+          this.verifyCellDescriptor(0, 5, 'markup://uitest:virtualDataGridItem');
+          this.verifyColumnDescriptor(6, 'markup://ui:inputCheckbox');
+          this.verifyCellDescriptor(0, 6, 'markup://ui:inputCheckbox');
+      }
   }
 
 })

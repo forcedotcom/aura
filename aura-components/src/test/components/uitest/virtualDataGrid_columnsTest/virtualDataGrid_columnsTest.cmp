@@ -46,9 +46,11 @@
 			<aura:set attribute="headerColumns">
 				<ui:dataGridColumn name="id" 			label="Id"			sortable="true"/>
 				<ui:dataGridColumn name="subject" 		label="Subject"		sortable="true"/>
-				<ui:dataGridColumn name="date" 		label="date" />
-				<ui:dataGridColumn name="name" 	label="name" />
+				<ui:dataGridColumn name="date" 		    label="date" />
+				<ui:dataGridColumn name="name" 	        label="name" />
 				<ui:dataGridColumn name="relatedTo" 	label="related to" />
+				<ui:dataGridColumn name="customCol"     label="some col"><uitest:virtualDataGridItem value="Custom Col"/></ui:dataGridColumn>
+				<ui:dataGridColumn><ui:inputCheckbox/></ui:dataGridColumn>
 			</aura:set>
 			
 			<aura:set attribute="columns">
@@ -57,6 +59,8 @@
 				<ui:outputText value="{!item.date}"/>
 				<ui:outputText value="{!item.name}"/>
 				<ui:outputText value="{!item.relatedTo}"/>
+				<uitest:virtualDataGridItem value="{!item.name}"/>
+				<ui:inputCheckbox/>
 			</aura:set>
 			
 			<aura:set attribute="dataModel">

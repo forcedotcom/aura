@@ -123,6 +123,9 @@ AuraStorage.prototype.clear = function() {
  * @export
  */
 AuraStorage.prototype.get = function(key, includeExpired) {
+    $A.assert($A.util.isString(key), "AuraStorage.get(): 'key' must be a String.");
+    $A.assert(!includeExpired || $A.util.isBoolean(includeExpired), "AuraStorage.get(): 'includeExpired' must be a Boolean.");
+
     return this.getAll([key], includeExpired)
         .then(
             function(items) {
@@ -146,13 +149,16 @@ AuraStorage.prototype.inFlightOperations = function() {
 
 /**
  * Asynchronously gets multiple items from storage.
- * @param {String[]} [keys] The set of keys to retrieve. Empty array or non-array to retrieve all items.
+ * @param {String[]} [keys] The set of keys to retrieve. Empty array or falsey to retrieve all items.
  * @param {Boolean} [includeExpired] True to return expired items, falsey to not return expired items.
  * @returns {Promise} A promise that resolves to an array of objects in storage. Each
  *      object consists of {key: String, value: *}.
  * @export
  */
 AuraStorage.prototype.getAll = function(keys, includeExpired) {
+    $A.assert(!keys || Array.isArray(keys), "AuraStorage.getAll(): 'keys' must be an Array.");
+    $A.assert(!includeExpired || $A.util.isBoolean(includeExpired), "AuraStorage.getAll(): 'includeExpired' must be a Boolean.");
+
     var prefixedKeys = undefined;
 
     if (Array.isArray(keys) && keys.length > 0) {
@@ -232,26 +238,31 @@ AuraStorage.prototype.buildPayload = function(key, value, now) {
  * @export
  */
 AuraStorage.prototype.set = function(key, value) {
-    return this.setAll([[key, value]]);
+    $A.assert($A.util.isString(key), "AuraStorage.set(): 'key' must be a String.");
+
+    var values = {};
+    values[key] = value;
+    return this.setAll(values);
 };
 
 /**
  * Asynchronously stores multiple values in storage. All or none of the values are stored.
- * @param {Array} tuples An array of key-value pairs. Eg <code>[ [key1, value1], [key2, value2] ]</code>.
+ * @param {Object} values The key-values to store. Eg <code>{key1: value1, key2: value2}</code>.
  * @returns {Promise} A promise that resolves when all of the key-values are stored.
  * @export
  */
-AuraStorage.prototype.setAll = function(tuples) {
+AuraStorage.prototype.setAll = function(values) {
+    $A.assert($A.util.isObject(values), "AuraStorage.setAll(): 'values' must be an Object.");
+
     var now = new Date().getTime();
     var storablesSize = 0;
     var storables = [];
     var storable;
     try {
-        for (var i = 0; i < tuples.length; i++) {
-            storable = this.buildPayload(tuples[i][0], tuples[i][1], now);
+        for (var key in values) {
+            storable = this.buildPayload(key, values[key], now);
             storables.push(storable);
             storablesSize += storable[2];
-
         }
     } catch (e) {
         this.logError({ "operation": "set", "error": e });
@@ -259,7 +270,7 @@ AuraStorage.prototype.setAll = function(tuples) {
     }
 
     if (storablesSize > this.maxSize) {
-        var e2 = new Error("AuraStorage.set() cannot store " + tuples.length + " items of total size " + storablesSize + "b because it's over the max size of " + this.maxSize + "b");
+        var e2 = new Error("AuraStorage.set() cannot store " + Object.keys(values).length + " items of total size " + storablesSize + "b because it's over the max size of " + this.maxSize + "b");
         this.logError({ "operation": "set", "error": e2 });
         return Promise["reject"](e2);
     }
@@ -268,9 +279,8 @@ AuraStorage.prototype.setAll = function(tuples) {
     var promise = this.adapter.setItems(storables)
         .then(
             function() {
-                for (i = 0; i < tuples.length; i++) {
-                    that.log("set() - key: " + tuples[i][0]);
-                }
+                var keys = Object.keys(values);
+                that.log("set() - " + keys.length + " keys: " + keys.join(", "));
 
                 that.fireModified();
             },
@@ -293,6 +303,8 @@ AuraStorage.prototype.setAll = function(tuples) {
  * @export
  */
 AuraStorage.prototype.remove = function(key, doNotFireModified) {
+    $A.assert($A.util.isString(key), "AuraStorage.remove(): 'key' must be a String.");
+    $A.assert(!doNotFireModified || $A.util.isBoolean(doNotFireModified), "AuraStorage.remove(): 'doNotFireModified' must be a Boolean.");
     return this.removeAll([key], doNotFireModified);
 };
 
@@ -304,6 +316,9 @@ AuraStorage.prototype.remove = function(key, doNotFireModified) {
  * @export
  */
 AuraStorage.prototype.removeAll = function(keys, doNotFireModified) {
+    $A.assert($A.util.isArray(keys), "AuraStorage.removeAll(): 'keys' must be an Array.");
+    $A.assert(!doNotFireModified || $A.util.isBoolean(doNotFireModified), "AuraStorage.removeAll(): 'doNotFireModified' must be a Boolean.");
+
     var prefixedKeys = [];
     for (var i = 0; i < keys.length; i++) {
         prefixedKeys.push(this.keyPrefix + keys[i]);

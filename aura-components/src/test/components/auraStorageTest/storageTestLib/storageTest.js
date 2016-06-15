@@ -46,32 +46,6 @@ function storageTest () {
         });
     }
 
-    function runUnsureKey(cmp, storage, key) {
-        var completed = false;
-        var failTest = function(error) { completed=true; logAndFailTest(cmp, error); };
-        append(cmp, "set("+key+",value);");
-        storage.set(key, "value")
-            .then(function() {
-                append(cmp, "get("+key+");");
-                return storage.get(key);
-            }).then(function(value) {
-                append(cmp, "value="+value);
-                if (value) {
-                    $A.test.assertEquals("value", value, "Failed initial get for "+key);
-                }
-                append(cmp,"remove("+key+");");
-                return storage.remove(key);
-            }).then(function() {
-                append(cmp,"get("+key+");");
-                return storage.get(key);
-            }).then(function(value) {
-                append(cmp,"value="+value);
-                completed = true;
-                $A.test.assertUndefinedOrNull(value, "remove failed");
-            })['catch'](failTest);
-        $A.test.addWaitFor(true, function() { return completed; });
-    }
-
     function runFullCycle(cmp, storage, key, value) {
         var completed = false;
         var failTest = function(error) { completed=true; logAndFailTest(cmp, error); };
@@ -134,16 +108,8 @@ function storageTest () {
             $A.test.assertEquals(expected, storage.getMaxSize(), "testGetMaxSize: Failed to configure max size of storage");
         },
 
-        testNullKey: function(cmp, storage) {
-            runUnsureKey(cmp, storage, null);
-        },
-
-        testUndefinedKey: function(cmp, storage) {
-            runUnsureKey(cmp, storage, undefined);
-        },
-
         testEmptyStringKey: function(cmp, storage) {
-            runUnsureKey(cmp, storage, "");
+            runFullCycle(cmp, storage, "");
         },
 
         testGetNullValue: function(cmp, storage) {
@@ -536,8 +502,8 @@ function storageTest () {
                     storage.set("2", { "a" : 2 })
                 ]);
             })
-            .then(function() { 
-                return storage.getAll(["0", "1", "2"]); 
+            .then(function() {
+                return storage.getAll(["0", "1", "2"]);
             })
             .then(function(results) {
                      $A.test.assertEquals(2, Object.keys(results).length, "Unexpected number of items returned");
@@ -563,8 +529,8 @@ function storageTest () {
                     storage.set("1", { "a" : 1 })
                 ]);
             })
-            .then(function() { 
-                return storage.getAll(["0", "1", "2"]); 
+            .then(function() {
+                return storage.getAll(["0", "1", "2"]);
             })
             .then(function(results) {
                      $A.test.assertEquals(1, Object.keys(results).length, "Unexpected number of items returned");
@@ -585,10 +551,10 @@ function storageTest () {
             var completed = false;
             storage.clear()
             .then(function() {
-                return storage.setAll([ ["0", { "a" : 0 }], ["1", { "a" : 1 }], ["2", { "a" : 2 }] ]);
+                return storage.setAll({ "0":{"a":0}, "1":{"a":1}, "2":{"a":2} });
             })
-            .then(function() { 
-                return storage.getAll(); 
+            .then(function() {
+                return storage.getAll();
             })
             .then(function(results) {
                      $A.test.assertEquals(3, Object.keys(results).length, "Unexpected number of items returned");
@@ -618,11 +584,13 @@ function storageTest () {
             $A.test.assertTrue(storage.getMaxSize() < totalSizeAdded, "Test setup failure: storage being tested is too"
                     + " large to properly test overflow");
 
-            storage.setAll([["testOverflow.1", chunk],
-                            ["testOverflow.2", chunk],
-                            ["testOverflow.3", chunk],
-                            ["testOverflow.4", chunk],
-                            ["testOverflow.5", chunk]])
+            storage.setAll({
+                "testOverflow.1": chunk,
+                "testOverflow.2": chunk,
+                "testOverflow.3": chunk,
+                "testOverflow.4": chunk,
+                "testOverflow.5": chunk
+            })
             .then(function() {
                 $A.test.fail("Expected setAll promise to reject when attemping to set items over maxSize");
             }, function(error) {
@@ -640,13 +608,13 @@ function storageTest () {
             var completed = false;
             storage.clear()
             .then(function() {
-                return storage.setAll([ ["0", { "a" : 0 }], ["2", { "a" : 2 }], ["3", {"a" : 3 }] ]);
+                return storage.setAll({ "0":{"a":0}, "2":{"a":2}, "3":{"a":3} });
             })
             .then(function() {
                 return storage.removeAll(["0", "1", "2"]);
             })
             .then(function() {
-                return storage.getAll(); 
+                return storage.getAll();
             })
             .then(function(results) {
                  $A.test.assertEquals(1, Object.keys(results).length, "Unexpected number of items returned");
@@ -664,13 +632,13 @@ function storageTest () {
             var completed = false;
             storage.clear()
             .then(function() {
-                return storage.setAll([ ["1", { "a" : 1 }], ["2", { "a" : 2 }] ]);
+                return storage.setAll({ "1":{"a":1}, "2":{"a":2} });
             })
             .then(function() {
                 return storage.removeAll(["0", "1", "3"]);
             })
             .then(function() {
-                return storage.getAll(); 
+                return storage.getAll();
             })
             .then(function(results) {
                  $A.test.assertEquals(1, Object.keys(results).length, "Unexpected number of items returned");

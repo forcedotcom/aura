@@ -633,7 +633,9 @@ Test.Aura.Storage.AuraStorageTest = function() {
                     estimateSize: function(obj) {
                         if(obj === "size5") { return 5; }
                         return 0;
-                    }
+                    },
+                    isString: function() { return true; },
+                    isObject: function() { return true; }
                 },
                 eventService: {
                     getNewEvent: function(name) {
@@ -644,7 +646,8 @@ Test.Aura.Storage.AuraStorageTest = function() {
                 },
                 metricsService: {
                     transaction: function() {}
-                }
+                },
+                assert: function() {}
             },
             "AuraStorage": {
                 KEY_DELIMITER: ":"
@@ -828,7 +831,10 @@ Test.Aura.Storage.AuraStorageTest = function() {
                 util: {
                     format: function() {},
                     isUndefinedOrNull: function(obj) { return obj === undefined || obj === null; },
-                    estimateSize: function() { return 0; }
+                    estimateSize: function() { return 0; },
+                    isString: function() { return true; },
+                    isArray: function() { return true; },
+                    isBoolean: function() { return true; }
                 },
                 eventService: {
                     getNewEvent: function(name) {
@@ -839,7 +845,8 @@ Test.Aura.Storage.AuraStorageTest = function() {
                 },
                 metricsService: {
                     transaction: function() {}
-                }
+                },
+                assert: function() {}
             },
             "AuraStorage": {
                 KEY_DELIMITER: ":"

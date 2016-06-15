@@ -75,11 +75,15 @@ SecureObject.getCached = function(raw, key) {
 
 SecureObject.filterEverything = function (st, raw, options) {
 	"use strict";
+	
+	function filterOpaque(opts, so) {
+		return opts && opts.filterOpaque === true && $A.lockerService.isOpaque(so);
+	}
 
 	var key = getLockerSecret(st, "key");
 	var cached = SecureObject.getCached(raw, key);
 	if (cached) {
-		return cached;
+		return !filterOpaque(options, cached) ? cached : undefined;
 	}
 
 	var t = typeof raw;
@@ -110,7 +114,7 @@ SecureObject.filterEverything = function (st, raw, options) {
 
 				// TODO: NaN !== NaN
 
-				if (!options || options.filterOpaque !== true || !$A.lockerService.isOpaque(newValue)) {
+				if (!filterOpaque(options, newValue)) {
 					swallowed.push(newValue);
 				}
 

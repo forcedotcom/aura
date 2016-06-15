@@ -71,6 +71,11 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
      */
     List<LibraryDefRef> getImports() throws QuickFixException;
 
+    /**
+     * @return All the locators defined in this component def
+     */
+    Map<String, LocatorDef> getLocators();
+
     DefDescriptor<ModelDef> getLocalModelDefDescriptor();
 
     List<DefDescriptor<ModelDef>> getModelDefDescriptors()

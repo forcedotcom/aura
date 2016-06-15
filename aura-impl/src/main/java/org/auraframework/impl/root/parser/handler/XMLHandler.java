@@ -45,7 +45,7 @@ public abstract class XMLHandler<T extends Definition> extends BaseXMLElementHan
     public final static Set<String> SYSTEM_TAGS = ImmutableSet.of(ApplicationDefHandler.TAG,
             AttributeDefHandler.TAG, ComponentDefHandler.TAG, EventDefHandler.TAG, InterfaceDefHandler.TAG,
             EventHandlerDefHandler.TAG, LibraryDefRefHandler.TAG, MethodDefHandler.TAG,RegisterEventHandler.TAG,
-            AttributeDefRefHandler.TAG,
+            AttributeDefRefHandler.TAG, LocatorDefHandler.TAG, LocatorContextDefHandler.TAG,
             DependencyDefHandler.TAG, TokensDefHandler.TAG, DesignDefHandler.TAG,
             DesignAttributeDefHandler.TAG, DesignTemplateDefHandler.TAG, DesignTemplateRegionDefHandler.TAG,
             LibraryDefHandler.TAG, IncludeDefRefHandler.TAG);
@@ -77,7 +77,7 @@ public abstract class XMLHandler<T extends Definition> extends BaseXMLElementHan
      * @throws QuickFixException
      */
     public abstract T getElement() throws XMLStreamException, QuickFixException;
-    
+
     @Override
     protected String getAttributeValue(String name) {
         String value = xmlReader.getAttributeValue(null, name);
@@ -121,7 +121,7 @@ public abstract class XMLHandler<T extends Definition> extends BaseXMLElementHan
             return null;
         }
     }
-    
+
     @Override
     protected void validateAttributes() {
         if (!isSystemTag()) {

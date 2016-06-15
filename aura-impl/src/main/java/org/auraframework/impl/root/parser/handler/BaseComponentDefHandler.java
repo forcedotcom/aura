@@ -36,6 +36,7 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LocatorDef;
 import org.auraframework.def.MethodDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
@@ -227,6 +228,20 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                 );
             }
             builder.getMethodDefs().put(methodDef.getDescriptor(),methodDef);
+        } else if (LocatorDefHandler.TAG.equalsIgnoreCase(tag)) {
+            LocatorDef locatorDef = new LocatorDefHandler<>(this, xmlReader, source).getElement();
+            if (builder.locatorDefs != null &&
+                    builder.locatorDefs.containsKey(locatorDef.getTarget())) {
+                tagError("There is already a locator with target named '%s' on %s '%s'.",
+                        this.getDefDescriptor(),
+                        locatorDef.getTarget(),
+                        "%s","%s"
+                    );
+            }
+            builder.addLocatorDef(locatorDef);
+        } else if (LocatorContextDefHandler.TAG.equalsIgnoreCase(tag)) {
+            tagError("Cannot use tag '%s' directly. Must be used inside '%s' in %s '%s'.",
+                    this.getDefDescriptor(), tag, LocatorDefHandler.TAG, "%s", "%s");
         } else {
             // if it wasn't one of the above, it must be a defref, or an error
             ComponentDefRef cdr = getDefRefHandler(this).getElement();

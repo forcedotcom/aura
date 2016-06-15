@@ -97,7 +97,7 @@
         attributes: {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'es'},
         test: function (cmp) {
             var inputDateStr = cmp.find("inputText").getElement().value;
-            $A.test.assertEquals("Septiembre 10, 2012", inputDateStr, "Dates are not the same and they should be");
+            $A.test.assertEquals("septiembre 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
 

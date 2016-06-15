@@ -78,6 +78,40 @@
 	 },
 	 
 	 /**
+	  *  Tests non editable inlineEdit cells
+      */
+     testNonEditableCells : {
+         test : [function(cmp) {
+             var editable = cmp.find("grid").get("v.editable");
+             cmp.find("grid").set('v.editable', !editable);
+         }, function(cmp) {
+             this.triggerEditOnCell(cmp, 3, 0);
+         }, function(cmp) {
+             this.waitForPanelClose(cmp);
+             this.triggerEditOnCell(cmp, 3, 1);
+         }, function(cmp) {
+             this.waitForPanelClose(cmp);
+             this.triggerEditOnCell(cmp, 3, 2);
+         }, function(cmp) {
+             this.waitForPanelClose(cmp);
+             this.triggerEditOnCell(cmp, 3, 3);
+         }, function(cmp) {
+             this.waitForPanelClose(cmp);
+             this.triggerEditOnCell(cmp, 3, 4);
+         }, function(cmp) {
+             this.waitForPanelClose(cmp);
+             this.triggerEditOnCell(cmp, 3, 5);
+         }, function(cmp) {
+             this.waitForPanelClose(cmp);
+             this.triggerEditOnCell(cmp, 3, 6);
+         }, function(cmp) {
+             this.waitForPanelClose(cmp);
+             var editable = cmp.find("grid").get("v.editable");
+             cmp.find("grid").set('v.editable', !editable);
+         }]
+     },
+	 
+	 /**
 	  * Test append functionality
 	  */
 	 testAppendItems : {

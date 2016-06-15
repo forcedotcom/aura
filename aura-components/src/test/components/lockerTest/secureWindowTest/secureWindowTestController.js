@@ -25,12 +25,17 @@
             cmp.set("v.testComplete", true);
         }, 0);
     },
-
+    
+    testHistoryExposedOnWindow: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertDefined(window.history);
+    },
+    
     testLocationExposedOnWindow: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertDefined(window.location);
     },
-
+    
     testNavigatorExposedOnWindow: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertStartsWith("SecureNavigator", window.navigator.toString(), "Expected navigator to return SecureNavigator");

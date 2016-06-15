@@ -88,6 +88,7 @@ function LockerService() {
 	    "Float32Array",
 	    "Float64Array",
 	    "DataView",
+	    "Promise",
 
 	    // Misc
 	    "Intl"

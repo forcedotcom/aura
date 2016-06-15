@@ -23,6 +23,7 @@
     <aura:method name="testDocumentExposedOnWindow" action="{!c.testDocumentExposedOnWindow}"/>
     <aura:method name="testCircularReferenceIsSecureWindow" action="{!c.testCircularReferenceIsSecureWindow}"/>
     <aura:method name="testNoAccessToWindowViaSetTimeout" action="{!c.testNoAccessToWindowViaSetTimeout}"/>
+    <aura:method name="testHistoryExposedOnWindow" action="{!c.testHistoryExposedOnWindow}"/>
     <aura:method name="testLocationExposedOnWindow" action="{!c.testLocationExposedOnWindow}"/>
     <aura:method name="testNavigatorExposedOnWindow" action="{!c.testNavigatorExposedOnWindow}"/>
     <aura:method name="testWhitelistedGlobalAttributeExposedOnWindow" action="{!c.testWhitelistedGlobalAttributeExposedOnWindow}"/>

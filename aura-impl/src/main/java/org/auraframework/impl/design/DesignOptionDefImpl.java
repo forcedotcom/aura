@@ -21,7 +21,6 @@ import org.auraframework.def.genericxml.GenericXmlElement;
 
 public class DesignOptionDefImpl implements DesignOptionDef {
 
-    private static final long serialVersionUID = -990356785176000885L;
     private final GenericXmlElement tag;
 
     protected DesignOptionDefImpl(GenericXmlElement tag) {

@@ -936,10 +936,20 @@ AuraClientService.prototype.saveTokenToStorage = function() {
     var storage = Action.getStorage();
     if (storage && this._token) {
         var token = this._token;
-        // certain storage adapters require token object be wrapped in "value" object for indexing
-        var value = { "value": { "token": this._token } };
-        var size = $A.util.estimateSize(this._tokenStorageKey) + $A.util.estimateSize(this._token);
-        return storage.adapter.setItem(this._tokenStorageKey, value, size).then(
+
+        // satisfy the adapter API shape requirements; see AuraStorage.setItems().
+        var now = new Date().getTime();
+        var tuple = [
+             this._tokenStorageKey,
+             {
+                 "value": { "token": this._token },
+                 "expires": now + 15768000000, // 1/2 year
+                 "created": now
+             },
+             $A.util.estimateSize(this._tokenStorageKey) + $A.util.estimateSize(this._token)
+         ];
+
+        return storage.adapter.setItems([tuple]).then(
             function() { return token; },
             function(err) {
                 $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err);
@@ -958,11 +968,12 @@ AuraClientService.prototype.saveTokenToStorage = function() {
 AuraClientService.prototype.loadTokenFromStorage = function() {
     var storage = Action.getStorage();
     if (storage) {
+        var that = this;
         // TODO - why go straight to the adapter?
-        return storage.adapter.getItem(this._tokenStorageKey)
-            .then(function(item) {
-                if (item) {
-                    return item["value"];
+        return storage.adapter.getItems([this._tokenStorageKey])
+            .then(function(items) {
+                if (items[that._tokenStorageKey]) {
+                    return items[that._tokenStorageKey]["value"];
                 }
                 return undefined;
             });
@@ -1134,7 +1145,7 @@ AuraClientService.prototype.initDefs = function(config, resolved) {
     if (resolved) {
         var classExporter = config["classExporter"];
         for (i in classExporter) {
-            $A.componentService.addComponentClass(i, classExporter[i]);  
+            $A.componentService.addComponentClass(i, classExporter[i]);
         }
         var libraryDefs = config["libraryDefs"];
         for (i in libraryDefs) {
@@ -1338,14 +1349,14 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
 
     this.runAfterInitDefs(function () {
         Aura.bootstrapMark("runAfterInitDefsCall");
-        
+
         acs.runAfterBootstrapReady(function (bootConfig) {
             Aura.bootstrapMark("runAfterBootstrapCall");
 
             $A.run(function() {
                 callback(bootConfig);
             });
-        }); 
+        });
     });
 };
 
@@ -2994,22 +3005,18 @@ AuraClientService.prototype.populatePersistedActionsFilter = function() {
     }
 
     var acs = this;
-    return actionStorage.getAll(true)
-        .then(function(all) {
-            if (all) {
-                for (var i in all) {
-                    var key = all[i]["key"];
-                    acs.persistedActionFilter[key] = true;
-                    // Get it from storage if bootstrap.js hasnt arrived yet
-                    if (key === AuraClientService.BOOTSTRAP_KEY && !Aura["appBootstrap"]) {
-                        Aura["appBootstrapReady"] = true;
-                        Aura["appBootstrapFromCache"] = true;
-                        Aura["appBootstrap"] = all[i]["value"];
-                    }
+    return actionStorage.getAll([], true)
+        .then(function(items) {
+            for (var key in items) {
+                acs.persistedActionFilter[key] = true;
+                // Get it from storage if bootstrap.js hasnt arrived yet
+                if (key === AuraClientService.BOOTSTRAP_KEY && !Aura["appBootstrap"]) {
+                    Aura["appBootstrapReady"] = true;
+                    Aura["appBootstrapFromCache"] = true;
+                    Aura["appBootstrap"] = items[key];
                 }
-
-                $A.log("AuraClientSevice: restored " + all.length + " actions");
             }
+            $A.log("AuraClientSevice: restored " + Object.keys(items).length + " actions");
         });
 };
 

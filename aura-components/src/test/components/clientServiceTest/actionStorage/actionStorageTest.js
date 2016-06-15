@@ -193,15 +193,16 @@
             function captureExpirationTime(cmp) {
                 var asyncComplete = false;
                 var adapter = this._action.getStorage().adapter;
-                adapter.getItem(cmp.DELIMITER + this._action.getStorageKey())
+                var prefixedKey = cmp.DELIMITER + this._action.getStorageKey();
+                adapter.getItems([prefixedKey])
                     .then(
-                        function(item) {
+                        function(items) {
                             asyncComplete = true;
-                            cmp._expiryTime = item.expires;
+                            cmp._expiryTime = items[prefixedKey].expires;
                             $A.test.assertNotUndefinedOrNull(cmp._expiryTime, "stored expiry time should not be null/undefined");
                         },
                         function(e) {
-                            $A.test.fail("getItem() rejected: " + e);
+                            $A.test.fail("getItems() rejected: " + e);
                         }
                     );
 
@@ -231,14 +232,15 @@
             function verifyExpirationTimeExtended(cmp) {
                 var asyncComplete = false;
                 var adapter = this._action.getStorage().adapter;
-                adapter.getItem(cmp.DELIMITER + this._action.getStorageKey())
+                var prefixedKey = cmp.DELIMITER + this._action.getStorageKey();
+                adapter.getItems([prefixedKey])
                     .then(
-                        function(item) {
+                        function(items) {
                             asyncComplete = true;
-                            $A.test.assertTrue(item.expires > cmp._expiryTime, "stored expires time should be extended by revalidateAction");
+                            $A.test.assertTrue(items[prefixedKey].expires > cmp._expiryTime, "stored expires time should be extended by revalidateAction");
                         },
                         function(e) {
-                            $A.test.fail("getItem() rejected: " + e);
+                            $A.test.fail("getItems() rejected: " + e);
                         }
                     );
 

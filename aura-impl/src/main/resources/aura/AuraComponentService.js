@@ -1589,24 +1589,23 @@ AuraComponentService.prototype.buildDependencyGraph = function() {
 
     var promises = [];
     var actionStorage = Action.getStorage();
-    var actionsGetAll = actionStorage ? actionStorage.getAll(true) : Promise["resolve"]([]);
+    var actionsGetAll = actionStorage ? actionStorage.getAll([], true) : Promise["resolve"]([]);
     promises.push(actionsGetAll);
-    promises.push(this.componentDefStorage.getAll(true));
+    promises.push(this.componentDefStorage.getAll([], true));
 
     // promise will reject if either getAll rejects
     return Promise.all(promises).then(function (results) {
         var actionEntries = results[0];
         var defEntries    = results[1];
-        var storedKeys    = defEntries.map(function (entry) { return entry.key; });
+        var defKeys       = Object.keys(defEntries);
         var nodes         = {};
 
-        function createNode(isAction, entry) {
-            var key = entry.key;
-            var dependencies = this.findDependencies(key, entry.value, storedKeys);
+        function createNode(isAction, values, key) {
+            var dependencies = this.findDependencies(key, values[key], defKeys);
             nodes[key] = { "id": key, "dependencies": dependencies, "action": isAction };
         }
 
-        actionEntries = actionEntries.filter(function (a) {
+        var actionKeys = Object.keys(actionEntries).filter(function (a) {
             for (var i = 0; i < actionsBlackList.length; i++) {
                 if (a.key.indexOf(actionsBlackList[i]) === 0) {
                     return false;
@@ -1614,8 +1613,10 @@ AuraComponentService.prototype.buildDependencyGraph = function() {
             }
             return true;
         });
-        actionEntries.forEach(createNode.bind(this, true));
-        defEntries.forEach(createNode.bind(this, false));
+
+        actionKeys.forEach(createNode.bind(this, true, actionEntries));
+        defKeys.forEach(createNode.bind(this, false, defEntries));
+
         return nodes;
     }.bind(this));
 };

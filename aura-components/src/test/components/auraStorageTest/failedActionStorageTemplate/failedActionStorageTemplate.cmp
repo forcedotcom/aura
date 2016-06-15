@@ -13,23 +13,23 @@
                 return Promise.reject(new Error("getSize(): mock always fails"));
             };
 
-            MockStorageAdapter.prototype.getItem = function(key) {
-                return Promise.reject(new Error("getItem(): mock always fails"));
+            MockStorageAdapter.prototype.getItems = function(keys) {
+                return Promise.reject(new Error("getItems(): mock always fails"));
             };
 
             MockStorageAdapter.prototype.getAll = function(key) {
                 return Promise.reject(new Error("getAll(): mock always fails"));
             };
 
-            MockStorageAdapter.prototype.setItem = function(key, item) {
-                return Promise.reject(new Error("setItem(): mock always fails"));
+            MockStorageAdapter.prototype.setItems = function(tuples) {
+                return Promise.reject(new Error("setItems(): mock always fails"));
             };
 
-            MockStorageAdapter.prototype.removeItem = function(key) {
-                return Promise.reject(new Error("removeItem(): mock always fails"));
+            MockStorageAdapter.prototype.removeItems = function(keys) {
+                return Promise.reject(new Error("removeItems(): mock always fails"));
             };
 
-            MockStorageAdapter.prototype.clear = function(key) {
+            MockStorageAdapter.prototype.clear = function() {
                 return Promise.reject(new Error("clear(): mock always fails"));
             };
 

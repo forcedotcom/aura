@@ -21,7 +21,7 @@
         test: [
         function(cmp) {
             // New action to be added to action storage in priming scenario
-            cmp._actionDescriptor = "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getInt";
+            cmp._actionDescriptorPrefix = "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getInt";
             var that = this;
             var addAction = function(response) {
                 // Make sure this is the action response we care about
@@ -32,12 +32,12 @@
                 // Copy response and add an additional storable action to the response object
                 var newResponse = $A.util.copy(response);
                 var responseMessage = that.decodeResponse(response);
-                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptor);
+                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix);
                 responseMessage["actions"].push(action);
 
                 var newResponseMessage = that.encodeResponse(responseMessage);
-                newResponse['response'] = newResponseMessage;
-                newResponse['responseText'] = newResponseMessage;
+                newResponse["response"] = newResponseMessage;
+                newResponse["responseText"] = newResponseMessage;
 
                 return newResponse;
             }
@@ -51,14 +51,14 @@
         function(cmp) {
             var completed = false;
             var found = false;
-            $A.storageService.getStorage("actions").getAll(true)
+            $A.storageService.getStorage("actions").getAll([], true)
                 .then(function(items) {
-                    for (var i = 0; i < items.length; i++) {
-                        if (items[i]["key"].indexOf(cmp._actionDescriptor) > -1
-                                && items[i]["value"]["returnValue"].indexOf("return modified in test") > -1) {
+                    for (key in items) {
+                        if (key.indexOf(cmp._actionDescriptorPrefix) === 0 && items[key]["returnValue"].indexOf("return modified in test") === 0) {
                             found = true;
                         }
                     }
+
                     completed = true;
                 })
                 ["catch"](function(error) { $A.test.fail(error.toString()); });
@@ -81,7 +81,7 @@
     testNoProcessOfPrimingActionsMarkedError: {
         test: [
         function(cmp) {
-            cmp._actionDescriptor = "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getInt";
+            cmp._actionDescriptorPrefix = "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getInt";
             var that = this;
             var addAction = function(response) {
                 // Make sure this is the action response we care about
@@ -92,7 +92,7 @@
                 // Copy response and add an action in the ERROR state
                 var newResponse = $A.util.copy(response);
                 var responseMessage = that.decodeResponse(response);
-                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptor);
+                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix);
                 action["state"] = "ERROR";
                 responseMessage["actions"].push(action);
 
@@ -112,14 +112,14 @@
         function(cmp) {
             var completed = false;
             var found = false;
-            $A.storageService.getStorage("actions").getAll(true)
+            $A.storageService.getStorage("actions").getAll([], true)
                 .then(function(items) {
-                    for (var i = 0; i < items.length; i++) {
-                        if (items[i]["key"].indexOf(cmp._actionDescriptor) > -1
-                                && items[i]["value"]["returnValue"].indexOf("return modified in test") > -1) {
+                    for (key in items) {
+                        if (key.indexOf(cmp._actionDescriptorPrefix) === 0 && items[key]["returnValue"].indexOf("return modified in test") === 0) {
                             found = true;
                         }
                     }
+
                     completed = true;
                 })
                 ["catch"](function(error) { $A.test.fail(error.toString()); });
@@ -153,7 +153,7 @@
                 // Copy response and add a non-storable action
                 var newResponse = $A.util.copy(response);
                 var responseMessage = that.decodeResponse(response);
-                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptor);
+                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix);
                 action["storable"] = false;
                 responseMessage["actions"].push(action);
 

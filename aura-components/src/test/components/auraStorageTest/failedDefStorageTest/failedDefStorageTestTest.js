@@ -131,7 +131,7 @@
     testDefStorageClearedWhenSetItemOperationFails: {
         test: function(cmp) {
             window.mockComponentDefStorage.failAll = false;
-            window.mockComponentDefStorage.failSetItem = true;
+            window.mockComponentDefStorage.failSetItems = true;
             var actual;
             $A.createComponent("test:text", {}, function(newCmp){
                 actual = newCmp;
@@ -142,7 +142,7 @@
                     function() {
                         return window.mockComponentDefStorage.clearCallCount > 0;
                     },
-                    "Component def storage never called clear() when the adapter's setItem() fails",
+                    "Component def storage never called clear() when the adapter's setItems() fails",
                     function() {
                         $A.test.assertEquals("markup://test:text", actual.getDef().getDescriptor().getQualifiedName(),
                                 "Unexpected component returned from createComponent() when storage operations fail");

@@ -822,7 +822,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                         "}" +
                         "var storage = $A.storageService.getStorage('ComponentDefStorage');" +
                         "storage.getAll().then(" +
-                        "  function(items){ callback(items) }," +
+                        "  function(items){ callback(Object.keys(items)) }," +
                         "  function() { callback(null); }" +
                         ")";
                 Object result = null;

@@ -15,27 +15,17 @@
  */
 /*jslint sub: true */
 /**
- * @description Storage for component definitions. If persistent storage
+ * @description Storage for component, library, and event definitions. If persistent storage
  * is not available then most operations are noops.
  * @constructor
  * @protected
  */
-function ComponentDefStorage(){}
+function ComponentDefStorage() {}
 
 /**
  * Target size, as a percent of max size, for component def storage during eviction.
  */
 ComponentDefStorage.prototype.EVICTION_TARGET_LOAD = 0.75;
-
-/**
- * Key to use of the MutexLocker to guarantee atomic execution across tabs.
- */
-ComponentDefStorage.prototype.MUTEX_KEY = "ComponentDefStorage";
-
-/**
- * Function to release the mutex, set while the mutex is held.
- */
-ComponentDefStorage.prototype.mutexUnlock = undefined;
 
 /**
  * Minimum head room, as a percent of max size, to allocate after eviction and adding new definitions.
@@ -49,15 +39,37 @@ ComponentDefStorage.prototype.EVICTION_HEADROOM = 0.1;
 ComponentDefStorage.prototype.TRANSACTION_SENTINEL_KEY = "sentinel_key";
 
 /**
- * Queue of operations on the def store. Used to prevent concurrent DML on the def store, or analysis
- * of the def store during DML, which often results in a broken def graph. This is set to an array
+ * Key to use of the MutexLocker to guarantee atomic execution across tabs.
+ */
+ComponentDefStorage.prototype.MUTEX_KEY = "ComponentDefStorage";
+
+/**
+ * Function to release the mutex, set while the mutex is held.
+ */
+ComponentDefStorage.prototype.mutexUnlock = undefined;
+
+/**
+ * Queue of operations on the def store. Used to prevent concurrent DML on the underlying AuraStorage, or analysis
+ * of the AuraStorage contents during DML, which often results in a broken def graph. This is set to an array
  * when an operation is in-flight.
  */
 ComponentDefStorage.prototype.queue = undefined;
 
 /**
+ * Whether defs are backed up to persistent storage. Evaluated to a boolean
+ * on first request to operate on defs (get, put, or remove).
+ */
+ComponentDefStorage.prototype.useDefStore = undefined;
+
+/**
+ * The AuraStorage instance.
+ */
+ComponentDefStorage.prototype.storage = undefined;
+
+
+/**
  * Whether to use storage for component definitions.
- * @returns {Boolean} whether to use storage for component definitions.
+ * @returns {Boolean} Whether to use storage for component definitions.
  */
 ComponentDefStorage.prototype.useDefinitionStorage = function() {
     if (this.useDefStore === undefined) {
@@ -67,9 +79,8 @@ ComponentDefStorage.prototype.useDefinitionStorage = function() {
 };
 
 /**
- * Creates storage to determine whether available storage mechanism is persistent
- * to store component definitions. Uses storage if persistent. Otherwise, don't use
- * storage to backup definitions.
+ * Sets up persistent storage for definitions if the necessary prerequisites are satisfied.
+ * If they are not then storage is not setup and definitions are not backed up.
  */
 ComponentDefStorage.prototype.setupDefinitionStorage = function() {
     if (this.useDefStore === undefined) {
@@ -101,9 +112,9 @@ ComponentDefStorage.prototype.setupDefinitionStorage = function() {
 
             // def storage only enabled with persistent storage
             if (storage.isPersistent()) {
-                this.definitionStorage = storage;
+                this.storage = storage;
                 // explicitly disable sweeping b/c AuraComponentService handles eviction
-                this.definitionStorage.suspendSweeping();
+                this.storage.suspendSweeping();
                 this.useDefStore = true;
             } else if (removeStorage) {
                 $A.storageService.deleteStorage("ComponentDefStorage");
@@ -114,19 +125,21 @@ ComponentDefStorage.prototype.setupDefinitionStorage = function() {
 
 /**
  * Gets the storage for component definitions.
- * @return {AuraStorage|null} the component def storage or null if it's disabled.
+ * @return {AuraStorage|null} The component def storage or null if it's disabled.
  */
 ComponentDefStorage.prototype.getStorage = function () {
     if (this.useDefinitionStorage()) {
-        return this.definitionStorage;
+        return this.storage;
     }
 };
 
 /**
  * Stores component and library definitions into storage. Should always be called from within a call to #enqueue().
- * @param {Array} cmpConfigs the component definitions to store
- * @param {Array} libConfigs the lib definitions to store
- * @return {Promise} promise that resolves when storing is complete.
+ * @param {Array} cmpConfigs The component definitions to store.
+ * @param {Array} libConfigs The library definitions to store.
+ * @param {Array} evtConfigs The event definitions to store.
+ * @param {AuraContext} context The Aura context.
+ * @return {Promise} Promise that resolves when storing is complete.
  */
 ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtConfigs, context) {
     if (!this.useDefinitionStorage() || (!cmpConfigs.length && !libConfigs.length && !evtConfigs.length)) {
@@ -134,59 +147,59 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
     }
 
     var that = this;
-    return this.definitionStorage.set(this.TRANSACTION_SENTINEL_KEY, {})
+    return this.storage.set(this.TRANSACTION_SENTINEL_KEY, true)
         .then(function() {
-        var promises = [];
-        var descriptor, encodedConfig, i;
+            var promises = [];
+            var descriptor, encodedConfig, i;
 
-        for (i = 0; i < cmpConfigs.length; i++) {
-            descriptor = cmpConfigs[i]["descriptor"];
-            cmpConfigs[i]["uuid"] = context.findLoaded(descriptor);
-            encodedConfig = $A.util.json.encode(cmpConfigs[i]);
-                promises.push(that.definitionStorage.set(descriptor, encodedConfig));
-        }
-
-        for (i = 0; i < libConfigs.length; i++) {
-            descriptor = libConfigs[i]["descriptor"];
-            encodedConfig = $A.util.json.encode(libConfigs[i]);
-                promises.push(that.definitionStorage.set(descriptor, encodedConfig));
-        }
-
-        for (i = 0; i < evtConfigs.length; i++) {
-            descriptor = evtConfigs[i]["descriptor"];
-            encodedConfig = $A.util.json.encode(evtConfigs[i]);
-                promises.push(that.definitionStorage.set(descriptor, encodedConfig));
-        }
-
-        return Promise["all"](promises).then(
-            function () {
-                $A.log("ComponentDefStorage: Successfully stored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries, " + evtConfigs.length + " events");
-                    return that.definitionStorage.remove(that.TRANSACTION_SENTINEL_KEY)
-                        .then(
-                            undefined,
-                            function() {
-                                // we can't recover: the defs were properly stored but the sentinel is still there.
-                                // W-2365447 removes the need for a sentinel which eliminates this possibility.
-                            }
-                        );
-            },
-            function (e) {
-                $A.warning("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries, " + evtConfigs.length + " events", e);
-                    // error storing defs so the persisted def graph is broken. do not remove the sentinel:
-                    // 1. reject this promise so the caller, AuraComponentService.saveDefsToStorage(), will
-                    //    clear the def + action stores which removes the sentinel.
-                    // 2. if the page reloads before the stores are cleared the sentinel prevents getAll()
-                    //    from restoring any defs.
-                throw e;
+            for (i = 0; i < cmpConfigs.length; i++) {
+                descriptor = cmpConfigs[i]["descriptor"];
+                cmpConfigs[i]["uuid"] = context.findLoaded(descriptor);
+                encodedConfig = $A.util.json.encode(cmpConfigs[i]);
+                    promises.push(that.storage.set(descriptor, encodedConfig));
             }
-        );
+
+            for (i = 0; i < libConfigs.length; i++) {
+                descriptor = libConfigs[i]["descriptor"];
+                encodedConfig = $A.util.json.encode(libConfigs[i]);
+                    promises.push(that.storage.set(descriptor, encodedConfig));
+            }
+
+            for (i = 0; i < evtConfigs.length; i++) {
+                descriptor = evtConfigs[i]["descriptor"];
+                encodedConfig = $A.util.json.encode(evtConfigs[i]);
+                    promises.push(that.storage.set(descriptor, encodedConfig));
+            }
+
+            return Promise["all"](promises).then(
+                function () {
+                    $A.log("ComponentDefStorage: Successfully stored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries, " + evtConfigs.length + " events");
+                        return that.storage.remove(that.TRANSACTION_SENTINEL_KEY)
+                            .then(
+                                undefined,
+                                function() {
+                                    // we can't recover: the defs were properly stored but the sentinel is still there.
+                                    // W-2365447 removes the need for a sentinel which eliminates this possibility.
+                                }
+                            );
+                },
+                function (e) {
+                    $A.warning("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries, " + evtConfigs.length + " events", e);
+                        // error storing defs so the persisted def graph is broken. do not remove the sentinel:
+                        // 1. reject this promise so the caller, AuraComponentService.saveDefsToStorage(), will
+                        //    clear the def + action stores which removes the sentinel.
+                        // 2. if the page reloads before the stores are cleared the sentinel prevents getAll()
+                        //    from restoring any defs.
+                    throw e;
+                }
+            );
         });
 };
 
 /**
  * Removes definitions from storage. Should always be called from within a call to #enqueue().
- * @param {String[]} descriptors the descriptors identifying the definitions to remove.
- * @return {Promise} a promise that resolves when the definitions are removed.
+ * @param {String[]} descriptors The descriptors identifying the definitions to remove.
+ * @return {Promise} A promise that resolves when the definitions are removed.
  */
 ComponentDefStorage.prototype.removeDefs = function(descriptors) {
     if (!this.useDefinitionStorage() || !descriptors.length) {
@@ -194,17 +207,17 @@ ComponentDefStorage.prototype.removeDefs = function(descriptors) {
     }
 
     var that = this;
-    return this.definitionStorage.set(this.TRANSACTION_SENTINEL_KEY, {})
+    return this.storage.set(this.TRANSACTION_SENTINEL_KEY, true)
         .then(function() {
             var promises = [];
             for (var i = 0; i < descriptors.length; i++) {
-                    promises.push(that.definitionStorage.remove(descriptors[i], true));
+                promises.push(that.storage.remove(descriptors[i], true));
             }
 
             return Promise["all"](promises).then(
                 function () {
                     $A.log("ComponentDefStorage: Successfully removed " + promises.length + " descriptors");
-                    return that.definitionStorage.remove(that.TRANSACTION_SENTINEL_KEY)
+                    return that.storage.remove(that.TRANSACTION_SENTINEL_KEY)
                     .then(
                         undefined,
                         function() {
@@ -229,19 +242,18 @@ ComponentDefStorage.prototype.removeDefs = function(descriptors) {
 
 /**
  * Gets all definitions from storage. Should always be called from within a call to #enqueue().
- * @return {Promise} a promise that resolves with an array of the configs from storage. If decoding
- *  the configs fails the promise rejects. If the underlying storage fails or is disabled the promise
- *  resolves to an empty array.
+ * @return {Promise} A promise that resolves with a map of descriptor name to definitions. If
+ *  the underlying storage fails or is disabled then the promise resolves to an empty map.
  */
 ComponentDefStorage.prototype.getAll = function () {
     if (!this.useDefinitionStorage()) {
-        return Promise["resolve"]([]);
+        return Promise["resolve"]({});
     }
 
     var that = this;
     var actions = Action.getStorage();
 
-    return this.definitionStorage.getAll(true).then(
+    return this.storage.getAll([], true).then(
         function(items) {
             function clearActionsCache() {
                 if (actions && actions.isPersistent()) {
@@ -254,36 +266,33 @@ ComponentDefStorage.prototype.getAll = function () {
                 throw new $A.auraError("Sentinel value found in def storage indicating a corrupt def graph", null, $A.severity.QUIET);
             }
 
-            var i, len, result = [];
-            for (i = 0, len = items.length; i < len; i++) {
-                var item = items[i];
-
-                // if sentinel key is found then the persisted graph is corrupt. clear it and
-                // cause the parent promise to error.
-                if (item["key"] === that.TRANSACTION_SENTINEL_KEY) {
-                    return that.definitionStorage.clear()
-                        .then(clearActionsCache, clearActionsCache)
-                        .then(throwSentinelError, throwSentinelError);
-                }
-
-                var config = $A.util.json.decode(item["value"]);
-                if (config === null) {
-                    throw new $A.auraError("Error decoding definition from storage: " + item["key"], null, $A.severity.QUIET);
-                }
-                result.push({ "key": item["key"], "value" : config });
+            // if sentinel key is found then the persisted graph is corrupt. clear it and
+            // cause the parent promise to error.
+            if (items[that.TRANSACTION_SENTINEL_KEY] === true) {
+                return that.storage.clear()
+                    .then(clearActionsCache, clearActionsCache)
+                    .then(throwSentinelError, throwSentinelError);
             }
 
+            var result = {};
+            for (var key in items) {
+                var config = $A.util.json.decode(items[key]);
+                if (config === null) {
+                    throw new $A.auraError("Error decoding definition from storage: " + key, null, $A.severity.QUIET);
+                }
+                result[key] = config;
+            }
             return result;
         },
         function() {
-            return [];
+            return {};
         }
     );
 };
 
 /**
  * Asynchronously retrieves all definitions from storage and adds to component service.
- * @return {Promise} a promise that resolves when definitions are restored.
+ * @return {Promise} A promise that resolves when definitions are restored.
  */
 ComponentDefStorage.prototype.restoreAll = function(context) {
     var that = this;
@@ -298,8 +307,8 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
                 // Decode all items
                 // @dval: The following type checking is REALLY loose and flaky.
                 // All this code needs to go as part of the epic caching refactor.
-                for (var i = 0; i < items.length; i++) {
-                    var config = items[i]["value"];
+                for (var key in items) {
+                    var config = items[key];
 
                     if (config["type"] && config["attributes"]) { // It's an event (although the signature is... interesting)
                         if (!$A.eventService.getEventDef(config)) {
@@ -338,9 +347,9 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
 
 
 /**
- * Enqueues a function that requires isolated access to def storage.
- * @param {function} execute the function to execute.
- * @return {Promise} a promise that resolves when the provided function executes.
+ * Enqueues a function that requires isolated access to the underlying AuraStorage.
+ * @param {Function} execute The function to execute.
+ * @return {Promise} A promise that resolves when the provided function executes.
  */
 ComponentDefStorage.prototype.enqueue = function(execute) {
     var that = this;
@@ -394,13 +403,13 @@ ComponentDefStorage.prototype.enqueue = function(execute) {
     return promise;
 };
 
+
 /**
  * Clears persisted definitions and all dependent stores and context.
- * @param {Object} [metricsPayload] optional payload to send to metrics service.
- * @return {Promise} a promise that resolves when all stores are cleared.
+ * @param {Object=} metricsPayload An optional payload to send to metrics service.
+ * @return {Promise} A promise that resolves when all stores are cleared.
  */
 ComponentDefStorage.prototype.clear = function(metricsPayload) {
-
     // if def storage isn't in use then nothing to do
     if (!this.useDefinitionStorage()) {
         return Promise["resolve"]();
@@ -416,7 +425,7 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
         // send all defs so the client rebuilds a complete def graph for persistence. (the in-memory
         // graph remains complete at all times but when the app is restarted memory is reset.)
         //
-        // to avoid an in-flight XHR from having a stale context.loaded value, the def clearing is
+        // to avoid an in-flight XHR from having a stale context.loaded value, def clearing is
         // carefully orchestrated:
         // 1. wait until no XHRs are in flight
         // 2. synchronously clear aura.context.loaded
@@ -454,7 +463,7 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
                 actionClear = Promise["resolve"]();
             }
 
-            var defClear = that.definitionStorage.clear().then(
+            var defClear = that.storage.clear().then(
                 undefined, // noop on success
                 function(e) {
                     $A.warning("ComponentDefStorage.clear: failure clearing cmp def store", e);

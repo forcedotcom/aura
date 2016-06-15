@@ -30,23 +30,23 @@
             return Promise.reject(new Error("getSize(): mock always fails"));
         };
 
-        MockStorageAdapter.prototype.getItem = function(key) {
-            return Promise.reject(new Error("getItem(): mock always fails"));
+        MockStorageAdapter.prototype.getItems = function(keys) {
+            return Promise.reject(new Error("getItems(): mock always fails"));
         };
 
-        MockStorageAdapter.prototype.getAll = function(key) {
+        MockStorageAdapter.prototype.getAll = function(keys) {
             return Promise.reject(new Error("getAll(): mock always fails"));
         };
 
-        MockStorageAdapter.prototype.setItem = function(key, item) {
-            return Promise.reject(new Error("setItem(): mock always fails"));
+        MockStorageAdapter.prototype.setItems = function(tuples) {
+            return Promise.reject(new Error("setItems(): mock always fails"));
         };
 
-        MockStorageAdapter.prototype.removeItem = function(key) {
-            return Promise.reject(new Error("removeItem(): mock always fails"));
+        MockStorageAdapter.prototype.removeItems = function(keys) {
+            return Promise.reject(new Error("removeItems(): mock always fails"));
         };
 
-        MockStorageAdapter.prototype.clear = function(key) {
+        MockStorageAdapter.prototype.clear = function() {
             return Promise.reject(new Error("clear(): mock always fails"));
         };
 
@@ -108,7 +108,7 @@
                this.doFailedActionAndVerifyError(promise, "Error: CryptoAdapter '" + this.storageName + "' adapter failed to initialize");
            },
            function verifyExpectedLogs(cmp) {
-               this.verifyLogs("get");
+               this.verifyLogs("getAll");
            }
         ]
     },
@@ -157,9 +157,9 @@
     doFailedActionAndVerifyError: function(promise, errorMessage) {
         var completed = false;
         var error;
-        promise.then(function(){
-                // Resolve handler should not be called
-            }, function(err) {
+        promise.then(
+            undefined, // Resolve handler should not be called
+            function(err) {
                 // Save error and let promise return to success state for test to verify error
                 error = err;
             })

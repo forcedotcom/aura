@@ -247,8 +247,53 @@
         }]
     },
 
+    testBulkGetInnerItemNotInStorage: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testBulkGetInnerItemNotInStorage(cmp, this.storage);
+        }
+    },
+
+    testBulkGetOuterItemsNotInStorage: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testBulkGetOuterItemsNotInStorage(cmp, this.storage);
+        }
+    },
+
+    testBulkSet: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testBulkSet(cmp, this.storage);
+        }
+    },
+
+    testBulkSetLargerThanMaxSize: {
+        test: function(cmp) {
+            // Due to differences in size calculation between adapters, pass in a storage with the correct size to
+            // fill up the storage after 5 entries of a 512 character string.
+            var storage = $A.storageService.initStorage({
+                name: "memory-testOverflow",
+                maxSize: 5000,
+                expiration: 2000
+            });
+
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("memory-testOverflow"); });
+            cmp.helper.lib.storageTest.testBulkSetLargerThanMaxSize(cmp, storage);
+        }
+    },
+
+    testBulkRemoveInnerItemNotInStorage: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testBulkRemoveInnerItemNotInStorage(cmp, this.storage);
+        }
+    },
+
+    testBulkRemoveOuterItemsNotInStorage: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testBulkRemoveOuterItemsNotInStorage(cmp, this.storage);
+        }
+    },
+
     /**
-     * Tests that verify behavior specific to CryptoAdapter.
+     * Tests that verify behavior specific to MemoryAdapter.
      */
 
     testSizeOneObject : {
@@ -499,10 +544,7 @@
                 return that.storage.getAll();
             })
             .then(function(items) {
-                for (var i = 0; i < items.length; i++) {
-                    var item = items[i];
-                    $A.test.assertNotEquals(key1, item.key, "Original key not evicted from storage");
-                }
+                $A.test.assertFalse(items.hasOwnProperty(key1), "Original key not evicted from storage");
                 completed = true;
             })
             ["catch"](function(error) { $A.test.fail(error.toString()); });

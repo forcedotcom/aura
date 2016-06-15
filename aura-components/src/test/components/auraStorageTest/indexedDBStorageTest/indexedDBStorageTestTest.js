@@ -14,10 +14,11 @@
             name: "browserdb",
             maxSize: 32768,
             expiration: 2000,
-            debugLogging: true
+            debugLogging: true,
+            clearOnInit: true
         });
 
-        $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb"); });
+       $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb"); });
     },
 
     testSizeInitial: {
@@ -240,6 +241,51 @@
         }]
     },
 
+    testBulkGetInnerItemNotInStorage: {
+        test: function(cmp) {
+            cmp._storageLib.testBulkGetInnerItemNotInStorage(cmp, this.storage);
+        }
+    },
+
+    testBulkGetOuterItemsNotInStorage: {
+        test: function(cmp) {
+            cmp._storageLib.testBulkGetOuterItemsNotInStorage(cmp, this.storage);
+        }
+    },
+
+    testBulkSet: {
+        test: function(cmp) {
+            cmp._storageLib.testBulkSet(cmp, this.storage);
+        }
+    },
+
+    testBulkSetLargerThanMaxSize: {
+        test: function(cmp) {
+            // Due to differences in size calculation between adapters, pass in a storage with the correct size to
+            // fill up the storage after 5 entries of a 512 character string.
+            var storage = $A.storageService.initStorage({
+                name: "browserdb-testBulkSetLargerThanMaxSize",
+                maxSize: 5000,
+                expiration: 2000,
+                debugLogging: true
+            });
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testBulkSetLargerThanMaxSize"); });
+            cmp._storageLib.testBulkSetLargerThanMaxSize(cmp, storage);
+        }
+    },
+
+    testBulkRemoveInnerItemNotInStorage: {
+        test: function(cmp) {
+            cmp._storageLib.testBulkRemoveInnerItemNotInStorage(cmp, this.storage);
+        }
+    },
+
+    testBulkRemoveOuterItemsNotInStorage: {
+        test: function(cmp) {
+            cmp._storageLib.testBulkRemoveOuterItemsNotInStorage(cmp, this.storage);
+        }
+    },
+
     /**
      * Tests that verify behavior specific to IndexedDB.
      */
@@ -319,7 +365,7 @@
                 .then(function() { return cmp._storage.get("testGetSize.key1"); })
                 .then(function(value) { $A.test.assertDefined(value, "Fail item."); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
-                .then(function(result) { cmp._append("result length = "+result.length); return cmp._storage.getSize(); })
+                .then(function(result) { cmp._append("result length = "+Object.keys(result).length); return cmp._storage.getSize(); })
                 .then(function(size) {
                     $A.test.assertTrue(size >= 2 && size < 2.2, "testGetSize: Expected size of 2, but got " + size);
                     completed = true;
@@ -354,7 +400,7 @@
                 .then(function() { return cmp._storage.get("testGetSize.key2"); })
                 .then(function(value) { $A.test.assertDefined(value); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
-                .then(function(results) { return cmp._storage.getSize(); })
+                .then(function() { return cmp._storage.getSize(); })
                 .then(function(size) {
                     $A.test.assertTrue(size >= 4 && size < 4.3, "testGetSize: Expected size of 4, but got " + size);
                     completed = true;
@@ -603,22 +649,18 @@
                    // can't call sweep() directly so rely on get() to trigger sweep().
                    return cmp._storage.get("anything")
                        .then(function() {
-                           return cmp._storage.getAll();
+                           // expiration is set very low to force sweeping so must request expired items
+                           return cmp._storage.getAll([], true);
                        })
                        .then(function(items) {
-                           var indexedItems = {};
-                           items.forEach(function(item) {
-                               indexedItems[item["key"]] = item["value"];
-                           });
-
                            // if sweep() hasn't cleared the items then recurse
-                           if (indexedItems[cmp._prefix.key] || indexedItems[cmp._suffix1.key]) {
+                           if (items[cmp._prefix.key] || items[cmp._suffix1.key]) {
                                return checkStorage();
                            }
 
                            // verify the blacklisted items remain
                            for (var i = 0; i < cmp._actionsBlacklist.length; i++) {
-                               var item = indexedItems[cmp._actionsBlacklist[i]];
+                               var item = items[cmp._actionsBlacklist[i]];
                                if (!item) {
                                    return Promise["reject"](new Error("Blacklisted entry '" + cmp._actionsBlacklist[i] + "' was incorrectly evicted"));
                                }

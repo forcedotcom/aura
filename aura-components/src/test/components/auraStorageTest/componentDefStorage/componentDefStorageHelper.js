@@ -69,23 +69,15 @@
             }
             iterationCount++;
 
-            defs.getAll(true).then(function(items) {
-                items = items || [];
-
+            defs.getAll([], true).then(function(items) {
                 // recurse if transaction key is found
-                for (var i = 0; i < items.length; i++) {
-                    if (items[i]["key"] === TRANSACTION_SENTINEL_KEY) {
-                        queryDefStorage();
-                        return;
-                    }
+                if (items[TRANSACTION_SENTINEL_KEY]) {
+                    queryDefStorage();
+                    return;
                 }
 
                 // collect the defs
-                var keys  = [];
-                for (var i = 0; i < items.length; i++) {
-                    keys.push(items[i]["key"]);
-                }
-                var content = keys.sort().join(", ");
+                var content = Object.keys(items).sort().join(", ");
 
                 // only log if the value has changed
                 if (cmp._ComponentDefStorage !== content) {

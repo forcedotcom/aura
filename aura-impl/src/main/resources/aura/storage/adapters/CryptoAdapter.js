@@ -66,15 +66,16 @@ function CryptoAdapter(config) {
     // async initialize. if it completes successfully, process the queue;
     // otherwise reject the pending operations.
     var that = this;
-    this.initialize().then(
-        function() {
-            that.executeQueue(true);
-        },
-        function() {
-            // Reject on initialize should be rare because we use memory storage as alternate
-            that.executeQueue(false);
-        }
-    );
+    this.initialize()
+        .then(
+            function() {
+                that.executeQueue(true);
+            },
+            function() {
+                // Reject on initialize should be rare because we use memory storage as alternate
+                that.executeQueue(false);
+            }
+        );
 }
 
 /** Name of adapter. */
@@ -85,7 +86,6 @@ CryptoAdapter.LOG_LEVEL = {
     INFO:    { id: 0, fn: "log" },
     WARNING: { id: 1, fn: "warning" }
 };
-
 
 /** Encryption algorithm. */
 CryptoAdapter.ALGO = "AES-CBC";
@@ -109,6 +109,7 @@ CryptoAdapter.key = new Promise(function(resolve, reject) {
     CryptoAdapter._keyResolve = resolve;
     CryptoAdapter._keyReject = reject;
 });
+
 
 /**
  * Sets the per-application encryption key.
@@ -141,26 +142,28 @@ CryptoAdapter["setKey"] = function(rawKey) {
         CryptoAdapter.ALGO,     // algorithm of key
         false,                  // don't allow key export
         ["encrypt", "decrypt"]  // allowed operations
-    ).then(
-        function(key) {
-            // it's possible for key import to fail, which we treat as a fatal
-            // error. all pending and future operations will fail.
-            if (!key) {
-                log = "CryptoAdapter crypto.importKey() returned no key, rejecting";
+    )
+        .then(
+            function(key) {
+                // it's possible for key import to fail, which we treat as a fatal
+                // error. all pending and future operations will fail.
+                if (!key) {
+                    log = "CryptoAdapter crypto.importKey() returned no key, rejecting";
+                    $A.warning(log);
+                    reject(new Error(log));
+                    return;
+                }
+                $A.log("CryptoAdapter crypto.importKey() successfully imported key");
+                resolve(key);
+            },
+            function(e) {
+                log = "CryptoAdapter crypto.importKey() failed, rejecting: " + e;
                 $A.warning(log);
                 reject(new Error(log));
-                return;
             }
-            $A.log("CryptoAdapter crypto.importKey() successfully imported key");
-            resolve(key);
-        },
-        function(e) {
-            log = "CryptoAdapter crypto.importKey() failed, rejecting: " + e;
-            $A.warning(log);
-            reject(new Error(log));
-        }
-    );
+        );
 };
+
 
 /**
  * Registers crypto adapter.
@@ -220,6 +223,7 @@ CryptoAdapter.prototype.fallbackToMemoryAdapter = function(e) {
     this.adapter = new Aura.Storage.MemoryAdapter(this.config);
 };
 
+
 /**
  * Initializes the adapter by waiting for the app-wide crypto key to be set,
  * then validates the key works for items already in persistent storage. If a
@@ -237,44 +241,45 @@ CryptoAdapter.prototype.initialize = function() {
     }
 
     return CryptoAdapter.key
-    .then(
-        function(key) {
-            // it's possible for key generation to fail, which we treat as a fatal
-            // error. all pending and future operations will fail.
-            if (!key) {
-                throw new Error("CryptoAdapter.key resolved with no key."); // move to reject state
-            }
-            that.key = key;
-        },
-        function(e) {
-            throw new Error("CryptoAdapter.key rejected: " + e); // maintain reject state
-        }
-    ).then(
-        function() {
-            // check if existing data can be decrypted
-            return new Promise(function(resolve, reject) {
-                that.log(CryptoAdapter.LOG_LEVEL.INFO, "initialize(): checking encryption key status");
-                that.getItemInternal(CryptoAdapter.SENTINEL, resolve, reject);
-            }).then(
-                null,
-                function() {
-                    // decryption failed so flush the store. do not re-throw since we've recovered
-                    that.log(CryptoAdapter.LOG_LEVEL.INFO, "initialize(): encryption key is different so clearing storage");
-                    $A.metricsService.transaction("aura", "initializeCryptoStorage");
-                    return that.adapter.clear();
+        .then(
+            function(key) {
+                // it's possible for key generation to fail, which we treat as a fatal
+                // error. all pending and future operations will fail.
+                if (!key) {
+                    throw new Error("CryptoAdapter.key resolved with no key."); // move to reject state
                 }
-            );
-        },
-        function(e) {
-            that.fallbackToMemoryAdapter(e);
-            // do not throw an error so the promise moves to resolve state
-        }
-    ).then(
-        function() {
-            return that.setSentinalItem();
-        }
-    );
+                that.key = key;
+            },
+            function(e) {
+                throw new Error("CryptoAdapter.key rejected: " + e); // maintain reject state
+            }
+        ).then(
+            function() {
+                // check if existing data can be decrypted
+                return new Promise(function(resolve, reject) {
+                    that.log(CryptoAdapter.LOG_LEVEL.INFO, "initialize(): checking encryption key status");
+                    that.getItemsInternal([CryptoAdapter.SENTINEL], resolve, reject);
+                }).then(
+                    undefined,
+                    function() {
+                        // decryption failed so flush the store. do not re-throw since we've recovered
+                        that.log(CryptoAdapter.LOG_LEVEL.INFO, "initialize(): encryption key is different so clearing storage");
+                        $A.metricsService.transaction("aura", "initializeCryptoStorage");
+                        return that.adapter.clear();
+                    }
+                );
+            },
+            function(e) {
+                that.fallbackToMemoryAdapter(e);
+                // do not throw an error so the promise moves to resolve state
+            }
+        ).then(
+            function() {
+                return that.setSentinalItem();
+            }
+        );
 };
+
 
 /**
  * Gets whether the crypto adapter is running in standard mode (secure and persistent) or fallback
@@ -311,8 +316,15 @@ CryptoAdapter.prototype.executeQueue = function(readyState) {
             // adapter is in permanent error state, reject all queued promises
             queue[i]["reject"](new Error(this.getInitializationError()));
         } else {
-            // run the queued logic, which will resolve the promises
-            queue[i]["execute"](queue[i]["resolve"], queue[i]["reject"]);
+            try {
+                // run the queued logic, which will resolve the promises
+                queue[i]["execute"](queue[i]["resolve"], queue[i]["reject"]);
+            } catch (e) {
+                var message = "executeQueue(): error processing queue: "+e;
+                this.log(CryptoAdapter.LOG_LEVEL.WARNING, message);
+                queue[i]["reject"](new Error("CryptoAdapter."+message));
+
+            }
         }
     }
 };
@@ -367,138 +379,108 @@ CryptoAdapter.prototype.getSize = function() {
 
 
 /**
- * Retrieves an item from storage.
- * @param {String} key key for item to retrieve
- * @returns {Promise} a promise that resolves with the item or undefined if not found
+ * Retrieves items from storage.
+ * @param {String[]} [keys] The set of keys to retrieve. Undefined to retrieve all items.
+ * @param {Boolean} [includeExpired] True to return expired items, false to not return expired items.
+ * @returns {Promise} A promise that resolves with an array of the items.
  */
-CryptoAdapter.prototype.getItem = function(key) {
+CryptoAdapter.prototype.getItems = function(keys /*, includeExpired*/) {
+    // TODO - optimize by respecting includeExpired
     var that = this;
-    return this.enqueue(function(resolve, reject) {
-        that.getItemInternal(key, resolve, reject);
-    });
-};
-
-
-/**
- * Retrieves an item from storage.
- * @param {String} key key for item to retrieve
- * @param {Function} resolve promise resolve function
- * @param {Function} reject promise resolve function
- * @private
- */
-CryptoAdapter.prototype.getItemInternal = function(key, resolve, reject) {
-    var that = this;
-    this.adapter.getItem(key)
-    .then(
-        function(value) {
-            // key not found
-            if ($A.util.isUndefinedOrNull(value)) {
-                resolve();
-                return;
-            }
-
-            if (that.isCrypto()) {
-                that.decrypt(value).then(
-                    function (decrypted) {
-                        resolve(decrypted);
-                    },
-                    function (err) {
-                        reject(err);
-                    }
-                );
-            } else {
-                resolve(value);
-            }
-        },
-        function(e) {
-            reject(e);
-        }
-    );
-};
-
-/**
- * Decrypts a stored cached entry.
- * @param {Object} value the cache entry to decrypt
- * @returns {Promise} a promise that resolves with the decrypted item.
- * The object consists of {value: *, isExpired: Boolean}.
- * @private
- */
-CryptoAdapter.prototype.decrypt = function(value) {
-    var that = this;
-
-    return CryptoAdapter.engine["decrypt"]({
-            "name": CryptoAdapter.ALGO,
-            "iv": value["value"]["iv"]
-        },
-        that.key,
-        value["value"]["cipher"]
-    ).then(
-        function(decrypted) {
-            var obj = that.arrayBufferToObject(new Uint8Array(decrypted));
-            return {"expires": value["expires"], "value": obj};
-        },
-        function(err) {
-            that.log(CryptoAdapter.LOG_LEVEL.WARNING, "decrypt(): decryption failed", err);
-            throw new Error(err);
-        }
-    );
-};
-
-
-/**
- * Gets all items in storage.
- * @returns {Promise} a promise that resolves with the an array of all items
- */
-CryptoAdapter.prototype.getAll = function() {
-    var that = this;
-    var execute = function(resolve, reject) {
-        that.adapter.getAll()
-        .then(
-            function(items) {
-                if (that.isCrypto()) {
-                    var results = [];
-                    var promises = [];
-
-                    var captureResults = function (key, decrypted) {
-                        decrypted["key"] = key;
-                        results.push(decrypted);
-                    };
-
-                    // use bind() to curry a function specific to each item, capturing its key.
-                    // decrypt returns only the decrypted value, not the other properties.
-                    for (var i in items) {
-                        promises.push(
-                            that.decrypt(items[i])
-                                .then(captureResults.bind(undefined, items[i]["key"]))
-                        );
-                    }
-
-                    // when all items are decrypted we can return the full result set
-                    Promise["all"](promises).then(
-                        function () {
-                            resolve(results);
-                        },
-                        function (err) {
-                            reject(new Error("getAll(): decryption failed: " + err));
-                        }
-                    );
-                } else {
-                    resolve(items);
-                }
-            },
-            function(e) {
-                reject(e);
-            }
-        );
-
+    var execute = function getIems(resolve, reject) {
+        that.getItemsInternal(keys, resolve, reject);
     };
     return this.enqueue(execute);
 };
 
 
 /**
+ * Retrieves items from storage.
+ * @param {String[]} keys The keys of the items to retrieve.
+ * @param {Function} resolve Promise resolve function.
+ * @param {Function} reject Promise resolve function.
+ * @private
+ */
+CryptoAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
+    var that = this;
+    this.adapter.getItems(keys)
+        .then(
+            function(values) {
+                if (!that.isCrypto()) {
+                    return values;
+                }
+
+                var decrypted = {};
+                function collector(k, decryptedValue) {
+                    // do not return the sentinel. note that we did verify it decrypts correctly.
+                    if (k !== CryptoAdapter.SENTINEL) {
+                        decrypted[k] = decryptedValue;
+                    }
+                }
+
+                var promises = [];
+                var promise, value;
+                for (var key in values) {
+                    value = values[key];
+                    if ($A.util.isUndefinedOrNull(value)) {
+                        decrypted[key] = undefined;
+                    } else {
+                        promise = that.decrypt(value).then(collector.bind(undefined, key));
+                        promises.push(promise);
+                    }
+                }
+
+                return Promise["all"](promises)
+                    .then(function() {
+                        return decrypted;
+                    });
+            }
+        )
+        .then(
+            function(decrypted) {
+                resolve(decrypted);
+            },
+            function(e) {
+                reject(e);
+            }
+        );
+};
+
+
+/**
+ * Decrypts a stored cached entry.
+ * @param {Object} value The cache entry to decrypt.
+ * @returns {Promise} Promise that resolves with the decrypted item.
+ * The object consists of {value: *, isExpired: Boolean}.
+ * @private
+ */
+CryptoAdapter.prototype.decrypt = function(value) {
+    var that = this;
+
+    return CryptoAdapter.engine["decrypt"](
+            {
+                "name": CryptoAdapter.ALGO,
+                "iv": value["value"]["iv"]
+            },
+            that.key,
+            value["value"]["cipher"]
+        )
+        .then(
+            function(decrypted) {
+                var obj = that.arrayBufferToObject(new Uint8Array(decrypted));
+                return {"expires": value["expires"], "value": obj};
+            },
+            function(err) {
+                that.log(CryptoAdapter.LOG_LEVEL.WARNING, "decrypt(): decryption failed", err);
+                throw new Error(err);
+            }
+        );
+};
+
+
+/**
  * Converts an object to an ArrayBuffer.
- * @param {Object} o the object to convert
+ * @param {Object} o The object to convert.
  * @private
  */
 CryptoAdapter.prototype.objectToArrayBuffer = function(o) {
@@ -516,7 +498,7 @@ CryptoAdapter.prototype.objectToArrayBuffer = function(o) {
 
 /**
  * Converts an ArrayBuffer to object.
- * @param {ArrayBuffer} ab the ArrayBuffer to convert
+ * @param {ArrayBuffer} ab The ArrayBuffer to convert.
  * @private
  */
 CryptoAdapter.prototype.arrayBufferToObject = function(ab) {
@@ -530,103 +512,140 @@ CryptoAdapter.prototype.arrayBufferToObject = function(ab) {
     return JSON.parse(str);
 };
 
+
 /**
- * Stores entry used to determine whether encryption key provided can decrypt the entry.
- * @returns {Promise} a promise that resolves when the item is stored.
+ * Stores entry used to determine whether encryption key provided can decrypt the store.
+ * @returns {Promise} Promise that resolves when the item is stored.
  */
 CryptoAdapter.prototype.setSentinalItem = function() {
     return new Promise(function(resolve, reject) {
-        this.setItemInternal(CryptoAdapter.SENTINEL, {
-            "value": CryptoAdapter.SENTINEL,
-            "expires": new Date().getTime() + 15768000000 // 1/2 year
-        }, 0, resolve, reject);
+        var tuple = [
+            CryptoAdapter.SENTINEL,
+            {
+                "value": CryptoAdapter.SENTINEL,
+                "expires": new Date().getTime() + 15768000000 // 1/2 year
+            },
+            0
+        ];
+        this.setItemsInternal([tuple], resolve, reject);
     }.bind(this));
 };
 
+
 /**
- * Stores an item in storage.
- * @param {String} key key for item
- * @param {Object} item item to store
- * @param {Number} size size of key + item in bytes
- * @returns {Promise} a promise that resolves when the item is stored
+ * Stores items in storage.
+ * @param {Array} tuples An array of key-value-size pairs. Eg <code>[ [key1, value1, size1], [key2, value2, size2] ]</code>.
+ * @returns {Promise} A promise that resolves when the items are stored.
  */
-CryptoAdapter.prototype.setItem = function(key, item, size) {
+CryptoAdapter.prototype.setItems = function(tuples) {
     var that = this;
     return this.enqueue(function(resolve, reject) {
-        that.setItemInternal(key, item, size, resolve, reject);
+        that.setItemsInternal(tuples, resolve, reject);
     });
 };
 
 
 /**
- * Stores an item in storage.
- * @param {String} key key for item
- * @param {Object} item item to store
- * @param {Number} size size of key + item in bytes
- * @param {Function} resolve promise resolve function
- * @param {Function} reject promise resolve function
+ * Encrypts a tuple.
+ * @param {Array} tuple An array of key-value-size.
+ * @return {Promise} Promise that resolves to a tuple of key-encrypted value-size.
  */
-CryptoAdapter.prototype.setItemInternal = function(key, item, size, resolve, reject) {
+CryptoAdapter.prototype.encryptToTuple = function(tuple) {
     var that = this;
-    if (this.isCrypto()) {
-
+    return new Promise(function(resolve, reject) {
         var itemArrayBuffer;
         try {
-            // in case json serialize produces error, we still reject
-            itemArrayBuffer = this.objectToArrayBuffer(item["value"]);
+            // if json serialization errors then reject
+            itemArrayBuffer = that.objectToArrayBuffer(tuple[1]["value"]);
         } catch (e) {
-            this.log(CryptoAdapter.LOG_LEVEL.WARNING, "setItem(): serialization failed for key " + key, e);
+            that.log(CryptoAdapter.LOG_LEVEL.WARNING, "encryptToTuple(): serialization failed for key " + tuple[0], e);
             reject(e);
             return;
         }
 
         // generate a new initialization vector for every item
         var iv = window["crypto"]["getRandomValues"](new Uint8Array(CryptoAdapter.IV_LENGTH));
-        CryptoAdapter.engine["encrypt"]({
-                "name": CryptoAdapter.ALGO,
-                "iv": iv
-            },
-            this.key,
-            itemArrayBuffer
-        ).then(
-            function (encrypted) {
-                var storable = {
-                    "expires": item["expires"],
-                    "value": {"iv": iv, "cipher": encrypted}
-                };
-                resolve(that.adapter.setItem(key, storable, size));
-            },
-            function (err) {
-                that.log(CryptoAdapter.LOG_LEVEL.WARNING, "setItem(): encryption failed for key " + key, err);
-                reject(err);
-            }
-        );
-    } else {
-        resolve(this.adapter.setItem(key, item, size));
-    }
-};
-
-/**
- * Removes an item from storage.
- * @param {String} key key for item to remove
- * @returns {Promise} a promise that resolves when the item is removed
- */
-CryptoAdapter.prototype.removeItem = function(key) {
-    var that = this;
-    return this.enqueue(function(resolve, reject) {
-        that.removeItemInternal(key, resolve, reject);
+        CryptoAdapter.engine["encrypt"](
+                {
+                    "name": CryptoAdapter.ALGO,
+                    "iv": iv
+                },
+                that.key,
+                itemArrayBuffer
+            )
+            .then(
+                function (encrypted) {
+                    var storable = {
+                        "expires": tuple[1]["expires"],
+                        "value": {"iv": iv, "cipher": encrypted}
+                    };
+                    resolve([tuple[0], storable, tuple[2]]);
+                },
+                function (err) {
+                    that.log(CryptoAdapter.LOG_LEVEL.WARNING, "encryptToTuple(): encryption failed for key " + tuple[0], err);
+                    reject(err);
+                }
+            );
     });
 };
 
 
 /**
- * Removes an item from storage.
- * @param {String} key key for item to remove
- * @param {Function} resolve promise resolve function
- * @param {Function} reject promise resolve function
+ * Stores items in storage.
+ * @param {Array} tuples An array of key-value-size pairs.
+ * @param {Function} resolve Promise resolve function.
+ * @param {Function} reject Promise resolve function.
+ * @private
  */
-CryptoAdapter.prototype.removeItemInternal = function(key, resolve, reject) {
-    this.adapter.removeItem(key).then(resolve, reject);
+CryptoAdapter.prototype.setItemsInternal = function(tuples, resolve, reject) {
+    var that = this;
+    if (!this.isCrypto()) {
+        resolve(this.adapter.setItems(tuples));
+        return;
+    }
+
+    // encrypt into tuples
+    var promises = [];
+    var tuple;
+    for (var i = 0; i < tuples.length; i++) {
+        tuple = tuples[i];
+        promises.push(this.encryptToTuple(tuple));
+    }
+
+    Promise["all"](promises).then(
+        function(encryptedTuples) {
+            resolve(that.adapter.setItems(encryptedTuples));
+        },
+        function (err) {
+            var keys = tuples.map(function(t) { return t[0]; });
+            that.log(CryptoAdapter.LOG_LEVEL.WARNING, "setItemsInternal(): transaction error for keys "+keys.toString(), err);
+            reject(err);
+        }
+    );
+};
+
+
+/**
+ * Removes items from storage.
+ * @param {String[]} keys The keys of the items to remove.
+ * @returns {Promise} A promise that resolves when all items are removed.
+ */
+CryptoAdapter.prototype.removeItems = function(keys) {
+    var that = this;
+    return this.enqueue(function(resolve, reject) {
+        that.removeItemsInternal(keys, resolve, reject);
+    });
+};
+
+
+/**
+ * Removes items from storage.
+ * @param {String[]} keys The kets of the items to remove.
+ * @param {Function} resolve Promise resolve function.
+ * @param {Function} reject Promise resolve function.
+ */
+CryptoAdapter.prototype.removeItemsInternal = function(keys, resolve, reject) {
+    this.adapter.removeItems(keys).then(resolve, reject);
 };
 
 
@@ -635,6 +654,7 @@ CryptoAdapter.prototype.removeItemInternal = function(key, resolve, reject) {
  * @returns {Promise} a promise that resolves when the store is cleared
  */
 CryptoAdapter.prototype.clear = function() {
+    // TODO - should re-set sentinel key after a clear
     return this.adapter.clear();
 };
 
@@ -666,6 +686,7 @@ CryptoAdapter.prototype.suspendSweeping = function() {
     }
 };
 
+
 /**
  * Resumes eviction.
  */
@@ -690,7 +711,6 @@ CryptoAdapter.prototype.isSecure = function() {
 CryptoAdapter.prototype.isPersistent = function() {
     return this.mode === CryptoAdapter.NAME;
 };
-
 
 
 /**

@@ -64,7 +64,7 @@
             }, function(cmp) {
                 $A.test.addWaitForWithFailureMessage("newString", function() {
                     var lastEdited = cmp.get("v.lastEdited");
-                    return lastEdited && lastEdited.value;
+                    return lastEdited && lastEdited.values[0];
                 }, "The lastEdited attribute should be updated with the last edited value");
             }
         ]

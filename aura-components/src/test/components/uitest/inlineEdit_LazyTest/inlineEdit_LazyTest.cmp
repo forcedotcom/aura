@@ -44,11 +44,11 @@
             <ui:button label="Change items" press="{!c.changeItems}" />
         </div>
         
-        <div class="info">
+        <div aura:id="lastEdited">
             <span>Last Edited: </span><br/>
-            <span>Index: {!v.lastEdited.index}</span><br/>
-            <span>Key: {!v.lastEdited.key}</span><br/>
-            <span>Value: {!v.lastEdited.value}</span><br/>
+            Index: <span>{!v.lastEdited.index}</span><br/>
+            Keys: <span>{!v.lastEdited.keys[0]}</span><br/>
+            Values: <span>{!v.lastEdited.values[0]}</span><br/>
         </div>
 
         <div class="content">

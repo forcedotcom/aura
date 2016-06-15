@@ -56,11 +56,17 @@
 				}
 				
 				editLayout.attributes.values.value = payload.value;
-				editLayout.attributes.values.updateOn = 'input';
+				editLayout.attributes.values.updateOn = "input";
+				
+				var editFieldOverrides = cmp.get("v.editFieldOverrides") || {};
+				var updateMap = editFieldOverrides[payload.name] || {};
+				if (!editFieldOverrides[payload.name]) {
+					updateMap[payload.name] = "value";
+				}
 				
 				var panelBodyAttributes = {
 				        index : index,
-				        key : payload.name,
+				        updateMap : updateMap,
 				        inputComponent : $A.createComponentFromConfig(editLayout)
 				};
 				
@@ -72,23 +78,19 @@
 	handlePanelSubmit : function(cmp, evt, helper) {
 		var payload = evt.getParam("payload");
 		var items = cmp.get("v.items");
+		var values = payload.values;
 		var index = payload.index;
 		var item = items[index];
 		
 		// TODO: Move into preprocessing logic when items are initially set
 		item.status = item.status || {};
-
-		// Update UI
-		// TODO: Better status passing from container to cell
-		item.data[payload.key] = payload.value;
-		if (!item.status[payload.key]) {
-			item.status[payload.key] = {};
-		}
-		item.status[payload.key].edited = true;
-
-		// Sample status update
-		if ($A.util.isUndefinedOrNull(payload.value)) {
-			item.status[payload.key].hasErrors = true;
+		
+		// Update all record data values and status
+		if (values) {			
+			$A.util.apply(item.data, values, true, true);
+			for (var key in values) {
+				$A.util.addMapValueToMap(item.status, key, true, "edited");
+			}
 		}
 		
 		// Update only the specified item

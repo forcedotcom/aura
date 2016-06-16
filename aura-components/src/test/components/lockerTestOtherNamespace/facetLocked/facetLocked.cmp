@@ -1,0 +1,42 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component
+    implements="aura:requireLocker"
+    description="A locked compoment that can be probed un user mode.">
+
+    <aura:attribute name="id" type="String"/>
+    <aura:attribute name="class" type="String"/>
+
+    <aura:method name="documentQuerySelector" action="{!c.handleDocumentQuerySelector}">
+        <aura:attribute name="selectors" type="String[]" required="true"/>
+        <aura:attribute name="results" type="Object" required="true"/>
+    </aura:method>
+    <aura:method name="elementQuerySelector" action="{!c.handleElementQuerySelector}">
+        <aura:attribute name="selectors" type="String[]" required="true"/>
+        <aura:attribute name="results" type="Object" required="true"/>
+    </aura:method>
+
+    <div>
+        <h1>Locked</h1>
+        <p id="{!v.id}" class="{!v.class}">
+            {! !empty(v.id) ? '#' + v.id : ''}
+            {! !empty(v.class) ? '.' + v.class : ''}
+        </p>
+        <div>{!v.body}</div>
+    </div>
+</aura:component>

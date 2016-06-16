@@ -43,7 +43,7 @@ function SecureElement(el, key) {
             trustNodes(child, child.childNodes);
         }
     }
-    
+
 	var o = SecureObject.getCached(el, key);
 	if (o) {
 		return o;
@@ -64,7 +64,7 @@ function SecureElement(el, key) {
 		o = SecureScriptElement(key, el);
 		break;
 	}
-	
+
 	if (o) {
 		SecureObject.addToCache(el, o, key);
 		return o;
@@ -127,9 +127,31 @@ function SecureElement(el, key) {
 
 				return newNode;
 			}
-		}
+		},
+        querySelector: {
+            value: function(selector) {
+                var rawAll = el.querySelectorAll(selector);
+                for (var n = 0; n < rawAll.length; n++) {
+                    var raw = rawAll[n];
+                    var hasAccess = $A.lockerService.util.hasAccess(o, raw);
+                    if (hasAccess || raw === document.body || raw === document.head) {
+
+                        var cached = SecureObject.getCached(raw, key);
+                        if (cached) {
+                            return cached;
+                        }
+
+                        var swallowed = SecureElement(raw, key);
+                        SecureObject.addToCache(raw, swallowed, key);
+                        return swallowed;
+                    }
+                }
+
+                return null;
+            }
+        }
 	});
-	
+
 	Object.defineProperties(o, {
 		removeChild : SecureObject.createFilteredMethod(o, el, "removeChild", {
 			beforeCallback : function(child) {
@@ -212,8 +234,8 @@ function SecureElement(el, key) {
 		});
 	});
 
-	[ "compareDocumentPosition", "getElementsByClassName", "getElementsByTagName", "getElementsByTagNameNS", "querySelector", "querySelectorAll",
-			"getBoundingClientRect", "getClientRects", "blur", "click", "focus", 
+	[ "compareDocumentPosition", "getElementsByClassName", "getElementsByTagName", "getElementsByTagNameNS", "querySelectorAll",
+			"getBoundingClientRect", "getClientRects", "blur", "click", "focus",
 			"getAttribute", "hasAttribute", "setAttribute", "removeAttribute", "getAttributeNS", "hasAttributeNS", "setAttributeNS", "removeAttributeNS" ].forEach(function(name) {
 		SecureObject.addMethodIfSupported(o, el, name, {
 			filterOpaque : true
@@ -230,11 +252,11 @@ function SecureElement(el, key) {
 				throw new $A.auraError("SecureElement.innerHTML cannot be used with " + el.tagName + " elements!");
 			}
 
-			// Allow SVG <use> element 
+			// Allow SVG <use> element
 			var config = {
 				"ADD_TAGS" : [ "use" ]
 			};
-			
+
 			return DOMPurify["sanitize"](value, config);
 		},
 		afterSetCallback : function() {
@@ -252,7 +274,7 @@ function SecureElement(el, key) {
 
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", el);
-	
+
 	SecureObject.addToCache(el, o, key);
 
     return o;

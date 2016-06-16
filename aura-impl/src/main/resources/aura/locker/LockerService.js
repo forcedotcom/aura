@@ -279,7 +279,8 @@ function LockerService() {
 		},
 
 		isOpaque : function(st) {
-			return getLockerSecret(st, "opaque") === true;
+			var t = typeof st;
+			return (t === "object" || t === "function") && getLockerSecret(st, "opaque") === true;
 		},
 
 		showLockedNodes : function showLockedNodes(root) {

@@ -169,7 +169,6 @@
         svg.appendChild(rect);
 
         var bbox = rect.getBBox();
-        testUtils.assertEquals("[object SVGRect]", bbox.toString());
         for (var prop in expected) {
             testUtils.assertEquals(expected[prop], bbox[prop], "Unexpected attribute value returned from getBBox() for <" + prop + ">");
         }

@@ -164,12 +164,21 @@ SecureObject.filterEverything = function (st, raw, options) {
 				mutated = true;
 			} else {
 				swallowed = {};
+				mutated = true;
+				setLockerSecret(swallowed, "key", key);
 				setLockerSecret(swallowed, "ref", raw);
 				SecureObject.addToCache(raw, swallowed, key);
-
-				for (var prop in raw) {
-					swallowed[prop] = SecureObject.filterEverything(st, raw[prop]);
-					mutated = mutated || (raw[prop] !== swallowed[prop]);
+				
+				for (var name in raw) {
+					if (typeof raw[name] === "function") {
+						Object.defineProperty(swallowed, name, SecureObject.createFilteredMethod(swallowed, raw, name, {
+							filterOpaque : true
+						}));
+					} else {
+						Object.defineProperty(swallowed, name, SecureObject.createFilteredProperty(swallowed, raw, name, {
+							filterOpaque : true
+						}));
+					}
 				}				
 			}
 		}
@@ -195,6 +204,7 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 	}
 
 	var t = typeof value;
+	
 	if (!value || (t !== "object" && t !== "function")) {
 		// ignoring falsy, nully references, non-objects and non-functions
 		return value;

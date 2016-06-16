@@ -27,6 +27,8 @@
                 // HTML5 date input requires a full date format equal to YYYY-MM-DD.
                 inputElement.value = $A.localizationService.formatDateUTC(parsedDate, "YYYY-MM-DD");
             }
+        } else if ($A.util.isEmpty(value)) {
+            inputElement.value = "";
         }
     }
 });

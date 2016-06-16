@@ -20,6 +20,7 @@
     <aura:attribute name="publicAttribute" type="String" access="PUBLIC" description="public" default="PUBLIC"/>
     <aura:attribute name="globalAttribute" type="String" access="GLOBAL" description="global" default="GLOBAL"/>
     <aura:attribute name="privilegedAttribute" type="String" access="PRIVILEGED" description="privileged" default="PRIVILEGED"/>
+    <aura:attribute name="internalAttribute" type="String" access="INTERNAL" description="internal" default="INTERNAL"/>
     
     <aura:method name="globalMethod" action="{!c.globalMethod}" access="GLOBAL"/>
     <aura:method name="publicMethod" action="{!c.publicMethod}" access="PUBLIC"/>

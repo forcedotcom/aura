@@ -204,7 +204,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     }
 
     @Test
-    public void testAccessInternalProvidesPublicComponent() throws Exception {
+    public void _testAccessInternalProvidesPublicComponent() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("auratest");
         open("/componentTest/accessGlobalProvidesPublic.cmp");
         waitForElementTextContains(

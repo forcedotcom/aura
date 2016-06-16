@@ -17,4 +17,17 @@
 -->
 <aura:component access='Privileged'>
 	<auratest:accessPublicComponent aura:id="accessPublicComponent"/>
+	
+	<aura:method name="callGlobalMethodInComponentWithPublicAccess" action="{!c.callGlobalMethodInComponentWithPublicAccess}" access="GLOBAL"/>
+    <aura:method name="callPublicMethodInComponentWithPublicAccess" action="{!c.callPublicMethodInComponentWithPublicAccess}" access="GLOBAL"/>
+    <aura:method name="callPrivateMethodInComponentWithPublicAccess" action="{!c.callPrivateMethodInComponentWithPublicAccess}" access="GLOBAL"/>
+    <aura:method name="callPrivilegedMethodInComponentWithPublicAccess" action="{!c.callPrivilegedMethodInComponentWithPublicAccess}" access="GLOBAL"/>
+	<aura:method name="callInternalMethodInComponentWithPublicAccess" action="{!c.callInternalMethodInComponentWithPublicAccess}" access="GLOBAL"/>
+	
+	<aura:method name="setGlobalAttributeInComponentWithPublicAccess" action="{!c.setGlobalAttributeInComponentWithPublicAccess}" access="GLOBAL"/>
+	<aura:method name="setPublicAttributeInComponentWithPublicAccess" action="{!c.setPublicAttributeInComponentWithPublicAccess}" access="GLOBAL"/>
+	<aura:method name="setPrivateAttributeInComponentWithPublicAccess" action="{!c.setPrivateAttributeInComponentWithPublicAccess}" access="GLOBAL"/>
+	<aura:method name="setPrivilegedAttributeInComponentWithPublicAccess" action="{!c.setPrivilegedAttributeInComponentWithPublicAccess}" access="GLOBAL"/>
+	<aura:method name="setInternalAttributeInComponentWithPublicAccess" action="{!c.setInternalAttributeInComponentWithPublicAccess}" access="GLOBAL"/>
+	
 </aura:component>

@@ -1326,7 +1326,6 @@ AuraClientService.prototype.runAfterInitDefs = function(callback) {
  * @private
  */
 AuraClientService.prototype.loadComponent = function(descriptor, attributes, callback /*,defType*/) {
-    Aura.bootstrapMark("runLoadComponent");
     var acs = this;
 
     this.loadTokenFromStorage().then(
@@ -1348,10 +1347,10 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
     );
 
     this.runAfterInitDefs(function () {
-        Aura.bootstrapMark("runAfterInitDefsCall");
+        Aura.bootstrapMark("runAfterInitDefsReady");
 
         acs.runAfterBootstrapReady(function (bootConfig) {
-            Aura.bootstrapMark("runAfterBootstrapCall");
+            Aura.bootstrapMark("runAfterBootstrapReady");
 
             $A.run(function() {
                 callback(bootConfig);

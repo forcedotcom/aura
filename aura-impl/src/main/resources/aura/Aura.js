@@ -681,6 +681,7 @@ AuraInstance.prototype.initAsync = function(config) {
 
         // the final step in initAsync: trigger the getApplication action
         function getApplication() {
+            Aura.bootstrapMark("runAfterContextCreated");
             $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
         }
 
@@ -764,10 +765,9 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
  * @private
  */
 AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
-    Aura.bootstrapMark("runInitPriv");
-
     if (!$A["hasErrors"]) {
         if (Aura["frameworkLibrariesReady"]) {
+            Aura.bootstrapMark("runAfterLibsReady");
             $A.addTearDownHandler();
             Aura.bootstrapMark("createAndRenderAppInit");
             var app = $A.clientService["init"](config, token, $A.util.getElement(container));

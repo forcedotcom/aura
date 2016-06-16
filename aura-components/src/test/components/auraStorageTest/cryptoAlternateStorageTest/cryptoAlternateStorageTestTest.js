@@ -51,18 +51,6 @@
         }
     },
 
-    testNullKey: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testNullKey(cmp, this.storage);
-        }
-    },
-
-    testUndefinedKey: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testUndefinedKey(cmp, this.storage);
-        }
-    },
-
     testEmptyStringKey: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testEmptyStringKey(cmp, this.storage);

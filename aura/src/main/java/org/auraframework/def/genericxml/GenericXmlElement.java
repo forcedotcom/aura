@@ -16,12 +16,13 @@
 
 package org.auraframework.def.genericxml;
 
-import org.auraframework.def.BaseXmlElement;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Map;
-import java.util.Set;
+
+import org.auraframework.def.BaseXmlElement;
 
 /**
  * Generic xml tag does minimal validation.
@@ -65,9 +66,4 @@ public interface GenericXmlElement extends BaseXmlElement {
      */
     @Nullable
     String getText();
-
-    /**
-     * Returns the current tag name
-     */
-    String getName();
 }

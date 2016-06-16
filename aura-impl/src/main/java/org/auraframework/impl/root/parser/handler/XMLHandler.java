@@ -16,7 +16,12 @@
 
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.root.parser.handler.design.DesignAttributeDefHandler;
@@ -29,10 +34,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Superclass for all the definition handlers.
@@ -75,7 +77,8 @@ public abstract class XMLHandler<T extends Definition> extends BaseXMLElementHan
      * @throws QuickFixException
      */
     public abstract T getElement() throws XMLStreamException, QuickFixException;
-
+    
+    @Override
     protected String getAttributeValue(String name) {
         String value = xmlReader.getAttributeValue(null, name);
         if (AuraTextUtil.isNullEmptyOrWhitespace(value)) {
@@ -118,7 +121,8 @@ public abstract class XMLHandler<T extends Definition> extends BaseXMLElementHan
             return null;
         }
     }
-
+    
+    @Override
     protected void validateAttributes() {
         if (!isSystemTag()) {
             return;

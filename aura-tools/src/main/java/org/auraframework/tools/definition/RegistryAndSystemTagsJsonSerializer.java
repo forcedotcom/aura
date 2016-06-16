@@ -16,6 +16,13 @@
 
 package org.auraframework.tools.definition;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.annotation.Nonnull;
+
 import org.auraframework.Aura;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
@@ -29,6 +36,8 @@ import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
 import org.auraframework.impl.root.parser.handler.InterfaceDefHandler;
 import org.auraframework.impl.root.parser.handler.LibraryDefHandler;
 import org.auraframework.impl.root.parser.handler.LibraryDefRefHandler;
+import org.auraframework.impl.root.parser.handler.LocatorContextDefHandler;
+import org.auraframework.impl.root.parser.handler.LocatorDefHandler;
 import org.auraframework.impl.root.parser.handler.MethodDefHandler;
 import org.auraframework.impl.root.parser.handler.RegisterEventHandler;
 import org.auraframework.impl.root.parser.handler.TokensDefHandler;
@@ -42,12 +51,6 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.RegistryJsonSerializer;
-
-import javax.annotation.Nonnull;
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Serialize Aura Component Registry to json for consumption by tools like
@@ -118,6 +121,10 @@ public class RegistryAndSystemTagsJsonSerializer {
             return new LibraryDefHandler();
         } else if (tag.equals(IncludeDefRefHandler.TAG)) {
             return new IncludeDefRefHandler();
+        } else if (tag.equals(LocatorDefHandler.TAG)) {
+            return new LocatorDefHandler();
+        } else if (tag.equals(LocatorContextDefHandler.TAG)) {
+            return new LocatorContextDefHandler();
         }
         return null;
     }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*jslint sub: true */
 
 /**
  * @description The Aura Expression Service, accessible using $A.expressionService.
@@ -273,5 +274,66 @@ AuraExpressionService.prototype.resolve = function(expression, container, rawVal
     return target;
 };
 
+/**
+ * @param cmp - component
+ * @param locatorDef - LocatorDef defined in cmp
+ * 
+ * Resolves values within a locatorContext inside a locatorDef.
+ * @private
+ */
+AuraExpressionService.prototype.resolveLocatorContext = function (cmp, locatorDef) {
+    if (!locatorDef) {
+        return undefined;
+    }
+    var contextDefs = locatorDef["context"];
+    if (!contextDefs) {
+        return undefined;
+    }
+    var context = {};
+    for (var key in contextDefs) {
+        var unresolvedValue = contextDefs[key];
+        var value = this.create(cmp, unresolvedValue).evaluate();
+        context[key] = value;
+    }
+    return context;
+};
+
+/**
+ * @param component The component that contains the locator defining localId
+ * @param localId The ID of the locator that needs resolving
+ * @returns This will produce a locator object giving the localId of the component that the locator 
+ * refers to, along with the localId of the lexical scope owner of 'component'
+ */
+AuraExpressionService.prototype.resolveLocator = function (component, localId) {
+    var ownerLocalId = component.getLocalId();
+    if (!localId || !ownerLocalId) {
+        // if the child component or it's parent don't have a localId, return undefined
+        return undefined;
+    }
+    
+    var locator = {
+            "target" : localId,
+            "scope" : ownerLocalId
+    };
+    
+    // TODO: replace with component.getOwner after jbuch checks that in
+    var ownerCmp = component.getAttributeValueProvider();
+    
+    var rootLocatorDefs = component.getDef().getLocatorDefs();
+    var ownerLocatorDefs = ownerCmp.getDef().getLocatorDefs();
+    
+    if (!rootLocatorDefs && !ownerLocatorDefs) {
+        return locator;
+    }
+    
+    var rootContext = this.resolveLocatorContext(component, rootLocatorDefs && rootLocatorDefs[localId]);
+    var ownerContext = this.resolveLocatorContext(ownerCmp, ownerLocatorDefs && ownerLocatorDefs[ownerLocalId]);
+    
+    var context = $A.util.apply(ownerContext || {}, rootContext);
+    if (!$A.util.isEmpty(context)) {
+        locator["context"] = context;
+    }
+    return locator;
+};
 
 Aura.Services.AuraExpressionService = AuraExpressionService;

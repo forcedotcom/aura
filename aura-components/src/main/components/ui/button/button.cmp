@@ -65,6 +65,10 @@
         onblur="{!c.blur}"
     -->
 
+    <aura:locator target="button" description="A Button">
+        <aura:locatorContext key="label" value="{!v.label}"/>
+    </aura:locator>
+    
     <button type="{!v.buttonType}"
             aura:id="button"             
             class="{!join(' ', v.variant || token('uiButton.button'), v.stateful ? v.selected ? 'is-selected ' + token('uiButton.is-selected') : 'not-selected ' + token('uiButton.not-selected') : '', v.class)}"

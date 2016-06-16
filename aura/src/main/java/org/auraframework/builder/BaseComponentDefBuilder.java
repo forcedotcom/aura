@@ -25,6 +25,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LocatorDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.SVGDef;
@@ -64,6 +65,8 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
     BaseComponentDefBuilder<T> setFacet(String key, Object value);
 
     BaseComponentDefBuilder<T> addClientLibrary(ClientLibraryDef clientLibrary);
+
+    BaseComponentDefBuilder<T> addLocatorDef(LocatorDef locator);
 
     /**
      * Specifies the token descriptors.

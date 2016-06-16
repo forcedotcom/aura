@@ -65,21 +65,20 @@ DomHandlersPlugin.prototype.disable = function () {
 DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
     // We want to get the localId of the component with the handler 
     // and the component who owns the action (its lexical scope)
-    var localCmpId = cmp.getLocalId(); 
-    var dispatchCmpId = action.getComponent().getConcreteComponent().getLocalId();
+    var localCmpId = cmp.getLocalId();
+    // TODO: can this be simplified to cmp.getOwner() once jbuch adds that?
+    var ownerCmp = action.getComponent().getConcreteComponent();
+    var dispatchCmpId = ownerCmp.getLocalId();
+    var locator = ownerCmp.getLocator(localCmpId);
     var ms = this.metricsService;
-
-    // Only if we have a uniquely identier send the interaction
-    if (localCmpId && dispatchCmpId && (event.type in DomHandlersPlugin.WHITELISTEVENTS)) { 
+    // Only if we have a unique, identifier send the interaction
+    if (locator && (event.type in DomHandlersPlugin.WHITELISTEVENTS)) { 
         var locatorStr = localCmpId + ":" + dispatchCmpId;
         var target = cmp["getElement"]();
         var meta = target && target.getAttribute("data-refid"); // optional metadata
 
         var context = {
-            "locator" : {
-                "target"  : localCmpId,
-                "scope"   : dispatchCmpId
-            },
+            "locator" : locator,
             "eventType"   : DomHandlersPlugin.DEFAULT_INTERACTION_TYPE,
             "eventSource" : event.type, // type of event (click, hover, scroll)
             "attributes"  : {
@@ -90,7 +89,9 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
         if (meta) {
             var state = {};
             state[meta] = target.getAttribute("data-" + meta);
-            context["locator"]["context"] = state;
+            // append this meta data to locator 
+            // dom based meta data can append to the locator context, but won't override existing values
+            locator["context"] = $A.util.apply(locator["context"] || {}, state);
         }
 
         ms.transaction("aura", "interaction", { "context": context, "postProcess" : function (trx) {

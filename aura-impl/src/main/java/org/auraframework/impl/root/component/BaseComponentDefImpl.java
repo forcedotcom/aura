@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -52,6 +53,7 @@ import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LibraryDefRef;
+import org.auraframework.def.LocatorDef;
 import org.auraframework.def.MethodDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
@@ -129,6 +131,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     private final List<DependencyDef> dependencies;
     private final List<ClientLibraryDef> clientLibraries;
+    private final Map<String, LocatorDef> locatorDefs;
 
     private final List<DefDescriptor<TokensDef>> tokenOverrides;
     private final DefDescriptor<FlavorsDef> flavorOverrides;
@@ -165,6 +168,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.facets = AuraUtil.immutableList(builder.facets);
         this.dependencies = AuraUtil.immutableList(builder.dependencies);
         this.clientLibraries = AuraUtil.immutableList(builder.clientLibraries);
+        this.locatorDefs = AuraUtil.immutableMap(builder.locatorDefs);
         this.render = builder.renderType;
         this.whitespaceBehavior = builder.whitespaceBehavior;
         this.designDefDescriptor = builder.designDefDescriptor;
@@ -725,6 +729,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     /**
+     * @return All the locators defined in this component def
+     */
+    @Override
+    public Map<String, LocatorDef> getLocators() {
+        return this.locatorDefs;
+    };
+    
+    /**
      * @return all the library imports from this component, including those inherited
      * @throws QuickFixException
      */
@@ -1038,6 +1050,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("imports", imports);
                 }
 
+                Map<String, LocatorDef> locatorDefs = getLocators();
+                if (locatorDefs!=null && !locatorDefs.isEmpty()) {
+                    json.writeMapEntry("locatorDefs", locatorDefs);
+                }
+                
                 if (!facets.isEmpty()) {
                     json.writeMapEntry("facets", facets);
                 }
@@ -1392,6 +1409,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public Map<String, RegisterEventDef> events;
         public List<EventHandlerDef> eventHandlers;
         public List<LibraryDefRef> imports;
+        public Map<String, LocatorDef> locatorDefs;
 
 		public String code;
 		public Set<PropertyReference> expressionRefs;
@@ -1558,6 +1576,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 this.clientLibraries = Lists.newArrayList();
             }
             this.clientLibraries.add(clientLibrary);
+            return this;
+        }
+
+        @Override
+        public Builder<T> addLocatorDef(LocatorDef locator) {
+            if (this.locatorDefs == null) {
+                this.locatorDefs = new HashMap<>();
+            }
+            this.locatorDefs.put(locator.getTarget(), locator);
             return this;
         }
 

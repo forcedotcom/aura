@@ -152,7 +152,11 @@ function ComponentDef(config) {
     if (config["flavorOverrides"]) { // for applications
         this.flavorOverrides = new FlavorsDef(config["flavorOverrides"]);
     }
-
+    
+    if (config["locatorDefs"]) {
+        this.locatorDefs = config["locatorDefs"];
+    }
+    
     this.attributeDefs = new AttributeDefSet(config["attributeDefs"],this.descriptor.getNamespace());
     this.requiredVersionDefs = new RequiredVersionDefSet(config["requiredVersionDefs"]);
     this.initStyleDefs();
@@ -581,6 +585,15 @@ ComponentDef.prototype.getLocationChangeEvent = function() {
  */
 ComponentDef.prototype.getLayouts = function() {
     return this.layouts;
+};
+
+/**
+ * Gets the defined locators in the component definition
+ *
+ * @returns Locators defined in component
+ */
+ComponentDef.prototype.getLocatorDefs = function() {
+    return this.locatorDefs;
 };
 
 /**

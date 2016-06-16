@@ -2493,4 +2493,13 @@ Component.prototype.associateRenderedBy = function(cmp, element) {
     }
 };
 
+/**
+ * Finds a locator definition by id from the locator definitions.
+ * 
+ * @returns The locator object which contains the target & scope IDs and locator context resolved
+ */
+Component.prototype.getLocator = function(localId) {
+    return $A.expressionService.resolveLocator(this, localId);
+};
+
 Aura.Component.Component = Component;

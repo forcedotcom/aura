@@ -76,6 +76,7 @@ function() {
      * @param {Number} size the total size of the data to populate (bytes).
      * @param {Number=} entries the number of entries to populate. If unspecified defaults to StorageUtil.POPULATE_ENTRIES.
      * @return {Promise} promise that resolves when population is complete.
+     * @private
      */
     StorageUtil.prototype._populate = function(storage, size, entries) {
         entries = entries || StorageUtil.POPULATE_ENTRIES;
@@ -105,6 +106,7 @@ function() {
         }
         return result;
     };
+
 
     return new StorageUtil();
 }

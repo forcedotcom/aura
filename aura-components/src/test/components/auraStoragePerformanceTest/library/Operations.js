@@ -13,8 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function(StorageUtil) {
-    /** Constructor */
+function (StorageUtil) {
+    /**
+     * The Operations class is a performance runner. Specify
+     * the configuration values with the "set" functions then
+     * run it with run().
+     *
+     * There is a hierarchy of iteration types (from outer loop to inner):
+     * - runs: the number of times to run the list of operations. Set with setRuns().
+     * - operations: the list of operations to perform. Set with setOperations().
+     * - count: the number of times to run the operation. Set with setOperations().
+     *
+     * Count takes on two meanings:
+     * - for non-bulk operations (serial and parallel prefixes) the operation is run
+     *   count times with 1 item.
+     * - for bulk operations (bulk prefix) the operation is run count times with
+     *   count items.
+     *
+     * When comparing non-bulk to bulk operations compare the transaction time.
+     * ept95 of serial operations is also a valuable measure to examine.
+     */
     function Operations() {
         // the AuraStorage instance
         this._storage = undefined;
@@ -80,7 +98,9 @@ function(StorageUtil) {
 
 
     /**
-     * @param {String[]} operations the list of operation names. See AuraStorage.js.
+     * Sets the operations to run. See Operations#_getStorageFunctionAsArray() for
+     * the supported operations.
+     * @param {String[]} operations the list of operation names.
      * @param {Number} count the number of times to perform each operation.
      */
     Operations.prototype.setOperations = function(operations, count) {
@@ -141,7 +161,9 @@ function(StorageUtil) {
      * Runs the perf test.
      */
     Operations.prototype.run = function() {
-        var promise = Promise["resolve"]();
+        // start with get() to ensure the adapter is ready. ie don't let
+        // adapter setup time count towards first timed operation.
+        var promise = this._storage.get("initialGet");
 
         for (var i = 0; i < this._runs; i++) {
             promise = promise.then(function() {
@@ -166,7 +188,7 @@ function(StorageUtil) {
 
     /**
      * Runs a list of operations once, running each one serially.
-     * @param {Object[]} operations the set of operations to run.
+     * @param {Object[]} operations the list of operations to run.
      * @param {String} operations.name the name of the operation to run.
      * @param {Number} operations.count the number of times to run the operation.
      * @return {Promise} a promise that resolves when the operations are complete.
@@ -181,11 +203,31 @@ function(StorageUtil) {
         for (var i = 0; i < operations.length; i++) {
             operation = operations[i];
             promise = promise
-                .then(this._runOneOperationManyTimes.bind(this, operation.name, operation.count))
+                .then(this._runLoopOfOneOperation.bind(this, operation.name, operation.count));
+        }
+
+        return promise;
+    };
+
+
+    /**
+     * Runs a single operation multiple times.
+     * @param {String} operation the operation to run.
+     * @param {Number} count the number of times to run the operation.
+     */
+    Operations.prototype._runLoopOfOneOperation = function(operation, count) {
+        // promise chain start
+        var promise = Promise["resolve"]();
+
+        // serially run a loop of the operation
+        // use bind to closure the values at the specific loop iteration
+        for (var i = 0; i < count; i++) {
+            promise = promise
+                .then(this._runOneOperationManyTimes.bind(this, operation, i, count))
                 .then(
                     function(name, transaction) {
                         this._log(name, transaction);
-                    }.bind(this, operation.name)
+                    }.bind(this, operation)
                 );
         }
 
@@ -196,18 +238,19 @@ function(StorageUtil) {
     /**
      * Runs one operation serially many times.
      * @param {String} operation the operation to run.
+     * @param {String} loopIndex the loop index.
      * @param {Number} count the number of times to the run operation.
      */
-    Operations.prototype._runOneOperationManyTimes = function(operation, count) {
-        // function to run a single storage operation, wrapped in
-        // mark start and end.
+    Operations.prototype._runOneOperationManyTimes = function(operation, loopIndex, count) {
+
+        // function to run a single storage operation, wrapped in mark start and end.
         // @return {Promise} a promise that resolves when the operation is complete.
-        function run(operation, index) {
-            var args = this._getStorageFunctionAsArray(operation, index);
+        function run(operation, loopIndex, count, countIndex) {
+            var args = this._getStorageFunctionAsArray(operation, loopIndex, count, countIndex);
             var fn = args[0];
             args = Array.prototype.slice.call(args, 1);
 
-            var markKey = this._getMsKey(operation, index);
+            var markKey = this._getMsKey(operation, loopIndex, countIndex);
             $A.metricsService.markStart(Operations.MS_NAMESPACE, markKey);
             return this._storage[fn].apply(this._storage, args)
                 .then(
@@ -217,17 +260,41 @@ function(StorageUtil) {
                 );
         }
 
-        var transactionKey = this._getMsKey(operation, "");
+        var transactionKey = this._getMsKey(operation, loopIndex, "");
 
         // promise chain start: start the transaction
         var promise = new Promise(function(resolve) {
             $A.metricsService.transactionStart(Operations.MS_NAMESPACE, transactionKey);
             resolve();
-        }.bind(this));
+        });
 
-        // run each operation serially. each is wrapped with a mark start + end.
-        for (var i = 0; i < count; i++) {
-            promise = promise.then(run.bind(this, operation, i));
+        var i;
+        var mode = this._getOperationMode(operation);
+        switch (mode) {
+        case "serial":
+            // run each operation serially. each is wrapped with a mark start + end.
+            for (i = 0; i < count; i++) {
+                promise = promise.then(run.bind(this, operation, loopIndex, count, i));
+            }
+            break;
+
+        case "parallel":
+            // run all operations in parallel. individual marks are less meaningful due
+            // to interweaving.
+            var promises = [];
+            for (i = 0; i < count; i++) {
+                promises.push(run.call(this, operation, loopIndex, count, i));
+            }
+            promise = promise.then(function() { return Promise["all"](promises); });
+            break;
+
+        case "bulk":
+            // bulk operations run once. creates a single mark.
+            promise = promise.then(run.bind(this, operation, loopIndex, count, 0));
+            break;
+
+        default:
+            throw new Error("Unknown operation mode (" + mode + ") on operation (" + operation + ")");
         }
 
         // grab the size
@@ -254,24 +321,67 @@ function(StorageUtil) {
 
 
     /**
+     * @return {"parallel"|"bulk"|"serial"} the mode of the operation, which defines
+     * how the promises are chained.
+     */
+    Operations.prototype._getOperationMode = function(operation) {
+        if (operation.indexOf("parallel") === 0) {
+            return "parallel";
+        } else if (operation.indexOf("bulk") === 0) {
+            return "bulk";
+        } else {
+            return "serial";
+        }
+    };
+
+
+    /**
      * Gets an AuraStorage function as an array so it may be invoked with function.apply.
      * @param {String} operation the name of the operation.
-     * @param {Number} index the operation's index.
+     * @param {Number} loop the loop index.
+     * @param {Number} count for bulk operations it's the arguments used. Ignored for non-bulk operations.
+     * @param {Number} countIndex for single operations it's the iteration identifier. Ignored for bulk operations.
      */
-    Operations.prototype._getStorageFunctionAsArray = function(operation, index) {
-        // key must be consistent across operations so set(), get(), and remove()
+    Operations.prototype._getStorageFunctionAsArray = function(operation, loop, count, countIndex) {
+        // key must be consistent across operations so set*(), get*(), and remove*()
         // share the same set of keys.
-        var key = "run" + this._runIndex + "_idx" + index;
+        var singleKey = "run" + this._runIndex + "_loop" + loop + "_idx" + countIndex + "/" + count;
+        var bulkPayload = {};
+        for (var i = 0; i < count; i++) {
+            var key = "run" + this._runIndex + "_loop" + loop + "_idx" + i + "/" + count;
+            bulkPayload[key] = this._payload[i];
+        }
 
         switch(operation) {
-        case "set":
-            return [operation, key, this._payload[index]];
-        case "get":
-        case "remove":
-            return [operation, key];
+        case "serialSet":
+        case "parallelSet":
+            return ["set", singleKey, this._payload[countIndex]];
+
+        case "serialGet":
+        case "parallelGet":
+            return ["get", singleKey];
+
+        case "serialRemove":
+        case "parallelRemove":
+            return ["remove", singleKey];
+
+        // special case: getAll to fetch all items. this is different
+        // than bulkGetAll, serialGet, and parallelGet
         case "getAll":
+            return ["getAll"];
+
+        case "bulkSetAll":
+            return ["setAll", bulkPayload];
+
+        case "bulkGetAll":
+            return ["getAll", Object.keys(bulkPayload)];
+
+        case "bulkRemoveAll":
+            return ["removeAll", Object.keys(bulkPayload)];
+
         case "clear":
             return [operation];
+
         default:
             throw new Error("Unsupported operation: " + operation);
         }
@@ -281,10 +391,11 @@ function(StorageUtil) {
     /**
      * Gets a Metric Service transaction/mark key.
      * @param {String} operation the name of the operation.
-     * @param {String|Number} index the operation's index.
+     * @param {String|Number} loopIndex the loop of the operation.
+     * @param {String|Number} countIndex the count within the loop.
      */
-    Operations.prototype._getMsKey = function(operation, index) {
-        return "run" + this._runIndex + "_op" + operation + index;
+    Operations.prototype._getMsKey = function(operation, loopIndex, countIndex) {
+        return "run=" + this._runIndex + "_op=" + operation + "_loop=" + loopIndex + countIndex;
     };
 
 

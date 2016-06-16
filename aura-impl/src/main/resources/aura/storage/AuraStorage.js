@@ -159,6 +159,29 @@ AuraStorage.prototype.getAll = function(keys, includeExpired) {
     $A.assert(!keys || Array.isArray(keys), "AuraStorage.getAll(): 'keys' must be an Array.");
     $A.assert(!includeExpired || $A.util.isBoolean(includeExpired), "AuraStorage.getAll(): 'includeExpired' must be a Boolean.");
 
+    var that = this;
+
+    // helper function to log cache hits & misses
+    function logHitsAndMisses(storageResults) {
+        var hit = [], miss = [];
+        var key;
+        for (var j = 0; j < keys.length; j++) {
+            key = keys[j];
+            if (storageResults.hasOwnProperty(key)) {
+                hit.push(key);
+            } else {
+                miss.push(key);
+            }
+        }
+        if (hit.length > 0) {
+            that.log("get() - HIT on key(s): " + hit.join(", "));
+        }
+        if (miss.length > 0) {
+            that.log("get() - MISS on key(s): " + miss.join(", "));
+        }
+    }
+
+
     var prefixedKeys = undefined;
 
     if (Array.isArray(keys) && keys.length > 0) {
@@ -169,15 +192,11 @@ AuraStorage.prototype.getAll = function(keys, includeExpired) {
     }
 
     this.getOperationsInFlight += 1;
-    var that = this;
+
     return this.adapter.getItems(prefixedKeys, includeExpired)
         .then(
             function(items) {
                 that.getOperationsInFlight -= 1;
-
-                if (!items) {
-                    return {};
-                }
 
                 var now = new Date().getTime();
                 var results = {};
@@ -193,8 +212,17 @@ AuraStorage.prototype.getAll = function(keys, includeExpired) {
                     // TODO - capture entries to be removed async
                 }
 
+                // explicit logging check because this is costly
+                if (that.debugLogging && Array.isArray(keys) && keys.length > 0) {
+                    logHitsAndMisses(results);
+                }
+
                 return results;
-            }, function (e) {
+            }
+        )
+        .then(
+            undefined,
+            function(e) {
                 that.logError({ "operation": "getAll", "error": e });
                 that.getOperationsInFlight -= 1;
                 throw e;
@@ -228,7 +256,6 @@ AuraStorage.prototype.buildPayload = function(key, value, now) {
         size
     ];
 };
-
 
 /**
  * Asynchronously stores the value in storage using the specified key.
@@ -280,10 +307,12 @@ AuraStorage.prototype.setAll = function(values) {
         .then(
             function() {
                 var keys = Object.keys(values);
-                that.log("set() - " + keys.length + " keys: " + keys.join(", "));
-
+                that.log("set() - " + keys.length + " key(s): " + keys.join(", "));
                 that.fireModified();
-            },
+            }
+        )
+        .then(
+            undefined,
             function(e) {
                 that.logError({ "operation": "set", "error": e });
                 throw e;
@@ -291,7 +320,6 @@ AuraStorage.prototype.setAll = function(values) {
         );
 
     this.sweep();
-
     return promise;
 };
 
@@ -337,7 +365,10 @@ AuraStorage.prototype.removeAll = function(keys, doNotFireModified) {
                 if (!doNotFireModified) {
                     that.fireModified();
                 }
-            },
+            }
+        )
+        .then(
+            undefined,
             function(e) {
                 that.logError({ "operation": "remove", "error": e });
                 throw e;

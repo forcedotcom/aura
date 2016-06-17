@@ -1,4 +1,4 @@
-<aura:application template="auraStorageTest:cryptoRegistrationTemplate" implements="performance:test">
+<aura:component>
     <!--  input attributes -->
     <aura:attribute name="adapterName" type="String" default="crypto" description="Aura Storage adapter name to test: memory, indexeddb, crypto, smartstore" />
     <aura:attribute name="maxSize" type="Integer" default="40960" description="Storage max size (bytes)" />
@@ -11,24 +11,20 @@
 
     <aura:attribute name="displayLogs" type="Boolean" default="true" description="Whether to display a table of perf results. Use only for manual runs because the data gathering appears as a memory leak"/>
 
-
-    <!-- import $A.PerfRunner -->
-    <aura:import library="performance:perfLib" property="lib" />
-
-    <!-- reusable storage perf logic -->
-    <aura:import library="auraStoragePerformanceTest:library" property="storage" />
-
-
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    <aura:handler event="aura:locationChange" action="{!c.locationChange}" />
-
     <!--  private vars -->
     <aura:attribute name="status" access="private" type="String" default="Not started" description="The status of the test"/>
     <aura:attribute name="logs" access="private" type="Object" description="Log lines from perf measurements"/>
 
+    <!-- reusable storage perf logic -->
+    <aura:import library="auraStoragePerformanceTest:library" property="storage" />
 
+    <aura:method name="run" action="{!c.run}" description="Runs the performance test.">
+        <aura:attribute name="callback" type="Function" description="Callback function invoked when the performance test is complete"/>
+    </aura:method>
+
+
+    <div><ui:button label="Run" press="{!c.runButton}"/></div>
     <div>Status: <b>{!v.status}</b></div>
-    <!-- Display of results, for manual runs  (set v.displayLogs to true) -->
     <div class="logs">
         <div class="log">
             <table>
@@ -45,18 +41,18 @@
                 </tr>
                 <aura:iteration aura:id="iteration" items="{!v.logs}" var="item">
                 <tr>
-                    <td><ui:outputText value="{!item.adapterName}" visible="true"/></td>
-                    <td><ui:outputText value="{!item.payloadSize}" visible="true"/></td>
-                    <td><ui:outputText value="{!item.operation}" visible="true"/></td>
-                    <td><ui:outputText value="{!item.count}" visible="true"/></td>
-                    <td><ui:outputText value="{!item.average}" visible="true"/></td>
-                    <td><ui:outputText value="{!item.ept95}" visible="true"/></td>
-                    <td><ui:outputText value="{!item.max}" visible="true"/></td>
-                    <td><ui:outputText value="{!item.total}" visible="true"/></td>
-                    <td><ui:outputText value="{!item.storeSize}" visible="true"/></td>
+                    <td><ui:outputText value="{!item.adapterName}"/></td>
+                    <td><ui:outputText value="{!item.payloadSize}"/></td>
+                    <td><ui:outputText value="{!item.operation}"/></td>
+                    <td><ui:outputText value="{!item.count}"/></td>
+                    <td><ui:outputText value="{!item.average}"/></td>
+                    <td><ui:outputText value="{!item.ept95}"/></td>
+                    <td><ui:outputText value="{!item.max}"/></td>
+                    <td><ui:outputText value="{!item.total}"/></td>
+                    <td><ui:outputText value="{!item.storeSize}"/></td>
                 </tr>
               </aura:iteration>
             </table>
         </div>
     </div>
-</aura:application>
+</aura:component>

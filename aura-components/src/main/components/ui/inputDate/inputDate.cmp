@@ -43,7 +43,7 @@
     </aura:if>
 
     <aura:if isTrue="{!$Browser.formFactor == 'DESKTOP'}">
-        <form class="form--stacked form-element">
+        <div class="form-element">
             <input aura:id="inputText" id="{!v.domId}" class="{!v.class + ' input'}" onclick="{!c.inputDateFocus}" type="text" placeholder="{!v.placeholder}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
 
             <aura:if isTrue="{!v.displayDatePicker}">
@@ -57,6 +57,6 @@
             <aura:if isTrue="{!v.loadDatePicker}">
                 <ui:datePicker aura:id="datePicker" hideOnSelect="true" closeOnClickOut="true" selectDate="{!c.onDateSelected}" showToday="{!$Browser.isPhone || $Browser.isTablet}"/>
             </aura:if>
-        </form>
+        </div>
     </aura:if>
 </aura:component>

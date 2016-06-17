@@ -32,7 +32,7 @@
     <aura:handler name="openPicker" action="{!c.openDatePicker}"/>
 
     <aura:if isTrue="{!and($Browser.formFactor == 'DESKTOP', !v.useSingleInput)}">
-        <form class="form--stacked form-element__group">
+        <div class="form--stacked form-element__group">
             <div class="dateTime-inputDate form-element form-element__control">
                 <label class="form-element__label" for="{!v.domId}">{!v.dateLabel}</label>
                 <input aura:id="inputDate" id="{!v.domId}" class="{!v.class + ' input'}" onclick="{!c.inputDateFocus}" type="text" placeholder="{!v.placeholder}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
@@ -55,7 +55,7 @@
                 </div>
             </div>
             <ui:inputTimePicker aura:id="timePicker" selectDate="{!c.setValue}" timeFormat="{!v.timeFormat}"/>
-        </form>
+        </div>
 
         <!-- tablet/mobile -->
         <aura:set attribute="else">

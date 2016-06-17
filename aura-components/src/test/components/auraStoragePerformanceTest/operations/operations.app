@@ -6,8 +6,8 @@
 
     <aura:attribute name="payloadSize" type="Integer" default="4096" description="Payload size to used in operations (bytes)" />
     <aura:attribute name="runs" type="Integer" default="1" description="Number of runs of the perf test" />
-    <aura:attribute name="operationIterations" type="Integer" default="5" description="Number of times each operation is performed" />
-    <aura:attribute name="operations" type="String[]" default="set,get,getAll,remove,clear" description="List of operations to perform. Refer to AuraStorage.js" />
+    <aura:attribute name="operationIterations" type="Integer" default="5" description="Number of times each operation is performed. For bulk iterations also defines the operands." />
+    <aura:attribute name="operations" type="String[]" default="serialSet,serialGet,getAll,serialRemove,parallelSet,parallelGet,parallelRemove,bulkSetAll,bulkGetAll,bulkRemoveAll,clear" description="List of operations to perform. Refer to AuraStorage.js" />
 
     <aura:attribute name="displayLogs" type="Boolean" default="true" description="Whether to display a table of perf results. Use only for manual runs because the data gathering appears as a memory leak"/>
 
@@ -37,10 +37,10 @@
                     <th>Payload (b)</th>
                     <th>Op</th>
                     <th>#</th>
-                    <th>Avg Time (ms)</th>
-                    <th>EPT95 Time (ms)</th>
-                    <th>Max Time (ms)</th>
-                    <th>Total (ms)</th>
+                    <th>Avg Mark Time (ms)</th>
+                    <th>EPT95 Mark Time (ms)</th>
+                    <th>Max Mark Time (ms)</th>
+                    <th>Transaction Time (ms)</th>
                     <th>Store Size (kB)</th>
                 </tr>
                 <aura:iteration aura:id="iteration" items="{!v.logs}" var="item">

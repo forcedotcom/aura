@@ -11,224 +11,174 @@
         { "Aura.coql.afterRender.added" : 5 },
         { "Network.numRequests" : 20 }
     ],
-    "options" : { "metricsMode" : "foo", "timeline": "disable", "timeout" : 120,"skipDiff":true},
+    "options" : { "metricsMode":"foo", "timeline":"disable", "timeout":120, "skipDiff":true},
     "customOptions" : [
         {
-            "crypto-4kb-50" : {
-                "adapterSize" : "4096",
-                "adapterName" : "crypto",
-                "payload" : "4kb",
-                "opsIterations" : "50"
+            "crypto-4kb-5" : {
+                "adapterName"         : "crypto",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "4096",
+                "operationIterations" : "5",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "crypto-4kb-100" : {
-                "adapterSize" : "4096",
-                "adapterName" : "crypto",
-                "payload" : "4kb",
-                "opsIterations" : "100"
+            "crypto-4kb-10" : {
+                "adapterName"         : "crypto",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "4096",
+                "operationIterations" : "10",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "crypto-4kb-500" : {
-                "adapterSize" : "4096",
-                "adapterName" : "crypto",
-                "payload" : "4kb",
-                "opsIterations" : "500"
+            "crypto-64kb-5" : {
+                "adapterName"         : "crypto",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "65536",
+                "operationIterations" : "5",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "crypto-64kb-50" : {
-                "adapterSize" : "4096",
-                "adapterName" : "crypto",
-                "payload" : "64kb",
-                "opsIterations" : "50"
+            "crypto-64kb-10" : {
+                "adapterName"         : "crypto",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "65536",
+                "operationIterations" : "10",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "crypto-64kb-100" : {
-                "adapterSize" : "4096",
-                "adapterName" : "crypto",
-                "payload" : "64kb",
-                "opsIterations" : "100"
+            "crypto-1024kb-3" : {
+                "adapterName"         : "crypto",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "1048576",
+                "operationIterations" : "3",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "crypto-64kb-500" : {
-                "adapterSize" : "4096",
-                "adapterName" : "crypto",
-                "payload" : "64kb",
-                "opsIterations" : "500"
+            "memory-4kb-5" : {
+                "adapterName"         : "memory",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "4096",
+                "operationIterations" : "5",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "crypto-1024kb-50" : {
-                "adapterSize" : "4096",
-                "adapterName" : "crypto",
-                "payload" : "1024kb",
-                "opsIterations" : "50"
+            "memory-4kb-10" : {
+                "adapterName"         : "memory",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "4096",
+                "operationIterations" : "10",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "crypto-1024kb-100" : {
-                "adapterSize" : "4096",
-                "adapterName" : "crypto",
-                "payload" : "1024kb",
-                "opsIterations" : "100"
+            "memory-64kb-5" : {
+                "adapterName"         : "memory",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "65536",
+                "operationIterations" : "5",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "crypto-1024kb-500" : {
-                "adapterSize" : "4096",
-                "adapterName" : "crypto",
-                "payload" : "1024kb",
-                "opsIterations" : "500"
+            "memory-64kb-10" : {
+                "adapterName"         : "memory",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "65536",
+                "operationIterations" : "10",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "mem-4kb-50" : {
-                "adapterSize" : "4096",
-                "adapterName" : "memory",
-                "payload" : "4kb",
-                "opsIterations" : "50"
+            "memory-1024kb-3" : {
+                "adapterName"         : "memory",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "1048576",
+                "operationIterations" : "3",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "mem-4kb-100" : {
-                "adapterSize" : "4096",
-                "adapterName" : "memory",
-                "payload" : "4kb",
-                "opsIterations" : "100"
+            "indexeddb-4kb-5" : {
+                "adapterName"         : "indexeddb",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "4096",
+                "operationIterations" : "5",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "mem-4kb-500" : {
-                "adapterSize" : "4096",
-                "adapterName" : "memory",
-                "payload" : "4kb",
-                "opsIterations" : "500"
+            "indexeddb-4kb-10" : {
+                "adapterName"         : "indexeddb",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "4096",
+                "operationIterations" : "10",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "mem-64kb-50" : {
-                "adapterSize" : "4096",
-                "adapterName" : "memory",
-                "payload" : "64kb",
-                "opsIterations" : "50"
+            "indexeddb-64kb-5" : {
+                "adapterName"         : "indexeddb",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "65536",
+                "operationIterations" : "5",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "mem-64kb-100" : {
-                "adapterSize" : "4096",
-                "adapterName" : "memory",
-                "payload" : "64kb",
-                "opsIterations" : "100"
+            "indexeddb-64kb-10" : {
+                "adapterName"         : "indexeddb",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "65536",
+                "operationIterations" : "10",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         },
         {
-            "mem-64kb-500" : {
-                "adapterSize" : "4096",
-                "adapterName" : "memory",
-                "payload" : "64kb",
-                "opsIterations" : "500"
-            }
-        },
-        {
-            "mem-1024kb-50" : {
-                "adapterSize" : "4096",
-                "adapterName" : "memory",
-                "payload" : "1024kb",
-                "opsIterations" : "50"
-            }
-        },
-        {
-            "mem-1024kb-100" : {
-                "adapterSize" : "4096",
-                "adapterName" : "memory",
-                "payload" : "1024kb",
-                "opsIterations" : "100"
-            }
-        },
-        {
-            "mem-1024kb-500" : {
-                "adapterSize" : "4096",
-                "adapterName" : "memory",
-                "payload" : "1024kb",
-                "opsIterations" : "500"
-            }
-        },
-        {
-            "idx-4kb-50" : {
-                "adapterSize" : "4096",
-                "adapterName" : "indexeddb",
-                "payload" : "4kb",
-                "opsIterations" : "50"
-            }
-        },
-        {
-            "idx-4kb-100" : {
-                "adapterSize" : "4096",
-                "adapterName" : "indexeddb",
-                "payload" : "4kb",
-                "opsIterations" : "100"
-            }
-        },
-        {
-            "idx-4kb-500" : {
-                "adapterSize" : "4096",
-                "adapterName" : "indexeddb",
-                "payload" : "4kb",
-                "opsIterations" : "500"
-            }
-        },
-        {
-            "idx-64kb-50" : {
-                "adapterSize" : "4096",
-                "adapterName" : "indexeddb",
-                "payload" : "64kb",
-                "opsIterations" : "50"
-            }
-        },
-        {
-            "idx-64kb-100" : {
-                "adapterSize" : "4096",
-                "adapterName" : "indexeddb",
-                "payload" : "64kb",
-                "opsIterations" : "100"
-            }
-        },
-        {
-            "idx-64kb-500" : {
-                "adapterSize" : "4096",
-                "adapterName" : "indexeddb",
-                "payload" : "64kb",
-                "opsIterations" : "500"
-            }
-        },
-        {
-            "idx-1024kb-50" : {
-                "adapterSize" : "4096",
-                "adapterName" : "indexeddb",
-                "payload" : "1024kb",
-                "opsIterations" : "50"
-            }
-        },
-        {
-            "idx-1024kb-100" : {
-                "adapterSize" : "4096",
-                "adapterName" : "indexeddb",
-                "payload" : "1024kb",
-                "opsIterations" : "100"
-            }
-        },
-        {
-            "idx-1024kb-500" : {
-                "adapterSize" : "4096",
-                "adapterName" : "indexeddb",
-                "payload" : "1024kb",
-                "opsIterations" : "500"
+            "indexeddb-1024kb-3" : {
+                "adapterName"         : "indexeddb",
+                "maxSize"             : "15728640",
+                "initialSize"         : "1048576",
+                "payloadSize"         : "1048576",
+                "operationIterations" : "3",
+                "operations"          : "bulkSetAll,bulkGetAll,getAll,bulkRemoveAll,clear",
+                "displayLogs"         : false,
             }
         }
+
     ]
 
 }

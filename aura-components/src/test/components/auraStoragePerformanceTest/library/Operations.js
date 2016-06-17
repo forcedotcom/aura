@@ -178,7 +178,7 @@ function (StorageUtil) {
 
         // error handler for the entire chain of promises
         promise = promise["catch"](function(e){
-            this._msCallback();
+            this._msCallback && this._msCallback();
             throw e;
         }.bind(this));
 

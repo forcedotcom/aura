@@ -32,7 +32,13 @@
                 // Copy response and add an additional storable action to the response object
                 var newResponse = $A.util.copy(response);
                 var responseMessage = that.decodeResponse(response);
-                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix);
+
+                // action with params
+                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix, {});
+                responseMessage["actions"].push(action);
+
+                // action without params
+                action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix, undefined);
                 responseMessage["actions"].push(action);
 
                 var newResponseMessage = that.encodeResponse(responseMessage);
@@ -92,13 +98,13 @@
                 // Copy response and add an action in the ERROR state
                 var newResponse = $A.util.copy(response);
                 var responseMessage = that.decodeResponse(response);
-                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix);
+                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix, {});
                 action["state"] = "ERROR";
                 responseMessage["actions"].push(action);
 
                 var newResponseMessage = that.encodeResponse(responseMessage);
-                newResponse['response'] = newResponseMessage;
-                newResponse['responseText'] = newResponseMessage;
+                newResponse["response"] = newResponseMessage;
+                newResponse["responseText"] = newResponseMessage;
 
                 return newResponse;
             }
@@ -153,13 +159,13 @@
                 // Copy response and add a non-storable action
                 var newResponse = $A.util.copy(response);
                 var responseMessage = that.decodeResponse(response);
-                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix);
+                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix, {});
                 action["storable"] = false;
                 responseMessage["actions"].push(action);
 
                 var newResponseMessage = that.encodeResponse(responseMessage);
-                newResponse['response'] = newResponseMessage;
-                newResponse['responseText'] = newResponseMessage;
+                newResponse["response"] = newResponseMessage;
+                newResponse["responseText"] = newResponseMessage;
 
                 return newResponse;
             }
@@ -192,12 +198,12 @@
     /**
      * Make a copy of an action and add fields AuraClientService.js#buildStorableServerAction expects
      */
-    copyAction: function(original, descriptor) {
+    copyAction: function(original, descriptor, params) {
         var action = $A.util.copy(original);
         action["id"] = "12345;a";
         action["storable"] = true;
         action["action"] = descriptor;
-        action["params"] = {"param":5};
+        action["params"] = params;
         action["returnValue"] = "return modified in test";
         return action;
     }

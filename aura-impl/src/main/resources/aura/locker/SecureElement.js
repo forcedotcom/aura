@@ -130,24 +130,7 @@ function SecureElement(el, key) {
 		},
         querySelector: {
             value: function(selector) {
-                var rawAll = el.querySelectorAll(selector);
-                for (var n = 0; n < rawAll.length; n++) {
-                    var raw = rawAll[n];
-                    var hasAccess = $A.lockerService.util.hasAccess(o, raw);
-                    if (hasAccess || raw === document.body || raw === document.head) {
-
-                        var cached = SecureObject.getCached(raw, key);
-                        if (cached) {
-                            return cached;
-                        }
-
-                        var swallowed = SecureElement(raw, key);
-                        SecureObject.addToCache(raw, swallowed, key);
-                        return swallowed;
-                    }
-                }
-
-                return null;
+                return SecureElement.secureQuerySelector(o, el, key, selector);
             }
         }
 	});
@@ -415,6 +398,27 @@ SecureElement.addElementSpecificMethods = function(se, el) {
 			});
 		}
 	}
+};
+
+SecureElement.secureQuerySelector = function(st, el, key, selector) {
+    var rawAll = el.querySelectorAll(selector);
+    for (var n = 0; n < rawAll.length; n++) {
+        var raw = rawAll[n];
+        var hasAccess = $A.lockerService.util.hasAccess(st, raw);
+        if (hasAccess || raw === document.body || raw === document.head) {
+
+            var cached = SecureObject.getCached(raw, key);
+            if (cached) {
+                return cached;
+            }
+
+            var swallowed = SecureElement(raw, key);
+            SecureObject.addToCache(raw, swallowed, key);
+            return swallowed;
+        }
+    }
+
+    return null;
 };
 
 SecureElement.elementSpecificAttributeWhitelists = {

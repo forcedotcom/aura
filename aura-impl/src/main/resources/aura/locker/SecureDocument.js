@@ -83,25 +83,7 @@ function SecureDocument(doc, key) {
         },
         querySelector: {
             value: function(selector) {
-
-                var rawAll = doc.querySelectorAll(selector);
-                for (var n = 0; n < rawAll.length; n++) {
-                    var raw = rawAll[n];
-                    var hasAccess = $A.lockerService.util.hasAccess(o, raw);
-                    if (hasAccess || raw === document.body || raw === document.head) {
-
-                        var cached = SecureObject.getCached(raw, key);
-                        if (cached) {
-                            return cached;
-                        }
-
-                        var swallowed = SecureElement(raw, key);
-                        SecureObject.addToCache(raw, swallowed, key);
-                        return swallowed;
-                    }
-                }
-
-                return null;
+                return SecureElement.secureQuerySelector(o, doc, key, selector);
             }
         }
     });

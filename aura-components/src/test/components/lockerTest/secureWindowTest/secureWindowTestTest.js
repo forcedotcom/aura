@@ -38,6 +38,12 @@
         }
     },
 
+    testHistoryExposedOnWindow: {
+        test: function(cmp) {
+            cmp.testHistoryExposedOnWindow();
+        }
+    },
+    
     testLocationExposedOnWindow: {
         test: function(cmp) {
             cmp.testLocationExposedOnWindow();

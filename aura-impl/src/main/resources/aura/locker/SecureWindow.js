@@ -32,7 +32,7 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 	"use strict";
 	
     var hostedDefinedGlobals = ["alert", "clearInterval", "clearTimeout", "confirm", "console", "DOMParser", "FileReader",
-                                "location", "Node", "requestAnimationFrame", "cancelAnimationFrame", "atob", "btoa"];
+                                "history", "location", "Node", "requestAnimationFrame", "cancelAnimationFrame", "atob", "btoa", "screen"];
 
 	var o = Object.create(null, {
 		document: {
@@ -83,7 +83,7 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 		});
 	});
 	
-	[ "getComputedStyle", "scroll", "scrollBy", "scrollTo" ].forEach(function(name) {
+	[ "getComputedStyle", "open", "scroll", "scrollBy", "scrollTo" ].forEach(function(name) {
 		SecureObject.addMethodIfSupported(o, win, name, {
 			filterOpaque : true
 		});

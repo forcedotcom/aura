@@ -24,8 +24,7 @@
             // JBUCH: HALO: TODO: MIGHT BE ABLE TO RETURN THIS TO SIMPLE TEXTNODE MANAGEMENT
             component._lastRenderedValue = value = $A.createComponentFromConfig({ descriptor:'markup://aura:text', attributes:{ value: value } });
 
-            var parent = component.getComponentValueProvider();
-            $A.lockerService.trust(parent, value);
+            $A.lockerService.trust(component.getOwner(), value);
         }
 
         return $A.renderingService.renderFacet(component,value);

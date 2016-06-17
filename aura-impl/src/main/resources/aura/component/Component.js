@@ -30,6 +30,7 @@
  * @export
  */
 function Component(config, localCreation) {
+    var context = $A.getContext();
 
     // setup some basic things
     this.concreteComponentId = config["concreteComponentId"];
@@ -45,8 +46,7 @@ function Component(config, localCreation) {
     this.localIndex = {};
     this.destroyed=false;
     this.version = config["version"];
-
-    var context = $A.getContext();
+    this.owner = context.getCurrentAccess();
 
     // allows components to skip creation path checks if it's doing something weird
     // such as wrapping server created components in client created one
@@ -1323,6 +1323,21 @@ Component.prototype.getComponentValueProvider = function() {
         valueProvider = valueProvider.getComponent();
     }
     return valueProvider;
+};
+
+/**
+ * Returns the owner of the component. This should represent the lexical scope for markup components, and the
+ * component calling the create method for dynamic components.
+ *
+ * @return {Object} Owning component
+ * @public
+ * @export
+ */
+Component.prototype.getOwner = function() {
+    if(!this.owner){
+        this.owner=this.getAttributeValueProvider();
+    }
+    return this.owner;
 };
 
 /**

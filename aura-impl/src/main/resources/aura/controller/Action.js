@@ -618,7 +618,11 @@ Action.prototype.runDeprecated = function(evt) {
     try {
         var secureCmp = $A.lockerService.wrapComponent(this.cmp);
         var secureEvt = $A.lockerService.wrapComponentEvent(secureCmp, evt);
-        this.returnValue = this.meth.call(undefined, secureCmp, secureEvt, this.cmp['helper']);
+        
+        this.returnValue = this.meth.call(undefined, secureCmp, secureEvt, this.cmp["helper"]);
+        
+    	// TODO W-3199680 Locker Service - Action.runDeprecated() is not unfiltering/writing back expandos of secure event params
+        
         this.state = "SUCCESS";
     } catch (e) {
         this.markException(e);

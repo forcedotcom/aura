@@ -75,11 +75,15 @@ SecureObject.getCached = function(raw, key) {
 
 SecureObject.filterEverything = function (st, raw, options) {
 	"use strict";
+	
+	function filterOpaque(opts, so) {
+		return opts && opts.filterOpaque === true && $A.lockerService.isOpaque(so);
+	}
 
 	var key = getLockerSecret(st, "key");
 	var cached = SecureObject.getCached(raw, key);
 	if (cached) {
-		return cached;
+		return !filterOpaque(options, cached) ? cached : undefined;
 	}
 
 	var t = typeof raw;
@@ -110,7 +114,7 @@ SecureObject.filterEverything = function (st, raw, options) {
 
 				// TODO: NaN !== NaN
 
-				if (!options || options.filterOpaque !== true || !$A.lockerService.isOpaque(newValue)) {
+				if (!filterOpaque(options, newValue)) {
 					swallowed.push(newValue);
 				}
 
@@ -160,12 +164,21 @@ SecureObject.filterEverything = function (st, raw, options) {
 				mutated = true;
 			} else {
 				swallowed = {};
+				mutated = true;
+				setLockerSecret(swallowed, "key", key);
 				setLockerSecret(swallowed, "ref", raw);
 				SecureObject.addToCache(raw, swallowed, key);
-
-				for (var prop in raw) {
-					swallowed[prop] = SecureObject.filterEverything(st, raw[prop]);
-					mutated = mutated || (raw[prop] !== swallowed[prop]);
+				
+				for (var name in raw) {
+					if (typeof raw[name] === "function") {
+						Object.defineProperty(swallowed, name, SecureObject.createFilteredMethod(swallowed, raw, name, {
+							filterOpaque : true
+						}));
+					} else {
+						Object.defineProperty(swallowed, name, SecureObject.createFilteredProperty(swallowed, raw, name, {
+							filterOpaque : true
+						}));
+					}
 				}				
 			}
 		}
@@ -191,6 +204,7 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 	}
 
 	var t = typeof value;
+	
 	if (!value || (t !== "object" && t !== "function")) {
 		// ignoring falsy, nully references, non-objects and non-functions
 		return value;

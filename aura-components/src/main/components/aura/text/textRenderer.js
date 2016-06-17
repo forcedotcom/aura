@@ -30,8 +30,7 @@
         
         // aura:text is syntactic sugar for document.createTextNode() and the resulting nodes need to be directly visible to the container
     	// otherwise no code would be able to manipulate them
-    	var parent = component.getComponentValueProvider();
-    	$A.lockerService.trust(parent, textNode);
+    	$A.lockerService.trust(component, textNode);
     	
         return [textNode];
     },

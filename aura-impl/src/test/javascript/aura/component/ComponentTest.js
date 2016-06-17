@@ -50,6 +50,7 @@ Test.Aura.Component.ComponentTest=function(){
                 error:function(message){throw new Error(message)},
                 getContext:function(){return {
                     getAccessVersion:function(){},
+                    getCurrentAccess:function(){},
                     getCurrentAction:function(){
                         return {
                             topPath: function () {},

@@ -298,7 +298,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
     // now that we have a response from a server.
     //
     if (this._isDisconnected) {
-        e = $A.getEvt("markup://aura:connectionResumed");
+        e = $A.eventService.getNewEvent("markup://aura:connectionResumed");
         if (e) {
             this._isDisconnected = false;
             e.fire();

@@ -298,7 +298,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
     // now that we have a response from a server.
     //
     if (this._isDisconnected) {
-        e = $A.getEvt("markup://aura:connectionResumed");
+        e = $A.eventService.getNewEvent("markup://aura:connectionResumed");
         if (e) {
             this._isDisconnected = false;
             e.fire();
@@ -1189,7 +1189,7 @@ AuraClientService.prototype.initDefs = function(config, resolved) {
             }
         }
     }
-    
+
     var defObservers = Aura["afterAppDefsReady"] || [];
 
     // Let any interested parties know that defs have been initialized
@@ -1264,9 +1264,9 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
 
         // We just have bootstrap data processed either from js or from cache
 
-        try { 
+        try {
             // We can have a missmatch if we are upgrading framework or mode
-            context['merge'](boot["context"]); 
+            context['merge'](boot["context"]);
         } catch(e) {
             // Abort caching and wait for bootstrap.js to arrive
             $A.warning('Bootstrap cache missmatch, waiting for bootstrap.js');
@@ -1276,7 +1276,7 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
         }
 
         callback.call(this, boot["actions"][0]);
-        
+
 
     // Wait for bootstrap.js to arrive
     } else {
@@ -2288,7 +2288,9 @@ AuraClientService.prototype.buildStorableServerAction = function(response) {
         }
         action = actionDef.newInstance();
         action.setStorable();
-        action.setParams(response["params"]);
+        if (response["params"]) {
+            action.setParams(response["params"]);
+        }
         action.updateFromResponse(response);
     }
     return action;

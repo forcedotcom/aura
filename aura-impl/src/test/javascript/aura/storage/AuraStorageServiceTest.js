@@ -510,6 +510,43 @@ Test.Aura.Storage.AuraStorageServiceTest = function() {
 
     }
 
+    [Fixture]
+    function getStorage() {
 
+        [Fact]
+        function ReturnsUndefinedWhenCalledWithUndefined() {
+            var targetService = new Aura.Services.AuraStorageService();
+
+            var actual = targetService.getStorage();
+            Assert.Undefined(actual);
+        }
+
+        [Fact]
+        function ReturnsUndefinedWhenCalledWithNull() {
+            var targetService = new Aura.Services.AuraStorageService();
+
+            var actual = targetService.getStorage(null);
+            Assert.Undefined(actual);
+        }
+
+        [Fact]
+        function ReturnsUndefinedWhenStorageNotExists() {
+            var targetService = new Aura.Services.AuraStorageService();
+
+            var actual = targetService.getStorage("NotExists");
+            Assert.Undefined(actual);
+        }
+
+        [Fact]
+        function ReturnsStorageWhenStorageExists() {
+            var storageName = "storageName";
+            var expected = {};
+            var targetService = new Aura.Services.AuraStorageService();
+            targetService.storages[storageName] = expected;
+
+            var actual = targetService.getStorage(storageName);
+            Assert.Equal(expected, actual, "Failed to return corresponding storage.");
+        }
+    }
 
 }

@@ -56,20 +56,6 @@
         }
     },
 
-    /**
-     * Test case to verify the behavior of $A.storageService.getStorage()
-     * TODO: this can be moved to xunit.
-     */
-    testGetStorageApi : {
-        test: function(cmp){
-            $A.test.assertFalsy($A.storageService.getStorage());
-            $A.test.assertFalsy($A.storageService.getStorage(undefined));
-            $A.test.assertFalsy($A.storageService.getStorage(null));
-            $A.test.assertFalsy($A.storageService.getStorage(""));
-            $A.test.assertFalsy($A.storageService.getStorage("fooBar"));
-        }
-    },
-
     testGetStoragesApi : {
         test: function (cmp){
             var storages = $A.storageService.getStorages();

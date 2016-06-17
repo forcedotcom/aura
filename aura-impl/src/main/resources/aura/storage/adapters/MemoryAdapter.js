@@ -66,7 +66,7 @@ MemoryAdapter.prototype.getSize = function() {
  * Retrieves items from storage.
  * @param {String[]} [keys] The set of keys to retrieve. Undefined to retrieve all items.
  * @param {Boolean} [includeExpired] True to return expired items, false to not return expired items.
- * @returns {Promise} A promise that resolves with an array of the items.
+ * @returns {Promise} A promise that resolves with an object that contains key-value pairs.
  */
 MemoryAdapter.prototype.getItems = function(keys /* , includeExpired*/) {
     // TODO - optimize by respecting includeExpired

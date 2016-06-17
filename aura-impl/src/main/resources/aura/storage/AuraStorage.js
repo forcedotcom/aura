@@ -151,8 +151,7 @@ AuraStorage.prototype.inFlightOperations = function() {
  * Asynchronously gets multiple items from storage.
  * @param {String[]} [keys] The set of keys to retrieve. Empty array or falsey to retrieve all items.
  * @param {Boolean} [includeExpired] True to return expired items, falsey to not return expired items.
- * @returns {Promise} A promise that resolves to an array of objects in storage. Each
- *      object consists of {key: String, value: *}.
+ * @returns {Promise} A promise that resolves to an object that contains key-value pairs. {key: storedItem}
  * @export
  */
 AuraStorage.prototype.getAll = function(keys, includeExpired) {

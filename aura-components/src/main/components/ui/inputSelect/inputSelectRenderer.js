@@ -23,6 +23,16 @@
 			cmp.find("select").getElement().appendChild(optionElements);
 		}
 
+		if (cmp.get("v.useMenu")) {
+			var menuList = cmp.find("options").getElement();
+
+			var triggerRect = cmp.find("selectTrigger").getElement().getBoundingClientRect();
+			var width = typeof triggerRect.width !== 'undefined' ? triggerRect.width : triggerRect.right - triggerRect.left;
+			menuList.style.width = width + "px";
+			// In case the width exceeds the max width we want to still limit to the width of the trigger
+			menuList.style.maxWidth = menuList.style.width;
+		}
+
 		this.superAfterRender();
 	},
 

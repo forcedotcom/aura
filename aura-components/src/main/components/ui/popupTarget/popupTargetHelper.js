@@ -141,7 +141,8 @@
                 target: target,
                 appendToBody: true,
                 align: cornerAlign + " top",
-                targetAlign: cornerAlign + " bottom"
+                targetAlign: cornerAlign + " bottom",
+                padTop: 2
             });
             
 
@@ -152,7 +153,7 @@
                 self.lib.panelPositioning.reposition(function() {
                     element.style.opacity = 1;
                 });
-            }),50);
+            }), 50);
             
         }
     },

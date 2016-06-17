@@ -1,31 +1,5 @@
 ({
     /**
-     * Verify that AuraError's severity default value is Alert
-     */
-    testAuraErrorDefaultSeverity : {
-        attributes: {"handleSystemError": true},
-        test: [
-            function(cmp) {
-                $A.test.expectAuraError("AuraError from app client controller");
-                $A.test.clickOrTouch(cmp.find("auraErrorFromClientControllerButton").getElement());
-
-                // since the error handler is executed asyncly, must wait here.
-                $A.test.addWaitForWithFailureMessage(true, function(){
-                        return cmp.get("v.eventHandled");
-                    },
-                    "The expected error didn't get handled.");
-            }, function(cmp) {
-                var expected = $A.severity.ALERT;
-                var actual = cmp.get("v.severity");
-
-                // set handler back to default, so that error model can show up
-                cmp.set("v.handleSystemError", false);
-                $A.test.assertEquals(expected, actual);
-            }
-        ]
-    },
-
-    /**
      * Verify that AuraError's severity default value is Quiet
      */
     testAuraFriendlyErrorDefaultSeverity : {
@@ -44,34 +18,6 @@
                 var actual = cmp.get("v.severity");
 
                 // set handler back to default, so that error model can show up
-                cmp.set("v.handleSystemError", false);
-                $A.test.assertEquals(expected, actual);
-            }
-        ]
-    },
-
-    /**
-     * Verify that AuraError's severity default value is Alert
-     */
-    testAuraErrorWithNonDefaultSeverityInHanlder : {
-        attributes: {
-            "handleSystemError": true,
-            "severity": "FATAL"
-        },
-        test: [
-            function(cmp) {
-                $A.test.expectAuraError("AuraError from app client controller");
-                $A.test.clickOrTouch(cmp.find("auraErrorFromClientControllerButton").getElement());
-                $A.test.addWaitForWithFailureMessage(true, function(){
-                        return cmp.get("v.eventHandled");
-                    },
-                    "The expected error didn't get handled.");
-            },
-            function(cmp) {
-                var expected = $A.severity.FATAL;
-                var actual = cmp.get("v.severity");
-
-               // set handler back to default, so that error model can show up
                 cmp.set("v.handleSystemError", false);
                 $A.test.assertEquals(expected, actual);
             }
@@ -98,33 +44,11 @@
                 // cmp._auraError gets assigned in error handler
                 var targetError = cmp._auraError;
                 cmp.set("v.handleSystemError", false);
-                $A.test.assertTrue(targetError instanceof AuraError);
                 $A.test.assertTrue($A.test.contains(targetError.message, expectedMessage),
                         "Error in handler doesn't contain the original error message.");
             }
         ]
      },
-
-    /**
-     * Verify that failing descriptor is correct when an AuraError gets thrown
-     */
-    testFailingDescriptorWhenAuraErrorIsThrown : {
-        test: [
-            function(cmp) {
-                $A.test.expectAuraError("AuraError from app client controller");
-                $A.test.clickOrTouch(cmp.find("auraErrorFromClientControllerButton").getElement());
-                this.waitForErrorModal();
-            },
-            function(cmp) {
-                var actual = this.findFailingDescriptorFromErrorModal();
-                //auratest$errorHandlingApp$controller$throwAuraErrorFromClientController
-                var action = cmp.get("c.throwAuraErrorFromClientController");
-                var expected = action.getDef().toString();
-
-                $A.test.assertEquals(expected, actual);
-            }
-        ]
-    },
 
     testFailingDescriptorForErrorFromCreateComponentCallback: {
         test: [

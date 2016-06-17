@@ -99,7 +99,7 @@
 			try {
 				this.pushButton(cmp, "btnIndex", 25);
 			} catch (e) {
-				$A.test.assertEquals("Index is out of bounds for list's data provider trigger.", e.message);
+				$A.test.assertTrue(e.message.indexOf("Index is out of bounds for list's data provider trigger.") > -1);
 			}
 		}, function(cmp) {
 			// verify data didnt change.

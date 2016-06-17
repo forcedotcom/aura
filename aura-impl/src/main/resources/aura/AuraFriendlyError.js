@@ -21,7 +21,6 @@
  * @param {String} message - the detail message about the error.
  * @param {Object} innerError - an Error object whose properties are to be placed into AuraFriendlyError.
  * @param {String} severity - the severity of the error. Aura built-in values are defined in $A.severity.
- * @export
  */
 Aura.Errors.AuraFriendlyError = function AuraFriendlyError() {
     Aura.Errors.AuraError.apply(this,arguments);

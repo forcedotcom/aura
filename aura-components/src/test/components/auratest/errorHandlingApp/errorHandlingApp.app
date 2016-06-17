@@ -111,15 +111,6 @@
         </td>
     </tr>
     <tr>
-        <td>AuraError From Application Client Controller: </td>
-        <td>
-          <ui:button label="Throw"
-                     press="{!c.throwAuraErrorFromClientController}"
-                     class="auraErrorFromClientControllerButton"
-                     aura:id="auraErrorFromClientControllerButton"/>
-        </td>
-    </tr>
-    <tr>
         <td>AuraFriendlyError From Application Client Controller: </td>
         <td>
           <ui:button label="Throw"

@@ -15,6 +15,6 @@
  */
 ({	
 	noAttr : function(cmp, event, helper) {
-		throw new $A.auraError("we use js provider for auraMethodProvider.cmp, this function shouldn't get called at all");
+		throw new Error("we use js provider for auraMethodProvider.cmp, this function shouldn't get called at all");
 	}
 })

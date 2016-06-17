@@ -141,30 +141,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     @Test
-    public void testErrorMessageFromAuraErrorContainsStacktraceDevMode() throws Exception {
-        open("/auratest/errorHandlingApp.app", Mode.DEV);
-
-        findAndClickElement(By.cssSelector(".errorFromAppTable .auraErrorFromClientControllerButton"));
-
-        String actualMsg = findErrorMessage();
-        String expectedMsg = "AuraError from app client controller";
-        assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
-        assertClientErrorContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_NON_PROD_MODE);
-    }
-
-    @Test
-    public void testErrorMessageFromAuraErrorNotContainsStacktraceInProdMode() throws Exception {
-        open("/auratest/errorHandlingApp.app", Mode.PROD);
-
-        findAndClickElement(By.cssSelector(".errorFromAppTable .auraErrorFromClientControllerButton"));
-
-        String actualMsg = findErrorMessage();
-        String expectedMsg = "AuraError from app client controller";
-        assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
-        assertClientErrorNotContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_PROD_MODE);
-    }
-
-    @Test
     public void testErrorMessageFromAuraFriendlyErrorNotContainsStacktraceInPRODMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromAppTable .auraFriendlyErrorFromClientControllerButton"));

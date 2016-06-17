@@ -34,7 +34,7 @@
 			item = items[i];
 
 			if (!item || !item.operation) {
-				throw new $A.auraError('Invalid data format. Specify the desired operation.');
+				throw new Error('Invalid data format. Specify the desired operation.');
 			}
 
 			if (defaultFields) {
@@ -70,6 +70,6 @@
 	 * Implement write logic in a concrete helper.
 	 */
 	write: function () {
-		throw new $A.auraError('Unimplemented function! dataWriterHelper#write should be implemented in a concrete helper.');
+		throw new Error('Unimplemented function! dataWriterHelper#write should be implemented in a concrete helper.');
 	}
 })// eslint-disable-line semi

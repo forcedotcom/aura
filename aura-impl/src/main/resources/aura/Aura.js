@@ -530,7 +530,6 @@ function AuraInstance () {
     this["getEvt"] = this.getEvt;
     this["Component"] = this.Component;
 
-    this["auraError"] = this.auraError;
     this["auraFriendlyError"] = this.auraFriendlyError;
     this["severity"] = this.severity;
     this["severity"]["ALERT"] = this.severity.ALERT;

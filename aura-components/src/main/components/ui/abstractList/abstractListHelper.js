@@ -162,7 +162,7 @@
         } else {
             this.showLoading(component, false);
             component.getConcreteComponent()._refreshing = false;
-            throw new $A.auraError("Index is out of bounds for list's data provider trigger.");
+            throw new Error("Index is out of bounds for list's data provider trigger.");
         }
     }
 })// eslint-disable-line semi

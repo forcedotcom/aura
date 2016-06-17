@@ -179,13 +179,18 @@
 
 	_setData : function(editorInstance, content) {
 		var helper = this;
-		editorInstance.setData(content, function() {
+		var options = {};
+		options.callback = function() {
 			if (!$A.util.isEmpty(editorInstance._nextContent)) {
 				helper._setData(editorInstance,editorInstance._nextContent.shift());
 			} else {
 				editorInstance._settingContent = false;
 			}
-		} );
+		};
+		if ($A.util.isUndefinedOrNull(content)) {
+			options.noSnapshot = true;
+		}
+		editorInstance.setData(content, options);
 	},
 
 	getLocale : function() {

@@ -19,8 +19,9 @@
 /**
  * @classdesc Utility functions for component testing, accessible using $A.test.
  * @constructor Test
+ * @export
  */
-TestInstance = function() {
+function TestInstance() {
     this.waits = [];
     this.currentWait = undefined;
     this.cleanups = [];
@@ -44,7 +45,7 @@ TestInstance = function() {
     this.prePostDecodeConfigs = [];
     this.installOverride();
     this.name = undefined;
-};
+}
 
 /**
  * The set of errors accumulated.
@@ -941,6 +942,8 @@ TestInstance.prototype.assertAuraType = function(type, condition, assertMessage)
         case "ControllerDef": return condition instanceof ControllerDef;
 
         case "ModelDef": return condition instanceof ModelDef;
+
+        case "AuraError": return condition instanceof AuraError;
 
         default: this.fail(assertMessage, "\nExpected: Aura object of type {" + type + "}");
     }
@@ -2208,7 +2211,7 @@ TestInstance.prototype.checkGlobalNamespacePollution = function(whitelistedPollu
 /**
  * Json instance for test. Used to export Json methods for testing.
  *
- * @private
+ * @export
  * @memberof Test
  */
 JsonTestInstance = function() {
@@ -2235,21 +2238,17 @@ JsonTestInstance.prototype.decode = function(obj, refSupport) {
     return $A.util.json.decode(obj, refSupport);
 };
 
-/**
- * @export
- * @private
- * @memberof Test
- */
-TestInstance.prototype.json = new JsonTestInstance();
+// -- Aura Bootstrap ------------------------------------------------------------
 
 $A["test"] = new TestInstance();
+$A["test"]["json"] = new JsonTestInstance();
 
 $A.logger.subscribe("WARNING", $A["test"].auraWarning.bind($A["test"]));
 $A.logger.subscribe("ERROR", $A["test"].auraError.bind($A["test"]));
 
 /**
  * Register a global error handler to catch uncaught javascript errors.
- *
+ * @export
  * @ignore
  */
 window.onerror = (function() {

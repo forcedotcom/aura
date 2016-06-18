@@ -1,4 +1,5 @@
-(function(){var rrrrr = "ARRRRRRRR";
+new function() {
+var rrrrr = "ARRRRRRRR";
 function dress() {
   return"like a pirate"
 }
@@ -12,4 +13,5 @@ var sixtyfive = 6;
 var stuff = {$i$:"am string", $numeros$:23525, $blah$:function(food) {
   return"i like to eat " + food
 }};
-})();
+
+};

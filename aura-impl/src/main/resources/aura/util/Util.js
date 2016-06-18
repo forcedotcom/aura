@@ -60,7 +60,7 @@ Aura.Utils.Util.prototype.isIE = (navigator.userAgent.indexOf("MSIE") !== -1) ||
 Aura.Utils.Util.prototype.isLocalStorageEnabled = function () {
     if (this.localStorageEnabled === undefined) {
         this.localStorageEnabled = false;
-        if (window.localStorage) { 
+        if (window.localStorage) {
             try {
                 window.localStorage.setItem("__AURA_LOCAL_STORAGE_ENABLED_TEST", "");
                 window.localStorage.removeItem("__AURA_LOCAL_STORAGE_ENABLED_TEST");
@@ -105,13 +105,15 @@ Aura.Utils.Util.prototype.globalEval = function(src, globals, optionalSourceURL)
     // The protection mechanism here is that if CSP is in place, and the worker is not, the evaluation will be prevented,
     // but if CSP is off, and the worker was initialized, the system still behaves.
     // This block can be removed as part of that work is described here: @W-2900324
-    if (Aura.Utils.Util.prototype.isIE) {
-        // use assignment to variable so that the newlines in src are not actually treated as the end of the line
-        return new Function("var a = " + src + "; return a;")();
-    } else {
-        // normal indirect eval call
-        return window.eval("false||" + src);
+
+    // This evaluation occurs in the global scope and with the extra globals visible but not defined there.
+    var keys = [];
+    var vals = [];
+    for (var key in globals) {
+        keys.push(key);
+        vals.push(globals[key]);
     }
+    return new Function(keys, "var a = " + src + "; return a;").apply({}, vals);
 };
 
 /**

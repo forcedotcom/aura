@@ -111,11 +111,31 @@ public enum JavascriptWriter {
     public abstract void setClosureOptions(CompilerOptions options);
 
     /**
-     * I'm not sure this is exactly "compression level," but it's here for hysterical raisins: some of our closure runs
-     * want to be run in an anonymous function, so they explicitly export anything that should survive.
+     * To remove global namespace pollution, we wrap the compiled code inside a private scope by default.
+     * Global APIs need to be exported explicitly to the global scope.
      */
     public boolean isSelfScoping() {
         return false;
+    }
+
+    /**
+     * Encase the compressed output in an immediately-invoked function expression (IIFE).
+     * This provides a private scope but no instance, therefore "this" still refers to encompassing scope.
+     */
+    private void warpWithIIFE(Writer out, String source) throws IOException {
+        out.append("(function() {\n");
+        out.append(source);
+        out.append("\n)();");
+    }
+
+    /**
+     * Encase the compressed output in a immediately-invoked constructor (IIC).
+     * This provides a private scope and an instance that can be access with "this".
+     */
+    private void warpWithIIC(Writer out, String source) throws IOException {
+        out.append("new function() {\n");
+        out.append(source);
+        out.append("\n};");
     }
 
     /**
@@ -216,10 +236,8 @@ public enum JavascriptWriter {
             String source = compiler.toSource();
 
             if (isSelfScoping()) {
-                // Encase the compressed output in a self-executing function to
-                // scope everything.
-                // Global APIs are exported explicitly in the code.
-                out.append("(function(){").append(source).append("})();");
+                // We use an IIC to make goog.local point to the local scope via "this".
+                warpWithIIC(out, source);
             } else {
                 out.append(source);
             }

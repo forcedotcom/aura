@@ -19,6 +19,7 @@
     "Aura": true,
     "AuraClientService": true,
     "AuraContext": true,
+    "AuraError": true,
     "AuraSerializationService": true,
     "AuraExpressionService": true,
     "AuraEventService": true,

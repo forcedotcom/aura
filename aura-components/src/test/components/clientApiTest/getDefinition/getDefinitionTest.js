@@ -29,7 +29,7 @@
 
             $A.getDefinition(descriptor, function(definition) {
                 $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
-                $A.test.assertTrue(definition instanceof ComponentDef,
+                $A.test.assertAuraType("ComponentDef", definition,
                         "Definition should be a instance of ComponentDef, but actual is " +
                         definition.constructor.name);
                 $A.test.assertEquals(expected, definition.getDescriptor().getQualifiedName());
@@ -43,7 +43,7 @@
 
             $A.getDefinition(expected, function(definition) {
                 $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
-                $A.test.assertTrue(definition instanceof ComponentDef,
+                $A.test.assertAuraType("ComponentDef", definition,
                         "Definition should be a instance of ComponentDef, but actual is " +
                         definition.constructor.name);
                 $A.test.assertEquals(expected, definition.getDescriptor().getQualifiedName());
@@ -58,7 +58,7 @@
 
             $A.getDefinition(expected, function(definition) {
                 $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
-                $A.test.assertTrue(definition instanceof ComponentDef,
+                $A.test.assertAuraType("ComponentDef", definition,
                         "Definition should be a instance of ComponentDef, but actual is " +
                         definition.constructor.name);
                 $A.test.assertEquals(expected, definition.getDescriptor().getQualifiedName());
@@ -89,7 +89,7 @@
 
             $A.getDefinition(descriptor, function(definition) {
                 $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
-                $A.test.assertTrue(definition instanceof EventDef,
+                $A.test.assertAuraType("EventDef", definition,
                         "Definition should be a instance of EventDef, but actual is " +
                         definition.constructor.name);
                 $A.test.assertEquals(expected, definition.getDescriptor().getQualifiedName());
@@ -104,7 +104,7 @@
 
             $A.getDefinition(descriptor, function(definition) {
                 $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
-                $A.test.assertTrue(definition instanceof EventDef,
+                $A.test.assertAuraType("EventDef", definition,
                         "Definition should be a instance of EventDef, but actual is " +
                         definition.constructor.name);
                 $A.test.assertEquals(expected, definition.getDescriptor().getQualifiedName());
@@ -120,7 +120,7 @@
 
             $A.getDefinition(descriptor, function(definition) {
                 $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
-                $A.test.assertTrue(definition instanceof EventDef,
+                $A.test.assertAuraType("EventDef", definition,
                         "Definition should be a instance of EventDef, but actual is " +
                         definition.constructor.name);
                 $A.test.assertEquals(expected, definition.getDescriptor().getQualifiedName());
@@ -169,7 +169,7 @@
                     var definition = definitions[0];
                     $A.test.assertNotUndefinedOrNull(definition,
                         "definitions[0] should be an object.");
-                    $A.test.assertTrue(definition instanceof ComponentDef,
+                    $A.test.assertAuraType("ComponentDef", definition,
                         "definitions[0] should be a instance of ComponentDef, but actual is " +
                         definition.constructor.name);
                     $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
@@ -177,7 +177,7 @@
                     definition = definitions[1];
                     $A.test.assertNotUndefinedOrNull(definition,
                         "definitions[1] should be an object.");
-                    $A.test.assertTrue(definition instanceof ComponentDef,
+                    $A.test.assertAuraType("ComponentDef", definition,
                         "definitions[1] should be a instance of ComponentDef, but actual is " +
                         definition.constructor.name);
                     $A.test.assertEquals("markup://aura:label", definition.getDescriptor().getQualifiedName());
@@ -196,7 +196,7 @@
                     var definition = definitions[0];
                     $A.test.assertNotUndefinedOrNull(definition,
                         "definitions[0] should be an object.");
-                    $A.test.assertTrue(definition instanceof ComponentDef,
+                    $A.test.assertAuraType("ComponentDef", definition,
                         "definitions[0] should be a instance of ComponentDef, but actual is " +
                         definition.constructor.name);
                     $A.test.assertEquals("markup://ui:button", definition.getDescriptor().getQualifiedName());
@@ -204,7 +204,7 @@
                     definition = definitions[1];
                     $A.test.assertNotUndefinedOrNull(definition,
                         "definitions[1] should be an object.");
-                    $A.test.assertTrue(definition instanceof ComponentDef,
+                    $A.test.assertAuraType("ComponentDef", definition,
                         "definitions[1] should be a instance of ComponentDef, but actual is " +
                         definition.constructor.name);
                     $A.test.assertEquals("markup://ui:inputCheckbox", definition.getDescriptor().getQualifiedName());
@@ -227,7 +227,7 @@
                     var definition = definitions[0];
                     $A.test.assertNotUndefinedOrNull(definition,
                         "definitions[0] should be an object.");
-                    $A.test.assertTrue(definition instanceof ComponentDef,
+                    $A.test.assertAuraType("ComponentDef", definition,
                         "definitions[0] should be a instance of ComponentDef, but actual is " +
                         definition.constructor.name);
                     $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
@@ -235,7 +235,7 @@
                     var definition = definitions[1];
                     $A.test.assertNotUndefinedOrNull(definition,
                         "definitions[1] should be an object.");
-                    $A.test.assertTrue(definition instanceof ComponentDef,
+                    $A.test.assertAuraType("ComponentDef", definition,
                         "definitions[1] should be a instance of ComponentDef, but actual is " +
                         definition.constructor.name);
                     $A.test.assertEquals("markup://ui:button", definition.getDescriptor().getQualifiedName());
@@ -258,7 +258,7 @@
                     var definition = definitions[0];
                     $A.test.assertNotUndefinedOrNull(definition,
                         "definitions[0] should be an object.");
-                    $A.test.assertTrue(definition instanceof ComponentDef,
+                    $A.test.assertAuraType("ComponentDef", definition,
                         "definitions[0] should be a instance of ComponentDef, but actual is " +
                         definition.constructor.name);
                     $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
@@ -266,7 +266,7 @@
                     var definition = definitions[1];
                     $A.test.assertNotUndefinedOrNull(definition,
                         "definitions[1] should be an object.");
-                    $A.test.assertTrue(definition instanceof ComponentDef,
+                    $A.test.assertAuraType("ComponentDef", definition,
                         "definitions[1] should be a instance of ComponentDef, but actual is " +
                         definition.constructor.name);
                     $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
@@ -274,7 +274,7 @@
                     var definition = definitions[2];
                     $A.test.assertNotUndefinedOrNull(definition,
                         "definitions[2] should be an object.");
-                    $A.test.assertTrue(definition instanceof ComponentDef,
+                    $A.test.assertAuraType("ComponentDef", definition,
                         "definitions[2] should be a instance of ComponentDef, but actual is " +
                         definition.constructor.name);
                     $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
@@ -290,7 +290,7 @@
                 ], function(definitions) {
                     var definition = definitions[0];
                     $A.test.assertNotUndefinedOrNull(definition, "definitions[0] should be an object.");
-                    $A.test.assertTrue(definition instanceof EventDef,
+                    $A.test.assertAuraType("EventDef", definition,
                             "definitions[0] should be a instance of EventDef, but actual is " +
                             definition.constructor.name);
                     $A.test.assertEquals("markup://aura:valueChange", definition.getDescriptor().getQualifiedName());
@@ -298,7 +298,7 @@
                     definition = definitions[1];
                     $A.test.assertNotUndefinedOrNull(definition,
                             "definitions[1] should be an object.");
-                    $A.test.assertTrue(definition instanceof EventDef,
+                    $A.test.assertAuraType("EventDef", definition,
                             "definitions[1] should be a instance of EventDef, but actual is " +
                             definition.constructor.name);
                     $A.test.assertEquals("markup://aura:titleChange", definition.getDescriptor().getQualifiedName());
@@ -318,21 +318,21 @@
                 ], function(definitions) {
                     var definition = definitions[0];
                     $A.test.assertNotUndefinedOrNull(definition, "definitions[0] should be an object.");
-                    $A.test.assertTrue(definition instanceof ComponentDef,
+                    $A.test.assertAuraType("ComponentDef", definition,
                             "definitions[0] should be a instance of ComponentDef, but actual is " +
                             definition.constructor.name);
                     $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
 
                     definition = definitions[1];
                     $A.test.assertNotUndefinedOrNull(definition, "definitions[1] should be an object.");
-                    $A.test.assertTrue(definition instanceof ComponentDef,
+                    $A.test.assertAuraType("ComponentDef", definition,
                             "definitions[1] should be a instance of ComponentDef, but actual is " +
                             definition.constructor.name);
                     $A.test.assertEquals("markup://ui:button", definition.getDescriptor().getQualifiedName());
 
                     definition = definitions[2];
                     $A.test.assertNotUndefinedOrNull(definition, "definitions[2] should be an object.");
-                    $A.test.assertTrue(definition instanceof EventDef,
+                    $A.test.assertAuraType("EventDef", definition,
                             "definitions[2] should be a instance of EventDef, but actual is " +
                             definition.constructor.name);
                     $A.test.assertEquals("markup://clientApiTest:getDefinitionTestEvent", definition.getDescriptor().getQualifiedName());
@@ -372,7 +372,7 @@
                 ], function(definitions) {
                     var definition = definitions[0];
                     $A.test.assertNotUndefinedOrNull(definition, "definitions[0] should be an object.");
-                    $A.test.assertTrue(definition instanceof ComponentDef,
+                    $A.test.assertAuraType("ComponentDef", definition,
                             "definitions[0] should be a instance of ComponentDef, but actual is " +
                             definition.constructor.name);
                     $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());

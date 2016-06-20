@@ -122,17 +122,18 @@ public enum JavascriptWriter {
      * Encase the compressed output in an immediately-invoked function expression (IIFE).
      * This provides a private scope but no instance, therefore "this" still refers to encompassing scope.
      */
-    private void warpWithIIFE(Writer out, String source) throws IOException {
-        out.append("(function() {\n");
-        out.append(source);
-        out.append("\n)();");
-    }
+    // Keep for future implementations
+//    private void wrapWithIIFE(Writer out, String source) throws IOException {
+//        out.append("(function() {\n");
+//        out.append(source);
+//        out.append("\n)();");
+//    }
 
     /**
      * Encase the compressed output in a immediately-invoked constructor (IIC).
      * This provides a private scope and an instance that can be access with "this".
      */
-    private void warpWithIIC(Writer out, String source) throws IOException {
+    private void wrapWithIIC(Writer out, String source) throws IOException {
         out.append("new function() {\n");
         out.append(source);
         out.append("\n};");
@@ -237,7 +238,7 @@ public enum JavascriptWriter {
 
             if (isSelfScoping()) {
                 // We use an IIC to make goog.local point to the local scope via "this".
-                warpWithIIC(out, source);
+                wrapWithIIC(out, source);
             } else {
                 out.append(source);
             }

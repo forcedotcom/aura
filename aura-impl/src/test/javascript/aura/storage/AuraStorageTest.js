@@ -57,7 +57,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
                     var value = reject(error);
                     return ResolvePromise(value);
                 } catch (newError) {
-                  return RejectPromise(newError);
+                    return RejectPromise(newError);
                 }
             }
         };
@@ -716,10 +716,11 @@ Test.Aura.Storage.AuraStorageTest = function() {
     [Fixture]
     function sweep() {
 
-        var NoopPromise = function NoopPromise() {
+        // a promise that doesn't resolve, doesn't invoke then()'s
+        var UnresolvedPromise = function UnresolvedPromise() {
           return {
               then: function() {
-                  return { then: function() {} };
+                  return UnresolvedPromise();
               }
           };
         };
@@ -770,7 +771,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             var config = makeConfigAndAdapter();
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return NoopPromise();
+                return UnresolvedPromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -779,7 +780,6 @@ Test.Aura.Storage.AuraStorageTest = function() {
 
                 time = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX+1;
                 target.sweep();
-
                 target.sweep();
             }); });
 
@@ -795,7 +795,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             var config = makeConfigAndAdapter();
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return NoopPromise();
+                return ResolvePromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -819,7 +819,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             var config = makeConfigAndAdapter();
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return NoopPromise();
+                return ResolvePromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -843,7 +843,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             var config = makeConfigAndAdapter();
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return NoopPromise();
+                return ResolvePromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -870,7 +870,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             config.expiration = 1;
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return NoopPromise();
+                return ResolvePromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -896,7 +896,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             config.expiration = 1;
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return NoopPromise();
+                return ResolvePromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -914,6 +914,33 @@ Test.Aura.Storage.AuraStorageTest = function() {
 
 
         [Fact]
+        function SweepAllowedBeforeMinIntervalIfForced() {
+            var expected = 1;
+            var actual = 0;
+
+            var config = makeConfigAndAdapter();
+            config.expiration = 1;
+            config.adapterClass.prototype.sweep = function() {
+                actual++;
+                return ResolvePromise();
+            };
+
+            mockTime(function() { mockA(function() {
+                time = 0;
+                var target = new Aura.Storage.AuraStorage(config);
+
+                // advance time to 1ms less than min sweep interval
+                time = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MIN - 1;
+
+                target.sweep(true);
+            }); });
+
+            Assert.Equal(expected, actual);
+        }
+
+
+
+        [Fact]
         function SweepPreventedBeforeMaxInterval() {
             var expected = 0;
             var actual = 0;
@@ -923,7 +950,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return NoopPromise();
+                return ResolvePromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -950,7 +977,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
             config.adapterClass.prototype.sweep = function() {
                 actual++;
-                return NoopPromise();
+                return ResolvePromise();
             };
 
             mockTime(function() { mockA(function() {
@@ -965,29 +992,6 @@ Test.Aura.Storage.AuraStorageTest = function() {
 
             Assert.Equal(expected, actual);
         }
-
-
-        [Fact]
-        function AdapterSweepRejectClearsSweepInProgress() {
-            var config = makeConfigAndAdapter();
-            // set config such that max interval applies
-            config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
-            config.adapterClass.prototype.sweep = function() {
-                return RejectPromise();
-            };
-
-            mockTime(function() { mockA(function() {
-                time = 0;
-                var target = new Aura.Storage.AuraStorage(config);
-
-                // advance time to exactly max sweep interval
-                time = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX;
-
-                target.sweep();
-                Assert.False(target._sweepingInProgress);
-            }); });
-        }
-
 
         [Fact]
         function AdapterSweepResolveFiresModified() {
@@ -1041,14 +1045,14 @@ Test.Aura.Storage.AuraStorageTest = function() {
         }
 
         [Fact]
-        function AdapterSweepRejectsDoesNotFireModified() {
+        function AdapterSweepRejectDoesNotFireModified() {
             firedEvents = [];
 
             var config = makeConfigAndAdapter();
             // set config such that max interval applies
             config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
             config.adapterClass.prototype.sweep = function() {
-                return RejectPromise();
+                return RejectPromise(new Error("message"));
             };
 
             mockTime(function() { mockA(function() {
@@ -1062,56 +1066,6 @@ Test.Aura.Storage.AuraStorageTest = function() {
             }); });
 
             Assert.Equal(0, firedEvents.length);
-        }
-
-
-        [Fact]
-        function AdapterAbsentSweepInvokesGetExpired() {
-            var actual = false;
-            var config = makeConfigAndAdapter();
-            // set config such that max interval applies
-            config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
-
-            // do not define adapter.sweep(). this forces getExpired() to be used.
-            config.adapterClass.prototype.getExpired = function() {
-                actual = true
-                return ResolvePromise(); // do not return the expected array
-            };
-
-            mockTime(function() { mockA(function() {
-                time = 0;
-                var target = new Aura.Storage.AuraStorage(config);
-
-                // advance time to exactly max sweep interval
-                time = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX;
-
-                target.sweep();
-            }); });
-
-            Assert.True(actual);
-        }
-
-
-        [Fact]
-        function AdapterGetExpiredReturnsNonArrayUnblocksFutureSweep() {
-            var config = makeConfigAndAdapter();
-            // set config such that max interval applies
-            config.expiration = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX*2/1000 + 1;
-            config.adapterClass.prototype.getExpired = function() {
-                return ResolvePromise(); // do not return the expected array
-            };
-
-            mockTime(function() { mockA(function() {
-                time = 0;
-                var target = new Aura.Storage.AuraStorage(config);
-                target._sweepingInProgress = false;
-
-                // advance time to exactly max sweep interval
-                time = Aura.Storage.AuraStorage.SWEEP_INTERVAL.MAX;
-
-                target.sweep();
-                Assert.False(target._sweepingInProgress);
-            }); });
         }
     }
 

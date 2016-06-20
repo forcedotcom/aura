@@ -572,10 +572,6 @@
     testSweepNeverEvictsBlacklist: {
         test: [
            function setup(cmp) {
-               // force rapid sweeps so test runs quickly
-               // AuraStorage.SWEEP_INTERVAL.MIN = 1;
-               // AuraStorage.SWEEP_INTERVAL.MAX = 2;
-
                // store max size
                var maxSize = 400;
 
@@ -604,17 +600,17 @@
                var completed = false;
                cmp._storage.set(cmp._prefix.key, cmp._prefix.value)
                    .then(function() {
-                       var promises = [];
+                       var values = {};
                        for (var i = 0; i < cmp._actionsBlacklist.length; i++) {
-                           promises.push(cmp._storage.set(cmp._actionsBlacklist[i], cmp._expected));
+                           values[cmp._actionsBlacklist[i]] = cmp._expected;
                        }
-                       return Promise.all(promises);
+                       return cmp._storage.setAll(values);
                    })
                    .then(function() {
-                       return cmp._storage.set(cmp._suffix1.key, cmp._prefix.value);
-                   })
-                   .then(function() {
-                       return cmp._storage.set(cmp._suffix2.key, cmp._prefix.value);
+                       var values = {};
+                       values[cmp._suffix1.key] = cmp._prefix.value;
+                       values[cmp._suffix2.key] = cmp._prefix.value;
+                       return cmp._storage.setAll(values);
                    })
                    .then(function() {
                        completed = true;
@@ -635,15 +631,19 @@
                 */
                function checkStorage() {
                    // can't call sweep() directly so rely on get() to trigger sweep().
-                   return cmp._storage.get("anything")
+                   return $A.test.storageSweep(cmp._storage)
                        .then(function() {
                            // expiration is set very low to force sweeping so must request expired items
                            return cmp._storage.getAll([], true);
                        })
                        .then(function(items) {
-                           // if sweep() hasn't cleared the items then recurse
+                           // if sweep() hasn't cleared the items then delay (to not starve other "threads")
+                           // and recurse.
                            if (items[cmp._prefix.key] || items[cmp._suffix1.key]) {
-                               return checkStorage();
+                               setTimeout(function() {
+                                   checkStorage();
+                               }, 100);
+                               return;
                            }
 
                            // verify the blacklisted items remain

@@ -205,8 +205,8 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 
 	var t = typeof value;
 	
-	if (!value || (t !== "object" && t !== "function")) {
-		// ignoring falsy, nully references, non-objects and non-functions
+	if (!value || (t !== "object" && t !== "function") || value === window || value === document) {
+		// ignoring falsy, nully references, non-objects and non-functions, and global window/document
 		return value;
 	}
 	

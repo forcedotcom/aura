@@ -25,7 +25,6 @@ Test.Aura.Locker.SecureObjectTest = function() {
     delete newWeakMap;
     delete rawToSecureObjectCaches;
 
-
     [Fixture]
     function unfilterEverything() {
         var validLockSet = new WeakSet();
@@ -49,7 +48,10 @@ Test.Aura.Locker.SecureObjectTest = function() {
                 return newWeakMap;
             },
 
-            SecureObject: Aura.Locker.SecureObject
+            SecureObject: Aura.Locker.SecureObject,
+            
+            document: {},
+            window: {}
         });
 
         [Fact]

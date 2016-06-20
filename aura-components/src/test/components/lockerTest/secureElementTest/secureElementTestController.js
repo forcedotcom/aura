@@ -117,6 +117,26 @@
         testUtils.assertEquals("innerHTML content", element.innerHTML);
     },
 
+    testInsertAdjacentHTML: function(cmp, event) {
+        var testUtils = cmp.get("v.testUtils");
+        var targetElement = event.getParam("arguments").targetElement;
+        var element;
+        if(targetElement === "ExistingElement") {
+            element = document.querySelector('.title');
+        } else if (targetElement === "CreatedElement") {
+            element = document.createElement("div");
+        }
+
+        element.innerHTML = "<span>innerHTML content</span>";
+        var innerElement = element.firstChild;
+        innerElement.insertAdjacentHTML("afterbegin","<i>afterbegin content</i>");
+        innerElement.insertAdjacentHTML("beforeend","<i>beforeend content</i>");
+        innerElement.insertAdjacentHTML("beforebegin","<i>beforebegin content</i>");
+        innerElement.insertAdjacentHTML("afterend","<i>afterend content</i>");
+
+        testUtils.assertEquals("<i>beforebegin content</i><span><i>afterbegin content</i>innerHTML content<i>beforeend content</i></span><i>afterend content</i>", element.innerHTML);
+    },
+
     testAddEventListenerMultipleCalls : function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
 

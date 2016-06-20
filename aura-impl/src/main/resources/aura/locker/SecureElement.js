@@ -132,6 +132,36 @@ function SecureElement(el, key) {
             value: function(selector) {
                 return SecureElement.secureQuerySelector(o, el, key, selector);
             }
+        },
+        insertAdjacentHTML: {
+            value: function(position, text) {
+
+                // Do not allow insertAdjacentHTML on shared elements (body/head)
+                if (isSharedElement(el)) {
+                    throw new $A.auraError("SecureElement.insertAdjacentHTML cannot be used with " + el.tagName + " elements!");
+                }
+                var parent;
+                if (position === "afterbegin" || position === "beforeend") {
+                    // We have access to el, nothing else to check.
+                } else if (position === "beforebegin" || position === "afterend") {
+                    // Prevent writing outside secure node.
+                    parent = el.parentNode;
+                    $A.lockerService.util.verifyAccess(o, parent, {
+                        verifyNotOpaque : true
+                    });
+                } else {
+                    throw new $A.auraError("SecureElement.insertAdjacentHTML requires position 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'.");
+                }
+
+                // Allow SVG <use> element
+                var config = {
+                    "ADD_TAGS" : [ "use" ]
+                };
+
+                el.insertAdjacentHTML(position, DOMPurify["sanitize"](text, config));
+
+                trustNodes(undefined, parent ? parent.childNodes : el.childNodes);
+            }
         }
 	});
 

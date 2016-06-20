@@ -52,6 +52,9 @@
     <aura:method name="testInnerHTML" action="{!c.testInnerHTML}">
         <aura:attribute name="targetElement" type="String"/>
     </aura:method>
+    <aura:method name="testInsertAdjacentHTML" action="{!c.testInsertAdjacentHTML}">
+        <aura:attribute name="targetElement" type="String"/>
+    </aura:method>
 
     <lockerTest:facet/>
 
@@ -77,6 +80,6 @@
 
     <div aura:id="scalarExpression">{!v.scalarExpression}</div>
 
-    <div aura:id="cacheTestA" id="cacheTestA"></div>
-    <div aura:id="cacheTestB" id="cacheTestB"></div>
+  	<div aura:id="cacheTestA" id="cacheTestA"></div>
+  	<div aura:id="cacheTestB" id="cacheTestB"></div>
 </aura:component>

@@ -533,6 +533,7 @@
 
             if (!style) {
                 // If we've encountered an element we can't compute the style for, get out
+                evt.preventBounce = false;
                 break;
             }
 
@@ -559,6 +560,7 @@
                 }
 
                 // No need to continue up the DOM, we've done our job
+                evt.preventBounce = false;
                 return;
             }
 

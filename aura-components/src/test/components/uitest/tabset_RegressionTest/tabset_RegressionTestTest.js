@@ -113,7 +113,9 @@
                 }];
 
                 self.updateTab(tabSet, 0, undefined, {icon: newIcon});
-
+            }, function(cmp) {
+                var self = this,
+                newIconText = "T";
                 $A.test.addWaitForWithFailureMessage(
                     newIconText,
                     function() {
@@ -150,7 +152,9 @@
 
                 self.updateTab(tabSet, 0, undefined, {title: newTitle0});
                 self.updateTab(tabSet, undefined, tab1Name, {title: newTitle1});
-
+            }, function(cmp) {
+                var self = this,
+                newTitle0 = "Title 0 Updated!";
                 $A.test.addWaitForWithFailureMessage(
                     newTitle0,
                     function() {
@@ -158,7 +162,9 @@
                     },
                     "Title of tab 0 should be " + newTitle0 
                 );
-
+            }, function(cmp) {
+                var self = this,
+                newTitle1 = "Title 1 Updated!";
                 $A.test.addWaitForWithFailureMessage(
                     newTitle1,
                     function() {

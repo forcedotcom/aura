@@ -51,7 +51,8 @@
                     name : 'Acme' + i,
                     id   : '00' + i
                 },
-                url: isEven ? 'https://www.google.com' : 'https://www.salesforce.com'
+                url: isEven ? 'https://www.google.com' : 'https://www.salesforce.com',
+                selected: isTriple ? true : false
             });
         }
         

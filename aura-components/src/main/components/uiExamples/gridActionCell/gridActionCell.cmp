@@ -16,5 +16,6 @@
 
 -->
 <aura:component implements="ui:hasGridEvents">
-	<input type="checkbox" onclick="{!c.handleClick}" tabindex="-1"/>
+    <aura:attribute name="value" type="Boolean" default="false" />
+	<input type="checkbox" onclick="{!c.handleClick}" checked="{!v.value}" tabindex="-1"/>
 </aura:component>

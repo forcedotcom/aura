@@ -21,11 +21,13 @@
 	<aura:attribute name="isPsuedoInput" type="Boolean" default="false"/>
     
     <aura:attribute name="valueAttribute" type="String" default="value" description="The name of the attribute on the body component that holds the value to be edited."/>
+
+	<aura:attribute name="triggerIcon" type="Aura.Component[]" default="" description="Icon used for the trigger."/>
 	
 	<!-- Cell states -->
-	<aura:attribute name="disabled" type="Boolean" default="false"/>
+	<aura:attribute name="disabled"  type="Boolean" default="false"/>
 	<aura:attribute name="hasErrors" type="Boolean" default="false"/>
-	
+
 	<!-- Potentially move psuedo input version into separate component -->
 	<span class="{! 'cellContainer' + (v.edited ? ' edited' : '') + (v.hasErrors ? ' errors' : '')}">
 		<aura:renderIf isTrue="{!!v.isPsuedoInput}">
@@ -36,6 +38,9 @@
 				<aura:renderIf isTrue="{!v.isPsuedoInput}">
 					<span aura:id="contentSpan" class="content">{!v.body}</span>
 				</aura:renderIf>
+				
+				{!v.triggerIcon}
+
 			</ui:button>
 		</span>
 	</span>

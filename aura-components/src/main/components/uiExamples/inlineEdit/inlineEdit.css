@@ -145,3 +145,15 @@
 .THIS.blue {
 	border: 1px solid blue;
 }
+
+.THIS .disabled .iconCmp {
+	color: #fff;
+}
+
+.THIS .iconCmp {
+	visibility: hidden;
+}
+
+.THIS .cellContainer:hover .iconCmp {
+	visibility: visible;
+}

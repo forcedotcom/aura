@@ -16,6 +16,7 @@
 ({
 	handleClick : function(cmp, evt, helper) {
 		var newValue = cmp.getElement().checked;
+		cmp.set("v.value", newValue);
 		
 		cmp.getEvent("gridAction").setParams({
 			action  : 'select',

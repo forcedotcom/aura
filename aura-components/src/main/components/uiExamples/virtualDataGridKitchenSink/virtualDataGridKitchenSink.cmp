@@ -66,7 +66,7 @@
 				<ui:outputText value="{!item.who.name}"/>
 				<ui:outputText value="{!item.what.name}"/>
 				<ui:outputText value="{!item.activityDate}"/>
-				<uiExamples:gridActionCell />
+				<uiExamples:gridActionCell value="{!item.selected}"/>
                 <uiExamples:gridActionCell />
 			</aura:set>
 			

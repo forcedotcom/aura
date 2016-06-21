@@ -272,12 +272,14 @@
     },
     _rerenderDirtyElement: function (cmp, item, target, index) {
         var gridBody     = this.getGridBody(cmp),
-            virtualItems = cmp._virtualItems,
-            updatedRow   = this._generateVirtualRow(cmp, item, index);
+            virtualItems = cmp._virtualItems;
         
         index = (!$A.util.isUndefinedOrNull(index)) ? index : this._findVirtualElementPosition(virtualItems, target);
 
-        if (!$A.util.isUndefinedOrNull(gridBody) && !$A.util.isUndefined(index) && index >= 0 && index < virtualItems.length) {
+        if (!$A.util.isUndefinedOrNull(gridBody) && !$A.util.isUndefinedOrNull(index) &&
+            index >= 0 && index < virtualItems.length) {
+            
+            var updatedRow = this._generateVirtualRow(cmp, item, index);
             if (!target) {
                 target = virtualItems[index];
             }
@@ -286,6 +288,7 @@
             this._replaceDOMElement(gridBody, updatedRow, target);
         }
     },
+    
     _generateVirtualRow: function (cmp, item, index) {
         var rowTmpl = cmp._rowTemplate,
             itemVar = cmp.get('v.itemVar'),

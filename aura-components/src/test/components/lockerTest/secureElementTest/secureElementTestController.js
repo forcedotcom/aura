@@ -3,13 +3,13 @@
         var testUtils = cmp.get("v.testUtils");
         var auraId = event.getParam("arguments").auraId;
         var elementPropertiesWhitelist = event.getParam("arguments").elementPropertiesWhitelist;
-        var elementProperitesBlacklist = event.getParam("arguments").elementPropertiesBlacklist;
+        var elementPropertiesBlacklist = event.getParam("arguments").elementPropertiesBlacklist;
         var element = cmp.find(auraId).getElement();
 
         elementPropertiesWhitelist.forEach(function(name) {
             testUtils.assertTrue(name in element, "Expected property '" + name + "' to be a property on SecureElement");
         });
-        elementProperitesBlacklist.forEach(function(name) {
+        elementPropertiesBlacklist.forEach(function(name) {
             testUtils.assertFalse(name in element, "Expected property '" + name + "' to not be exposed on SecureElement");
         });
     },
@@ -178,7 +178,7 @@
         var testUtils = cmp.get("v.testUtils");
         var scalarExpression = cmp.find("scalarExpression");
         var element = scalarExpression.getElement();
-          
+
         testUtils.assertEquals("A scalar expression", element.innerHTML);
     },
 

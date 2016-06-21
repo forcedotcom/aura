@@ -103,28 +103,28 @@
 		}]
 	},
 
-    testChangeTemplate:{
-        attributes : {},
-        test:function(cmp){
+    testChangeTemplate: {
+        test: [function(cmp){
             cmp.set("v.loaded",false);
-            var list=cmp.find("list");
-            var expected="A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:10,K:11,L:12,M:13,N:14,O:15,P:16,Q:17,R:18,S:19,T:20,U:21,V:22,W:23,X:24,Y:25,";
-            list.set("v.itemTemplate",[
+            var list = cmp.find("list");
+            list.set("v.itemTemplate", [
                 {attributes:{values:{value:"{!row.char}"}},componentDef:{descriptor:"aura:expression"}},
                 {attributes:{values:{value:":"}},componentDef:{descriptor:"aura:text"}},
                 {attributes:{values:{value:"{!row.index}"}},componentDef:{descriptor:"aura:expression"}},
                 {attributes:{values:{value:","}},componentDef:{descriptor:"aura:text"}}
             ]);
 
-            $A.test.addWaitFor(true,function(){return cmp.get("v.loaded");},function(){
-                var actual=$A.test.getTextByComponent(list);
-                // infiniteList.cmp has a hidden loading message that we don't care about
-                actual = $A.util.trim(actual.replace("Loading...",""));
-
-                $A.test.assertEquals(expected,actual);
-            })
-
-        }
+            $A.test.addWaitFor(true, function(){
+            	return cmp.get("v.loaded");
+            });
+        }, function(cmp) {
+        	var expected = "A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:10,K:11,L:12,M:13,N:14,O:15,P:16,Q:17,R:18,S:19,T:20,U:21,V:22,W:23,X:24,Y:25,";
+        	var list = cmp.find("list");
+        	var listElm = list.getElement().querySelector("ul");
+        	$A.test.addWaitFor(expected, function(){
+        		return $A.test.getText(listElm);
+        	});
+        }]
     },
 	
 	pushButton : function(cmp, btnName, numItems) {

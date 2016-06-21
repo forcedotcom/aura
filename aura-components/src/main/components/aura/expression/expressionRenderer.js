@@ -22,9 +22,13 @@
 
         if(!($A.util.isComponent(value) || $A.util.isArray(value))){
             // JBUCH: HALO: TODO: MIGHT BE ABLE TO RETURN THIS TO SIMPLE TEXTNODE MANAGEMENT
-            component._lastRenderedValue = value = $A.createComponentFromConfig({ descriptor:'markup://aura:text', attributes:{ value: value } });
-
-            $A.lockerService.trust(component.getOwner(), value);
+        	var owner = component.getOwner();
+        	var context = $A.getContext();  	
+        	context.setCurrentAccess(owner);
+            component._lastRenderedTextNode = value = $A.createComponentFromConfig({ descriptor: "markup://aura:text", attributes:{ value: value } });
+            context.releaseCurrentAccess();
+            
+            $A.lockerService.trust(owner, value);
         }
 
         return $A.renderingService.renderFacet(component,value);
@@ -38,10 +42,10 @@
                 if($A.util.isUndefinedOrNull(value)){
                     value = "";
                 }
-                if(component._lastRenderedValue && component._lastRenderedValue.isValid()){
+                if(component._lastRenderedTextNode && component._lastRenderedTextNode.isValid()){
                     // JBUCH: HALO: TODO: MIGHT BE ABLE TO RETURN THIS TO SIMPLE TEXTNODE MANAGEMENT
-                    component._lastRenderedValue.set("v.value",value,true);
-                    value=component._lastRenderedValue;
+                    component._lastRenderedTextNode.set("v.value",value,true);
+                    value=component._lastRenderedTextNode;
                     return $A.rerender(value);
                 }else {
                     value = $A.createComponentFromConfig({descriptor: 'markup://aura:text', attributes: {value: value}});
@@ -54,9 +58,9 @@
 
     unrender : function(component) {
         $A.renderingService.unrenderFacet(component);
-        if (component._lastRenderedValue) {
-            component._lastRenderedValue.destroy();
-            component._lastRenderedValue = null;
+        if (component._lastRenderedTextNode) {
+            component._lastRenderedTextNode.destroy();
+            delete component._lastRenderedTextNode;
         }
     },
 

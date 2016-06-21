@@ -1654,8 +1654,8 @@
                 "__proto__": null
             };
             var visited = new Set();
-            var toJSONCmp = Component.prototype.toJSON;
-            delete Component.prototype.toJSON;
+            var toJSONCmp = $A.Component.prototype.toJSON;
+            delete $A.Component.prototype.toJSON;
             var result = "{}";
             try {
                 result = JSON.stringify(originalValue, function(key, value) {
@@ -1730,7 +1730,7 @@
                 }
             });
 
-            Component.prototype.toJSON = toJSONCmp;
+            $A.Component.prototype.toJSON = toJSONCmp;
 
             return result;
         };
@@ -1901,12 +1901,12 @@
         });
 
         // No way of displaying this at the moment.
-        // wrapFunction(Component.prototype, "render", function(){
+        // wrapFunction($A.Component.prototype, "render", function(){
         //     $Aura.Inspector.count("component_rendered");
         //     $Aura.Inspector.count(this.getGlobalId() + "_rendered");
         // });
 
-        wrapFunction(Component.prototype, "rerender", function(){
+        wrapFunction($A.Component.prototype, "rerender", function(){
             $Aura.Inspector.count("component_rerendered");
             $Aura.Inspector.count(this.getGlobalId() + "_rerendered");
         });
@@ -1916,8 +1916,8 @@
             I shouldn't rely on this, it's merely a best case scenario work around.
             Fallbacks should be present if I use this method.
          */
-        var originalRender = Component.prototype.render;
-        wrapFunction(Component.prototype, "render", function(){
+        var originalRender = $A.Component.prototype.render;
+        wrapFunction($A.Component.prototype, "render", function(){
             var current = this.getDef();
             while(current.getSuperDef()) {
                 current = current.getSuperDef();
@@ -1929,11 +1929,11 @@
                     }
                 });
                 // No need anymore to do the override. It's simply to attach this access trap.
-                Component.prototype.render = originalRender;
+                $A.Component.prototype.render = originalRender;
             }
         });
         // No way of displaying this at the moment.
-        // wrapFunction(Component.prototype, "unrender", function(){
+        // wrapFunction($A.Component.prototype, "unrender", function(){
         //     $Aura.Inspector.count("component_unrendered");
         //     $Aura.Inspector.count(this.getGlobalId() + "_unrendered");
         // });
@@ -1977,8 +1977,8 @@
         }
 
         function output(data) {
-            var componentToJSON = Component.prototype.toJSON;
-            delete Component.prototype.toJSON;
+            var componentToJSON = $A.Component.prototype.toJSON;
+            delete $A.Component.prototype.toJSON;
 
             var json = $Aura.Inspector.safeStringify(data, function(key, value){
                 if($A.util.isComponent(value)) {
@@ -1989,7 +1989,7 @@
                 return value;
             });
 
-            Component.prototype.toJSON = componentToJSON;
+            $A.Component.prototype.toJSON = componentToJSON;
 
             return json;
         }

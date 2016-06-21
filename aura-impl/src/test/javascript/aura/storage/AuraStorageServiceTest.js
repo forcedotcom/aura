@@ -377,7 +377,6 @@ Test.Aura.Storage.AuraStorageServiceTest = function() {
                     isFunction: function(obj) { return true; }
                 }
             },
-
         });
 
         function registerAdapter(service, name, persistent, secure) {
@@ -470,41 +469,74 @@ Test.Aura.Storage.AuraStorageServiceTest = function() {
 
     [Fixture]
     function deleteStorage() {
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "Aura": {
+                "Storage": {
+                    "MemoryAdapter": {
+                        "NAME": "memory"
+                    }
+                }
+            },
+            "$A": {
+                assert: function(condition, assertMessage) {
+                    if (!condition) { throw new Error(assertMessage); }
+                },
+                util: {
+                    isString: function(obj) { return typeof obj === "string"; },
+                    isFunction: function(obj) { return true; }
+                }
+            },
+
+        });
+
         [Fact]
         function DeleteCallsAdapterDelete() {
             var name = "arbitrary";
             var actual;
 
-            var targetService = new Aura.Services.AuraStorageService();
-            targetService.storages[name] = {
-                deleteStorage: function() {
-                    actual = true;
-                }
-            };
+            mockA(function() {
+                var targetService = new Aura.Services.AuraStorageService();
+                targetService.storages[name] = {
+                    deleteStorage: function() {
+                        actual = true;
+                    }
+                };
 
-            targetService.deleteStorage(name);
+                targetService.deleteStorage(name);
+            });
+
             Assert.True(actual);
         }
 
         [Fact]
         function DeleteCausesGetStorageToReturnNull() {
             var name = "arbitrary";
-            var targetService = new Aura.Services.AuraStorageService();
-            targetService.storages[name] = {
-                deleteStorage: function() {}
-            };
+            var actual;
 
-            targetService.deleteStorage(name);
-            var actual = targetService.getStorage(name);
+            mockA(function() {
+                var targetService = new Aura.Services.AuraStorageService();
+                targetService.storages[name] = {
+                    deleteStorage: function() {}
+                };
+
+                targetService.deleteStorage(name);
+                actual = targetService.getStorage(name);
+            });
+
             Assert.Undefined(actual);
         }
 
         [Fact]
         function DeleteNonExistentStorage() {
             var name = "arbitrary";
-            var targetService = new Aura.Services.AuraStorageService();
-            targetService.deleteStorage(name);
-            var actual = targetService.getStorage(name);
+            var actual
+
+            mockA(function() {
+                var targetService = new Aura.Services.AuraStorageService();
+                targetService.deleteStorage(name);
+                actual = targetService.getStorage(name);
+            });
+
             Assert.Undefined(actual);
         }
 
@@ -513,27 +545,48 @@ Test.Aura.Storage.AuraStorageServiceTest = function() {
     [Fixture]
     function getStorage() {
 
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                util: {
+                    isString: function(obj){
+                        return typeof obj === 'string';
+                    }
+                },
+                assert: function(condition, message){
+                    if (!condition) {
+                        throw new Error(message);
+                    }
+                }
+            }
+        });
+
+
         [Fact]
-        function ReturnsUndefinedWhenCalledWithUndefined() {
-            var targetService = new Aura.Services.AuraStorageService();
+        function ReturnsUndefinedWhenCalledWithNonString() {
+            var expected = "AuraStorageService.getStorage(): 'name' must be a String.";
+            var actual;
 
-            var actual = targetService.getStorage();
-            Assert.Undefined(actual);
-        }
+            mockA(function() {
+                var targetService = new Aura.Services.AuraStorageService();
+                try {
+                    targetService.getStorage(null);
+                } catch (e) {
+                    actual = e.toString();
+                }
+            });
 
-        [Fact]
-        function ReturnsUndefinedWhenCalledWithNull() {
-            var targetService = new Aura.Services.AuraStorageService();
-
-            var actual = targetService.getStorage(null);
-            Assert.Undefined(actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
         function ReturnsUndefinedWhenStorageNotExists() {
-            var targetService = new Aura.Services.AuraStorageService();
+            var actual;
 
-            var actual = targetService.getStorage("NotExists");
+            mockA(function() {
+                var targetService = new Aura.Services.AuraStorageService();
+                actual = targetService.getStorage("NotExists");
+            });
+
             Assert.Undefined(actual);
         }
 
@@ -541,10 +594,15 @@ Test.Aura.Storage.AuraStorageServiceTest = function() {
         function ReturnsStorageWhenStorageExists() {
             var storageName = "storageName";
             var expected = {};
-            var targetService = new Aura.Services.AuraStorageService();
-            targetService.storages[storageName] = expected;
+            var actual;
 
-            var actual = targetService.getStorage(storageName);
+            mockA(function() {
+                var targetService = new Aura.Services.AuraStorageService();
+                targetService.storages[storageName] = expected;
+
+                actual = targetService.getStorage(storageName);
+            });
+
             Assert.Equal(expected, actual, "Failed to return corresponding storage.");
         }
     }

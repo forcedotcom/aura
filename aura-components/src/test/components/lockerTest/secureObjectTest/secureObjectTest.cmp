@@ -17,11 +17,17 @@
 -->
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+    <aura:attribute name="wrapUnwrapTestObj" type="Object" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
 
     <aura:method name="createComponent" action="{!c.createComponent}"/>
     <aura:method name="deleteFirstComponent" action="{!c.deleteFirstComponent}"/>
     <aura:method name="deleteLastComponent" action="{!c.deleteLastComponent}"/>
+    <aura:method name="setWrapUnwrapObject" action="{!c.setWrapUnwrapObject}"/>
+    <aura:method name="checkWrapUnwrapObject" action="{!c.checkWrapUnwrapObject}"/>
 
     <div id="title">SecureObject test</div>
+    <lockerTest:wrapUnwrapFacet aura:id="facet" obj="{!v.wrapUnwrapTestObj}" value1="{!v.wrapUnwrapTestObj.value1}" value2="{!v.wrapUnwrapTestObj.sub.value2}" />
     <div aura:id="content"></div>
 </aura:component>

@@ -62,5 +62,16 @@
                 );
             }
         ]
+    },
+
+    /**
+     * Verify when objects in Locker are wrapped/unwrapped in their secure wrappers the backing object can still be
+     * successfully modified.
+     */
+    testWrappingUnwrappingUpdatesBackingObject: {
+        test: function(cmp) {
+            cmp.setWrapUnwrapObject();
+            cmp.checkWrapUnwrapObject();
+        }
     }
 })

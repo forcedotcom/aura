@@ -2123,20 +2123,6 @@ TestInstance.prototype.executeAfterCkEditorIsReady = function(inputRichTextCompo
 };
 
 /**
- * Reload the Global Value Providers on the client by calling the GlobalValueProviders.js constructor.
- *
- * @param {Object}
- *            gvp an optional serialized GVP to load.
- * @param {Function}
- *            callback an optional callback invoked after the GVP has finished its asynchronous initialization.
- * @export
- * @function Test#reloadGlobalValueProviders
- */
-TestInstance.prototype.reloadGlobalValueProviders = function(gvp, callback) {
-    $A.getContext().globalValueProviders = new Aura.Provider.GlobalValueProviders(gvp, callback);
-};
-
-/**
  * Gets the Global Value Providers based on type.
  *
  * @param {String}

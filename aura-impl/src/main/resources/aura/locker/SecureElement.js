@@ -268,6 +268,8 @@ SecureElement.addSecureProperties = function(se, raw) {
 	// Standard Element interface represents an object of a Document.
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
 	"childElementCount", "classList", "className", "id", "tagName", "namespaceURI",
+            "scrollHeight", "scrollLeft", "scrollTop", "scrollWidth",
+
 	// Note: ignoring "firstElementChild", "lastElementChild",
 	// "nextElementSibling" and "previousElementSibling" from the list
 	// above.
@@ -275,8 +277,10 @@ SecureElement.addSecureProperties = function(se, raw) {
 	// Standard HTMLElement interface represents any HTML element
 	// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
 	"accessKey", "accessKeyLabel", "contentEditable", "isContentEditable", "contextMenu", "dataset", "dir", "draggable", "dropzone", "hidden", "lang",
-			"spellcheck", "style", "tabIndex", "title", "offsetHeight", "offsetLeft", "offsetParent", "offsetTop", "offsetWidth", "clientWidth",
-			"clientHeight", "clientLeft", "clientTop", "nodeValue"
+			"spellcheck", "style", "tabIndex", "title",
+            "offsetHeight", "offsetLeft", "offsetParent", "offsetTop", "offsetWidth",
+            "clientHeight", "clientLeft", "clientTop", "clientWidth",
+            "nodeValue"
 
 	// DCHASMAN TODO This list needs to be revisted as it is missing a ton of
 	// valid attributes!

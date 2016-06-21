@@ -40,6 +40,8 @@ var AuraStorage = function AuraStorage(config) {
     this.lastSweepTime = new Date().getTime();
     this.sweepingSuspended = false;
 
+    this.sweepPromise = undefined;
+
     this.log($A.util.format("initializing storage adapter using { maxSize: {0} KB, expiration: {1} sec, autoRefreshInterval: {2} sec, clearStorageOnInit: {3}, isolationKey: {4} }",
             (this.maxSize/1024).toFixed(1), this.expiration/1000, this.autoRefreshInterval/1000, config["clearOnInit"], this.keyPrefix
         ));
@@ -378,94 +380,57 @@ AuraStorage.prototype.removeAll = function(keys, doNotFireModified) {
 
 /**
  * Asynchronously sweeps the store to remove expired items.
+ * @param {Boolean} ignoreInterval True to ignore minimum sweep intervals.
+ * @return {Promise} A promise that resolves when sweeping is completed.
  * @private
  */
-AuraStorage.prototype.sweep = function() {
+AuraStorage.prototype.sweep = function(ignoreInterval) {
     // sweeping guards:
     // 1. sweeping is in progress
-    if (this._sweepingInProgress) {
-        return;
+
+    if (this.sweepPromise) {
+        return this.sweepPromise;
     }
     // 2. sweeping has been suspended. often set when the client goes offline or the store's size is being manually managed.
     if (this.sweepingSuspended) {
-        return;
+        return Promise["resolve"]();
     }
     // 3. framework hasn't finished init'ing
     if (!$A["finishedInit"]) {
-        return;
+        return Promise["resolve"]();
     }
-    // 4. frequency
+    // 4. frequency (yet respect ignoreInterval)
     var sweepInterval = new Date().getTime() - this.lastSweepTime;
-    if (sweepInterval < this.sweepInterval) {
-        return;
+    if (!ignoreInterval && sweepInterval < this.sweepInterval) {
+        return Promise["resolve"]();
     }
 
-    // prevent concurrent sweeps
-    this._sweepingInProgress = true;
-    var that = this;
 
-    function doneSweeping(doNotFireModified) {
-        that.log("sweep() - complete");
-        that._sweepingInProgress = false;
-        that.lastSweepTime = new Date().getTime();
+
+    // Final thenable on sweep() promise chain.
+    // @param {Boolean} doNotFireModified true if no items were evicted.
+    // @param {Error} e the error if the promise was rejected
+    function doneSweeping(doNotFireModified, e) {
+        this.log("sweep() - complete" + (e ? " (with errors)" : ""));
+        this.sweepPromise = undefined;
+        this.lastSweepTime = new Date().getTime();
         if (!doNotFireModified) {
-            that.fireModified();
+            this.fireModified();
         }
+        // do not re-throw any error
     }
 
-    // if adapter can do its own sweeping
-    if (this.adapter.sweep) {
-        this.adapter.sweep()
-            .then(
-                undefined, // noop
-                function(e) {
-                    that.logError({ "operation": "sweep", "error": e });
-                    // do not rethrow to move to resolve state. return true to not fire modified
-                    return true;
-                }
-            )
-            .then(doneSweeping, doneSweeping);
-        return;
-    }
-
-    // fallback: get expired items and remove them
-    this.adapter.getExpired()
-        .then(
+    // start the sweep + prevent concurrent sweeps
+    this.sweepPromise = this.adapter.sweep().then(
             undefined, // noop
             function(e) {
-                that.logError({ "operation": "getExpired", "error": e });
-                return [];
-            }
+                this.logError({ "operation": "sweep", "error": e });
+                throw e;
+            }.bind(this)
         )
-        .then(function(expired) {
-            // note: expired includes any key prefix. and it may
-            // include items with different key prefixes which
-            // we want to expire first. thus remove directly from the
-            // adapter to avoid re-adding the key prefix.
+        .then(doneSweeping.bind(this), doneSweeping.bind(this,true));
 
-            if (expired.length === 0) {
-                // return true to not fire modified
-                return true;
-            }
-
-            function noop() { return true; }
-            var promiseSet = [];
-            var key, promise;
-
-            for (var n = 0; n < expired.length; n++) {
-                key = expired[n];
-                that.log("sweep() - expiring item with key: " + key);
-                // ensure all promises succeed
-                promise = that.adapter.removeItem(key).then(
-                    undefined, // noop
-                    noop // return promise to success state
-                );
-                promiseSet.push(promise);
-            }
-
-            return Promise.all(promiseSet); // eslint-disable-line consistent-return
-        })
-        .then(doneSweeping, doneSweeping);
+    return this.sweepPromise;
 };
 
 /**

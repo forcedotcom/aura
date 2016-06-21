@@ -575,9 +575,6 @@
      */
     testAgeBasedEviction: {
         test: function(cmp) {
-            // set min sweep interval to 1ms
-            // AuraStorage.SWEEP_INTERVAL.MIN = 1;
-
             var storage = $A.storageService.initStorage({
                 name: "ageBasedEviction",
                 maxSize: 4096,
@@ -588,12 +585,12 @@
             var key = "key1";
             storage.set(key, { "value" : { "alpha" : "beta", "gamma" : "delta" } })
                 .then(function() {
-                    // get() triggers an async sweep so loop until get()
-                    // returns undefined indicating sweep has run
-
-                    var checkIfItemEvicted = function() {
-                        storage.get(key).then(
-                            function(value) {
+                    var checkIfItemEvicted = function checkIfItemEvicted() {
+                        $A.test.storageSweep(storage)
+                            .then(function() {
+                                return storage.get(key);
+                            })
+                            .then(function(value) {
                                 if (value === undefined) {
                                     completed = true;
                                     return; // so we don't loop

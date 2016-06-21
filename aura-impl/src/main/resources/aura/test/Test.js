@@ -2149,6 +2149,18 @@ TestInstance.prototype.getGlobalValueProvider = function(type) {
 };
 
 /**
+ * Sweeps expired items from an AuraStorage instance. Ignores minimum sweep intervals
+ * but does not circumvent other restrictions (eg no concurrent sweeps).
+ *
+ * @param {AuraStorage} storage the storage to sweep.
+ * @export
+ * @function Test#storageSweep
+ */
+TestInstance.prototype.storageSweep = function(storage) {
+    return storage.sweep(true);
+};
+
+/**
  * @export
  * @function Test#getCreationPath
  */

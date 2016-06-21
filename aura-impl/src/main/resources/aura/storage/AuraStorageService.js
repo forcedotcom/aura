@@ -36,6 +36,7 @@ function AuraStorageService(){
  * @export
  */
 AuraStorageService.prototype.getStorage = function(name) {
+    $A.assert($A.util.isString(name), "AuraStorageService.getStorage(): 'name' must be a String.");
     return this.storages[name];
 };
 
@@ -132,6 +133,7 @@ AuraStorageService.prototype.registerAdapter = function(config) {
  * @export
  */
 AuraStorageService.prototype.isRegisteredAdapter = function(name) {
+    $A.assert($A.util.isString(name), "AuraStorageService.isRegisteredAdapter(): 'name' must be a String.");
     return this.adapters[name] !== undefined;
 };
 
@@ -142,7 +144,6 @@ AuraStorageService.prototype.isRegisteredAdapter = function(name) {
  * @memberOf AuraStorageService
  * @export
  */
-// TODO - remove? Only real use is CryptoAdapter
 AuraStorageService.prototype.getAdapterConfig = function(adapter) {
     return this.adapters[adapter];
 };
@@ -200,6 +201,8 @@ AuraStorageService.prototype.selectAdapter = function(persistent, secure) {
  * @export
  */
 AuraStorageService.prototype.deleteStorage = function(name) {
+    $A.assert($A.util.isString(name), "AuraStorageService.deleteStorage(): 'name' must be a String.");
+
     var storage = this.getStorage(name);
     if (!storage) {
         return Promise["resolve"]();

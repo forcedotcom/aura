@@ -36,6 +36,12 @@
         </script>
     </aura:set>
 
+    <!-- comments out since _testOfflineLaunch is disabled.
+         The $A.initAsync() causes init storage twice, when
+         $A.initAsync() in Aura.js gets called (when inline.js
+         is loaded ahead of aura_x.js)
+    -->
+    <!--
     <aura:set attribute="autoInitialize" value="false" />
     <aura:set attribute="autoInitializeSync" value="false" />
 
@@ -48,5 +54,5 @@
 
             $A.initAsync(auraInit);
         </script>
-    </aura:set>
+    </aura:set> -->
 </aura:component>

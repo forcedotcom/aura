@@ -17,7 +17,7 @@
 -->
 <aura:component>
 	<aura:attribute name="index" type="Integer"/>
-	<aura:attribute name="key" type="String"/>
+	<aura:attribute name="updateMap" type="Object"/>
 	<aura:attribute name="inputComponent" type="Aura.Component[]" />
 	
 	<aura:registerevent name="submit" type="ui:gridAction" />

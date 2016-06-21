@@ -17,6 +17,5 @@
 -->
 <aura:event type="COMPONENT" description="Event fired when an item or part of an item in a collection has been changed">
     <aura:attribute name="index"    type="Integer"  description="The index of the item in the collection" />
-    <aura:attribute name="key"      type="String"   description="The key of the specific attribute that was changed." />
-    <aura:attribute name="value"    type="Object"   description="The new value of the key in the object." />
+    <aura:attribute name="values"   type="Object"   description="A map of the keys and values that were changed in the collection" />
 </aura:event>

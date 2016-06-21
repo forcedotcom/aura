@@ -102,17 +102,17 @@
 	flex-grow: 1;
 } 
  
-.THIS.cellContainer {
+.THIS .cellContainer {
 	display:flex;
 	position: relative;
 	padding: 0.5rem;
 }
 
-.THIS.cellContainer.edited {
+.THIS .cellContainer.edited {
 	background-color: #faffbd;
 }
 
-.THIS.cellContainer.errors {
+.THIS .cellContainer.errors {
 	border: 1px solid red;
 }
 
@@ -142,7 +142,7 @@
 	background-color: black;
 }
 
-.THIS.blue {
+.THIS .blue {
 	border: 1px solid blue;
 }
 

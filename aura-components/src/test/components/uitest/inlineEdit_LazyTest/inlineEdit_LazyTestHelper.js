@@ -74,14 +74,21 @@
 	    return { headers: headers, columns: columns };
 	},
 	
-	updateLastEdited: function(cmp, params) {
-	    var lastEdited = {
-	            index: params.index,
-	            key: params.key,
-	            value: params.value
-	    };
-	    
-	    cmp.set("v.lastEdited", lastEdited);
-	}
+	updateLastEdited : function(cmp, params) {
+        var values = params.values;
+        var lastEdited = {
+            index : params.index,
+            keys : [],
+            values : []
+        };
+        
+        // Retrieve keys and values as arrays
+        for (key in values) {
+            lastEdited.keys.push(key);
+            lastEdited.values.push(values[key]);
+        }
+        
+        cmp.set("v.lastEdited", lastEdited);
+    }
 })
 

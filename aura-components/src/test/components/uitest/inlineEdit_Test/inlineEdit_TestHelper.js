@@ -58,11 +58,18 @@
 	},
 	
 	updateLastEdited : function(cmp, params) {
-	    var lastEdited = {};
+	    var values = params.values;
+	    var lastEdited = {
+	        index : params.index,
+	        keys : [],
+	        values : []
+	    };
 	    
-	    lastEdited.index = params.index;
-	    lastEdited.key = params.key;
-	    lastEdited.value = params.value;
+	    // Retrieve keys and values as arrays
+	    for (key in values) {
+	        lastEdited.keys.push(key);
+	        lastEdited.values.push(values[key]);
+	    }
 	    
 	    cmp.set("v.lastEdited", lastEdited);
 	}

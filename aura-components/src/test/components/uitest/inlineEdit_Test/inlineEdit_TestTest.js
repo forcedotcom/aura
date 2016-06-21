@@ -44,7 +44,7 @@
 		}, function(cmp) {
 		    $A.test.addWaitForWithFailureMessage(5, function() {
 		        var lastEdited = cmp.get("v.lastEdited");
-		        return lastEdited && lastEdited.value;
+		        return lastEdited && lastEdited.values[0];
 		    }, "The lastEdited attribute should be updated with the last edited value");
 		}]
 	 },
@@ -73,7 +73,7 @@
 	         }).fire();
 	     }, function(cmp) {
 	         var lastEdited = cmp.get("v.lastEdited");
-	         $A.test.assertEquals("abc", lastEdited.value, "Default value of output component is wrong");
+	         $A.test.assertEquals("abc", lastEdited.values[0], "Default value of output component is wrong");
 	     }]
 	 },
 	 
@@ -275,12 +275,14 @@
 		 }
 	 },
 	 
-	 commitCellContent : function(cmp) {
-         cmp.getEvent('submit').setParams({
-             payload : {
-                 index : cmp.get('v.index'),
-                 key : cmp.get('v.key'),
-                 value : cmp.get('v.inputComponent')[0].get('v.value')
+	 commitCellContent : function(panelCmp) {
+	     var input = panelCmp.get("v.inputComponent")[0];
+	     
+         input.getEvent("keydown").setParams({
+             keyCode : 13,
+             domEvent : {
+                 type : "keydown",
+                 preventDefault : function() {}
              }
          }).fire();
      },

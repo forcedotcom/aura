@@ -15,16 +15,34 @@
  */
 ({
 	submit : function(cmp) {
-		var value = cmp.get("v.inputComponent")[0].get("v.value");
-		var key = cmp.get("v.key");
-		var index = cmp.get("v.index");
+		var values = {};
+		var updateMap = cmp.get("v.updateMap");
+		if (updateMap) {
+			// Construct the map of name : updated input values
+			for (var name in updateMap) {
+				var value = cmp.get("v.inputComponent")[0].get("v." + updateMap[name]);
+				this.updateValueMap(values, name, value);
+			}
+		}
 
 		cmp.get("e.submit").setParams({
 			payload : {
-				index : index,
-				key : key,
-				value : value
+				index : cmp.get("v.index"),
+				values : values
 			}
 		}).fire();
+	},
+	
+	updateValueMap : function(inputMap, name, value) {
+		var keys = name.split(".");
+		var map = inputMap;
+		
+		// In case the name is in dot notation (ex. record.Account.Name), we need to create nested mappings
+		for (var i = 0; i < keys.length - 1; i++) {
+			var key = keys[i];
+			map[key] = map[key] || {};
+			map = map[key];
+		}
+		map[keys[keys.length - 1]] = value;
 	}
 })// eslint-disable-line semi

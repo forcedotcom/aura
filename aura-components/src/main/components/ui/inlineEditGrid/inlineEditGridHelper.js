@@ -115,8 +115,7 @@
 	fireEditEvent : function(cmp, params) {
 	    cmp.getEvent("onEdit").setParams({
             index : params.index,
-            key : params.key,
-            value : params.value
+            values : params.values
         }).fire();
 	}
 })// eslint-disable-line semi

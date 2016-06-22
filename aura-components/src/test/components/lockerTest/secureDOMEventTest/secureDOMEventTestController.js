@@ -22,12 +22,12 @@
         var testUtils = cmp.get("v.testUtils");
 
         var domEvent;
-        var element = document.createElement("div");
-        element.addEventListener("click", function(e) {
+        var element = document.createElement("input");
+        element.addEventListener("change", function(e) {
             domEvent = e;
         });
-        var event = document.createEvent("MouseEvents");
-        event.initEvent("click");
+        var event = document.createEvent("HTMLEvents");
+        event.initEvent("change", false, true);
         element.dispatchEvent(event);
 
         testUtils.assertDefined(domEvent, "Event handler never called after firing event created via document.createEvent");

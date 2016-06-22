@@ -81,6 +81,8 @@ Aura.Services.AuraClientService$AuraActionCollector = function AuraActionCollect
     this.actionsToComplete = [];
     this.completionIndex = 0;
 
+    this.collectedStorableActions = [];
+
     // server actions completed.
     this.actionsCompleted = 0;
 };
@@ -200,6 +202,9 @@ function AuraClientService () {
     // Run client actions synchronously. This is the previous behaviour.
     //
     this.optionClientSynchronous = true;
+
+    // whether to use bulk storage apis for storable actions
+    this.optionBulkStorage = true;
 
     this.reloadFunction = undefined;
     this.reloadPointPassed = false;
@@ -555,7 +560,7 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
                 action.fireRefreshEvent("refreshEnd", needUpdate);
             }
         }
-        if (store) {
+        if (store && !this.optionBulkStorage) {
             storage = action.getStorage();
         }
         if (storage) {
@@ -1466,7 +1471,11 @@ AuraClientService.prototype.continueProcessing = function() {
                 this.collector.collected[index] = undefined;
                 this.collector.collecting[index] = action;
                 if (!action.isRefreshAction() && action.isStorable() && storage) {
-                    this.getStoredResult(action, storage, index);
+                    if (this.optionBulkStorage) {
+                        this.collectStorableAction(action, index);
+                    } else {
+                        this.getStoredResult(action, storage, index);
+                    }
                 } else {
                     this.collectServerAction(action, index);
                 }
@@ -1480,6 +1489,11 @@ AuraClientService.prototype.continueProcessing = function() {
             $A.logger.reportError(errorWrapper);
         }
     }
+
+    if (this.optionBulkStorage) {
+        this.processStorableActions();
+    }
+
     this.collector.actionsToCollect -= 1;
     // Start our index at 0
     this.collector.clientIndex = 0;
@@ -1525,6 +1539,163 @@ AuraClientService.prototype.getStoredResult = function(action, storage, index) {
             }
         );
     }
+};
+
+/**
+ * Collect a storable action for subsequent bulk processing.
+ * @param {Action} action The action to collect.
+ * @param {Number} index The index of the array in the queue.
+ */
+AuraClientService.prototype.collectStorableAction = function(action, index) {
+    this.collector.collectedStorableActions[index] = action;
+};
+
+/**
+ * Bulk process the storable actions collected by AuraClientService#collectStorableAction.
+ * - Action storage is bulk queried for cached action results.
+ * - If a cached result is found for an action then the action is processed immediately. Otherwise
+ *   the action is enqueued for the server.
+ * - If an error occurs querying storage then all actions are sent to the server.
+ */
+AuraClientService.prototype.processStorableActions = function() {
+    var arr, i;
+
+    // if not storable actions then nothing to do
+    if (this.collector.collectedStorableActions.length === 0) {
+        return;
+    }
+
+    var collectedStorableActions = this.collector.collectedStorableActions;
+    this.collector.collectedStorableActions = [];
+
+    // if no storage then all actions go to the server
+    var storage = Action.getStorage();
+    if (!storage) {
+        for (i = 0; i < collectedStorableActions.length; i++) {
+            action = collectedStorableActions[i];
+            if (!action) {
+                this.collectServerAction(action, i);
+            }
+        }
+        return;
+    }
+
+    // map of storage keys to array of action/index
+    var keysToActions = {};
+
+    var action, key;
+    for (i = 0; i < collectedStorableActions.length; i++) {
+        action = collectedStorableActions[i];
+        if (action) {
+            key = action.getStorageKey();
+            arr = keysToActions[key];
+            if (!arr) {
+                arr = [];
+                keysToActions[key] = arr;
+            }
+            arr.push({action:action, index:i});
+        }
+    }
+
+    var that = this;
+    storage.getAll(Object.keys(keysToActions), true)
+        .then(
+            function(items) {
+                var value;
+                for (var k in keysToActions) {
+                    arr = keysToActions[k];
+                    value = items[k];
+
+                    for (i = 0; i < arr.length; i++) {
+                        try {
+                            if (value) {
+                                that.executeStoredAction(arr[i].action, value, that.collector.collected, arr[i].index);
+                                that.collector.actionsToCollect -= 1;
+                            } else {
+                                that.collectServerAction(arr[i].action, arr[i].index);
+                            }
+                        } catch (e) {
+                            // don't let one action's failure impact the others
+                            $A.logger.reportError(e);
+                        }
+                    }
+
+                    that.finishCollection();
+                }
+            },
+            function(/*error*/) {
+                // error fetching from storage so all actions go to the server
+                for (var k in keysToActions) {
+                    arr = keysToActions[k];
+                    for (i = 0; i < arr.length; i++) {
+                        that.collectServerAction(arr[i].action, arr[i].index);
+                    }
+                }
+            }
+        )
+        .then(
+            undefined,
+            function(error) {
+                // something is really wrong. no clear way to recover so at least report
+                $A.logger.reportError(error);
+            }
+        );
+};
+
+/**
+ * Bulk persist storable actions to storage.
+ * @param {Array} actions An array of storable actions to persist.
+ */
+AuraClientService.prototype.persistStorableActions = function(actions) {
+    var action, key, value, errorHandler;
+    var doStore = false;
+
+    var values = {};
+    for (var i = 0; i < actions.length; i++) {
+        action = actions[i];
+        value = action.getStored();
+        if (value) {
+            errorHandler = action.getStorageErrorHandler();
+
+            try {
+                key = action.getStorageKey();
+            } catch (e) {
+                if (errorHandler && $A.util.isFunction(errorHandler)) {
+                    errorHandler(e);
+                } else {
+                    var errorWrapper = new $A.auraError(null, e);
+                    errorWrapper.action = action;
+                    $A.logger.reportError(errorWrapper);
+                }
+            }
+
+            doStore = true;
+            values[key] = value;
+            if (this.persistedActionFilter) {
+                this.persistedActionFilter[key] = true;
+            }
+        }
+    }
+
+    var storage = Action.getStorage();
+    if (doStore && storage) {
+        storage.setAll(values)
+            .then(
+                undefined,
+                function(error){
+                    $A.run(function() {
+                        if (errorHandler && $A.util.isFunction(errorHandler)) {
+                            errorHandler(error);
+                        } else {
+                            // storage problems should warn rather than the aggressive error.
+                            var keys = Object.keys(values);
+                            $A.warning("AuraClientService.persistStorableActions, problem storing "+keys.length+" actions:\n"+keys.join("\n")+"\n"+error);
+                        }
+                    });
+                }
+            );
+    }
+
 };
 
 /**
@@ -1635,7 +1806,7 @@ AuraClientService.prototype.executeClientAction = function(action) {
  * Finish the collection process and send XHRs.
  */
 AuraClientService.prototype.finishCollection = function() {
-    if (this.collector.actionsToCollect !== 0 || this.collector.clientActions.length) {
+    if (!this.collector || this.collector.actionsToCollect !== 0 || this.collector.clientActions.length) {
         return;
     }
     if (this.collector.actionsCompleted) {
@@ -2225,6 +2396,8 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
 
     actionResponses = responseMessage["actions"];
 
+    var actionsToPersist = [];
+
     // Process each action and its response
     for ( var r = 0; r < actionResponses.length; r++) {
         action = null;
@@ -2248,6 +2421,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             if (!action) {
                 throw new $A.auraError("Unable to find an action for "+response["id"]+": "+response);
             } else {
+                actionsToPersist.push(action);
                 var key = this.actionStoreMap[action.getId()];
                 dupes = this.getAndClearDupes(key);
                 this.singleAction(action, response, key, true);
@@ -2256,6 +2430,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
                         this.singleAction(dupes[i], response, key, false);
                     }
                 }
+
             }
         } catch (e) {
             if (e instanceof $A.auraError) {
@@ -2267,6 +2442,11 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             }
         }
     }
+
+    if (this.optionBulkStorage) {
+        this.persistStorableActions(actionsToPersist);
+    }
+
 };
 
 AuraClientService.prototype.buildStorableServerAction = function(response) {

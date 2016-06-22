@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.uiInputTextArea.noresize{
-	resize:none;
+/* Covers the case where textarea is at the root of the component as well as when it's contained by
+   the label when the label attribute is used. */
+.THIS.noresize, .THIS .noresize {
+    resize: none;
 }

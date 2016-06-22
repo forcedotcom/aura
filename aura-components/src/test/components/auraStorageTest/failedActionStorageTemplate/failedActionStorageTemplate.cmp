@@ -33,10 +33,6 @@
                 return Promise.reject(new Error("clear(): mock always fails"));
             };
 
-            MockStorageAdapter.prototype.getExpired = function() {
-                return Promise.reject(new Error("getExpired(): mock always fails"));
-            };
-
             // register the mock adapter
             $A.storageService.registerAdapter({
                 "name": MockStorageAdapter.NAME,

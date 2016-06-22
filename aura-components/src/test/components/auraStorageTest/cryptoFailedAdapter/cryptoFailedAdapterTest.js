@@ -50,10 +50,6 @@
             return Promise.reject(new Error("clear(): mock always fails"));
         };
 
-        MockStorageAdapter.prototype.getExpired = function() {
-            return Promise.reject(new Error("getExpired(): mock always fails"));
-        };
-
         MockStorageAdapter.prototype.clearOnInit = function() {
             return Promise.reject(new Error("clearOnInit(): mock always fails"));
         };

@@ -445,7 +445,7 @@ SecureElement.elementSpecificAttributeWhitelists = {
     "INPUT" : [ "type", "accept", "autocomplete", "autofocus", "autosave", "checked", "disabled", "form", "formAction",
                 "formEnctype", "formMethod", "formNoValidate", "formTarget", "height", "inputMode", "list", "max", "maxLength",
                 "min", "minLength", "multiple", "name", "pattern", "placeholder", "readOnly", "required", "selectionDirection",
-                "size", "src", "step", "value", "width" ],
+                "size", "src", "step", "value", "width", "files" ],
     "INS" : [ "cite", "dateTime" ],
     "LABEL" : [ "htmlFor", "form" ],
     "LI" : [ "value" ],

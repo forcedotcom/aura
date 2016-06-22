@@ -985,6 +985,13 @@ AuraInstance.prototype.message = function(msg) {
 AuraInstance.prototype.getCallback = function(callback) {
     $A.assert($A.util.isFunction(callback),"$A.getCallback(): 'callback' must be a valid Function");
     var context=$A.getContext().getCurrentAccess();
+    var contextComponent = null;
+    if (context && context.getDef) {
+        var contextComponentDef = context.getDef();
+        if (contextComponentDef) {
+            contextComponent = contextComponentDef.getDescriptor().toString();    
+        }
+    }
     return function(){
         $A.getContext().setCurrentAccess(context);
         $A.clientService.pushStack("$A.getCallback()");
@@ -994,18 +1001,12 @@ AuraInstance.prototype.getCallback = function(callback) {
             // no need to wrap AFE with auraError as
             // customers who throw AFE would want to handle it with their own custom experience.
             if (e instanceof $A.auraError) {
-                if (context && context.getDef) {
-                    e.component = e.component || context.getDef().getDescriptor().toString();
-                }
-
+                e.component = e.component || contextComponent;
                 $A.lastKnownError = e;
                 throw e;
             } else {
                 var errorWrapper = new $A.auraError("Error in $A.getCallback()", e);
-                if (context && context.getDef) {
-                    errorWrapper.component = context.getDef().getDescriptor().toString();
-                }
-
+                errorWrapper.component = contextComponent;
                 $A.lastKnownError = errorWrapper;
                 throw errorWrapper;
             }

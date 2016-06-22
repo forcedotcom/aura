@@ -99,7 +99,7 @@ PerfConstants.STATS = {
  * @namespace
  * @const
  */
-PerfShim = {
+var PerfShim = {
     /**
      * @type {!window.typePerfLogLevel}
      * @expose

@@ -68,6 +68,8 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
 
     BaseComponentDefBuilder<T> addLocatorDef(LocatorDef locator);
 
+    BaseComponentDefBuilder<T> setExtendsDescriptor(DefDescriptor<T> extendsDescriptor);
+
     /**
      * Specifies the token descriptors.
      *

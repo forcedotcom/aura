@@ -16,5 +16,10 @@
 
 -->
 <aura:component implements="aura:requireLocker">
+    <aura:attribute name="callback" type="Object"/>
 
+    <aura:method name="setCallback" action="{!c.setCallback}">
+        <aura:attribute name="callback" type="function" />
+    </aura:method>
+    <aura:method name="executeCallback" action="{!c.executeCallback}"/>
 </aura:component>

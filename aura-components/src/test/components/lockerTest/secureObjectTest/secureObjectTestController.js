@@ -43,6 +43,19 @@
     },
 
     setWrapUnwrapObject: function(component) {
-        component.find("facet").setValues();
+        component.find("wrapUnwrapFacet").setValues();
+    },
+
+    testMethodWithParams: function(component) {
+        var testUtils = component.get("v.testUtils");
+
+        var callbackCalled = false;
+        var facet = component.find("facet");
+        facet.setCallback(function() {
+            callbackCalled = true;
+        });
+        facet.executeCallback();
+
+        testUtils.assertTrue(callbackCalled, "Function passed to facet via aura:method not successfully called");
     }
 })

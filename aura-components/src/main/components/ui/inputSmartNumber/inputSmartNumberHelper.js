@@ -46,7 +46,7 @@
         }
     },
     setDefaultUpdateOn : function (cmp) {
-        if (['input','change'].indexOf(cmp.get('v.updateOn')) === -1) {
+        if (['input','change','keypress','keydown','keyup'].indexOf(cmp.get('v.updateOn')) === -1) {
             cmp.set('v.updateOn','change');
         }
     },
@@ -75,7 +75,6 @@
         var lib = this.inputNumberLibrary.number;
         var formatter = cmp.get('v.format');
         var inputValue = cmp.get('v.inputValue');
-
         return lib.isFormattedNumber(inputValue, formatter) && this.isNumberInRange(cmp);
     },
     isFormattedValue : function (string, formatter) {
@@ -89,7 +88,14 @@
        return this.getElementInput(cmp) ===  document.activeElement;
     },
     weHaveToUpdate : function (cmp, eventType) {
-        return cmp.get('v.updateOn') === eventType;
+        var eventMap = {
+            input : 'input',
+            keypress : 'input',
+            keyup : 'input',
+            keydown : 'input',
+            change  : 'change'
+        };
+        return eventMap[cmp.get('v.updateOn').toLowerCase()] === eventType;
     },
     handleNewValue: function (cmp) {
         var lib = this.inputNumberLibrary.number;

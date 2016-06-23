@@ -37,7 +37,6 @@
 
     <aura:registerEvent name="change"             type="ui:change"                          access="GLOBAL" description="The event fired when the user changes the content of the input."/>
 
-
     <input type="text"
            aura:id="input"
            id="{! v.id }"
@@ -54,5 +53,5 @@
            required="{!v.required}"
            disabled="{!v.disabled}"
            aria-describedby="{!v.ariaDescribedBy}"/>
-
+            {! v.value }
 </aura:component>

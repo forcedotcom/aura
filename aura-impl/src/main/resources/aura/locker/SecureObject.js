@@ -43,7 +43,7 @@ SecureObject.isDOMElementOrNode = function(el) {
 		(typeof el.nodeType === "number" && typeof el.nodeName === "string"));
 };
 
-function newWeakMap() {	
+function newWeakMap() {
 	return typeof WeakMap !== "undefined" ? new WeakMap() : {
 		/* WeakMap dummy polyfill */
 		"get": function () {
@@ -75,7 +75,7 @@ SecureObject.getCached = function(raw, key) {
 
 SecureObject.filterEverything = function (st, raw, options) {
 	"use strict";
-	
+
 	function filterOpaque(opts, so) {
 		return opts && opts.filterOpaque === true && $A.lockerService.isOpaque(so);
 	}
@@ -149,7 +149,7 @@ SecureObject.filterEverything = function (st, raw, options) {
 				} else if (!options || options.filterOpaque !== true) {
 					swallowed = SecureObject(raw, key);
 				} else {
-					swallowed = undefined;
+					swallowed = options.defaultValue;
 				}
 
 				mutated = true;
@@ -168,7 +168,7 @@ SecureObject.filterEverything = function (st, raw, options) {
 				setLockerSecret(swallowed, "key", key);
 				setLockerSecret(swallowed, "ref", raw);
 				SecureObject.addToCache(raw, swallowed, key);
-				
+
 				for (var name in raw) {
 					if (typeof raw[name] === "function") {
 						Object.defineProperty(swallowed, name, SecureObject.createFilteredMethod(swallowed, raw, name, {
@@ -179,7 +179,7 @@ SecureObject.filterEverything = function (st, raw, options) {
 							filterOpaque : true
 						}));
 					}
-				}				
+				}
 			}
 		}
 	}
@@ -199,17 +199,17 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 		try {
 			visitedCache.set(v, unfiltered);
 		} catch (ignore) { /* ignored */ }
-		
+
 		return unfiltered;
 	}
 
 	var t = typeof value;
-	
+
 	if (!value || (t !== "object" && t !== "function") || value === window || value === document) {
 		// ignoring falsy, nully references, non-objects and non-functions, and global window/document
 		return value;
 	}
-	
+
 	var isArray = Array.isArray(value);
 
 	var raw = getLockerSecret(value, "ref");
@@ -221,7 +221,7 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 				raw.push(SecureObject.unfilterEverything(st, v, visited));
 			});
 		}
-		
+
 		// returning the raw value stored in the secure reference, which means
 		// this value was original produced in system-mode
 		return raw;

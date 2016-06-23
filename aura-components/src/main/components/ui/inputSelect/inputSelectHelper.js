@@ -19,6 +19,10 @@
     init: function (cmp) {
         var currentValue = cmp.get("v.value");
 
+        if ($A.util.isEmpty(cmp.get("v.options")) && !$A.util.isEmpty(cmp.get("v.body"))) {
+            cmp.set("v.renderBody", true);
+        }
+
         if (!$A.util.isUndefined(currentValue)) {
             // if a "value" attribute is specified on initial render, it should win over what the individual options report
             this.updateOptionsFromValue(cmp);

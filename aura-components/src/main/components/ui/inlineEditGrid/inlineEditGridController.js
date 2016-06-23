@@ -71,6 +71,18 @@
 		helper.fireEditEvent(cmp, payload);
 	},
 	
+	enableKeyboardMode: function(cmp, evt, helper){
+		helper.lib.keyNav.enableKeyboardMode(cmp);	
+	},
+	
+	disableKeyboardMode: function(cmp, evt, helper){	
+		helper.lib.keyNav.disableKeyboardMode(cmp);
+	},
+
+	editActiveCell: function(cmp, evt, helper){	
+		helper.lib.keyNav.triggerEditOnActiveCell();
+	},	
+
 	/* Passthrough handlers & methods */
 	handleSort : function(cmp, evt, helper) {
 		helper.bubbleEvent(cmp, evt, 'onSort');

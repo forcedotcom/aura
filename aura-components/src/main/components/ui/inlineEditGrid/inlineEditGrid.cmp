@@ -18,10 +18,14 @@
 <aura:component support="PROTO">
 	<aura:dependency resource="markup://ui:inlineEditPanelBody" type="COMPONENT" />
 	
+	<aura:import library="ui:inlineEditGridLib" property="lib"/>	
+	
 	<aura:attribute name="class"       type="String" />
 	<aura:attribute name="editLayouts" type="Object"/>
     <aura:attribute name="editPanelConfigs" type="Object" description="A map of attributes for each edit panel by columnName. Sample map : {columnName : {attr1:value1, attr2:value2} }"/>
 	<aura:attribute name="editable"    type="Boolean" default="true" description="Editable status of the inline edit grid. If false, no inline edit functionality will be available."/>
+	<aura:attribute name="inKeyboardMode"  type="Boolean" default="false" description="Keyboard Mode status of the inline edit grid. If true, a visual indicator will be present and keyboard events will be captured."/>
+	
 	<aura:attribute name="dataVar" type="String" default="data" description="The name of the variable to use for the data in each item inside the grid."/>
     
 	<!-- Attributes used by the virtualDataGrid -->
@@ -50,6 +54,10 @@
 	<aura:registerEvent name="onColumnResize"  type="ui:resize"    description="The event fired when a column is resized."/>
 	
 	<!-- Grid Methods -->
+	<aura:method name="enableKeyboardMode"></aura:method>
+	<aura:method name="disableKeyboardMode"></aura:method>
+	<aura:method name="editActiveCell"></aura:method>
+	
 	<aura:method name="appendItems">
 	   <aura:attribute name="items" type="Object"/>
 	</aura:method>
@@ -70,6 +78,9 @@
 	<!-- Component markup begins -->
 	<!-- TODO: This could conflict if the Records Experience's inlineEdit feature uses the same classes. Revisit with SLDS integration -->
     <div class="{! 'slds-table--edit_container slds-is-relative ' + (v.editable ? ' inlineEdit--enabled' : ' inlineEdit--disabled')}">
+    				(v.inKeyboardMode 			? ' keyboardMode--enabled' 		: ' keyboardMode--disabled') +
+					' inlineEditGrid'}" tabindex="0">
+
         <ui:virtualDataTable
             aura:id="grid"
             class="{! v.class + ' slds-table--edit slds-table--bordered'}"
@@ -85,6 +96,5 @@
 			
 			onsort="{!c.handleSort}"
 			onColumnResize="{!c.handleColumnResize}"/>
-		
 	</div>
 </aura:component>

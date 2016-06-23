@@ -21,12 +21,16 @@
 	<aura:dependency resource="markup://ui:inputSelect" type="COMPONENT" />
 	
 	<aura:attribute name="items" type="Object[]" />
-	<aura:attribute name="editable" type="Boolean" default="true" description="Tracks editable status of the inline edit grid, this is attr is just for the label the real 'editable' attr is on the inlineEditGrid." />
-
+	<aura:attribute name="editable" type="Boolean" default="true" description="Tracks editable status of the inline edit grid, this is attr is just for the label the real 'editable' attr is on the inlineEditGrid." />	
+	<aura:attribute name="inKeyboardMode" type="Boolean" default="false" description="Tracks keyboard mode status of the inline edit grid, this is attr is just for the label." />	
+	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
-	<div>
-		<ui:button label="{! (v.editable ? 'Disable Inline Edit' : 'Enable Inline Edit')}" press="{!c.handleEditableChange}" /> 
+	<div tabindex="0" aura:id="inlineEditExample">
+		<ui:button label="{! (v.editable ? 'Disable Inline Edit' : 'Enable Inline Edit')}" press="{!c.handleEditableChange}" />
+		<ui:button label="{! (v.inKeyboardMode ? 'Disable Keyboard Mode' : 'Enable Keyboard Mode')}" press="{!c.handleKeyboardModeChange}" />
+		<ui:button label="Edit Active Cell" class="{! (v.inKeyboardMode ? ' ' : ' hidden')}" press="{!c.editActiveCell}" />
+
 		<ui:inlineEditGrid aura:id="grid" class="inline-edit-example" items="{!v.items}" onEdit="{!c.onEdit}" editable="{!v.editable}" dataVar="record">
 			<aura:set attribute="headerColumns">
 				<ui:dataGridColumn name="id"	     label="Id" sortable="true"/>

@@ -29,9 +29,24 @@
 	},
 
 	handleEditableChange: function(cmp, evt, helper){
-
 		var editable = cmp.get('v.editable');
 		cmp.set('v.editable', !editable);
 		
+	},
+
+	handleKeyboardModeChange: function(cmp, evt, handler){
+		var inKeyboardMode = cmp.get('v.inKeyboardMode');
+		cmp.set('v.inKeyboardMode', !inKeyboardMode);
+
+		if (!inKeyboardMode) {
+			cmp.find('grid').enableKeyboardMode(cmp);
+		}
+		else {
+			cmp.find('grid').disableKeyboardMode(cmp);
+		}
+	},
+
+	editActiveCell: function(cmp, evt, helper){
+		cmp.find('grid').editActiveCell(cmp);
 	}
 })// eslint-disable-line semi

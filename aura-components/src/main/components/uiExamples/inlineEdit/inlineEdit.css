@@ -157,3 +157,27 @@
 .THIS .cellContainer:hover .iconCmp {
 	visibility: visible;
 }
+
+.THIS .inlineEditGrid {
+	position: relative;
+}
+
+.THIS .inlineEditGrid.keyboardMode--enabled {
+	border: 3px solid green;
+}
+
+.THIS .inlineEditGrid.keyboardMode--disabled {
+	border: 3px solid red;
+}
+
+.THIS .inlineEditGrid.keyboardMode--enabled .activeCell {
+	background: rgba(0,0,0,.5);
+}
+
+.THIS .activeCell {
+	background: rgba(0,0,0,.15);
+}
+
+.THIS .hidden {
+	display: none;
+}

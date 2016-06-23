@@ -146,6 +146,9 @@
         };
     },
 
+	initKeyboardEntry: function(cmp){
+		this.lib.keyNav.initKeyboardEntry(cmp);
+	},
 	updateItem: function(cmp, item, index){
 		cmp.find('grid').updateItem(item, index);
 	},
@@ -156,6 +159,10 @@
 	    var map = {};
 	    map[name] = 'value';
 	    return map;
+	},
+
+	initActiveCell: function(cmp){
+ 		this.lib.keyNav.initActiveCell(cmp);
 	},
 
 	/* UTILITY FUNCTIONS */

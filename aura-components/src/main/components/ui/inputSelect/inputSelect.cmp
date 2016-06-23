@@ -18,7 +18,7 @@
 <aura:component access="GLOBAL" support="GA" extends="ui:input" extensible="true" description="Represents a drop-down list with options." defaultFlavor="default, select">
 
     <!-- A list of aura.components.ui.InputOption -->
-    <aura:attribute access="GLOBAL" name="options" type="List" description="A list of aura.components.ui.InputOption."/>
+    <aura:attribute access="GLOBAL" name="options" type="List" description="A list of options to use for the select. Note: setting this attribute will make the component ignore v.body"/>
 
     <!-- Could be needed in form -->
     <aura:attribute name="name" type="String" description="The name of the component."/>
@@ -31,6 +31,7 @@
 
     <aura:attribute name="useMenu" type="Boolean" default="false"/>
     <aura:attribute access="PRIVATE" name="selectedLabel" type="String"/>
+    <aura:attribute access="PRIVATE" name="renderBody" type="Boolean" default="false"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
@@ -58,7 +59,7 @@
                     disabled="{!v.disabled}"
                     multiple="{!v.multiple}"
                     aria-describedby="{!v.ariaDescribedBy}">
-                <aura:if isTrue="{!and(v.options.length eq 0, v.body.length gt 0)}">
+                <aura:if isTrue="{!v.renderBody}">
                     {!v.body}
                 </aura:if>
             </select>

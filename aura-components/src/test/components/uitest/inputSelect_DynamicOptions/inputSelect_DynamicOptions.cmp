@@ -20,10 +20,16 @@
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <ui:inputSelect aura:id="dynamicSelect" class="dynamicSelect"/>
     <br/>
-    
+
     <ui:inputSelect aura:id="inputSelectIteration">
     	<aura:iteration items="1,2,3,4,5" var="item">
     		<ui:inputSelectOption text="{!item}" label="{!item}"/>
     	</aura:iteration>
+    </ui:inputSelect>
+    <br/>
+
+    <ui:inputSelect aura:id="optionsWithBody">
+        <ui:inputSelectOption aura:id="firstOption" text="1"/>
+        <ui:inputSelectOption aura:id="secondOption" text="2"/>
     </ui:inputSelect>
 </aura:component>

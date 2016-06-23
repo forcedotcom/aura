@@ -23,7 +23,7 @@
     <aura:attribute name="for" type="Object" description="Specified to indicate a component with which the label is to be associated. This attribute can accept raw string, localId, globalId, or the component object. If the value is resolved to a component, the global id of the component will be used in the output."/>
     <aura:attribute name="requiredIndicator" type="Aura.Component[]" description="A component that displays the indicator for the required field. "/>
 
-    <label class="{!v.class}" aura:id="labelElement" for="{!v.for}">
+    <label class="{!join(' ', v.class, token('uiLabel.label'))}" aura:id="labelElement" for="{!v.for}">
         <span title="{!v.title}" class="{!v.labelDisplay ? null : 'assistiveText' }">{!v.label}</span>
         {!v.body}
         {!v.requiredIndicator}

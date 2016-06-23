@@ -34,11 +34,17 @@
             var body=component.get("v.body");
             $A.renderingService.renderFacet(component,body,element);
 		}
-		
-    	// aura:html is syntactic sugar for document.createElement() and the resulting elements need to be directly visible to the container
-    	// otherwise no code would be able to manipulate them
-    	$A.lockerService.trust(component.getOwner(), component, element);
-    	
+
+        // aura:html is syntactic sugar for document.createElement() and the resulting elements need to be directly visible to the container
+        // otherwise no code would be able to manipulate them
+        var owner = component.getOwner();
+        var ownerName = owner.getName();
+        while (ownerName === "aura$iteration" || ownerName === "aura$if") {
+            owner = owner.getOwner();
+            ownerName = owner.getName();
+        }
+        $A.lockerService.trust(owner, component, element);
+
     	return element;
 	},
 

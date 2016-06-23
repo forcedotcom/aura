@@ -17,13 +17,33 @@
 -->
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
-    <aura:attribute name="buttonClickedFlag" type="Boolean" default="false" description="Flag set from click handler for test to check" />
+    <aura:attribute name="accounts" type="Object[]" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
     <aura:method name="testClickEvent" action="{!c.testClickEvent}"/>
     <aura:method name="testEventView" action="{!c.testEventView}"/>
-    <aura:method name="testMarkupDefinedClickHandler" action="{!c.testMarkupDefinedClickHandler}"/>
     <aura:method name="testInitEvent" action="{!c.testInitEvent}"/>
+    <aura:method name="testEventTargetOfHtmlElementHandler" action="{!c.testEventTargetOfHtmlElementHandler}"/>
 
     <div aura:id="title">SecureDOMEvent test</div>
-    <button aura:id="button" onclick="{!c.onclick}">Test click handler</button>
+    <button aura:id="button" id="buttonInMarkup" onclick="{!c.handleClick}">Button in markup</button>
+
+    <aura:iteration items="{!v.accounts}" var="account">
+        <button onclick="{!c.handleClick}" id="buttonInIteration">Button inside aura:iteration</button>
+    </aura:iteration>
+
+    <aura:if isTrue="{!true}">
+        <button onclick="{!c.handleClick}" id="buttonInIf">Button inside aura:if</button>
+    </aura:if>
+
+    <aura:iteration items="{!v.accounts}" var="account">
+        <aura:if isTrue="{!true}">
+            <button onclick="{!c.handleClick}" id="buttonInNestedIteration">Button inside aura:iteration and aura:if</button>
+        </aura:if>
+    </aura:iteration>
+
+    <lockerTest:facetWithBody>
+        <button onclick="{!c.handleClick}" id="buttonInFacet">Button inside facet</button>
+    </lockerTest:facetWithBody>
 </aura:component>

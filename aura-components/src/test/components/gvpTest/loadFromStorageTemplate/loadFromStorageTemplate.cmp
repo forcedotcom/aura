@@ -59,10 +59,6 @@
                 return new Promise(function(success, error) { success(); });
             };
 
-            MockStorageAdapter.prototype.getExpired = function() {
-                return new Promise(function(success, error) { success([]); });
-            };
-
             MockStorageAdapter.prototype.getAll = function() {
                 return new Promise(function(success, error) { success({}); });
             };

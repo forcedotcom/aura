@@ -16,15 +16,92 @@
 Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
-Test.Aura.AuraTest = function() {
-	Mocks.GetMocks(Object.Global(), {
-        "Aura": {Services:{}},
+Test.Aura.AuraEventServiceTest = function() {
+    var Aura = {Services:{}, Event:{}};
+
+    Mocks.GetMocks(Object.Global(), {
+        "Aura": Aura,
         "AuraEventService": function(){}
     })(function() {
-		[Import("aura-impl/src/main/resources/aura/AuraEventService.js")]
-	});
-	
-	function getStubMethod(args, returnValue){
-		return Stubs.GetMethod(args, returnValue);	
-	}
+        Import("aura-impl/src/main/resources/aura/AuraEventService.js");
+    });
+
+
+    [Fixture]
+    function newEvent() {
+
+        var accessCheckedDef;
+
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                assert: function(value, msg) {
+                    if (!value) {
+                        throw new Error(msg);
+                    }
+                },
+                clientService: {
+                    allowAccess: function(def) {
+                        accessCheckedDef = def;
+                        return true;
+                    }
+                }
+            }
+        });
+
+        [Fact]
+        function DoesAccessCheck() {
+            var eventDescr = "eventDescr";
+            var expected = "expected";
+            accessCheckedDef = null;
+
+            mockA(function() {
+                var target = new Aura.Services.AuraEventService();
+                target.getEventDef = function(descriptor) {
+                    if(descriptor === eventDescr) {
+                        return expected;
+                    }
+                }
+                target.newEvent(eventDescr);
+            });
+
+            Assert.Equal(expected, accessCheckedDef);
+        }
+    }
+
+    [Fixture]
+    function getNewEvent() {
+
+        var mockA = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                assert: function(value, msg) {
+                    if (!value) {
+                        throw new Error(msg);
+                    }
+                },
+                getContext: function() {
+                    return {
+                        getCurrentAccess: function() {}
+                    }
+                },
+                getRoot: function(){}
+            }
+        });
+
+        [Fact]
+        function AcceptsStringEventDefinition() {
+            var expectedEvtDef = {
+                getEventType: function() {},
+            };
+
+            var actual;
+            mockA(function() {
+                var target = new Aura.Services.AuraEventService();
+                target["eventDefRegistry"] = {"markup://eventDescr": expectedEvtDef};
+
+                actual = target.getNewEvent("markup://eventDescr");
+            });
+
+            Assert.Equal(expectedEvtDef, actual.getDef());
+        }
+    }
 }

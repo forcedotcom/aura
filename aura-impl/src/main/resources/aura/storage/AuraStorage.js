@@ -48,7 +48,6 @@ var AuraStorage = function AuraStorage(config) {
 
     // work around the obfuscation logic to allow external adapters to properly plug in
     this.adapter.clear = this.adapter.clear || this.adapter["clear"];
-    this.adapter.getExpired = this.adapter.getExpired || this.adapter["getExpired"];
     this.adapter.sweep = this.adapter.sweep || this.adapter["sweep"];
     this.adapter.getName = this.adapter.getName || this.adapter["getName"];
     this.adapter.getSize = this.adapter.getSize || this.adapter["getSize"];

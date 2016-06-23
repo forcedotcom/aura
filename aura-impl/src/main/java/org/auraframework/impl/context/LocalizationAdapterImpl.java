@@ -32,8 +32,9 @@ import aQute.bnd.annotation.component.Component;
 
 @Component (provide=AuraServiceProvider.class)
 public class LocalizationAdapterImpl implements LocalizationAdapter {
+	private List<Locale> requestedLocales;
 
-    /**
+	/**
      * Temporary workaround for localized labels
      */
     private static Map<String, Map<String, String>> labels = new HashMap<>();
@@ -94,17 +95,27 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
      * default is used.
      */
     @Override
-    public AuraLocale getAuraLocale() {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        // check for nulls - this happens when AuraContextFilter has not been run
-        if (context != null) {
-            List<Locale> locales = context.getRequestedLocales();
-            if (locales != null && locales.size() > 0) {
-                return new AuraLocaleImpl(locales.get(0));
-            }
-        }
-        return new AuraLocaleImpl();
-    }
+	public AuraLocale getAuraLocale() {
+		//
+		// use requested locales from context
+		// check for nulls - this happens when AuraContextFilter has not been
+		// run
+		AuraContext context = Aura.getContextService().getCurrentContext();
+		if (context != null) {
+			List<Locale> locales = context.getRequestedLocales();
+			if (locales != null && locales.size() > 0) {
+				return new AuraLocaleImpl(locales.get(0));
+			}
+		}
+
+		// use any explicitly set requested locales if available
+		if (requestedLocales != null && !requestedLocales.isEmpty()) {
+			return new AuraLocaleImpl(requestedLocales.get(0));
+		}
+
+		// none available create a default locale
+		return new AuraLocaleImpl();
+	}
 
     @Override
     public AuraLocale getAuraLocale(Locale defaultLocale) {
@@ -122,5 +133,10 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
         return new AuraLocaleImpl(defaultLocale, currencyLocale, dateLocale, languageLocale, numberLocale,
                 systemLocale, timeZone);
     }
+
+	@Override
+	public void setRequestedLocales(List<Locale> requestedLocales) {
+		this.requestedLocales = requestedLocales;
+	}
 
 }

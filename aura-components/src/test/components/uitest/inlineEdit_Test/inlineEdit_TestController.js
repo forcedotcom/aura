@@ -24,7 +24,8 @@
 					id : i,
 					name : "Name" + i,
 					grade : i,
-					linkLabel : "Link" + i
+					linkLabel : "Link" + i,
+					bloodtype : helper.BLOOD_TYPES[Math.floor(Math.random() * 3)],
 				},
 				status : {},
 				errors : {}
@@ -39,6 +40,8 @@
 		
 		// Generate edit layouts:
 		cmp.find("grid").set("v.editLayouts", helper.EDIT_LAYOUTS);
+		
+		cmp.find("grid").set("v.editPanelConfigs", helper.EDIT_PANEL_CONFIG);
 	},
 	
 	appendItem : function(cmp, evt, helper) {
@@ -48,7 +51,8 @@
 		    	data : {
 		    		id : i,
 		    		name : "Name" + i,
-		    		grade : i
+		    		grade : i,
+		    		bloodtype : helper.BLOOD_TYPES[Math.floor(Math.random() * 3)],
 		    	},
 		    	status : {},
 		    	errors : {}

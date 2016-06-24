@@ -18,13 +18,23 @@
 	    id : {
 	        componentDef : {
 	            descriptor : 'markup://ui:inputNumber'
+	        },
+	        attributes : {
+	            values : {
+	                updateOn : 'input'
+	            }
 	        }
 	    },
 	    
 	    name : {
 	        componentDef : {
 	            descriptor : 'markup://ui:inputText'
-	        }
+	        },
+            attributes : {
+                values : {
+                    updateOn : 'input'
+                }
+            }
 	    }
 	},
 	

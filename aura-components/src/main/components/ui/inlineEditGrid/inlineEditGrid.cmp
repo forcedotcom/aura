@@ -20,7 +20,7 @@
 	
 	<aura:attribute name="class"       type="String" />
 	<aura:attribute name="editLayouts" type="Object"/>
-	<aura:attribute name="editFieldOverrides" type="Object" description="A map of { columnName : { key in item.data : value attribute on input component} }"/>
+    <aura:attribute name="editPanelConfigs" type="Object" description="A map of attributes for each edit panel by columnName. Sample map : {columnName : {attr1:value1, attr2:value2} }"/>
 	<aura:attribute name="editable"    type="Boolean" default="true" description="Editable status of the inline edit grid. If false, no inline edit functionality will be available."/>
 	
 	<!-- Attributes used by the virtualDataGrid -->

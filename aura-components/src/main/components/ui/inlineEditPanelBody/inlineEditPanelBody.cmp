@@ -18,10 +18,13 @@
 <aura:component>
 	<aura:attribute name="index" type="Integer"/>
 	<aura:attribute name="updateMap" type="Object"/>
+    <aura:attribute name="submitOn" type="String" default="keydown" description="Event to listen to for submitting the edited value"/>
 	<aura:attribute name="inputComponent" type="Aura.Component[]" />
 	
 	<aura:registerevent name="submit" type="ui:gridAction" />
 	
+    <aura:method name="submitValues" />
+    
 	<aura:handler name="init" value="{!this}" action="{!c.init}" />
 
 	<div class="editPanel">

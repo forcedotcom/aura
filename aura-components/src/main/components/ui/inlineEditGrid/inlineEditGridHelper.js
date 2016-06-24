@@ -15,6 +15,7 @@
  */
 ({
 	cellStatuses : ['edited', 'disabled', 'hasErrors'],
+	PANEL_SUBMIT_ON_DEFAULT : 'keydown',
 	
 	initializeColumns : function(cmp) {
 	    var columns = cmp.get("v.columns");
@@ -50,21 +51,38 @@
 		};
 	},
 	
+	handleEditAction : function(cmp, evt) {
+	    var index = evt.getParam("index");
+        var payload = evt.getParam("payload");
+        
+        var editLayouts = cmp.get("v.editLayouts") || {};
+        var editLayout = editLayouts[payload.name];
+        
+        if (editLayout) {
+            // TODO: Need check that editLayout follows a certain interface so we can attach the appropriate
+            // attributes and events.
+            if (!editLayout.attributes) {
+                editLayout.attributes = { values : {} };
+            }
+            
+            editLayout.attributes.values.value = payload.value;
+            
+            var panelBodyConfig = this.getPanelBodyConfig(cmp, payload.name);
+            var panelBodyAttributes = {
+                    index : index,
+                    submitOn : panelBodyConfig.submitOn,
+                    updateMap : panelBodyConfig.updateMap,
+                    inputComponent : $A.createComponentFromConfig(editLayout)
+            };
+            
+            this.displayEditPanel(cmp, panelBodyAttributes, payload.targetElement);
+        }
+	},
+	
 	createEditPanel : function(cmp, newPanelBody, referenceElement) {
-		var config = {
-	        referenceElement: referenceElement,
-	        showCloseButton: false,
-	        closeOnClickOut: true,
-	        useTransition: false,
-	        showPointer: false,
-	        inside: true,
-	        pad: 0,
-	        padTop: 0,
-	        direction: "northwest"
-	    };
+		var config = this.getPanelConfig(referenceElement);
 		
 		newPanelBody.addHandler('submit', cmp, 'c.handlePanelSubmit');
-		
 		config.body = newPanelBody;
 		
 		$A.get('e.ui:createPanel').setParams({
@@ -100,12 +118,49 @@
 				});
 		//}
 	},
+	
+	getPanelBodyConfig: function(cmp, name) {
+	    var config = cmp.get("v.editPanelConfigs");
+	    var panelBodyConfig = config ? (config[name] || {}) : {};   
+	    
+	    if ($A.util.isEmpty(panelBodyConfig.updateMap)) {
+	        panelBodyConfig.updateMap = this.getDefaultUpdateMap(name);
+	    }
+	    
+	    if ($A.util.isEmpty(panelBodyConfig.submitOn)) {
+	        panelBodyConfig.submitOn = this.PANEL_SUBMIT_ON_DEFAULT;
+	    }
+	    
+	    return panelBodyConfig;
+	},
+	
+	getPanelConfig: function(referenceElement) {
+        return {
+            referenceElement: referenceElement,
+            showCloseButton: false,
+            closeOnClickOut: true,
+            useTransition: false,
+            showPointer: false,
+            inside: true,
+            pad: 0,
+            padTop: 0,
+            direction: "northwest",
+            closeAction: function(panel) {
+                panel.get("v.body")[0].submitValues();
+            }
+        };
+    },
 
 	updateItem: function(cmp, item, index){
 		cmp.find('grid').updateItem(item, index);
 	},
 	updateHeaderColumns: function(cmp) {
 	    cmp.find("grid").set("v.headerColumns", cmp.get("v.headerColumns"));
+	},
+	getDefaultUpdateMap: function(name) {
+	    var map = {};
+	    map[name] = 'value';
+	    return map;
 	},
 
 	/* UTILITY FUNCTIONS */

@@ -20,12 +20,22 @@
 		id : {
 			componentDef : {
 				descriptor : 'markup://ui:inputNumber'
+			},
+			attributes : {
+			    values : {
+			        updateOn : 'input'
+			    }
 			}
 		},
 		name : {
 			componentDef : {
 				descriptor : 'markup://ui:inputText'
-			}
+			},
+			attributes : {
+                values : {
+                    updateOn : 'input'
+                }
+            }
 		},
 		bloodtype : {
 			componentDef : {
@@ -33,11 +43,12 @@
 			},
 			attributes : {
 			    values : {
+			        updateOn : 'input',
 			        options : [
-			            { label : "A", value : "A" },
-			            { label : "B", value : "B" },
-			            { label : "AB", value : "AB" },
-			            { label : "O", value : "O" }
+			            { label : "A", value : "A", selected : true },
+			            { label : "B", value : "B", selected : false },
+			            { label : "AB", value : "AB", selected : false },
+			            { label : "O", value : "O", selected : false }
 			        ]
 			    }
 			}
@@ -45,9 +56,20 @@
 		phone : {
 			componentDef : {
 				descriptor : 'markup://ui:inputPhone'
-			}
+			},
+			attributes : {
+                values : {
+                    updateOn : 'input'
+                }
+            }
 		}
 	},
+	
+	EDIT_PANEL_CONFIG : {
+        bloodtype : {
+            submitOn : 'change'
+        }
+    },
 	
 	generateItems : function() {
 		var items = [];

@@ -27,7 +27,7 @@
 
 	<div>
 		<ui:button label="{! (v.editable ? 'Disable Inline Edit' : 'Enable Inline Edit')}" press="{!c.handleEditableChange}" /> 
-		<ui:inlineEditGrid aura:id="grid" class="inline-edit-example" items="{!v.items}" onEdit="{!c.onEdit}" editable="{!v.editable}" >
+		<ui:inlineEditGrid aura:id="grid" class="inline-edit-example" items="{!v.items}" onEdit="{!c.onEdit}" editable="{!v.editable}" dataVar="record">
 			<aura:set attribute="headerColumns">
 				<ui:dataGridColumn name="id"	     label="Id" sortable="true"/>
 				<ui:dataGridColumn name="name"	     label="Name"/>
@@ -36,20 +36,20 @@
 			</aura:set>
 			
 			<aura:set attribute="columns">
-				<ui:inlineEditCell name="id" isPsuedoInput="true" class="psuedoInput">
-					<ui:outputText value="{!item.data.id}"/>
+				<ui:inlineEditCell name="id" isPsuedoInput="true" class="pseudoInput">
+					<ui:outputText value="{!item.record.id}"/>
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="name">
-					<ui:outputText value="{!item.data.name}"/>
+					<ui:outputText value="{!item.record.name}"/>
 					<aura:set attribute="triggerIcon">
 						<uiExamples:iconCmp key="{! item.status.name.disabled ? 'L' : 'P'}" />
 					</aura:set>					
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="bloodtype">
-					<ui:outputText value="{!item.data.bloodtype}"/>
+					<ui:outputText value="{!item.record.bloodtype}"/>
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="phone">
-					<ui:outputDate value="{!item.data.phone}"/>
+					<ui:outputDate value="{!item.record.phone}"/>
 					<aura:set attribute="triggerIcon">
 						<uiExamples:iconCmp key="{! item.status.phone.disabled ? 'L' : 'P'}" />
 					</aura:set>

@@ -76,7 +76,7 @@
 		
 		for (var i = 0; i < 10; i++) {
 			items.push({
-				data : {
+				record : {
 					id : i,
 					name : "Name" + i,
 					bloodtype : this.BLOOD_TYPES[Math.floor(Math.random() * 3)],

@@ -22,10 +22,11 @@
 	<aura:attribute name="editLayouts" type="Object"/>
     <aura:attribute name="editPanelConfigs" type="Object" description="A map of attributes for each edit panel by columnName. Sample map : {columnName : {attr1:value1, attr2:value2} }"/>
 	<aura:attribute name="editable"    type="Boolean" default="true" description="Editable status of the inline edit grid. If false, no inline edit functionality will be available."/>
-	
+	<aura:attribute name="dataVar" type="String" default="data" description="The name of the variable to use for the data in each item inside the grid."/>
+    
 	<!-- Attributes used by the virtualDataGrid -->
 	<aura:attribute name="items"           type="Object[]"                 description="A list of objects representing the rows of data in the grid"/>
-	<aura:attribute name="itemVar"         type="String"   default="item"  description="The name of the variable to use for each item inside the grid"/>
+	<aura:attribute name="itemVar"         type="String"   default="item"  description="The name of the variable to use for each row's item inside the grid"/>
 	<aura:attribute name="headerColumns"   type="Aura.Component[]"         description="Components used as the header of the table"/>
 	<aura:attribute name="columns"         type="Aura.ComponentDefRef[]"   description="Components used as the template for each row"/>
 	

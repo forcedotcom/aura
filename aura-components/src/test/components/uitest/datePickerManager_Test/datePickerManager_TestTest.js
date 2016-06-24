@@ -85,8 +85,7 @@
      *
      * Ignored in IE7 because ie7 handles bounding rectangle differently and the datepicker ends up be askewed
      */
-     //this is a flapper, please fix and then enable, W-3169820
-    _testCheckDatePickerPosition: {
+    testCheckDatePickerPosition: {
         browsers: ["-IE7"],
         test: [
             function(cmp) {
@@ -219,16 +218,20 @@
     },
 
     verifyPosition: function(cmp, dpCmpID) {
-        var self = this;
         var epsilon = 5;
         var inputBoxRect = cmp.find(dpCmpID).getElement().getBoundingClientRect();
-        var datePickerRect = this.getDPMDatePicker(cmp).getElement().getBoundingClientRect();
+        var datePickerElm = this.getDPMDatePicker(cmp).getElement();
 
         // positions are updated after the datePicker is visible, so we need to have
         // some waitFor's here
         $A.test.addWaitForWithFailureMessage(true, function() {
-            return self.isDatePickerBelowInput(datePickerRect, inputBoxRect, epsilon);
-        }, "The left sides of inputBox and datePicker for " + dpCmpID + " do not match");
+                var datePickerRect = datePickerElm.getBoundingClientRect();
+                return this.isDatePickerBelowInput(datePickerRect, inputBoxRect, epsilon);
+            }.bind(this),
+            "DatePicker at [top=" + datePickerElm.getBoundingClientRect().top +
+            ", left=" + datePickerElm.getBoundingClientRect().left + "], " +
+            "while input at [bottom=" + inputBoxRect.bottom + ", left=" + inputBoxRect.left + "]"
+        );
     },
 
     isDatePickerBelowInput : function(datePickerRect, inputBoxRect, epsilon) {

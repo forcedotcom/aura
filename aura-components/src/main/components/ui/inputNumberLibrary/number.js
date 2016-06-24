@@ -23,6 +23,11 @@ function lib() { // eslint-disable-line no-unused-vars
         trillion : 't'
     };
 
+    function isNoZeroLeadingNumber(string) {
+        var decimalSeparator = $A.get("$Locale.decimal");
+        var reg = new RegExp('(^\\s*(\\+|\\-)\\s*)?\\' + decimalSeparator + '$');
+        return reg.test(string);
+    }
 
     return {
         formatNumber: function (number, formatter) {
@@ -55,8 +60,13 @@ function lib() { // eslint-disable-line no-unused-vars
                 billionRegExp,
                 trillionRegExp;
 
+
             if (this.isNumber(string)) {
                 return string;
+            }
+
+            if (isNoZeroLeadingNumber(string)) {
+                return 0;
             }
 
             if (decimalSeparator !== '.') {
@@ -83,7 +93,7 @@ function lib() { // eslint-disable-line no-unused-vars
             var decimalSeparator  = $A.get("$Locale.decimal");
             var groupingSeparator = $A.get("$Locale.grouping");
 
-            var const1 = '(?!(K|B|M|T|\\' + decimalSeparator + '))';
+            var const1 = '(?!(K|B|M|T))';
 
             // This regexp math with any formatted number or any possible formatted number
             // Match with :
@@ -94,7 +104,7 @@ function lib() { // eslint-disable-line no-unused-vars
             // ended by any shortcut (K|B|M|T)
             // it not case sensitive
             var regString = '^' + const1 + '((\\s*(\\+|\\-)?\\s*)' + const1 + ')?' +
-                            '(\\d+(\\' + groupingSeparator + '\\d*)*)*' +
+                            '(\\d*(\\' + groupingSeparator + '\\d*)*)*' +
                             '(\\' + decimalSeparator + '\\d*)?' +
                             '(K|B|M|T)?$';
 

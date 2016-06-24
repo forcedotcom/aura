@@ -43,17 +43,17 @@
 
         <aura:if isTrue="{! v.testInputCmp == 'inputNumber' }">
             <ui:inputNumber
-                    aura:id="input" updateOn="keyup" label="inputNumber" labelPosition="top"
+                    aura:id="input" label="inputNumber" labelPosition="top"
                     disabled="{! v.disabled }" max="{! v.max }" min="{! v.min }" />
         </aura:if>
         <aura:if isTrue="{! v.testInputCmp == 'inputCurrency' }">
             <ui:inputCurrency
-                    aura:id="input" updateOn="keyup" label="inputCurrency" labelPosition="top"
+                    aura:id="input" label="inputCurrency" labelPosition="top"
                     disabled="{! v.disabled }" max="{! v.max }" min="{! v.min }"/>
         </aura:if>
         <aura:if isTrue="{! v.testInputCmp == 'inputPercent' }">
             <ui:inputPercent
-                    aura:id="input" updateOn="keyup" label="inputPercent" labelPosition="top"
+                    aura:id="input" label="inputPercent" labelPosition="top"
                     disabled="{! v.disabled }" max="{! v.max }" min="{! v.min }"/>
         </aura:if>
 

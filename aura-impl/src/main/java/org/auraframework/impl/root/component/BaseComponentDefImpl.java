@@ -735,7 +735,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     public Map<String, LocatorDef> getLocators() {
         return this.locatorDefs;
     };
-    
+
     /**
      * @return all the library imports from this component, including those inherited
      * @throws QuickFixException
@@ -1054,7 +1054,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 if (locatorDefs!=null && !locatorDefs.isEmpty()) {
                     json.writeMapEntry("locatorDefs", locatorDefs);
                 }
-                
+
                 if (!facets.isEmpty()) {
                     json.writeMapEntry("facets", facets);
                 }
@@ -1635,6 +1635,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         @Override
         public void setCode(String code) {
         	this.code = code;
+        }
+
+        @Override
+        public Builder<T> setExtendsDescriptor(DefDescriptor<T> extendsDescriptor) {
+            this.extendsDescriptor = extendsDescriptor;
+            return this;
         }
 
         /**

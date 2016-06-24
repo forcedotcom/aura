@@ -144,7 +144,16 @@
             var pageCount = cmp.get('v.pageCount');
         	$A.test.assertEquals(6, pageCount, "Total Number of pages should be 6");
         }
+    },
+
+    /**
+     * Verify that when totalItems = 0, cmp should have class 'empty'
+     */
+    testZeroItemCSS: {
+        attributes: { totalItems: 0 },
+        test: function(cmp) {
+            $A.test.assertTrue($A.util.hasClass(cmp.getElement(), "empty"),
+                    "Element should have class 'empty' when totalItems is 0");
+        }
     }
-/*eslint-disable semi*/
-})
-/*eslint-enable semi*/
+})//eslint-disable-line semi

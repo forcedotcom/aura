@@ -4,4 +4,9 @@
 	    <ui:button label="Peacock" aura:id="peacock"/>
 	    <aura:text value="Parakeet" aura:id="parrot"/>
     </componentTest:stubComponent>
+    <componentTest:stubComponent aura:id='anotherCmpAsStub'>
+        <aura:iteration items="one,two,three" var="item">
+            <aura:text value="{!'Parrotlet ' + item}" aura:id="parrotlet"/>
+        </aura:iteration>
+    </componentTest:stubComponent>
 </aura:component>

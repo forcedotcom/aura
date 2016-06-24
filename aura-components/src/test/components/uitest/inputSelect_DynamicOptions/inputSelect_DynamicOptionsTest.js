@@ -96,6 +96,16 @@
 		}
 	},
 
+	testSetOptionsWhenSelectHasBody : {
+		test: [function(cmp) {
+			cmp.find("optionsWithBody").set("v.options", this.OPTS);
+		}, function(cmp) {
+			debugger;
+			cmp.find("firstOption").set("v.text", "abcd");
+			this.verifyElements(cmp.find("optionsWithBody"), this.OPTS);
+		}]
+	},
+
 	verifyElements : function(inputSelect, expectedOptions){
 		var actualOptions = inputSelect.getElement().getElementsByTagName("option");
 		var expectedOption = "", actualOption = "" ;

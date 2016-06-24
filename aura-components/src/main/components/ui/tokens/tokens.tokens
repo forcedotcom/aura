@@ -33,4 +33,6 @@
   <aura:token name="uiModal.backdropOpen" value=""/>
   
   <aura:token name="uiPanel.truncate" value=""/>
+
+  <aura:token name="uiLabel.label" value=""/>
 </aura:tokens>

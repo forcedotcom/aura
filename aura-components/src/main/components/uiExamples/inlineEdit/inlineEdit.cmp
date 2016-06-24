@@ -36,7 +36,7 @@
 			</aura:set>
 			
 			<aura:set attribute="columns">
-				<ui:inlineEditCell name="id" isPsuedoInput="true">
+				<ui:inlineEditCell name="id" isPsuedoInput="true" class="psuedoInput">
 					<ui:outputText value="{!item.data.id}"/>
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="name">

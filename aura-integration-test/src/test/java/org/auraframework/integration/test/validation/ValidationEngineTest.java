@@ -28,30 +28,6 @@ import org.auraframework.util.validation.ValidationError;
 import org.junit.Test;
 
 public final class ValidationEngineTest extends AuraValidationTestCase {
-    @Test
-    public void testValidateDescriptorJavaScript() throws Exception {
-        DefDescriptor<?> descriptor = DefDescriptorImpl.getInstance("js://validationTest.basic", ControllerDef.class);
-        List<ValidationError> errors = new ValidationEngine().validate(descriptor);
-        assertEquals(2, errors.size());
-
-        // custom: missing (
-        ValidationError error = errors.get(0);
-        String filename = error.getFilename();
-        assertEquals("js/custom", error.getValidatingTool());
-        assertEquals("Starting '(' missing", error.getMessage());
-        assertTrue(filename, filename.endsWith("/validationTest/basic/basicController.js"));
-        assertEquals(5, error.getLine());
-        assertEquals(1, error.getStartColumn());
-
-        // jslint: missing ;
-        error = errors.get(1);
-        filename = error.getFilename();
-        assertEquals("jslint", error.getValidatingTool());
-        assertEquals("Expected ';' and instead saw '}'", error.getMessage());
-        assertTrue(filename, filename.endsWith("/validationTest/basic/basicController.js"));
-        assertEquals(7, error.getLine());
-        assertEquals(20, error.getStartColumn());
-    }
 
     @Test
     public void testValidateDescriptorCSS() {

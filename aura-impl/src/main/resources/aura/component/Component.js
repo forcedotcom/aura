@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true*/
 
 /**
  * Construct a new Component.
@@ -1018,7 +1017,6 @@ Component.prototype.getSuper = function() {
     return this.superComponent;
 };
 
-/* jslint sub: true */
 /**
  * Associates a rendered element with the component that rendered it for later
  * lookup. Also adds the rendering component's global Id as an attribute to the

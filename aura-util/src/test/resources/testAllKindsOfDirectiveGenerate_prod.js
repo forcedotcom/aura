@@ -1,4 +1,3 @@
-/*jslint sub: true*/
 var rrrrr = "ARRRRRRRR";
 function dress() {
 

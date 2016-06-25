@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/*jslint sub: true */
 
 /**
  * Constructor for a doc level handler.

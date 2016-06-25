@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/*jslint sub: true */
 
 /**
  * A glorified stack to keep track of which component we're working

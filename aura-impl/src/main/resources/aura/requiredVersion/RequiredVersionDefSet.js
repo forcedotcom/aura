@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * Creates a new RequiredVersionDefSet instance.
  * @param {Object} configs For each configs object provided, a new RequiredVersionDef instance is added

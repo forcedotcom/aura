@@ -3,7 +3,6 @@
  * Copyrights licensed under the BSD License. See the accompanying LICENSE.txt file for terms.
  */
 
-/*jslint sub: true*/
 
 /**
  * @define {!string}

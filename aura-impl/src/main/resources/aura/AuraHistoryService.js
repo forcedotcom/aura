@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * @description The Aura History Service, accessible using $A.historyService. Manages Browser History.
  * Internet Explorer 7 and 8 are not supported for this service.

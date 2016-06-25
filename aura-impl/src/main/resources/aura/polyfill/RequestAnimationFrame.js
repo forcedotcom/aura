@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/*jslint sub: true */
 
 Date.now = (Date.now || function () {  // thanks IE8
     return new Date().getTime();

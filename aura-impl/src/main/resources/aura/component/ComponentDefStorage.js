@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * @description Storage for component, library, and event definitions. If persistent storage
  * is not available then most operations are noops.

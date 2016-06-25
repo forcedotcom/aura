@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/*jslint sub: true */
 
 /**
  * Construct a SecureNavigator.

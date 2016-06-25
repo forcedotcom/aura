@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true*/
 /**
  * @description The Action Definition including the name, descriptor, action type, method, and parameter definitions. An
  *            ActionDef instance is created as part of the ControllerDef initialization.

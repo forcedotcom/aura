@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint bitwise: true*/
 /**
  * A representation of a set of individual bits, addressable as if organized as
  * an array.

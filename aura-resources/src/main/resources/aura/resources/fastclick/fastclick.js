@@ -9,7 +9,6 @@
 	 * @license MIT License (see LICENSE.txt)
 	 */
 
-	/*jslint browser:true, node:true*/
 	/*global define, Event, Node*/
 
 

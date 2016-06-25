@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * @description A value provider that resolves against a few primary providers first, then falls back on a component.
  * @constructor

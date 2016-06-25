@@ -114,9 +114,7 @@ public final class ValidationEngine {
         }
 
         // perform language specific checking
-        if (prefix.equals(DefDescriptor.JAVASCRIPT_PREFIX)) {
-            errors.addAll(validateJavascript(source, descriptor.getDefType()));
-        } else if (prefix.equals(DefDescriptor.CSS_PREFIX)) {
+        if (prefix.equals(DefDescriptor.CSS_PREFIX)) {
             errors.addAll(validateCSS(source, descriptor.getDefType()));
         }
         // TODO: all other prefixes

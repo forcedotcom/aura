@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * @description Creates a new ControllerDef, including the descriptor and action definitions.
  * A ControllerDef instance is created as part of the ComponentDef initialization.

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * @description The Aura Localization service Service, accessible using $A.localizationService. Provides utility methods
  * for localizing data or getting formatters for numbers, currencies, dates, etc.

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/*jslint sub: true */
 
 // Will use ES6Promises in the global namespace when native Promises
 // aren't supported.

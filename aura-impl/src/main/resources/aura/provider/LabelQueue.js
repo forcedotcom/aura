@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * @description Label Queue. Holds the components and callbacks for a particular $Label.
  * Queues request for the same $Label to make server calls efficient

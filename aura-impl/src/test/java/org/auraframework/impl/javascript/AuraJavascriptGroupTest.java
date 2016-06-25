@@ -40,22 +40,6 @@ public class AuraJavascriptGroupTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify that AuraJavascriptGroup does not fail JSLint validation.
-     */
-    @Test
-    public void testJSLintValidationForAuraJavascriptGroup() throws Exception {
-        AuraJavascriptGroup js = new AuraJavascriptGroup();
-        try {
-            // Should be ideally in setup, but this step might have some errors,
-            // so won't assume its reliable
-            js.parse();
-            js.validate();
-        } catch (RuntimeException e) {
-            fail("AuraJavascriptGroup failed validation with the following error:" + e.getMessage());
-        }
-    }
-
-    /**
      * Verify that AuraJavascriptGroup can be compressed with all modes.
      */
     @Test

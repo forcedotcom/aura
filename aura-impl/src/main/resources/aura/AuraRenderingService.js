@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * @class The Aura Rendering Service, accessible using $A.renderingService.
  *        Renders components. The default behaviors can be customized in a

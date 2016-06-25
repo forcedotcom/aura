@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * @description Creates a FlavorsDef instance with a collection of flavor overrides for specific component descriptors.
  * @param {Object} config

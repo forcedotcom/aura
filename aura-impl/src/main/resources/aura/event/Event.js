@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * @description Creates an Event with name, source component, event definition, event dispatcher, parameters, and sets the fired flag to false.
  * @constructor

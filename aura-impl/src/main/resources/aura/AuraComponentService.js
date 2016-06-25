@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true, evil: true */
 
 /**
  * @description The Aura Component Service, accessible using $A.service.component.  Creates and Manages Components.

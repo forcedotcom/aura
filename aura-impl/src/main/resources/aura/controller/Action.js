@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * A base class for an Aura Action to be passed to an associated component. An Action is created in a client-side or
  * server-side controller. Invoke an Action in a controller by declaring cmp.get("c.actionName"). Call a server-side

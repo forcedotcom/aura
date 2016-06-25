@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint evil: true, sub : true */
 /**
  * @description A base class to enable JSON manipulation
  * @constructor

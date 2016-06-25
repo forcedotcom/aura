@@ -1,5 +1,4 @@
 /* file testAllKindsOfDirectiveGenerate.js */
-/*jslint sub: true*/
 var rrrrr = "ARRRRRRRR";
 function dress() {
 

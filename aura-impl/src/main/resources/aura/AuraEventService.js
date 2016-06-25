@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * @description The Aura Event Service, accessible using $A.eventService. Creates and Manages Events.
  * @constructor AuraEventService

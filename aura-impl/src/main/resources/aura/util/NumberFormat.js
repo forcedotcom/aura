@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub : true */
 /**
  * Format is a string using the java format pattern (e.g. #,##0.0). Note that this does not handle quoted
  * special characters or exponents.

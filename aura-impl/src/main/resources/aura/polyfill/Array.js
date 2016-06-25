@@ -16,7 +16,6 @@
 // Implementation from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
 // Production steps of ECMA-262, Edition 5, 15.4.4.14
 // Reference: http://es5.github.io/#x15.4.4.14
-/*jslint bitwise: true*/
 if (!Array.prototype.indexOf||Array.prototype.indexOf.toString().indexOf('[native code]')<0) {
     Array.prototype.indexOf = function(searchElement, fromIndex) {
 

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true, evil : true  */
 /**
  * @description The Aura Dev Tool Service, accessible using $A.devToolServices.
  * Use mostly in non-production modes.

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * @description The Event Definition including the descriptor, type, and attributes.
  * An EventDef instance is created as part of Aura initialization.

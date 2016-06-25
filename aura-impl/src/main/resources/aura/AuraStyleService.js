@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
 /**
  * @description The Aura Style Service, accessible using <b><code>$A.styleService</code></b>.
  *              Dynamically loads and applies tokenized CSS.

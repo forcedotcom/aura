@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true*/
 /**
  * @description Represents a Aura client-side context, created during HTTP requests for component definitions. A context
  *            can include a mode, such as "DEV" for development mode or "PROD" for production mode.

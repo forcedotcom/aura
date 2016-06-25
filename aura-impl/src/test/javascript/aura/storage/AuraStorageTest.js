@@ -38,6 +38,11 @@ Test.Aura.Storage.AuraStorageTest = function() {
 
                 try {
                     var newValue = resolve(value);
+                    while (newValue && newValue["then"]) {
+                        newValue.then(function(v) {
+                            newValue = v;
+                        });
+                    }
                     return ResolvePromise(newValue);
                 } catch (e) {
                     return RejectPromise(e);
@@ -55,6 +60,11 @@ Test.Aura.Storage.AuraStorageTest = function() {
 
                 try {
                     var value = reject(error);
+                    while (value && value["then"]) {
+                        value.then(function(v) {
+                            value = v;
+                        });
+                    }
                     return ResolvePromise(value);
                 } catch (newError) {
                     return RejectPromise(newError);

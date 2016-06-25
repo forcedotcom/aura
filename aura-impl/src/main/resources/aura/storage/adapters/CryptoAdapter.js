@@ -64,7 +64,7 @@ function CryptoAdapter(config) {
     this.mode = CryptoAdapter.NAME;
 
     // async initialize. if it completes successfully, process the queue;
-    // otherwise reject the pending operations.
+    // otherwise reject all pending and future operations.
     var that = this;
     this.initialize()
         .then(
@@ -72,7 +72,7 @@ function CryptoAdapter(config) {
                 that.executeQueue(true);
             },
             function() {
-                // Reject on initialize should be rare because we use memory storage as alternate
+                // reject on initialize should never happen because we fallback to non-crypto memory storage
                 that.executeQueue(false);
             }
         );
@@ -220,15 +220,21 @@ CryptoAdapter.prototype.fallbackToMemoryAdapter = function(e) {
     this.log(CryptoAdapter.LOG_LEVEL.WARNING, "initialize(): falling back to memory storage", e);
     $A.metricsService.transaction("aura", "memoryCryptoStorage");
     this.mode = Aura.Storage.MemoryAdapter.NAME; // "memory";
-    this.adapter = new Aura.Storage.MemoryAdapter(this.config);
+
+    // TODO - this indirection is used by auraStorageTest:cryptoFailedAdapter. this needs to be improved.
+    var adapterClass = $A.storageService.getAdapterConfig(Aura.Storage.MemoryAdapter.NAME)["adapterClass"];
+    this.adapter = new adapterClass(this.config);
+    // this.adapter = new Aura.Storage.MemoryAdapter(this.config);
 };
 
 
 /**
  * Initializes the adapter by waiting for the app-wide crypto key to be set,
- * then validates the key works for items already in persistent storage. If a
- * valid key is not provided the adapter moves to fallback mode, storing items
- * in memory.
+ * then validates the key works for items already in persistent storage. Several
+ * error scenarios to detect:
+ * - invalid key provided -> fallback to memory storage
+ * - valid key is provided but can't fetch what's in storage -> clear then use crypto with new key
+ * - valid key is provided but doesn't match what's in storage -> clear then use crypto with new key
  * @private
  */
 CryptoAdapter.prototype.initialize = function() {
@@ -242,7 +248,7 @@ CryptoAdapter.prototype.initialize = function() {
 
     return CryptoAdapter.key
         .then(
-            function(key) {
+            function keyReceived(key) {
                 // it's possible for key generation to fail, which we treat as a fatal
                 // error. all pending and future operations will fail.
                 if (!key) {
@@ -250,32 +256,46 @@ CryptoAdapter.prototype.initialize = function() {
                 }
                 that.key = key;
             },
-            function(e) {
+            function noKeyReceived(e) {
                 throw new Error("CryptoAdapter.key rejected: " + e); // maintain reject state
             }
         ).then(
-            function() {
-                // check if existing data can be decrypted
+            function verifySentinel() {
+
+                function handleInvalidSentinel() {
+                    // decryption failed so clear the store. do not re-throw to remain using crypto with new key.
+                    that.log(CryptoAdapter.LOG_LEVEL.INFO, "initialize(): encryption key is different so clearing storage");
+                    $A.metricsService.transaction("aura", "initializeCryptoStorage");
+                    return that.adapter.clear();
+                }
+
+                // check if existing data can be decrypted. note the use of getItemsInternal() to bypass the queue.
                 return new Promise(function(resolve, reject) {
-                    that.log(CryptoAdapter.LOG_LEVEL.INFO, "initialize(): checking encryption key status");
-                    that.getItemsInternal([CryptoAdapter.SENTINEL], resolve, reject);
-                }).then(
-                    undefined,
-                    function() {
-                        // decryption failed so flush the store. do not re-throw since we've recovered
-                        that.log(CryptoAdapter.LOG_LEVEL.INFO, "initialize(): encryption key is different so clearing storage");
-                        $A.metricsService.transaction("aura", "initializeCryptoStorage");
-                        return that.adapter.clear();
-                    }
-                );
-            },
-            function(e) {
+                        that.log(CryptoAdapter.LOG_LEVEL.INFO, "initialize(): verifying sentinel");
+                        that.getItemsInternal([CryptoAdapter.SENTINEL], resolve, reject, true);
+                    }).then(
+                        function(values) {
+                            // if sentinel value is incorrect then clear the store. remain using crypto with new key.
+                            if (!values[CryptoAdapter.SENTINEL] || values[CryptoAdapter.SENTINEL]["value"] !== CryptoAdapter.SENTINEL) {
+                                return handleInvalidSentinel();
+                            }
+
+                            // new key matches key used in store. existing values remain.
+                        },
+                        handleInvalidSentinel
+                    );
+            }
+        ).then(
+            undefined,
+            function initFailedSoFallbackToMemory(e) {
                 that.fallbackToMemoryAdapter(e);
                 // do not throw an error so the promise moves to resolve state
             }
         ).then(
             function() {
-                return that.setSentinalItem();
+                // underlying store is setup, either as crypto or memory fallback. this store
+                // is now ready for use.
+                return that.setSentinelItem();
             }
         );
 };
@@ -399,9 +419,11 @@ CryptoAdapter.prototype.getItems = function(keys /*, includeExpired*/) {
  * @param {String[]} keys The keys of the items to retrieve.
  * @param {Function} resolve Promise resolve function.
  * @param {Function} reject Promise resolve function.
+ * @param {Boolean} includeInternalKeys True to return internal keys (eg sentinel), otherwise they are
+ *  excluded from the return value.
  * @private
  */
-CryptoAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
+CryptoAdapter.prototype.getItemsInternal = function(keys, resolve, reject, includeInternalKeys) {
     var that = this;
     this.adapter.getItems(keys)
         .then(
@@ -411,11 +433,16 @@ CryptoAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
                 }
 
                 var decrypted = {};
-                function collector(k, decryptedValue) {
+                function decryptSucceeded(k, decryptedValue) {
                     // do not return the sentinel. note that we did verify it decrypts correctly.
-                    if (k !== CryptoAdapter.SENTINEL) {
+                    if (k !== CryptoAdapter.SENTINEL || includeInternalKeys) {
                         decrypted[k] = decryptedValue;
                     }
+                }
+
+                function decryptFailed() {
+                    // decryption failed. do not add the key to decrypted to indicate we
+                    // do not have the key. do not rethrow to return the promise to resolve state.
                 }
 
                 var promises = [];
@@ -423,13 +450,17 @@ CryptoAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
                 for (var key in values) {
                     value = values[key];
                     if ($A.util.isUndefinedOrNull(value)) {
-                        decrypted[key] = undefined;
+                        // should never get back a non-crypto payload. treat is as though
+                        // the underlying adapter doesn't have it.
                     } else {
-                        promise = that.decrypt(value).then(collector.bind(undefined, key));
+                        promise = that.decrypt(key, value)
+                            .then(
+                                decryptSucceeded.bind(undefined, key),
+                                decryptFailed
+                            );
                         promises.push(promise);
                     }
                 }
-
                 return Promise["all"](promises)
                     .then(function() {
                         return decrypted;
@@ -449,12 +480,13 @@ CryptoAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
 
 /**
  * Decrypts a stored cached entry.
+ * @param {String} key The key of the value to decrypt.
  * @param {Object} value The cache entry to decrypt.
  * @returns {Promise} Promise that resolves with the decrypted item.
  * The object consists of {value: *, isExpired: Boolean}.
  * @private
  */
-CryptoAdapter.prototype.decrypt = function(value) {
+CryptoAdapter.prototype.decrypt = function(key, value) {
     var that = this;
 
     return CryptoAdapter.engine["decrypt"](
@@ -471,7 +503,7 @@ CryptoAdapter.prototype.decrypt = function(value) {
                 return {"expires": value["expires"], "value": obj};
             },
             function(err) {
-                that.log(CryptoAdapter.LOG_LEVEL.WARNING, "decrypt(): decryption failed", err);
+                that.log(CryptoAdapter.LOG_LEVEL.WARNING, "decrypt(): decryption failed for key "+key, err);
                 throw new Error(err);
             }
         );
@@ -517,16 +549,20 @@ CryptoAdapter.prototype.arrayBufferToObject = function(ab) {
  * Stores entry used to determine whether encryption key provided can decrypt the store.
  * @returns {Promise} Promise that resolves when the item is stored.
  */
-CryptoAdapter.prototype.setSentinalItem = function() {
+CryptoAdapter.prototype.setSentinelItem = function() {
     return new Promise(function(resolve, reject) {
+        var now = new Date().getTime();
+        // shape must match AuraStorage#buildPayload
         var tuple = [
             CryptoAdapter.SENTINEL,
             {
                 "value": CryptoAdapter.SENTINEL,
-                "expires": new Date().getTime() + 15768000000 // 1/2 year
+                "created": now,
+                "expires": now + 15768000000 // 1/2 year
             },
             0
         ];
+        // note the use of setItemsInternal() to bypass the queue.
         this.setItemsInternal([tuple], resolve, reject);
     }.bind(this));
 };
@@ -645,6 +681,7 @@ CryptoAdapter.prototype.removeItems = function(keys) {
  * @param {Function} reject Promise resolve function.
  */
 CryptoAdapter.prototype.removeItemsInternal = function(keys, resolve, reject) {
+    // note: rely on AuraStorage key prefixing to avoid clashing with sentinel key
     this.adapter.removeItems(keys).then(resolve, reject);
 };
 
@@ -654,8 +691,12 @@ CryptoAdapter.prototype.removeItemsInternal = function(keys, resolve, reject) {
  * @returns {Promise} a promise that resolves when the store is cleared
  */
 CryptoAdapter.prototype.clear = function() {
-    // TODO - should re-set sentinel key after a clear
-    return this.adapter.clear();
+    return this.adapter.clear()
+        .then(
+            function() {
+                return this.setSentinelItem();
+            }.bind(this)
+        );
 };
 
 
@@ -664,7 +705,13 @@ CryptoAdapter.prototype.clear = function() {
  * @returns {Promise} a promise that resolves when the sweep is complete.
  */
 CryptoAdapter.prototype.sweep = function() {
-    return this.adapter.sweep();
+    // underlying adapter may sweep the sentinel so always re-add it
+    return this.adapter.sweep()
+    .then(
+        function() {
+            return this.setSentinelItem();
+        }.bind(this)
+    );
 };
 
 

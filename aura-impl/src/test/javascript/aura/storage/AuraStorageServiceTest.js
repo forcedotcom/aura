@@ -562,7 +562,7 @@ Test.Aura.Storage.AuraStorageServiceTest = function() {
 
 
         [Fact]
-        function ReturnsUndefinedWhenCalledWithNonString() {
+        function ThrowsErrorWhenCalledWithNonString() {
             var expected = "AuraStorageService.getStorage(): 'name' must be a String.";
             var actual;
 

@@ -47,7 +47,7 @@
 				<ui:dataGridColumn name="passing" label="Passing"/>
 				<ui:dataGridColumn name="notes"   label="Notes"/>
 				<ui:dataGridColumn name="modDateTime"   label="Modified"/>
-				<ui:dataGridColumn name=""        label="Actions" hideLabel="true"/>
+				<ui:dataGridColumn name="picklist" label="Blood Type"/>
 			</aura:set>
 			
 			<aura:set attribute="columns">
@@ -66,8 +66,8 @@
 				<ui:inlineEditCell name="issueDate" edited="{!row.status.issueDate}">
 					<ui:outputText value="{!row.data.issueDate}"/>
 				</ui:inlineEditCell>
-				<ui:inlineEditCell name="passing" edited="{!row.status.isPassing}">
-					<ui:outputText value="{!row.data.isPassing}"/>
+				<ui:inlineEditCell name="passing" edited="{!row.status.passing}">
+					<ui:outputCheckbox value="{!row.data.passing}"/>
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="notes" edited="{!row.status.notes}">
 					<ui:outputText value="{!row.data.notes}"/>
@@ -75,6 +75,9 @@
 				<ui:inlineEditCell name="modDateTime" edited="{!row.status.modDateTime}">
 					<ui:outputText value="{!row.status.modDateTime}"/>
 				</ui:inlineEditCell>
+                <ui:inlineEditCell name="bloodtype">
+                    <ui:outputText value="{!row.data.bloodtype}"/>
+                </ui:inlineEditCell>
 			</aura:set>
 		</ui:inlineEditGrid>
         

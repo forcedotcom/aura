@@ -21,6 +21,7 @@
 		
 		// Generate edit layouts:
 		cmp.find("grid").set("v.editLayouts", helper.EDIT_LAYOUTS);
+		cmp.find("grid").set("v.editPanelConfigs", helper.EDIT_PANEL_CONFIG);
 	},
 	
 	onEdit : function(cmp, evt) {

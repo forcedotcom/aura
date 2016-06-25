@@ -14,26 +14,47 @@
  * limitations under the License.
  */
 ({
+    BLOOD_TYPES : ['A', 'B', 'AB', 'O'],
 	EDIT_LAYOUTS : {
 		id : {
 			componentDef : {
 				descriptor : 'markup://ui:inputNumber'
+			},
+			attributes : {
+			    values : {
+			        updateOn : 'input'
+			    }
 			}
 		},
 		name : {
 			componentDef : {
 				descriptor : 'markup://ui:inputText'
-			}
+			},
+            attributes : {
+                values : {
+                    updateOn : 'input'
+                }
+            }
 		},
 		grade : {
 			componentDef : {
 				descriptor : 'markup://ui:inputNumber'
-			}
+			},
+			attributes : {
+                values : {
+                    updateOn : 'input'
+                }
+            }
 		},
 		linkLabel : {
 		    componentDef : {
 		        descriptor : 'markup://ui:inputText'
-		    }
+		    },
+            attributes : {
+                values : {
+                    updateOn : 'input'
+                }
+            }
 		},
 		issueDate : {
 			componentDef : {
@@ -43,18 +64,53 @@
 		passing : {
 			componentDef : {
 				descriptor : 'markup://ui:inputCheckbox'
-			}
+			},
+            attributes : {
+                values : {
+                    updateOn : 'click'
+                }
+            }
 		},
 		notes : {
 			componentDef : {
 				descriptor : 'markup://ui:inputTextArea'
-			}
+			},
+            attributes : {
+                values : {
+                    updateOn : 'input'
+                }
+            }
 		},
 		modDateTime : {
 			componentDef : {
 				descriptor : 'markup://ui:inputDateTime'
 			}
-		}
+		},
+		bloodtype : {
+            componentDef : {
+                descriptor : 'markup://ui:inputSelect'
+            },
+            attributes : {
+                values : {
+                    useMenu : true,
+                    options : [
+                        { label : "A", value : "A", selected : true},
+                        { label : "B", value : "B", selected : false },
+                        { label : "AB", value : "AB", selected : false },
+                        { label : "O", value : "O", selected : false }
+                    ]
+                }
+            }
+        },
+	},
+	
+	EDIT_PANEL_CONFIG : {
+	    passing : {
+	        submitOn : 'change'
+	    },
+	    bloodtype : {
+	        submitOn : 'change'
+	    }
 	},
 	
 	updateLastEdited : function(cmp, params) {

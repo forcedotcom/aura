@@ -15,17 +15,24 @@
  */
 ({
 	init : function(cmp) {
+	    var submitOn = cmp.get("v.submitOn");
 		var inputComponent = cmp.get("v.inputComponent")[0];
 		
 		if (inputComponent && inputComponent.isInstanceOf("ui:input")) {
-			inputComponent.addHandler("keydown", cmp, "c.keydown");
+		    var submitAction = (submitOn === 'keydown') ? "c.keydown" : "c.submitValues";
+			inputComponent.addHandler(submitOn, cmp, submitAction);
 		}
 	},
 	
 	keydown : function(cmp, evt, helper) {
-		// ENTER key
-		if (evt.getParam('keyCode') === 13) {
+	    var params = evt.getParams();
+		// Assume ENTER key
+		if (params.keyCode === 13 && !params.shiftKey && !params.ctrlKey) {
 			helper.submit(cmp);
 		}
+	},
+	
+	submitValues : function(cmp, evt, helper) {
+	    helper.submit(cmp);
 	}
 })// eslint-disable-line semi

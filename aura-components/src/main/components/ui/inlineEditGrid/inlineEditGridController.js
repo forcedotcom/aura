@@ -33,45 +33,13 @@
 		 * If the bubbled event is an edit, send an edit panel to the cell
 		 */
 		if (action === 'edit') {
-
-			// Prevent inline edit if editable is false	
-			if (!cmp.get('v.editable')){
-				evt.preventDefault();
-				evt.stopPropagation();
-				return;
-			}
-
-			var index = evt.getParam("index");
-			var payload = evt.getParam("payload");
-			
-			var editLayouts = cmp.get("v.editLayouts") || {};
-			var editLayout = editLayouts[payload.name];
-			
-			if (editLayout) {
-				// TODO: Need check that editLayout follows a certain interface so we can attach the appropriate
-				// attributes and events.
-				
-				if (!editLayout.attributes) {
-				    editLayout.attributes = { values : {} };
-				}
-				
-				editLayout.attributes.values.value = payload.value;
-				editLayout.attributes.values.updateOn = "input";
-				
-				var editFieldOverrides = cmp.get("v.editFieldOverrides") || {};
-				var updateMap = editFieldOverrides[payload.name] || {};
-				if (!editFieldOverrides[payload.name]) {
-					updateMap[payload.name] = "value";
-				}
-				
-				var panelBodyAttributes = {
-				        index : index,
-				        updateMap : updateMap,
-				        inputComponent : $A.createComponentFromConfig(editLayout)
-				};
-				
-				helper.displayEditPanel(cmp, panelBodyAttributes, payload.targetElement);
-			}
+		    // Prevent inline edit if editable is false   
+            if (!cmp.get('v.editable')){
+                evt.preventDefault();
+                evt.stopPropagation();
+                return;
+            }
+		    helper.handleEditAction(cmp, evt);
 		}
 	},
 	

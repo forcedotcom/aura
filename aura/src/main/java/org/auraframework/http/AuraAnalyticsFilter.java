@@ -60,9 +60,9 @@ public class AuraAnalyticsFilter implements Filter {
 	        	throw new AuraRuntimeException("Invalid payload for Analytics");
 	        }
 	        
-	        RequestDispatcher dispatcher = servletContext.getRequestDispatcher(sb.toString());
-	        dispatcher.forward(req, res);
-        } else {        
+	        servletContext.getRequestDispatcher(sb.toString()).forward(req, res);
+
+        } else {
         	chain.doFilter(req, res);
         }
     }

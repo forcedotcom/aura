@@ -2218,11 +2218,11 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
  * Send beacon
  * @export
  */
-AuraClientService.prototype.sendBeacon = function(actions) {
+AuraClientService.prototype.sendBeacon = function(action) {
     if (window.navigator && window.navigator["sendBeacon"]) {
         try {
             var params = {
-                "message"      : $A.util.json.encode({ "actions" : actions }),
+                "message"      : $A.util.json.encode({ "actions" : [action] }),
                 "aura.context" : $A.getContext().encodeForServer(true),
                 "aura.token"   : this._token
             };

@@ -44,8 +44,10 @@
 	},
 	
 	handlePanelSubmit : function(cmp, evt, helper) {
+	    var items = cmp.get("v.items");
+	    var dataVar = cmp.get("v.dataVar");
+	    
 		var payload = evt.getParam("payload");
-		var items = cmp.get("v.items");
 		var values = payload.values;
 		var index = payload.index;
 		var item = items[index];
@@ -55,7 +57,7 @@
 		
 		// Update all record data values and status
 		if (values) {			
-			$A.util.apply(item.data, values, true, true);
+			$A.util.apply(item[dataVar], values, true, true);
 			for (var key in values) {
 				$A.util.addMapValueToMap(item.status, key, true, "edited");
 			}

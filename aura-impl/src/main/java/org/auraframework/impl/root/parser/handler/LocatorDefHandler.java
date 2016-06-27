@@ -35,7 +35,8 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
 
     private static String ATTRIBUTE_TARGET = "target";
     private static String ATTRIBUTE_DESCRIPTION = "description";
-    private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_TARGET, ATTRIBUTE_DESCRIPTION);
+    private static String ATTRIBUTE_ALIAS = "alias";
+    private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_TARGET, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ALIAS);
 
     private final LocatorDefImpl.Builder builder = new LocatorDefImpl.Builder();
 
@@ -76,6 +77,7 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
 
         String description = getAttributeValue(ATTRIBUTE_DESCRIPTION);
         String target = getAttributeValue(ATTRIBUTE_TARGET);
+        String alias = getAttributeValue(ATTRIBUTE_ALIAS);
 
         if (AuraTextUtil.isNullEmptyOrWhitespace(target)) {
             error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_TARGET, TAG);
@@ -88,6 +90,10 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
         builder.setLocation(getLocation());
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
         builder.setTarget(target);
+        
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(alias)) {
+        	builder.setAlias(alias);
+        }
     }
 
     @Override

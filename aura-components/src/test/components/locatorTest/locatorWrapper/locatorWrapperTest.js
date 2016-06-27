@@ -97,6 +97,16 @@
                         "parentKey": cmp.get("v.wrapperText")
                     });
         }
+    },
+    testParentWithAuraIdLocatorAliasChildWithLocatorDefNoAlias: {
+        test: function (cmp) {
+            this.doClickAndValidateTransaction("innerWithAuraIdDataRef", "locatorWrapperIdWithDefAlias", 
+                    {
+                        // keyRef is set from a data-keyRef attribute on the inner div
+                        "keyRef": cmp.find("locatorWrapperIdWithDefActual").get("v.innerTextValue")
+                        // there is no parent key for this locator
+                    });
+        }
     }
     
 })

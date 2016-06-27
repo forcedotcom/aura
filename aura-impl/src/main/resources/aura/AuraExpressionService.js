@@ -316,23 +316,37 @@ AuraExpressionService.prototype.resolveLocator = function (component, localId) {
             "scope" : ownerLocalId
     };
     
-    // TODO: replace with component.getOwner after jbuch checks that in
-    var ownerCmp = component.getAttributeValueProvider();
+    var ownerCmp = component.getOwner();
     
     var rootLocatorDefs = component.getDef().getLocatorDefs();
+    var rootLocatorDef = rootLocatorDefs && rootLocatorDefs[localId];
+    
     var ownerLocatorDefs = ownerCmp.getDef().getLocatorDefs();
+    var ownerLocatorDef = ownerLocatorDefs && ownerLocatorDefs[ownerLocalId];
     
     if (!rootLocatorDefs && !ownerLocatorDefs) {
         return locator;
     }
     
-    var rootContext = this.resolveLocatorContext(component, rootLocatorDefs && rootLocatorDefs[localId]);
-    var ownerContext = this.resolveLocatorContext(ownerCmp, ownerLocatorDefs && ownerLocatorDefs[ownerLocalId]);
+    var rootContext = this.resolveLocatorContext(component, rootLocatorDef);
+    var ownerContext = this.resolveLocatorContext(ownerCmp, ownerLocatorDef);
     
     var context = $A.util.apply(ownerContext || {}, rootContext);
     if (!$A.util.isEmpty(context)) {
         locator["context"] = context;
     }
+    
+    // Apply Aliases from target and scope as needed
+    var targetAlias = rootLocatorDef && rootLocatorDef["alias"];
+    var scopeAlias  = ownerLocatorDef && ownerLocatorDef["alias"];
+    
+    if (targetAlias) {
+        locator["target"] = targetAlias;
+    }
+    if (scopeAlias) {
+        locator["scope"] = scopeAlias;
+    }
+    
     return locator;
 };
 

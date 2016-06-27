@@ -38,12 +38,14 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
     // target doesn't need to be serialized to the client
     private transient String target = null;
     private Map<String, Object> locatorContextDefs = null;
+	private String alias = null;
 
     private static final long serialVersionUID = -6148857447543915255L;
 
     protected LocatorDefImpl(Builder builder) {
         super(builder);
         this.target = builder.target;
+        this.alias = builder.alias;
         this.locatorContextDefs = AuraUtil.immutableMap(builder.locatorContextDefs);
     }
 
@@ -66,6 +68,10 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
             json.writeMapEntry("context", locatorContextDefs);
         }
         
+        if (this.alias != null) {
+            json.writeMapEntry("alias", this.alias);
+        }
+        
         json.writeMapEnd();
     }
 
@@ -83,11 +89,17 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
     public String getDescription() {
         return description;
     }
+    
+    @Override
+    public String getAlias() {
+        return this.alias;
+    }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<LocatorDef> {
 
         private String target;
         private Map<String, Object> locatorContextDefs;
+		private String alias = null;
 
         public Builder() {
             super(LocatorDef.class);
@@ -109,6 +121,10 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
             }
             locatorContextDefs.put(locatorContext.getKey(), locatorContext.getValue());
             return this;
+        }
+
+        public void setAlias(String alias) {
+            this.alias = alias;
         }
 
     }

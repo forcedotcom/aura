@@ -119,7 +119,8 @@
                 $A.test.addWaitForWithFailureMessage(
                     newIconText,
                     function() {
-                        return $A.test.select(self.SELECTOR.tabitem_icon)[0].innerText;
+                        var icon = $A.test.select(self.SELECTOR.tabitem_icon)[0];
+                        return $A.test.getText(icon);
                     },
                     "Icon should be " + newIconText
                 );
@@ -136,7 +137,8 @@
                     $A.test.addWaitForWithFailureMessage(
                         newBodyText,
                         function() {
-                            return $A.test.select(self.SELECTOR.tabbody)[0].innerText;
+                            var tabbody = $A.test.select(self.SELECTOR.tabbody)[0]; 
+                            return $A.test.getText(tabbody);
                         },
                         "Body should be " + newBodyText
                     );

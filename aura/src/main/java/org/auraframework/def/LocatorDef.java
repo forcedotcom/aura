@@ -26,6 +26,8 @@ public interface LocatorDef extends Definition, ParentedDef {
     public String getDescription();
 
     public String getTarget();
+    
+    public String getAlias();
 
     public Map<String, Object> getLocatorContextMap();
 }

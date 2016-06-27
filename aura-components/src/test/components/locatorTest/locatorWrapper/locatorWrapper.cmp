@@ -20,6 +20,11 @@
     <aura:attribute name="wrapperText" default="Inner Text Set from locatorWrapper" type="String"/>
     <aura:attribute name="parentKeyAppend" default=" abc" type="String"/>
     
+    <aura:locator 
+            target="locatorWrapperIdWithDefActual" 
+            alias="locatorWrapperIdWithDefAlias" 
+            description="Locator defined on wrapper"/>
+    
     <aura:locator target="locatorWrapperIdWithDef" description="Locator defined on wrapper">
         <aura:locatorContext key="parentKey" value="{!v.wrapperText}"/>
     </aura:locator>
@@ -36,4 +41,8 @@
         <locatorTest:innerWithLocator aura:id="locatorWrapperIdWithDef" innerTextValue="{!v.wrapperText + ' | Parent has auraid with locator def'}"/>
     </div>
 
+    <div class="locatorWrapperIdWithDefAlias">
+        <locatorTest:innerWithLocator aura:id="locatorWrapperIdWithDefActual" innerTextValue="{!v.wrapperText + ' | Parent has auraid with locator def Aliased'}"/>
+    </div>
+    
 </aura:component>

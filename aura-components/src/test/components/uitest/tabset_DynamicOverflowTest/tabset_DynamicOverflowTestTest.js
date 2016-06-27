@@ -26,7 +26,6 @@
  	 * Test tabs show up in overflow.
  	 */
  	testTabsInOverflow : {
- 		browsers : ["-IPHONE", "-IPAD"],
  		attributes : {"numTabs" : 10, "headerWidth" : 200},
  		test: [function(cmp) {
  			this.pressCreateTabsForAutomation(cmp);
@@ -43,7 +42,6 @@
   	 * Test select a tab that is in the overflow
   	 */
   	testSelectTabInOverflow : {
-  		browsers : ["-IPHONE", "-IPAD"],
   		test: [function(cmp) {
  			this.pressCreateTabsForAutomation(cmp);
  			this.waitForTabsetPresent(cmp, "testTabContainerForAutomation");
@@ -72,7 +70,6 @@
      * Test single tab visible with rest in overflow
      */
     testSingleTabVislbe : {
-    	browsers : ["-IPHONE", "-IPAD"],
     	test: [function(cmp) {
  			this.pressCreateMultipleTabs(cmp);
  			this.waitForTabsetPresent(cmp, "testTabContainerFixed");

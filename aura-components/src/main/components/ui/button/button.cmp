@@ -65,9 +65,7 @@
         onblur="{!c.blur}"
     -->
 
-    <aura:locator target="button" description="A Button">
-        <aura:locatorContext key="label" value="{!v.label}"/>
-    </aura:locator>
+    <aura:locator target="button" description="Simple UI button"/>
     
     <button type="{!v.buttonType}"
             aura:id="button"             

@@ -2214,6 +2214,28 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     return true;
 };
 
+/**
+ * Send beacon
+ * @export
+ */
+AuraClientService.prototype.sendBeacon = function(action) {
+    if (window.navigator && window.navigator["sendBeacon"]) {
+        try {
+            var params = {
+                "message"      : $A.util.json.encode({ "actions" : [action] }),
+                "aura.context" : $A.getContext().encodeForServer(true),
+                "aura.token"   : this._token
+            };
+
+            window.navigator["sendBeacon"](this._host + "/analytics", this.buildParams(params));
+
+        } catch (e) {
+            $A.warning('Unable to parse action payload');
+        }
+    } else {
+        $A.enqueueAction(action);
+    }
+};
 
 /**
  * Sets a timeout for use by the XHR timeout mechanism. Hook for testing.

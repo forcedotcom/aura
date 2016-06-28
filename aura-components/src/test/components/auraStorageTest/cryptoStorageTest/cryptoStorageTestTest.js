@@ -223,6 +223,47 @@
         }]
     },
 
+    testClearThenKeyChangeAndReload: {
+        test: [
+               function loadComponentInIframe(cmp) {
+                   cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true&value=expected_value",
+                           "iframeContainer", "first load");
+               },
+               function setKey(cmp) {
+                   var iframeCmp = cmp._iframeLib.getIframeRootCmp();
+                   iframeCmp.setEncryptionKey(new Array(32).join("1"));
+               },
+               function clearStorage(cmp) {
+                   var iframeCmp = cmp._iframeLib.getIframeRootCmp();
+                   iframeCmp.resetStorage();
+                   cmp._iframeLib.waitForStatus("Resetting", "Done Resetting");
+               },
+               function addItemToStorage(cmp) {
+                   cmp._iframeLib.getIframeRootCmp().addToStorage();
+                   cmp._iframeLib.waitForStatus("Adding", "Done Adding");
+               },
+               function reloadIframe(cmp) {
+                   cmp._iframeLib.reloadIframe(cmp, false, "first reload");
+               },
+               function setKey(cmp) {
+                   var iframeCmp = cmp._iframeLib.getIframeRootCmp();
+                   iframeCmp.setEncryptionKey(new Array(32).join("2"));
+               },
+               function getItemFromStorage(cmp) {
+                   var iframeCmp = cmp._iframeLib.getIframeRootCmp();
+                   iframeCmp.getFromStorage();
+                   $A.test.addWaitFor(true, function() {
+                       return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
+                   }, function() {
+                       var actual = $A.util.getText(iframeCmp.find("output").getElement());
+                       $A.test.assertEquals("undefined", actual, "Got unexpected item from storage after page reload");
+                   });
+               },
+               function removeStorage(cmp) {
+                   cmp._iframeLib.getIframeRootCmp().deleteStorage();
+               }]
+    },
+
     testBulkGetInnerItemNotInStorage: {
         test: function(cmp) {
             cmp._storageLib.testBulkGetInnerItemNotInStorage(cmp, this.storage);

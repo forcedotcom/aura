@@ -473,9 +473,14 @@ function storageTest () {
             var failTest = function(error) { completed=true; logAndFailTest(cmp, error); };
             var completed = false;
 
-            storage.set("key1" , new Array(1024).join("x"))
+            var value = new Array(1024).join("x");
+            storage.set("key1" , value)
                 .then(function() {
                     append(cmp, "added item");
+                    return storage.get("key1");
+                })
+                .then(function(v) {
+                    $A.test.assertEquals(value, v, "testClear: value set after clear was not retrievable");
                     return storage.getSize();
                 })
                 .then(function(size) {

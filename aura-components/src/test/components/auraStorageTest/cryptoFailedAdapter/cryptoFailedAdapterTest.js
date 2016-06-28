@@ -61,6 +61,7 @@
         // Override IndexedDB adapter at the StorageService layer so CryptoAdapter uses our test mock storage instead
         // of the real IndexedDBAdapter.
         $A.storageService.getAdapterConfig("indexeddb").adapterClass = MockStorageAdapter;
+        $A.storageService.getAdapterConfig("memory").adapterClass = MockStorageAdapter;
 
         $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this);
         this.storage = $A.storageService.initStorage({

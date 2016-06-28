@@ -23,36 +23,6 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
             },
             IndexedDBAdapter: function(){}
     };
-    // NOTE: this mock does not currently support chained reject handlers.
-    var mockPromise=Mocks.GetMock(Object.Global(), "Promise", function(handler){
-        var _result=null;
-        var _resolved=false;
-        var _rejected=false;
-        var _thens=[];
-        this.then=function(callback){
-            _thens.push(callback);
-            if(_resolved){
-                callThens();
-            }
-            return this;
-        }
-        handler(
-            function(result){
-                _resolved=true;
-                _result=result;
-                callThens();
-            },
-            function(){
-                _rejected=true;
-            }
-        );
-
-        function callThens(){
-            while(_thens.length){
-                _thens.shift()(_result);
-            }
-        }
-    });
 
     Mocks.GetMocks(Object.Global(), {
         "window": {},
@@ -60,20 +30,65 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
         "CryptoAdapter": {},
         "AuraStorageService": function(){}
     })(function(){
-        mockPromise(function(){
-            Import("aura-impl/src/main/resources/aura/storage/adapters/CryptoAdapter.js");
-        });
+        Import("aura-impl/src/main/resources/aura/storage/adapters/CryptoAdapter.js");
     });
 
+    // required for non-prototypal functions on CryptoAdapter
     var mockCrypto = Mocks.GetMocks(Object.Global(), {
         CryptoAdapter: Aura.Storage.CryptoAdapter
     });
+
+    // promise mocks
+    var ResolvePromise = function ResolvePromise(value) {
+        return {
+            then: function(resolve, reject) {
+                if(!resolve) {
+                    return ResolvePromise(value);
+                }
+
+                try {
+                    var newValue = resolve(value);
+                    while (newValue && newValue["then"]) {
+                        newValue.then(function(v) {
+                            newValue = v;
+                        });
+                    }
+                    return ResolvePromise(newValue);
+                } catch (e) {
+                    return RejectPromise(e);
+                }
+            }
+        };
+    };
+
+    var RejectPromise = function RejectPromise(error) {
+        return {
+            then: function(resolve, reject) {
+                if(!reject) {
+                    return RejectPromise(error);
+                }
+
+                try {
+                    var value = reject(error);
+                    while (value && value["then"]) {
+                        value.then(function(v) {
+                            value = v;
+                        });
+                    }
+                    return ResolvePromise(value);
+                } catch (newError) {
+                    return RejectPromise(newError);
+                }
+            }
+        };
+    };
+
 
     [Fixture]
     function setKey(){
 
         [Fact]
-        function RejectWithErrorForInvalidKey(){
+        function RejectsWithErrorForInvalidKey(){
             var expected = "CryptoAdapter cannot import key of wrong type (undefined), rejecting"
             var actual;
             var mockA = Mocks.GetMock(Object.Global(), "$A", {
@@ -93,6 +108,7 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
             Assert.Equal(expected, actual.toString());
         }
     }
+
 
     [Fixture]
     function register(){
@@ -146,7 +162,6 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
             mockCrypto(function() {
                 mockA(function() {
                     mockIndexedDb(function() {
-                        System.Environment.Write(Aura.Storage.IndexedDBAdapter.NAME);
                         Aura.Storage.CryptoAdapter.register();
                     });
                 });
@@ -328,4 +343,373 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
             Assert.False(actual);
         }
     }
+
+
+    [Fixture]
+    function getItemsInternal() {
+        var AdapterClass = function() {
+        }
+        var mocks = Mocks.GetMocks(Object.Global(), {
+            $A: {
+                storageService: {
+                    "getAdapterConfig": function() {
+                        return {
+                            adapterClass: AdapterClass
+                        };
+                    }
+                },
+                warning: function(){},
+                util: {
+                    isUndefinedOrNull: function(obj) {
+                        return obj === undefined || obj === null;
+                    }
+                }
+            },
+            Aura: {
+                Storage: {
+                    IndexedDBAdapter: {
+                        NAME: "indexeddb"
+                    }
+                }
+            },
+            window: {
+                TextEncoder: function(){},
+                TextDecoder: function(){}
+            }
+        });
+
+        [Fact]
+        function IncludesInternalKeysWhenRequested(){
+            var actual;
+            AdapterClass.prototype.getItems = function(keys) {
+                // crux of the test: return CryptoAdapter.SENTINEL
+                return ResolvePromise({"cryptoadapter": "anything", "noncryptoadapter":"anything else"});
+            };
+
+            mockCrypto(function() {
+                mocks(function() {
+                    // mock the global Promise to be synchronous
+                    Promise.all = function() {
+                        return ResolvePromise();
+                    };
+
+                    // simplify the adapter init cycle
+                    Aura.Storage.CryptoAdapter.prototype.initialize = function() {
+                        return ResolvePromise();
+                    };
+
+                    var adapter = new Aura.Storage.CryptoAdapter({});
+                    adapter.decrypt = function(key, value) {
+                        return ResolvePromise(value);
+                    };
+
+                    adapter.getItemsInternal(
+                        [],
+                        function resolve(values) {
+                            actual = values;
+                        },
+                        function reject() {},
+                        true // includeInternalKeys
+                    );
+                });
+            });
+
+            Assert.Equal(2, Object.keys(actual).length);
+        }
+
+        [Fact]
+        function ExcludesInternalKeysWhenRequested(){
+            var actual;
+            AdapterClass.prototype.getItems = function(keys) {
+                // crux of the test: return CryptoAdapter.SENTINEL
+                return ResolvePromise({"cryptoadapter": "anything", "noncryptoadapter":"anything else"});
+            };
+
+            mockCrypto(function() {
+                mocks(function() {
+                    // mock the global Promise to be synchronous
+                    Promise.all = function() {
+                        return ResolvePromise();
+                    };
+
+                    // simplify the adapter init cycle
+                    Aura.Storage.CryptoAdapter.prototype.initialize = function() {
+                        return ResolvePromise();
+                    };
+
+                    var adapter = new Aura.Storage.CryptoAdapter({});
+                    adapter.decrypt = function(key, value) {
+                        return ResolvePromise(value);
+                    };
+
+                    adapter.getItemsInternal(
+                        [],
+                        function resolve(values) {
+                            actual = values;
+                        },
+                        function reject() {},
+                        false // includeInternalKeys
+                    );
+                });
+            });
+
+            Assert.Equal(1, Object.keys(actual).length);
+        }
+    }
+
+
+    [Fixture]
+    function clear() {
+        var AdapterClass = function() {
+        }
+        var mocks = Mocks.GetMocks(Object.Global(), {
+            $A: {
+                storageService: {
+                    "getAdapterConfig": function() {
+                        return {
+                            adapterClass: AdapterClass
+                        };
+                    }
+                }
+            },
+            Aura: {
+                Storage: {
+                    IndexedDBAdapter: {
+                        NAME: "indexeddb"
+                    }
+                }
+            },
+            window: {
+                TextEncoder: function(){},
+                TextDecoder: function(){}
+            }
+        });
+
+        [Fact]
+        function SetsSentinelAfterAdapterClearResolves(){
+            var actual = false;
+            AdapterClass.prototype.clear = function() {
+                return ResolvePromise();
+            };
+
+            mockCrypto(function() {
+                mocks(function() {
+                    // simplify the adapter init cycle
+                    Aura.Storage.CryptoAdapter.prototype.initialize = function() {
+                        return ResolvePromise();
+                    }
+
+                    var adapter = new Aura.Storage.CryptoAdapter({});
+                    adapter.setSentinelItem = function() {
+                        actual = true;
+                    };
+
+                    adapter.clear();
+                });
+            });
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function DoesNotSetSentinelAfterAdapterClearRejects(){
+            var actual = false;
+            AdapterClass.prototype.clear = function() {
+                return RejectPromise();
+            };
+
+            mockCrypto(function() {
+                mocks(function() {
+                    // simplify the adapter init cycle
+                    Aura.Storage.CryptoAdapter.prototype.initialize = function() {
+                        return ResolvePromise();
+                    }
+
+                    var adapter = new Aura.Storage.CryptoAdapter({});
+                    adapter.setSentinelItem = function() {
+                        actual = true;
+                    };
+
+                    adapter.clear();
+                });
+            });
+
+            Assert.False(actual);
+        }
+    }
+
+
+    [Fixture]
+    function sweep() {
+        var AdapterClass = function() {
+        }
+        var mocks = Mocks.GetMocks(Object.Global(), {
+            $A: {
+                storageService: {
+                    "getAdapterConfig": function() {
+                        return {
+                            adapterClass: AdapterClass
+                        };
+                    }
+                }
+            },
+            Aura: {
+                Storage: {
+                    IndexedDBAdapter: {
+                        NAME: "indexeddb"
+                    }
+                }
+            },
+            window: {
+                TextEncoder: function(){},
+                TextDecoder: function(){}
+            }
+        });
+
+
+        [Fact]
+        function SetsSentinelAfterAdapterSweepResolves(){
+            var actual = false;
+            AdapterClass.prototype.sweep = function() {
+                return ResolvePromise();
+            };
+
+            mockCrypto(function() {
+                mocks(function() {
+                    // simplify the adapter init cycle
+                    Aura.Storage.CryptoAdapter.prototype.initialize = function() {
+                        return ResolvePromise();
+                    }
+
+                    var adapter = new Aura.Storage.CryptoAdapter({});
+                    adapter.setSentinelItem = function() {
+                        actual = true;
+                    };
+
+                    adapter.sweep();
+                });
+            });
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function DoesNotSetSentinelAfterAdapterSweepRejects(){
+            var actual = false;
+            AdapterClass.prototype.sweep = function() {
+                return RejectPromise();
+            };
+
+            mockCrypto(function() {
+                mocks(function() {
+                    // simplify the adapter init cycle
+                    Aura.Storage.CryptoAdapter.prototype.initialize = function() {
+                        return ResolvePromise();
+                    }
+
+                    var adapter = new Aura.Storage.CryptoAdapter({});
+                    adapter.setSentinelItem = function() {
+                        actual = true;
+                    };
+
+                    adapter.sweep();
+                });
+            });
+
+            Assert.False(actual);
+        }
+    }
+
+
+    [Fixture]
+    function setSentinelItem() {
+        var mocks = Mocks.GetMocks(Object.Global(), {
+            $A: {
+                storageService: {
+                    "getAdapterConfig": function() {
+                        return {
+                            adapterClass: function(){}
+                        };
+                    }
+                }
+            },
+            Aura: {
+                Storage: {
+                    IndexedDBAdapter: {
+                        NAME: "indexeddb"
+                    }
+                }
+            },
+            window: {
+                TextEncoder: function(){},
+                TextDecoder: function(){}
+            }
+        });
+
+
+        [Fact]
+        function ValueContainsValue() {
+            var actual = false;
+            mockCrypto(function() {
+                mocks(function() {
+                    // simplify the adapter init cycle
+                    Aura.Storage.CryptoAdapter.prototype.initialize = function() {
+                        return ResolvePromise();
+                    }
+
+                    var adapter = new Aura.Storage.CryptoAdapter({});
+                    adapter.setItemsInternal = function(tuples, resolve, reject) {
+                        actual = tuples[0][1];
+                    };
+
+                    adapter.setSentinelItem();
+                });
+            });
+
+            Assert.True(!!actual["value"]);
+        }
+
+        [Fact]
+        function ValueContainsCreated() {
+            var actual = false;
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.prototype.initialize = function() {
+                        return ResolvePromise();
+                    }
+
+                    var adapter = new Aura.Storage.CryptoAdapter({});
+                    adapter.setItemsInternal = function(tuples, resolve, reject) {
+                        actual = tuples[0][1];
+                    };
+
+                    adapter.setSentinelItem();
+                });
+            });
+
+            Assert.True(!!actual["created"]);
+        }
+
+        [Fact]
+        function ValueContainsExpires() {
+            var actual = false;
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.prototype.initialize = function() {
+                        return ResolvePromise();
+                    }
+
+                    var adapter = new Aura.Storage.CryptoAdapter({});
+                    adapter.setItemsInternal = function(tuples, resolve, reject) {
+                        actual = tuples[0][1];
+                    };
+
+                    adapter.setSentinelItem();
+                });
+            });
+
+            Assert.True(!!actual["expires"]);
+        }
+    }
+
 }

@@ -75,14 +75,5 @@
             $A.test.assertEquals(3, Object.keys(storages).length, "Wrong number of stores");
             $A.test.assertTruthy(storages["actions"], "getStorage() should not be impacted by modifications to its return value");
         }
-    },
-
-    testGetStoragesUpdated : {
-        test: function (cmp) {
-            $A.storageService.initStorage({name: "imperative"});
-            var storages = $A.storageService.getStorages();
-            $A.test.assertEquals(4, Object.keys(storages).length, "Storage created with imperative API not returned");
-            $A.test.assertTruthy(storages["imperative"], "Storage created with imperative API not returned");
-        }
     }
 })

@@ -291,8 +291,8 @@
             that.storage.set("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(50, size*1024); })
-            .then( function() { completed = true; })
-            ["catch"](function(error) { $A.test.fail(error.toString()); });
+                .then( function() { completed = true; })
+                ["catch"](function(error) { $A.test.fail(error.toString()); });
 
             $A.test.addWaitFor(true, function() { return completed; });
         }

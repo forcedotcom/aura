@@ -122,7 +122,9 @@ public final class LocalizationServiceTestData {
     };
     public static final String[] FAIL_INT_STRINGS = { "#FFAA33", // # value
             "a", // alphabet
-            "'", "\0" };
+            "'", "\0",
+            "987654321987654321" //overflow
+            };
 
     /**
      * Test data for Long
@@ -132,7 +134,8 @@ public final class LocalizationServiceTestData {
             "123f", // float value
             "10d" // double value
     };
-    public static final String[] FAIL_LONG_STRINGS = { "L" // alphabet
+    public static final String[] FAIL_LONG_STRINGS = { "L", // alphabet,
+    		"987654321987654321987654321987654321987654321987654321" //overflow
     };
 
     /**

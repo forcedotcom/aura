@@ -175,24 +175,6 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * GET app cache manifest without a supported user agent returns 404.
-     */
-    @Test
-    public void testGetManifestWithUnsupportedUserAgent() throws Exception {
-        setHttpUserAgent(APPCACHE_UNSUPPORTED_USERAGENT);
-        String manifest = getManifestURL("/appCache/withpreload.app", false);
-
-        HttpGet get = obtainGetMethod(manifest);
-        HttpResponse httpResponse = perform(get);
-        String response = getResponseBody(httpResponse);
-        get.releaseConnection();
-
-        if (!response.isEmpty()) {
-            fail("manifest should be empty: *" + manifest);
-        }
-    }
-
-    /**
      * No manifest url is given when app cache is disabled via config.
      */
     @ThreadHostileTest("disables AppCache")

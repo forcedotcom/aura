@@ -78,11 +78,6 @@ public class ManifestUtil {
      * Check to see if we allow appcache on the current request.
      */
     public boolean isManifestEnabled(HttpServletRequest request) {
-    	final String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
-        if (userAgent != null && !userAgent.toLowerCase().contains("applewebkit")) {
-            return false;
-        }
-
         return isManifestEnabled();
     }
 

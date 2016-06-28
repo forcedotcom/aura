@@ -41,6 +41,9 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this.rowElements = newRowElements;
 
             if (newRowElements.length > 0) {
+            	//set currentRowIndex to minimized value of original currentRowIndex and newRowElements.length - 1
+            	//to avoid array out of Bounds issue
+            	this.currentRowIndex = Math.min(this.currentRowIndex, newRowElements.length - 1);
                 this._targetColumnIndex = this._findTargetColumnIndex(0);
                 var inputElement = this._getInputElement(this.currentRowIndex, this._targetColumnIndex);
                 inputElement.setAttribute("tabindex", "0");

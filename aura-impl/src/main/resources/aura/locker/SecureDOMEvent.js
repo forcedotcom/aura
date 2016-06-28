@@ -47,7 +47,7 @@ function SecureDOMEvent(event, key) {
             }
         }
     };
-    
+
     // non-standard properties and aliases
     ["relatedTarget", "srcElement", "explicitOriginalTarget", "originalTarget"].forEach(function(property) {
     	SecureObject.addPropertyIfSupported(o, event, property);
@@ -65,7 +65,7 @@ function SecureDOMEvent(event, key) {
 
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", event);
-    
+
     return o;
 }
 
@@ -81,7 +81,8 @@ SecureDOMEvent.filterTouchesDescriptor = function (se, event, propName) {
             if (!touches) {
                 return touches;
             }
-            return touches.map(function(touch) {
+            // touches, of type ToucheList does not implement "map"
+            return Array.prototype.map.call(touches, function(touch) {
                 // touches is normally a big big collection of touch objects,
                 // we do not want to pre-process them all, just create a the getters
                 // and process the accessor on the spot. e.g.:

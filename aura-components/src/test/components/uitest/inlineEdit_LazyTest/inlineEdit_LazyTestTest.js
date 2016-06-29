@@ -71,6 +71,49 @@
     },
     
     /**
+     * Validates the values of different output components are being set properly
+     */
+    testOutputComponents: {
+        test: [
+            function(cmp) {
+                this.changeAndVerifyColumnCount(cmp, 5);
+            }, function(cmp) {
+                var rowItem = cmp.find("grid").get("v.items")[0];
+                var actual = rowItem.data.checkbox;
+                $A.test.assertTrue(actual, "The checkbox should be checked");
+                var cell = this.getCell(0, 4);
+                var cellElm = cell.querySelector("span > img");
+                $A.test.assertTrue($A.util.hasClass(cellElm, "checked"), "The dom isn't displaying correctly");
+                cell = this.getCell(0, 3);
+                cellElm = cell.querySelector("span.uiOutputDate");
+                $A.test.assertNotNull($A.test.getText(cellElm), "The dom isn't displaying Date");
+            }, function(cmp) {
+                this.changeAndVerifyColumnCount(cmp, 9);
+            }, function(cmp) {
+                var rowItem = cmp.find("grid").get("v.items")[1];
+                var actual = rowItem.data.checkbox;
+                $A.test.assertFalse(actual, "The checkbox shouldn't be checked");
+                var cell = this.getCell(1, 4);
+                var cellElm = cell.querySelector("span > img");
+                $A.test.assertTrue($A.util.hasClass(cellElm, "unchecked"), "The dom isn't displaying correctly");
+                cell = this.getCell(2, 5);
+                cellElm = cell.querySelector("span.uiOutputTextArea");
+                $A.test.assertEquals($A.test.getText(cellElm), "special string that is long with special char!@#$%^&*()", "The dom isn't displaying output text");
+                var expectedDateText = "Jan 1, 2000";
+                cell = this.getCell(3, 6);
+                cellElm = cell.querySelector("span.uiOutputDateTime");
+                var cellText = $A.test.getText(cellElm);
+                $A.test.assertTrue((cellText.indexOf(expectedDateText) >= 0), "The dom isn't displaying dateTime");
+                cell = this.getCell(4, 7);
+                $A.test.assertEquals(cell.querySelectorAll('[href*="www.salesforce.com"]').length, 1, "There is no outputURL in the dom");
+                cell = this.getCell(1, 8);
+                cellElm = cell.querySelector("span.uiOutputPhone");
+                $A.test.assertEquals($A.test.getText(cellElm), "555-555-555" + rowItem.data.id, "The dom isn't displaying phone number");
+            }
+        ]
+    },
+    
+    /**
      * Checks that the cell's disabled state is properly applied to the button
      */
     testCellStates: {

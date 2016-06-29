@@ -549,9 +549,7 @@
     toggleListVisibility: function (component, items) {
         var showEmptyListContent = !$A.util.isEmpty(component.get("v.emptyListContent")) && !$A.util.isEmpty(component.get("v.keyword"));
         var hasVisibleOption = this.hasVisibleOption(items);
-        var hasVisibleHeader =  this.getHeader(component) && component.get("v.showListHeader");
-        var hasVisibleFooter =  this.getFooter(component) && component.get("v.showListFooter");
-        component.set("v.visible", hasVisibleOption || showEmptyListContent || hasVisibleHeader || hasVisibleFooter);
+        component.set("v.visible", hasVisibleOption || showEmptyListContent);
     },
 
     updateAriaAttributesFromIdAttribute: function (component, highlightedCmp) {

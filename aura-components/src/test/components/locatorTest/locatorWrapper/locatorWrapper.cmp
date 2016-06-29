@@ -19,6 +19,7 @@
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:attribute name="wrapperText" default="Inner Text Set from locatorWrapper" type="String"/>
     <aura:attribute name="parentKeyAppend" default=" abc" type="String"/>
+    <aura:attribute name="alwaysTrue" type="Boolean" default="true"/>
     
     <aura:locator 
             target="locatorWrapperIdWithDefActual" 
@@ -42,7 +43,9 @@
     </div>
 
     <div class="locatorWrapperIdWithDefAlias">
-        <locatorTest:innerWithLocator aura:id="locatorWrapperIdWithDefActual" innerTextValue="{!v.wrapperText + ' | Parent has auraid with locator def Aliased'}"/>
+        <aura:if isTrue="{!v.alwaysTrue}">
+            <locatorTest:innerWithLocator aura:id="locatorWrapperIdWithDefActual" innerTextValue="{!v.wrapperText + ' | Parent has aura:if and auraid with locator def Aliased'}"/>
+        </aura:if>
     </div>
     
 </aura:component>

@@ -32,7 +32,8 @@
 		<ui:inlineEditGrid
 		    aura:id="grid"        
 		    class="inline-edit-grid"
-		    itemVar="row"         
+		    itemVar="row"
+		    dataVar="myData"         
 		    items="{!v.items}"
 		    rowHeaderIndex="1"    
 		    delegatedEvents="click,keydown,mouseover"
@@ -52,31 +53,31 @@
 			
 			<aura:set attribute="columns">
 				<ui:inlineEditCell name="id" edited="{!row.status.id}">
-					<ui:outputText value="{!row.data.id}"/>
+					<ui:outputText value="{!row.myData.id}"/>
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="name" edited="{!row.status.name}">
-					<ui:outputText value="{!row.data.name}"/>
+					<ui:outputText value="{!row.myData.name}"/>
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="grade" edited="{!row.status.grade}">
-					<ui:outputText value="{!row.data.grade}"/>
+					<ui:outputText value="{!row.myData.grade}"/>
 				</ui:inlineEditCell>
 				    <ui:inlineEditCell name="linkLabel" edited="{!row.status.linkLabel}" valueAttribute="label">
-				        <ui:outputURL value="http://www.google.com" label="{!row.data.linkLabel}" />
+				        <ui:outputURL value="http://www.google.com" label="{!row.myData.linkLabel}" />
 				    </ui:inlineEditCell>
 				<ui:inlineEditCell name="issueDate" edited="{!row.status.issueDate}">
-					<ui:outputText value="{!row.data.issueDate}"/>
+					<ui:outputText value="{!row.myData.issueDate}"/>
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="passing" edited="{!row.status.passing}">
-					<ui:outputCheckbox value="{!row.data.passing}"/>
+					<ui:outputCheckbox value="{!row.myData.passing}"/>
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="notes" edited="{!row.status.notes}">
-					<ui:outputText value="{!row.data.notes}"/>
+					<ui:outputText value="{!row.myData.notes}"/>
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="modDateTime" edited="{!row.status.modDateTime}">
 					<ui:outputText value="{!row.status.modDateTime}"/>
 				</ui:inlineEditCell>
                 <ui:inlineEditCell name="bloodtype">
-                    <ui:outputText value="{!row.data.bloodtype}"/>
+                    <ui:outputText value="{!row.myData.bloodtype}"/>
                 </ui:inlineEditCell>
 			</aura:set>
 		</ui:inlineEditGrid>

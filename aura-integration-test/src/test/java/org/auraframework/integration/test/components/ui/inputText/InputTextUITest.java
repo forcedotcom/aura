@@ -258,7 +258,7 @@ public class InputTextUITest extends WebDriverTestCase {
         WebElement input = findDomElement(By.cssSelector("input.uiInputText.uiInput"));
         input.click();
         input.sendKeys("1234567890");
-        assertEquals("Text not truncated to 5 chars correctly", "12345", input.getAttribute("value"));
+        waitForInputValue(input, "12345", "Text not truncated to 5 chars correctly");
     }
 
     @Test
@@ -268,7 +268,7 @@ public class InputTextUITest extends WebDriverTestCase {
         input.click();
         String inputText = "1234567890";
         input.sendKeys(inputText);
-        assertEquals("Expected untruncated text", inputText, input.getAttribute("value"));
+        waitForInputValue(input, inputText, "Expected untruncated text");
     }
 
     private String assertModelValue(final String expectedValue) {
@@ -395,5 +395,14 @@ public class InputTextUITest extends WebDriverTestCase {
         outputDiv.click(); // to simulate tab behavior for touch browsers
         assertModelValue("empty"); // value should have been updated
         assertDomEventSet();
+    }
+
+    private void waitForInputValue(final WebElement inputElm, final String expValue, final String errorMsg) {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return expValue.equals(inputElm.getAttribute("value"));
+            }
+        }, errorMsg);
     }
 }

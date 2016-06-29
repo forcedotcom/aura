@@ -618,53 +618,60 @@ public class LocalizationServiceImpl implements LocalizationService {
         return parseDouble(number, null);
     }
 
-    @Override
-    public int parseInt(String number, Locale locale) throws ParseException {
-        if (number == null) {
-            throw new ParseException("Parameter 'number' was null", 0);
-        }
-        if (locale == null) {
-            locale = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
-        }
-        NumberFormat nf = NumberFormat.getInstance(locale);
-        return AuraNumberFormat.parseStrict(number, nf).intValue();
-    }
+	@Override
+	public int parseInt(String number, Locale locale) throws ParseException {
+		Number parsedNumber = parseNumber(number, locale);
+		double value = parsedNumber.doubleValue();
+		if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE) {
+			return parsedNumber.intValue();
+		}
+		throw new ParseException("Unparseable number: \"" + number + "\"", 0);
+	}
 
-    @Override
-    public long parseLong(String number, Locale locale) throws ParseException {
-        if (number == null) {
-            throw new ParseException("Parameter 'number' was null", 0);
-        }
-        if (locale == null) {
-            locale = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
-        }
-        NumberFormat nf = NumberFormat.getInstance(locale);
-        return AuraNumberFormat.parseStrict(number, nf).longValue();
-    }
+	@Override
+	public long parseLong(String number, Locale locale) throws ParseException {
+		Number parsedNumber = parseNumber(number, locale);
+		double value = parsedNumber.doubleValue();
+		if (value >= Long.MIN_VALUE && value <= Long.MAX_VALUE) {
+			return parsedNumber.longValue();
+		}
+		throw new ParseException("Unparseable number: \"" + number + "\"", 0);
+	}
 
-    @Override
-    public float parseFloat(String number, Locale locale) throws ParseException {
-        if (number == null) {
-            throw new ParseException("Parameter 'number' was null", 0);
-        }
-        if (locale == null) {
-            locale = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
-        }
-        NumberFormat nf = NumberFormat.getInstance(locale);
-        return AuraNumberFormat.parseStrict(number, nf).floatValue();
-    }
+	@Override
+	public float parseFloat(String number, Locale locale) throws ParseException {
+		Number parsedNumber = parseNumber(number, locale);
+		double value = parsedNumber.doubleValue();
+		if (value >= Float.MIN_VALUE && value <= Float.MAX_VALUE) {
+			return parsedNumber.floatValue();
+		}
+		throw new ParseException("Unparseable number: \"" + number + "\"", 0);
+	}
 
-    @Override
-    public double parseDouble(String number, Locale locale) throws ParseException {
-        if (number == null) {
-            throw new ParseException("Parameter 'number' was null", 0);
-        }
-        if (locale == null) {
-            locale = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
-        }
-        NumberFormat nf = NumberFormat.getInstance(locale);
-        return AuraNumberFormat.parseStrict(number, nf).doubleValue();
-    }
+	@Override
+	public double parseDouble(String number, Locale locale) throws ParseException {
+		return parseNumber(number, locale).doubleValue();
+	}
+
+	/*
+	 * Parses the given number.
+	 * 
+	 * @param number string representation of the number
+	 * 
+	 * @locale locate to be used
+	 * 
+	 * @return a Number
+	 */
+	private Number parseNumber(String number, Locale locale) throws ParseException {
+		if (number == null) {
+			throw new ParseException("Parameter 'number' was null", 0);
+		}
+		if (locale == null) {
+			locale = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
+		}
+		NumberFormat nf = NumberFormat.getInstance(locale);
+		return AuraNumberFormat.parseStrict(number, nf);
+	}
 
     @Override
     public double parsePercent(String percent) throws ParseException {

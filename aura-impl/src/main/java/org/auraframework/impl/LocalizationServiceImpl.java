@@ -650,7 +650,12 @@ public class LocalizationServiceImpl implements LocalizationService {
 
 	@Override
 	public double parseDouble(String number, Locale locale) throws ParseException {
-		return parseNumber(number, locale).doubleValue();
+		Number parsedNumber = parseNumber(number, locale);
+		double value = parsedNumber.doubleValue();
+		if (value >= Double.MIN_VALUE && value <= Double.MAX_VALUE) {
+			return value;
+		}
+		throw new ParseException("Unparseable number: \"" + number + "\"", 0);
 	}
 
 	/*

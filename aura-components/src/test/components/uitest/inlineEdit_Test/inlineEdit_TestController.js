@@ -20,7 +20,7 @@
 		
 		for (var i = 0; i < 10; i++) {
 			items.push({
-				data : {
+				myData : {
 					id : i,
 					name : "Name" + i,
 					grade : i,
@@ -32,9 +32,9 @@
 			});
 		}
 		// empty row
-		items[5].data.name = '';
-		items[5].data.grade = '';
-		items[5].data.linkLabel = '';
+		items[5].myData.name = '';
+		items[5].myData.grade = '';
+		items[5].myData.linkLabel = '';
 		
 		cmp.set("v.items", items);
 		
@@ -48,7 +48,7 @@
 		var i = Math.floor(Math.random() * 100);
 		cmp.find("grid").appendItems([
 		    {
-		    	data : {
+		    	myData : {
 		    		id : i,
 		    		name : "Name" + i,
 		    		grade : i,
@@ -65,7 +65,7 @@
 	    index = index ? index : cmp.find('inputTxt').get('v.value');
 	    
 	    var item = {
-	            data : {
+	            myData : {
 	                id : 999,
 	                name : 'updated at ' + index,
 	                grade : 999,

@@ -231,7 +231,7 @@
                },
                function setKey(cmp) {
                    var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-                   iframeCmp.setEncryptionKey(new Array(32).join("1"));
+                   iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
                },
                function clearStorage(cmp) {
                    var iframeCmp = cmp._iframeLib.getIframeRootCmp();
@@ -247,7 +247,7 @@
                },
                function setKey(cmp) {
                    var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-                   iframeCmp.setEncryptionKey(new Array(32).join("2"));
+                   iframeCmp.helper.setEncryptionKey(new Array(32).join("2"));
                },
                function getItemFromStorage(cmp) {
                    var iframeCmp = cmp._iframeLib.getIframeRootCmp();
@@ -389,7 +389,7 @@
         },
         function resetDatabase(cmp) {
             var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-            iframeCmp.setEncryptionKey(new Array(32).join("1"));
+            iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
             iframeCmp.resetStorage();
             cmp._iframeLib.waitForStatus("Resetting", "Done Resetting");
         },
@@ -403,7 +403,7 @@
         function getItemFromDatabase(cmp) {
             var iframeCmp = cmp._iframeLib.getIframeRootCmp();
             // same encryption key
-            iframeCmp.setEncryptionKey(new Array(32).join("1"));
+            iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
             iframeCmp.getFromStorage();
             $A.test.addWaitFor(true, function() {
                 return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
@@ -429,7 +429,7 @@
             },
             function resetDatabase(cmp) {
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-                iframeCmp.setEncryptionKey(new Array(32).join("1"));
+                iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
                 iframeCmp.resetStorage();
                 cmp._iframeLib.waitForStatus("Resetting", "Done Resetting");;
             },
@@ -443,7 +443,7 @@
             function verifyNoItemWithDifferentKey(cmp) {
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
                 // Provide different key
-                iframeCmp.setEncryptionKey(new Array(32).join("Z"));
+                iframeCmp.helper.setEncryptionKey(new Array(32).join("Z"));
                 iframeCmp.getFromStorage();
                 $A.test.addWaitFor(true, function() {
                     return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
@@ -455,6 +455,61 @@
             function cleanupDatabase(cmp) {
                 cmp._iframeLib.getIframeRootCmp().deleteStorage();
             }]
+    },
+
+    /**
+     * Verify getAll() returns decryptable items from storage and doesn't reject entire request
+     * if decrpt fails.
+     */
+    testGetAllReturnsDecryptableItems: {
+        test: [
+            function setDecryptableItem(cmp) {
+                var completed = false;
+
+                this.storage.set("key1", "decryptable")
+                    .then(
+                        function() {completed = true},
+                        function(e) {$A.test.fail(e.toString())}
+                    );
+
+                $A.test.addWaitFor(true, function() {return completed});
+            },
+            function setUndecryptableItem(cmp) {
+                var completed = false;
+                var undecryptableItem = [
+                    "key2",
+                    {
+                        expires : new Date().getTime() + 60000,
+                        value: {
+                            cipher: new ArrayBuffer(),
+                            iv: new Uint8Array()
+                        },
+                    },
+                    10];
+
+                $A.test.setItemsToCryptoAdapter(this.storage.adapter, [undecryptableItem])
+                    .then(
+                        function() {completed = true},
+                        function(e) {$A.test.fail(e.toString())}
+                    );
+
+                $A.test.addWaitFor(true, function() {return completed});
+            },
+            function verifyGetDecryptableItems(cmp) {
+                var completed = false;
+
+                this.storage.getAll().then(
+                    function(items){
+                        $A.test.assertEquals(1, Object.keys(items).length,
+                            "getAll() should return one key-value pair added with the latest secret key:" + JSON.stringify(items));
+                        $A.test.assertEquals("decryptable", items["key1"]);
+                        completed = true;
+                    })
+                    .catch(function(e){$A.test.fail(e.toString())});
+
+                $A.test.addWaitFor(true, function() {return completed});
+            }
+        ]
     },
 
     testDeleteDatabase: {

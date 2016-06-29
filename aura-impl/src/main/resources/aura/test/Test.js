@@ -2147,6 +2147,18 @@ TestInstance.prototype.storageSweep = function(storage) {
 };
 
 /**
+ * Set items to database directly through a CryptoAdapter's underlying adapter
+ * (indexedDBAdapter or memory adapter)
+ *
+ * @param {CryptoAdapter} cryptoAdapter.
+ * @param {Array} tuples An array of key-value-size pairs.
+ * @export
+ */
+TestInstance.prototype.setItemsToCryptoAdapter = function(cryptoAdapter, tuples) {
+    return cryptoAdapter.adapter.setItems(tuples);
+};
+
+/**
  * @export
  * @function Test#getCreationPath
  */

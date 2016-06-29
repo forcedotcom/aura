@@ -13,6 +13,10 @@
         });
     },
 
+    // TODO: remove the below funtions. We can directly call
+    // the functions through cmp._storage in tests.
+    // The functions are used in cryptoStorageTest
+
     resetStorage: function(cmp) {
         cmp.set("v.status", "Resetting");
         cmp._storage.clear()
@@ -21,17 +25,6 @@
             }, function(error) {
                 cmp.set("v.status", "Error during reset: " + error);
             });
-    },
-
-    setEncryptionKey: function(cmp, event, helper) {
-        var secure = cmp.get("v.secure");
-        if (secure) {
-            var encryptionKey = event.getParam("arguments")["encryptionKey"];
-            var buffer = new ArrayBuffer(32);
-            var view = new Uint8Array(buffer);
-            view.set(encryptionKey);
-            $A.storageService.CryptoAdapter.setKey(buffer);
-        }
     },
 
     getFromStorage: function(cmp) {

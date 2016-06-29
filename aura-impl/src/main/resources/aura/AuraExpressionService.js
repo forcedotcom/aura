@@ -306,17 +306,20 @@ AuraExpressionService.prototype.resolveLocatorContext = function (cmp, locatorDe
  */
 AuraExpressionService.prototype.resolveLocator = function (component, localId) {
     var ownerLocalId = component.getLocalId();
-    if (!localId || !ownerLocalId) {
-        // if the child component or it's parent don't have a localId, return undefined
+    if (!localId || 
+        !ownerLocalId ||
+        !component.find(localId) // localId isn't actually defined inside component
+        ) {
         return undefined;
     }
-    
+
+
     var locator = {
             "target" : localId,
             "scope" : ownerLocalId
     };
     
-    var ownerCmp = component.getOwner();
+    var ownerCmp = component.getComponentValueProvider();
     
     var rootLocatorDefs = component.getDef().getLocatorDefs();
     var rootLocatorDef = rootLocatorDefs && rootLocatorDefs[localId];
@@ -325,9 +328,19 @@ AuraExpressionService.prototype.resolveLocator = function (component, localId) {
     var ownerLocatorDef = ownerLocatorDefs && ownerLocatorDefs[ownerLocalId];
     
     if (!rootLocatorDefs && !ownerLocatorDefs) {
+        $A.warning("Locator Defintions aren't available for both target and scope. temporarily logging based on aura:ids");
         return locator;
     }
-    
+
+    // Deal with missing locator definitions
+    var errorString = "Didn't find matching locator definition for {0} in {1}. Temporarily falling back to aura:ids";
+    if (!rootLocatorDef) {
+        $A.warning($A.util.format(errorString, localId, component.getName()));
+    }
+    if (!ownerLocatorDef) {
+        $A.warning($A.util.format(errorString, ownerLocalId, ownerCmp.getName()));
+    }
+
     var rootContext = this.resolveLocatorContext(component, rootLocatorDef);
     var ownerContext = this.resolveLocatorContext(ownerCmp, ownerLocatorDef);
     

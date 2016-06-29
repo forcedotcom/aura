@@ -588,9 +588,10 @@ ComponentDef.prototype.getLayouts = function() {
 };
 
 /**
- * Gets the defined locators in the component definition
+ * Returns the component locator definition
  *
- * @returns Locators defined in component
+ * @returns {Object} LocatorDef Object
+ * @export
  */
 ComponentDef.prototype.getLocatorDefs = function() {
     return this.locatorDefs;

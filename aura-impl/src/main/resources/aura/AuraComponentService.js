@@ -114,6 +114,19 @@ AuraComponentService.prototype.countComponents = function() {
 };
 
 /**
+ * Calculates the locator for a given component and target localId
+ * 
+ * @param {Component} cmp The component that contains the localId
+ * @param {String} localId This localId must exist inside the component
+ * @public
+ * @export
+ */
+AuraComponentService.prototype.getComponentLocator = function(cmp, localId) {
+    $A.assert(cmp && localId, 'No component or id provided');
+    return cmp.getLocator(localId);
+};
+
+/**
  * Gets the rendering component for the provided element recursively.
  * @param {Object} element The element that is used to find the rendering component
  * @memberOf AuraComponentService

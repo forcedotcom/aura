@@ -241,11 +241,18 @@ function SecureElement(el, key) {
 		}
 	});
 
-	[ "childNodes", "children", "firstChild", "lastChild", "nodeName", "nodeType", "parentNode", "parentElement", "ownerDocument"].forEach(function(name) {
+	[ "childNodes", "children", "firstChild", "lastChild", "nodeName", "nodeType", "parentElement", "ownerDocument"].forEach(function(name) {
 		SecureObject.addPropertyIfSupported(o, el, name, {
 			filterOpaque : true
 		});
 	});
+
+    [ "parentNode" ].forEach(function(name) {
+        SecureObject.addPropertyIfSupported(o, el, name, {
+            filterOpaque : true,
+            defaultValue: null
+        });
+    });
 
 	[ "compareDocumentPosition", "getElementsByClassName", "getElementsByTagName", "getElementsByTagNameNS", "querySelectorAll",
 			"getBoundingClientRect", "getClientRects", "blur", "click", "focus",

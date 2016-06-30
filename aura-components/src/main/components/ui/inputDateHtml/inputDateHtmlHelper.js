@@ -19,14 +19,13 @@
         var inputElement = component.find("inputDateHtml").getElement();
 
         if (value && inputElement) {
-            // v.value could be in UTC format like "2015-08-10T04:00:00.000Z",
-            // we DON'T need the time portion
-            var dateValue = value.split("T", 1)[0] || value;
-            var parsedDate = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD");
-            if (parsedDate) {
+            var isoDate = $A.localizationService.parseDateTimeISO8601(value);
+            var timezone = component.get("v.timezone");
+
+            $A.localizationService.UTCToWallTime(isoDate, timezone, function(walltime) {
                 // HTML5 date input requires a full date format equal to YYYY-MM-DD.
-                inputElement.value = $A.localizationService.formatDateUTC(parsedDate, "YYYY-MM-DD");
-            }
+                inputElement.value = $A.localizationService.formatDateUTC(walltime, "YYYY-MM-DD");
+            });
         } else if ($A.util.isEmpty(value)) {
             inputElement.value = "";
         }

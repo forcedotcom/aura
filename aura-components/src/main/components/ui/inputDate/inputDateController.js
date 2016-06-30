@@ -26,15 +26,11 @@
     },
 
     doInit: function(component, event, helper) {
+        helper.setInitialValues(component);
     	// only add the placeholder when there is no date picker opener.
         if ($A.get("$Browser.formFactor") === "DESKTOP") {
             if (!component.get("v.displayDatePicker")) {
-                var concreteCmp = component.getConcreteComponent();
-                var format = concreteCmp.get("v.format");
-                if (!format) {
-                    format = $A.get("$Locale.dateFormat");
-                }
-                component.set("v.placeholder", format);
+                component.set("v.placeholder", component.get("v.format"));
             }
             if (component.get("v.useManager")) {
                 helper.checkManagerExists(component);

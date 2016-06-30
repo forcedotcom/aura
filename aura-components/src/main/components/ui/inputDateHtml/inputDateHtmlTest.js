@@ -17,24 +17,40 @@
     testInitialValue: {
         attributes : {value: "2016-01-22"},
         test: function(cmp){
-            var inputDateStr = cmp.find("inputDateHtml").getElement().value;
-            $A.test.assertEquals("2016-01-22", inputDateStr, "Dates are not the same and they should be");
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var inputDateStr = cmp.find("inputDateHtml").getElement().value;
+                return inputDateStr === "2016-01-22";
+            }, "Dates are not the same and they should be");
         }
     },
 
     testInitialValueWithoutPad: {
         attributes : {value: "2016-1-2"},
         test: function(cmp){
-            var inputDateStr = cmp.find("inputDateHtml").getElement().value;
-            $A.test.assertEquals("2016-01-02", inputDateStr, "Dates are not the same and they should be");
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var inputDateStr = cmp.find("inputDateHtml").getElement().value;
+                return inputDateStr === "2016-01-02";
+            }, "Dates are not the same and they should be");
         }
     },
 
-    testInitialValueInUTC: {
-        attributes : {value: "2016-01-22T01:00:00.000Z"},
+    testInitialValueInUTCSameDay: {
+        attributes : {value: "2016-01-22T01:00:00.000Z", timezone: 'GMT'},
         test: function(cmp){
-            var inputDateStr = cmp.find("inputDateHtml").getElement().value;
-            $A.test.assertEquals("2016-01-22", inputDateStr, "Dates are not the same and they should be");
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var inputDateStr = cmp.find("inputDateHtml").getElement().value;
+                return inputDateStr === "2016-01-22";
+            }, "Dates are not the same and they should be");
+        }
+    },
+
+    testInitialValueInUTCDifferentDay: {
+        attributes : {value: "2016-01-22T01:00:00.000Z", timezone: 'America/Toronto'},
+        test: function(cmp) {
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var inputDateStr = cmp.find("inputDateHtml").getElement().value;
+                return inputDateStr === "2016-01-21";
+            }, "Dates are not the same and they should be");
         }
     },
 

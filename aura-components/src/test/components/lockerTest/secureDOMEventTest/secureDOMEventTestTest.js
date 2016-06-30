@@ -23,17 +23,17 @@
         }
     },
 
-    testMarkupDefinedClickHandler: {
-        test: function(cmp) {
-            cmp.testMarkupDefinedClickHandler();
-        }
-    },
-    
     testInitEvent: {
         // Firefox does not like initEvent and errors out
         browsers: ["-IE8", "-IE9", "-IE10", "-FIREFOX"],
         test: function(cmp) {
             cmp.testInitEvent();
+        }
+    },
+
+    testEventTargetOfHtmlElementHandler: {
+        test: function(cmp) {
+            cmp.testEventTargetOfHtmlElementHandler();
         }
     }
 })

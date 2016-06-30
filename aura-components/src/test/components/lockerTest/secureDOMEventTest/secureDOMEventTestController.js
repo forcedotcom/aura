@@ -1,6 +1,7 @@
 ({
-    onclick: function(cmp) {
-        cmp.set("v.buttonClickedFlag", true);
+    doInit: function(cmp) {
+        var accounts = [{ id: 1, Name: "account1" }];
+        cmp.set("v.accounts", accounts);
     },
 
     testClickEvent: function(cmp, event, helper) {
@@ -46,10 +47,36 @@
         testUtils.assertTrue(domEvent.view == window);
     },
 
-    testMarkupDefinedClickHandler: function(cmp, event, helper) {
+    testEventTargetOfHtmlElementHandler: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        var button = cmp.find("button");
-        button.getElement().click();
-        testUtils.assertTrue(cmp.get("v.buttonClickedFlag"), "Click handler never called after clicking button");
+
+        cmp._event = null;
+        var buttonInMarkup = document.getElementById("buttonInMarkup");
+        buttonInMarkup.click();
+        testUtils.assertStartsWith("SecureElement", cmp._event.target.toString());
+
+        cmp._event = null;
+        var buttonInIteration = document.getElementById("buttonInIteration");
+        buttonInIteration.click();
+        testUtils.assertStartsWith("SecureElement", cmp._event.target.toString());
+
+        cmp._event = null;
+        var buttonInIf = document.getElementById("buttonInIf");
+        buttonInIf.click();
+        testUtils.assertStartsWith("SecureElement", cmp._event.target.toString());
+
+        cmp._event = null;
+        var buttonInNestedIteration = document.getElementById("buttonInNestedIteration");
+        buttonInNestedIteration.click();
+        testUtils.assertStartsWith("SecureElement", cmp._event.target.toString());
+
+        cmp._event = null;
+        var buttonInFacet = document.getElementById("buttonInFacet");
+        buttonInFacet.click();
+        testUtils.assertStartsWith("SecureElement", cmp._event.target.toString());
+    },
+
+    handleClick: function(cmp, event) {
+        cmp._event = event;
     }
 })

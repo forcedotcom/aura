@@ -26,8 +26,10 @@
     <aura:method name="deleteLastComponent" action="{!c.deleteLastComponent}"/>
     <aura:method name="setWrapUnwrapObject" action="{!c.setWrapUnwrapObject}"/>
     <aura:method name="checkWrapUnwrapObject" action="{!c.checkWrapUnwrapObject}"/>
+    <aura:method name="testMethodWithParams" action="{!c.testMethodWithParams}"/>
 
     <div id="title">SecureObject test</div>
-    <lockerTest:wrapUnwrapFacet aura:id="facet" obj="{!v.wrapUnwrapTestObj}" value1="{!v.wrapUnwrapTestObj.value1}" value2="{!v.wrapUnwrapTestObj.sub.value2}" />
+    <lockerTest:wrapUnwrapFacet aura:id="wrapUnwrapFacet" obj="{!v.wrapUnwrapTestObj}" value1="{!v.wrapUnwrapTestObj.value1}" value2="{!v.wrapUnwrapTestObj.sub.value2}" />
+    <lockerTest:facet aura:id="facet"/>
     <div aura:id="content"></div>
 </aura:component>

@@ -31,8 +31,13 @@
     <aura:method name="testSetTimeoutNonFunctionParamExploit" action="{!c.testSetTimeoutNonFunctionParamExploit}"/>
     <aura:method name="testComponentUnfilteredFromUserToSystemMode" action="{!c.testComponentUnfilteredFromUserToSystemMode}"/>
     <aura:method name="testLocationExposed" action="{!c.testLocationExposed}"/>
+    <aura:method name="testValueProviderOnDynamicallyCreatedComponents" action="{!c.testValueProviderOnDynamicallyCreatedComponents}"/>
 
     <div>LockerService test</div>
     <div aura:id="content"/>
     <lockerTest:facet aura:id="innerCmp"/>
+
+    <ul aura:id="ul">
+        <li aura:id="l1" id="l1">A</li>
+    </ul>
 </aura:component>

@@ -73,5 +73,11 @@
             cmp.setWrapUnwrapObject();
             cmp.checkWrapUnwrapObject();
         }
+    },
+
+    testMethodWithParams: {
+        test: function(cmp) {
+            cmp.testMethodWithParams();
+        }
     }
 })

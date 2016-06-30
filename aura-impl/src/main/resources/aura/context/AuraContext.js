@@ -159,6 +159,9 @@ Aura.Context.AuraContext.prototype.getCurrentAccessCaller=function(){
     return this.accessStack[this.accessStack.length-2];
 };
 
+/**
+ * @export
+*/
 Aura.Context.AuraContext.prototype.setCurrentAccess=function(component){
     if(!component){
         component=this.getCurrentAccess();
@@ -172,6 +175,9 @@ Aura.Context.AuraContext.prototype.setCurrentAccess=function(component){
     }
 };
 
+/**
+ *  @export
+*/
 Aura.Context.AuraContext.prototype.releaseCurrentAccess=function(){
     this.accessStack.pop();
 };

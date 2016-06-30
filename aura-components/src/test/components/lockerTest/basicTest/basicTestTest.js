@@ -148,5 +148,11 @@
                 $A.test.assertStartsWith("Error: Security violation: use of __proto__", error);
             }*/
         }
+    },
+
+    testValueProviderOnDynamicallyCreatedComponents: {
+        test: function(cmp) {
+            cmp.testValueProviderOnDynamicallyCreatedComponents();
+        }
     }
 })

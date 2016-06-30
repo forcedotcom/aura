@@ -39,6 +39,8 @@
         // otherwise no code would be able to manipulate them
         var owner = component.getOwner();
         var ownerName = owner.getName();
+        // TODO: Manually checking for aura:iteration or aura:if is a hack. Ideally, getOwner() or another API would
+        //       always return the element we need to key against.
         while (ownerName === "aura$iteration" || ownerName === "aura$if") {
             owner = owner.getOwner();
             ownerName = owner.getName();

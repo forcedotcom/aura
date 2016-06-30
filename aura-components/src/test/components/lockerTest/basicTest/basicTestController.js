@@ -1,4 +1,8 @@
 ({
+    doInit: function(cmp, event) {
+        cmp._thisFromInit = this;
+        cmp._eventParamValue = event.getParams().value;
+    },
 
     testAuraLockerInController: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
@@ -138,5 +142,18 @@
                     testUtils.assertEquals("B", testUtils.getText(createdLi), "Unexpected text on dynamically created component");
                 }
         );
+    },
+
+    testThisVariableNotLeakedFromMarkup: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var thisAttribute = cmp.get("v.thisAttribute");
+
+        testUtils.assertStartsWith("SecureComponent", thisAttribute.toString(), "Attribute with value {!this} should" +
+                " be a SecureComponent");
+        testUtils.assertStartsWith("SecureComponent", cmp._eventParamValue.toString(), "init handler event param" +
+                " should be a SecureComponent");
+        testUtils.assertUndefined(cmp._thisFromInit, "'this' in init handler should be undefined");
+        testUtils.assertUndefined(this, "'this' in controller method should be undefined");
     }
 })

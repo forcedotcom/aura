@@ -19,6 +19,9 @@
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
     <aura:attribute name="testRenderer" type="Boolean" default="false" description="Set to true to check Locker wrappers in renderer"/>
     <aura:attribute name="componentStore" type="Object"/>
+    <aura:attribute name="thisAttribute" type="Object" default="{!this}"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
     <aura:method name="testAuraLockerInController" action="{!c.testAuraLockerInController}"/>
     <aura:method name="testComponentLockerInController" action="{!c.testComponentLockerInController}"/>
@@ -32,6 +35,7 @@
     <aura:method name="testComponentUnfilteredFromUserToSystemMode" action="{!c.testComponentUnfilteredFromUserToSystemMode}"/>
     <aura:method name="testLocationExposed" action="{!c.testLocationExposed}"/>
     <aura:method name="testValueProviderOnDynamicallyCreatedComponents" action="{!c.testValueProviderOnDynamicallyCreatedComponents}"/>
+    <aura:method name="testThisVariableNotLeakedFromMarkup" action="{!c.testThisVariableNotLeakedFromMarkup}"/>
 
     <div>LockerService test</div>
     <div aura:id="content"/>

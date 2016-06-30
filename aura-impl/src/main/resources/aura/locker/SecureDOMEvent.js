@@ -35,7 +35,7 @@ function SecureDOMEvent(event, key) {
 
         // Touch Events are special on their own:
         // https://developer.mozilla.org/en-US/docs/Web/API/Touch
-        touches: SecureDOMEvent.filterTouchesDescriptor(o, event, "touch"),
+        touches: SecureDOMEvent.filterTouchesDescriptor(o, event, "touches"),
         targetTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, "targetTouches"),
         changedTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, "changedTouches"),
 

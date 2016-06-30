@@ -33,6 +33,24 @@
         <ui:inlineEditCell name="id">
             <ui:outputText value="{!row.data.id}" />
         </ui:inlineEditCell>
+        <ui:inlineEditCell name="date">
+            <ui:outputDate value="{!row.data.date}" />
+        </ui:inlineEditCell>
+        <ui:inlineEditCell name="checkbox">
+            <ui:outputCheckbox value="{!row.data.checkbox}" />
+        </ui:inlineEditCell>
+        <ui:inlineEditCell name="notes">
+            <ui:outputTextArea value="{!row.data.notes}" />
+        </ui:inlineEditCell>
+        <ui:inlineEditCell name="modDateTime">
+            <ui:outputDateTime value="{!row.data.modDateTime}" />
+        </ui:inlineEditCell>
+        <ui:inlineEditCell aura:id="url" name="url">
+            <ui:outputURL value="{!row.data.url}" />
+        </ui:inlineEditCell>
+        <ui:inlineEditCell name="phone">
+            <ui:outputPhone value="{!row.data.phone}" />
+        </ui:inlineEditCell>
     </aura:attribute>
     
     <aura:handler name="init" value="{!this}" action="{!c.changeItems}"/>
@@ -44,11 +62,11 @@
             <ui:button label="Change items" press="{!c.changeItems}" />
         </div>
         
-        <div aura:id="lastEdited">
+        <div class="info">
             <span>Last Edited: </span><br/>
-            Index: <span>{!v.lastEdited.index}</span><br/>
-            Keys: <span>{!v.lastEdited.keys[0]}</span><br/>
-            Values: <span>{!v.lastEdited.values[0]}</span><br/>
+            <span>Index: {!v.lastEdited.index}</span><br/>
+            <span>Key: {!v.lastEdited.keys[0]}</span><br/>
+            <span>Value: {!v.lastEdited.values[0]}</span><br/>
         </div>
 
         <div class="content">

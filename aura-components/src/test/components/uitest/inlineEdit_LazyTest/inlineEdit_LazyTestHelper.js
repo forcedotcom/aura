@@ -18,30 +18,55 @@
 	    id : {
 	        componentDef : {
 	            descriptor : 'markup://ui:inputNumber'
-	        },
-	        attributes : {
-	            values : {
-	                updateOn : 'input'
-	            }
 	        }
 	    },
-	    
 	    name : {
 	        componentDef : {
 	            descriptor : 'markup://ui:inputText'
-	        },
-            attributes : {
-                values : {
-                    updateOn : 'input'
-                }
+	        }
+	    },
+	    date : {
+            componentDef : {
+                descriptor : 'markup://ui:outputDate'
             }
-	    }
+        },
+        checkbox : {
+            componentDef : {
+                descriptor : 'markup://ui:outputCheckbox'
+            }
+        },
+        notes : {
+            componentDef : {
+                descriptor : 'markup://ui:outputTextArea'
+            }
+        },
+        modDateTime : {
+            componentDef : {
+                descriptor : 'markup://ui:outputDateTime'
+            }
+        },
+        url : {
+            componentDef : {
+                descriptor : 'markup://ui:outputURL'
+            }
+        },
+        phone : {
+            componentDef : {
+                descriptor : 'markup://ui:outputPhone'
+            }
+        }
 	},
 	
 	HEADERS: [
 	    { name: "id", label: "Id", sortable: "true"},
 	    { name: "name", label: "Name" },
-	    { name: "id", label: "Id"}
+	    { name: "id", label: "Id"},
+	    { name: "date", label: "Date"},
+	    { name: "checkbox", label: "Checkbox"},
+	    { name: "notes", label: "Notes"},
+	    { name: "modDateTime", label: "DateTime"},
+	    { name: "url", label: "Url"},
+	    { name: "phone", label: "Phone"}
 	],
 	
 	generateItems: function(count) {
@@ -53,7 +78,13 @@
 	        items.push({
 	            data: {
 	                id: rand,
-	                name: "Name " + rand
+	                name: "Name " + rand,
+	                date: "0123" + rand,
+	                checkbox: (i % 2 == 0),
+	                notes: "special string that is long with special char!@#$%^&*()",
+	                modDateTime: "1/1/2000 12:00 AM",
+	                url: 'www.salesforce.com',
+	                phone: "555-555-555" + rand
 	            },
 	            status: {
 	                name: {
@@ -84,21 +115,21 @@
 	    return { headers: headers, columns: columns };
 	},
 	
-	updateLastEdited : function(cmp, params) {
-        var values = params.values;
-        var lastEdited = {
-            index : params.index,
-            keys : [],
-            values : []
-        };
+	updateLastEdited: function(cmp, params) {
+            var values = params.values;
+            var lastEdited = {
+                index : params.index,
+                keys : [],
+                values : []
+            };
         
-        // Retrieve keys and values as arrays
-        for (key in values) {
-            lastEdited.keys.push(key);
-            lastEdited.values.push(values[key]);
-        }
+            // Retrieve keys and values as arrays
+            for (key in values) {
+                lastEdited.keys.push(key);
+                lastEdited.values.push(values[key]);
+            }
         
-        cmp.set("v.lastEdited", lastEdited);
-    }
+            cmp.set("v.lastEdited", lastEdited);
+	}
 })
 

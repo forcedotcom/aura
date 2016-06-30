@@ -51,7 +51,7 @@ public class TemplateUtil {
 
     public void writeHtmlScripts(AuraContext context, List<String> scripts, boolean canBeAsync, Appendable out)
             throws IOException {
-        if (scripts != null) {
+        if (scripts != null && !scripts.isEmpty()) {
             String format = null;
             switch (context.getClient().getType()) {
             case IE9:

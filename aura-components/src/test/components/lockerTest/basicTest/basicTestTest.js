@@ -154,5 +154,11 @@
         test: function(cmp) {
             cmp.testValueProviderOnDynamicallyCreatedComponents();
         }
+    },
+
+    testThisVariableNotLeakedFromMarkup: {
+        test: function(cmp) {
+            cmp.testThisVariableNotLeakedFromMarkup();
+        }
     }
 })

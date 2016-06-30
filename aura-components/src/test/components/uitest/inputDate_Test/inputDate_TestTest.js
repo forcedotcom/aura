@@ -286,6 +286,24 @@
         }
     },
 
+    testDateInputWithTimezone: {
+        browsers: ['DESKTOP'],
+        attributes: {value: "2016-01-22T01:00:00.000Z", timezone: 'America/Toronto', format: 'MM-DD-YYYY'},
+        test: [function (cmp) {
+            var inputDateTimeCmp = cmp.find("datePickerTestCmp");
+            var inputDateElement = inputDateTimeCmp.find("inputText").getElement();
+            $A.test.addWaitFor(true, function () {
+                return inputDateElement.value == "01-21-2016";
+            });
+        },
+        function (cmp) {
+            this.openDatePicker(cmp);
+        }, function (cmp) {
+            var curDate = $A.test.getElementByClass("selectedDate")[0];
+            $A.test.assertEquals("21", $A.util.getText(curDate), "Date picker did not open to the correct day");
+        }]
+    },
+
     iterateCal: function (monthIter, yearIter, monthButton, yearButton) {
         var i;
         for (i = 0; i < monthIter; i++) {

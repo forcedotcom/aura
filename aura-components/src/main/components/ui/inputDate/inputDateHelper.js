@@ -14,32 +14,51 @@
  * limitations under the License.
  */
 ({
-	displayValue: function(component) {
-        var concCmp = component.getConcreteComponent();
-        var value = concCmp.get("v.value");
+    setInitialValues : function (component) {
+        // set default values for initial attributes in case they weren't provided.
+        var timezone = component.get("v.timezone"),
+            format = component.get("v.format"),
+            langLocale = component.get("v.langLocale");
+
+        if ($A.util.isEmpty(timezone)) {
+            component.set("v.timezone", $A.get("$Locale.timezone"));
+        }
+        if ($A.util.isEmpty(format)) {
+            component.set("v.format", $A.get("$Locale.dateFormat"));
+        }
+        if ($A.util.isEmpty(langLocale)) {
+            component.set("v.langLocale", $A.get("$Locale.langLocale"));
+        }
+    },
+
+    displayValue: function(component) {
+        var value = component.get("v.value");
         var displayValue = value;
-        if (value) {
-            var langLocale = component.get("v.langLocale") || $A.get("$Locale.langLocale");
-            // since v.value is in UTC format like "2015-08-10T04:00:00.000Z", we only need the date portion
+        var date;
+        if (!$A.util.isEmpty(value)) {
+            var langLocale = component.get("v.langLocale");
+            // since v.value is in UTC format like "2015-08-10T04:00:00.000Z", we want to make sure the date portion is
+            // valid
             var dateValue = value.split("T", 1)[0] || value;
-            var date = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", langLocale, true);
-            if (date) {
-                var format = component.get("v.format") || $A.get("$Locale.dateFormat");
-                try {
-                    date = $A.localizationService.translateToOtherCalendar(date);
-                    displayValue = $A.localizationService.formatDateUTC(date, format, langLocale);
-                } catch (e) {
-                    displayValue = e.message;
-                }
+            date = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", langLocale, true);
+            if (!$A.util.isEmpty(date)) {
+                var format = component.get("v.format"),
+                    timezone = component.get("v.timezone"),
+                    helper = this;
+                var setDisplayValue = function (convertedDate) {
+                    var translatedDate = $A.localizationService.translateToOtherCalendar(convertedDate);
+                    displayValue = $A.localizationService.formatDateUTC(translatedDate, format, langLocale);
+
+                    helper.setInputValue(component, displayValue);
+                };
+
+                this.convertToTimezone(value, timezone, $A.getCallback(setDisplayValue));
             }
         }
 
-        /**This instance of the component variable was left in because in cases when we are extending inputDate,
-         * getting the concreteComponent will give us the lowest hanging fruit, which does not include an
-         * element with an id of inputText. By leaving this variable in, it will work in both cases.
-         */
-        var elem = component.find("inputText").getElement();
-        elem.value = displayValue ? $A.localizationService.translateToLocalizedDigits(displayValue) : '';
+        if ($A.util.isEmpty(value) || $A.util.isEmpty(date)) {
+            this.setInputValue(component, displayValue);
+        }
     },
 
     displayDatePicker: function(component) {
@@ -74,8 +93,8 @@
     	var localizedValue = $A.localizationService.translateFromLocalizedDigits(value);
         var formattedDate = localizedValue;
         if (value) {
-            var langLocale = component.get("v.langLocale") || $A.get("$Locale.langLocale");
-            var format = component.get("v.format") || $A.get("$Locale.dateFormat");
+            var langLocale = component.get("v.langLocale");
+            var format = component.get("v.format");
             var date = $A.localizationService.parseDateTimeUTC(localizedValue, format, langLocale, true);
 
             if (date) {
@@ -98,15 +117,14 @@
     },
 
     getDateValueForDatePicker: function(component) {
-        var currentDate = new Date();
-        var value = component.get("v.value");
-        if (value) {
-            var langLocale = component.get("v.langLocale") || $A.get("$Locale.langLocale");
-            // since v.value is in UTC format like "2015-08-10T04:00:00.000Z", we only need the date portion
-            var dateValue = value.split("T", 1)[0] || value;
-            currentDate = $A.localizationService.parseDateTime(dateValue, "YYYY-MM-DD", langLocale, true);
+        var date;
+        var format = component.get("v.format");
+        var langLocale = component.get("v.langLocale");
+        var dateString = this.getInputElement(component).value;
+        if (!$A.util.isEmpty(dateString)) {
+            date = $A.localizationService.parseDateTime(dateString, format, langLocale, true);
         }
-        return currentDate;
+        return date ? date : new Date();
     },
 
     getDateString: function(date) {
@@ -194,6 +212,20 @@
         var dateValue = event.getParam("value") || event.getParam("arguments").value;
         if (dateValue) {
             component.set("v.value", dateValue);
+        }
+    },
+
+    convertToTimezone: function(value, timezone, callback) {
+        var date = $A.localizationService.parseDateTimeISO8601(value);
+        if (!$A.util.isUndefinedOrNull(date)) {
+            $A.localizationService.UTCToWallTime(date, timezone, callback);
+        }
+    },
+
+    setInputValue: function(component, displayValue) {
+        var inputElement = this.getInputElement(component);
+        if (!$A.util.isUndefinedOrNull(inputElement)) {
+            inputElement.value = displayValue ? $A.localizationService.translateToLocalizedDigits(displayValue) : "";
         }
     }
 

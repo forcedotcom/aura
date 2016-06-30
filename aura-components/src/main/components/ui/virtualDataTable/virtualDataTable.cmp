@@ -1,0 +1,90 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<!-- 
+    Used temporarily for the ui:inlineEditGrid in 204 while we fully migrate the table components over to SLDS markup, refactor/integrate
+    with treeGrid in 206, and deal with test fallout. NOT SUPPORTED ANYWHERE ELSE, DO NOT USE
+ -->
+<aura:component extensible="true" support="PROTO" description="Displays a table of data">
+    <aura:import library="ui:virtualDataGridLib" property="lib"/>
+    <aura:attribute name="sortBy" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
+    
+    <!-- This is deprecated, used in old grid, eventually this should be a <method> -->
+    <aura:handler name="refresh" action="{!c.handleRefresh}"/>
+    <aura:registerEvent name="refresh" type="ui:refresh" description="Provides fresh data from the dataProvider."/>
+    <aura:method name="appendItems">
+        <aura:attribute name="items" type="Object"/>
+    </aura:method>
+    <aura:method name="updateItem">
+        <aura:attribute name="item" type="Object" required="true" description="Updated item to be placed in the grid at the specified index."/>
+        <aura:attribute name="index" type="Integer" required="true" description="Index of the target row within the grid."/>
+    </aura:method>        
+    <aura:method name="resizeColumns" description="Resizes columns if the plugin is enabled.">
+        <aura:attribute name="widths" type="Integer[]"/>
+    </aura:method>
+
+    <aura:registerEvent name="gridAction" type="ui:gridAction" description="Notifies listeners when actions were triggered by grid cells"/>
+    
+    <aura:method name="sort">
+        <aura:attribute name="sortBy" type="String"/>
+    </aura:method>
+
+    <!-- ATTRIBUTES -->
+    <aura:attribute name="class"           type="String"                                         description="CSS class to be applied to the table element"/>
+    <aura:attribute name="items"           type="List"                                           description="A list of objects representing the rows of data in the grid"/>
+    <aura:attribute name="headerColumns"   type="Aura.Component[]"                               description="Components used as the header elements of the table"/>
+    <aura:attribute name="columns"         type="Aura.ComponentDefRef[]"                         description="Components used as the template for each row"/>
+    <aura:attribute name="columnsEdit"     type="Aura.ComponentDefRef[]" />
+    <aura:attribute name="dataModel"       type="Aura.Component[]"                               description="Optional component to provide data for the grid"/>
+    <aura:attribute name="_dirty"          type="Integer"                                        description="Internal attribute for evaluating whether the grid should be rerendered"/>
+    <aura:attribute name="itemVar"         type="String"                 default="item"          description="The name of the variable to use for each item inside the grid"/>
+    <aura:attribute name="delegatedEvents" type="String"                 default="click,keydown" description="List of events the grid should delegate, separated by comma."/>
+    
+    <aura:attribute name="_sortBy"      type="String" default="" description="Sort order of the data in the grid. Name of column, predicated by a '-' for descending."/>
+    
+    <!-- useRowHeaders to be removed once use cases have been migrated to use rowHeaderIndex -->
+    <aura:attribute name="useRowHeaders"    type="Boolean"              default="false" description="Makes the first column of each row a header cell. The default is false."/>
+    <aura:attribute name="rowHeaderIndex"   type="Integer"              default="-1" description="Column index to convert into a row header" />
+    <aura:attribute name="fixedHeader"      type="Boolean"              default="false" description="Specifies whether the grid should use CSS to fix the header's position. If true, content in the table body is set to overflow and scrolling is enabled. 
+                                                                        To support overflow and scrolling, you must include a fixed or max-height CSS style for the table. The default is false."/>
+
+    <aura:attribute name="keyboardNavigation" type="boolean"            default="false" description="Enables keyboard navigation with up/down arrows. Requires having an input element in every row."/>
+
+    <!-- Resizable Columns -->
+    <aura:attribute name="enableResizableColumns"   type="Boolean"      default="false" description="Enables the column resize plugin. The default is false."/>
+    <aura:attribute name="resizableColumnsConfig"   type="Object" description="The column resize configuration. If not provided, the default configuration is used."/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <aura:handler name="change" value="{!v.items}"   action="{!c.handleItemsChange}"/>
+    <aura:handler name="change" value="{!v.columns}" action="{!c.handleColumnsChange}"/>
+
+    <aura:registerEvent name="onsort" type="ui:sort" description="The event fired when a column is sorted."/>
+    <aura:registerEvent name="onColumnResize" type="ui:resize" description="The event fired when a column is resized."/>
+
+    <table aura:id="table" class="{! 'slds-table ' + v.class}" aura:flavorable="true">
+        <thead aura:id="thead">
+            <tr aura:id="headerRow" class="slds-text-title--caps">{!v.headerColumns}</tr>
+        </thead>
+        <tfoot aura:id="tfoot"></tfoot>
+        <tbody aura:id="tbody"></tbody>
+    </table>
+
+
+</aura:component>
+

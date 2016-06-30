@@ -16,7 +16,9 @@
 package org.auraframework.impl.adapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,6 +62,10 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
         @Override
         public Collection<String> getFrameAncestors() {
+            AuraContext context = Aura.getContextService().getCurrentContext();
+            if (context != null && context.isTestMode()) {
+                return  Arrays.asList(CSP.ALL);
+            }
             return baseline.getFrameAncestors();
         }
 

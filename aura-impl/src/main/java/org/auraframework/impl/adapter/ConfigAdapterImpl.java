@@ -467,8 +467,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public String getEncryptionKeyURL(Boolean jsFormat) {
         AuraContext context = contextService.getCurrentContext();
+        String encodedContext = context.getEncodedURL(AuraContext.EncodingStyle.Normal);
         String contextPath = context.getContextPath();
-        return String.format("%s/l/{}/app.encryptionkey" + (jsFormat ? ".js" : ""), contextPath);
+        return String.format("%s/l/%s/app.encryptionkey" + (jsFormat ? ".js" : ""), contextPath, encodedContext);
     }
 
     /**

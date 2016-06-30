@@ -117,6 +117,15 @@
     padding: 0 10px 0 10px;
 }
 
+.THIS #box {
+    position: absolute;
+    top: 250px;
+    left: 230px;
+    width: 500px;
+    height: 500px;
+    border: 1px solid red;
+}
+
 .THIS > .header {
 	background: #061c3f;
 }

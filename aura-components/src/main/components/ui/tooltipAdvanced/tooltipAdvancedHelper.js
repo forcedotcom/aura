@@ -67,6 +67,19 @@
 		var thisConstraint;
 		var classArr = classList.split(' ');
 
+		var boundingElementSelector = component.get('v.boundingElementSelector');
+		var boundingElement;
+
+		if(!$A.util.getBooleanValue(boundingElementSelector)) {
+			boundingElement = window;
+		} else {
+			boundingElement = document.querySelector(boundingElementSelector);
+			if(!boundingElement) {
+				boundingElement = window;
+				$A.logger.warning('boundingElementSelector "'+ boundingElementSelector +'" matched no elements, falling back to window');
+			}
+		}
+
 		if(allowFlips && boundingRect.top < FLIP_THRESHOLD) {
 			direction = 'south';
 		} else if (allowFlips && document.documentElement.clientHeight - (boundingRect.top + boundingRect.height) < FLIP_THRESHOLD) {
@@ -147,7 +160,7 @@
 
 		component.constraints.windowBox = lib.createRelationship({
 			element:ttbodyNode,
-			target:window,
+			target:boundingElement,
 			type:'bounding box',
 			enable: true,
 			pad: 5,

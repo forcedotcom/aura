@@ -61,6 +61,7 @@
 				'domId',
 				'fadeOutDuration',
 				'fadeInDuration',
+				'boundingElementSelector',
 				'delay'].forEach(function(attr) {
 					compDef[attr] = component.get('v.' + attr);
 				});

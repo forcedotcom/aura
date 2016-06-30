@@ -2,7 +2,7 @@
     "manifest_version":2,
 	"name": "__MSG_manifest_name__",
 	"description": "__MSG_manifest_description__",
-    "version": "1.0.0.5",
+    "version": "1.0.0.6",
 	"icons": {
 		"16": "images/icon16.png",
 		"48": "images/icon48.png",

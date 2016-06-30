@@ -112,7 +112,7 @@
 }
 
 /* That's a fix for iOS and native scrolling */
-.THIS .IOS.container .panel-content * {
+.THIS .IOS.container .panel-content > * {
     transform : translate3d(0, 0, 0);
 }
 

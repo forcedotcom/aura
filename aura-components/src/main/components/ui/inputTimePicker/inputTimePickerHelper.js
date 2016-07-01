@@ -108,6 +108,7 @@
     },
 
     selectTime: function(component, event) {
+    	event.stopPropagation();
         var li = event.target || event.srcElement;
         var hours = li.getAttribute("data-hours"),
             minutes = li.getAttribute("data-minutes");

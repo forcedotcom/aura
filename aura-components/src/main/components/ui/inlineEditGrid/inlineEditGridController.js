@@ -49,6 +49,7 @@
 	    
 		var payload = evt.getParam("payload");
 		var values = payload.values;
+		var status = payload.status;
 		var index = payload.index;
 		var item = items[index];
 		
@@ -56,11 +57,11 @@
 		item.status = item.status || {};
 		
 		// Update all record data values and status
-		if (values) {			
+		if (values) {
 			$A.util.apply(item[dataVar], values, true, true);
-			for (var key in values) {
-				$A.util.addMapValueToMap(item.status, key, true, "edited");
-			}
+		}
+		if (status) {
+			$A.util.apply(item.status, status, true, true);
 		}
 		
 		// Update only the specified item

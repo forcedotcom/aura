@@ -36,19 +36,19 @@
 			</aura:set>
 			
 			<aura:set attribute="columns">
-				<ui:inlineEditCell name="id" isPsuedoInput="true" class="pseudoInput">
+				<ui:inlineEditCell name="id" isPsuedoInput="true" class="pseudoInput" triggerLabel="Edit Id">
 					<ui:outputText value="{!item.record.id}"/>
 				</ui:inlineEditCell>
-				<ui:inlineEditCell name="name">
+				<ui:inlineEditCell name="name"  triggerLabel="Edit Name">
 					<ui:outputText value="{!item.record.name}"/>
 					<aura:set attribute="triggerIcon">
 						<uiExamples:iconCmp key="{! item.status.name.disabled ? 'L' : 'P'}" />
 					</aura:set>					
 				</ui:inlineEditCell>
-				<ui:inlineEditCell name="bloodtype">
+				<ui:inlineEditCell name="bloodtype"  triggerLabel="Edit Blood Type">
 					<ui:outputText value="{!item.record.bloodtype}"/>
 				</ui:inlineEditCell>
-				<ui:inlineEditCell name="phone">
+				<ui:inlineEditCell name="phone" triggerLabel="Edit Phone">
 					<ui:outputDate value="{!item.record.phone}"/>
 					<aura:set attribute="triggerIcon">
 						<uiExamples:iconCmp key="{! item.status.phone.disabled ? 'L' : 'P'}" />

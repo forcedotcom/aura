@@ -35,6 +35,10 @@
 		items[5].myData.name = '';
 		items[5].myData.grade = '';
 		items[5].myData.linkLabel = '';
+		items[5].myData.bloodtype = '';
+		
+		// hack for testing picklist
+		items[0].myData.bloodtype = 'A';
 		
 		cmp.set("v.items", items);
 		

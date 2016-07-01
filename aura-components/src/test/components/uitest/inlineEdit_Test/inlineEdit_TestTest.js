@@ -166,10 +166,44 @@
 	         this.verifyCellContent(cmp, 4, 2, '999');
 	         this.verifyCellContent(cmp, 4, 3, 'new link');
 	         this.verifyCellContent(cmp, 4, 4, '');
-	         this.verifyCellContent(cmp, 4, 5, '');
+	         this.verifyCellContent(cmp, 4, 5, false);
 	     }]
 	 },
 	 
+	 /**
+	  * Test update picklist
+	  */
+	 testUpdatePicklist : {
+	     test : [function(cmp) {
+             this.triggerEditOnCell(cmp, 0, 8);
+         }, function(cmp) {
+             this.waitForPanelOpen(cmp);
+         }, function(cmp) {
+             this.verifyPanelContent(cmp, 'A');
+             this.editPanel(cmp, 'O', 0, 'picklist');
+         }, function(cmp) {
+             this.waitForCellContent(cmp, 0, 8, 'O');
+         }]
+     },
+     
+	 /**
+	  * Test update checkbox
+	  */
+     testUpdateCheckbox : {
+         test : [function(cmp) {
+             this.triggerEditOnCell(cmp, 0, 5);
+         }, function(cmp) {
+             this.waitForPanelOpen(cmp);
+         }, function(cmp) {
+             this.verifyPanelContent(cmp, false);
+             this.editPanel(cmp, true, 0, 'checkbox');
+         }, function(cmp) {
+             this.waitForPanelOpen(cmp);
+         }, function(cmp) {
+             this.verifyCellContent(cmp, 0, 5, true);
+         }]
+     },
+     
 	 triggerEditOnCell : function(cmp, rowIndex, colIndex) {
 		 var tbody = document.getElementsByTagName("tbody")[0];
 		 var trs = this.getOnlyTrs(tbody.children);		 
@@ -231,8 +265,15 @@
 	 getPanelContent : function(cmp, panelIndex) {
 		 panelIndex = panelIndex ? panelIndex : 0;
 		 var panel = this.getPanelFromDomElement(cmp, panelIndex);
+		 
 		 if (!$A.util.isUndefinedOrNull(panel)) {
-			 return panel.get('v.inputComponent')[0].get('v.value');
+		     var input = panel.get('v.inputComponent')[0];
+		 
+		     if (input.getDef().getDescriptor().getQualifiedName() === 'markup://ui:inputCheckbox') {
+		         return input.getElement().checked;
+		     } else {
+		         return input.get('v.value');
+		     }
 		 }
 		 return undefined;
 	 },
@@ -265,12 +306,35 @@
 		 }, 'Expected text in edit panel for cell is supposed to be "' + expected + '" but was "' + actual + '"');
 	 },
 	 
-	 editPanel : function(cmp, newInput, panelIndex) {
-		 panelIndex = panelIndex ? panelIndex : 0;
+	 editPanel : function(cmp, newInput, panelIndex, inputType) {
+	     panelIndex = panelIndex ? panelIndex : 0;
+	     inputType = inputType ? inputType : 'text';
 		 var panel = this.getPanelFromDomElement(cmp, panelIndex);
-		 if (!$A.util.isUndefinedOrNull(panel)) {
+		 
+	     if (!$A.util.isUndefinedOrNull(panel)) {
 			 var input = panel.get('v.inputComponent')[0];
-			 input.set('v.value', newInput);
+			 
+			 if (inputType === 'checkbox') {
+			     $A.test.clickOrTouch(input.getElement());    
+			 } else if (inputType === 'picklist') {
+			     $A.test.clickOrTouch(input.getElement());
+			     var options = input.get('v.options');
+			     
+			     for (var i=0; i<options.length; i++) {
+			         var option = options[i];
+			         if (option.selected) {
+			             option.selected = false;
+			         }
+			         if (option.value === newInput) {
+			             option.selected = true;
+			         }
+			     }
+			     input.set('v.options', options);
+			     this.clickOutOfEditPanel(cmp);
+			 } else {
+			     input.set('v.value', newInput);
+			 }
+		
 			 this.commitCellContent(panel);
 		 }
 	 },
@@ -299,9 +363,24 @@
 		 return col;
 	 },
 	 
+	 getCmpFromElement : function(elem) {
+	     var htmlCmp = $A.componentService.getRenderingComponentForElement(elem);
+         return htmlCmp.getAttributeValueProvider();
+	 },
+	 
 	 verifyCellContent : function(cmp, rowIndex, colIndex, expected) {
 	     var cell = this.getCellElem(cmp, rowIndex, colIndex);
-	     var actual = $A.test.getText(cell);
+	     var cellCmp = this.getCmpFromElement(cell.children[0]);
+	     var outputCmp = cellCmp.get('v.body')[0];
+	     var actual = '';
+	     
+	     if (outputCmp.getDef().getDescriptor().getQualifiedName() === 'markup://ui:outputCheckbox') {
+	         actual = outputCmp.get('v.value');
+	         actual = actual ? actual : false;
+         } else {
+             actual = $A.test.getText(cell);
+         }
+	     
 	     $A.test.assertEquals(expected, actual, 'Cell value is incorrect');
 	 },
 	 

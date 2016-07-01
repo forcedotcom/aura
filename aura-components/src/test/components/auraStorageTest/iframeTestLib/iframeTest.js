@@ -255,6 +255,43 @@ function iframeTest() {
                 function() { return found; },
                 "GVPs never persisted to actions store"
             );
+        },
+
+        /** Waits for an action to be present in the 'actions' store, with an optional error message. */
+        waitForActionInStorage : function(key, msg) {
+            var iframe = this.getIframe();
+            var found = false;
+            var that = this;
+
+            function checkActionStorage(key) {
+                // short-circuit once the test times out
+                if ($A.test.isComplete()) {
+                    return;
+                }
+
+                iframe.$A.storageService.getStorage("actions").getAll([], true)
+                    .then(
+                        function(items) {
+                            if (items[key]) {
+                                found = true;
+                                return;
+                            }
+
+                            checkActionStorage(key);
+                        },
+                        function(e) {
+                            $A.test.fail("action store getAll() failed: " + e);
+                        }
+                    );
+            }
+
+            checkActionStorage(key);
+
+            msg = msg || "Action " + key + " never present in action store";
+            $A.test.addWaitForWithFailureMessage(true,
+                function() { return found; },
+                msg
+            );
         }
     }
 }

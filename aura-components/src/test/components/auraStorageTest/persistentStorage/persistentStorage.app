@@ -14,10 +14,6 @@
     <aura:method name="resetStorage" action="c.resetStorage"/>
     <aura:method name="deleteStorage" action="c.deleteStorage"/>
 
-    <aura:method name="setEncryptionKey">
-        <aura:attribute type="String" name="encryptionKey"/>
-    </aura:method>
-
     Status: <span aura:id="status">{!v.status}</span><br/>
     Storage output: <span aura:id="output">{!v.return}</span>
 </aura:application>

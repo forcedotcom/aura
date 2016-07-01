@@ -483,11 +483,13 @@ CryptoAdapter.prototype.getItemsInternal = function(keys, resolve, reject, inclu
  * @param {String} key The key of the value to decrypt.
  * @param {Object} value The cache entry to decrypt.
  * @returns {Promise} Promise that resolves with the decrypted item.
- * The object consists of {value: *, isExpired: Boolean}.
  * @private
  */
 CryptoAdapter.prototype.decrypt = function(key, value) {
     var that = this;
+    if (!value || !value["value"]) {
+        return Promise["reject"](new Error("CryptoAdapter.decrypt() value is malformed for key"+key));
+    }
 
     return CryptoAdapter.engine["decrypt"](
             {

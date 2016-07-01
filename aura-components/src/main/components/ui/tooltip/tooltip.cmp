@@ -51,6 +51,8 @@
    
      <aura:attribute name="domId" type="String" access="INTERNAL" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
 
+     <aura:attribute name="boundingElementSelector" type="String" access="INTERNAL" description="The element to keep the tooltip inside (advanced only)" />
+
     <aura:method name="show"/>
     <aura:method name="hide"/>
 

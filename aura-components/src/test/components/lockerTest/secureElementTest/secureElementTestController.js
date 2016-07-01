@@ -230,5 +230,15 @@
 
         cacheTestA.appendChild(child);
         testUtils.assertTrue(child === cacheTestA.children[0]);
+    },
+
+    testNoAccessToParentNodeReturnsNull: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var title = document.getElementById("title");
+        // go up 2 levels since we will have access to the direct parent
+        var parentParentNode = title.parentNode.parentNode;
+
+        testUtils.assertEquals(null, parentParentNode, "Element.parentNode should return null when it is not accessible");
     }
 })

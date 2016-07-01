@@ -20,11 +20,7 @@ import java.util.Set;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.FlavorsDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -135,6 +131,11 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
                 builder.setFlavorOverrides(flavors);
             }
         }
+
+        String bootstrapPublicCacheExpiration = getAttributeValue(ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(bootstrapPublicCacheExpiration)) {
+            builder.bootstrapPublicCacheExpiration = bootstrapPublicCacheExpiration;
+        }
     }
 
     @Override
@@ -149,6 +150,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
     private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
     private static final String ATTRIBUTE_FLAVOR_OVERRIDES = "flavorOverrides";
+    private static final String ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION = "bootstrapPublicCacheExpiration";
 
     private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_APPCACHE_ENABLED, ATTRIBUTE_ADDITIONAL_APPCACHE_URLS)
@@ -156,7 +158,8 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 
     private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-            ATTRIBUTE_PRELOAD, ATTRIBUTE_TRACK, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_FLAVOR_OVERRIDES)
+            ATTRIBUTE_PRELOAD, ATTRIBUTE_TRACK, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_IS_ONE_PAGE_APP, 
+            ATTRIBUTE_FLAVOR_OVERRIDES, ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION)
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(BaseComponentDefHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();

@@ -69,7 +69,6 @@ public class Bootstrap extends AuraResourceImpl {
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context)
             throws IOException {
         DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
-        servletUtilAdapter.setNoCache(response);
 
         DefinitionService definitionService = Aura.getDefinitionService();
         DefType type = app.getDefType();
@@ -77,6 +76,14 @@ public class Bootstrap extends AuraResourceImpl {
         DefDescriptor<?> desc = definitionService.getDefDescriptor(app.getDescriptorName(), type.getPrimaryInterface());
 
         try {
+            ApplicationDef appDef = (ApplicationDef) desc.getDef();
+            Integer cacheExpiration = appDef.getBootstrapPublicCacheExpiration();
+            if (cacheExpiration != null && cacheExpiration.intValue() > 0) {
+                servletUtilAdapter.setCacheTimeout(response, cacheExpiration);
+            } else {
+                servletUtilAdapter.setNoCache(response);
+            }
+
             Instance<?> appInstance = Aura.getInstanceService().getInstance(desc, getComponentAttributes(request));
             definitionService.updateLoaded(desc);
             loadLabels();

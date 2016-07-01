@@ -79,7 +79,8 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * Cache-Control: no-cache.
      * Same as auraBaseServlet.java
      */
-    protected static final long LONG_EXPIRE = 45 * SHORT_EXPIRE;
+    protected static final long LONG_EXPIRE_SECONDS = 45 * SHORT_EXPIRE_SECONDS;
+    protected static final long LONG_EXPIRE = LONG_EXPIRE_SECONDS * 1000;
     protected static final String UTF_ENCODING = "UTF-8";
     protected static final String HTML_CONTENT_TYPE = "text/html";
     protected static final String JAVASCRIPT_CONTENT_TYPE = "text/javascript";
@@ -504,11 +505,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     @Override
     public void setLongCache(HttpServletResponse response) {
-        long now = System.currentTimeMillis();
-        response.setHeader(HttpHeaders.VARY, "Accept-Encoding");
-        response.setHeader(HttpHeaders.CACHE_CONTROL, String.format("max-age=%s, public", LONG_EXPIRE / 1000));
-        response.setDateHeader(HttpHeaders.EXPIRES, now + LONG_EXPIRE);
-        response.setDateHeader(HttpHeaders.LAST_MODIFIED, now - SHORT_EXPIRE);
+        this.setCacheTimeout(response, (int) LONG_EXPIRE_SECONDS);
     }
 
     /**
@@ -521,10 +518,24 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     @Override
     public void setShortCache(HttpServletResponse response) {
+        this.setCacheTimeout(response, (int) SHORT_EXPIRE_SECONDS);
+    }
+
+    /**
+     * Sets cache timeout to a given value.
+     *
+     * This sets several headers to try to ensure that the page will be cached for the given length of time. Of note is
+     * the last-modified header, which is set to a day ago so that browsers consider it to be safe.
+     *
+     * @param response the HTTP response to which we will add headers.
+     * @param expiration timeout value in seconds.
+     */
+    @Override
+    public void setCacheTimeout(HttpServletResponse response, int expiration) {
         long now = System.currentTimeMillis();
         response.setHeader(HttpHeaders.VARY, "Accept-Encoding");
-        response.setHeader(HttpHeaders.CACHE_CONTROL, String.format("max-age=%s, public", SHORT_EXPIRE / 1000));
-        response.setDateHeader(HttpHeaders.EXPIRES, now + SHORT_EXPIRE);
+        response.setHeader(HttpHeaders.CACHE_CONTROL, String.format("max-age=%s, public", expiration));
+        response.setDateHeader(HttpHeaders.EXPIRES, now + (expiration * 1000));
         response.setDateHeader(HttpHeaders.LAST_MODIFIED, now - SHORT_EXPIRE);
     }
 

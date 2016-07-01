@@ -21,14 +21,14 @@ import java.util.*;
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
 import org.auraframework.def.*;
-import org.auraframework.expression.Expression;
-import org.auraframework.expression.PropertyReference;
+import org.auraframework.expression.*;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.instance.Action;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -50,6 +50,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final List<DefDescriptor<ComponentDef>> trackedDependencies;
     private final Boolean isAppcacheEnabled;
     private final String additionalAppCacheURLs;
+    private final String bootstrapPublicCacheExpiration;
 
     private final Boolean isOnePageApp;
 
@@ -66,6 +67,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
         this.isOnePageApp = builder.isOnePageApp;
+        this.bootstrapPublicCacheExpiration = builder.bootstrapPublicCacheExpiration;
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef>implements ApplicationDefBuilder {
@@ -74,6 +76,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public Boolean isAppcacheEnabled;
         public Boolean isOnePageApp;
         public String additionalAppCacheURLs;
+        public String bootstrapPublicCacheExpiration;
 
         public Builder() {
             super(ApplicationDef.class);
@@ -195,6 +198,57 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     @Override
     public Boolean isOnePageApp() throws QuickFixException {
         return isOnePageApp;
+    }
+    
+    /**
+     * Returns any configured public cache expiration (in seconds) for bootstrap.js, or null if not set.
+     */
+    @Override
+    public Integer getBootstrapPublicCacheExpiration() throws QuickFixException {
+        Integer expiration = null;
+        
+        if (bootstrapPublicCacheExpiration != null) {
+            Expression expression = AuraImpl.getExpressionAdapter().buildExpression(
+                    TextTokenizer.unwrap(bootstrapPublicCacheExpiration), null);
+            
+            Object value = null;
+            if (expression instanceof Literal) {
+                value = ((Literal) expression).getValue();
+            } else if (expression instanceof PropertyReference) {
+                PropertyReference ref = (PropertyReference) expression;
+                if (AuraValueProviderType.CONTROLLER.getPrefix().equals(ref.getRoot())) {
+                    ref = ref.getStem();
+
+                    ControllerDef controllerDef = getControllerDef();
+                    ActionDef actionDef = controllerDef.getSubDefinition(ref.toString());
+                    Action action = Aura.getInstanceService().getInstance(actionDef);
+        
+                    AuraContext context = Aura.getContextService().getCurrentContext();
+                    Action previous = context.setCurrentAction(action);
+                    try {
+                        action.run();
+                    } finally {
+                        context.setCurrentAction(previous);
+                    }
+                    
+                    value = action.getReturnValue();
+                }
+            }
+
+            int intValue;
+            if (value instanceof Integer) {
+                intValue = ((Integer) value).intValue();
+            } else if (value instanceof Long) {
+                intValue = ((Long) value).intValue();
+            } else {
+                throw new AuraRuntimeException(
+                        "Value of 'bootstrapPublicCacheExpiration' attribute must either be an integer or a reference to a server Action");
+            }
+            
+            expiration = intValue < 0 ? 0 : intValue;
+        }
+        
+        return expiration;
     }
 
     @Override

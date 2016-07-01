@@ -16,9 +16,7 @@
 package org.auraframework.adapter;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -28,10 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.AuraResource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -201,6 +198,11 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * Set a page to cache for a 'long' time.
      */
     void setLongCache(HttpServletResponse response);
+    
+    /**
+     * Set cache timeout for a resource in seconds.
+     */
+    void setCacheTimeout(HttpServletResponse response, int expiration);
 
     /**
      * are we in production mode?

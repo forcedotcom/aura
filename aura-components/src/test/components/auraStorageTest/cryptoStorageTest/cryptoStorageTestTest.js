@@ -14,7 +14,7 @@
             $A.test.fail("CryptoAdapter failed to register. You must run these tests against localhost or with HTTPS (see http://sfdc.co/bO9Hok).");
         }
 
-        $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this);
+        $A.installOverride("StorageService.selectAdapter", function(){ return "crypto"; }, this);
         this.storage = this.createStorage("crypto-store", 32768, 2000, 3000);
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store"); });
     },
@@ -315,7 +315,7 @@
         test: function(cmp) {
             var that = this;
             var completed = false;
-            var failTest = function(cmp, error) { cmp._storageLib.failTest(cmp, error); }
+            var failTest = function(cmp, error) { cmp._storageLib.failTest(cmp, error); };
             this.storage.set("testErrorValue", new Error("hello, error"))
                 .then(function() {
                     completed = true;
@@ -431,7 +431,7 @@
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
                 iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
                 iframeCmp.resetStorage();
-                cmp._iframeLib.waitForStatus("Resetting", "Done Resetting");;
+                cmp._iframeLib.waitForStatus("Resetting", "Done Resetting");
             },
             function addItemToDatabase(cmp) {
                 cmp._iframeLib.getIframeRootCmp().addToStorage();
@@ -468,15 +468,15 @@
 
                 this.storage.set("key1", "decryptable")
                     .then(
-                        function() {completed = true},
-                        function(e) {$A.test.fail(e.toString())}
+                        function() {completed = true; },
+                        function(e) {$A.test.fail(e.toString()); }
                     );
 
-                $A.test.addWaitFor(true, function() {return completed});
+                $A.test.addWaitFor(true, function() {return completed; });
             },
             function setUndecryptableItem(cmp) {
                 var completed = false;
-                var undecryptableItem = [
+                var emptyCipherAndIv = [
                     "key2",
                     {
                         expires : new Date().getTime() + 60000,
@@ -486,14 +486,21 @@
                         },
                     },
                     10];
+                var absentValue = [
+                    "key3",
+                    {
+                        expires : new Date().getTime() + 60000
+                        // value is absent
+                    },
+                    5];
 
-                $A.test.setItemsToCryptoAdapter(this.storage.adapter, [undecryptableItem])
+                $A.test.setItemsToCryptoAdapter(this.storage.adapter, [emptyCipherAndIv, absentValue])
                     .then(
-                        function() {completed = true},
-                        function(e) {$A.test.fail(e.toString())}
+                        function() {completed = true;},
+                        function(e) {$A.test.fail(e.toString());}
                     );
 
-                $A.test.addWaitFor(true, function() {return completed});
+                $A.test.addWaitFor(true, function() {return completed;});
             },
             function verifyGetDecryptableItems(cmp) {
                 var completed = false;
@@ -505,9 +512,9 @@
                         $A.test.assertEquals("decryptable", items["key1"]);
                         completed = true;
                     })
-                    .catch(function(e){$A.test.fail(e.toString())});
+                    .catch(function(e){$A.test.fail(e.toString());});
 
-                $A.test.addWaitFor(true, function() {return completed});
+                $A.test.addWaitFor(true, function() {return completed;});
             }
         ]
     },

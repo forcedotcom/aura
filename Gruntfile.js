@@ -4,7 +4,7 @@ module.exports = function (grunt) {
     var version = pom.match(/\<version\>(\d+\.\d+).+\<\/version\>/)[1];
 
     if (!version) {
-        throw new Error('Coudn\'t extract Aura version');
+        throw new Error('Coudn\'t extract Aura version!');
     }
 
     grunt.initConfig({

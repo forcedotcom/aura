@@ -161,6 +161,40 @@
         </pluginManagement>
     </build>
     <profiles>
+    <profile>
+            <id>azureCdn</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <configuration>
+                            <workingDirectory>${project.parent.basedir}</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>install-node-npm</id>
+                                <phase>pre-clean</phase>
+                            </execution>
+                            <execution>
+                                <id>npm-install</id>
+                                <phase>pre-clean</phase>
+                            </execution>
+                            <execution>
+                                <id>grunt-cdn-resources</id>
+                                <goals>
+                                    <goal>grunt</goal>
+                                </goals>
+                                <phase>process-resources</phase>
+                                <configuration>
+                                    <arguments>azure-cdn</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>jsDoc</id>
             <activation>

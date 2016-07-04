@@ -16,27 +16,14 @@
 
 -->
 <aura:component isTemplate="true" extensible="true" extends="aura:template">
-
-    <!--
-    <aura:set attribute="extraScriptTags">
-        <script defer="1" async="1" src="/auraFW/resources/codemirror/js/codemirror.js?v1"></script>
-        <script defer="1" async="1" src="/auraFW/resources/codemirror/js/editor.js?v5"></script>
-        <script defer="1" async="1" src="/auraFW/resources/codemirror/js/editor.js?v6"></script>
-        <script defer="1" async="1" src="/auraFW/resources/codemirror/js/select.js?v3"></script>
-        <script defer="1" async="1" src="/auraFW/resources/codemirror/js/editor.js?v7"></script>
-        <script defer="1" async="1" src="/auraFW/resources/codemirror/js/editor.js?v4"></script>
-    </aura:set>
-    -->
-    
-    <aura:set attribute="title" value="Aura Documentation"/>
+    <aura:set attribute="title" value="Aura"/>
     
     <aura:set attribute="extraMetaTags">
-        <meta name="description" content="Extra meta tags" />
+        <meta name="description" content="Test" />
     </aura:set>
 
     <aura:set attribute="auraPreInitBlock">
-    	<auraStorage:init name="actions" maxSize="4096" defaultExpiration="3600" secure="true" persistent="false" defaultAutoRefreshInterval="3600" debugLoggingEnabled="true" clearStorageOnInit="false"/>
-
-    	<auraStorage:crypto debugLoggingEnabled="true" fetchRemoteKey="true"/>
+    	<!--<auraStorage:init name="actions" maxSize="4096" defaultExpiration="3600" secure="true" persistent="true" debugLoggingEnabled="true" clearStorageOnInit="false"/>-->
+    	<!--<auraStorage:crypto debugLoggingEnabled="true" fetchRemoteKey="true"/>-->
     </aura:set>
 </aura:component>

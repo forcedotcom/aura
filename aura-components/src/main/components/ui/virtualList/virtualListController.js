@@ -27,7 +27,7 @@
         cmp._initializing = false;
     },
     handleItemsChange: function (cmp, event, helper) {
-    	if (cmp._initializing || cmp._appending) {
+    	if (cmp._initializing || cmp._appending || cmp._updating) {
     		return;
     	}
     
@@ -64,7 +64,9 @@
             item    = params.item;
         cmp = helper._getRootComponent(cmp);
 
+        helper.ignorePTVChanges(cmp, true);
         helper.updateItem(cmp, item, index);
+        helper.ignorePTVChanges(cmp, false);
     },
     getComponentByIndex: function (cmp, event, helper) {
         var params   = event.getParam('arguments'),

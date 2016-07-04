@@ -120,7 +120,7 @@
             for (var i = 0; i < options.length; i++) {
                 $A.createComponent(menuItemComponentName, {
                     "label": options[i].label,
-                    "selected": options[i].selected,
+                    "selected": $A.util.getBooleanValue(options[i].selected),
                     "hideMenuAfterSelected": !multiSelect
                 }, handleCreatedMenuItem);
             }

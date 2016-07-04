@@ -55,7 +55,7 @@
         $A.enqueueAction(action);
     },
     getCmpDependencies: function (cmp, event, helper) {
-        var defs = helper.map.componentDefs.slice();
+        var defs = helper.map.componentDefs.map(function (d) { return d.def });
 
         if (defs.length) {
             helper.dependencyList(cmp, defs, function (dependencyList) {

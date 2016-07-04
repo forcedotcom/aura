@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 ({
-	/**
-	 * Map from the element aria attributes to the component attribute names
-	 * since attributes with hyphens currently don't work inside expressions.
-	 *
-	 * TODO: This needs to live somewhere more accessible to most components
-	 * that deal with aria attributes.
-	 */
-	ariaAttributeMap: {
-		"aria-expanded": "ariaExpanded",
-		"aria-activedescendant": "ariaActiveDescendant"
-	},
+    /**
+     * Map from the element aria attributes to the component attribute names
+     * since attributes with hyphens currently don't work inside expressions.
+     *
+     * TODO: This needs to live somewhere more accessible to most components
+     * that deal with aria attributes.
+     */
+    ariaAttributeMap: {
+        "aria-expanded": "ariaExpanded",
+        "aria-activedescendant": "ariaActiveDescendant"
+    },
 
     fetchData: function(component, event) {
         var listCmp = this.getListComponent(component);
@@ -51,7 +51,7 @@
             listCmp.abortFetchData(options, index);
         }
     },
-    
+
     fireInputChangeEvent: function(component) {
         //handling case when there is another element like label in the markup
         var value = component.getDef().getHelper().getInputElement(component).value;
@@ -69,7 +69,7 @@
             inputChangeEvt.fire();
         }
     },
-    
+
     hideList: function(component) {
         var list = this.getListComponent(component);
         if (list && list.get("v.visible") === true) {
@@ -79,7 +79,7 @@
         return false;
     },
 
-    handleEnterOrTabkey: function(component) {
+    handleEnterKey: function(component) {
         var list = this.getListComponent(component);
         if (list.get("v.visible") === true) {
             this.handleEnterkeyOnList(component, list);
@@ -99,7 +99,7 @@
     handleEsckey: function(component) {
         return this.hideList(component);
     },
-    
+
     handleKeyAction: function(component, event) {
         var keyCode = event.getParam("keyCode");
         var domEvent = event.getParam("domEvent");
@@ -113,8 +113,10 @@
             if (this.handleEsckey(component, event)) {
                 domEvent.stopPropagation();
             }
-        } else if (keyCode === 9 || keyCode === 13) {  // enter key: select the highlighted list option
-            this.handleEnterOrTabkey(component, event);
+        } else if (keyCode === 9) { // tab key
+            this.handleTabKey(component, event);
+        } else if (keyCode === 13) {  // enter key: select the highlighted list option
+            this.handleEnterKey(component, event);
         } else {
             this.handleOtherKeyAction(component, component.find("input"), event);
         }
@@ -123,10 +125,15 @@
     handleOtherKeyAction: function() {
     },
 
-    handleTabkey: function(component) {
-        this.hideList(component);
+    handleTabKey: function(component, event) {
+        if (component.get("v.selectOnTab")) {
+            // Select the highlighted list option
+            this.handleEnterKey(component, event);
+        } else {
+            this.hideList(component);
+        }
     },
-    
+
     highlightNextItem: function(component) {
         var list = this.getListComponent(component);
         if (list.get("v.visible") === true) {
@@ -137,7 +144,7 @@
             highlightEvent.fire();
         }
     },
-    
+
     highlightPrevItem: function(component) {
         var list = this.getListComponent(component);
         if (list.get("v.visible") === true) {
@@ -148,23 +155,23 @@
             highlightEvent.fire();
         }
     },
-    
+
     /**
      * Any event fired on input field, we need fire a same one on autocomplete.
      */
     relayEvents: function(component) {
-    	var inputCmp = component.find("input");
+        var inputCmp = component.find("input");
         if (inputCmp) {
-        	var handledEvents = component.getHandledEvents();
-        	for ( var name in handledEvents) {
-        		var eventDef = inputCmp.getDef().getEventDef(name);
-    			if (eventDef && handledEvents.hasOwnProperty(name) && handledEvents[name] === true) {
+            var handledEvents = component.getHandledEvents();
+            for ( var name in handledEvents) {
+                var eventDef = inputCmp.getDef().getEventDef(name);
+                if (eventDef && handledEvents.hasOwnProperty(name) && handledEvents[name] === true) {
                     inputCmp.addHandler(name, component, "c.fireEventsFromInput");
-    			}
-    		}
-        } 
+                }
+            }
+        }
     },
-    
+
     /**
      * Tell list component which elements it should ignore to handle collapse.
      *
@@ -189,12 +196,12 @@
     updateAriaAttributes: function(component, event) {
         var inputCmp = component.find("input");
         if (inputCmp) {
-        	var attrs = event.getParam("attrs");
-        	for (var key in attrs) {
-        		if (attrs.hasOwnProperty(key) && this.ariaAttributeMap[key]) {
-        			inputCmp.set("v." + this.ariaAttributeMap[key], attrs[key]);
-        		}
-        	}
+            var attrs = event.getParam("attrs");
+            for (var key in attrs) {
+                if (attrs.hasOwnProperty(key) && this.ariaAttributeMap[key]) {
+                    inputCmp.set("v." + this.ariaAttributeMap[key], attrs[key]);
+                }
+            }
         }
     },
 

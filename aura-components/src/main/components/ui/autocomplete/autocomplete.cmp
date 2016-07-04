@@ -26,6 +26,7 @@
     <aura:attribute name="usePanel" type="boolean" default="false"/>
     <aura:attribute name="maxlength" type="Integer" description="The maximum number of characters allowed in the inputTextForAutocomplete"/>
     <aura:attribute name="inputTitle" type="String" description="The title/tooltip for the input component."/>
+    <aura:attribute name="selectOnTab" type="boolean"  default="true" description="Indicates whether pressing the tab key will select the highlighted list item."/>
 
     <!-- START - the following attributes are only used when using the default list -->
     <aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components"/>

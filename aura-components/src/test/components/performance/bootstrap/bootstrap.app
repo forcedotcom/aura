@@ -17,10 +17,9 @@
 
 -->
 <aura:application
+    access="GLOBAL"
     template="performance:bootstrapTemplate" 
-    useAppcache="true">
-
-    <aura:dependency resource="markup://ui:scroller" type="COMPONENT" />
+    useAppcache="false">
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <section class="container" aura:id="container"> Bootstrap App </section>

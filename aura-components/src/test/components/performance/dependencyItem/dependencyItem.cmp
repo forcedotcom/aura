@@ -1,0 +1,17 @@
+<aura:component>
+    <aura:attribute name="index" type="Integer"/>
+    <aura:attribute name="def" type="String"/>
+    <aura:attribute name="isOpen" type="Boolean"/>
+    <aura:attribute name="dependencies" type="List"/>
+
+    <aura:registerevent name="press" type="ui:press" access="INTERNAL"/>
+
+    <li aura:id="li" data-index="{!v.index}" onclick="{!c.press}">
+        <p><span style="display: inline-block; width: 50px">{!v.index}</span>  {!v.def} {! v.dependencies.length > 0 ? ' (' + v.dependencies.length + ' dependencies)' : ''} </p>
+        <ul  class= "deplist" style="{!v.isOpen ? '' : 'display: none' }">
+            <aura:iteration items="{!v.dependencies}" var="dep" indexVar="j"> 
+                <li data-index="{!j}"> {!dep.descriptor} ({!dep.type})</li>
+            </aura:iteration>
+        </ul>
+    </li>
+</aura:component>

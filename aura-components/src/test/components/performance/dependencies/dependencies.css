@@ -1,0 +1,24 @@
+.THIS {}
+
+.THIS .deflist {
+    list-style-type: none; 
+    padding: 5px
+}
+
+.THIS li {
+    cursor: pointer;
+    padding: 2px 0;
+}
+
+.THIS .deflist > li:hover {
+    background: #DDD;
+}
+
+.THIS .deplist {
+    list-style-type: none;
+    padding: 5px 80px;
+}
+
+.THIS .uiInputCheckbox {
+    display: inline-block;
+}

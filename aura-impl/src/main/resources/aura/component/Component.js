@@ -1896,6 +1896,9 @@ Component.prototype.setupSuper = function(configAttributes) {
         superConfig["componentDef"] = { "descriptor" : superDef.getDescriptor().toString() };
         superConfig["concreteComponentId"] = this.concreteComponentId || this.globalId;
 
+        $A.pushCreationPath("super");
+        $A.getContext().setCurrentAccess(this);
+
         if (configAttributes) {
             superAttributes["values"] = {};
             var facets = this.componentDef.getFacets();
@@ -1927,10 +1930,8 @@ Component.prototype.setupSuper = function(configAttributes) {
 
         superConfig["attributes"] = superAttributes;
 
-        $A.pushCreationPath("super");
-        $A.getContext().setCurrentAccess(this);
-
         this.setSuperComponent($A.componentService.createComponentPriv(superConfig));
+
         $A.getContext().releaseCurrentAccess();
         $A.popCreationPath("super");
     }

@@ -18,7 +18,20 @@
             clearOnInit: true
         });
 
-       $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb"); });
+       $A.test.addCleanup(function(){ this.deleteStorage("browserdb"); }.bind(this));
+    },
+
+    deleteStorage: function(storageName) {
+        var completed = false;
+
+        $A.storageService.deleteStorage(storageName)
+            .then(function() {completed = true;})
+            .catch(function(e) {
+                var msg = "Failed to delete storage [" + storageName + "] :" + e.toString();
+                $A.test.fail(msg);
+            });
+
+        $A.test.addWaitFor(true, function() {return completed;});
     },
 
     testSizeInitial: {
@@ -148,7 +161,7 @@
                 expiration: 2000,
                 debugLogging: true
             });
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testReplaceExistingWithEntryTooLarge"); });
+            $A.test.addCleanup(function(){ this.deleteStorage("browserdb-testReplaceExistingWithEntryTooLarge"); }.bind(this));
 
             cmp._storageLib.testReplaceExistingWithEntryTooLarge_stage1(cmp, cmp._storage);
         },
@@ -214,7 +227,7 @@
                 expiration: 2000,
                 debugLogging: true
             });
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow"); });
+            $A.test.addCleanup(function(){ this.deleteStorage("browserdb-testOverflow"); }.bind(this));
 
             cmp._storageLib.testOverflow(cmp, cmp._storage);
         }
@@ -257,7 +270,7 @@
                 expiration: 2000,
                 debugLogging: true
             });
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testBulkSetLargerThanMaxSize"); });
+            $A.test.addCleanup(function(){ this.deleteStorage("browserdb-testBulkSetLargerThanMaxSize"); }.bind(this));
             cmp._storageLib.testBulkSetLargerThanMaxSize(cmp, storage);
         }
     },
@@ -343,7 +356,7 @@
                 expiration: 2000,
                 debugLogging: true
             });
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testGetSize"); });
+            $A.test.addCleanup(function(){ this.deleteStorage("browserdb-testGetSize"); }.bind(this));
             cmp._failTest = function(error) { cmp._storageLib.failTest(cmp, error); };
             cmp._append = function(string) { cmp._storageLib.appendLine(cmp, string); };
         }, function(cmp){
@@ -430,41 +443,44 @@
      */
     testReloadPage: {
         test: [
-        function loadComponentInIframe(cmp) {
-            cmp._expected = "expected value";
-            cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=false&value="+cmp._expected,
-                    "iframeContainer", "first load");
-        },
-        function resetDatabase(cmp) {
-            cmp._iframeLib.getIframeRootCmp().resetStorage();
-            cmp._iframeLib.waitForStatus("Resetting", "Done Resetting");
-        },
-        function addItemToDatabase(cmp) {
-            cmp._iframeLib.getIframeRootCmp().addToStorage();
-            cmp._iframeLib.waitForStatus("Adding", "Done Adding");
-        },
-        function reloadIframe(cmp) {
-            cmp._iframeLib.reloadIframe(cmp, false, "first reload");
-        },
-        function getItemFromDatabase(cmp) {
-            var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-            iframeCmp.getFromStorage();
-            $A.test.addWaitFor(true, function() {
-                return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
-            }, function() {
-                var actual = $A.util.getText(iframeCmp.find("output").getElement());
-                $A.test.assertEquals(cmp._expected, actual, "Got unexpected item from storage after page reload");
-            });
-        },
-        function cleanupDatabase(cmp) {
-            cmp._iframeLib.getIframeRootCmp().deleteStorage();
-        }]
+            function loadComponentInIframe(cmp) {
+                $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));
+
+                cmp._expected = "expected value";
+                cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=false",
+                        "iframeContainer", "first load");
+            },
+            function addItemToStorage(cmp) {
+                var completed = false;
+                var targetStorage = cmp._iframeLib.getIframeRootCmp()._storage;
+
+                targetStorage.set("key1", cmp._expected)
+                    .then(function(){ completed = true; })
+                    .catch(function(e){ $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function() {return completed;});
+            },
+            function reloadIframe(cmp) {
+                cmp._iframeLib.reloadIframe(cmp, false, "first reload");
+            },
+            function getItemFromStorage(cmp) {
+                var completed = false;
+                var targetStorage = cmp._iframeLib.getIframeRootCmp()._storage;
+
+                targetStorage.get("key1").
+                    then(function(value) {
+                        $A.test.assertEquals(cmp._expected, value, "Found unexpected item from storage after page reload");
+                        completed = true;
+                    })
+                    .catch(function(e){ $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function() {return completed;});
+            }
+        ]
     },
 
     testDeleteDatabase: {
-        test: [
-        function deleteDatabase(cmp) {
-            var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); };
+        test: function deleteDatabase(cmp) {
             var dbName = "browserdb";
             var completed = false;
             var results;
@@ -478,23 +494,24 @@
                             results = event.target.result;
                             completed = true;
                         };
+                        window.indexedDB.webkitGetDatabaseNames().onerror = function(e) {
+                            $A.test.fail(e.toString());
+                        };
                     } else {
                         completed = true;
                     }
-                })["catch"](failTest);
+                })
+                .catch(function(e) { $A.test.fail(e.toString()); });
 
-            $A.test.addWaitFor(
-                    true,
-                    function() {
-                        return completed;
-                    }, function() {
-                        $A.test.assertUndefined($A.storageService.getStorage(dbName),
-                                "Storage service still has reference to deleted database "+dbName);
-                        if (window.indexedDB.webkitGetDatabaseNames) {
-                            $A.test.assertFalse(results.contains(dbName), "IndexedDb "+dbName+" still present in browser");
-                        }
-                    });
-        }]
+            $A.test.addWaitFor(true, function() { return completed; },
+                function() {
+                    $A.test.assertUndefined($A.storageService.getStorage(dbName),
+                            "Storage service still has reference to deleted database "+dbName);
+                    if (window.indexedDB.webkitGetDatabaseNames) {
+                        $A.test.assertFalse(results.contains(dbName), "IndexedDb "+dbName+" still present in browser");
+                    }
+                });
+        }
     },
 
     testDeleteDatabaseTwice: {

@@ -18,6 +18,7 @@
     NAME: "ui:virtualDataGrid",
     
     DELEGATED_EVENTS : [],
+    USE_CAPTURE : ['focus', 'blur'],
     
     DEFAULT_TEMPLATES : {
         row    : 'tr',
@@ -165,7 +166,7 @@
         if (!$A.util.isEmpty(events)) {
         	events = events.split(',');
         	for (var i = 0; i < events.length; i++) {
-                container.addEventListener(events[i], delegate, false);
+                container.addEventListener(events[i], delegate, this.USE_CAPTURE.includes(events[i]));
             }
         }
     },

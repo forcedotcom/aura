@@ -3,13 +3,13 @@
         var def = cmp.get('v.def');
         if (def) {
 
-            helper.dependencyList(cmp, [def], function (dependencyList) {
+            helper.dependencyList(cmp, [def], helper.getWhitelist(cmp), function (dependencyList) {
                 console.log('Dependencies: ', dependencyList[0]);
             });    
         }
 
         $A.dependencies =  {
-            list: $A.getCallback(function (dep, callback) {
+            list: $A.getCallback(function (dep, whitelist, callback) {
                 if (typeof dep === 'string') {
                     dep = [dep];
                 }
@@ -25,7 +25,16 @@
                     }
                 }
 
-                helper.dependencyList(cmp, dep, callback);
+                helper.dependencyList(cmp, dep, whitelist, callback);
+            }),
+            writeDeps: $A.getCallback(function () {
+                var action = $A.getRoot().get('c.writeAllDependencies');
+                action.setParams({file : 'all_deps.json'});
+                action.setCallback(this, function () {
+                    console.log('File (all_deps.json) written under aura-resources');
+                });
+                console.log('This will take around ~5min or so...');
+                $A.enqueueAction(action);
             })
         };
     },
@@ -58,7 +67,7 @@
         var defs = helper.map.componentDefs.map(function (d) { return d.def });
 
         if (defs.length) {
-            helper.dependencyList(cmp, defs, function (dependencyList) {
+            helper.dependencyList(cmp, defs, helper.getWhitelist(cmp), function (dependencyList) {
                 console.log('Dependencies: ', dependencyList);
             });    
         }
@@ -74,7 +83,7 @@
             window.history.replaceState({}, descriptor, window.location.origin + window.location.pathname + '?def=' + descriptor);
 
             if (!cmpDef.dependencies.length) {
-                helper.dependencyList(cmp, [descriptor], function (result) {
+                helper.dependencyList(cmp, [descriptor], helper.getWhitelist(cmp), function (result) {
                     console.log('Dependencies: ', result[0]);
                     cmpDef.isOpen = true;
                     cmpDef.dependencies = result[0].dependencies;

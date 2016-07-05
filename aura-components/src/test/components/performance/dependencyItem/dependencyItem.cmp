@@ -10,7 +10,7 @@
         <p><span style="display: inline-block; width: 50px">{!v.index}</span>  {!v.def} {! v.dependencies.length > 0 ? ' (' + v.dependencies.length + ' dependencies)' : ''} </p>
         <ul  class= "deplist" style="{!v.isOpen ? '' : 'display: none' }">
             <aura:iteration items="{!v.dependencies}" var="dep" indexVar="j"> 
-                <li data-index="{!j}"> {!dep.descriptor} ({!dep.type})</li>
+                <li data-index="{!j}"> {!dep})</li>
             </aura:iteration>
         </ul>
     </li>

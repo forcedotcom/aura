@@ -26,13 +26,14 @@
     <aura:attribute name="items" type="Object[]"/>
     <aura:attribute name="def" type="String"/>
     <aura:attribute name="cmpFilter" type="Boolean" default="true"/>
-    <aura:attribute name="eventFilter" type="Boolean" default="false"/>
-    <aura:attribute name="intfFilter" type="Boolean" default="false"/>
+    <aura:attribute name="eventFilter" type="Boolean" default="true"/>
+    <aura:attribute name="intfFilter" type="Boolean" default="true"/>
+    <aura:attribute name="libFilter" type="Boolean" default="true"/>
     
     <section class="container" aura:id="container"> 
         <h1 style="padding: 5px; text-align: center;">Dependencies App </h1>
         <h3 style="text-align:center; margin: 20px 0">
-            <code>$A.dependencies.list(['ui:button','ui:scroller'], function (d) {console.log(d);}) //It honors the filters (CMP, EVENT, INTF) selected</code><br/>
+            <code>$A.dependencies.list(['ui:button','ui:scroller'], {COMPONENT: true, LIBRARY: true, ...}, function (d) {console.log(d);})</code><br/>
         </h3>
         <p>
             <ui:button label="Get all descriptors (filters tests)" press="{!c.getAllCmpDescriptors}" /> | 
@@ -40,6 +41,7 @@
             <ui:inputCheckbox label="CMP" value="{!v.cmpFilter}"/>
             <ui:inputCheckbox label="EVENT" value="{!v.eventFilter}"/>
             <ui:inputCheckbox label="INTF" value="{!v.intfFilter}"/>
+            <ui:inputCheckbox label="LIB" value="{!v.libFilter}"/>
         </p>
 
             <ui:virtualList aura:id="list" itemVar="item" items="{!v.items}">

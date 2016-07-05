@@ -39,10 +39,14 @@ function SecureNavigator(navigator, key) {
 		}
 	});
 
-	["appCodeName", "appName", "appVersion", "cookieEnabled", "geolocation", 
+	["appCodeName", "appName", "appVersion", "cookieEnabled", 
 	 "language", "onLine", "platform", "product", "userAgent"].forEach(function (name) {
 		Object.defineProperty(o, name, SecureObject.createFilteredProperty(o, navigator, name));
 	});
+
+    ["geolocation"].forEach(function(name) {
+        SecureObject.addPropertyIfSupported(o, navigator, name);
+    });
 
 	setLockerSecret(o, "key", key);
 	setLockerSecret(o, "ref", navigator);

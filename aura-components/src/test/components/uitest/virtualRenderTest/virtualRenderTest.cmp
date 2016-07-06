@@ -22,7 +22,9 @@
 	<aura:handler name="init" value="{!this}" action="{!c.init}" />
 	
 	<div class="container">
-		<ui:button aura:id="appendGrid" label="Append Items" press="{!c.appendToGrid}" />
+		<ui:button aura:id="updateItem" label="Update Item" press="{!c.updateOnGrid}" />
+        <ui:button aura:id="appendGrid" label="Append Items" press="{!c.appendToGrid}" />
+		<ui:button aura:id="delayedAppendGrid" label="Delayed Append Items" press="{!c.delayedAppendToGrid}" />
 		<br />
 
 		<ui:virtualDataGrid aura:id="grid" items="{!v.gridItems}">
@@ -42,7 +44,8 @@
 		</ui:virtualDataGrid>
 	</div>
 	<div class="container">
-		<ui:button aura:id="appendGrid" label="Append Items" press="{!c.appendToList}" />
+		<ui:button aura:id="appendList" label="Append Items" press="{!c.appendToList}" />
+		<ui:button aura:id="updateList" label="Update List" press="{!c.updateList}" />
 		<br />
 		
 		<ui:virtualList aura:id="list" items="{!v.listItems}" itemVar="item">

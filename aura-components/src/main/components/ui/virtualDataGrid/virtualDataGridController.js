@@ -85,7 +85,11 @@
         
         cmp = helper._getRootComponent(cmp);
         
-        helper.updateItem(cmp, item, index);
+        if (item) {
+            cmp._updating = true;
+            helper.updateItem(cmp, item, index);
+            cmp._updating = false;
+        }
     },     
     
     /*
@@ -151,10 +155,8 @@
     },
     
     /*
-    * DEPRECATED FROM OLD GRID
-    */
-    handleRefresh: function () {
-    },
+	 *  METHODS
+	 */
     appendItems: function (cmp, event, helper) {
         var superCmp   = cmp.getSuper(),
             isExtended = superCmp.getDef().getDescriptor().getName() !== 'component',
@@ -169,5 +171,11 @@
             helper.appendVirtualRows(cmp, items);
             cmp._appending = false;
         }
+    },
+    
+    /*
+    * DEPRECATED FROM OLD GRID
+    */
+    handleRefresh: function () {
     }
 })// eslint-disable-line semi

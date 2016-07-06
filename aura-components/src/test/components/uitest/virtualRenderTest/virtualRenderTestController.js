@@ -15,49 +15,36 @@
  */
 ({
 	init : function(cmp, evt, helper) {
-		var items = [];
-		
-		for (var i = 0; i < 25; i++) {
-			items.push({
-				name 	: "Name " + i,
-				phone	: "Phone",
-				balance	: i
-			});
-		}
+		var items = helper.generateItems(25);
 		
 		cmp.set("v.gridItems", items);
 		cmp.set("v.listItems", items);
 	},
 	
+	updateOnGrid : function(cmp, evt, helper) {
+	    helper.update(cmp, "grid");
+	},
+	
 	appendToGrid : function(cmp, evt, helper) {
-		var grid = cmp.find("grid");
-		var startIndex = grid.get("v.items").length;
-		
-		var items = [];
-		for (var i = 0; i < 25; i++) {
-			items.push({
-				name 	: "Name " + (startIndex + i),
-				phone	: "Phone",
-				balance	: (startIndex + i)
-			});
-		}
-		
-		grid.appendItems(items);
+		helper.appendTo(cmp, "grid");
+	},
+	
+	delayedAppendToGrid : function(cmp, evt, helper) {
+		setTimeout($A.getCallback(function() {
+			helper.appendTo(cmp, "grid");
+		}), 300);
 	},
 	
 	appendToList : function(cmp, evt, helper) {
+		helper.appendTo(cmp, "list");
+	},
+	
+	updateList : function(cmp, evt, helper) {
 		var list = cmp.find("list");
-		var startIndex = list.get("v.items").length;
+		var index = 0;
 		
-		var items = [];
-		for (var i = 0; i < 25; i++) {
-			items.push({
-				name 	: "Name " + (startIndex + i),
-				phone	: "Phone",
-				balance	: (startIndex + i)
-			});
-		}
-		
-		list.appendItems(items);
+		var item = list.get("v.items")[index];
+		item.name += '.';
+		list.updateItem(item, index);
 	}
 })

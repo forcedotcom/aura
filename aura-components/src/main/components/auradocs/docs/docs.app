@@ -23,7 +23,6 @@
     locationChangeEvent="auradocs:locationChange"
     implements="auraStorage:refreshObserver">
 
-    <aura:dependency resource="auradocs:*" />
     <aura:dependency resource="auraStorage:*" />
 
     <aura:handler event="aura:waiting" action="{!c.waiting}"/>

@@ -25,12 +25,29 @@ import org.mockito.Mockito;
 
 public class BootstrapTest extends UnitTestCase {
     
+    @Test
+    public void testPublicCacheExpirationNotSet() throws Exception {
+        verifyCacheHeaders(null, false);
+    }
+    
+    @Test
+    public void testPublicCacheExpirationZero() throws Exception {
+        verifyCacheHeaders(0, false);
+    }
+    
+    @Test
+    public void testPublicCacheExpirationValidValue() throws Exception {
+        verifyCacheHeaders(600, true);
+    }
+    
+    
     /**
-     * Test logic setting cache-related HTTP headers in response.
+     * Verify logic setting cache-related HTTP headers in response.
+     * @param expirationSetting expiration setting on the app definition
+     * @param shouldCache expect there is caching based on expiration setting. false means there should be no cache.
      * @throws Exception
      */
-    @Test
-    public void testSetCacheHeaders() throws Exception {
+    private void verifyCacheHeaders(Integer expirationSetting, boolean shouldCache) throws Exception {
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         ApplicationDef appDef = Mockito.mock(ApplicationDef.class);
@@ -39,17 +56,15 @@ public class BootstrapTest extends UnitTestCase {
         bootstrap.setServletUtilAdapter(servletUtilAdapter);
         
         // Public cache expiration not set, should be no cache
-        Mockito.when(appDef.getBootstrapPublicCacheExpiration()).thenReturn(null);
+        Mockito.when(appDef.getBootstrapPublicCacheExpiration()).thenReturn(expirationSetting);
         bootstrap.setCacheHeaders(response, appDef);
         
-        Mockito.verify(servletUtilAdapter).setNoCache(Mockito.any(HttpServletResponse.class));
-        Mockito.verifyNoMoreInteractions(servletUtilAdapter);
-        
-        // Set public cache expiration to a valid value
-        Mockito.when(appDef.getBootstrapPublicCacheExpiration()).thenReturn(600);
-        bootstrap.setCacheHeaders(response, appDef);
-        
-        Mockito.verify(servletUtilAdapter).setCacheTimeout(Mockito.any(HttpServletResponse.class), Mockito.eq(600));
+        if (shouldCache) {
+            Mockito.verify(servletUtilAdapter).setCacheTimeout(Mockito.any(HttpServletResponse.class), 
+                    Mockito.eq(expirationSetting.intValue()));
+        } else {
+            Mockito.verify(servletUtilAdapter).setNoCache(Mockito.any(HttpServletResponse.class));
+        }
         Mockito.verifyNoMoreInteractions(servletUtilAdapter);
     }
 }

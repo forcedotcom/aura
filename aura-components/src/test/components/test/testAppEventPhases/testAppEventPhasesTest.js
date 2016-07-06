@@ -20,14 +20,15 @@
 
     assertLogs : function(cmp, expectedPhased, expectedBroadcast) {
         var actualArr = this.getLoggedStatements(cmp);
+
         // Assert expectedPhased - first expectedPhased.length belong to the phased group
         var broadcastStartIdx = this.indexOfFirstBroadcast(actualArr);
         var actualPhased = actualArr.slice(0, broadcastStartIdx > -1 ? broadcastStartIdx : actualArr.length);
         var actualBroadcast = actualArr.slice(actualPhased.length);
-        $A.test.assertEquals(actualPhased.join(), actualArr.slice(0, expectedPhased.length).join(), "Incorrect phased sequence");
+        $A.test.assertEquals(expectedPhased.join(), actualPhased.join(), "Incorrect phased sequence");
 
         // Assert expectedBroadcast - rest belong to the broadcast group; can appear in any order
-        this.matchBroadcast(actualBroadcast, expectedBroadcast);
+        this.matchBroadcast(expectedBroadcast, actualBroadcast);
     },
 
     assertLogsRaw: function(cmp, expectedLogs) {
@@ -87,7 +88,7 @@
         $A.get("e.test:testAppEventPhasesCommand").setParams(params).fire();
     },
 
-    matchBroadcast: function(actual, expected) {
+    matchBroadcast: function(expected, actual) {
         $A.test.assertEquals(expected.length, actual.length, "Wrong number broadcast handlers");
         expected.forEach(function(exVal) {
             $A.test.assertTrue(actual.indexOf(exVal) >= 0, "Incorrect broadcast sequence: missing " + exVal);
@@ -115,6 +116,35 @@
                                 newBody.push(newCmp);
                             }
                             wrapperCmp.set("v.body", newBody);
+                            success();
+                        });
+                    },
+                    targetId: targetId, phase: "BUBBLE"
+                }]
+            });
+        }.bind(this));
+    },
+
+    createCmpInBody: function(sourceId, targetId, progId, appendToBody) {
+        return new Promise(function(success, failure) {
+            this.runCommand({
+                sourceId: sourceId, 
+                skipLog: true,
+                actions: [{
+                    action: function(curCmp) {
+                        $A.createComponent("test:testAppEventPhasesHandlerChild", {
+                            logId: progId
+                        }, function(newCmp) {
+                            newCmp.setAttributeValueProvider(curCmp);
+                            var newBody;
+                            if(!appendToBody) {
+                                newBody = [newCmp];
+                            }
+                            else {
+                                newBody = curCmp.get("v.body") || [];
+                                newBody.push(newCmp);
+                            }
+                            curCmp.set("v.body", newBody);
                             success();
                         });
                     },
@@ -165,7 +195,7 @@
         test : function(cmp) {
             var sourceId = "RootOwnedHandler";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler"];
-            var expectedBubble = expectedCapture.slice().reverse();
+            var expectedBubble = ["RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = this.getDefaultBroadcasts(sourceId);
             var actions = [];
@@ -181,14 +211,13 @@
         test : function(cmp) {
             var sourceId = "Grandchild";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
-            var expectedBubble = expectedCapture.slice().reverse();
+            var expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = this.getDefaultBroadcasts(sourceId);
             var actions = [];
 
             this.clearLogs(cmp);
             this.runCommand({sourceId: sourceId, actions: actions});
-
             this.assertLogs(cmp, expectedPhased, expectedBroadcast);
         }
     },
@@ -215,7 +244,13 @@
             var expectedCapture = ["RootSuper", "Root"];
             var expectedBubble = [];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
-            var expectedBroadcast = this.getDefaultBroadcasts(sourceId);
+            var expectedBroadcast = this.getCustomBroadcasts(sourceId, [
+                "GrandchildWrapper",
+                "Grandchild",
+                "RootOwnedWrapper",
+                "RootOwnedHandler",
+                "RootOwnedChild",
+                "RootWrapper"]);
             var actions = [{action: "stopPropagation", targetId: "Root", phase: "CAPTURE"}];
 
             this.clearLogs(cmp);
@@ -246,9 +281,15 @@
             var sourceId = "Grandchild";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
             // Mirrors component event bubbling semantics; stopPropagation cancels going up inheritance as well
-            var expectedBubble = ["Grandchild", "RootOwnedChild", "RootOwnedHandler", "Root"];
+            var expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
-            var expectedBroadcast = this.getDefaultBroadcasts(sourceId);
+            var expectedBroadcast = this.getCustomBroadcasts(sourceId, [
+                "GrandchildWrapper",
+                "Grandchild",
+                "RootOwnedWrapper",
+                "RootOwnedHandler",
+                "RootOwnedChild",
+                "RootWrapper"]);
             var actions = [{action: "stopPropagation", targetId: "Root", phase: "BUBBLE"}];
 
             this.clearLogs(cmp);
@@ -279,9 +320,13 @@
             var sourceId = "Grandchild";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
             // Mirrors component event bubbling semantics; stopPropagation cancels going up inheritance as well
-            var expectedBubble = ["Grandchild", "RootOwnedChild"];
+            var expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
-            var expectedBroadcast = this.getCustomBroadcasts(sourceId, ["RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler", "GrandchildWrapper", "Grandchild"]);
+            var expectedBroadcast = this.getCustomBroadcasts(sourceId, [
+                "RootOwnedWrapper", 
+                "RootOwnedChild", 
+                "GrandchildWrapper", 
+                "Grandchild"]);
             var actions = [{action: "stopPropagation", targetId: "RootOwnedChild", phase: "BUBBLE"}];
 
             this.clearLogs(cmp);
@@ -296,7 +341,7 @@
         test : function(cmp) {
             var sourceId = "Grandchild";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
-            var expectedBubble = expectedCapture.slice().reverse();
+            var expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = [];
             var actions = [{action: "preventDefault", targetId: "RootOwnedChild", phase: "BUBBLE"}];
@@ -327,11 +372,55 @@
         }
     },
 
+    testFromNestedStopPropCaptureAtRootPreventDefaultBubbleAtRoot: {
+        test : function(cmp) {
+            var sourceId = "Grandchild";
+            var expectedCapture = ["RootSuper", "Root"];
+            var expectedBubble = [];
+            var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
+            var expectedBroadcast = this.getCustomBroadcasts(sourceId, [
+                "GrandchildWrapper",
+                "Grandchild",
+                "RootOwnedWrapper",
+                "RootOwnedHandler",
+                "RootOwnedChild",
+                "RootWrapper"]);
+            var actions = [
+                {action: "stopPropagation", targetId: "Root", phase: "CAPTURE"},
+                {action: "preventDefault", targetId: "Root", phase: "BUBBLE"}
+            ];
+
+            this.clearLogs(cmp);
+            this.runCommand({sourceId: sourceId, actions: actions});
+            
+            this.assertLogs(cmp, expectedPhased, expectedBroadcast);
+        }
+    },
+    
+    testFromNestedStopPropCaptureAtRootPreventDefaultCaptureAtRootSuper: {
+        test : function(cmp) {
+            var sourceId = "Grandchild";
+            var expectedCapture = ["RootSuper", "Root"];
+            var expectedBubble = [];
+            var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
+            var expectedBroadcast = [];
+            var actions = [
+                {action: "stopPropagation", targetId: "Root", phase: "CAPTURE"},
+                {action: "preventDefault", targetId: "RootSuper", phase: "CAPTURE"}
+            ];
+
+            this.clearLogs(cmp);
+            this.runCommand({sourceId: sourceId, actions: actions});
+            
+            this.assertLogs(cmp, expectedPhased, expectedBroadcast);
+        }
+    },
+    
     testFromNestedStopPropBubbleAtMiddlePreventDefaultCaptureAtRootSuper: {
         test : function(cmp) {
             var sourceId = "Grandchild";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
-            var expectedBubble = ["Grandchild", "RootOwnedChild"];
+            var expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = [];
             var actions = [
@@ -350,7 +439,7 @@
         test : function(cmp) {
             var sourceId = "Grandchild";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild"];
-            var expectedBubble = ["Root", "RootSuper"];
+            var expectedBubble = ["RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = this.getCustomBroadcasts(sourceId, [
                 "RootWrapper",
@@ -371,7 +460,7 @@
         test : function(cmp) {
             var sourceId = "Grandchild";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
-            var expectedBubble = ["Grandchild", "RootOwnedChild", "RootOwnedHandler", "Root", "RootSuper"];
+            var expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = this.getCustomBroadcasts(sourceId, [
                 "RootWrapper",
@@ -392,7 +481,7 @@
         test : function(cmp) {
             var sourceId = "Grandchild";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
-            var expectedBubble = ["Grandchild", "RootOwnedChild", "Root", "RootSuper"];
+            var expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = this.getCustomBroadcasts(sourceId, [
                 "RootWrapper",
@@ -409,12 +498,31 @@
         }
     },
 
+    testFromNestedPreventDefaultCaptureAtMiddleDestroyCaptureAtMiddle: {
+        test : function(cmp) {
+            var sourceId = "Grandchild";
+            var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild"];
+            var expectedBubble = ["RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"]; 
+            var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
+            var expectedBroadcast = [];
+            var actions = [
+                {action: "preventDefault", targetId: "RootOwnedChild", phase: "CAPTURE"},
+                {action: "destroy", targetId: "RootOwnedChild", phase: "CAPTURE"}
+                 
+            ];
+            this.clearLogs(cmp);
+            this.runCommand({sourceId: sourceId, actions: actions});
+            
+            this.assertLogs(cmp, expectedPhased, expectedBroadcast);
+        }
+    },
+    
     testFromNestedDefaultProgrammatic: {
         test : function(cmp) {
             var sourceId = "Grandchild";
             var progId = "RootOwnedProgrammatic";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedProgrammaticHandler", "RootOwnedProgrammaticChild", "Grandchild"];
-            var expectedBubble = ["Grandchild", "RootOwnedProgrammaticChild", "RootOwnedProgrammaticHandler", "Root", "RootSuper"];
+            var expectedBubble = ["Grandchild", "RootOwnedProgrammaticWrapper", "RootOwnedProgrammaticChild", "RootOwnedProgrammaticHandler", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = this.getCustomBroadcasts(sourceId, [
                 "GrandchildWrapper",
@@ -472,13 +580,12 @@
             var sourceId = "Grandchild";
             var progId = "RootOwnedProgrammatic";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedProgrammaticHandler", "RootOwnedProgrammaticChild", "Grandchild"];
-            var expectedBubble = ["Grandchild", "RootOwnedProgrammaticChild"];
+            var expectedBubble = ["Grandchild", "RootOwnedProgrammaticWrapper", "RootOwnedProgrammaticChild"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = this.getCustomBroadcasts(sourceId, [
                 "GrandchildWrapper",
                 "Grandchild",
-                "RootOwnedProgrammaticWrapper",
-                "RootOwnedProgrammaticHandler",
+                "RootOwnedProgrammaticWrapper",               
                 "RootOwnedProgrammaticChild"
             ]);
             var actions = [{action: "stopPropagation", targetId: "RootOwnedProgrammaticChild", phase: "BUBBLE"}];
@@ -486,31 +593,6 @@
             this.clearLogs(cmp);
             // Programmatically create a component during setup
             this.createCmp(sourceId, "Root", progId)
-            .then(function() {
-                this.runCommand({sourceId: sourceId, actions: actions});
-                
-                this.assertLogs(cmp, expectedPhased, expectedBroadcast);
-            }.bind(this))
-            .then(this.continuation());
-        }
-    },
-
-    testFromProgrammaticStopPropBubbleAtProgrammaticSuperPreventDefaultCaptureAtProgrammatic: {
-        test : function(cmp) {
-            var sourceId = "RootOwnedProgrammaticChild";
-            var progId = "RootOwnedProgrammatic";
-            var expectedCapture = ["RootSuper", "Root", "RootOwnedProgrammaticHandler", "RootOwnedProgrammaticChild"];
-            var expectedBubble = ["RootOwnedProgrammaticChild", "RootOwnedProgrammaticHandler"];
-            var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
-            var expectedBroadcast = [];
-            var actions = [
-                {action: "stopPropagation", targetId: "RootOwnedProgrammaticHandler", phase: "BUBBLE"},
-                {action: "preventDefault", targetId: "RootOwnedProgrammaticChild", phase: "CAPTURE"}
-            ];
-
-            this.clearLogs(cmp);
-            // Programmatically create a component during setup; fire it at the Grandchild
-            this.createCmp("Root", "Root", progId)
             .then(function() {
                 this.runCommand({sourceId: sourceId, actions: actions});
                 
@@ -565,9 +647,13 @@
         test : function(cmp) {
             var sourceId = "Grandchild";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
-            var expectedBubble = ["Grandchild", "RootOwnedChild"];
+            var expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
-            var expectedBroadcast = this.getCustomBroadcasts(sourceId, ["RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler", "GrandchildWrapper", "Grandchild"]);
+            var expectedBroadcast = this.getCustomBroadcasts(sourceId, [
+                "RootOwnedWrapper", 
+                "RootOwnedChild", 
+                "GrandchildWrapper", 
+                "Grandchild"]);
             var actions = [{action: "stopPropagation", targetId: "RootOwnedChild", phase: "BUBBLE"}];
 
             this.clearLogs(cmp);
@@ -581,7 +667,7 @@
         test : function(cmp) {
             var sourceId = "Grandchild";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
-            var expectedBubble = ["Grandchild", "RootOwnedChild"];
+            var expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = [];
             var actions = [{action: "pause", targetId: "RootOwnedChild", phase: "BUBBLE"}];
@@ -593,7 +679,7 @@
             this.assertLogs(cmp, expectedPhased, expectedBroadcast);
 
             eventList[0].resume();
-            expectedBubble = expectedCapture.slice().reverse();
+            expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
             expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             expectedBroadcast = this.getDefaultBroadcasts(sourceId);
             this.assertLogs(cmp, expectedPhased, expectedBroadcast);
@@ -620,12 +706,12 @@
 
             eventList[0].resume();
             expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
-            expectedBubble = ["Grandchild", "RootOwnedChild"];
+            expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild"];
             expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             this.assertLogs(cmp, expectedPhased, expectedBroadcast);
 
             eventList[0].resume();
-            expectedBubble = expectedCapture.slice().reverse();
+            expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
             expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             expectedBroadcast = this.getDefaultBroadcasts(sourceId);
             this.assertLogs(cmp, expectedPhased, expectedBroadcast);
@@ -651,7 +737,7 @@
             this.assertLogs(cmp, expectedPhased, expectedBroadcast);
 
             eventList[0].resume();
-            expectedBubble = ["Grandchild", "RootOwnedChild", "RootOwnedHandler"];
+            expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler"];
             expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             expectedBroadcast = this.getCustomBroadcasts(sourceId, [
                 "GrandchildWrapper",
@@ -668,7 +754,7 @@
         test : function(cmp) {
             var sourceId = "Grandchild";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
-            var expectedBubble = ["Grandchild", "RootOwnedChild", "RootOwnedHandler"];
+            var expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler"];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = [];
             var actions = [
@@ -683,7 +769,7 @@
             this.assertLogs(cmp, expectedPhased, expectedBroadcast);
 
             eventList[0].resume();
-            expectedBubble = expectedCapture.slice().reverse();
+            expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
             expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             this.assertLogs(cmp, expectedPhased, expectedBroadcast);
         }
@@ -693,7 +779,7 @@
         test : function(cmp) {
             var sourceId = "Grandchild";
             var expectedCapture = [];
-            var expectedBubble = expectedCapture.slice().reverse();
+            var expectedBubble = [];
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = [];
             // Signal the event source component to create the event, call pause(), then call fire()
@@ -707,7 +793,7 @@
 
             eventList[0].resume();
             expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
-            expectedBubble = expectedCapture.slice().reverse();
+            expectedBubble = ["Grandchild", "RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
             expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             expectedBroadcast = this.getDefaultBroadcasts(sourceId);
             this.assertLogs(cmp, expectedPhased, expectedBroadcast);
@@ -735,7 +821,7 @@
             this.runCommand({sourceId: sourceId, actions: [{action: "destroy", targetId: "RootOwnedHandler", phase: "BUBBLE"}], eventList: [], skipLog: true});
 
             eventList[0].resume();
-            expectedBubble = ["Root", "RootSuper"];
+            expectedBubble = ["RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
             expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             expectedBroadcast = this.getCustomBroadcasts(sourceId, [
                 "RootWrapper",
@@ -745,12 +831,46 @@
         }
     },
 
+    testFromNestedPauseDestroyAtMiddleThenResume: { 
+        test : function(cmp) {
+            var sourceId = "Grandchild";
+            var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler", "RootOwnedChild", "Grandchild"];
+            var expectedBubble = [];
+            var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
+            var expectedBroadcast = [];
+            var actions = [
+                {action: "pause", targetId: "Grandchild", phase: "CAPTURE"}
+            ];
+            var eventList = [];
+
+            this.clearLogs(cmp);
+            this.runCommand({sourceId: sourceId, actions: actions, eventList: eventList});
+
+            this.assertLogs(cmp, expectedPhased, expectedBroadcast);
+
+            // Now destroy GrandChild; don't log anything here to avoid polluting the logs
+            this.runCommand({sourceId: sourceId, actions: [{action: "destroy", targetId: "Grandchild", phase: "CAPTURE"}], eventList: [], skipLog: true});
+
+            eventList[0].resume();
+            expectedBubble = ["RootOwnedWrapper", "RootOwnedChild", "RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
+            expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
+            expectedBroadcast = this.getCustomBroadcasts(sourceId, [
+                "RootOwnedWrapper",
+                "RootOwnedChild",
+                "RootOwnedHandler",
+                "RootWrapper",
+                "RootSuper"
+            ]);
+            this.assertLogs(cmp, expectedPhased, expectedBroadcast);
+        }
+    },
+    
     testFromMiddleSuperPauseCreateProgrammaticThenResume: {
         test : function(cmp) {
             var sourceId = "RootOwnedHandler";
             var progId = "RootOwnedProgrammatic";
             var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler"];
-            var expectedBubble = ["RootOwnedHandler", "Root"]; 
+            var expectedBubble = ["RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root"]; 
             var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
             var expectedBroadcast = [];
             var actions = [{action: "pause", targetId: "Root", phase: "BUBBLE"}];
@@ -761,14 +881,13 @@
             this.runCommand({sourceId: sourceId, actions: actions, eventList: eventList});
             // Assert that everything is golden at this point
             this.assertLogs(cmp, expectedPhased, expectedBroadcast);
-            console.info("PASSED Assertion 1");
 
             // Now programmatically create a component
             this.createCmp(sourceId, "Root", progId, true)
             .then(function() {
                 // Resume the original event
                 eventList[0].resume();
-                expectedBubble = expectedCapture.slice().reverse();
+                expectedBubble = ["RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
                 expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
                 expectedBroadcast = this.getDefaultBroadcasts(sourceId).concat(this.getCustomBroadcasts(sourceId, [
                     "GrandchildWrapper",
@@ -779,6 +898,87 @@
                 ]));
                 // Should include broadcast handlers from the programmatically created components
                 // that arrived after the event was originally fired
+                this.assertLogs(cmp, expectedPhased, expectedBroadcast);
+            }.bind(this))
+            .then(this.continuation());
+        }
+    },
+
+    testFromMiddlePauseResumeAndPreventDefaultBubbleAtWrapper: {
+        test : function(cmp) {
+            var sourceId = "RootOwnedHandler";
+            var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler"];
+            var expectedBubble = ["RootOwnedHandler", "RootWrapper"];
+            var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
+            var expectedBroadcast = [];
+            var actions = [
+                {action: "pause", targetId: "RootWrapper", phase: "BUBBLE"},
+                {action: "preventDefault", targetId: "Root", phase: "CAPTURE"}
+            ];
+            var eventList = [];
+
+            this.clearLogs(cmp);
+            this.runCommand({sourceId: sourceId, actions: actions, eventList: eventList});
+
+            this.assertLogs(cmp, expectedPhased, expectedBroadcast);
+
+            eventList[0].resume();
+            expectedBubble = ["RootOwnedHandler", "RootWrapper", "RootEmptyWrapper", "Root", "RootSuper"];
+            expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
+            this.assertLogs(cmp, expectedPhased, expectedBroadcast);
+        }
+    },
+
+    testFromMiddleStopPropagationBubbleAtEmptyWrapper: {
+        test : function(cmp) {
+            var sourceId = "RootOwnedHandler";
+            var expectedCapture = ["RootSuper", "Root", "RootOwnedHandler"];
+            var expectedBubble = ["RootOwnedHandler", "RootWrapper", "RootEmptyWrapper"];
+            var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
+            var expectedBroadcast = this.getCustomBroadcasts(sourceId, [
+                "GrandchildWrapper",
+                "Grandchild",
+                "RootOwnedWrapper",
+                "RootOwnedHandler",
+                "RootOwnedChild",
+                "RootWrapper"]);
+            var actions = [
+                {action: "stopPropagation", targetId: "RootEmptyWrapper", phase: "BUBBLE"}
+            ];
+            var eventList = [];
+
+            this.clearLogs(cmp);
+            this.runCommand({sourceId: sourceId, actions: actions, eventList: eventList});
+
+            this.assertLogs(cmp, expectedPhased, expectedBroadcast);
+        }
+    },
+
+    testCreateProgrammaticInEmptyWrapper: {
+        test : function(cmp) {
+            var sourceId = "Grandchild";
+            var progId = "RootOwnedProgrammatic";
+            // RootEmptyWrapper is in the capture flow because it is the owner of the programmatically created component (see below)
+            var expectedCapture = ["RootSuper", "Root", "RootEmptyWrapper", "RootOwnedProgrammaticHandler", "RootOwnedProgrammaticChild", "Grandchild"];
+            // RootWrapper is not in the bubble flow because it is replaced by RootEmptyWrapper when it changes its body facet
+            var expectedBubble = ["Grandchild", "RootOwnedProgrammaticWrapper", "RootOwnedProgrammaticChild", "RootOwnedProgrammaticHandler", "RootEmptyWrapper", "Root", "RootSuper"];
+            var expectedPhased = this.getExpectedPhasedLogs(sourceId, expectedCapture, expectedBubble);
+            var expectedBroadcast = this.getCustomBroadcasts(sourceId, [
+                "RootSuper",
+                "GrandchildWrapper",
+                "Grandchild",
+                "RootOwnedProgrammaticWrapper",
+                "RootOwnedProgrammaticHandler",
+                "RootOwnedProgrammaticChild"
+            ]);
+            var actions = [];
+
+            this.clearLogs(cmp);
+            // Programmatically create a component during setup
+            this.createCmpInBody("RootOwnedHandler", "RootEmptyWrapper", progId)
+            .then(function() {
+                this.runCommand({sourceId: sourceId, actions: actions});
+                
                 this.assertLogs(cmp, expectedPhased, expectedBroadcast);
             }.bind(this))
             .then(this.continuation());

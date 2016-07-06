@@ -17,18 +17,19 @@
 -->
 <aura:component extensible="true" extends="test:testAppEventPhasesHandler" implements="test:testAppEventPhasesHasLogId,test:testAppEventPhasesProvidable">
     <aura:handler event="test:testAppEventPhasesCommand" action="{!c.handleCommand}"/>
-    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEventCapture}" phase="capture"/>
-    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEventBubble}" phase="bubble"/>
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="capture"/>
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="bubble"/>
     <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" />
 
     <aura:import library="test:testAppEventPhasesLibrary" property="lib" />
     
-    <test:testAppEventPhasesWrapper logId="{! v.logId + 'Wrapper' }">
-        <div class="wrapper">
-            {!v.logId + 'Child'}
+    <div class="wrapper handlerChild">
+        {!v.logId + 'Child'}
+        <test:testAppEventPhasesWrapper logId="{! v.logId + 'Wrapper' }">
             <test:testAppEventPhasesEmitter aura:id="emitter" logId="{!v.logId + 'Child'}"/>
 
             <test:testAppEventPhasesHandlerGrandchild aura:id="grandchild" logId="Grandchild" />
-        </div>
-    </test:testAppEventPhasesWrapper>
+        </test:testAppEventPhasesWrapper>
+    </div>
+    
 </aura:component>

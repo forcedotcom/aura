@@ -16,5 +16,5 @@
 
 -->
 <aura:component implements="test:testAppEventPhasesHasLogId">
-    <ui:button aura:id="button" press="{!c.fireEvent}" label="{!v.logId + ' Emitter'}"/>
+    <ui:button aura:id="button" press="{!c.fireEvent}" label="{!v.logId + ' Emitter'}"/> {#globalId}
 </aura:component>

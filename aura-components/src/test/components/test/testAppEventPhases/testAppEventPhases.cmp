@@ -21,8 +21,8 @@
 	<aura:set attribute="logId" value="Root"/>
 
     <aura:handler event="test:testAppEventPhasesCommand" action="{!c.handleCommand}"/>
-    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEventCapture}" phase="capture"/>
-    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEventBubble}" phase="bubble"/>
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="capture"/>
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="bubble"/>
 
     <aura:import library="test:testAppEventPhasesLibrary" property="lib" />
 
@@ -34,13 +34,15 @@
     	ClientCreated {! globalid }
     </div>
 
-    <test:testAppEventPhasesWrapper logId="RootWrapper" aura:id="wrapper">
-        <div class="wrapper">
-            {!'Facet' + i}
-            <test:testAppEventPhasesEmitter aura:id="emitter" logId="{!v.logId}" />
+    <test:testAppEventPhasesEmptyWrapper logId="{! v.logId + 'EmptyWrapper'}" aura:id="emptyWrapper">
+        <test:testAppEventPhasesWrapper logId="{! v.logId + 'Wrapper'}" aura:id="wrapper">
+            <div class="wrapper main">
+                Facet
+                <test:testAppEventPhasesEmitter aura:id="emitter" logId="{!v.logId}" />
 
-            <test:testAppEventPhasesHandlerChild aura:id="handler" logId="{! v.logId + 'Owned' }" />
-        </div>
-    </test:testAppEventPhasesWrapper>
+                <test:testAppEventPhasesHandlerChild aura:id="handler" logId="{! v.logId + 'Owned' }" />
+            </div>
+        </test:testAppEventPhasesWrapper>
+    </test:testAppEventPhasesEmptyWrapper>
 
 </aura:component>

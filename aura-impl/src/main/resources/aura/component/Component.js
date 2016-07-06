@@ -34,6 +34,7 @@ function Component(config, localCreation) {
 
     // setup some basic things
     this.concreteComponentId = config["concreteComponentId"];
+    this.containerComponentId = config["containerComponentId"];
     this.shouldAutoDestroy=true;
     this.rendered = false;
     this.inUnrender = false;
@@ -130,7 +131,7 @@ function Component(config, localCreation) {
 
     //JBUCH: HALO: FIXME: THIS IS A DIRTY FILTHY HACK AND I HAVE BROUGHT SHAME ON MY FAMILY
     this.attributeValueProvider = configAttributes["valueProvider"];
-    this.facetValueProvider = configAttributes["facetValueProvider"];
+    this.facetValueProvider = configAttributes["facetValueProvider"];    
 
     // initialize attributes
     this.setupAttributes(this, configAttributes);
@@ -149,6 +150,9 @@ function Component(config, localCreation) {
 
     // sets up component level events
     this.setupComponentEvents(this, configAttributes);
+
+    // now that the def is set up, establish our parent id through any expression results
+    this.setContainerComponentId(this.containerComponentId);
 
     // instantiate super component(s)
     this.setupSuper(configAttributes, localCreation);
@@ -177,6 +181,30 @@ function Component(config, localCreation) {
     this._destroying = false;
     this.fire("init");
 }
+
+/**
+ * Sets this component's containerComponentId, which is the global id of
+ * the component that owns the facet attribute for which this
+ * component is a value.
+ * @private
+ */
+Component.prototype.setContainerComponentId = function(containerComponentId) {
+    this.containerComponentId = containerComponentId;
+    if(this.isInstanceOf("aura:expression")) {
+        // set the containerComponentId for expression values to the expression component itself
+        var facetValue = this.get("v.value");
+        if($A.util.isArray(facetValue)){
+            for(var fidx = 0; fidx < facetValue.length; fidx++) {
+                if(facetValue[fidx] instanceof Component) {
+                    facetValue[fidx].setContainerComponentId(this.globalId);
+                }
+            }
+        }
+        else if(facetValue instanceof Component) {
+            facetValue.setContainerComponentId(this.globalId);
+        }
+    }
+};
 
 Component.currentComponentId = 0;
 
@@ -457,11 +485,15 @@ Component.prototype.implementsDirectly = function(type) {
  *            beginning instead of the end of handlers array.
  * @param {String}
  *            phase The target event phase; defaults to "bubble"
+ * @param {Boolean}
+ *            includeFacets If true, this handler will also be invoked when events
+ *            flow from facet values whose value provider hierarchy does not
+ *            include this component.
  * @public
  * @export
  * @platform
  */
-Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert, phase) {
+Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert, phase, includeFacets) {
     var dispatcher = this.getEventDispatcher(this);
 
     if(!phase) {
@@ -478,10 +510,14 @@ Component.prototype.addHandler = function(eventName, valueProvider, actionExpres
         handlers[phase] = phasedHandlers = [];
     }
 
+    var actionCaller = this.getActionCaller(valueProvider, actionExpression);
+    if($A.util.getBooleanValue(includeFacets)) {
+        actionCaller.includeFacets = true;
+    }
     if (insert === true) {
-        phasedHandlers.unshift(this.getActionCaller(valueProvider, actionExpression));
+        phasedHandlers.unshift(actionCaller);
     } else {
-        phasedHandlers.push(this.getActionCaller(valueProvider, actionExpression));
+        phasedHandlers.push(actionCaller);
     }
 };
 
@@ -1308,6 +1344,11 @@ Component.prototype.getAttributeValueProvider = function() {
  */
 Component.prototype.setAttributeValueProvider = function (avp) {
     this.attributeValueProvider = avp;
+    if(avp) {
+        // JBA: without this, programmatically created components exhibit indeterministic owners
+        // with no way for the creator to fix
+        this.owner = avp;
+    }
 };
 
 /**
@@ -1338,6 +1379,21 @@ Component.prototype.getOwner = function() {
         this.owner=this.getAttributeValueProvider();
     }
     return this.owner;
+};
+
+/**
+ * Returns the container component of the component.
+ * The container is the component that owns the facet attribute for 
+ * which this component is a value. This may be different than the 
+ * result from getComponentValueProvider(), particularly if this
+ * component was transcluded into its container and not created 
+ * directly by its container.
+ *
+ * @return {Object} component
+ * @private
+ */
+Component.prototype.getContainerComponent = function() {
+    return $A.getComponent(this.containerComponentId);
 };
 
 /**
@@ -1851,6 +1907,7 @@ Component.prototype.createComponentStack = function(facets, valueProvider){
             var config = facetConfig[index];
             if (config instanceof Component) {
                 components.push(config);
+                config.setContainerComponentId(this.globalId);
             } else if (config && config["componentDef"]) {
                 if (action) {
                     action.setCreationPathIndex(index);
@@ -1869,7 +1926,7 @@ Component.prototype.createComponentStack = function(facets, valueProvider){
 
                 facetConfigAttr["valueProvider"] = (config["attributes"] && config["attributes"]["valueProvider"]) || valueProvider;
                 facetConfigClone["attributes"] = facetConfigAttr;
-
+                facetConfigClone["containerComponentId"] = this.globalId;
                 components.push($A.componentService.createComponentPriv(facetConfigClone));
                 $A.getContext().releaseCurrentAccess();
             } else {
@@ -2036,6 +2093,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 value=[$A.componentService.createComponentPriv({ "componentDef": { "descriptor" :"markup://aura:text" }, "attributes": {"values": { "value":value } }})];
             }
             var facetStack = this.createComponentStack([{"descriptor": attribute, value: value}], attributeValueProvider, localCreation);
+            
             // JBUCH: HALO: TODO: DEDUPE THIS AGAINST lines 462 - 467 AFTER CONFIRMING IT WORKS
             if (attribute === "body") {
                 attributes[attribute]=(this.concreteComponentId&&cmp.getConcreteComponent().attributeSet.values["body"])||{};
@@ -2301,7 +2359,7 @@ Component.prototype.setupComponentEvents = function(cmp, config) {
     if (cmpHandlers) {
         for (var k = 0; k < cmpHandlers.length; k++) {
             var cmpHandler = cmpHandlers[k];
-            cmp.addHandler(cmpHandler["name"], cmp, cmpHandler["action"], false, cmpHandler["phase"]);
+            cmp.addHandler(cmpHandler["name"], cmp, cmpHandler["action"], false, cmpHandler["phase"], cmpHandler["includeFacets"]);
         }
     }
 };
@@ -2332,6 +2390,7 @@ Component.prototype.setupApplicationEventHandlers = function(cmp) {
             handlerConfig["handler"] = this.getHandler(cmp, handlerDef["action"]);
             handlerConfig["event"] = handlerDef["eventDef"].getDescriptor().getQualifiedName();
             handlerConfig["phase"] = handlerDef["phase"];
+            handlerConfig["includeFacets"] = handlerDef["includeFacets"];
             $A.eventService.addHandler(handlerConfig);
         }
     }

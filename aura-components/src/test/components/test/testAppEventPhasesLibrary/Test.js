@@ -57,10 +57,22 @@ function Test() {
             }
         },
 
-        handle: function(cmp, event, currentPhase, logIdOverride) {
+        handle: function(cmp, event, logIdOverride) {
             var myLogId = logIdOverride || cmp.get("v.logId");
             var evtSourceId = event.getParam("sourceId");
             var evtActions = event.getParam("actions");
+            var currentPhase = "";
+            switch(event.getPhase()) {
+                case "capture":
+                    currentPhase = "CAPTURE";
+                    break;
+                case "bubble":
+                    currentPhase = "BUBBLE";
+                    break;
+                case "default":
+                    currentPhase = "BROADCAST";
+                    break;
+            }
 
             var parts = [currentPhase, "handle", evtSourceId, "in", myLogId];
             

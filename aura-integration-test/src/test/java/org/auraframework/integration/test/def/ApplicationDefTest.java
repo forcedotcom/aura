@@ -19,19 +19,13 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Set;
 
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.TokensDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
-import org.auraframework.system.Parser;
+import org.auraframework.system.*;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.*;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -245,5 +239,39 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
         String expected = "\"controller\":{\n    \"function1\":function(cmp) {var a = {k:}}\n  }";
         assertThat(actual, containsString(expected));
+    }
+
+    /**
+     * bootstrapPublicCacheExpiration attribute not set.
+     */
+    @Test
+    public void testBootstrapPublicCacheExpirationNotSet() throws Exception {
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseTag, "", ""));
+        ApplicationDef appdef = definitionService.getDefinition(desc);
+        assertNull(appdef.getBootstrapPublicCacheExpiration());
+    }
+
+    /**
+     * bootstrapPublicCacheExpiration set to integer value.
+     */
+    @Test
+    public void testBootstrapPublicCacheExpirationIntegerValue() throws Exception {
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseTag, "bootstrapPublicCacheExpiration='100'", ""));
+        ApplicationDef appdef = definitionService.getDefinition(desc);
+        assertEquals(Integer.valueOf(100), appdef.getBootstrapPublicCacheExpiration());
+    }
+
+    /**
+     * bootstrapPublicCacheExpiration set to server-side action.
+     */
+    @Test
+    public void testBootstrapPublicCacheExpirationServerAction() throws Exception {
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseTag, "bootstrapPublicCacheExpiration='{!c.getBootstrapPublicCacheExpiration}'"
+                        + " controller='java://org.auraframework.components.test.java.controller.TestController'", ""));
+        ApplicationDef appdef = definitionService.getDefinition(desc);
+        assertEquals(Integer.valueOf(60), appdef.getBootstrapPublicCacheExpiration());
     }
 }

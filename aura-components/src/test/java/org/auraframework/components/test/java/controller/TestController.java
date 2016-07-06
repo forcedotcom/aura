@@ -79,4 +79,9 @@ public class TestController {
         urls.add("/auraFW/resources/aura/resetCSS.css");
         return urls;
     }
+    
+    @AuraEnabled
+    public static int getBootstrapPublicCacheExpiration() {
+        return 60;
+    }
 }

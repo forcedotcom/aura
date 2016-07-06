@@ -15,9 +15,13 @@
  */
 package org.auraframework.http;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
 import java.net.URI;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,16 +30,26 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ServletUtilAdapter;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.instance.Action;
-import org.auraframework.service.*;
-import org.auraframework.system.*;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.LoggingService;
+import org.auraframework.service.SerializationService;
+import org.auraframework.service.ServerService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.throwable.*;
+import org.auraframework.system.Message;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.ClientOutOfSyncException;
+import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 
@@ -340,8 +354,7 @@ public class AuraServlet extends AuraBaseServlet {
 
     private Map<String, Object> getComponentAttributes(HttpServletRequest request) {
         Enumeration<String> attributeNames = request.getParameterNames();
-        // Using LinkedHashMap because when we serialize this map for URLs we will want a predictable order for caching
-        Map<String, Object> attributes = new LinkedHashMap<>();
+        Map<String, Object> attributes = new HashMap<>();
 
         while (attributeNames.hasMoreElements()) {
             String name = attributeNames.nextElement();

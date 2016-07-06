@@ -28,13 +28,17 @@
  	testTabsInOverflow : {
  		attributes : {"numTabs" : 10, "headerWidth" : 200},
  		test: [function(cmp) {
+            this.testContainer = "testTabContainerForAutomation";
  			this.pressCreateTabsForAutomation(cmp);
- 			this.waitForTabsetPresent(cmp, "testTabContainerForAutomation");
+ 			this.waitForTabsetPresent(cmp, this.testContainer);
+        }, function(cmp) {
+            // make sure overflow items are loaded
+            this.waitForOverflowTabsLoaded(cmp, this.testContainer);
  		}, function(cmp) {
  			var expectedTabs = this.EXPECTED_TAB_HEADER_LABELS.slice(0,10);
  			var expectedTabsInOverflow = this.EXPECTED_TAB_HEADER_LABELS.slice(2,10);
- 			this.verifyTabHeaders(cmp, "testTabContainerForAutomation", expectedTabs);
- 			this.verifyTabsInOverflow(cmp, "testTabContainerForAutomation", expectedTabsInOverflow);
+ 			this.verifyTabHeaders(cmp, this.testContainer, expectedTabs);
+ 			this.verifyTabsInOverflow(cmp, this.testContainer, expectedTabsInOverflow);
  		}]
      },
 
@@ -43,12 +47,16 @@
   	 */
   	testSelectTabInOverflow : {
   		test: [function(cmp) {
+            this.testContainer = "testTabContainerForAutomation";
  			this.pressCreateTabsForAutomation(cmp);
- 			this.waitForTabsetPresent(cmp, "testTabContainerForAutomation");
+ 			this.waitForTabsetPresent(cmp, this.testContainer);
+        }, function(cmp) {
+            // make sure overflow items are loaded
+            this.waitForOverflowTabsLoaded(cmp, this.testContainer);
  		}, function(cmp) {
  			// select 2rd tab in overflow (4th tab overall)
- 			this.selectTabFromOverflow(cmp, "testTabContainerForAutomation",2);
- 			this.waitForTabVisible(cmp, "testTabContainerForAutomation", this.EXPECTED_TAB_HEADER_LABELS[3]);
+ 			this.selectTabFromOverflow(cmp, this.testContainer, 2);
+ 			this.waitForTabVisible(cmp, this.testContainer, this.EXPECTED_TAB_HEADER_LABELS[3]);
  		}, function(cmp) {
  			// 4th tab overall is now in visible section while rest are in overflow
  			var expectedSelectedTab = this.EXPECTED_TAB_HEADER_LABELS[3];
@@ -61,8 +69,8 @@
  			var expectedTabs = [expectedSelectedTab].concat(expectedTabsInOverflow);
 
  			// verify tabs and order
- 			this.verifyTabHeaders(cmp, "testTabContainerForAutomation", expectedTabs);
- 			this.verifyTabsInOverflow(cmp, "testTabContainerForAutomation", expectedTabsInOverflow);
+ 			this.verifyTabHeaders(cmp, this.testContainer, expectedTabs);
+ 			this.verifyTabsInOverflow(cmp, this.testContainer, expectedTabsInOverflow);
  		}]
     },
 
@@ -71,12 +79,16 @@
      */
     testSingleTabVislbe : {
     	test: [function(cmp) {
+            this.testContainer = "testTabContainerFixed";
  			this.pressCreateMultipleTabs(cmp);
- 			this.waitForTabsetPresent(cmp, "testTabContainerFixed");
+ 			this.waitForTabsetPresent(cmp, this.testContainer);
+        }, function(cmp) {
+            // make sure overflow items are loaded
+            this.waitForOverflowTabsLoaded(cmp, this.testContainer);
  		}, function(cmp) {
  			var expectedTabsInOverflow = this.EXPECTED_TAB_HEADER_LABELS.slice(1,20);
- 			this.verifyTabHeaders(cmp, "testTabContainerFixed", this.EXPECTED_TAB_HEADER_LABELS);
- 			this.verifyTabsInOverflow(cmp, "testTabContainerFixed", expectedTabsInOverflow);
+ 			this.verifyTabHeaders(cmp, this.testContainer, this.EXPECTED_TAB_HEADER_LABELS);
+ 			this.verifyTabsInOverflow(cmp, this.testContainer, expectedTabsInOverflow);
  		}]
     },
 
@@ -86,13 +98,14 @@
     testZeroTabInOverflow : {
     	attributes : {"numTabs" : 2},
     	test: [function(cmp) {
+            this.testContainer = "testTabContainerFixed";
     		this.pressCreateMultipleTabs(cmp);
-  			this.waitForTabsetPresent(cmp, "testTabContainerFixed");
+  			this.waitForTabsetPresent(cmp, this.testContainer);
   		}, function(cmp) {
   			var expectedTabs = this.EXPECTED_TAB_HEADER_LABELS.slice(0,2);
   			var expectedTabsInOverflow = [];
-  			this.verifyTabHeaders(cmp, "testTabContainerFixed", expectedTabs);
-  			this.verifyTabsInOverflow(cmp, "testTabContainerFixed", expectedTabsInOverflow);
+  			this.verifyTabHeaders(cmp, this.testContainer, expectedTabs);
+  			this.verifyTabsInOverflow(cmp, this.testContainer, expectedTabsInOverflow);
   		}]
     },
 
@@ -120,10 +133,14 @@
 		cmp.find("btnChangeHeaderTitle").get("e.press").fire();
 	},
 
+    getOverflowMenu: function(cmp, containerName) {
+        var tabset = this.getTabset(cmp, containerName);
+        return tabset.find("tabBar").find("overflowMenu");
+    },
+
 	selectTabFromOverflow: function(cmp, containerName, tabNumInOverflow) {
-		var tabset = this.getTabset(cmp, containerName);
-		var overflowList = tabset.find("tabBar").find("overflowMenu").find("menuList");
-		var overflowItems = overflowList.get("v.childMenuItems");
+        var overflowMenu = this.getOverflowMenu(cmp, containerName);
+		var overflowItems = overflowMenu.find("menuList").get("v.childMenuItems");
 		overflowItems[tabNumInOverflow-1].get("e.click").fire();
 	},
 
@@ -221,7 +238,7 @@
 		var tabLabelsInOverflow = [];
 
 		if (tabs.length > 1) {
-			var tabsOverflow = tabs[1].getElementsByTagName("li");
+			tabsOverflow = tabs[1].getElementsByTagName("li");
 		}
 
 		for (var i=0; i<tabsOverflow.length; i++) {
@@ -241,5 +258,12 @@
 			var actualLabel = actualTabsInOverflow[i];
 			$A.test.assertEquals(expectedLabel, actualLabel, "Incorret tab at position " + i);
 		}
-	}
+	},
+
+    waitForOverflowTabsLoaded: function(cmp, containerName) {
+        var overflowMenu = this.getOverflowMenu(cmp, containerName);
+        $A.test.addWaitForWithFailureMessage(true, function() {
+            return overflowMenu.getElement().getElementsByTagName("li").length > 0;
+        }, "No tabs in overflow are loaded!");
+    }
 })

@@ -25,7 +25,7 @@
 
 	<div>
         <div class="toolbar">
-        	<ui:inputText aura:id="inputTxt" class="inputTxt"/>
+            <ui:inputText aura:id="inputTxt" class="inputTxt"/>
             <ui:button aura:id="appendButton" label="Append Item" press="{!c.appendItem}" />
             <ui:button aura:id="updateButton" label="Update Item" press="{!c.updateItem}" />
         </div>
@@ -40,15 +40,17 @@
 		    onEdit="{!c.onEdit}">
 		    
 			<aura:set attribute="headerColumns">
-				<ui:dataGridColumn name="id"	  label="Id" sortable="true"/>
-				<ui:dataGridColumn name="name"	  label="Name" sortable="true"/>
-				<ui:dataGridColumn name="grade"   label="Grade"/>
-				<ui:dataGridColumn name="linkLabel"  label="Link"/>
+				<ui:dataGridColumn name="id"	    label="Id" sortable="true"/>
+				<ui:dataGridColumn name="name"	    label="Name" sortable="true"/>
+				<ui:dataGridColumn name="grade"     label="Grade"/>
+				<ui:dataGridColumn name="linkLabel" label="Link"/>
 				<ui:dataGridColumn name="issueDate" label="Issue Date"/>
-				<ui:dataGridColumn name="passing" label="Passing"/>
-				<ui:dataGridColumn name="notes"   label="Notes"/>
+				<ui:dataGridColumn name="passing"   label="Passing"/>
+				<ui:dataGridColumn name="notes"     label="Notes"/>
 				<ui:dataGridColumn name="modDateTime"   label="Modified"/>
-				<ui:dataGridColumn name="picklist" label="Blood Type"/>
+				<ui:dataGridColumn name="picklist"  label="Blood Type"/>
+				<ui:dataGridColumn name="progress"  label="Progress"/>
+				<ui:dataGridColumn name="dues"      label="Dues"/>
 			</aura:set>
 			
 			<aura:set attribute="columns">
@@ -78,6 +80,12 @@
 				</ui:inlineEditCell>
                 <ui:inlineEditCell name="bloodtype">
                     <ui:outputText value="{!row.myData.bloodtype}"/>
+                </ui:inlineEditCell>
+                <ui:inlineEditCell name="GPA">
+                    <ui:outputPercent value="{!row.myData.progress}"/>
+                </ui:inlineEditCell>
+                <ui:inlineEditCell name="Dues">
+                    <ui:outputCurrency value="{!row.myData.dues}"/>
                 </ui:inlineEditCell>
 			</aura:set>
 		</ui:inlineEditGrid>

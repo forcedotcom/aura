@@ -606,7 +606,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @return {HTMLElement} The input of type range we use to store the column width values
 		 */
 		_findRangeElement: function(headerEl) {
-			return headerEl ? headerEl.querySelector('input') : null;
+			return headerEl ? headerEl.querySelector('input[type="range"]') : null;
 		},
 		
 		/**

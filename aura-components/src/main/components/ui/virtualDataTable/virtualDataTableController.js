@@ -85,7 +85,11 @@
         
         cmp = helper._getRootComponent(cmp);
         
-        helper.updateItem(cmp, item, index);
+        if (item) {
+            cmp._updating = true;
+            helper.updateItem(cmp, item, index);
+            cmp._updating = false;
+        }
     },     
     
     /*

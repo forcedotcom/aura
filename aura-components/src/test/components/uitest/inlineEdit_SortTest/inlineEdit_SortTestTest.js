@@ -15,6 +15,7 @@
  */
  ({
      browsers: ["-IE7","-IE8"],
+     EDIT_PANEL_CLASS: "slds-popover--edit",
      
      /**
       * Test sorting updates column info
@@ -87,8 +88,9 @@
      },
      
      waitForPanel : function(cmp, isOpen) {
+         var panelClass = this.EDIT_PANEL_CLASS;
          $A.test.addWaitForWithFailureMessage(isOpen, function() {
-             var panel = $A.test.getElementByClass('editPanel');
+             var panel = $A.test.getElementByClass(panelClass);
              return !$A.util.isUndefinedOrNull(panel);
          }, 'Edit panel for cell is supposed to be open="' + isOpen + '" but was not');
      },

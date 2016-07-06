@@ -51,18 +51,7 @@
     rerender: function (cmp, helper) {
         this.superRerender();
         
-        var container = helper.getGridBody(cmp),
-            items     = cmp._virtualItems,
-            fragment  = document.createDocumentFragment();
-        
-        for (var i = 0; i < items.length; i++) {
-            fragment.appendChild(items[i]);
-        }
-
-        while (container.firstChild) {
-            container.removeChild(container.firstChild);
-        }
-        container.appendChild(fragment);
+        helper._selectiveRerender(cmp);
         
         if (cmp.get("v.fixedHeader")) {
             helper.updateSizesForFixedHeader(cmp);

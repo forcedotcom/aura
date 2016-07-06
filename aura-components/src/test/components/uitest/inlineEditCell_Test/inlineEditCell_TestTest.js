@@ -121,7 +121,7 @@
 	 
 	 getCellErrorState : function(cmp) {
 		 var cellElem = cmp.find('cell1').getElement();
-		 return $A.util.hasClass(cellElem, 'errors');
+		 return $A.util.hasClass(cellElem, 'slds-has-error');
 	 },
 	 
 	 verifyCellErrorState : function(cmp, expected) {

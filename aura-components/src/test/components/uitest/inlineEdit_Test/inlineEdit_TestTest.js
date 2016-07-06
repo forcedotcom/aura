@@ -17,6 +17,8 @@
 	 browsers: ["-IE7","-IE8"],
 	 colIds: ["id", "name", "grade"],
 	 
+	 EDIT_PANEL_CLASS: "slds-popover--edit",
+	 
 	 /**
 	  * Test basic flow:
       *  - triggering an edit moves focus into an inputElement
@@ -272,7 +274,7 @@
 	 
 	 getPanelFromDomElement : function(cmp, panelIndex) {
 		 panelIndex = panelIndex ? panelIndex : 0;
-		 var panels = $A.test.getElementByClass('editPanel');
+		 var panels = $A.test.getElementByClass(this.EDIT_PANEL_CLASS);
 		 if (0 < panelIndex > panels.length) {
 			 return undefined;
 		 }
@@ -290,8 +292,9 @@
 	 },
 	 
 	 waitForPanel : function(cmp, isOpen) {
+	     var panelClass = this.EDIT_PANEL_CLASS;
 		 $A.test.addWaitForWithFailureMessage(isOpen, function() {
-			 var panel = $A.test.getElementByClass('editPanel');
+			 var panel = $A.test.getElementByClass(panelClass);
 			 return !$A.util.isUndefinedOrNull(panel);
 		 }, 'Edit panel for cell is supposed to be open="' + isOpen + '" but was not');
 	 },
@@ -412,7 +415,7 @@
 	         actual = outputCmp.get('v.value');
 	         actual = actual ? actual : false;
          } else {
-             actual = $A.test.getText(cell.querySelector('.content'));
+             actual = $A.test.getText(cell.querySelector('.cellContainer').firstChild);
          }
 	     $A.test.assertEquals(expected, actual, 'Cell value is incorrect');
 	 },
@@ -422,7 +425,7 @@
 	     var actual = '';
 	     $A.test.addWaitForWithFailureMessage(expected, function() {
              var cell = that.getCellElem(cmp, rowIndex, colIndex);
-             actual = $A.test.getText(cell.querySelector('.content'));
+             actual = $A.test.getText(cell.querySelector('.cellContainer').firstChild);
              return actual;
          }, 'Cell value was not updated expecting "' + expected + '" but was "' + actual + '"');
 	 },

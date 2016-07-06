@@ -20,7 +20,7 @@
     Used temporarily for the ui:inlineEditGrid in 204 while we fully migrate the table components over to SLDS markup, refactor/integrate
     with treeGrid in 206, and deal with test fallout. NOT SUPPORTED ANYWHERE ELSE, DO NOT USE
  -->
-<aura:component extensible="true" support="PROTO" description="Displays a table of data">
+<aura:component extensible="false" support="PROTO" description="Displays a table of data">
     <aura:import library="ui:virtualDataGridLib" property="lib"/>
     <aura:attribute name="sortBy" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
     
@@ -68,6 +68,9 @@
     <!-- Resizable Columns -->
     <aura:attribute name="enableResizableColumns"   type="Boolean"      default="false" description="Enables the column resize plugin. The default is false."/>
     <aura:attribute name="resizableColumnsConfig"   type="Object" description="The column resize configuration. If not provided, the default configuration is used."/>
+    
+    <!-- PRIVATE ATTRIBUTES -->
+    <aura:attribute name="renderInfo" type="Object" description="Determines how the grid should rerender its DOM"/>
     
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 

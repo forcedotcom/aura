@@ -27,8 +27,8 @@
     
 	<aura:handler name="init" value="{!this}" action="{!c.init}" />
 
-	<div class="editPanel">
-		<div aura:id="panelContent" class="content">
+	<div class="slds-popover slds-popover--edit">
+		<div aura:id="panelContent" class="slds-popover__body">
 			{!v.inputComponent}
 		</div>
 	</div>

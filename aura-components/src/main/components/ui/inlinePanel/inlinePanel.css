@@ -13,22 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-	trigger : function(cmp) {
-		// TODO: Checks to make sure we can retrieve a value here.
-		var outputCmp = cmp.get("v.body")[0];
-		
-		if (outputCmp) {
-		    var value = outputCmp.get("v." + cmp.get("v.valueAttribute"));
-		    
-		    cmp.getEvent("gridAction").setParams({
-                action : "edit",
-                payload : {
-                    targetElement : cmp.getElement().parentNode,
-                    name : cmp.get("v.name"),
-                    value : value
-                }
-            }).fire();
-		}
-	}
-})// eslint-disable-line semi
+
+.THIS {
+    display: none;
+    position: absolute;
+    border: 1px solid #B6B6B6;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+    overflow: visible;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    z-index: 1;
+
+}
+
+.THIS.open,
+.THIS.transitioning {
+    display: block;
+}
+
+.THIS.open {
+    opacity: 1;
+}
+
+.THIS .container {
+    position: relative;
+}
+
+.THIS .content {
+    padding: 1px 14px;
+}
+
+.THIS .panel-header {
+    position: relative;
+}
+

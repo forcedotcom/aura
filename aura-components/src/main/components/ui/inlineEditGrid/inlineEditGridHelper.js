@@ -80,13 +80,14 @@
 	},
 	
 	createEditPanel : function(cmp, newPanelBody, referenceElement) {
+
 		var config = this.getPanelConfig(referenceElement);
 		
 		newPanelBody.addHandler('submit', cmp, 'c.handlePanelSubmit');
 		config.body = newPanelBody;
 		
 		$A.get('e.ui:createPanel').setParams({
-			panelType : 'panel',
+			panelType : 'inlinePanel',
 			visible : true,
 			panelConfig : config,
 			onCreate : function(panel) {
@@ -137,15 +138,9 @@
 	getPanelConfig: function(referenceElement) {
         return {
             referenceElement: referenceElement,
-            showCloseButton: false,
             closeOnClickOut: true,
-            useTransition: false,
-            showPointer: false,
-            inside: true,
-            pad: 0,
-            padTop: 0,
-            direction: "northwest",
             closeAction: function(panel) {
+
                 panel.get("v.body")[0].submitValues();
             }
         };

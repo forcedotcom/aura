@@ -236,7 +236,8 @@
         }]
     },
 
-    testClearThenKeyChangeAndReload: {
+    // disabled as flapper: W-3225654
+    _testClearThenKeyChangeAndReload: {
         test: [
            function loadComponentInIframe(cmp) {
                 $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));

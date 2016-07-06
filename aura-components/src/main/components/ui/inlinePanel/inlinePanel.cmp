@@ -1,0 +1,63 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="false" implements="ui:panelType" description="An inline panel.">
+    <aura:import library="ui:panelLib" property="lib"/>
+
+    <aura:attribute name="startOfDialogLabel" type="String" default="Start of Dialog" description="Accessibility label that indicates the start of the dialog" />
+    <aura:attribute name="title" type="String" description="The title of the dialog window" />
+    <aura:attribute name="class" type="String" description="CSS class" />
+    <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="If true, adds a listener to close the dialog when a user clicks outside the dialog. The default is false." />
+    <aura:attribute name="referenceElement" type="Object" required="true" description="The parent node to which this panel should be appended" />
+    <aura:attribute name="closeAction" type="Object"
+                    description="Overrides default close action (which is destroy) on click outside, tab out and Esc key press. The action is called with two parameters: panel component and one of 'closeOnEsc', 'closeOnTabOut' or 'closeOnClickOut'"/>
+    <aura:attribute name="autoFocus" type="Boolean" default="true" description="If true, sets the panel as the first focusable element. The default is true."/>
+
+    <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" description="Enables panel manager and panels to communicate"/>
+
+
+        <div aura:id='panel'
+         tabindex="-1"
+         class="{!v.class}"
+         role="dialog"
+         aria-labelledby="{!'title_' + globalId}"
+         aura:flavorable="true">
+
+        <div aura:id="content" class="{! join(' ',$Browser.isIOS ? 'IOS' : '','container') }">
+            <span class="assistiveText">{!v.startOfDialogLabel}</span>
+
+            <aura:if isTrue="{! v.header.length || !empty(v.title) }">
+                <div class="panel-header">
+                    <aura:if isTrue="{!!empty(v.title)}">
+                        <h2 id="{!'title_' + globalId}" class="{!join(' ', v.titleDisplay ? 'title' : 'assistiveText', and(v.titleTruncate, v.titleDisplay) ? token('uiPanel.truncate') : '')}">{!v.title}</h2>
+                    </aura:if>
+                     {!v.header}
+                     {!v.closeButton}
+                </div>
+            </aura:if>
+
+            <div aura:id="body" class="panel-content scrollable">
+               {!v.body}
+            </div>
+
+            <div class="panel-footer">
+                {!v.footer}
+            </div>
+
+        </div>
+    </div>
+</aura:component>

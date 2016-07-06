@@ -201,9 +201,6 @@
              this.verifyPanelContent(cmp, false);
              this.editPanel(cmp, true, 0, 'checkbox');
          }, function(cmp) {
-             this.waitForPanelOpen(cmp);
-         }, function(cmp) {
-             //this.verifyCellEditStatus(cmp, 0, 5, true);
              this.verifyCellContent(cmp, 0, 5, true);
          }]
      },
@@ -219,8 +216,6 @@
          }, function(cmp) {
              this.verifyPanelContent(cmp, 0.98);
              this.editPanel(cmp, 1.01, 0);
-         }, function(cmp) {
-             this.waitForPanelOpen(cmp);
          }, function(cmp) {
              this.verifyCellContent(cmp, 0, 9, '101%');
          }]
@@ -239,8 +234,6 @@
              this.verifyPanelContent(cmp, 1234.56);
              this.editPanel(cmp, 101.99, 0);
          }, function(cmp) {
-             this.waitForPanelOpen(cmp);
-         }, function(cmp) {
              this.verifyCellEditStatus(cmp, 0, 10, true);
              this.verifyCellContent(cmp, 0, 10, '$101.99');
          }]
@@ -250,7 +243,6 @@
 		 var tbody = document.getElementsByTagName("tbody")[0];
 		 var trs = this.getOnlyTrs(tbody.children);		 
 		 var trigger = trs[rowIndex].children[colIndex].querySelector('.triggerContainer button');
-		 
 		 $A.test.clickOrTouch(trigger);
 	 },
 	 

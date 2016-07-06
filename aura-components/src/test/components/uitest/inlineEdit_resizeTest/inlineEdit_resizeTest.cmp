@@ -88,6 +88,7 @@
             <ui:panelManager2 aura:id="pm">
                 <aura:set attribute="registeredPanels">
                    <ui:panel alias="panel"/>
+                   <ui:inlinePanel alias="inlinePanel"/>
                 </aura:set>
             </ui:panelManager2>
         </div>

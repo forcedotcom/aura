@@ -13,22 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-	trigger : function(cmp) {
-		// TODO: Checks to make sure we can retrieve a value here.
-		var outputCmp = cmp.get("v.body")[0];
-		
-		if (outputCmp) {
-		    var value = outputCmp.get("v." + cmp.get("v.valueAttribute"));
-		    
-		    cmp.getEvent("gridAction").setParams({
-                action : "edit",
-                payload : {
-                    targetElement : cmp.getElement().parentNode,
-                    name : cmp.get("v.name"),
-                    value : value
-                }
-            }).fire();
-		}
-	}
-})// eslint-disable-line semi
+
+.THIS {
+    border: 1px solid #d8dde6;
+    -webkit-filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.16));
+    -webkit-filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.16));
+}

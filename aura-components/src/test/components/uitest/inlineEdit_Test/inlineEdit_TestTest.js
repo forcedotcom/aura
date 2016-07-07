@@ -193,6 +193,7 @@
 	  */
      testUpdateCheckbox : {
          test : [function(cmp) {
+             //this.verifyCellEditStatus(cmp, 0, 5, false);
              this.triggerEditOnCell(cmp, 0, 5);
          }, function(cmp) {
              this.waitForPanelOpen(cmp);
@@ -202,10 +203,49 @@
          }, function(cmp) {
              this.waitForPanelOpen(cmp);
          }, function(cmp) {
+             //this.verifyCellEditStatus(cmp, 0, 5, true);
              this.verifyCellContent(cmp, 0, 5, true);
          }]
      },
      
+     /**
+      * Test update a cell with percent
+      */
+     testUpdatePercent : {
+         test : [function(cmp) {
+             this.triggerEditOnCell(cmp, 0, 9);
+         }, function(cmp) {
+             this.waitForPanelOpen(cmp);
+         }, function(cmp) {
+             this.verifyPanelContent(cmp, 0.98);
+             this.editPanel(cmp, 1.01, 0);
+         }, function(cmp) {
+             this.waitForPanelOpen(cmp);
+         }, function(cmp) {
+             this.verifyCellContent(cmp, 0, 9, '101%');
+         }]
+     },
+     
+     /**
+      * Test update a cell with currency
+      */
+     testUpdateCurrency : {
+         test : [function(cmp) {
+             this.verifyCellEditStatus(cmp, 0, 10, false);
+             this.triggerEditOnCell(cmp, 0, 10);
+         }, function(cmp) {
+             this.waitForPanelOpen(cmp);
+         }, function(cmp) {
+             this.verifyPanelContent(cmp, 1234.56);
+             this.editPanel(cmp, 101.99, 0);
+         }, function(cmp) {
+             this.waitForPanelOpen(cmp);
+         }, function(cmp) {
+             this.verifyCellEditStatus(cmp, 0, 10, true);
+             this.verifyCellContent(cmp, 0, 10, '$101.99');
+         }]
+     },
+          
 	 triggerEditOnCell : function(cmp, rowIndex, colIndex) {
 		 var tbody = document.getElementsByTagName("tbody")[0];
 		 var trs = this.getOnlyTrs(tbody.children);		 
@@ -393,5 +433,13 @@
              actual = $A.test.getText(cell.querySelector('.content'));
              return actual;
          }, 'Cell value was not updated expecting "' + expected + '" but was "' + actual + '"');
+	 },
+	 
+	 verifyCellEditStatus : function(cmp, rowIndex, colIndex, isEdited) {
+	     var cell = this.getCellElem(cmp, rowIndex, colIndex);
+         var cellCmp = this.getCmpFromElement(cell.children[0]);
+         var actual = cellCmp.get('v.edited');
+         actual = actual ? actual : false;
+         $A.test.assertEquals(isEdited, actual, 'Cell\'s editied status is incorrect');
 	 }
  })

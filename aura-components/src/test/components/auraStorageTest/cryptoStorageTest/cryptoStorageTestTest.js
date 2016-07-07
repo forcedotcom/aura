@@ -16,7 +16,7 @@
 
         $A.installOverride("StorageService.selectAdapter", function(){ return "crypto"; }, this);
         this.storage = this.createStorage("crypto-store", 32768, 2000, 3000);
-        $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store"); });
+        $A.test.addCleanup(function(){ this.deleteStorage("crypto-store"); }.bind(this));
     },
 
     createStorage: function(name, maxSize, expiration, autoRefreshInterval) {
@@ -28,6 +28,19 @@
             autoRefreshInterval: autoRefreshInterval,
             debugLogging: true
         });
+    },
+
+    deleteStorage: function(storageName) {
+        var completed = false;
+
+        $A.storageService.deleteStorage(storageName)
+            .then(function() {completed = true;})
+            .catch(function(e) {
+                var msg = "Failed to delete storage [" + storageName + "] :" + e.toString();
+                $A.test.fail(msg);
+            });
+
+        $A.test.addWaitFor(true, function() {return completed;});
     },
 
     /**
@@ -208,7 +221,7 @@
             // Due to differences in size calculation between adapters, pass in a storage with the correct size to
             // fill up the storage after 5 entries of a 512 character string.
             var storage = this.createStorage("crypto-store-overflow", 5000, 2000, 3000);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store-overflow"); });
+            $A.test.addCleanup(function(){ this.deleteStorage("crypto-store-overflow"); }.bind(this));
 
             cmp._storageLib.testOverflow(cmp, storage);
         }
@@ -225,43 +238,49 @@
 
     testClearThenKeyChangeAndReload: {
         test: [
-               function loadComponentInIframe(cmp) {
-                   cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true&value=expected_value",
-                           "iframeContainer", "first load");
-               },
-               function setKey(cmp) {
-                   var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-                   iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
-               },
-               function clearStorage(cmp) {
-                   var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-                   iframeCmp.resetStorage();
-                   cmp._iframeLib.waitForStatus("Resetting", "Done Resetting");
-               },
-               function addItemToStorage(cmp) {
-                   cmp._iframeLib.getIframeRootCmp().addToStorage();
-                   cmp._iframeLib.waitForStatus("Adding", "Done Adding");
-               },
-               function reloadIframe(cmp) {
-                   cmp._iframeLib.reloadIframe(cmp, false, "first reload");
-               },
-               function setKey(cmp) {
-                   var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-                   iframeCmp.helper.setEncryptionKey(new Array(32).join("2"));
-               },
-               function getItemFromStorage(cmp) {
-                   var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-                   iframeCmp.getFromStorage();
-                   $A.test.addWaitFor(true, function() {
-                       return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
-                   }, function() {
-                       var actual = $A.util.getText(iframeCmp.find("output").getElement());
-                       $A.test.assertEquals("undefined", actual, "Got unexpected item from storage after page reload");
-                   });
-               },
-               function removeStorage(cmp) {
-                   cmp._iframeLib.getIframeRootCmp().deleteStorage();
-               }]
+           function loadComponentInIframe(cmp) {
+                $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));
+                cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true",
+                        "iframeContainer", "first load");
+           },
+           function setKeyAndClearStorage(cmp) {
+                var completed = false;
+                var iframeCmp = cmp._iframeLib.getIframeRootCmp();
+                iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
+
+                var targetStorage = iframeCmp._storage;
+                targetStorage.clear()
+                    .then(function() {completed = true;})
+                    .catch(function(e) { $A.test.fail(e.toString());});
+
+                $A.test.addWaitFor(true, function() {return completed;});
+           },
+           function addItemToStorage(cmp) {
+               var targetStorage = cmp._iframeLib.getIframeRootCmp()._storage;
+                targetStorage.set("key1", cmp._expected)
+                    .then(function(){ completed = true; })
+                    .catch(function(e){ $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function() {return completed;});
+           },
+           function reloadIframe(cmp) {
+               cmp._iframeLib.reloadIframe(cmp, false, "first reload");
+           },
+           function changeKeyAndGetItemFromStorage(cmp) {
+               var iframeCmp = cmp._iframeLib.getIframeRootCmp();
+               iframeCmp.helper.setEncryptionKey(new Array(32).join("2"));
+
+               var targetStorage = iframeCmp._storage;
+                targetStorage.get("key1").
+                    then(function(value) {
+                        $A.test.assertUndefined(value, "Found unexpected item from storage.");
+                        completed = true;
+                    })
+                    .catch(function(e){ $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function() {return completed;});
+            }
+        ]
     },
 
     testBulkGetInnerItemNotInStorage: {
@@ -287,7 +306,7 @@
             // Due to differences in size calculation between adapters, pass in a storage with the correct size to
             // fill up the storage after 5 entries of a 512 character string.
             var storage = this.createStorage("crypto-store-overflow", 5000, 2000, 3000);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store-overflow"); });
+            $A.test.addCleanup(function(){ this.deleteStorage("crypto-store-overflow"); }.bind(this));
             cmp._storageLib.testBulkSetLargerThanMaxSize(cmp, storage);
         }
     },
@@ -382,39 +401,44 @@
      */
     testReloadPage: {
         test: [
-        function loadComponentInIframe(cmp) {
-            cmp._expected = "expected value";
-            cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true&value="
-                    + cmp._expected, "iframeContainer", "first load");
-        },
-        function resetDatabase(cmp) {
-            var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-            iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
-            iframeCmp.resetStorage();
-            cmp._iframeLib.waitForStatus("Resetting", "Done Resetting");
-        },
-        function addItemToDatabase(cmp) {
-            cmp._iframeLib.getIframeRootCmp().addToStorage();
-            cmp._iframeLib.waitForStatus("Adding", "Done Adding");
-        },
-        function reloadIframe(cmp) {
-            cmp._iframeLib.reloadIframe(cmp, false, "first reload");
-        },
-        function getItemFromDatabase(cmp) {
-            var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-            // same encryption key
-            iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
-            iframeCmp.getFromStorage();
-            $A.test.addWaitFor(true, function() {
-                return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
-            }, function() {
-                var actual = $A.util.getText(iframeCmp.find("output").getElement());
-                $A.test.assertEquals(cmp._expected, actual, "Got unexpected item from storage after page reload");
-            });
-        },
-        function cleanupDatabase(cmp) {
-            cmp._iframeLib.getIframeRootCmp().deleteStorage();
-        }]
+            function loadComponentInIframe(cmp) {
+                $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));
+                cmp._expected = "expected";
+                cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true",
+                        "iframeContainer", "first load");
+            },
+            function addItemToStorage(cmp) {
+                var completed = false;
+                var iframeCmp = cmp._iframeLib.getIframeRootCmp();
+                iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
+
+                var targetStorage = iframeCmp._storage;
+                targetStorage.set("key1", cmp._expected)
+                    .then(function(){ completed = true; })
+                    .catch(function(e){ $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function() {return completed;});
+            },
+            function reloadIframe(cmp) {
+                cmp._iframeLib.reloadIframe(cmp, false, "first reload");
+            },
+            function getItemFromStorage(cmp) {
+                var completed = false;
+                var iframeCmp = cmp._iframeLib.getIframeRootCmp();
+                // same encryption key
+                iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
+
+                var targetStorage = iframeCmp._storage;
+                targetStorage.get("key1").
+                    then(function(value) {
+                        $A.test.assertEquals(cmp._expected, value, "Found unexpected item from storage after page reload");
+                        completed = true;
+                    })
+                    .catch(function(e){ $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function() {return completed;});
+            }
+        ]
     },
 
     /**
@@ -423,38 +447,67 @@
     testDifferentEncryptKeysShouldClearStorage: {
         test: [
             function loadComponentInIframe(cmp) {
-                cmp._expected = "expected value";
-                cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true&value="
-                        + cmp._expected, "iframeContainer", "first load");
+                $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));
+                cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true",
+                        "iframeContainer", "first load");
             },
-            function resetDatabase(cmp) {
+            function clearStorage(cmp) {
+                var completed = false;
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
                 iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
-                iframeCmp.resetStorage();
-                cmp._iframeLib.waitForStatus("Resetting", "Done Resetting");
+
+                var targetStorage = iframeCmp._storage;
+                targetStorage.clear()
+                    .then(function() {completed = true;})
+                    .catch(function(e) { $A.test.fail(e.toString());});
+
+                $A.test.addWaitFor(true, function() {return completed;});
             },
             function addItemToDatabase(cmp) {
-                cmp._iframeLib.getIframeRootCmp().addToStorage();
-                cmp._iframeLib.waitForStatus("Adding", "Done Adding");
+                var completed = false;
+                var targetStorage = cmp._iframeLib.getIframeRootCmp()._storage;
+                targetStorage.set("key1", "value1")
+                    .then(function() {
+                        return targetStorage.getSize()
+                    })
+                    .then(function(val) { completed = true;})
+                    .catch(function(e) { $A.test.fail(e.toString());});
+
+                $A.test.addWaitFor(true, function() {return completed;});
             },
             function reloadFrame(cmp) {
                 cmp._iframeLib.reloadIframe(cmp, false, "first reload");
             },
             function verifyNoItemWithDifferentKey(cmp) {
+                var completed = false;
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
                 // Provide different key
                 iframeCmp.helper.setEncryptionKey(new Array(32).join("Z"));
-                iframeCmp.getFromStorage();
-                $A.test.addWaitFor(true, function() {
-                    return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
-                }, function() {
-                    var actual = $A.util.getText(iframeCmp.find("output").getElement());
-                    $A.test.assertEquals("undefined", actual, "Got unexpected item from storage after page reload");
-                });
+
+                var targetStorage = iframeCmp._storage;
+                targetStorage.get("key1")
+                    .then(function(value) {
+                        $A.test.assertUndefined(value, "Got unexpected item from storage.");
+                        completed = true;
+                    })
+                    .catch(function(e) { $A.test.fail(e.toString());});
+
+                $A.test.addWaitFor(true, function() {return completed;});
             },
-            function cleanupDatabase(cmp) {
-                cmp._iframeLib.getIframeRootCmp().deleteStorage();
-            }]
+            function verifyStorageSize(cmp) {
+                var completed = false;
+                var targetStorage = cmp._iframeLib.getIframeRootCmp()._storage;
+                targetStorage.getSize()
+                    .then(function(value) {
+                        $A.test.assertEquals(0, value, "Storage should be cleared.");
+                        completed = true;
+                    })
+                    .catch(function(e) { $A.test.fail(e.toString());});
+
+                $A.test.addWaitFor(true, function() {return completed;});
+
+            }
+        ]
     },
 
     /**
@@ -546,10 +599,14 @@
                             results = event.target.result;
                             completed = true;
                         };
+                        window.indexedDB.webkitGetDatabaseNames().onerror = function(e) {
+                            $A.test.fail(e.toString());
+                        };
                     } else {
                         completed = true;
                     }
-                })['catch'](cmp._failTest);
+                })
+                .catch(cmp._failTest);
 
             $A.test.addWaitFor(
                     true,

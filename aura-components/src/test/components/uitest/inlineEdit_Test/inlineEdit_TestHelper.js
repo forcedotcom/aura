@@ -102,6 +102,26 @@
                 }
             }
         },
+        percent : {
+            componentDef : {
+                descriptor : 'markup://ui:inputPercent'
+            },
+            attributes : {
+                values : {
+                    updateOn : 'input'
+                }
+            }
+        },
+        dues : {
+            componentDef : {
+                descriptor : 'markup://ui:inputCurrency'
+            },
+            attributes : {
+                values : {
+                    updateOn : 'input'
+                }
+            }
+        },
 	},
 	
 	EDIT_PANEL_CONFIG : {

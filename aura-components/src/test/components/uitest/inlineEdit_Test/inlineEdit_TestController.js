@@ -26,6 +26,8 @@
 					grade : i,
 					linkLabel : "Link" + i,
 					bloodtype : helper.BLOOD_TYPES[Math.floor(Math.random() * 3)],
+					progress : Math.random(),
+					dues : Math.random() * 100
 				},
 				status : {},
 				errors : {}
@@ -36,9 +38,13 @@
 		items[5].myData.grade = '';
 		items[5].myData.linkLabel = '';
 		items[5].myData.bloodtype = '';
+		items[5].myData.progress = '';
+		items[5].myData.dues = '';
 		
 		// hack for testing picklist
 		items[0].myData.bloodtype = 'A';
+		items[0].myData.progress = 0.98;
+        items[0].myData.dues = 1234.56;
 		
 		cmp.set("v.items", items);
 		

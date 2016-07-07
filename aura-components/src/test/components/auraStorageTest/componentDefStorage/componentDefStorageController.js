@@ -7,21 +7,14 @@
         var load = cmp.get("v.load");
         helper.setStatus(cmp, "Fetching: " + load);
         helper.logDefs(cmp);
-        var action = $A.get("c.aura://ComponentController.getComponent");
-        action.setParams({name: load});
-        action.setStorable();
-
-        action.setCallback(this, function (action) {
-            if (action.getState() === "SUCCESS") {
+        $A.createComponent(load, {}, function (newCmp, status, errorMsg) {
+            if (status === "SUCCESS") {
                 helper.setStatus(cmp, "Fetched: " + load);
-                helper.log(cmp, "Action.isFromStorage() = " + action.isFromStorage());
                 helper.logDefs(cmp);
             } else {
-                helper.setStatus(cmp, "Error: " + action.getError().toString());
+                helper.setStatus(cmp, "Error: " + errorMsg);
             }
         });
-
-        $A.enqueueAction(action);
     },
 
     createComponentFromConfig: function(cmp, evt, helper) {

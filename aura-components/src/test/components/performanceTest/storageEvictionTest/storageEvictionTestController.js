@@ -15,41 +15,23 @@
     clearActionStorage: function (cmp, helper) {
         $A.storageService.deleteStorage('actions');
     },
+
     clearDefStorage: function (cmp, helper) {
         $A.storageService.deleteStorage('ComponentDefStorage');
     },
 
     fetchCmp: function (cmp, helper) {
-        var action = $A.get("c.aura://ComponentController.getComponent");
-        var input = cmp.find('input').getElement();
-        action.setParams({ name: input.value });
-        action.setStorable();
-
-        action.setCallback(this, function () {
-            try {
-                var newCmp = $A.createComponentFromConfig(action.getReturnValue());
-                console.log('>>>>>>>> Component fetched and created successfully! \n', newCmp + '');
-            } catch (e) {
-                console.log('BOoOoM!, Component blew up!');
-                console.log(e);
-            }
-        });
-
-        $A.enqueueAction(action);
+        createComponent(cmp, helper);
     },
 
     createComponent: function (cmp, helper) {
         var input = cmp.find('input').getElement();
-        try {
-            $A.createComponent(input.value, {}, function(newCmp) {
-                if (newCmp) {
-                    console.log('Component Created successfully! ', newCmp + '');
-                } else {
-                    console.log('BOoOoM!, Component blew up!');
-                }
-            });
-        } catch (e) {
-            console.log('$A.createComponent() threw!', e);
-        }
+        $A.createComponent(input.value, {}, function(newCmp, status, errorMsg) {
+            if (status === "SUCCESS") {
+                console.log('Component Created successfully! ', newCmp + '');
+            } else {
+                console.log('BOoOoM!, Component blew up!');
+            }
+        });
     }
 })

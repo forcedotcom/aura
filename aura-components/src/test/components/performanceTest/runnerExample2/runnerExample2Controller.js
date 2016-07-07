@@ -15,21 +15,13 @@
         // The "done" attribute gets provided by the perfRunner
         var done = event.getParam('arguments').done;
 
-        // Action to load a component
-        var action = $A.get("c.aura://ComponentController.getComponent");
-
         // Tells the perfRunner this operation is async 
         // (we will need to execute the returned finishRun callback when we are done)
         var finishRun = done.async(); 
 
-        action.setParams({ name: 'ui:image' });
-
-        action.setCallback(this, function () {
-            $A.createComponentFromConfig(action.getReturnValue());
+        $A.createComponent("ui:image", {}, function (newCmp, status, errorMsg) {
             cmp.set('v.loaded', true);
-            finishRun();
+            finishRun();            
         });
-
-        $A.enqueueAction(action);
     }
 })

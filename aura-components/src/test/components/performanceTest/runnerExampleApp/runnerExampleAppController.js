@@ -5,12 +5,9 @@
             // (we will need to execute the returned finishRun callback when we are done)
             var finishRun = done.async();
 
-            // Example of async operation:
-            var action = $A.get("c.aura://ComponentController.getComponent");
-            action.setParams({ name: 'ui:image' });
+            $A.createComponent("ui:image", {}, function (newCmp, status, errorMsg) {
 
-            action.setCallback(this, function () {
-                console.log('Downloaded def: ', action.getReturnValue());
+                console.log('Downloaded def: ', newCmp.getDef());
 
                 // We now tell the PerfFramework to finish
                 finishRun(function (results) {
@@ -18,9 +15,8 @@
                     // You can add your own custom metrics on results
                     results.customMetrics.test = true;
                 });
+            
             });
-
-            $A.enqueueAction(action);
         });
     }
 })

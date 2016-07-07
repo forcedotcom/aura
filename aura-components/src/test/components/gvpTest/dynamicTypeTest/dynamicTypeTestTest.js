@@ -33,17 +33,12 @@
 
     insertServerSide: function(cmp) {
         var finished = false;
-        var action = $A.get("c.aura://ComponentController.getComponent");
-
-        action.setParams({
-                "name" : "markup://gvpTest:dynamicTypeTest"
+        $A.createComponent("gvpTest:dynamicTypeTest", {}, function(newCmp, status, errorMsg) {
+            if (status === "SUCCESS") {
+                cmp.find("insertion").set("v.body", [ newCmp ]);
+                finished = true;
+            }
         });
-        action.setCallback(this, function(a) {
-            var newCmp = $A.createComponentFromConfig(a.getReturnValue());
-            cmp.find("insertion").set("v.body", [ newCmp ])
-            finished = true;
-        }, "SUCCESS");
-        $A.enqueueAction(action);
         // wait for our component to be inserted.
         $A.test.addWaitFor(true, function() { return finished});
     },

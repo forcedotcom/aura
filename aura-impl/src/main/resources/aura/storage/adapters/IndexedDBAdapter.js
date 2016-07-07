@@ -380,7 +380,7 @@ IndexedDBAdapter.prototype.enqueue = function(execute) {
     var promise;
 
     if (this.ready === false) {
-        promise = Promise["reject"](new Error("IndexedDBStorageAdapte.enqueue: database failed to initialize"));
+        promise = Promise["reject"](new Error("IndexedDBStorageAdapter.enqueue: database failed to initialize"));
     } else if (this.ready === undefined) {
         promise = new Promise(function(resolve, reject) {
             that.pendingRequests.push({ "execute":execute, "resolve":resolve, "reject":reject });
@@ -693,14 +693,14 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
 
                     if (shouldEvict) {
                         that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "expireCache(): sweep removing "+icursor.primaryKey);
-                        icursor['delete']();
+                        icursor["delete"]();
                         expiredSize += stored["size"];
                     } else {
                         size += stored["size"];
                         count += 1;
                     }
                 }
-                icursor['continue']();
+                icursor["continue"]();
             } else {
                 that.refreshSize(size, count);
 

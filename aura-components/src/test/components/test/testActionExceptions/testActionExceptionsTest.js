@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    
+
 
     testThrowable: {
         attributes : { throwableClass:"java.lang.Throwable",
@@ -38,7 +38,7 @@
         attributes : { throwableClass:"java.lang.Error",
                        throwableCause:"java.lang.RuntimeException" },
         test: function(cmp){
-        	this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.components.test.java.controller.JavaTestController: " + 
+        	this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.components.test.java.controller.JavaTestController: " +
                                                 "java.lang.Error: java.lang.RuntimeException");
         }
     },
@@ -65,7 +65,7 @@
         attributes : { throwableClass:"java.lang.IllegalArgumentException",
                        throwableCause:"you're not listening" },
         test: function(cmp){
-            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.components.test.java.controller.JavaTestController: " + 
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.components.test.java.controller.JavaTestController: " +
                                                 "java.lang.IllegalArgumentException: you're not listening");
         }
     },
@@ -88,13 +88,38 @@
     },
 
     testAuraHandledExceptionString: {
-        attributes : { throwableClass:"aura.throwable.AuraHandledException", 
+        attributes : { throwableClass:"aura.throwable.AuraHandledException",
                        throwableCause:"something to say" },
         test: function(cmp){
             this.checkHandledExceptionResponse(cmp, "ERROR", "something to say", "org.auraframework.throwable.AuraHandledException: " +
                                                                     "something to say");
         }
     },
+
+    /**
+     * Test that an XHR-level exception fires the corresponding app-level event
+     * and sets this action to ERROR state.
+     *
+     * Note: Test.js' setup pushes an access context so it's not possible for a cmp test
+     * to create and verify behavior of an access context-less XHR receive loop.
+     */
+    testXhrLevelException: {
+        attributes : { throwableClass:"aura.throwable.AuraHandledException",
+                       throwableCause:"something to say" },
+        test: [
+            function(cmp){
+                // set an invalid token to trigger an XHR-level exception event
+                $A.clientService.resetToken("invalid");
+                this.checkHandledExceptionResponse(cmp, "ERROR", "Received exception event from server", "Error: Received exception event from server");
+            },
+            function(cmp) {
+                $A.test.assertTrue(cmp.get("v.invalidSessionReceived"), "aura:invalidSession event was not fired / received");
+            }
+        ]
+    },
+
+
+
     //Because AuraHandledExceptions are treated differently
     checkHandledExceptionResponse : function(cmp, expectedState, expectedMessage, expectedStack){
         cmp.find("trigger").get("e.press").fire();
@@ -114,7 +139,7 @@
             }
         );
     },
-    
+
     checkUnHandledExceptionResponse : function(cmp, expectedState, expectedMessage, expectedStack){
         cmp.find("trigger").get("e.press").fire();
         $A.test.runAfterIf(
@@ -130,7 +155,7 @@
                     		||
                     		msg.match(/^Unable to process your request\n\norg\.auraframework\.throwable\.AuraExecutionException:/)
                     );
-                	$A.test.assertTrue(msg.indexOf(expectedMessage)!= -1, 
+                	$A.test.assertTrue(msg.indexOf(expectedMessage)!= -1,
                 			"Expected error message not seen: Expected {"+expectedMessage+"} but saw {"+msg+"}");
                 }
                 if(expectedStack){

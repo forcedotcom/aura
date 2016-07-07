@@ -18,7 +18,6 @@ package org.auraframework.impl.adapter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +35,7 @@ import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.throwable.InvalidSessionException;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Sets;
@@ -140,12 +140,12 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
                             "renderingTest", "setAttributesTest", "test", "tokenSanityTest", "uitest", "utilTest",
                             "updateTest", "whitespaceBehaviorTest", "appCache")
                     .build();
-    
+
     private static final Set<String> SYSTEM_TEST_PRIVILEGED_NAMESPACES = new ImmutableSortedSet.Builder<>(
             String.CASE_INSENSITIVE_ORDER)
                     .add("privilegedNS", "testPrivilegedNS1", "testPrivilegedNS2")
                     .build();
-    
+
     private static final Set<String> SYSTEM_TEST_CUSTOM_NAMESPACES = new ImmutableSortedSet.Builder<>(
     		String.CASE_INSENSITIVE_ORDER)
     		.add("testCustomNS1", "testCustomNS2")
@@ -253,7 +253,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         if (unprivilegedNamespaces.contains(namespace)) {
             return false;
         }
-        
+
         if(StringSourceLoader.getInstance().isPrivilegedNamespace(namespace) || SYSTEM_TEST_PRIVILEGED_NAMESPACES.contains(namespace)) {
         	return true;
         }
@@ -283,7 +283,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         if (nonInternalNamespaces.contains(namespace)) {
             return false;
         }
-        
+
         if(SYSTEM_TEST_CUSTOM_NAMESPACES.contains(namespace) || SYSTEM_TEST_PRIVILEGED_NAMESPACES.contains(namespace)) {
         	return false;
         }
@@ -316,10 +316,18 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
         return false;
     }
-    
+
     @Override
     public boolean isUnsecuredNamespace(String namespace) {
         return super.isUnsecuredNamespace(namespace) || SYSTEM_TEST_NAMESPACES.contains(namespace);
+    }
+
+    @Override
+    public void validateCSRFToken(String token) {
+        if ("invalid".equalsIgnoreCase(token)) {
+            throw new InvalidSessionException(new Exception("token was invalid"));
+        }
+        super.validateCSRFToken(token);
     }
 
     @Override

@@ -19,5 +19,9 @@
     <aura:attribute name="throwableClass" type="String"/>
     <aura:attribute name="throwableCause" type="String"/>
     <aura:attribute name="response" type="Aura.Action"/>
+
+    <aura:attribute name="invalidSessionReceived" type="Boolean" default="false"/>
+    <aura:handler event="aura:invalidSession" action="{!c.handleInvalidSession}"/>
+
     <ui:button aura:id="trigger" label="fire!" press="{!c.getException}"/>
 </aura:component>

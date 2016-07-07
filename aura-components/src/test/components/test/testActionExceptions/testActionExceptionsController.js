@@ -24,5 +24,9 @@
             cmp.set("v.response", action);
         });
         $A.enqueueAction(a);
+    },
+
+    handleInvalidSession: function(cmp, event){
+        cmp.set("v.invalidSessionReceived", true);
     }
 })

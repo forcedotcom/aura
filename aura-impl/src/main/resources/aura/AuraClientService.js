@@ -473,7 +473,7 @@ AuraClientService.prototype.throwExceptionEvent = function(resp) {
     }
 
     if ($A.eventService.hasHandlers(descriptor)) {
-        var evt = $A.getEvt(descriptor);
+        var evt = $A.eventService.getNewEvent(descriptor);
         if (evtObj["attributes"]) {
             evt.setParams(values);
         }
@@ -1274,11 +1274,11 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
         // We just have bootstrap data processed either from js or from cache
 
         try {
-            // We can have a missmatch if we are upgrading framework or mode
+            // We can have a mismatch if we are upgrading framework or mode
             context['merge'](boot["context"]);
         } catch(e) {
             // Abort caching and wait for bootstrap.js to arrive
-            $A.warning('Bootstrap cache missmatch, waiting for bootstrap.js');
+            $A.warning('Bootstrap cache mismatch, waiting for bootstrap.js');
             Aura["afterBootstrapReady"].push(this.runAfterBootstrapReady.bind(this, callback));
             return;
         }
@@ -1561,7 +1561,7 @@ AuraClientService.prototype.collectStorableAction = function(action, index) {
  * - If an error occurs querying storage then all actions are sent to the server.
  */
 AuraClientService.prototype.processStorableActions = function() {
-    var arr, i;
+    var arr, i, action;
 
     // if not storable actions then nothing to do
     if (this.collector.collectedStorableActions.length === 0) {
@@ -1586,7 +1586,7 @@ AuraClientService.prototype.processStorableActions = function() {
     // map of storage keys to array of action/index
     var keysToActions = {};
 
-    var action, key;
+    var key;
     for (i = 0; i < collectedStorableActions.length; i++) {
         action = collectedStorableActions[i];
         if (action) {
@@ -3221,7 +3221,7 @@ AuraClientService.prototype.populatePersistedActionsFilter = function() {
                     Aura["appBootstrap"] = items[key];
                 }
             }
-            $A.log("AuraClientSevice: restored " + Object.keys(items).length + " actions");
+            $A.log("AuraClientService: restored " + Object.keys(items).length + " actions");
         });
 };
 

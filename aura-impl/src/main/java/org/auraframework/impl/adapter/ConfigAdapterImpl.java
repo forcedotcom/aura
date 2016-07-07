@@ -745,16 +745,16 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 			} catch (QuickFixException e) {
 				throw new AuraRuntimeException(e);
 			}
-    	} 
-        
+    	}
+
 		return requireLocker;
 	}
-	
+
 	@Override
 	public String getLockerServiceCacheBuster() {
-		return isLockerServiceEnabled() ? "Y" : "N";		
+		return isLockerServiceEnabled() ? "Y" : "N";
 	}
-	
+
 	protected boolean isSafeEvalWorkerURI(String uri) {
         return uri.endsWith("/lockerservice/safeEval.html");
     }

@@ -25,13 +25,11 @@ function FlavorDefaultDef(config) {
 
     if (!$A.util.isUndefinedOrNull(config["removeAll"])) {
         this.removeAll = config["removeAll"];
-        this.context = config["context"];
     } else {
         for (var key in config) {
             if (config.hasOwnProperty(key)) {
                 this.map[key] = {
-                    flavor: config[key]["flavor"],
-                    context: config[key]["context"]
+                    flavor: config[key]["flavor"]
                 };
             }
         }
@@ -46,37 +44,18 @@ function FlavorDefaultDef(config) {
  */
 FlavorDefaultDef.prototype.getFlavor = function(componentDescriptor) {
     if (!$A.util.isUndefinedOrNull(this.removeAll)) {
-        if (this.context && !this.isContextual(this.context)) {
-            return null;
-        }
         if (this.removeAll === "*" || this.removeAll === componentDescriptor.getNamespace()) {
             return "{!remove}";
         }
     }
 
     var entry = this.map[componentDescriptor.getQualifiedName()];
-    if (entry && entry.context) {
-        return this.isContextual(entry.context) ? entry.flavor : null;
-    } else if (entry) {
+    if (entry) {
         return entry.flavor;
     }
 
     return null;
 };
 
-/**
- * Returns true if the given expression string evaluates to true.
- * @param {String} context The expression.
- * @returns {Boolean} the evaluation result.
- * @private
- */
-FlavorDefaultDef.prototype.isContextual = function(context) {
-    var value = valueFactory.create(context, null, $A);
-    $A.assert(value && value.evaluate, "unable to parse expression for aura:flavor override");
-
-    var result = value.evaluate();
-    $A.assert($A.util.isBoolean(result), "expressions for aura:flavor overrides must result in a boolean value");
-    return result;
-};
 
 Aura.Flavors.FlavorDefaultDef = FlavorDefaultDef;

@@ -18,10 +18,7 @@ package org.auraframework.def;
 import java.util.Map;
 
 import org.auraframework.css.FlavorOverrideLocator;
-import org.auraframework.expression.Expression;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import com.google.common.base.Optional;
 
 public interface FlavorDefaultDef extends Definition {
     @Override
@@ -40,11 +37,6 @@ public interface FlavorDefaultDef extends Definition {
      * @throws QuickFixException If there's a problem loading a {@link FlavoredStyleDef}.
      */
     Map<DefDescriptor<ComponentDef>, String> computeFilterMatches(FlavorOverrideLocator mapping) throws QuickFixException;
-
-    /**
-     * Gets the value of the context attribute if present, or {@link Optional#absent()} if not specified.
-     */
-    public Optional<Expression> getContext();
 
     /**
      * @return Returns the parentDescriptor.

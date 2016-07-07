@@ -29,11 +29,10 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.FlavorDefaultDef;
 import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.expression.Expression;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -55,7 +54,6 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
 
     private final String component;
     private final String flavor;
-    private final Expression context;
 
     private final String removeAllNamespace;
 
@@ -89,13 +87,7 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
         }
 
         this.parentDescriptor = builder.parentDescriptor;
-        this.context = builder.context;
-        this.hashCode = AuraUtil.hashCode(descriptor, location, component, flavor, context);
-    }
-
-    @Override
-    public Optional<Expression> getContext() {
-        return Optional.fromNullable(context);
+        this.hashCode = AuraUtil.hashCode(descriptor, location, component, flavor);
     }
 
     @Override
@@ -176,17 +168,11 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
 
                 if (removeAllNamespace != null) {
                     json.writeMapEntry("removeAll", removeAllNamespace);
-                    if (context != null) {
-                        json.writeMapEntry("context", context);
-                    }
                 } else {
                     for (Entry<DefDescriptor<ComponentDef>, String> entry : computeFilterMatches(mapping).entrySet()) {
                         json.writeMapKey(entry.getKey().getQualifiedName());
                         json.writeMapBegin();
                         json.writeMapEntry("flavor", entry.getValue());
-                        if (context != null) {
-                            json.writeMapEntry("context", context);
-                        }
                         json.writeMapEnd();
                     }
                 }
@@ -210,8 +196,7 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
             return Objects.equal(descriptor, other.descriptor)
                     && Objects.equal(location, other.location)
                     && Objects.equal(component, other.component)
-                    && Objects.equal(flavor, other.flavor)
-                    && Objects.equal(context, other.context);
+                    && Objects.equal(flavor, other.flavor);
         }
 
         return false;
@@ -226,7 +211,6 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
         private String component;
         private String flavor;
-        private Expression context;
 
         public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
             this.parentDescriptor = parentDescriptor;
@@ -241,10 +225,6 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
         public Builder setFlavor(String flavor) {
             this.flavor = flavor.trim();
             return this;
-        }
-
-        public void setContext(Expression context) throws InvalidDefinitionException {
-            this.context = context;
         }
 
         @Override

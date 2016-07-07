@@ -166,7 +166,8 @@
         if (!$A.util.isEmpty(events)) {
         	events = events.split(',');
         	for (var i = 0; i < events.length; i++) {
-                container.addEventListener(events[i], delegate, this.USE_CAPTURE.includes(events[i]));
+        	    var useCapture = this.USE_CAPTURE.indexOf(events[i]) !== -1;
+                container.addEventListener(events[i], delegate, useCapture);
             }
         }
     },

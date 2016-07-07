@@ -236,8 +236,7 @@
         }]
     },
 
-    // disabled as flapper: W-3225654
-    _testClearThenKeyChangeAndReload: {
+    testClearThenKeyChangeAndReload: {
         test: [
            function loadComponentInIframe(cmp) {
                 $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));
@@ -257,7 +256,8 @@
                 $A.test.addWaitFor(true, function() {return completed;});
            },
            function addItemToStorage(cmp) {
-               var targetStorage = cmp._iframeLib.getIframeRootCmp()._storage;
+                var completed = false;
+                var targetStorage = cmp._iframeLib.getIframeRootCmp()._storage;
                 targetStorage.set("key1", cmp._expected)
                     .then(function(){ completed = true; })
                     .catch(function(e){ $A.test.fail(e.toString()); });
@@ -268,10 +268,11 @@
                cmp._iframeLib.reloadIframe(cmp, false, "first reload");
            },
            function changeKeyAndGetItemFromStorage(cmp) {
-               var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-               iframeCmp.helper.setEncryptionKey(new Array(32).join("2"));
+                var completed = false;
+                var iframeCmp = cmp._iframeLib.getIframeRootCmp();
+                iframeCmp.helper.setEncryptionKey(new Array(32).join("2"));
 
-               var targetStorage = iframeCmp._storage;
+                var targetStorage = iframeCmp._storage;
                 targetStorage.get("key1").
                     then(function(value) {
                         $A.test.assertUndefined(value, "Found unexpected item from storage.");

@@ -29,63 +29,65 @@
         }
     },
 
-    _testDynamicallyCreatingComponentOnServer: {
+    testDynamicallyCreatingComponentWithNoServerDependencyFromServer: {
         test: [
-        function createComponentOnServer(cmp) {
-            cmp._expectedCmp = "test:text";
-            var completed = false;
-            $A.createComponent(cmp._expectedCmp, {}, function(newCmp) {
-                var actual = newCmp.getDef().getDescriptor().getQualifiedName();
-                $A.test.assertEquals("markup://"+cmp._expectedCmp, actual,
-                        "Unexpected component returned via $A.createComponent on first call");
-                completed = true;
-            });
+            function createComponentOnServer(cmp) {
+                cmp._expectedCmp = "markup://ui:inputText";
+                var completed = false;
+                $A.createComponent(cmp._expectedCmp, {}, function(newCmp) {
+                    var actual = newCmp.getDef().getDescriptor().getQualifiedName();
+                    $A.test.assertEquals(cmp._expectedCmp, actual,
+                            "Unexpected component returned via $A.createComponent on first call");
+                    completed = true;
+                });
 
-            $A.test.addWaitFor(true, function(){ return completed; });
-        },
-        function createSameComponent(cmp) {
-            // After retrieving the component from the server it should be saved in memory on the client, even though
-            // all def cache operations will fail, allowing us to recreate the same component offline.
-            $A.test.setServerReachable(false);
-            $A.test.addCleanup(function(){ $A.test.setServerReachable(true) });
-            var completed = false;
-            $A.createComponent(cmp._expectedCmp, {}, function(newCmp) {
-                var actual = newCmp.getDef().getDescriptor().getQualifiedName();
-                $A.test.assertEquals("markup://"+cmp._expectedCmp, actual,
-                        "Unexpected component returned via $A.createComponent on second call");
-                completed = true;
-            });
+                $A.test.addWaitFor(true, function(){ return completed; });
+            },
+            function createSameComponent(cmp) {
+                // After retrieving the component from the server it should be saved in memory on the client, even though
+                // all def cache operations will fail, allowing us to recreate the same component offline.
+                $A.test.setServerReachable(false);
+                $A.test.addCleanup(function(){ $A.test.setServerReachable(true) });
+                var completed = false;
+                $A.createComponent(cmp._expectedCmp, {}, function(newCmp) {
+                    var actual = newCmp.getDef().getDescriptor().getQualifiedName();
+                    $A.test.assertEquals(cmp._expectedCmp, actual,
+                            "Unexpected component returned via $A.createComponent on second call");
+                    completed = true;
+                });
 
-            $A.test.addWaitFor(true, function(){ return completed; });
-        }]
+                $A.test.addWaitFor(true, function(){ return completed; });
+            }
+        ]
     },
 
-    testDynamicallyCreatingComponentOnClient: {
+    testDynamicallyCreatingComponentFromClient: {
         test: [
-        function createComponentOnClient(cmp) {
-            // Create a component we've included as a dependency so component creation stays client-side
-            cmp._expectedCmp = "attributesTest:parent";
-            var completed = false;
-            $A.createComponent(cmp._expectedCmp, {}, function(newCmp) {
-                var actual = newCmp.getDef().getDescriptor().getQualifiedName();
-                $A.test.assertEquals("markup://"+cmp._expectedCmp, actual,
-                        "Unexpected component returned via $A.createComponent on second call");
-                completed = true;
-            });
+            function createComponentOnClient(cmp) {
+                // Create a component we've included as a dependency so component creation stays client-side
+                cmp._expectedCmp = "markup://ui:button";
+                var completed = false;
+                $A.createComponent(cmp._expectedCmp, {}, function(newCmp) {
+                    var actual = newCmp.getDef().getDescriptor().getQualifiedName();
+                    $A.test.assertEquals(cmp._expectedCmp, actual,
+                            "Unexpected component returned via $A.createComponent on first call");
+                    completed = true;
+                });
 
-            $A.test.addWaitFor(true, function(){ return completed; });
-        },
-        function createSameComponent(cmp) {
-            var completed = false;
-            $A.createComponent(cmp._expectedCmp, {}, function(newCmp) {
-                var actual = newCmp.getDef().getDescriptor().getQualifiedName();
-                $A.test.assertEquals("markup://"+cmp._expectedCmp, actual,
-                        "Unexpected component returned via $A.createComponent on second call");
-                completed = true;
-            });
+                $A.test.addWaitFor(true, function(){ return completed; });
+            },
+            function createSameComponent(cmp) {
+                var completed = false;
+                $A.createComponent(cmp._expectedCmp, {}, function(newCmp) {
+                    var actual = newCmp.getDef().getDescriptor().getQualifiedName();
+                    $A.test.assertEquals(cmp._expectedCmp, actual,
+                            "Unexpected component returned via $A.createComponent on second call");
+                    completed = true;
+                });
 
-            $A.test.addWaitFor(true, function(){ return completed; });
-        }]
+                $A.test.addWaitFor(true, function(){ return completed; });
+            }
+        ]
     },
 
     /**
@@ -99,19 +101,14 @@
                 actual = newCmp;
             });
 
-            $A.test.addWaitFor(
-                    true,
-                    function() {
-                        return actual !== undefined;
-                    },
+            $A.test.addWaitFor(true, function() { return actual !== undefined; },
                     function() {
                         $A.test.assertEquals("markup://test:text", actual.getDef().getDescriptor().getQualifiedName(),
                                 "Unexpected component returned from createComponent() when storage operations fail");
                     }
             );
             // run as a separate waitFor because def persistence and the subsequent clearing is async to cmp creation
-            $A.test.addWaitForWithFailureMessage(
-                    true,
+            $A.test.addWaitForWithFailureMessage(true,
                     function() {
                         return window.mockComponentDefStorage.clearCallCount > 0;
                     },

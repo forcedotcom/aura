@@ -142,23 +142,26 @@
     },
 
     testFocusOnPillAfterDelete: {
-        test: function (cmp) {
-            var pillContainer = cmp.find("pillContainer");
-            var textInput = this._getInput(cmp);
-            this._inputPill(textInput, this.PILLS[0].label);
-            this._inputPill(textInput, this.PILLS[1].label);
+        test: [
+            function (cmp) {
+                var pillContainer = cmp.find("pillContainer");
+                var textInput = this._getInput(cmp);
+                this._inputPill(textInput, this.PILLS[0].label);
+                this._inputPill(textInput, this.PILLS[1].label);
 
-            this._fireKeydownEvent(textInput, this.BACKSPACE_KEY);
+                this._fireKeydownEvent(textInput, this.BACKSPACE_KEY);
 
-            var secondPill = pillContainer.find("pill")[1];
-            this._fireKeydownEvent(secondPill, this.BACKSPACE_KEY);
-
-
-            $A.test.addWaitForWithFailureMessage(true, function() {
+                var secondPill = pillContainer.find("pill")[1];
+                this._fireKeydownEvent(secondPill, this.BACKSPACE_KEY);
+            },
+            function (cmp) {
+                var pillContainer = cmp.find("pillContainer");
                 var firstPill = pillContainer.find("pill")[0];
-                return document.activeElement === firstPill.getElement();
-            }, "first pill should be focused");
-        }
+                var errorMsg =  "first pill should be focused";
+                $A.test.assertTrue(document.activeElement === firstPill.getElement(), errorMsg);
+            }
+        ]
+
     },
     
     DOWNARROW_KEY: 40,

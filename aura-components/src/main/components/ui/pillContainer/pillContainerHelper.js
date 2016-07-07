@@ -308,24 +308,27 @@
                 if (items.length <= 0) {
                     this.focusOnInputBox(cmp);
                 } else {
-                    // need to set focus on next item
-                    var pillItems = cmp.find('pill');
-                    pillItems.splice(i, 1);
-                    if ($A.util.isEmpty(items) || !$A.util.isArray(items)) {
-                        return;
-                    }
-                    var idxToFocus = i; // [i] is removed, so next one is i
-                    // correct for pointing to last item
-                    if (idxToFocus >= pillItems.length) {
-                        idxToFocus = pillItems.length - 1;
-                    }
-
-                    pillItems[idxToFocus].focus();
+                    this.focusNextPill(i, cmp);
                 }
                 this._setActiveItem(cmp,0);
                 break;
             }
         }
+    },
+    focusNextPill : function (index, cmp) {
+        var pillItems = cmp.find('pill');
+        var hasOnlyOnePill = pillItems.length === 1;
+        var isIndexTheLastPill = index === pillItems.length - 1;
+
+        if (hasOnlyOnePill) {
+            return;
+        }
+
+        if (isIndexTheLastPill) {
+            index = pillItems.length - 2;
+        }
+
+        pillItems[index].focus();
     },
 
     _setActiveItem: function(cmp, index) {

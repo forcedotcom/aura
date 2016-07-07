@@ -15,12 +15,12 @@
  */
 package org.auraframework.instance;
 
-import java.util.Map;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+
+import java.util.Map;
 
 /**
  * value providers for $ stuff that is not component specific, there is only 1
@@ -52,7 +52,7 @@ public interface GlobalValueProvider extends ValueProvider {
     boolean isEmpty();
 
     /**
-     * @return true if this provider has serialization references;
+     * @deprecated refSupport no longer supported
      */
     boolean refSupport();
 

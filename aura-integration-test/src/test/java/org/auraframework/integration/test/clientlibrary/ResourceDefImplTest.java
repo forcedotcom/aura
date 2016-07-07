@@ -15,9 +15,7 @@
  */
 package org.auraframework.integration.test.clientlibrary;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Set;
-
+import com.google.common.base.Charsets;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ResourceDef;
@@ -26,7 +24,8 @@ import org.auraframework.impl.clientlibrary.ResourceDefImpl;
 import org.auraframework.util.json.JsonEncoder;
 import org.junit.Test;
 
-import com.google.common.base.Charsets;
+import java.io.ByteArrayOutputStream;
+import java.util.Set;
 
 public class ResourceDefImplTest extends AuraImplTestCase {
     @Test
@@ -70,7 +69,7 @@ public class ResourceDefImplTest extends AuraImplTestCase {
         assertTrue("CSS resource should be in component", resourceDefs.contains(cssResourceDef));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
+        JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false);
         jsResourceDef.serialize(json);
         cssResourceDef.serialize(json);
         json.close();

@@ -15,20 +15,10 @@
  */
 package org.auraframework.impl.context;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.css.StyleContext;
@@ -59,10 +49,19 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 public class AuraContextImpl implements AuraContext {
     // JBUCH: TEMPORARY FLAG FOR 202 CRUC. REMOVE IN 204.
@@ -632,7 +631,7 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public String serialize(EncodingStyle style) {
         StringBuffer sb = new StringBuffer();
-        JsonEncoder json = new JsonEncoder(sb, false, false);
+        JsonEncoder json = new JsonEncoder(sb, false);
 
         try {
             json.writeMapBegin();

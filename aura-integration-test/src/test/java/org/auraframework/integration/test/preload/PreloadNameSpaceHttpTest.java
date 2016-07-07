@@ -25,7 +25,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
-import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.junit.Test;
@@ -61,8 +60,7 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         List<Object> actions = (List<Object>) outerMap.get("actions");
         Map<String, Object> action = (Map<String, Object>) actions.get(0);
         Map<String, Object> returnValue = (Map<String, Object>) action.get("returnValue");
-        Map<String, Object> value = (Map<String, Object>) returnValue.get(Json.ApplicationKey.VALUE.toString());
-        Map<String, Object> def = (Map<String, Object>) value.get("componentDef");
+        Map<String, Object> def = (Map<String, Object>) returnValue.get("componentDef");
         String descriptor = (String) def.get("descriptor");
 
         // Verify that Descriptor was the only value sent back as part of the componentDef

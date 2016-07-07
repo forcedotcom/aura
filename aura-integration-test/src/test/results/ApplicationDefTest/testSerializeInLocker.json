@@ -1,73 +1,17 @@
 {
-  "s":1,
-  "v":{
-    "descriptor":"markup://nonInternal:component",
-    "superDef":{
-      "s":2,
-      "v":{
-        "descriptor":"markup://aura:application",
-        "attributeDefs":[
-          {
-            "s":3,
-            "v":{
-              "name":"body",
-              "type":"aura://Aura.Component[]",
-              "xs":"G"
-            }
-          }
-        ],
-        "interfaces":[
-          "markup://aura:rootComponent"
-        ],
-        "isAbstract":true,
-        "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:application\",function() {\nvar aura$application = {\n  \"meta\":{\n    \"name\":\"aura$application\"\n  },\n  \"renderer\":{\n    \"render\":function(component) {\n        var rendering = component.getRendering();\n        return rendering||$A.renderingService.renderFacet(component,component.get(\"v.body\"));\n    },\n    \"afterRender\":function(component) {\n        var body = component.get(\"v.body\");\n        $A.afterRender(body);\n    },\n    \"rerender\":function(component) {\n        var body = component.get(\"v.body\");\n        return $A.renderingService.rerenderFacet(component,body);\n    },\n    \"unrender\":function(component) {\n        var body = component.get(\"v.body\");\n        $A.renderingService.unrenderFacet(component,body);\n    }\n  }\n};\nreturn aura$application;\n});\n}",
-        "locationChangeEventDef":{
-          "s":4,
-          "v":{
-            "descriptor":"markup://aura:locationChange",
-            "type":"APPLICATION",
-            "xs":"G",
-            "superDef":{
-              "s":5,
-              "v":{
-                "descriptor":"markup://aura:applicationEvent",
-                "type":"APPLICATION",
-                "xs":"G",
-                "attributes":{
-
-                }
-              }
-            },
-            "attributes":{
-              "token":{
-                "s":6,
-                "v":{
-                  "name":"token",
-                  "type":"aura://String",
-                  "xs":"G"
-                }
-              },
-              "querystring":{
-                "s":7,
-                "v":{
-                  "name":"querystring",
-                  "type":"aura://String",
-                  "xs":"G"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "attributeDefs":[
-      {
-        "r":3
-      }
-    ],
-    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\n  var def = $A.componentService.getDef(\"markup://nonInternal:component\");  var locker = $A.lockerService.createForDef(\n\"var nonInternal$component = {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"nonInternal$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:application\\\"\\n  }\\n};\\nreturn nonInternal$component;\\n\", def);\n  return locker.$result;\n});\n}",
-    "locationChangeEventDef":{
-      "r":4
+  "descriptor": "markup://nonInternal:component",
+  "superDef": {
+    "descriptor": "markup://aura:application"
+  },
+  "attributeDefs": [
+    {
+      "name": "body",
+      "type": "aura://Aura.Component[]",
+      "xs": "G"
     }
+  ],
+  "componentClass": "function(){$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\n  var def = $A.componentService.getDef(\"markup://nonInternal:component\");  var locker = $A.lockerService.createForDef(\n\"var nonInternal$component = {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"nonInternal$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:application\\\"\\n  }\\n};\\nreturn nonInternal$component;\\n\", def);\n  return locker.$result;\n});\n}",
+  "locationChangeEventDef": {
+    "descriptor": "markup://aura:locationChange"
   }
 }

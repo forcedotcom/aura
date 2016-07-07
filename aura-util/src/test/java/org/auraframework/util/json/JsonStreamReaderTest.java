@@ -15,6 +15,16 @@
  */
 package org.auraframework.util.json;
 
+import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.IOUtil;
+import org.auraframework.util.json.JsonStreamReader.JsonParseException;
+import org.auraframework.util.json.JsonStreamReader.JsonStreamParseException;
+import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -28,17 +38,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.IOUtil;
-import org.auraframework.util.json.JsonStreamReader.JsonParseException;
-import org.auraframework.util.json.JsonStreamReader.JsonStreamParseException;
-import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Test;
-
-import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 /**
  * @hierarchy Aura.Unit Tests.Json StreamReader
@@ -580,8 +579,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
             assertEquals(1.23456, ((BigDecimal) outerMap.get("otherNum")).doubleValue());
             assertEquals(12345.6, ((BigDecimal) outerMap.get("otherOtherNum")).doubleValue());
             assertTrue(outerMap.get("func") instanceof JsFunction);
-            
-            assertEquals(AuraTextUtil.replaceSimple(func, "/*comment\n\n\n*/", "\n"), JsonEncoder.serialize(outerMap.get("func"), true, false));
+
+            assertEquals(AuraTextUtil.replaceSimple(func, "/*comment\n\n\n*/", "\n"), JsonEncoder.serialize(outerMap.get("func"), true));
             
             assertEquals("whose's son?", outerMap.get("jsean"));
             assertEquals("за", outerMap.get("Фокс"));

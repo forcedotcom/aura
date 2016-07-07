@@ -33,7 +33,7 @@
                     name: "ComponentDefStorage",
                     persistent: true,
                     secure: false,
-                    maxSize: 570000,
+                    maxSize: 520000,
                     expiration: 10886400,
                     clearOnInit: false
                 });

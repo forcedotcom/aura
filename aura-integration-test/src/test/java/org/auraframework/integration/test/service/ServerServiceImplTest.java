@@ -15,27 +15,9 @@
  */
 package org.auraframework.integration.test.service;
 
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.ConcurrentModificationException;
-import java.util.EmptyStackException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.http.HttpStatus;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
@@ -73,9 +55,25 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.ConcurrentModificationException;
+import java.util.EmptyStackException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ServerServiceImplTest extends AuraImplTestCase {
     private static final Set<String> GLOBAL_IGNORE = Sets.newHashSet("context", "actions", "perf");
@@ -684,14 +682,10 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         List<?> defs = (List<?>) json.get("componentDefs");
 
         for (Object def : defs) {
-            Map<?, ?> value = ((Map<?, ?>) ((Map<?, ?>) def)
-                    .get(Json.ApplicationKey.VALUE.toString()));
-            if (value != null) {
-                String desc = (String) value.get("descriptor");
-                if (desc.equals("markup://aura:html")) {
-                    componentClass = value.get("componentClass");
-                    found = true;
-                }
+            String desc = (String) ((Map<?, ?>) def).get("descriptor");
+            if (desc.equals("markup://aura:html")) {
+                componentClass = ((Map<?, ?>) def).get("componentClass");
+                found = true;
             }
         }
 

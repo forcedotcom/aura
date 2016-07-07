@@ -15,12 +15,10 @@
  */
 package org.auraframework.integration.test.context;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.auraframework.Aura;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.ActionDef;
@@ -62,10 +60,11 @@ import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Unit tests for AuraContextImpl.
@@ -696,7 +695,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
         Mode mode = Mode.PROD;
         MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
-        AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true);
+        AuraJsonContext serCtx = AuraJsonContext.createContext(mode);
         AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
                 globalProviders, false);
         ctx.setFrameworkUID("#FAKEUID#");
@@ -720,7 +719,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
         Mode mode = Mode.PROD;
         MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
-        AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true);
+        AuraJsonContext serCtx = AuraJsonContext.createContext(mode);
         AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
                 globalProviders, false);
         ctx.setFrameworkUID("#FAKEUID#");
@@ -744,7 +743,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
         Mode mode = Mode.PROD;
         MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
-        AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true);
+        AuraJsonContext serCtx = AuraJsonContext.createContext(mode);
         AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
                 globalProviders, false);
         ctx.setFrameworkUID("#FAKEUID#");
@@ -787,7 +786,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
         Mode mode = Mode.PROD;
         MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
-        AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true);
+        AuraJsonContext serCtx = AuraJsonContext.createContext(mode);
         AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
                 globalProviders, false);
         ctx.setFrameworkUID("#FAKEUID#");

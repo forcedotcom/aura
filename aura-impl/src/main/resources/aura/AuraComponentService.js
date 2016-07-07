@@ -1327,7 +1327,7 @@ AuraComponentService.prototype.isConfigDescriptor = function(config) {
  */
 AuraComponentService.prototype.saveComponentConfig = function(config) {
     var componentDescriptor = this.getDescriptorFromConfig(config);
-    if (this.savedComponentConfigs[componentDescriptor]) {
+    if (componentDescriptor in this.savedComponentConfigs || componentDescriptor in this.componentDefRegistry) {
         return;
     }
 
@@ -1391,9 +1391,9 @@ AuraComponentService.prototype.clearDefsFromStorage = function (metricsPayload) 
  *  the process they are handled (and logged) so the returned promise always resolves.
  */
 AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
-    var cmpConfigs = config["componentDefs"];
-    var libConfigs = config["libraryDefs"];
-    var evtConfigs = config["eventDefs"];
+    var cmpConfigs = config["componentDefs"] || [];
+    var libConfigs = config["libraryDefs"] || [];
+    var evtConfigs = config["eventDefs"] || [];
 
     if (cmpConfigs.length === 0 && libConfigs.length === 0 && evtConfigs.length === 0) {
         return Promise["resolve"]();

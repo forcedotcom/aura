@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.javascript.parser.handler;
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -32,6 +29,9 @@ import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonHandlerProvider;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * base class for javascripty source handling gnomes.
@@ -141,7 +141,7 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
      */
     protected String mapToCode(Map<String, Object> map) throws IOException {
         StringBuilder sb = new StringBuilder(map.size() * 32);
-        JsonEncoder json = new JsonEncoder(sb, true, false);
+        JsonEncoder json = new JsonEncoder(sb, true);
         // Indent to ease debugging.
 		json.pushIndent(IndentType.BRACE);
         json.writeValue(map);

@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.root.library;
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.LibraryDefRef;
@@ -27,6 +24,9 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.Set;
 
 public class LibraryDefRefImpl extends DefinitionImpl<LibraryDef> implements LibraryDefRef {
     private static final long serialVersionUID = 8916829297107001915L;
@@ -68,14 +68,10 @@ public class LibraryDefRefImpl extends DefinitionImpl<LibraryDef> implements Lib
 
     @Override
     public void serialize(Json json) throws IOException {
-        if (json.getSerializationContext().refSupport()) {
-            json.writeMapBegin();
-            json.writeMapEntry("descriptor", descriptor.getQualifiedName());
-            json.writeMapEntry("property", property);
-            json.writeMapEnd();
-        } else {
-            json.writeMapEntry(property, descriptor.getDescriptorName());
-        }
+        json.writeMapBegin();
+        json.writeMapEntry("descriptor", descriptor.getQualifiedName());
+        json.writeMapEntry("property", property);
+        json.writeMapEnd();
     }
 
     public static class Builder extends DefinitionImpl.RefBuilderImpl<LibraryDef, LibraryDefRef> {

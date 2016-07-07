@@ -15,14 +15,11 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
@@ -53,18 +50,19 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends RootDefinitionTest<T> {
 
@@ -273,8 +271,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 rendererList, null, null, false, false);
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
-        Map<?, ?> rendererDef = (Map<?, ?>) ((Map<?, ?>) json
-                .get(Json.ApplicationKey.VALUE.toString())).get("rendererDef");
+        Map<?, ?> rendererDef = (Map<?, ?>) json.get("rendererDef");
 
         assertNull("RendererDef should not be serialized with ComponentDef",
                 rendererDef);
@@ -295,8 +292,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 null, helperList, null, false, false);
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
-        Map<?, ?> helperDef = (Map<?, ?>) ((Map<?, ?>) json
-                .get(Json.ApplicationKey.VALUE.toString())).get("helperDef");
+        Map<?, ?> helperDef = (Map<?, ?>) json.get("helperDef");
 
         assertNull("HelperDef should not be serialized with ComponentDef",
                 helperDef);
@@ -309,9 +305,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 null, null, null, false, false);
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
-        String componentClass = (String) ((Map<?, ?>) json
-                .get(Json.ApplicationKey.VALUE.toString()))
-                        .get("componentClass");
+        String componentClass = (String) json.get("componentClass");
 
         assertNotNull(componentClass);
     }

@@ -15,15 +15,6 @@
  */
 package org.auraframework.util;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
@@ -35,6 +26,15 @@ import org.auraframework.def.RegisterEventDef;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Serialize Aura Component Registry to json for consumption by tools like
@@ -69,7 +69,7 @@ public class RegistryJsonSerializer {
             String file) throws IOException {
         FileWriter f = new FileWriter(file, false);
         BufferedWriter bf = new BufferedWriter(f);
-        JsonEncoder.serialize(components, bf, shouldPrettyPrint, false);
+        JsonEncoder.serialize(components, bf, shouldPrettyPrint);
         bf.close();
     }
 

@@ -15,9 +15,6 @@
  */
 package org.auraframework.integration.test.root;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -26,9 +23,11 @@ import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Tests to verify AttributeSetImpl class. Component/Application instances are assigned an AttributeSet. A
@@ -177,7 +176,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
                         "<aura:attribute name='default' type='String' default='innie'/><aura:attribute name='both' type='String' default='outie' serializeTo='BOTH'/><aura:attribute name='server' type='String' default='lint' serializeTo='SERVER'/><aura:attribute name='none' type='String' default='holy' serializeTo='NONE'/>"));
         Component cmp = Aura.getInstanceService().getInstance(desc);
         Map<?, ?> attSet = (Map<?, ?>) new JsonReader().read(toJson(cmp.getAttributes()));
-        Map<?, ?> attSetValues = (Map<?, ?>) ((Map<?, ?>) attSet.get(Json.ApplicationKey.VALUE.toString())).get("values");
+        Map<?, ?> attSetValues = (Map<?, ?>) attSet.get("values");
         assertEquals(2, attSetValues.size());
         assertEquals("innie", attSetValues.get("default"));
         assertEquals("outie", attSetValues.get("both"));
@@ -191,7 +190,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
                         "<aura:attribute name='server' type='String' default='lint' serializeTo='SERVER'/><aura:attribute name='none' type='String' default='holy' serializeTo='NONE'/>"));
         cmp = Aura.getInstanceService().getInstance(desc);
         attSet = (Map<?, ?>) new JsonReader().read(toJson(cmp.getAttributes()));
-        attSetValues = (Map<?, ?>) ((Map<?, ?>) attSet.get(Json.ApplicationKey.VALUE.toString())).get("values");
+        attSetValues = (Map<?, ?>) attSet.get("values");
         assertEquals(0, attSetValues.size());
     }
 }

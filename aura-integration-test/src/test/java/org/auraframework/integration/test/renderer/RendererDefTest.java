@@ -15,8 +15,6 @@
  */
 package org.auraframework.integration.test.renderer;
 
-import java.util.Map;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -24,10 +22,11 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Test;
+
+import java.util.Map;
 
 /**
  * This class has automation to verify implementation of rendering for
@@ -53,7 +52,7 @@ public class RendererDefTest extends AuraImplTestCase {
                 ComponentDef.class);
         ComponentDef def = d.getDef();
         // Convert the definition to a format that is used by the client
-        String defInJson = JsonEncoder.serialize(def, false, true);
+        String defInJson = JsonEncoder.serialize(def, false);
         // Convert back to the object, just like the client does in javascript
         Object defObj = new JsonReader().read(defInJson);
         assertTrue(defObj instanceof Map);
@@ -73,14 +72,15 @@ public class RendererDefTest extends AuraImplTestCase {
         Component component = Aura.getInstanceService().getInstance("test:test_SimpleJavaRenderer", ComponentDef.class,
                 null);
         // Convert the instance to a format that is used by the client
-        String defInJson = JsonEncoder.serialize(component, false, true);
+        String defInJson = JsonEncoder.serialize(component, false);
         // Convert back to the object, just like the client does in javascript
         Object defObj = new JsonReader().read(defInJson);
         assertTrue(defObj instanceof Map);
+        String html = (String) ((Map<?, ?>) defObj).get("rendering");
         assertNotNull("Component Instance of components which use java renderers should have a rendering section",
-                ((Map<?, ?>) ((Map<?, ?>) defObj).get(Json.ApplicationKey.VALUE.toString())).get("rendering"));
+                html);
         assertEquals("Component markup seen in Component instance does not match the markup in Java Renderer",
-                TestSimpleRenderer.htmlOutput, ((Map<?, ?>) ((Map<?, ?>) defObj).get(Json.ApplicationKey.VALUE.toString())).get("rendering"));
+                TestSimpleRenderer.htmlOutput, html);
     }
 
     /**

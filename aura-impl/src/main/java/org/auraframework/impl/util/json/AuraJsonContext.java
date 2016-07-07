@@ -15,11 +15,8 @@
  */
 package org.auraframework.impl.util.json;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import org.auraframework.adapter.JsonSerializerAdapter;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.system.AuraContext.Mode;
@@ -28,8 +25,10 @@ import org.auraframework.util.json.JsonSerializable;
 import org.auraframework.util.json.JsonSerializer;
 import org.auraframework.util.json.JsonSerializers;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * json serialization context for aura
@@ -37,14 +36,28 @@ import com.google.common.collect.ImmutableMap.Builder;
 public class AuraJsonContext extends ClassMapJsonSerializationContext {
     private static Map<String, JsonSerializer<?>> SERIALIZERS_LOOKUP_MAP;
     private static final ConcurrentMap<String, JsonSerializer<?>> cache = new ConcurrentHashMap<>();
-    private static Map<Class<?>, JsonSerializer<?>> SERIALIZERS_INSTANCE_MAP;   
+    private static Map<Class<?>, JsonSerializer<?>> SERIALIZERS_INSTANCE_MAP;
 
-    public static AuraJsonContext createContext(Mode mode, boolean refSupport) {
-        return new AuraJsonContext(mode.prettyPrint(), refSupport);
+    /**
+     * Creates AuraJsonContext based on mode
+     *
+     * @param mode Context mode
+     * @return AuraJsonContext
+     * @deprecated refSupport no longer supported
+     */
+    public static AuraJsonContext createContext(Mode mode) {
+        return new AuraJsonContext(mode.prettyPrint());
     }
 
-    private AuraJsonContext(boolean format, boolean refSupport) {
-        super(getLookupMap(), getInstanceMap(), cache, format, refSupport, -1, -1);
+    /**
+     * @deprecated refSupport no longer supported
+     */
+    public static AuraJsonContext createContext(Mode mode, boolean refSupport) {
+        return new AuraJsonContext(mode.prettyPrint());
+    }
+
+    private AuraJsonContext(boolean format) {
+        super(getLookupMap(), getInstanceMap(), cache, format, -1, -1);
     }
 
     @Override

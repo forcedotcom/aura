@@ -351,7 +351,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             //
             text = "//" + text;
         }
-        var resp = $A.util.json.decode(text, true);
+        var resp = $A.util.json.decode(text);
 
         // if the error on the server is meant to trigger a client-side event...
         if ($A.util.isUndefinedOrNull(resp)) {
@@ -438,12 +438,8 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
                 }
             }
 
-            $A.util.json.resolveRefsObject(responseMessage);
-
             // Restore original provider (order doesn't matter)
             responseMessage["context"]["globalValueProviders"] = gvpList.concat(saved);
-        } else {
-            $A.util.json.resolveRefsObject(responseMessage);
         }
     }
 
@@ -1166,22 +1162,22 @@ AuraClientService.prototype.initDefs = function(config, resolved) {
     }
 
 
-    var evtConfigs = resolved ? config["eventDefs"] : $A.util.json.resolveRefsArray(config["eventDefs"]);
+    var evtConfigs = config["eventDefs"];
     for (i = 0; i < evtConfigs.length; i++) {
         $A.eventService.saveEventConfig(evtConfigs[i]);
     }
 
-    var libraryConfigs = resolved ? config["libraryDefs"] : $A.util.json.resolveRefsArray(config["libraryDefs"]);
+    var libraryConfigs = config["libraryDefs"];
     for (i = 0; i < libraryConfigs.length; i++) {
         $A.componentService.saveLibraryConfig(libraryConfigs[i]);
     }
 
-    var controllerConfigs =  resolved ? config["controllerDefs"] : $A.util.json.resolveRefsArray(config["controllerDefs"]);
+    var controllerConfigs = config["controllerDefs"];
     for (i = 0; i < controllerConfigs.length; i++) {
         $A.componentService.createControllerDef(controllerConfigs[i]);
     }
 
-    var comConfigs = resolved ? config["componentDefs"] : $A.util.json.resolveRefsArray(config["componentDefs"]);
+    var comConfigs = config["componentDefs"];
     for (i = 0; i < comConfigs.length; i++) {
         $A.componentService.saveComponentConfig(comConfigs[i]);
     }
@@ -1223,7 +1219,6 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
 
         if (boot["error"]) {
             if (boot["error"]["exceptionEvent"]) {
-                $A.util.json.resolveRefsObject(boot);
                 this.throwExceptionEvent(boot["error"]);
                 return;
             } else {
@@ -1236,26 +1231,6 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
 
         // If is not coming from cache we need to clean the payload
         if (Aura["appBootstrapReady"] !== "cache") {
-            // Prevent collision between $Label value provider and serRefId properties (typically "s" and "r").
-            if (boot["context"] && boot["context"]["globalValueProviders"]) {
-                var saved = [];
-                var gvpList = boot["context"]["globalValueProviders"];
-
-                // Filter out providers without refs
-                for (var i = gvpList.length - 1; i >= 0; i--) {
-                    if (gvpList[i]["hasRefs"] !== true) {
-                        saved.push(gvpList.splice(i, 1)[0]);
-                    }
-                }
-
-                $A.util.json.resolveRefsObject(boot);
-
-                // Restore original provider (order doesn't matter)
-                boot["context"]["globalValueProviders"] = gvpList.concat(saved);
-            } else {
-                $A.util.json.resolveRefsObject(boot);
-            }
-
             $A.componentService.saveDefsToStorage(boot["context"], context);
 
             if (this._useBootstrapCache) {
@@ -2395,9 +2370,10 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         if(!priorAccess){
             context.setCurrentAccess($A.getRoot());
         }
-        if (responseMessage["context"]) {
-            context['merge'](responseMessage["context"]);
-            $A.componentService.saveDefsToStorage(responseMessage["context"], context);
+        if ("context" in responseMessage) {
+            var responseContext = responseMessage["context"];
+            context['merge'](responseContext);
+            $A.componentService.saveDefsToStorage(responseContext, context);
         }
     } catch (e) {
         $A.logger.reportError(e);
@@ -2596,15 +2572,13 @@ AuraClientService.prototype.runActions = function(actions, scope, callback) {
  *
  * FIXME: this should be private.
  *
- * @param {Object} rawConfig the config for the component to be injected
+ * @param {Object} config the config for the component to be injected
  * @param {String} locatorDomId the DOM id where we should place our element.
  * @param {String} localId the local id for the component to be created.
  * @memberOf AuraClientService
  * @export
  */
-AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, localId) {
-    var config = $A.util.json.resolveRefsObject(rawConfig);
-
+AuraClientService.prototype.injectComponent = function(config, locatorDomId, localId) {
     // Save off any context global stuff like new labels
     var context = $A.getContext();
     context['merge'](config["context"]);

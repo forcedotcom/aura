@@ -296,7 +296,8 @@
 
     _deleteItem: function(cmp, data) {
         var items = cmp.get('v.items'),
-            itemsLength = items.length;
+            itemsLength = items.length,
+            isContainerEmpty;
 
         for (var i = 0; i < itemsLength; i++) {
             if (this._isEqual(data, items[i])) {
@@ -304,31 +305,26 @@
                 items.splice(i, 1);
                 cmp.set('v.items', items);
 
-                cmp.get("e.pillRemoved").fire();
-                if (items.length <= 0) {
+                isContainerEmpty = items.length === 0;
+
+                if (isContainerEmpty) {
                     this.focusOnInputBox(cmp);
                 } else {
-                    this.focusNextPill(i, cmp);
+                    this.setFocusRightPill(i, cmp);
                 }
-                this._setActiveItem(cmp,0);
+                cmp.get("e.pillRemoved").fire();
                 break;
             }
         }
     },
-    focusNextPill : function (index, cmp) {
+
+    setFocusRightPill : function (index, cmp) {
         var pillItems = cmp.find('pill');
-        var hasOnlyOnePill = pillItems.length === 1;
-        var isIndexTheLastPill = index === pillItems.length - 1;
+        var isIndexTheFirstPill = index === 0;
+        var nextFocusIndex =  isIndexTheFirstPill ? 1 : index - 1;
 
-        if (hasOnlyOnePill) {
-            return;
-        }
-
-        if (isIndexTheLastPill) {
-            index = pillItems.length - 2;
-        }
-
-        pillItems[index].focus();
+        pillItems[nextFocusIndex].focus();
+        this._setActiveItem(cmp, nextFocusIndex);
     },
 
     _setActiveItem: function(cmp, index) {

@@ -399,21 +399,23 @@
         attributes: {
             maxAllowed: 1
         },
-        test: function (cmp) {
-            var pillContainer = cmp.find("pillContainer");
-            var textInput = this._getInput(cmp);
-            var textInputElement = this._getInputElement(cmp);
-            this._inputPill(textInput, this.PILLS[0].label);
+        test: [
+            function (cmp) {
+                var pillContainer = cmp.find("pillContainer");
+                var textInput = this._getInput(cmp);
 
-            this._fireKeydownEvent(textInput, this.BACKSPACE_KEY);
+                this._inputPill(textInput, this.PILLS[0].label);
+                this._fireKeydownEvent(textInput, this.BACKSPACE_KEY);
 
-            var firstPill = pillContainer.find("pill");
-            this._fireKeydownEvent(firstPill, this.BACKSPACE_KEY);
-
-            $A.test.addWaitForWithFailureMessage(true, function() {
-                return document.activeElement === textInputElement;
-            }, "input should be focused");
-        }
+                var firstPill = pillContainer.find("pill");
+                this._fireKeydownEvent(firstPill, this.BACKSPACE_KEY);
+            },
+            function (cmp) {
+                var textInputElement = this._getInputElement(cmp);
+                var errorMsg = "input should be focused";
+                $A.test.assertTrue(document.activeElement === textInputElement, errorMsg);
+            }
+        ]
     },
 
     /**

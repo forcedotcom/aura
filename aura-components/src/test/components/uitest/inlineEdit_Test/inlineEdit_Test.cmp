@@ -81,10 +81,10 @@
                 <ui:inlineEditCell name="bloodtype">
                     <ui:outputText value="{!row.myData.bloodtype}"/>
                 </ui:inlineEditCell>
-                <ui:inlineEditCell name="GPA">
+                <ui:inlineEditCell name="progress">
                     <ui:outputPercent value="{!row.myData.progress}"/>
                 </ui:inlineEditCell>
-                <ui:inlineEditCell name="Dues">
+                <ui:inlineEditCell name="dues">
                     <ui:outputCurrency value="{!row.myData.dues}"/>
                 </ui:inlineEditCell>
 			</aura:set>

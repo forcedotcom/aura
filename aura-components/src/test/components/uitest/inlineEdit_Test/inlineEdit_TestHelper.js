@@ -102,7 +102,7 @@
                 }
             }
         },
-        percent : {
+        progress : {
             componentDef : {
                 descriptor : 'markup://ui:inputPercent'
             },

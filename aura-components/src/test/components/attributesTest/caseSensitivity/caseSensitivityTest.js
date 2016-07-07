@@ -38,6 +38,7 @@
 
             $A.test.runAfterIf(function(){return !!def},function(){
                 $A.test.expectAuraError("Access Check Failed!");
+                $A.test.expectAuraError("Access Check Failed!");
                 $A.createComponent("attributesTest:caseInsensitiveChild",{},
                 function(){
                 	testCompleted = true;
@@ -51,6 +52,7 @@
     testCaseSensitivityWhenSettingParentAttributes_ComponentRequestedFromServer:{
         test:function(){
         		var testCompleted = false;
+                $A.test.expectAuraError("Access Check Failed!");
                 $A.test.expectAuraError("Access Check Failed!");
                 $A.createComponent("attributesTest:caseInsensitiveChild",{},
                 function(){

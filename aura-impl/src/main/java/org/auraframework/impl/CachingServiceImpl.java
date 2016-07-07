@@ -15,26 +15,29 @@
  */
 package org.auraframework.impl;
 
-import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
-
+import com.google.common.base.Optional;
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.builder.CacheBuilder;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.SourceListener;
 
-import com.google.common.base.Optional;
+import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 @ServiceComponent
 public class CachingServiceImpl implements CachingService {
@@ -248,6 +251,8 @@ public class CachingServiceImpl implements CachingService {
         depsCache.invalidateAll();
         descriptorFilterCache.invalidateAll();
         stringsCache.invalidateAll();
+        altStringsCache.invalidateAll();
+        clientLibraryOutputCache.invalidateAll();
 
         if (descriptor == null) {
             defsCache.invalidateAll();

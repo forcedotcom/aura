@@ -94,6 +94,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
         };
     };
 
+
     [Fixture]
     function constructor() {
 
@@ -124,6 +125,27 @@ Test.Aura.Storage.AuraStorageTest = function() {
             Assert.Equal(expected, target.keyPrefix);
         }
 
+
+        [Fact]
+        function PassesKeyPrefixToAdapterConstructor() {
+            var actual;
+            var AdapterClass = function(adapterConfig) {
+                actual = adapterConfig;
+            };
+            AdapterClass.prototype.getName = function() {};
+
+            var config = {
+                adapterClass: AdapterClass
+            };
+
+            mockA(function() {
+                Aura.Storage.AuraStorage.prototype.generateKeyPrefix = function() {
+                    return "keyprefix";
+                };
+                var target = new Aura.Storage.AuraStorage(config);
+                Assert.Equal(target.keyPrefix, actual.keyPrefix);
+            });
+        }
     }
 
     [Fixture]

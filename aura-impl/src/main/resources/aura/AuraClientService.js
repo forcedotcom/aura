@@ -153,7 +153,11 @@ function AuraClientService () {
     // XHR timeout (milliseconds)
     this.xhrTimeout = undefined;
 
-    // token storage key should not be changed because external client may query independently
+    // storage key for csrf token. it is queried / updated by non-aura clients before aura boots so
+    // key must not change and must avoid the keyprefix being applied so directly interact with adapter
+    // (not AuraStorage).
+    // TODO W-2531907 - handle CSRF/invalid session issue so this key can be keyprefix'ed and standard
+    // AuraStorage APIs used, and no need for non-aura clients to change with the value preboot.
     this._tokenStorageKey = "$AuraClientService.token$";
 
     // cookie name to force getApplication to the server (to skip cache). done as a cookie so the server
@@ -975,7 +979,6 @@ AuraClientService.prototype.loadTokenFromStorage = function() {
     var storage = Action.getStorage();
     if (storage) {
         var that = this;
-        // TODO - why go straight to the adapter?
         return storage.adapter.getItems([this._tokenStorageKey])
             .then(function(items) {
                 if (items[that._tokenStorageKey]) {

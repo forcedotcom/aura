@@ -21,6 +21,11 @@
  * @export
  */
 var AuraStorage = function AuraStorage(config) {
+    // first generate key prefix so it may be passed to the adapter constructor
+    this.version = "" + config["version"];
+    this.keyPrefix = this.generateKeyPrefix(config["isolationKey"], this.version);
+    config["keyPrefix"] = this.keyPrefix;
+
     var AdapterCtr = config["adapterClass"];
     this.adapter = new AdapterCtr(config);
 
@@ -30,8 +35,6 @@ var AuraStorage = function AuraStorage(config) {
     this.expiration = config["expiration"] * 1000;
     this.autoRefreshInterval = config["autoRefreshInterval"] * 1000;
     this.debugLogging = config["debugLogging"];
-    this.version = "" + config["version"];
-    this.keyPrefix = this.generateKeyPrefix(config["isolationKey"], this.version);
 
     this.getOperationsInFlight = 0;
 
@@ -386,7 +389,6 @@ AuraStorage.prototype.removeAll = function(keys, doNotFireModified) {
 AuraStorage.prototype.sweep = function(ignoreInterval) {
     // sweeping guards:
     // 1. sweeping is in progress
-
     if (this.sweepPromise) {
         return this.sweepPromise;
     }
@@ -403,7 +405,6 @@ AuraStorage.prototype.sweep = function(ignoreInterval) {
     if (!ignoreInterval && sweepInterval < this.sweepInterval) {
         return Promise["resolve"]();
     }
-
 
 
     // Final thenable on sweep() promise chain.

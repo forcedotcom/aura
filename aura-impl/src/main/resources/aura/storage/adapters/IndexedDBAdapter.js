@@ -40,6 +40,8 @@ var IndexedDBAdapter = function IndexedDBAdapter(config) {
     this.instanceName = config["name"];
     this.sizeMax = config["maxSize"];
     this.debugLogging = config["debugLogging"];
+    this.keyPrefix = config["keyPrefix"];
+
     this.db = undefined;
     // whether the ObjectStore is ready to service operations
     // undefined = being setup, true = ready, false = permanent error
@@ -436,6 +438,8 @@ IndexedDBAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
 
     var objectStoreRequest;
     for (var i = 0; i < keys.length; i++) {
+        // TODO W-2531907 skip items with the wrong keyprefix when
+        // AuraClientService#loadTokenFromStorage doesn't use a keyprefix-less entry
         objectStoreRequest = objectStore.get(keys[i]);
         objectStoreRequest.onsuccess = collector;
     }
@@ -464,7 +468,7 @@ IndexedDBAdapter.prototype.walkInternal = function(resolve, reject, sendResult) 
             if (stored) {
                 size += stored["size"];
                 count += 1;
-                if (sendResult) {
+                if (sendResult && stored["key"].indexOf(that.keyPrefix) === 0) {
                     result[stored["key"]] = stored["item"];
                 }
             }
@@ -619,8 +623,8 @@ IndexedDBAdapter.prototype.clearInternal = function(resolve, reject) {
  * Evicts cache entries and updates the cached size of the store.
  *
  * Cache entries are evicted until requested size is freed. Algorithm evicts
- * items based on age; an LRU algorithm is not used which differentiates this
- * adapter from others.
+ * items based on age and not sharing the key prefix (aka isolation key). An
+ * LRU algorithm is not used which differentiates this adapter from others.
  *
  * The rest of the store is traversed to calculate the real size of the
  * persisted data.
@@ -672,7 +676,7 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
                 if (stored) {
                     var shouldEvict = false;
 
-                    if (stored["expires"] < expireDate || expiredSize < removeSize) {
+                    if (stored["expires"] < expireDate || expiredSize < removeSize || stored["key"].indexOf(that.keyPrefix) !== 0) {
                         shouldEvict = true;
 
                         // TODO W-2481519 - ensure aura framework-required data is never evicted without having a

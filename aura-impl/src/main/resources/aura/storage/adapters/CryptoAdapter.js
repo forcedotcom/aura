@@ -709,11 +709,11 @@ CryptoAdapter.prototype.clear = function() {
 CryptoAdapter.prototype.sweep = function() {
     // underlying adapter may sweep the sentinel so always re-add it
     return this.adapter.sweep()
-    .then(
-        function() {
-            return this.setSentinelItem();
-        }.bind(this)
-    );
+        .then(
+            function() {
+                return this.setSentinelItem();
+            }.bind(this)
+        );
 };
 
 

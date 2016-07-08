@@ -21,7 +21,7 @@
     dpmID: "dpm",
 
     // Excluding mobile because on mobile we use native date pickers
-    browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
+    browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD", "-SAFARI"],
 
     /**
      * Test that opens multiple datepickers then verifies that they are not overriding each

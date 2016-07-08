@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:pager" extensible="true" support="GA" description="A purely presentational pager implementation, used to display the current and total items.">
+<aura:component access="PRIVILEGED" extends="ui:pager" extensible="true" support="GA" description="A purely presentational pager implementation, used to display the current and total items.">
     <aura:attribute name="Labels_Of" type="String" default=" of "  description="The text to display between the endItem and totalItems."/>
     <aura:attribute name="Labels_To" type="String" default=" - "   description="The text to display between the startItem and endItem."/>
 

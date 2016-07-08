@@ -16,6 +16,7 @@
 
 -->
 <aura:component 
+		access="PRIVILEGED" 
         implements="ui:dataProviderInterface,ui:pagingInterface,ui:sortingInterface,ui:searchInterface" 
         abstract="true" description="A generic list data provider">
     

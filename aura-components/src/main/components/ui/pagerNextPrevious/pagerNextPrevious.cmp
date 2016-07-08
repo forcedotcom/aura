@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:pager" extensible="true" support="GA" description="A pager implementation that allows the user to navigate sequentially between pages or jump to the first or last page.">
+<aura:component access="PRIVILEGED" extends="ui:pager" extensible="true" support="GA" description="A pager implementation that allows the user to navigate sequentially between pages or jump to the first or last page.">
     <aura:attribute name="Labels_First" type="String" default="First"          description="The text to display in the label of the link used to jump to the first page."/>
     <aura:attribute name="Labels_Last" type="String" default="Last"            description="The text to display in the label of the link used to jump to the last page."/>
     <aura:attribute name="Labels_Next" type="String" default="Next"            description="The text to display in the label of the link used to jump to the next page."/>

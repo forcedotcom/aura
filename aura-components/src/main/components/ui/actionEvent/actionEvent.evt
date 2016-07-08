@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="PROTO">
+<aura:event access="PRIVILEGED" type="COMPONENT" support="PROTO">
 	<aura:attribute name="name" type="String"/>
     <aura:attribute name="index" type="Integer"/>
 	<aura:attribute name="value" type="String"/>

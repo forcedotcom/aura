@@ -15,4 +15,4 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="GA" description="Indicates that the content of a component or the state has changed."></aura:event>
+<aura:event access="PRIVILEGED" type="COMPONENT" support="GA" description="Indicates that the content of a component or the state has changed."></aura:event>

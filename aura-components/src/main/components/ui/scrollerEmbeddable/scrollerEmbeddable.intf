@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:interface support="BETA" extends="ui:handlesShowMore,ui:handlesRefresh"
+<aura:interface access="PRIVILEGED" support="BETA" extends="ui:handlesShowMore,ui:handlesRefresh"
                 description="Interface for components that are placed in the body of a ui:scroller that want to handle 'Pull to Refresh' and 'Load More' functionality provided by the scroller.">
 
     <aura:registerEvent name="parentScrollTo" type="ui:scrollTo" description="Requests the parent component to scroll"/>

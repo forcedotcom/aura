@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:interface support="GA">
+<aura:interface access="PRIVILEGED" support="GA">
     <aura:attribute name="class" type="String" access="GLOBAL" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component."/>
     <aura:attribute name="dir" type="String" default="ltr" description="The direction in which the component should be read. Possible values are &quot;rtl&quot; (right to left) and &quot;ltr&quot; (left to right). Default value is &quot;ltr&quot;."/>
     <aura:attribute name="label" type="String" description="The text displayed on the component. In the rendered HTML output, where possible the label is associated with the HTML element to improve accessibility."/>

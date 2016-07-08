@@ -15,7 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:autocompleteOption"
+<aura:component access="PRIVILEGED"
+				extends="ui:autocompleteOption"
                 description="Auto complete component for use in a ui:pillContainer" extensible="true" support="PROTO">
     <aura:attribute name="iconUrl" type="String" default="true"/>
     <aura:attribute name="iconBackgroundColor" type="String" default="true"/>

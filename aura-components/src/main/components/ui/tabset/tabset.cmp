@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" support="GA" description="A tab set that displays a list of tabs in an unordered list.">
+<aura:component access="PRIVILEGED" extensible="true" implements="ui:visible" support="GA" description="A tab set that displays a list of tabs in an unordered list.">
     <aura:attribute name="tabs" type="List" description="The collection of objects to construct tabs." />
     <aura:attribute name="tabItems" access="private" type="List" description="Use internally for passing a list of tab items to ui:tabBar component." />
     <aura:attribute name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component." />

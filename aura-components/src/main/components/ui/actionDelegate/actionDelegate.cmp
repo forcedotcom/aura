@@ -16,6 +16,6 @@
     limitations under the License.
 
 -->
-<aura:component description="Fires and handles the onaction event for the ui:dataGrid component.">
+<aura:component access="PRIVILEGED" description="Fires and handles the onaction event for the ui:dataGrid component.">
 	<aura:registerEvent name="onaction" type="ui:actionEvent"/>
 </aura:component>

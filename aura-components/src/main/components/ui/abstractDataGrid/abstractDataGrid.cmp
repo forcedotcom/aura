@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component abstract="true" extensible="true" implements="ui:visible" support="PROTO" description="An abstract component that provides a basic layout for the ui:dataGrid component.">
+<aura:component access="PRIVILEGED" abstract="true" extensible="true" implements="ui:visible" support="PROTO" description="An abstract component that provides a basic layout for the ui:dataGrid component.">
 	
 	<!-- Public attributes -->
 	<aura:attribute name="items" type="List" description="Arbitrary list of objects to iterate over. Object type to avoid expensive wrapping."/>

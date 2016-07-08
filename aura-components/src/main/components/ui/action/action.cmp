@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="PROTO" abstract="true" description="An abstract component that provides bubbling of events.">
+<aura:component access="PRIVILEGED" extensible="true" support="PROTO" abstract="true" description="An abstract component that provides bubbling of events.">
 	<aura:attribute name="name" type="String" description="The name for the action-name data attribute value specified on the DOM element."/>
 	<aura:attribute name="label" type="String" description="The text label for the component."/>
 	<aura:attribute name="labelClass" type="String" description="The class for the label on the component."/>

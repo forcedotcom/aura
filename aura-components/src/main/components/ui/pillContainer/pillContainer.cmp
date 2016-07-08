@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:focusable" description="A container for ui:pill" extensible="true" support="PROTO">
+<aura:component access="PRIVILEGED" implements="ui:focusable" description="A container for ui:pill" extensible="true" support="PROTO">
 
     <aura:attribute name="items" type="List" description="A list of pill items."/>
     <aura:attribute name="maxAllowed" type="Integer" default="10" description="Max pills this container should have."/>

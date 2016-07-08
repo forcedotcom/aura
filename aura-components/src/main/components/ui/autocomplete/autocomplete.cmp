@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" support="proto" extensible="true" defaultFlavor="default, lookup" description="Represents an input field that suggests a list of values from the data provider as you type.">
+<aura:component access="PRIVILEGED" extends="ui:input" support="proto" extensible="true" defaultFlavor="default, lookup" description="Represents an input field that suggests a list of values from the data provider as you type.">
     <aura:attribute name="inputClass" type="String" description="The css class for input component."/>
     <aura:attribute name="inputType" type="String" default="inputText" description="The type of input component (inputText or inputTextArea)."/>
     <aura:attribute name="inputFlavor" type="String" default="default, input" description="Optional aura:flavor override for the input component."/>

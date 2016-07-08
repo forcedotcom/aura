@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:interface>
+<aura:interface access="PRIVILEGED">
     <aura:attribute name="name" type="String" access="GLOBAL" description="The name of the component."/>
     <aura:attribute name="label" type="String" access="GLOBAL" description="The text displayed on the component."/>
     <!-- The boolean value indicating the status (selected or not) of the option -->

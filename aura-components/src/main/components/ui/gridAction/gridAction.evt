@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" description="Facilitates the communication from a grid cell through the grid component">
+<aura:event access="PRIVILEGED" type="COMPONENT" description="Facilitates the communication from a grid cell through the grid component">
 	<aura:attribute name="index"	type="Integer" description="Automatically populated by the containing grid component. Index of the row containing this cell."/>
 	<aura:attribute name="action"	type="String" description="Which grid action this event contains"/>
     <aura:attribute name="payload"	type="Object" description="Attributes passed to the action"/>

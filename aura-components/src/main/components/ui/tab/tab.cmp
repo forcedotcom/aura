@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="GA" description="A single tab that is nested in a ui:tabset component.">
+<aura:component access="PRIVILEGED" extensible="true" support="GA" description="A single tab that is nested in a ui:tabset component.">
     <aura:attribute name="class" type="String" description="" />
     <aura:attribute name="title" type="String" description="The text to display as a tooltip when the mouse hovers over the tab."/>
     <aura:attribute name="name" type="String" description="The internal name of the tab that can be referenced to."/>

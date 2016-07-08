@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" description="Facilitates the communication between panel manager and panels. To contain an action to a specific panel, specify the scope of the action. The panel manager stores the event parameters when ui:notify is fired from the source panel.">
+<aura:event access="PRIVILEGED" type="COMPONENT" description="Facilitates the communication between panel manager and panels. To contain an action to a specific panel, specify the scope of the action. The panel manager stores the event parameters when ui:notify is fired from the source panel.">
     <aura:attribute name="currentTarget"  type="String" description="The global Id of the source panel that holds information about the event"/>
     <aura:attribute name="target"         type="String" description="Identifies the component on which the event occurred. If the target component implements the interface typeOf, action is called against that component."/>
     <aura:attribute name="scope"          type="String" description="The scope of the event (all || id)"/>

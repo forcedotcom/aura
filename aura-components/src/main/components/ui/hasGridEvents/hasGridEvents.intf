@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:interface description="Components with this interface can trigger actions on virtualDataGrid from inside a grid cell">
+<aura:interface access="PRIVILEGED" description="Components with this interface can trigger actions on virtualDataGrid from inside a grid cell">
 	<aura:registerEvent name="gridAction" type="ui:gridAction" />
 </aura:interface>

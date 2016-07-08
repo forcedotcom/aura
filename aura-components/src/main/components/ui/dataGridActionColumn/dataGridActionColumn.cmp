@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="PROTO" description="A column of actionable buttons or links in ui:dataGrid">
+<aura:component access="PRIVILEGED" extensible="true" support="PROTO" description="A column of actionable buttons or links in ui:dataGrid">
 	<aura:attribute name="name" type="String"/>
 	<aura:attribute name="label" type="String"/>
 	<aura:attribute name="assistiveLabel" type="String" default="Actions" description="Hidden assistive text for the header."/>

@@ -30,9 +30,12 @@
  */
 function SecureWindow(win, key, globalAttributeWhitelist) {
 	"use strict";
-	
-    var hostedDefinedGlobals = ["alert", "clearInterval", "clearTimeout", "confirm", "console", "DOMParser", "FileReader",
-                                "history", "location", "Node", "requestAnimationFrame", "cancelAnimationFrame", "atob", "btoa", "screen"];
+
+    var hostedDefinedGlobals = [
+            "alert", "clearInterval", "clearTimeout", "confirm", "console", "DOMParser",
+            "File", "FileList", "FileReader",
+            "history", "location", "Node", "requestAnimationFrame", "cancelAnimationFrame", "atob", "btoa", "screen"
+        ];
 
 	var o = Object.create(null, {
 		document: {
@@ -82,17 +85,17 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 			filterOpaque : true
 		});
 	});
-	
+
 	[ "getComputedStyle", "open", "scroll", "scrollBy", "scrollTo" ].forEach(function(name) {
 		SecureObject.addMethodIfSupported(o, win, name, {
 			filterOpaque : true
 		});
-	});	
-	
+	});
+
 	SecureElement.addSecureGlobalEventHandlers(o, win, key);
 	SecureElement.addEventTargetMethods(o, win, key);
-	
-    // Salesforce API entry points (first phase) - W-3046191 is tracking adding $A.lockerService.publish() API enhancement where we will move these 
+
+    // Salesforce API entry points (first phase) - W-3046191 is tracking adding $A.lockerService.publish() API enhancement where we will move these
     // to their respective javascript/container architectures
     ["sforce", "Sfdc"].forEach(function(name) {
 		SecureObject.addPropertyIfSupported(o, win, name);

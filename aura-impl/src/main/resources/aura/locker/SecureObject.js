@@ -76,6 +76,19 @@ SecureObject.getCached = function(raw, key) {
 SecureObject.filterEverything = function (st, raw, options) {
 	"use strict";
 
+    if (!raw) {
+        // ignoring falsy, nully references
+        return raw;
+    }
+
+    var t = typeof raw;
+    if (t === "object") {
+        if (raw instanceof File || raw instanceof FileList) {
+            // Passthru for objects without priviledges.
+            return raw;
+        }
+    }
+
 	function filterOpaque(opts, so) {
 		return opts && opts.filterOpaque === true && $A.lockerService.isOpaque(so);
 	}
@@ -86,13 +99,9 @@ SecureObject.filterEverything = function (st, raw, options) {
 		return !filterOpaque(options, cached) ? cached : undefined;
 	}
 
-	var t = typeof raw;
 	var swallowed;
 	var mutated = false;
-	if (!raw) {
-		// ignoring falsy, nully references
-		return raw;
-	} else if (t === "function") {
+	if (t === "function") {
 		// wrapping functions to guarantee that they run in system mode but their
 		// returned value complies with user-mode.
 		swallowed = function SecureFunction() {

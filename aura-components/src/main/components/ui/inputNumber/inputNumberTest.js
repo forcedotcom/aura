@@ -496,6 +496,78 @@
         }]
     },
 
+    /**
+     * Leading decimal mark should be treated as "0."
+     */
+    testLeadingDecimalMark: {
+        test: [function(component) {
+            this.inputValue(component, ".12");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 0.12, "0.12");
+        }]
+    },
+
+    /**
+     * updateOn=keyup|keydown|keypress|input should be treated the same
+     * and updates on "input" event
+     */
+    testUpdateOnKeyup: {
+        attributes: { updateOn: "keyup" },
+        test: [function(component) {
+            this.inputValue(component, "1k");
+        }, function(component) {
+            $A.test.assertEquals(component.get("v.value"), 1000);
+        }]
+    },
+
+    testUpdateOnKeydown: {
+        attributes: { updateOn: "keydown" },
+        test: [function(component) {
+            this.inputValue(component, "1k");
+        }, function(component) {
+            $A.test.assertEquals(component.get("v.value"), 1000);
+        }]
+    },
+
+    testUpdateOnKeypress: {
+        attributes: { updateOn: "keypress" },
+        test: [function(component) {
+            this.inputValue(component, "1k");
+        }, function(component) {
+            $A.test.assertEquals(component.get("v.value"), 1000);
+        }]
+    },
+
+    testUpdateOnInput: {
+        attributes: { updateOn: "input" },
+        test: [function(component) {
+            this.inputValue(component, "1k");
+        }, function(component) {
+            $A.test.assertEquals(component.get("v.value"), 1000);
+        }]
+    },
+
+    /**
+     * default is updateOn=change
+     */
+    testUpdateOnChange: {
+        test: [function(component) {
+            $A.test.assertEquals(component.get("v.updateOn"), "change");
+            // enter 1k and fire input event
+            this.inputValue(component, "1k");
+        }, function(component) {
+            // v.value should still be undefined since change event is not fired yet
+            $A.test.assertEquals(component.get("v.value"), undefined);
+            // fire change event
+            var inputElm = component.getElement();
+            $A.test.fireDomEvent(inputElm, "change");
+        }, function(component) {
+            $A.test.assertEquals(component.get("v.value"), 1000);
+        }]
+    },
+
     /*****************
      * Helpers
      *****************/

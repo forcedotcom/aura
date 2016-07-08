@@ -42,6 +42,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
     private final PropertyReference value;
     private final String name;
     private final String phase;
+    private final String includeFacets;
 
     protected EventHandlerDefImpl(Builder builder) {
         super(builder);
@@ -50,6 +51,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
         this.value = builder.value;
         this.name = builder.name;
         this.phase = builder.phase;
+        this.includeFacets = builder.includeFacets;
     }
 
     @Override
@@ -122,6 +124,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
             json.writeMapEntry("value", value);
             json.writeMapEntry("name", name);
             json.writeMapEntry("phase", phase);
+            json.writeMapEntry("includeFacets", includeFacets);
             json.writeMapEnd();
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
@@ -138,6 +141,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
         private PropertyReference action;
         private String name;
         private String phase;
+        private String includeFacets;
         private PropertyReference value;
 
         @Override
@@ -167,6 +171,11 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
 
         public Builder setPhase(String phase) {
             this.phase = phase;
+            return this;
+        }
+
+        public Builder setIncludeFacets(String includeFacets) {
+            this.includeFacets = includeFacets;
             return this;
         }
     }

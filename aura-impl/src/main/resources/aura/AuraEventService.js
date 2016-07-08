@@ -93,34 +93,139 @@ AuraEventService.prototype.getNewEvent = function(eventDefinition, eventName, so
 };
 
 /**
+ * Accumulates the ordered list of components from cmp to the root through
+ * which an event should bubble. This includes all paths through both owners
+ * and containerComponents.
+ * @param {Component} cmp
+ * @param {Array} queue ordered list of nodes in the path
+ * @param {Object} visited map of components that have been visited already
+ * @param {Boolean} isOwner indicates if this path is the value provider path
+ *      of the cmp from the original call in the stack
+ * @return {Array} queue of ordered list of nodes in the path; each element
+ *      includes a "cmp" property and a "isOwner" property
+ * @private
+ */
+AuraEventService.prototype.collectBubblePath = function(cmp, queue, visited, isOwner) {
+    if(!cmp) {
+        // we reached a dead end
+        return queue;
+    }
+    if(visited[cmp.globalId]) {
+        // we reached a previously visited component
+        if(!isOwner) {
+            // we need markers in non-value provider queues to track where
+            // containerComponent trees intersect with the main owner queue
+            queue.push({
+                cmp: cmp,
+                isMarker: true
+            });
+        }
+        return queue;
+    }
+
+    queue.push({
+        cmp: cmp,
+        isOwner: isOwner
+    });
+    visited[cmp.globalId] = true;
+
+    var superCmp = cmp.getSuper();
+    if(superCmp) {
+        // collect the super chain before handling the containerComponent to mark the visited map
+        this.collectBubblePath(superCmp, queue, visited, isOwner && true);
+    }
+    
+    var next = cmp;
+    var queueIndex = queue.length;
+    // loop until we find the next level
+    while(next) {
+        next = next.getOwner();
+        if (next === cmp || !(next instanceof Component)) {
+            // We are at the top-level now, so we are done
+            break;
+        }
+
+        if (next.getGlobalId() !== cmp.getGlobalId()) {
+            // Reached a facet value provider
+            // collect the owner chain before handling the containerComponent to mark the visited map
+            this.collectBubblePath(next, queue, visited, isOwner && true);
+
+            // stop looping, the call above will recurse up the tree
+            break;
+        }
+        else {
+            // keep going
+            cmp = next;
+        }
+    }
+
+    if(cmp.isConcrete()) {
+        // After collecting the owner chain, check if this level's concrete component's containerComponent
+        // is from a different level itself. This occurs when cmp is passed as the facet value 
+        // to its containerComponent (transcluded) by the containerComponent's value provider.
+        // e.g. <containerComponent><cur/></containerComponent>
+        var concreteCmpContainerComponent = cmp.getContainerComponent();
+        if(concreteCmpContainerComponent) {
+            // this containerComponent may be from a different component inheritance level
+            // so collect its bubble path and insert it into the queue at queueIndex
+            // before the chain of owner components that were just added above
+            var containerComponentQueue = this.collectBubblePath(concreteCmpContainerComponent, [], visited, false);
+
+            var intersectionPoint = null;
+            // walk through the containerComponent queue, finding each marker and inserting
+            // the segments between them into the queue at the correct positions
+            for(var pStopIdx = 0; pStopIdx < containerComponentQueue.length; pStopIdx++) {
+                if(containerComponentQueue[pStopIdx].isMarker) {
+                    // found a marker
+                    intersectionPoint = containerComponentQueue[pStopIdx].cmp;
+                    break;
+                }
+            }
+
+            var intersectionIndex = queueIndex;
+            if(intersectionPoint) {
+                for(var j = 0; j < queue.length; j++) {
+                    if(queue[j].cmp === intersectionPoint) {
+                        intersectionIndex = j;
+                        break;
+                    }
+                }
+            }
+
+            // insert containerComponentQueue slice into queue at intersectionIndex position
+            queue.splice.apply(queue, [intersectionIndex, 0].concat(containerComponentQueue.slice(0, pStopIdx)));
+        }
+    }
+
+    return queue;
+};
+
+
+/**
  * Returns an iterator over the sequence of components for a given event 
  * through the "capture" phase then the "bubble" phase.
- * NOTE: Transcluded event handler support could potentially be added here.
- * @return {Object} An object with the form { cmp: Component, phase: String }
+ * @return {Object} An object with the form { cmp: Component, isOwner: Boolean, phase: String }
  * @private
  * @function
  */
 AuraEventService.prototype.getEventPhaseCmpIterator = (function() {
 
-    function EventPhaseCmpIterator(evt) {
+    function EventPhaseCmpIterator(cmp, eventService) {
 
         // This is not lazy b/c calculating the next element in "capture"
         // would require iterating from the source to the last return value
         // on each iteration. Can revisit if the need arises.
-        var cmpSource = evt.getSource();
-        var cmpHierarchyIterator = $A.componentService.getComponentValueProviderHierarchy(cmpSource);
-        var bubbleCollection = [];
-        var res = null;
-        do {
-            res = cmpHierarchyIterator.next();
-            if(res.value) {
-                bubbleCollection.push.apply(bubbleCollection, res.value);
-            }
-        } while(!res.done);
+        
+        // Build the queue for the entire bubble path
+        // JBA: If the containerComponent chain is completely separated from the owner chain at any point, 
+        // this will result in an odd flow.
+        var queue = eventService.collectBubblePath(cmp, [], {}, true);
 
-        var queue = bubbleCollection.slice().reverse().concat(bubbleCollection);
+        // Now mirror the queue in reverse direction to run capture -> bubble
+        queue = queue.slice().reverse().concat(queue);
+
         var queueIndex = 0;
-        var phaseSwitchIndex = bubbleCollection.length;
+        var phaseSwitchIndex = queue.length / 2;
         var phase = AuraEventService.Phase.CAPTURE;
         var currentValue;
         var done = false;
@@ -133,8 +238,10 @@ AuraEventService.prototype.getEventPhaseCmpIterator = (function() {
                         // reached the middle, switch phases
                         phase = AuraEventService.Phase.BUBBLE;
                     }
+                    var qval = queue[queueIndex++];
                     currentValue = {
-                        cmp: queue[queueIndex++],
+                        cmp: qval.cmp,
+                        isOwner: qval.isOwner,
                         phase: phase
                     };
                     break;
@@ -165,14 +272,15 @@ AuraEventService.prototype.getEventPhaseCmpIterator = (function() {
         this.throw = function(e) {
             if(!done) {
                 done = true;
+                currentValue = undefined;
             }
 
             throw e;
         };
     }
 
-    return function(evt) {
-        return new EventPhaseCmpIterator(evt);
+    return function(cmp) {
+        return new EventPhaseCmpIterator(cmp, this);
     };
 })();
 
@@ -230,7 +338,7 @@ AuraEventService.prototype.getPhasedEventHandlerIterator = (function() {
             }
             else {
                 currentLocation = res.value;
-                currentHandlers = handlerSupplierFn(currentLocation.cmp, evt, currentLocation.phase); // an array
+                currentHandlers = handlerSupplierFn(evt, currentLocation.cmp, currentLocation.phase, currentLocation.isOwner); // an array
                 currentHandlersIndex = 0;
             }
         }
@@ -294,6 +402,7 @@ AuraEventService.prototype.getPhasedEventHandlerIterator = (function() {
         this.throw = function(e) {
             if(!done) {
                 done = true;
+                currentValue = undefined;
             }
 
             throw e;
@@ -301,7 +410,7 @@ AuraEventService.prototype.getPhasedEventHandlerIterator = (function() {
     }
 
     return function(evt, handlerSupplierFn) {
-        return new PhasedEventHandlerIterator(evt, this.getEventPhaseCmpIterator(evt), handlerSupplierFn);
+        return new PhasedEventHandlerIterator(evt, this.getEventPhaseCmpIterator(evt.getSource()), handlerSupplierFn);
     };
 })();
 
@@ -333,7 +442,7 @@ AuraEventService.prototype.eventStopPropagationHandler = function(evt) {
  * that go through capture and bubble phases.
  * @private
  */ 
-AuraEventService.prototype.getComponentEventHandlers = function(cmp, evt, phase) {
+AuraEventService.prototype.getComponentEventHandlers = function(evt, cmp, phase, isOwner) {
     var handlers;
     var eventName = evt.getName();
     // just get event handlers for this cmp, not its super(s)
@@ -362,7 +471,13 @@ AuraEventService.prototype.getComponentEventHandlers = function(cmp, evt, phase)
                             // If we have the def we guard against it. If we just have name, only check the name
                             // TODO @dval: Refactor this, once we remove all self-events + move parent->child event into methods
                             if (cmpHandlerDefs[i]["name"] === eventName && (!hDef || hDef === evtDef)) {
-                                handlers.push.apply(handlers, phasedHandlers);
+                                for(var j = 0; j < phasedHandlers.length; j++) {
+                                    // if cmp is a parent but is not in the value provider hierarchy,
+                                    // only include handlers that were registered with includeFacets=true
+                                    if(isOwner || phasedHandlers[j].includeFacets) {
+                                        handlers.push(phasedHandlers[j]);
+                                    }
+                                }
                                 includedHandlers = true;
                                 break;
                             }
@@ -374,7 +489,7 @@ AuraEventService.prototype.getComponentEventHandlers = function(cmp, evt, phase)
                             // in the array doesn't define the event type. It may have nothing to do with *THIS* event, but we're
                             // stopping this one anyway. However, this is guarding against an infinite loop in some components with event 
                             // handlers that fire an event on a child that bubbles right back to the same handler handler...!
-                            if(!hDef) {
+                            if(!hDef && isOwner) {
                                 // insert a stopPropagation() call at this point in the iteration
                                 handlers.push(this.eventStopPropagationHandler);
                             }
@@ -384,7 +499,7 @@ AuraEventService.prototype.getComponentEventHandlers = function(cmp, evt, phase)
 
                 // If we need to dispatch here, is a direct parent-children event (no def handler)
                 // So we can stopPropagation
-                if(!includedHandlers && cmp.getDef().getEventDef(eventName)) {
+                if(!includedHandlers && cmp.getDef().getEventDef(eventName)&& isOwner) {
                     // insert a stopPropagation() call at this point in the iteration
                     handlers.push(this.eventStopPropagationHandler);
                     handlers.push.apply(handlers, phasedHandlers);
@@ -402,7 +517,7 @@ AuraEventService.prototype.getComponentEventHandlers = function(cmp, evt, phase)
  * phases.
  * @private
  */ 
-AuraEventService.prototype.getNonBubblingComponentEventHandlers = function(cmp, evt, phase) {
+AuraEventService.prototype.getNonBubblingComponentEventHandlers = function(cmp, evt, phase/*, isOwner*/) {
     var handlers;
     // just get event handlers for this cmp, not its super(s)
     if(cmp.isValid() && cmp.getDef().getEventDef(evt.getName())) {
@@ -496,6 +611,7 @@ AuraEventService.prototype.getNonBubblingComponentEventHandlerIterator = (functi
         this.throw = function(e) {
             if(!done) {
                 done = true;
+                currentValue = undefined;
             }
 
             throw e;
@@ -582,6 +698,7 @@ AuraEventService.prototype.getValueHandlerIterator = (function() {
         this.throw = function(e) {
             if(!done) {
                 done = true;
+                currentValue = undefined;
             }
 
             throw e;
@@ -597,7 +714,7 @@ AuraEventService.prototype.getValueHandlerIterator = (function() {
  * A handlerSupplier implementation for APPLICATION event handlers
  * @private
  */ 
-AuraEventService.prototype.getPhasedApplicationEventHandlers = function(cmp, evt, phase) {
+AuraEventService.prototype.getPhasedApplicationEventHandlers = function(evt, cmp, phase, isOwner) {
     var evtDef = evt.eventDef;
     var eventDispatcher = evt.eventDispatcher;
     var globalId = cmp.globalId;
@@ -608,9 +725,13 @@ AuraEventService.prototype.getPhasedApplicationEventHandlers = function(cmp, evt
         while (evtDef) {
             var qname = evtDef.getDescriptor().getQualifiedName();
             var handlers = eventDispatcher[qname];
-
-            if (handlers && handlers[phase] && handlers[phase][globalId]) {
-                phasedEvtHandlers.push.apply(phasedEvtHandlers, handlers[phase][globalId]);
+            var cmpPhasedHandlers = handlers && handlers[phase] && handlers[phase][globalId];
+            if (cmpPhasedHandlers) {
+                for(var i = 0; i < cmpPhasedHandlers.length; i++) {
+                    if(isOwner || cmpPhasedHandlers[i].includeFacets) {
+                        phasedEvtHandlers.push(cmpPhasedHandlers[i]);
+                    }
+                }
             }
             evtDef = evtDef.getSuperDef();
         }
@@ -618,6 +739,44 @@ AuraEventService.prototype.getPhasedApplicationEventHandlers = function(cmp, evt
 
     return phasedEvtHandlers;
 };
+
+
+/**
+ * Convenience function that indicates if an event has any handlers registered
+ * in the bubble or capture phases at all.
+ * @return {Boolean} True if the event has any handlers in bubble or capture
+ *      phases
+ * @private
+ */
+AuraEventService.prototype.applicationEventHasPhasedHandlers = (function() {
+
+    function hasHandlers(phasedHandlerMap) {
+        for(var globalId in phasedHandlerMap) {
+            if(phasedHandlerMap.hasOwnProperty(globalId) && phasedHandlerMap[globalId] && phasedHandlerMap[globalId].length) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    return function(evt) {
+        var evtDef = evt.eventDef;
+        var eventDispatcher = evt.eventDispatcher;
+
+        // look for handlers in the entire event definition hierarchy
+        while (evtDef) {
+            var qname = evtDef.getDescriptor().getQualifiedName();
+            var handlers = eventDispatcher[qname];
+            if(handlers && (hasHandlers(handlers[AuraEventService.Phase.BUBBLE]) || hasHandlers(handlers[AuraEventService.Phase.CAPTURE]))) {
+                return true;
+            }
+            evtDef = evtDef.getSuperDef();
+        }
+
+        return false;
+    };
+})();
+
 
 /**
  * Returns an iterator over all event handlers for a given APPLICATION event. 
@@ -629,23 +788,6 @@ AuraEventService.prototype.getPhasedApplicationEventHandlers = function(cmp, evt
  */
 AuraEventService.prototype.getAppEventHandlerIterator = (function() {
 
-    // returns true if the cmpGen generator emits a component whose global id
-    // matches the id
-    function hasId(cmpGen, id) {
-        var res = null;
-        do {
-            res = cmpGen.next();
-            // res.value is an array of the component hierarchy for a single
-            // concrete component; we only need to check the first element in 
-            // the array since all the elements in the array will share the same globalId
-            if(res.value && id === res.value[0].getGlobalId()) {
-                return true;
-            }
-        } while(!res.done);
-
-        return false;
-    }
-
     // Iterator over all event handlers in the "default" phase 
     function AppEventDefaultPhaseHandlerIterator(evt, rootId) {
         var done = false;
@@ -653,6 +795,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
         var queue = null;
         var queueIndex = 0;
         var currentValue;
+        var rootCmp = rootId && $A.getComponent(rootId);
 
         // this is lazy in that it's called on the first "next()" call
         // but once called it builds a queue of the entire result set
@@ -678,14 +821,17 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
                             if(cmp && !cmp.isValid()) {
                                 continue;
                             }
-                            if(rootId) {
-                                // check if the cmp is contained within the rootId
-                                var cmpHierarchyGen = $A.componentService.getComponentValueProviderHierarchy(cmp);
-                                if(!hasId(cmpHierarchyGen, rootId)) {
-                                    // the component hierarchy for the cmp does not include the rootId
+                            if(rootCmp) {
+                                // check if the cmp is contained within the rootCmp
+                                var containsResult = $A.componentService.contains(rootCmp, cmp);
+                                if(!containsResult.result) {
+                                    // the component hierarchy for the cmp does not include the rootCmp
                                     // so don't include these handlers in the result set for the iterator
                                     continue;
                                 }
+
+                                // JBA: Should we use containsResult.isOwner to distinguish between 
+                                // containment by owner and containment by transclusion?
                             }
 
                             // push an entry for each handler into the queue
@@ -743,6 +889,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
         this.throw = function(e) {
             if(!done) {
                 done = true;
+                currentValue = undefined;
             }
 
             throw e;
@@ -750,13 +897,23 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
     }
 
     // Iterator over all event handlers in "capture", "bubble", and "default" phase
-    function AppEventHandlerIterator(evt, phasedEventHandlerIterator) {
+    function AppEventHandlerIterator(evt, eventService) {
 
         var defaultEventHandlerIterator = null;
         var currentPhase = AuraEventService.Phase.CAPTURE;
-        var bcastRootId = null;
         var currentValue = null; // HandlerIteratorResult
         var done = false;
+        var phasedEventHandlerIterator;
+
+        if(!eventService.applicationEventHasPhasedHandlers(evt)) {
+            // there are no "bubble" or "capture" handlers at all
+            // optimize by moving straight to the "default" phase
+            currentPhase = AuraEventService.Phase.DEFAULT;
+            defaultEventHandlerIterator = new AppEventDefaultPhaseHandlerIterator(evt);
+        }
+        else {
+            phasedEventHandlerIterator = eventService.getPhasedEventHandlerIterator(evt, eventService.getPhasedApplicationEventHandlers);
+        }
 
         this.next = function() {
             while(!done) {
@@ -782,10 +939,11 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
                         // PhasedEventHandlerIterator will terminate with a defined value if stopPropagation()
                         // was called. 
                         currentPhase = AuraEventService.Phase.DEFAULT;
+                        var bcastRootId = null;
                         if(evt.eventStopPropagation && phaseRes.value) {
                             // stopPropagation() was called, so we need to establish the broadcast root
                             // to scope the default event handlers
-                            bcastRootId = phaseRes.value.cmp.getConcreteComponent().getGlobalId(); // (evt.getSource() && evt.getSource().getGlobalId()) ?
+                            bcastRootId = phaseRes.value.cmp.globalId;
                         }
 
                         defaultEventHandlerIterator = new AppEventDefaultPhaseHandlerIterator(evt, bcastRootId);
@@ -824,6 +982,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
         this.throw = function(e) {
             if(!done) {
                 done = true;
+                currentValue = undefined;
             }
 
             throw e;
@@ -831,7 +990,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
     }
 
     return function(evt) {
-        return new AppEventHandlerIterator(evt, this.getPhasedEventHandlerIterator(evt, this.getPhasedApplicationEventHandlers));
+        return new AppEventHandlerIterator(evt, this);
     };
 })();
 
@@ -876,6 +1035,14 @@ AuraEventService.prototype.addHandler = function(config) {
     var cmpHandlers = phaseHandlers[config["globalId"]];
     if (cmpHandlers === undefined) {
         phaseHandlers[config["globalId"]] = cmpHandlers = [];
+    }
+    var includeFacets = config["includeFacets"];
+    // $A.util.getBooleanValue isn't available here immediately
+    if(includeFacets !== undefined && includeFacets !== null && 
+        includeFacets !== false && includeFacets !== 0 && 
+        includeFacets !== "false" && includeFacets !== "" && 
+        includeFacets !== "f") {
+        config["handler"].includeFacets = true;
     }
     cmpHandlers.push(config["handler"]);
 };

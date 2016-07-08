@@ -42,9 +42,11 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_VALUE = "value";
     private static final String ATTRIBUTE_PHASE = "phase";
+    private static final String ATTRIBUTE_INCLUDE_FACETS = "includeFacets";
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_ACTION, ATTRIBUTE_EVENT,
-            ATTRIBUTE_NAME, ATTRIBUTE_VALUE, ATTRIBUTE_PHASE, RootTagHandler.ATTRIBUTE_DESCRIPTION);
+            ATTRIBUTE_NAME, ATTRIBUTE_VALUE, ATTRIBUTE_PHASE, ATTRIBUTE_INCLUDE_FACETS,
+            RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
     private RootTagHandler<? extends RootDefinition> parentHandler;
     private final EventHandlerDefImpl.Builder builder = new EventHandlerDefImpl.Builder();
@@ -73,6 +75,8 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
         builder.setName(getAttributeValue(ATTRIBUTE_NAME));
 
         builder.setPhase(getAttributeValue(ATTRIBUTE_PHASE));
+
+        builder.setIncludeFacets(getAttributeValue(ATTRIBUTE_INCLUDE_FACETS));
 
         builder.setDescription(getAttributeValue(RootTagHandler.ATTRIBUTE_DESCRIPTION));
 

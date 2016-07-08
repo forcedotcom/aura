@@ -163,105 +163,76 @@ AuraComponentService.prototype.getAttributeProviderForElement = function(element
 };
 
 /**
- * Returns an iterator over components from cmp to the root through
- * the value provider chain. The iterator emits an array of the component extension
- * hierarchy for each concrete component.
- * Example: [Cmp, SuperCmp, SuperSuperCmp] -> [CmpCVP, SuperCmpCVP] -> CmpCVPCVP
- * @param {Component} cmp The source component
+ * Determines if the container contains cmp. The return value is an object
+ * with two properties. 
+ *      - {Boolean} "result" true if container contains cmp; false otherwise
+ *      - {Boolean} "isOwner" true if the containment is within the owner hierarchy; 
+ *          false if the containment is only by transclusion
+ * @param {Component} container the container
+ * @param {Component} cmp cmp to check
+ * @return {Object}
  * @private
  */
-AuraComponentService.prototype.getComponentValueProviderHierarchy = (function() {
+AuraComponentService.prototype.contains = (function() {
 
-    function getSuperHierarchy(cmp) {
-        var list = [cmp];
-        do {
-            if(!cmp.isValid()) {
-                // signal an invalid hiearchy to the caller
-                return undefined;
-            }
-            cmp = cmp.getSuper();
-            if(cmp) {
-                list.push(cmp);
-            }
-        } while (cmp);
+    function contains(container, cmp, visited, isOwner) {
+        if(container === cmp) {
+            return {
+                result: true,
+                isOwner: isOwner
+            };
+        }
 
-        return list;
-    }
+        if(!cmp || !container || visited[cmp.globalId]) {
+            return {
+                result: false
+            };
+        }
 
-    function ComponentValueProviderHierarchyIterator(cmp) {
-        var done = !cmp;
-        var current = cmp;
+        visited[cmp.globalId] = true;
 
-        this.next = function() {
+        // check super
+        var answer = contains(container, cmp.getSuper(), visited, isOwner);
 
-            if(!current || !current.isValid()) {
-                done = true;
-                current = undefined;
-            }
+        // check CVP
+        if(!answer.result) {
+            var next = cmp;
+            // loop until we find the next level
+            while(next) {
+                next = next.getOwner();
+                if (next === cmp || !(next instanceof Component)) {
+                    // We are at the top-level now, so we are done
+                    return {
+                        result: false
+                    };
+                }
 
-            var value;
-            if(current) {
-                value = getSuperHierarchy(current);
-                // an "undefined" value here means that we have an
-                // invalid component in the hierarchy
-                if(value === undefined) {
-                    done = true;
-                    current = undefined;
+                if (next.getGlobalId() !== cmp.getGlobalId()) {
+                    // Reached a facet value provider
+                    answer = contains(container, next, visited, isOwner);
+                    // stop looping, the call above will recurse up the tree
+                    break;
+                }
+                else {
+                    // keep going
+                    cmp = next;
                 }
             }
+        }
 
-            // store the current value before calculating the next one
-            var result = {
-                value: value
-            };
+        // check parent (non-value provider)
+        if(!answer.result) {
+            answer = contains(container, cmp.getContainerComponent(), visited, false);
+        }
 
-            if(!done) {
-                // Look for a facet value provider (some providers may just be extending definitions)
-                do {
-                    var next = current.getComponentValueProvider();
-                    if (next === current || !(next instanceof Component)) {
-                        // We are at the top-level now, so we are done
-                        current = undefined;
-                        break;
-                    }
-                    else if (next.getGlobalId() !== current.getGlobalId()) {
-                        // Reached a facet value provider
-                        current = next;
-                        break;
-                    }
-                    current = next;
-                } while (current);
-            }
-
-            result.done = done;
-
-            return result;
-        };
-
-        this.return = function(value) {
-            if(!done) {
-                done = true;
-                current = value;
-            }
-            return {
-                value: current,
-                done: done
-            };
-        };
-
-        this.throw = function(e) {
-            if(!done) {
-                done = true;
-            }
-
-            throw e;
-        };
+        return answer;
     }
 
-    return function(cmp) {
-        return new ComponentValueProviderHierarchyIterator(cmp);
+    return function(container, cmp) {
+        return contains(container, cmp, {}, true);
     };
 })();
+
 
 /**
  * Create a new component array.

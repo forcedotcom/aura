@@ -16,9 +16,9 @@
 
 -->
 <aura:component implements="test:testAppEventPhasesHasLogId">
-    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEventCapture}" phase="capture"/>
-    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEventBubble}" phase="bubble"/>
-    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}"/>
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="capture" />
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="bubble" includeFacets="true" />
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" />
 
     <aura:import library="test:testAppEventPhasesLibrary" property="lib" />
     

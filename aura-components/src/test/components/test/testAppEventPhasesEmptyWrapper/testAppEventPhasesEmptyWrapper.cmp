@@ -15,18 +15,14 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="test:testAppEventPhasesHasLogId,test:testAppEventPhasesProvidable" provider="js://test.testAppEventPhasesHandler">
+<aura:component implements="test:testAppEventPhasesHasLogId">
     <aura:handler event="test:testAppEventPhasesCommand" action="{!c.handleCommand}"/>
-    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="capture"/>
-    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="bubble"/>
-    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}"/>
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="capture" />
+    <aura:handler event="test:testAppEventPhasesEvent" action="{!c.handleEvent}" phase="bubble" includeFacets="true" />
 
     <aura:import library="test:testAppEventPhasesLibrary" property="lib" />
     
-    <div class="wrapper handler">
-    	{!v.logId + 'Handler'}
-    	<test:testAppEventPhasesEmitter aura:id="emitter" logId="{!v.logId + 'Handler'}"/>
-
-        {!v.body}
-    </div>
+    {!v.logId + ' ' + globalid}
+    <!-- This body facet has no direct container -->
+    {!v.body}
 </aura:component>

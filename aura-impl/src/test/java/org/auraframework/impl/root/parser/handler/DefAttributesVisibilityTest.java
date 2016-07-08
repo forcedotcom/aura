@@ -180,7 +180,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     public static class EventHandlerDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
         @Override
         public void setUp() throws Exception {
-            publicAttrs = Sets.newHashSet("action", "description", "event", "name", "value", "phase");
+            publicAttrs = Sets.newHashSet("action", "description", "event", "name", "value", "phase", "includeFacets");
             internalAttrs = Sets.newHashSet();
             super.setUp();
         }

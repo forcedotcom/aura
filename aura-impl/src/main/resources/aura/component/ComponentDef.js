@@ -96,19 +96,21 @@ function ComponentDef(config) {
                         cmpHandlerDefs = [];
                     }
                     cmpHandlerDefs.push({
-                        "name"     : handlerConfig["name"],
-                        "action"   : handlerConfig["action"],
-                        "phase"    : handlerConfig["phase"],
-                        "eventDef" : $A.eventService.createEventDef(handlerConfig["eventDef"])
+                        "name"          : handlerConfig["name"],
+                        "action"        : handlerConfig["action"],
+                        "phase"         : handlerConfig["phase"],
+                        "includeFacets" : handlerConfig["includeFacets"],
+                        "eventDef"      : $A.eventService.createEventDef(handlerConfig["eventDef"])
                     });
                 } else {
                     if (!appHandlerDefs) {
                         appHandlerDefs = [];
                     }
                     appHandlerDefs.push({
-                        "action"   : handlerConfig["action"],
-                        "phase"    : handlerConfig["phase"],
-                        "eventDef" : $A.eventService.createEventDef(handlerConfig["eventDef"])
+                        "action"        : handlerConfig["action"],
+                        "phase"         : handlerConfig["phase"],
+                        "includeFacets" : handlerConfig["includeFacets"],
+                        "eventDef"      : $A.eventService.createEventDef(handlerConfig["eventDef"])
                     });
                 }
 

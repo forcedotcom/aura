@@ -35,7 +35,7 @@
                 if (!resizer._resizing) {
                     resizer._resizing = true;
 
-                    setTimeout(function() {
+                    setTimeout($A.getCallback(function() {
                         try {
                             for (var n in resizer._resizerComponentSet) {
                                 var c = resizer._resizerComponentSet[n];
@@ -48,7 +48,7 @@
                         } finally {
                             resizer._resizing = false;
                         }
-                    }, 0);
+                    }), 0);
                 }
             };
 

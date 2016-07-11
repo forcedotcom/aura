@@ -15,11 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" extensible="true" defaultFlavor="default, input, datetime"
+<aura:component extends="ui:input" extensible="true" implements="ui:htmlDateTime" defaultFlavor="default, input, datetime"
                 description="HTML5 date picker, used for phone and tablet.">
 
-    <aura:attribute name="timezone" type="String" default="{!$Locale.timezone}" description="The timezone ID, for example, America/Los_Angeles."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
     <!-- update the value binding on blur, which is the event fired when the date/time picker is dismissed -->
     <aura:set attribute="updateOn" value="blur"/>
 

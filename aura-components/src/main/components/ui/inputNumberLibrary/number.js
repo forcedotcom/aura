@@ -25,8 +25,14 @@ function lib() { // eslint-disable-line no-unused-vars
 
     function isNoZeroLeadingNumber(string) {
         var decimalSeparator = $A.get("$Locale.decimal");
-        var reg = new RegExp('(^\\s*(\\+|\\-)\\s*)?\\' + decimalSeparator + '$');
+        var reg = new RegExp('(^\\s*(\\+|\\-)?\\s*)\\' + decimalSeparator + '\\d*(K|B|M|T)?$');
         return reg.test(string);
+    }
+
+    function injectZeroBeforeDecimalSeparator (string) {
+        var decimalSeparator = $A.get("$Locale.decimal");
+        var numberParts = string.split(decimalSeparator);
+        return numberParts[0] + '0' + decimalSeparator + numberParts[1];
     }
 
     return {
@@ -60,13 +66,12 @@ function lib() { // eslint-disable-line no-unused-vars
                 billionRegExp,
                 trillionRegExp;
 
-
             if (this.isNumber(string)) {
                 return string;
             }
 
             if (isNoZeroLeadingNumber(string)) {
-                return 0;
+                string = injectZeroBeforeDecimalSeparator(string);
             }
 
             if (decimalSeparator !== '.') {

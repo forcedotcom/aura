@@ -23,6 +23,8 @@
         <aura:locatorContext key="innerTextValue" value="{!v.innerTextValue + v.addText}"/>
     </aura:locator>
     
+    <aura:locator target="innerWithAuraIdDataRef" description="Inner Div with auraID and data ref attributes on dom element"/>
+    
     <div class="innerWithAuraIdLocator" aura:id="innerWithAuraIdLocator" onclick="{!c.clickHandler}">
         {!v.innerTextValue + ' | inner has auraid and locator'}
     </div>

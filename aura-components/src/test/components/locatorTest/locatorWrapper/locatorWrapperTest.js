@@ -52,21 +52,9 @@
     lastTransaction: {},
     testParentChildWithAuraIdOnly: {
         test: function () {
-           this.doClickAndValidateTransaction("innerWithAuraIdNoLocator", "locatorWrapperIdNoDef");
-        }
-    },
-    testParentChildWithoutAuraIds: {
-        test: function () {
-            trx = this.clickDivAndGetTransaction(".locatorWrapperNoAuraId .innerWithoutAuraId");
-            // no transactions are logged when the parent and child components don't have an aura id
-            $A.test.assertUndefined(trx);
-        }
-    },
-    testParentWithoutAuraIdChildWithAuraIdOnly: {
-        test: function () {
-            trx = this.clickDivAndGetTransaction(".locatorWrapperNoAuraId .innerWithAuraIdLocator");
-            // no transactions are logged when the parent doesn't have an Aura ID, even though the child does
-            $A.test.assertUndefined(trx);
+           var trx = this.clickDivAndGetTransaction(".locatorWrapperIdNoDef .innerWithAuraIdNoLocator");
+           // no transactions are logged when the parent and child components don't have locator defs, but aura ids
+           $A.test.assertUndefined(trx);
         }
     },
     testParentChildWithLocatorDefs: {
@@ -82,10 +70,8 @@
     testParentWithAuraIdOnlyChildWithLocatorDef: {
         test: function (cmp) {
             var innerCmp = cmp.find("locatorWrapperIdNoDef");
-            this.doClickAndValidateTransaction("innerWithAuraIdLocator", "locatorWrapperIdNoDef", 
-                {
-                    "innerTextValue": innerCmp.get("v.innerTextValue") + innerCmp.get("v.addText")
-                });
+            var trx = this.clickDivAndGetTransaction(".locatorWrapperIdNoDef .innerWithAuraIdLocator");
+            $A.test.assertUndefined(trx);
         }
     },
     testParentWithAuraIdLocatorChildWithAuraIdDataRefId: {

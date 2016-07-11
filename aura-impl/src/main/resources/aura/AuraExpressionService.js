@@ -306,59 +306,51 @@ AuraExpressionService.prototype.resolveLocatorContext = function (cmp, locatorDe
  */
 AuraExpressionService.prototype.resolveLocator = function (component, localId) {
     var ownerLocalId = component.getLocalId();
-    if (!localId || 
-        !ownerLocalId ||
-        !component.find(localId) // localId isn't actually defined inside component
-        ) {
-        return undefined;
-    }
+    var locator;
 
-
-    var locator = {
-            "target" : localId,
-            "scope" : ownerLocalId
-    };
-    
-    var ownerCmp = component.getComponentValueProvider();
-    
-    var rootLocatorDefs = component.getDef().getLocatorDefs();
-    var rootLocatorDef = rootLocatorDefs && rootLocatorDefs[localId];
-    
-    var ownerLocatorDefs = ownerCmp.getDef().getLocatorDefs();
-    var ownerLocatorDef = ownerLocatorDefs && ownerLocatorDefs[ownerLocalId];
-    
-    if (!rootLocatorDefs && !ownerLocatorDefs) {
-        $A.warning("Locator Defintions aren't available for both target and scope. temporarily logging based on aura:ids");
+    if (!localId || !ownerLocalId) {
         return locator;
     }
 
-    // Deal with missing locator definitions
-    var errorString = "Didn't find matching locator definition for {0} in {1}. Temporarily falling back to aura:ids";
-    if (!rootLocatorDef) {
-        $A.warning($A.util.format(errorString, localId, component.getName()));
-    }
-    if (!ownerLocatorDef) {
-        $A.warning($A.util.format(errorString, ownerLocalId, ownerCmp.getName()));
+    // We need to look at the linkage via super-chain in case the component is extended
+    var currentCmp = component;
+    var link = component.find(localId);
+
+    while (!link && currentCmp) {
+        currentCmp = currentCmp.getSuper();
+        link = currentCmp.find(localId);
     }
 
-    var rootContext = this.resolveLocatorContext(component, rootLocatorDef);
+    if (!link) {
+        return locator;
+    }
+
+    var ownerCmp = component.getComponentValueProvider();    
+    
+    var rootLocatorDefs = currentCmp.getDef().getLocatorDefs();
+    var rootLocatorDef = rootLocatorDefs && rootLocatorDefs[localId];
+
+    var ownerLocatorDefs = ownerCmp.getDef().getLocatorDefs();
+    var ownerLocatorDef = ownerLocatorDefs && ownerLocatorDefs[ownerLocalId];
+    
+    if (!rootLocatorDef || !ownerLocatorDef) {
+        return locator;
+    }
+
+    locator = {};
+
+    var rootContext = this.resolveLocatorContext(currentCmp, rootLocatorDef);
     var ownerContext = this.resolveLocatorContext(ownerCmp, ownerLocatorDef);
     
     var context = $A.util.apply(ownerContext || {}, rootContext);
+
     if (!$A.util.isEmpty(context)) {
         locator["context"] = context;
     }
     
-    // Apply Aliases from target and scope as needed
-    var targetAlias = rootLocatorDef && rootLocatorDef["alias"];
-    var scopeAlias  = ownerLocatorDef && ownerLocatorDef["alias"];
-    
-    if (targetAlias) {
-        locator["target"] = targetAlias;
-    }
-    if (scopeAlias) {
-        locator["scope"] = scopeAlias;
-    }
+    // Apply aliases from target and scope as needed
+    locator["target"] = rootLocatorDef["alias"] || localId;
+    locator["scope"] = ownerLocatorDef["alias"] || ownerLocalId;
     
     return locator;
 };

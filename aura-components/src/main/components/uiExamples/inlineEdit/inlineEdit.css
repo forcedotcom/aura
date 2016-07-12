@@ -34,6 +34,9 @@
 	padding: 0;
 	border-top: 1px solid #d8dde6;
 	text-align: left;
+
+	/* inline panel parent must have positioning */
+	position: relative;
 }
 
 .THIS .inline-edit-enabled .inline-edit-example th:hover,

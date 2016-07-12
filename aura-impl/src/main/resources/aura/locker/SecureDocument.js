@@ -117,6 +117,14 @@ function SecureDocument(doc, key) {
         })
     });
 
+    ["location"].forEach(function(name) {
+        // These are direct passthrough's and should never be wrapped in a SecureObject
+        Object.defineProperty(o, name, {
+            enumerable: true,
+            value: doc[name]
+        });
+    });
+
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", doc);
 

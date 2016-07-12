@@ -2147,12 +2147,27 @@ TestInstance.prototype.storageSweep = function(storage) {
 };
 
 /**
- * Set items to database directly through a CryptoAdapter's underlying adapter
- * (indexedDBAdapter or memory adapter)
+ * Store items to storage through the storage's adpater, bypassing the key prefix and
+ * size validation logic AuraStorage performs.
  *
- * @param {CryptoAdapter} cryptoAdapter.
- * @param {Array} tuples An array of key-value-size pairs.
+ * @param {StorageAdapter} adapter
+ * @param {Array} tuples An array of key-value-size pairs
  * @export
+ * @function Test#storageAdapterSetItems
+ */
+TestInstance.prototype.storageAdapterSetItems = function(adapter, tuples) {
+    return adapter.setItems(tuples);
+};
+
+/**
+ * Store items to storage directly through a CryptoAdapter's underlying adapter
+ * (IndexedDBAdapter or MemoryAdapter), bypassing the encryption logic CryptoAdapter
+ * performs.
+ *
+ * @param {CryptoAdapter} cryptoAdapter
+ * @param {Array} tuples An array of key-value-size pairs
+ * @export
+ * @function Test#setItemsToCryptoAdapter
  */
 TestInstance.prototype.setItemsToCryptoAdapter = function(cryptoAdapter, tuples) {
     return cryptoAdapter.adapter.setItems(tuples);

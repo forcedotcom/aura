@@ -695,5 +695,166 @@
                        "Sweeping items never completed");
            }
        ]
+    },
+
+    /**
+     * Verify that IndexedDBAdapter.getItems() excludes the items with different key prefix.
+     * Since storage.getAll() has the key prefix exclusion logic, calling getItems() directly
+     * through adapter.
+     */
+    testGetItemsExcludesItemsWithDifferentKeyPrefix: {
+        test: [
+            function createStorageAndSetDiffPrefixedItem(cmp) {
+                var completed = false;
+                var targetStorageName = "keyPrefixTestDB";
+                $A.test.addCleanup(function(){ this.deleteStorage(targetStorageName); }.bind(this));
+
+                // prefixKey is prefix:1
+                $A.storageService.setIsolation("prefix");
+                cmp._storage = $A.storageService.initStorage({
+                    name: targetStorageName,
+                    maxSize: 32768,
+                    expiration: 2000,
+                    debugLogging: true,
+                    clearOnInit: true,
+                    version: 1
+                });
+
+                var diffPrefixedKeyItem = [
+                    "diffPrefixedKey",
+                    {
+                        expires : new Date().getTime() + 60000,
+                        value: "value"
+                    },
+                    15];
+
+                $A.test.storageAdapterSetItems(cmp._storage.adapter, [diffPrefixedKeyItem])
+                    .then(function() { completed = true; } )
+                    .catch(function(e) { $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function() {return completed;});
+            },
+            function verifyGetItemsNotReturnDiffPrefixedItem(cmp) {
+                var completed = false;
+
+                // TODO: add a case for getItems with explicitly given keys when W-2531907 is done.
+                // Currently only getting all items excludes different prefix keyed item.
+                cmp._storage.adapter.getItems([])
+                    .then(function(items) {
+                        $A.test.assertEquals(0, Object.keys(items).length,
+                                "getItems() should not include items with different prefixed key");
+                        completed = true;
+                    })
+                    .catch(function(e) { $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function() {return completed;});
+            }
+        ]
+    },
+
+    testGetSizeIncludesSizeOfItemsWithDifferentPrefixKey: {
+        test: [
+            function createStorageAndSetDiffPrefixedItem(cmp) {
+                var completed = false;
+                var targetStorageName = "keyPrefixTestDB";
+                $A.test.addCleanup(function(){ this.deleteStorage(targetStorageName); }.bind(this));
+
+                // prefixKey is prefix:1
+                $A.storageService.setIsolation("prefix");
+                cmp._storage = $A.storageService.initStorage({
+                    name: targetStorageName,
+                    maxSize: 32768,
+                    expiration: 2000,
+                    debugLogging: true,
+                    clearOnInit: true,
+                    version: 1
+                });
+                cmp._expectedSize = 15;
+
+                var diffPrefixedKeyItem = [
+                    "diffPrefixedKey",
+                    {
+                        expires : new Date().getTime() + 60000,
+                        value: "value"
+                    },
+                    cmp._expectedSize];
+
+                $A.test.storageAdapterSetItems(cmp._storage.adapter, [diffPrefixedKeyItem])
+                    .then(function() { completed = true; } )
+                    .catch(function(e) { $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function() {return completed;});
+            },
+            function verifyGetSizeBeforeDiffPrefixedItemGetEvicted(cmp) {
+                var completed = false;
+
+                // storage.getSize() uses KB as unit, so getting size through adapter (Byte as unit)
+                // for more accurate comparison.
+                // Note: getSize() normally gives estimated size. Calling after getAll() can force it
+                // to scan entire table to get actual size. More details in IndexedDBAdapter.js docs.
+                cmp._storage.getAll().
+                    then(function() {
+                        return cmp._storage.adapter.getSize();
+                    })
+                    .then(function(size) {
+                        $A.test.assertEquals(cmp._expectedSize, size,
+                               "getSize() should include size of items with different prefixed key");
+                        completed = true;
+                    })
+                    .catch(function(e) { $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function() {return completed;});
+            }
+        ]
+    },
+
+    testSweepEvictsItemsWithDifferentKeyPrefix: {
+        test: [
+            function createStorageAndSetDiffPrefixedItem(cmp) {
+                var completed = false;
+                var targetStorageName = "keyPrefixTestDB";
+                $A.test.addCleanup(function(){ this.deleteStorage(targetStorageName); }.bind(this));
+
+                // prefixKey is prefix:1
+                $A.storageService.setIsolation("prefix");
+                cmp._storage = $A.storageService.initStorage({
+                    name: targetStorageName,
+                    maxSize: 32768,
+                    expiration: 2000,
+                    debugLogging: true,
+                    clearOnInit: true,
+                    version: 1
+                });
+
+                var diffPrefixedKeyItem = [
+                    "diffPrefixedKey",
+                    {
+                        expires : new Date().getTime() + 60000,
+                        value: "value"
+                    },
+                    15];
+
+                $A.test.storageAdapterSetItems(cmp._storage.adapter, [diffPrefixedKeyItem])
+                    .then(function() { completed = true; } )
+                    .catch(function(e) { $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function() {return completed;});
+            },
+            function sweepAndVerifyStorageSize(cmp) {
+                var completed = false;
+
+                $A.test.storageSweep(cmp._storage)
+                    .then(function() {
+                        return cmp._storage.getSize();
+                    })
+                    .then(function(size) {
+                        $A.test.assertEquals(0, size, "Item with different key prefix should be swept");
+                        completed = true;
+                    })
+                    .catch(function(e) { $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function() {return completed;});
+            }
+        ]
     }
 })

@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.renderer;
 
+import java.io.IOException;
+import java.io.StringWriter;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -29,9 +32,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.JsonEncoder;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import java.io.IOException;
-import java.io.StringWriter;
 
 /**
  * Test class to verify implementation of Java (server side) renderers for component.
@@ -68,7 +68,7 @@ public class JavaRendererDefTest extends AuraImplTestCase {
     @Test
     public void testSerializedFormat() throws Exception {
         JavaRendererDef def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
-        assertTrue(JsonEncoder.serialize(def, false).isEmpty());
+        assertTrue(JsonEncoder.serialize(def, false, false).isEmpty());
     }
 
     /**

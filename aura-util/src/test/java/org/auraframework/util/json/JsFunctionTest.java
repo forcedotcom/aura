@@ -15,9 +15,10 @@
  */
 package org.auraframework.util.json;
 
-import com.google.common.collect.ImmutableList;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  */
@@ -27,12 +28,12 @@ public class JsFunctionTest extends UnitTestCase {
     public void testSerialize() throws Exception {
         String contents = "var thin = \"brown fox\";\njumps('over the moon');";
         JsFunction f = new JsFunction(ImmutableList.<String> of(), contents);
-        assertEquals("function() {" + contents + "}", JsonEncoder.serialize(f, true));
+        assertEquals("function() {" + contents + "}", JsonEncoder.serialize(f, true, false));
 
         JsFunction f2 = new JsFunction(ImmutableList.of("arg1"), "nothing");
-        assertEquals("function(arg1) {nothing}", JsonEncoder.serialize(f2, true));
+        assertEquals("function(arg1) {nothing}", JsonEncoder.serialize(f2, true, false));
         JsFunction f3 = new JsFunction(ImmutableList.of("arg1", "arg2"), "something");
-        assertEquals("function(arg1, arg2) {something}", JsonEncoder.serialize(f3, true));
+        assertEquals("function(arg1, arg2) {something}", JsonEncoder.serialize(f3, true, false));
     }
 
     @Test

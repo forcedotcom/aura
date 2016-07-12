@@ -297,13 +297,6 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     this.globalValueProviders.merge(otherContext["globalValueProviders"]);
     $A.localizationService.init();
 
-    if (otherContext["eventDefs"]) {
-        defs = otherContext["eventDefs"];
-        for (i = 0; i < defs.length; i++) {
-            $A.eventService.saveEventConfig(defs[i]);
-        }
-    }
-
     if (otherContext["libraryDefs"]) {
         defs = otherContext["libraryDefs"];
         for (i = 0; i < defs.length; i++) {
@@ -316,8 +309,15 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
         for (i = 0; i < defs.length; i++) {
             // there are occasions when defs are just references (descriptor name)
             if (defs[i]["descriptor"]) {
-                $A.componentService.saveComponentConfig(defs[i]);
+                $A.componentService.createComponentDef(defs[i]);
             }
+        }
+    }
+
+    if (otherContext["eventDefs"]) {
+        defs = otherContext["eventDefs"];
+        for (i = 0; i < defs.length; i++) {
+            $A.eventService.createEventDef(defs[i]);
         }
     }
 

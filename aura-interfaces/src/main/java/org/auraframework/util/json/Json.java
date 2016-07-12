@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
+import org.auraframework.util.json.Serialization.ReferenceScope;
+
 /**
  * Json interface
  */
@@ -142,10 +144,12 @@ public interface Json {
     }
 
     void checkIndent(IndentType type, String message);
+    void clearReferences();
     void close() throws IOException;
 
     Appendable getAppendable();
     String getIndent();
+    Integer getRefId(ReferenceScope rs, Object value);
     JsonSerializationContext getSerializationContext();
     void pushIndent(IndentType type);
     void popIndent(IndentType type, String message);

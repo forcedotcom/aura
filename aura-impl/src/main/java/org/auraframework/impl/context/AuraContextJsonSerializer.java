@@ -15,7 +15,17 @@
  */
 package org.auraframework.impl.context;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -32,16 +42,17 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.Lists;
 
 public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
+    private static class DefSorter implements Comparator<Definition> {
+        @Override
+        public int compare(Definition arg0, Definition arg1) {
+            return arg0.getDescriptor().compareTo(arg1.getDescriptor());
+        }
+    }
+
+    private static final DefSorter DEFSORTER = new DefSorter();
 
     public AuraContextJsonSerializer() {
     }
@@ -50,6 +61,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
 
     private void writeDefs(Json json, String name, List<Definition> writable) throws IOException {
         if (writable.size() > 0) {
+            Collections.sort(writable, DEFSORTER);
             json.writeMapEntry(name, writable);
         }
     }
@@ -136,9 +148,9 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
                     }
                 }
             }
+            writeDefs(json, "componentDefs", componentDefs);
             writeDefs(json, "eventDefs", eventDefs);
             writeDefs(json, "libraryDefs", libraryDefs);
-            writeDefs(json, "componentDefs", componentDefs);
         }
 
         try {
@@ -187,12 +199,19 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
                     json.writeArrayBegin();
                     started = true;
                 }
-                json.writeComma();
-                json.writeIndent();
-                json.writeMapBegin();
-                json.writeMapEntry("type", valueProvider.getValueProviderKey().getPrefix());
-                json.writeMapEntry("values", valueProvider.getData());
-                json.writeMapEnd();
+                try {  
+                    // Conditionally disable refSupport for specific value providers.
+                    json.getSerializationContext().pushRefSupport(valueProvider.refSupport()); 
+                    json.writeComma();
+                    json.writeIndent();
+                    json.writeMapBegin();
+                    json.writeMapEntry("type", valueProvider.getValueProviderKey().getPrefix());
+                    json.writeMapEntry("hasRefs", valueProvider.refSupport());
+                    json.writeMapEntry("values", valueProvider.getData());
+                    json.writeMapEnd();
+                } finally { 
+                    json.getSerializationContext().popRefSupport(); 
+                }
             }
         }
 

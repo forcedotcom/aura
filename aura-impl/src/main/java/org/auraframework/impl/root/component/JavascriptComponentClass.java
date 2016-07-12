@@ -16,6 +16,9 @@
 
 package org.auraframework.impl.root.component;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -29,9 +32,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
-
-import java.io.IOException;
-import java.util.List;
 
 public class JavascriptComponentClass extends BaseJavascriptClass {
     private static final long serialVersionUID = 359409741393893330L;
@@ -124,7 +124,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
 
         private void writeObjectLiteral(StringBuilder out) throws IOException, QuickFixException {
 
-            JsonEncoder json = new JsonEncoder(out, true);
+            JsonEncoder json = new JsonEncoder(out, true, false);
             json.writeMapBegin();
 
             // Metadata

@@ -15,9 +15,14 @@
  */
 package org.auraframework.impl;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+
 import org.auraframework.Aura;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
@@ -30,6 +35,7 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.SVGDef;
+import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.service.LoggingService;
@@ -46,14 +52,13 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
+import aQute.bnd.annotation.component.Component;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
+
+@Component (provide=AuraServiceProvider.class)
 public class ServerServiceImpl implements ServerService {
     private static final long serialVersionUID = -2779745160285710414L;
 
@@ -128,6 +133,13 @@ public class ServerServiceImpl implements ServerService {
             loggingService.startAction(aap);
             Action oldAction = context.setCurrentAction(action);
             try {
+                //
+                // We clear out action centric references here.
+                //
+                json.clearReferences();
+                // DCHASMAN TODO Look into a common base for Action
+                // implementations that we can move the call to
+                // context.setCurrentAction() into!
                 action.run();
             } catch (AuraExecutionException x) {
                 Aura.getExceptionAdapter().handleException(x, action);
@@ -333,10 +345,14 @@ public class ServerServiceImpl implements ServerService {
             }
         }
 
+        sb.append("$A.clientService.initDefs({");
+
+        // append component definitions
+        sb.append("componentDefs:");
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
         serializationContext.pushFormatRootItems();
-
-        sb.append("$A.clientService.initDefs({");
+        Aura.getSerializationService().writeCollection(componentDefs, BaseComponentDef.class, sb, "JSON");
+        sb.append(",");
 
         // append namespaces.
         sb.append("ns:{");
@@ -367,11 +383,6 @@ public class ServerServiceImpl implements ServerService {
         sb.append("controllerDefs:");
         Collection<ControllerDef> controllers = filterAndLoad(ControllerDef.class, dependencies, ACF);
         Aura.getSerializationService().writeCollection(controllers, ControllerDef.class, sb, "JSON");
-        sb.append(",");
-
-        // append component definitions
-        sb.append("componentDefs:");
-        Aura.getSerializationService().writeCollection(componentDefs, BaseComponentDef.class, sb, "JSON");
 
         sb.append("});\n\n");
 

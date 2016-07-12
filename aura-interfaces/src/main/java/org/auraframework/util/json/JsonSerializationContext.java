@@ -53,6 +53,22 @@ public interface JsonSerializationContext {
     void popFormatRootItems();
 
     /**
+     * @return true if objects can be serialized by reference to prevent cycles
+     */
+    boolean refSupport();
+
+    /**
+     * Set a new state of serialization by reference, preserving the previous one.
+     * @param refSupport whenther objects should be serialized by reference.
+     */
+    void pushRefSupport(boolean refSupport);
+
+    /**
+     * Restore the previous state of reference serialization.
+     */
+    void popRefSupport();
+
+    /**
      * Get the serializer to use for the given object
      *
      * @return the serializer
@@ -66,7 +82,7 @@ public interface JsonSerializationContext {
      * @return When false, array and object values that are null cause the entry
      *         to not get written out. When true, these are written out.
      */
-    boolean isNullValueEnabled();
+    public boolean isNullValueEnabled();
 
     /**
      * sets whether or not null values in arrays and objects get written out.
@@ -76,19 +92,5 @@ public interface JsonSerializationContext {
      * @param nullValueEnabled the new value to set.
      * @return the previous value.
      */
-    boolean setNullValueEnabled(boolean nullValueEnabled);
-
-    /**
-     * Sets whether currently serializing
-     *
-     * @param serializing whether currently serializing
-     */
-    void setSerializing(boolean serializing);
-
-    /**
-     * Whether currently serializing
-     *
-     * @return true if currently serializing
-     */
-    boolean isSerializing();
+    public boolean setNullValueEnabled(boolean nullValueEnabled);
 }

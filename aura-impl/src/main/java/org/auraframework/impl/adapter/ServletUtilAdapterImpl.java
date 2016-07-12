@@ -15,9 +15,19 @@
  */
 package org.auraframework.impl.adapter;
 
-import aQute.bnd.annotation.component.Component;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.Aura;
@@ -48,17 +58,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import aQute.bnd.annotation.component.Component;
 
 @Component (provide=AuraServiceProvider.class)
 public class ServletUtilAdapterImpl implements ServletUtilAdapter {
@@ -395,7 +398,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         //
         if (attributes != null && !attributes.isEmpty()) {
             builder.append("?aura.attributes=");
-            builder.append(AuraTextUtil.urlencode(JsonEncoder.serialize(attributes, false)));
+            builder.append(AuraTextUtil.urlencode(JsonEncoder.serialize(attributes, false, false)));
         }
     }
     /**

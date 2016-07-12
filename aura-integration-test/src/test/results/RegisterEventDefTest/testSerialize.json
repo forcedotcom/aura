@@ -1,22 +1,42 @@
 {
-  "eventDef": {
-    "descriptor": "markup://auratest:testEvent",
-    "type": "COMPONENT",
-    "superDef": {
-      "descriptor": "markup://aura:componentEvent"
-    },
-    "attributes": {
-      "att1": {
-        "name": "att1",
-        "type": "aura://String"
-      },
-      "att2": {
-        "name": "att2",
-        "type": "aura://Boolean",
-        "required": true
+  "s":1,
+  "v":{
+    "eventDef":{
+      "s":2,
+      "v":{
+        "descriptor":"markup://auratest:testEvent",
+        "type":"COMPONENT",
+        "superDef":{
+          "s":3,
+          "v":{
+            "descriptor":"markup://aura:componentEvent",
+            "type":"COMPONENT",
+            "xs":"G",
+            "attributes":{
+
+            }
+          }
+        },
+        "attributes":{
+          "att1":{
+            "s":4,
+            "v":{
+              "name":"att1",
+              "type":"aura://String"
+            }
+          },
+          "att2":{
+            "s":5,
+            "v":{
+              "name":"att2",
+              "type":"aura://Boolean",
+              "required":true
+            }
+          }
+        }
       }
-    }
-  },
-  "attributeName": "fakey",
-  "xs": "G"
+    },
+    "attributeName":"fakey",
+    "xs":"G"
+  }
 }

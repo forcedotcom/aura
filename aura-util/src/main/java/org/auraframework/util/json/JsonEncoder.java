@@ -15,14 +15,6 @@
  */
 package org.auraframework.util.json;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.io.CountingOutputStream;
-import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.UncloseableOutputStream;
-
-import javax.annotation.Nonnull;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,10 +27,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
+
+import javax.annotation.Nonnull;
+
+import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.UncloseableOutputStream;
+import org.auraframework.util.json.Serialization.ReferenceScope;
+import org.auraframework.util.json.Serialization.ReferenceType;
+
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.io.CountingOutputStream;
 
 /**
  * java -> javascript encoder.
@@ -112,6 +117,9 @@ public class JsonEncoder implements Json {
     }
 
     private final JsonSerializationContext serializationContext;
+    private final Map<Object, Integer> actionMap;
+    private final Map<Object, Integer> requestMap;
+    private int lastRefId = 0;
     private final Appendable out;
     private final ArrayDeque<IndentEntry> indentStack = new ArrayDeque<>();
     private final DataOutputStream binaryOutput;
@@ -126,21 +134,25 @@ public class JsonEncoder implements Json {
      * @param out The Appendable to write the serialized objects to.
      * @param format defaults to false. If true, the output will be multi-line
      *            and indented.
-     */
-    public JsonEncoder(Appendable out, boolean format) {
-        this(out, null, new DefaultJsonSerializationContext(format, false));
-    }
-
-    /**
-     * @deprecated refSupport no longer supported
+     * @param refSupport If true, any objects annotated with &#64;Serialization
+     *            will be serialized using serRefIds
      */
     public JsonEncoder(Appendable out, boolean format, boolean refSupport) {
-        this(out, format);
+        this(out, null, new DefaultJsonSerializationContext(format, refSupport, false));
     }
 
     protected JsonEncoder(Appendable out, OutputStream binaryOutput, JsonSerializationContext context) {
         this.out = out;
         this.serializationContext = context;
+
+        // No need to create the maps if we're not doing the ref stuff
+        if (this.serializationContext.refSupport()) {
+            actionMap = new IdentityHashMap<>();
+            requestMap = new IdentityHashMap<>();
+        } else {
+            actionMap = null;
+            requestMap = null;
+        }
 
         // Set binaryOutput to a DataOutputStream if applicable; otherwise, null
         this.binaryOutput = binaryOutput == null ? null
@@ -162,38 +174,29 @@ public class JsonEncoder implements Json {
      * @param obj The thing to serialize
      * @param out The destination for the serialized form
      * @param format true if output should be indented and multiline for human readability (default = false)
+     * @param refSupport true if @Serialization annotations should be honored (default = false)
      * @throws JsonSerializationException if there's an issue during serialization
      */
-    public static void serialize(Object obj, Appendable out, boolean format) {
+    public static void serialize(Object obj, Appendable out, boolean format, boolean refSupport) {
         try {
-            new JsonEncoder(out, format).writeValue(obj);
+            new JsonEncoder(out, format, refSupport).writeValue(obj);
         } catch (IOException e) {
             throw new JsonSerializationException(e);
         }
     }
 
-    /**
-     * @deprecated refSupport no longer supported
-     */
-    public static void serialize(Object obj, Appendable out, boolean format, boolean refSupport) {
-        serialize(obj, out, format);
-    }
-
-    public static String serialize(Object obj, boolean format) {
+    public static String serialize(Object obj, boolean format, boolean refSupport) {
         StringBuilder sb = new StringBuilder(16);
-        serialize(obj, sb, format);
+        serialize(obj, sb, format, refSupport);
         return sb.toString();
     }
 
-    /**
-     * @deprecated refSupport no longer supported
-     */
-    public static String serialize(Object obj, boolean format, boolean refSupport) {
-        return serialize(obj, format);
-    }
-
     public static void serialize(Object obj, Appendable out) {
-        serialize(obj, out, false);
+        try {
+            new JsonEncoder(out, false, false).writeValue(obj);
+        } catch (IOException e) {
+            throw new JsonSerializationException(e);
+        }
     }
 
     public static void serialize(Object obj, Appendable out, JsonSerializationContext context) {
@@ -246,26 +249,20 @@ public class JsonEncoder implements Json {
      *            UTF-8. This must not be null.
      * @param format Defaults to false. If true, the output will be multi-line
      *            and indented.
+     * @param refSupport If true, any objects annotated with &#64;Serialization
+     *            will be serialized using serRefIds
      * @param nullValues When true, null values are written out when they exist
      *            in arrays and map values. When false, array items and map
      *            entries with null values are not serialized
      * @return A new Json instance that you can use for streaming to the given
      *         OutputStream
      */
-    public static JsonEncoder createJsonStream(@Nonnull OutputStream out, boolean format,
-                                               boolean nullValues) {
-        return createJsonStream(out, new DefaultJsonSerializationContext(format, nullValues));
-    }
-
-    /**
-     * @deprecated refSupport no longer supported
-     */
     public static JsonEncoder createJsonStream(@Nonnull OutputStream out, boolean format, boolean refSupport,
-                                               boolean nullValues) {
-        return createJsonStream(out, format, nullValues);
+            boolean nullValues) {
+        return createJsonStream(out, new DefaultJsonSerializationContext(format, refSupport, nullValues));
     }
 
-    /**
+    /*
      * Creates a Json instance that is suitable for output streaming, one
      * element at a time. This can help avoid building up an entire JavaScript
      * AST all in memory before it gets serialized, which can help cut down
@@ -280,7 +277,7 @@ public class JsonEncoder implements Json {
      * @param context The JSON serialization context to use for output
      * @return A new Json instance that you can use for streaming to the given
      *         OutputStream
-     **/
+     */
     public static JsonEncoder createJsonStream(@Nonnull OutputStream out, JsonSerializationContext context) {
         if (out == null) {
             throw new IllegalArgumentException("out must not be null");
@@ -289,7 +286,7 @@ public class JsonEncoder implements Json {
         return new JsonEncoder(writer, out, context);
     }
 
-    /**
+    /*
      * Creates a Json instance that is suitable for output streaming, one
      * element at a time. This can help avoid building up an entire JavaScript
      * AST all in memory before it gets serialized, which can help cut down
@@ -298,7 +295,7 @@ public class JsonEncoder implements Json {
      * @param out The Appendable to which to write the serialized objects. This must not be null.
      * @param context The JSON serialization context to use for output
      * @return A new Json instance that you can use for streaming to the given appendable
-     **/
+     */
     public static JsonEncoder createJsonStream(@Nonnull Appendable out, JsonSerializationContext context) {
         return new JsonEncoder(out, null, context);
     }
@@ -314,6 +311,48 @@ public class JsonEncoder implements Json {
      */
     public static void serialize(Map<String, ?> jsonMap, Appendable out) {
         serialize((Object) jsonMap, out);
+    }
+
+    /**
+     * If refSupport is on, track the object for later equality/identity checks
+     *
+     * @param rs the reference scope for the object.
+     * @param value the value for which we are storing a reference.
+     * @return
+     */
+    private Integer addReference(ReferenceScope rs, Object value) {
+        int ret = ++lastRefId;
+        Map<Object, Integer> m = (rs == ReferenceScope.ACTION) ? actionMap : requestMap;
+        m.put(value, ret);
+        return ret;
+    }
+
+    /**
+     * If refSupport is on, clear a set of objects from the references.
+     *
+     */
+    @Override
+    public void clearReferences() {
+        if (!serializationContext.refSupport()) {
+            return;
+        }
+        actionMap.clear();
+    }
+
+    /**
+     * @param rs the scope for the reference
+     * @param value the value for which we want a reference.
+     * @return The refId previously assigned to the value, or null if none has been assigned yet.
+     */
+    @Override
+    public Integer getRefId(ReferenceScope rs, Object value) {
+        switch (rs) {
+        case ACTION:
+            return actionMap.get(value);
+        case REQUEST:
+            return requestMap.get(value);
+        }
+        return null;
     }
 
     /**
@@ -552,7 +591,26 @@ public class JsonEncoder implements Json {
         if (serializer == null) {
             throw new JsonSerializerNotFoundException(value);
         }
-        serializer.serialize(this, value);
+        ReferenceType rt = serializationContext.refSupport() ? serializer.getReferenceType(value) : ReferenceType.NONE;
+        if (rt != ReferenceType.NONE) {
+            Integer refId;
+            if ((refId = getRefId(serializer.getReferenceScope(value), value)) != null) {
+                // Output a simple reference
+                writeMapBegin();
+                writeMapEntry(ApplicationKey.SERIAL_REFID.toString(), refId);
+                writeMapEnd();
+            } else {
+                refId = addReference(serializer.getReferenceScope(value), value);
+                // Now manually output this 2-element map to avoid loop
+                writeMapBegin();
+                writeMapEntry(ApplicationKey.SERIAL_ID.toString(), refId);
+                writeMapKey(ApplicationKey.VALUE.toString());
+                serializer.serialize(this, value);
+                writeMapEnd();
+            }
+        } else {
+            serializer.serialize(this, value);
+        }
     }
 
     /**
@@ -814,7 +872,7 @@ public class JsonEncoder implements Json {
      * <br>
      * Note that this method does nothing if Json was not created with an
      * OutputStream, such as via
-     * {@link #createJsonStream(OutputStream, boolean, boolean)}.
+     * {@link #createJsonStream(OutputStream, boolean, boolean, boolean)}.
      */
     @Override
     public void close() throws IOException {

@@ -83,7 +83,7 @@ public class StringSourceExternalLoader implements StringSourceLoader {
                                        DefDescriptor<? extends BaseComponentDef> app, String fwuid,
                                        List<String> dn) throws QuickFixException {
         StringBuffer sb = new StringBuffer();
-        JsonEncoder json = new JsonEncoder(sb, false);
+        JsonEncoder json = new JsonEncoder(sb, false, false);
 
         if (fwuid == null) {
             fwuid = configAdapter.getAuraFrameworkNonce();

@@ -15,11 +15,12 @@
  */
 package org.auraframework.integration.test.def;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.List;
+import java.util.Set;
+
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
@@ -36,11 +37,11 @@ import org.auraframework.util.json.JsonEncoder;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Charsets;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 public class LibraryDefTest extends DefinitionTest<LibraryDef> {
     /**
@@ -90,7 +91,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         assertNotNull(libDef);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false);
+        JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
         libDef.serialize(json);
         json.close();
 

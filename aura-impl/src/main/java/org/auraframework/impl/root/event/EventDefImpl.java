@@ -15,7 +15,13 @@
  */
 package org.auraframework.impl.root.event;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
@@ -31,14 +37,8 @@ import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializationContext;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.Lists;
 
 /**
  * The definition of an event, basically just defines shape, i.e. attributes
@@ -84,32 +84,19 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
 
     @Override
     public void serialize(Json json) throws IOException {
-        JsonSerializationContext serializationContext = json.getSerializationContext();
         try {
-
-            if (serializationContext.isSerializing()) {
-
-                json.writeMapBegin();
-                json.writeMapEntry("descriptor", descriptor);
-                json.writeMapEnd();
-
-            } else {
-
-                serializationContext.setSerializing(true);
-                json.writeMapBegin();
-                json.writeMapEntry("descriptor", getDescriptor());
-                json.writeMapEntry("type", eventType);
-                json.writeValue(getAccess());
-                if (extendsDescriptor != null) {
-                    json.writeMapEntry("superDef", extendsDescriptor.getDef());
-                }
-                json.writeMapEntry("attributes", getAttributeDefs());
-                if (requiredVersionDefs != null && requiredVersionDefs.size() > 0) {
-                    json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
-                }
-                json.writeMapEnd();
-                serializationContext.setSerializing(false);
+            json.writeMapBegin();
+            json.writeMapEntry("descriptor", getDescriptor());
+            json.writeMapEntry("type", eventType);
+            json.writeValue(getAccess());
+            if (extendsDescriptor != null) {
+                json.writeMapEntry("superDef", extendsDescriptor.getDef());
             }
+            json.writeMapEntry("attributes", getAttributeDefs());
+            if(requiredVersionDefs != null && requiredVersionDefs.size() > 0) {
+                json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
+            }
+            json.writeMapEnd();
         } catch (QuickFixException e) {
             throw new AuraUnhandledException("unhandled exception", e);
         }

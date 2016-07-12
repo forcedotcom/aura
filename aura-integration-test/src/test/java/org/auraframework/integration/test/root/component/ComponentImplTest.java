@@ -15,6 +15,9 @@
  */
 package org.auraframework.integration.test.root.component;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
@@ -23,11 +26,9 @@ import org.auraframework.instance.Component;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Test;
-
-import java.util.Collections;
-import java.util.Map;
 
 public class ComponentImplTest extends AuraImplTestCase {
 
@@ -66,7 +67,8 @@ public class ComponentImplTest extends AuraImplTestCase {
         Object cmp = vendor.makeComponent("test:parent", "foo");
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmp));
-        String componentClass = (String) json.get("componentClass");
+        String componentClass = (String) ((Map<?, ?>) json.get(Json.ApplicationKey.VALUE.toString()))
+                .get("componentClass");
 
         assertNull(componentClass);
     }

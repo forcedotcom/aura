@@ -15,13 +15,13 @@
  */
 package org.auraframework.util.json;
 
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentMap;
-
 import static org.auraframework.util.json.JsonSerializers.ARRAY;
 import static org.auraframework.util.json.JsonSerializers.LITERAL;
 import static org.auraframework.util.json.JsonSerializers.STRING;
+
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * uses 2 maps to find serializers. first is direct class lookup (fast), second
@@ -34,23 +34,12 @@ public class ClassMapJsonSerializationContext extends BaseJsonSerializationConte
     private final ConcurrentMap<String, JsonSerializer<?>> cache;
 
     public ClassMapJsonSerializationContext(Map<String, JsonSerializer<?>> serializersLookupMap,
-                                            Map<Class<?>, JsonSerializer<?>> serializersInstanceMap,
-                                            ConcurrentMap<String, JsonSerializer<?>> cache,
-                                            boolean format, int dataSizeLimit, int collectionSizeLimit) {
-        super(format, dataSizeLimit, collectionSizeLimit, false);
+            Map<Class<?>, JsonSerializer<?>> serializersInstanceMap, ConcurrentMap<String, JsonSerializer<?>> cache,
+            boolean format, boolean refSupport, int dataSizeLimit, int collectionSizeLimit) {
+        super(format, refSupport, dataSizeLimit, collectionSizeLimit, false);
         this.serializersLookupMap = serializersLookupMap;
         this.serializersInstanceMap = serializersInstanceMap;
         this.cache = cache;
-    }
-
-    /**
-     * @deprecated refSupport no longer supported
-     */
-    public ClassMapJsonSerializationContext(Map<String, JsonSerializer<?>> serializersLookupMap,
-                                            Map<Class<?>, JsonSerializer<?>> serializersInstanceMap,
-                                            ConcurrentMap<String, JsonSerializer<?>> cache,
-                                            boolean format, boolean refSupport, int dataSizeLimit, int collectionSizeLimit) {
-        this(serializersLookupMap, serializersInstanceMap, cache, format, dataSizeLimit, collectionSizeLimit);
     }
 
     @Override

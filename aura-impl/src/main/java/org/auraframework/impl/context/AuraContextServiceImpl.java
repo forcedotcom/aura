@@ -15,11 +15,10 @@
  */
 package org.auraframework.impl.context;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.*;
+
 import org.auraframework.Aura;
-import org.auraframework.adapter.GlobalValueProviderAdapter;
-import org.auraframework.adapter.PrefixDefaultsAdapter;
-import org.auraframework.adapter.RegistryAdapter;
+import org.auraframework.adapter.*;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -29,22 +28,14 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.json.AuraJsonContext;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.DefRegistry;
-import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.util.ServiceLocator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableMap;
 
 
 /**
@@ -78,7 +69,7 @@ public class AuraContextServiceImpl implements ContextService {
         Aura.getLoggingService().establish();
         AuraContext context = AuraImpl.getContextAdapter().establish(mode, getDefRegistry(mode, access, loaders),
                 getDefaultsProvider().getPrefixDefaults(mode), format, access,
-                AuraJsonContext.createContext(mode), getGlobalProviders(), null);
+                AuraJsonContext.createContext(mode, true), getGlobalProviders(), null);
         return context;
     }
 
@@ -108,7 +99,7 @@ public class AuraContextServiceImpl implements ContextService {
         Aura.getLoggingService().establish();
         AuraContext context = AuraImpl.getContextAdapter().establish(mode, getDefRegistry(mode, access, loaders),
                 getDefaultsProvider().getPrefixDefaults(mode), format, access,
-                AuraJsonContext.createContext(mode), getGlobalProviders(), appDesc, isDebugToolEnabled);
+                AuraJsonContext.createContext(mode, true), getGlobalProviders(), appDesc, isDebugToolEnabled);
         return context;
     }
 

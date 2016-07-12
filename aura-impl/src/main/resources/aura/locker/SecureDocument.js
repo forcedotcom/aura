@@ -117,7 +117,7 @@ function SecureDocument(doc, key) {
         })
     });
 
-    ["location"].forEach(function(name) {
+    ["implementation", "location"].forEach(function(name) {
         // These are direct passthrough's and should never be wrapped in a SecureObject
         Object.defineProperty(o, name, {
             enumerable: true,

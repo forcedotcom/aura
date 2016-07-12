@@ -190,18 +190,29 @@ function Component(config, localCreation) {
  */
 Component.prototype.setContainerComponentId = function(containerComponentId) {
     this.containerComponentId = containerComponentId;
-    if(this.isInstanceOf("aura:expression")) {
+    if(this.isValid() && this.isInstanceOf("aura:expression")) {
         // set the containerComponentId for expression values to the expression component itself
-        var facetValue = this.get("v.value");
-        if($A.util.isArray(facetValue)){
-            for(var fidx = 0; fidx < facetValue.length; fidx++) {
-                if(facetValue[fidx] instanceof Component) {
-                    facetValue[fidx].setContainerComponentId(this.globalId);
+        var context = $A.getContext();
+        var enableAccessChecks = context.enableAccessChecks;
+        try {
+            // JBA: turn off access checks so we can evaluate this expression
+            // safely just for this statement
+            context.enableAccessChecks = false;
+            var facetValue = this.get("v.value");
+            if($A.util.isArray(facetValue)){
+                for(var fidx = 0; fidx < facetValue.length; fidx++) {
+                    if(facetValue[fidx] instanceof Component) {
+                        facetValue[fidx].setContainerComponentId(this.globalId);
+                    }
                 }
             }
+            else if(facetValue instanceof Component) {
+                facetValue.setContainerComponentId(this.globalId);
+            }
         }
-        else if(facetValue instanceof Component) {
-            facetValue.setContainerComponentId(this.globalId);
+        finally {
+            // flip access checks back to their initial value
+            context.enableAccessChecks = enableAccessChecks;
         }
     }
 };

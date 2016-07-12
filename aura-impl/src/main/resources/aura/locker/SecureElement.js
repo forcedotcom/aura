@@ -241,16 +241,17 @@ function SecureElement(el, key) {
         }
     });
 
-    [ "childNodes", "children", "firstChild", "lastChild", "nodeName", "nodeType", "parentElement", "ownerDocument"].forEach(function(name) {
+    [ "childNodes", "children", "nodeName", "nodeType", "ownerDocument"].forEach(function(name) {
         SecureObject.addPropertyIfSupported(o, el, name, {
             filterOpaque : true
         });
     });
 
-    [ "parentNode" ].forEach(function(name) {
+    [ "firstChild", "lastChild", "parentElement", "parentNode" ].forEach(function(name) {
         SecureObject.addPropertyIfSupported(o, el, name, {
+            skipOpaque : true,
             filterOpaque : true,
-            defaultValue: null
+            defaultValue : null
         });
     });
 

@@ -77,7 +77,7 @@ SecureObject.filterEverything = function (st, raw, options) {
 	"use strict";
 
     if (!raw) {
-        // ignoring falsy, nully references
+        // ignoring falsy, nully references.
         return raw;
     }
 
@@ -111,12 +111,14 @@ SecureObject.filterEverything = function (st, raw, options) {
 		mutated = true;
 		setLockerSecret(swallowed, "ref", raw);
 	} else if (t === "object") {
-		var isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
 		if (raw === window) {
 			return $A.lockerService.getEnv(key);
 		} else if (raw === document) {
 			return $A.lockerService.getEnv(key).document;
-		} else if (Array.isArray(raw) || isNodeList) {
+		}
+
+        var isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
+        if (Array.isArray(raw) || isNodeList) {
 			swallowed = [];
 			for (var n = 0; n < raw.length; n++) {
 				var newValue = SecureObject.filterEverything(st, raw[n]);
@@ -314,7 +316,7 @@ SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
 SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
 	"use strict";
 
-	// Do not expose properties that the raw object does not actually support
+	// Do not expose properties that the raw object does not actually support.
 	if (!(propertyName in raw)) {
 		if (options && options.ignoreNonexisting) {
 			return undefined;
@@ -327,8 +329,20 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
 		enumerable: true
 	};
 
-	descriptor.get = function() {
+    descriptor.get = function() {
 		var value = raw[propertyName];
+
+        // Continue from the current object until we find an acessible object.
+        if (options && options.skipOpaque === true) {
+
+            while (value) {
+                var hasAccess = $A.lockerService.util.hasAccess(st, value);
+                if (hasAccess || value === document.body || value === document.head) {
+                    break;
+                }
+                value = value[propertyName];
+            }
+        }
 
 		if (options && options.afterGetCallback) {
 			// The caller wants to handle the property value

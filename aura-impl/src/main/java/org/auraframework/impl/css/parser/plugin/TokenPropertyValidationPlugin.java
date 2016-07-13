@@ -52,7 +52,8 @@ public final class TokenPropertyValidationPlugin implements Plugin {
                 Set<String> allowed = def.getAllowedProperties();
                 if (!allowed.isEmpty() && !allowed.contains(property)) {
                     // report the violation
-                    em.report(ErrorLevel.FATAL, function, String.format(MSG, def.getName(), property, allowed));
+                    em.report(ErrorLevel.FATAL, function,
+                            String.format(MSG, def.getName(), property, def.getAllowedPropertiesString()));
                 }
             }
         }

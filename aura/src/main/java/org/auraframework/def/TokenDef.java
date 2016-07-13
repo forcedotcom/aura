@@ -37,4 +37,9 @@ public interface TokenDef extends Definition, ParentedDef {
      * @return an ImmutableSet of property names.
      */
     Set<String> getAllowedProperties();
+    
+    /**
+     * Gets the string of allowed properties, which may include wildcards.
+     */
+    String getAllowedPropertiesString();
 }

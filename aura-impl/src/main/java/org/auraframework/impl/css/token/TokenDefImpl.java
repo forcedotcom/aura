@@ -16,7 +16,6 @@
 package org.auraframework.impl.css.token;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,7 +38,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.salesforce.omakase.data.Property;
 import com.salesforce.omakase.util.Properties;
 
@@ -64,6 +62,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
 
     private final Object value;
     private final Set<String> allowedProperties;
+    private final String allowedPropertiesString;
     private final DefDescriptor<? extends RootDefinition> parentDescriptor;
 
     private final int hashCode;
@@ -72,6 +71,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         super(builder);
         this.value = builder.value;
         this.allowedProperties = AuraUtil.immutableSet(builder.allowedProperties);
+        this.allowedPropertiesString = builder.allowedPropertiesString;
         this.parentDescriptor = builder.parentDescriptor;
 
         this.hashCode = AuraUtil.hashCode(descriptor, location, value);
@@ -90,6 +90,11 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
     @Override
     public Set<String> getAllowedProperties() {
         return allowedProperties;
+    }
+
+    @Override
+    public String getAllowedPropertiesString() {
+        return allowedPropertiesString;
     }
 
     @Override
@@ -192,6 +197,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
 
         private Object value;
         private Set<String> allowedProperties;
+        private String allowedPropertiesString;
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
 
         public Builder setValue(Object value) {
@@ -200,6 +206,8 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         }
 
         public Builder setAllowedProperties(String rawString) {
+            this.allowedPropertiesString = rawString;
+            
             allowedProperties = new LinkedHashSet<>();
 
             for (String name : Splitter.on(",").trimResults().split(rawString.toLowerCase())) {

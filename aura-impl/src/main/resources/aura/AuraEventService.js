@@ -106,7 +106,7 @@ AuraEventService.prototype.getNewEvent = function(eventDefinition, eventName, so
  * @private
  */
 AuraEventService.prototype.collectBubblePath = function(cmp, queue, visited, isOwner) {
-    if(!cmp) {
+    if(!cmp || !cmp.isValid()) {
         // we reached a dead end
         return queue;
     }

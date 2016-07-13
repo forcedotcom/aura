@@ -508,7 +508,7 @@ SecureElement.elementSpecificAttributeWhitelists = {
     "TEMPLATE" : [ "content" ],
     "TEXTAREA" : [ "autocomplete", "autofocus", "cols", "disabled", "form", "maxLength", "minLength", "name",
                    "placeholder", "readOnly", "required", "rows", "selectionDirection", "selectionEnd", "selectionStart",
-                   "wrap" ],
+                   "value", "wrap" ],
     "TH" : [ "colSpan", "headers", "rowSpan", "scope" ],
     "TIME" : [ "dateTime" ],
     "TRACK" : [ "default", "kind", "label", "src", "srclang" ],

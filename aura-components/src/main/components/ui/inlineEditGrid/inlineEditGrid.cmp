@@ -48,6 +48,8 @@
 	<aura:handler name="change" value="{!v.headerColumns}" action="{!c.handleHeadersChange}"/>
     
     <aura:registerEvent name="onEdit"   type="ui:collectionValueChanged"    description="Event fired when a cell of the grid has been edited" />
+	<aura:registerEvent name="onKeyboardModeEnabled"  type="ui:focus"    description="Event fired when user enables keyboard mode" />
+ 	<aura:registerEvent name="onKeyboardModeDisabled"   type="ui:blur"    description="Event fired when user disables keyboard mode" />
     
 	<!-- Events passed from the virtualDataGrid -->
 	<aura:registerEvent name="onSort"          type="ui:sort"      description="The event fired when a column is sorted."/>

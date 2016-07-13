@@ -174,5 +174,11 @@
             index : params.index,
             values : params.values
         }).fire();
-	}
+	},
+	fireKeyboardModeEnabledEvent: function(cmp) {
+ 		cmp.getEvent("onKeyboardModeEnabled").fire();
+ 	},
+ 	fireKeyboardModeDisabledEvent: function(cmp) {
+		cmp.getEvent("onKeyboardModeDisabled").fire();
+  	}	
 })// eslint-disable-line semi

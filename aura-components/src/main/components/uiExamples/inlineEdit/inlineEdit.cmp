@@ -31,7 +31,8 @@
 		<ui:button label="{! (v.inKeyboardMode ? 'Disable Keyboard Mode' : 'Enable Keyboard Mode')}" press="{!c.handleKeyboardModeChange}" />
 		<ui:button label="Edit Active Cell" class="{! (v.inKeyboardMode ? ' ' : ' hidden')}" press="{!c.editActiveCell}" />
 
-		<ui:inlineEditGrid aura:id="grid" class="inline-edit-example" items="{!v.items}" onEdit="{!c.onEdit}" editable="{!v.editable}" dataVar="record">
+		<ui:inlineEditGrid aura:id="grid" class="inline-edit-example" items="{!v.items}" onEdit="{!c.onEdit}" editable="{!v.editable}" dataVar="record"
+			onKeyboardModeEnabled="{!c.onKeyboardModeEnabled}"  onKeyboardModeDisabled="{!c.onKeyboardModeDisabled}">
 			<aura:set attribute="headerColumns">
 				<ui:dataGridColumn name="id"	     label="Id" sortable="true"/>
 				<ui:dataGridColumn name="name"	     label="Name"/>

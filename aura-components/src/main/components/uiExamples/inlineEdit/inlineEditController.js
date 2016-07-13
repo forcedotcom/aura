@@ -28,6 +28,16 @@
 	    // TODO: onEdit handler
 	},
 
+	onKeyboardModeEnabled : function(cmp, evt) {
+	    // TODO: onKeyboardModeEnabled handler
+	    alert('enabled');
+	},	
+
+	onKeyboardModeDisabled : function(cmp, evt) {
+	    // TODO: onKeyboardModeDisabled handler
+	    alert('disabled');
+	},	
+
 	handleEditableChange: function(cmp, evt, helper){
 		var editable = cmp.get('v.editable');
 		cmp.set('v.editable', !editable);

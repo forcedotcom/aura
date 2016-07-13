@@ -72,11 +72,13 @@
 	},
 	
 	enableKeyboardMode: function(cmp, evt, helper){
-		helper.lib.keyNav.enableKeyboardMode(cmp);	
+		helper.lib.keyNav.enableKeyboardMode(cmp);
+		helper.fireKeyboardModeEnabledEvent(cmp);	
 	},
 	
 	disableKeyboardMode: function(cmp, evt, helper){	
 		helper.lib.keyNav.disableKeyboardMode(cmp);
+		helper.fireKeyboardModeDisabledEvent(cmp);
 	},
 
 	editActiveCell: function(cmp, evt, helper){	

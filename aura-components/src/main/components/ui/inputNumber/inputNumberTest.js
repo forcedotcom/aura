@@ -367,7 +367,7 @@
             $A.test.assertEquals(null, component.get("v.value"), "Cmp: value should be undefined.");
         }]
     },
- 
+
     /**
      * Test shortcut K/k as in thousand
      */
@@ -445,15 +445,28 @@
     },
 
     /**
-     * Test shortcut should still work after decimal marker
+     * Test shortcut should still work for decimal value
      */
-    testShortcutAfterDecimalMark: {
+    testShortcutWithDecimalValue: {
         test: [function(component) {
             this.inputValue(component, "0.1m");
         }, function(component) {
             this.triggerUpdateCmpElmValues(component);
         }, function(component) {
             this.assertCmpElemValues(component, 100000, "100,000");
+        }]
+    },
+
+    /**
+     * Test shortcut should still work follow after the decimal mark
+     */
+    testShortcutAfterDecimalMark: {
+        test: [function(component) {
+            this.inputValue(component, "1.k");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 1000, "1,000");
         }]
     },
 
@@ -506,6 +519,32 @@
             this.triggerUpdateCmpElmValues(component);
         }, function(component) {
             this.assertCmpElemValues(component, 0.12, "0.12");
+        }, function(component) {
+            this.inputValue(component, "+.34");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 0.34, "0.34");
+        }, function(component) {
+            this.inputValue(component, "-.56");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, -0.56, "-0.56");
+        }]
+    },
+
+    /**
+     * Test trailing decimal marker has no effect to the value
+     * @bug W-3216262@
+     */
+    testTrailingDecimalMarker: {
+        test: [function(component) {
+            this.inputValue(component, "123.");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 123, "123");
         }]
     },
 

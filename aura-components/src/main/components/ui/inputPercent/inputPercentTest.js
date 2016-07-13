@@ -293,15 +293,28 @@
     },
 
     /**
-     * Test shortcut should still work after decimal marker
+     * Test shortcut should still work for decimal value
      */
-    testShortcutAfterDecimalMark: {
+    testShortcutWithDecimalValue: {
         test: [function(component) {
             this.inputValue(component, "0.1m");
         }, function(component) {
             this.triggerUpdateCmpElmValues(component);
         }, function(component) {
             this.assertCmpElemValues(component, 1000, "100,000%");
+        }]
+    },
+
+    /**
+     * Test shortcut should still work follow after the decimal mark
+     */
+    testShortcutAfterDecimalMark: {
+        test: [function(component) {
+            this.inputValue(component, "1.k");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 10, "1,000%");
         }]
     },
 
@@ -346,6 +359,8 @@
 
     /**
      * Leading decimal mark should be treated as "0."
+     * Expected results should all get rounded
+     * as percent doesn't allow decimal
      */
     testLeadingDecimalMark: {
         test: [function(component) {
@@ -353,8 +368,33 @@
         }, function(component) {
             this.triggerUpdateCmpElmValues(component);
         }, function(component) {
-            // gets rounded up as percent doesn't allow decimal
             this.assertCmpElemValues(component, 0.01, "1%");
+        }, function(component) {
+            this.inputValue(component, "+.12");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 0, "0%");
+        }, function(component) {
+            this.inputValue(component, "-.91");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, -0.01, "-1%");
+        }]
+    },
+
+    /**
+     * Test trailing decimal marker has no effect to the value
+     * @bug W-3216262@
+     */
+    testTrailingDecimalMarker: {
+        test: [function(component) {
+            this.inputValue(component, "123.");
+        }, function(component) {
+            this.triggerUpdateCmpElmValues(component);
+        }, function(component) {
+            this.assertCmpElemValues(component, 1.23, "123%");
         }]
     },
 

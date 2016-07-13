@@ -78,7 +78,7 @@
 	<!-- Component markup begins -->
 	<!-- TODO: This could conflict if the Records Experience's inlineEdit feature uses the same classes. Revisit with SLDS integration -->
     <div class="{! 'slds-table--edit_container slds-is-relative ' + (v.editable ? ' inlineEdit--enabled' : ' inlineEdit--disabled') + (v.inKeyboardMode 			? ' keyboardMode--enabled' 		: ' keyboardMode--disabled') +
-					' inlineEditGrid'}" tabindex="0">
+					' inlineEditGrid'}">
 
         <ui:virtualDataTable
             aura:id="grid"

@@ -31,7 +31,7 @@
         <div class="manager">
             <ui:panelManager2 aura:id="pm">
                 <aura:set attribute="registeredPanels">
-                        <ui:panel alias="panel"/>
+                        <ui:panel alias="inlinePanel"/>
                 </aura:set>
             </ui:panelManager2>
         </div>

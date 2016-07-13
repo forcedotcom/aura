@@ -21,7 +21,7 @@
     dpmID: "dpm",
 
     // Excluding mobile because on mobile we use native date pickers
-    browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD", "-SAFARI"],
+    browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
 
     /**
      * Test that opens multiple datepickers then verifies that they are not overriding each
@@ -86,7 +86,7 @@
      * Ignored in IE7 because ie7 handles bounding rectangle differently and the datepicker ends up be askewed
      */
     testCheckDatePickerPosition: {
-        browsers: ["-IE7"],
+        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD", "-IE7", "-SAFARI"],
         test: [
             function(cmp) {
                 this.openDatePicker(cmp, this.inputDateTriggerID);

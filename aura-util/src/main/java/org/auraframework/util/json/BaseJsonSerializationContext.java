@@ -28,10 +28,11 @@ public abstract class BaseJsonSerializationContext implements JsonSerializationC
     private final int dataSizeLimit;
     private final int collectionSizeLimit;
     private boolean nullValues;
-	private Deque<Boolean> refSupportStack;
+    private Deque<Boolean> refSupportStack;
+    private boolean isSerializing = false;
 
     public BaseJsonSerializationContext(boolean format, boolean refSupport, int dataSizeLimit, int collectionSizeLimit,
-            boolean nullValues) {
+                                        boolean nullValues) {
         this.format = format;
         this.refSupport = refSupport;
         this.dataSizeLimit = dataSizeLimit;
@@ -107,5 +108,15 @@ public abstract class BaseJsonSerializationContext implements JsonSerializationC
 
         nullValues = nullValueEnabled;
         return old;
+    }
+
+    @Override
+    public void setSerializing(boolean serializing) {
+        this.isSerializing = serializing;
+    }
+
+    @Override
+    public boolean isSerializing() {
+        return this.isSerializing;
     }
 }

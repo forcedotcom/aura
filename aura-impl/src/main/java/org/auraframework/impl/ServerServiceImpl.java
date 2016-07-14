@@ -35,7 +35,6 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.SVGDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.service.LoggingService;
@@ -52,13 +51,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
-import aQute.bnd.annotation.component.Component;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
-@Component (provide=AuraServiceProvider.class)
 public class ServerServiceImpl implements ServerService {
     private static final long serialVersionUID = -2779745160285710414L;
 
@@ -72,7 +68,8 @@ public class ServerServiceImpl implements ServerService {
             return;
         }
         List<Action> actions = message.getActions();
-        JsonEncoder json = JsonEncoder.createJsonStream(out, context.getJsonSerializationContext());
+        JsonSerializationContext serializationContext = context.getJsonSerializationContext();
+        JsonEncoder json = JsonEncoder.createJsonStream(out, serializationContext);
         try {
             json.writeMapBegin();
             if (extras != null && extras.size() > 0) {
@@ -88,11 +85,13 @@ public class ServerServiceImpl implements ServerService {
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION);
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION_AURA);
             try {
+                serializationContext.pushRefSupport(false);
                 json.writeMapEntry("context", context);
                 List<Event> clientEvents = Aura.getContextService().getCurrentContext().getClientEvents();
                 if (clientEvents != null && !clientEvents.isEmpty()) {
                     json.writeMapEntry("events", clientEvents);
                 }
+                serializationContext.popRefSupport();
             } finally {
                 loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);
                 loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION);
@@ -170,7 +169,7 @@ public class ServerServiceImpl implements ServerService {
     @Override
     public void writeAppCss(final Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException {
 
-    	AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = Aura.getContextService().getCurrentContext();
         boolean minify = context.getMode().minify();
 
         StyleContext styleContext = context.getStyleContext();
@@ -219,16 +218,16 @@ public class ServerServiceImpl implements ServerService {
         String cached = null;
         final boolean skipCache = styleContext.getTokens().hasDynamicTokens(); // TODONM undo this cache skipping
         if (skipCache) {
-        	cached = getAppCssString(dependencies);
+            cached = getAppCssString(dependencies);
         } else {
-        	cached = context.getDefRegistry().getAltCachedString(uid, appDesc, key,
-            	new Callable<String>() {
-	        		@Override
-					public String call() throws Exception {
-	        			return getAppCssString(dependencies);
-	        		}
-        		}
-			);
+            cached = context.getDefRegistry().getAltCachedString(uid, appDesc, key,
+                new Callable<String>() {
+                    @Override
+                    public String call() throws Exception {
+                        return getAppCssString(dependencies);
+                    }
+                }
+            );
         }
 
         if (out != null) {
@@ -240,14 +239,14 @@ public class ServerServiceImpl implements ServerService {
         Collection<BaseStyleDef> orderedStyleDefs = filterAndLoad(BaseStyleDef.class, dependencies, null);
         StringBuffer sb = new StringBuffer();
         Aura.getSerializationService().writeCollection(orderedStyleDefs, BaseStyleDef.class, sb, "CSS");
-    	return sb.toString();
+        return sb.toString();
     }
 
     @Override
     public void writeAppSvg(DefDescriptor<SVGDef> svg, Writer out)
             throws IOException, QuickFixException {
 
-    	AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = Aura.getContextService().getCurrentContext();
 
         // build cache key
         final StringBuilder keyBuilder = new StringBuilder(64);
@@ -272,13 +271,13 @@ public class ServerServiceImpl implements ServerService {
         context.setPreloading(true);
 
         String cached = context.getDefRegistry().getCachedString(uid, appDesc, key,
-        	new Callable<String>() {
-        		@Override
-				public String call() throws Exception {
-        			return getAppSvgString(svgDef);
-        		}
-        	}
-		);
+            new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    return getAppSvgString(svgDef);
+                }
+            }
+        );
 
         out.append(cached);
     }
@@ -293,7 +292,7 @@ public class ServerServiceImpl implements ServerService {
     public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out)
             throws IOException, QuickFixException {
 
-    	AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = Aura.getContextService().getCurrentContext();
         final boolean minify = context.getMode().minify();
 
         context.setPreloading(true);
@@ -304,15 +303,15 @@ public class ServerServiceImpl implements ServerService {
         final String key = "JS:" + mKey + uid;
 
         String cached = context.getDefRegistry().getAltCachedString(uid, appDesc, key,
-        		new Callable<String>() {
-		    		@Override
-					public String call() throws Exception {
-		    			String res = getDefinitionsString(dependencies, key);
-		    			//log the cache miss here
-		    			Aura.getCachingService().getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
-		    			return res;
-		    		}
-		    	});
+                new Callable<String>() {
+                    @Override
+                    public String call() throws Exception {
+                        String res = getDefinitionsString(dependencies, key);
+                        //log the cache miss here
+                        Aura.getCachingService().getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
+                        return res;
+                    }
+                });
 
         if (out != null) {
             out.append(cached);
@@ -320,7 +319,7 @@ public class ServerServiceImpl implements ServerService {
     }
 
     private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key)
-    		throws QuickFixException, IOException {
+            throws QuickFixException, IOException {
 
         AuraContext context = Aura.getContextService().getCurrentContext();
         boolean minify = context.getMode().minify();
@@ -338,21 +337,19 @@ public class ServerServiceImpl implements ServerService {
         // Process Libraries with a lower granularity level, to prevent duplication of external includes.
         Collection<LibraryDef> libraryDefs = filterAndLoad(LibraryDef.class, dependencies, null);
         for (LibraryDef libraryDef : libraryDefs) {
-        	List<IncludeDefRef> includeDefs = libraryDef.getIncludes();
-	        for (IncludeDefRef defRef : includeDefs) {
+            List<IncludeDefRef> includeDefs = libraryDef.getIncludes();
+            for (IncludeDefRef defRef : includeDefs) {
                 sb.append(defRef.getCode(minify));
                 masterDefRegistry.setClientClassLoaded(defRef.getDescriptor(), true);
             }
         }
 
-        sb.append("$A.clientService.initDefs({");
-
-        // append component definitions
-        sb.append("componentDefs:");
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
         serializationContext.pushFormatRootItems();
-        Aura.getSerializationService().writeCollection(componentDefs, BaseComponentDef.class, sb, "JSON");
-        sb.append(",");
+        // no ref support needed for defs
+        serializationContext.pushRefSupport(false);
+
+        sb.append("$A.clientService.initDefs({");
 
         // append namespaces.
         sb.append("ns:{");
@@ -383,8 +380,15 @@ public class ServerServiceImpl implements ServerService {
         sb.append("controllerDefs:");
         Collection<ControllerDef> controllers = filterAndLoad(ControllerDef.class, dependencies, ACF);
         Aura.getSerializationService().writeCollection(controllers, ControllerDef.class, sb, "JSON");
+        sb.append(",");
+
+        // append component definitions
+        sb.append("componentDefs:");
+        Aura.getSerializationService().writeCollection(componentDefs, BaseComponentDef.class, sb, "JSON");
 
         sb.append("});\n\n");
+
+        serializationContext.popRefSupport();
 
         return sb.toString();
     }
@@ -428,14 +432,14 @@ public class ServerServiceImpl implements ServerService {
 
         try {
             if(dependencies != null) {
-            	for (DefDescriptor<?> descriptor : dependencies) {
-	                if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
-	                        && (extraFilter == null || extraFilter.apply(descriptor))) {
-	                    @SuppressWarnings("unchecked")
-	                    DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
-	                    out.add(mdr.getDef(dd));
-	                }
-            	}
+                for (DefDescriptor<?> descriptor : dependencies) {
+                    if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
+                            && (extraFilter == null || extraFilter.apply(descriptor))) {
+                        @SuppressWarnings("unchecked")
+                        DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
+                        out.add(mdr.getDef(dd));
+                    }
+                }
             }
 
         } catch (QuickFixException qfe) {

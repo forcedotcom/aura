@@ -90,7 +90,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
             if (config["eventDefs"]) {
                 defs = config["eventDefs"];
                 for (i = 0; i < defs.length; i++) {
-                    $A.eventService.createEventDef(defs[i]);
+                    $A.eventService.saveEventConfig(defs[i]);
                 }
             }
             that.joinComponentConfigs(config["components"], that.currentAction.getId());
@@ -309,7 +309,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
         for (i = 0; i < defs.length; i++) {
             // there are occasions when defs are just references (descriptor name)
             if (defs[i]["descriptor"]) {
-                $A.componentService.createComponentDef(defs[i]);
+                $A.componentService.saveComponentConfig(defs[i]);
             }
         }
     }
@@ -317,7 +317,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     if (otherContext["eventDefs"]) {
         defs = otherContext["eventDefs"];
         for (i = 0; i < defs.length; i++) {
-            $A.eventService.createEventDef(defs[i]);
+            $A.eventService.saveEventConfig(defs[i]);
         }
     }
 

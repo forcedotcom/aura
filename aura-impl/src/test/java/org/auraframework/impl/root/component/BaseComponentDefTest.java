@@ -273,8 +273,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 rendererList, null, null, false, false);
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
-        Map<?, ?> rendererDef = (Map<?, ?>) ((Map<?, ?>) json
-                .get(Json.ApplicationKey.VALUE.toString())).get("rendererDef");
+        Map<?, ?> rendererDef = (Map<?, ?>) json.get("rendererDef");
 
         assertNull("RendererDef should not be serialized with ComponentDef",
                 rendererDef);
@@ -295,8 +294,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 null, helperList, null, false, false);
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
-        Map<?, ?> helperDef = (Map<?, ?>) ((Map<?, ?>) json
-                .get(Json.ApplicationKey.VALUE.toString())).get("helperDef");
+        Map<?, ?> helperDef = (Map<?, ?>) json.get("helperDef");
 
         assertNull("HelperDef should not be serialized with ComponentDef",
                 helperDef);

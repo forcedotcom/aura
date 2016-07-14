@@ -1,1 +1,1 @@
-{"mode":"PROD","test":"org.auraframework.integration.test.context.AuraContextImplTest.testSerializeGlobalValueProviderWithoutRefSupport","fwuid":"#FAKEUID#","globalValueProviders":[{"type":"$NONE","hasRefs":false,"values":{"data":"identity"}}],"enableAccessChecks":true,"lockerEnabled":true}
+{"mode":"PROD","test":"org.auraframework.integration.test.context.AuraContextImplTest.testSerializeGlobalValueProviderWithoutRefSupport","fwuid":"#FAKEUID#","globalValueProviders":[{"type":"$NONE","values":{"data":"identity"}}],"enableAccessChecks":true,"lockerEnabled":true}

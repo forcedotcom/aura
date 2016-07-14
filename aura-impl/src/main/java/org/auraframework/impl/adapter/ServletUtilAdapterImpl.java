@@ -39,7 +39,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.http.CSP;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.ContextService;
@@ -61,9 +60,6 @@ import org.auraframework.util.json.JsonEncoder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component (provide=AuraServiceProvider.class)
 public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     private ContextService contextSerivce = Aura.getContextService();
     private ConfigAdapter configAdapter = Aura.getConfigAdapter();
@@ -359,7 +355,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         }
         
         if (!ignoreNonCacheableScripts) {
-	        ret.add(getBootstrapUrl(context, attributes));
+            ret.add(getBootstrapUrl(context, attributes));
         }
 
         ret.add(getAppJsUrl(context, null));
@@ -369,30 +365,30 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     
     @Override
     public  Set<String> getJsClientLibraryUrls (AuraContext context) throws QuickFixException {
-    	return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
+        return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
     }
     
     @Override
     public  Set<String> getCssClientLibraryUrls (AuraContext context) throws QuickFixException {
-    	return getClientLibraryUrls(context, ClientLibraryDef.Type.CSS);
+        return getClientLibraryUrls(context, ClientLibraryDef.Type.CSS);
     }
     
     @Override
     public String getFrameworkLibUrl() {
-    	return configAdapter.getJSLibsURL();
+        return configAdapter.getJSLibsURL();
     }
     
     @Override
     public String getFrameworkUrl() {
-    	return configAdapter.getAuraJSURL();
+        return configAdapter.getAuraJSURL();
     }
 
     @Override
     public String getHTML5ShivUrl() {
-    	return configAdapter.getHTML5ShivURL();
-	}
+        return configAdapter.getHTML5ShivURL();
+    }
 
-	private void addAttributes(StringBuilder builder, Map<String,Object> attributes) {
+    private void addAttributes(StringBuilder builder, Map<String,Object> attributes) {
         //
         // This feels a lot like a hack.
         //
@@ -406,12 +402,12 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     @Override
     public String getBootstrapUrl(AuraContext context, Map<String,Object> attributes) {
-    	return commonJsUrl("/bootstrap.js", context, attributes);
+        return commonJsUrl("/bootstrap.js", context, attributes);
     }
     
     @Override
     public String getInlineJsUrl(AuraContext context, Map<String,Object> attributes) {
-    	return commonJsUrl("/inline.js", context, attributes);
+        return commonJsUrl("/inline.js", context, attributes);
     }
     
     @Override
@@ -421,7 +417,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     
     @Override
     public String getAppCssUrl(AuraContext context) {
-    	String contextPath = context.getContextPath();
+        String contextPath = context.getContextPath();
         StringBuilder defs = new StringBuilder(contextPath).append("/l/");
         defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Css));
         defs.append("/app.css");
@@ -429,11 +425,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
     
     private String commonJsUrl (String filepath, AuraContext context, Map<String,Object> attributes) {
-    	StringBuilder url = new StringBuilder(context.getContextPath()).append("/l/");
+        StringBuilder url = new StringBuilder(context.getContextPath()).append("/l/");
         url.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));
         url.append(filepath);
         if (attributes != null) {
-        	addAttributes(url, attributes);
+            addAttributes(url, attributes);
         }
         return url.toString();
     }

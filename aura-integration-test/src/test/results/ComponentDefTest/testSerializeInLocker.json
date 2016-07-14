@@ -5,28 +5,17 @@
     "superDef":{
       "s":2,
       "v":{
-        "xs":"G",
-        "descriptor":"markup://aura:component",
-        "attributeDefs":[
-          {
-            "s":3,
-            "v":{
-              "name":"body",
-              "type":"aura://Aura.Component[]",
-              "xs":"G"
-            }
-          }
-        ],
-        "interfaces":[
-          "markup://aura:rootComponent"
-        ],
-        "isAbstract":true,
-        "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:component\",function() {\nvar aura$component = {\n  \"meta\":{\n    \"name\":\"aura$component\"\n  },\n  \"renderer\":{\n    \"render\":function(component) {\n        var rendering = component.getRendering();\n        return rendering||$A.renderingService.renderFacet(component,component.get(\"v.body\"));\n    },\n    \"afterRender\":function(component) {\n        var body = component.get(\"v.body\");\n        $A.afterRender(body);\n    },\n    \"rerender\":function(component) {\n        var body = component.get(\"v.body\");\n        return $A.renderingService.rerenderFacet(component,body);\n    },\n    \"unrender\":function(component) {\n        var body = component.get(\"v.body\");\n        $A.renderingService.unrenderFacet(component,body);\n    }\n  }\n};\nreturn aura$component;\n});\n}"
+        "descriptor":"markup://aura:component"
       }
     },
     "attributeDefs":[
       {
-        "r":3
+        "s":3,
+        "v":{
+          "name":"body",
+          "type":"aura://Aura.Component[]",
+          "xs":"G"
+        }
       }
     ],
     "componentClass":"function(){$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\n  var def = $A.componentService.getDef(\"markup://nonInternal:component\");  var locker = $A.lockerService.createForDef(\n\"var nonInternal$component = {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"nonInternal$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:component\\\"\\n  }\\n};\\nreturn nonInternal$component;\\n\", def);\n  return locker.$result;\n});\n}"

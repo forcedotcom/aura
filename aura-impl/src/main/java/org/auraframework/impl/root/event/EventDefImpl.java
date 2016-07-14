@@ -39,6 +39,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
+import org.auraframework.util.json.JsonSerializationContext;
 
 /**
  * The definition of an event, basically just defines shape, i.e. attributes
@@ -84,19 +85,32 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
 
     @Override
     public void serialize(Json json) throws IOException {
+        JsonSerializationContext serializationContext = json.getSerializationContext();
         try {
-            json.writeMapBegin();
-            json.writeMapEntry("descriptor", getDescriptor());
-            json.writeMapEntry("type", eventType);
-            json.writeValue(getAccess());
-            if (extendsDescriptor != null) {
-                json.writeMapEntry("superDef", extendsDescriptor.getDef());
+
+            if (serializationContext.isSerializing()) {
+
+                json.writeMapBegin();
+                json.writeMapEntry("descriptor", descriptor);
+                json.writeMapEnd();
+
+            } else {
+
+                serializationContext.setSerializing(true);
+                json.writeMapBegin();
+                json.writeMapEntry("descriptor", getDescriptor());
+                json.writeMapEntry("type", eventType);
+                json.writeValue(getAccess());
+                if (extendsDescriptor != null) {
+                    json.writeMapEntry("superDef", extendsDescriptor.getDef());
+                }
+                json.writeMapEntry("attributes", getAttributeDefs());
+                if (requiredVersionDefs != null && requiredVersionDefs.size() > 0) {
+                    json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
+                }
+                json.writeMapEnd();
+                serializationContext.setSerializing(false);
             }
-            json.writeMapEntry("attributes", getAttributeDefs());
-            if(requiredVersionDefs != null && requiredVersionDefs.size() > 0) {
-                json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
-            }
-            json.writeMapEnd();
         } catch (QuickFixException e) {
             throw new AuraUnhandledException("unhandled exception", e);
         }

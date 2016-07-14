@@ -373,7 +373,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
                     // not sure what we should do here. but since this seems to only happen in corner cases
                     // we'll ignore this one for now.
                     //
-            }
+                }
             }
             return ret;
         } else if (resp["exceptionEvent"] === true) {
@@ -424,27 +424,10 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
         // #end
         ret["status"] = "ERROR";
         return ret;
-    } else {
-        var i;
-        // Prevent collision between $Label value provider and serRefId properties (typically "s" and "r").
-        if (responseMessage["context"] && responseMessage["context"]["globalValueProviders"]) {
-            var saved = [];
-            var gvpList = responseMessage["context"]["globalValueProviders"];
+    }
 
-            // Filter out providers without refs
-            for (i = gvpList.length - 1; i >= 0; i--) {
-                if (gvpList[i]["hasRefs"] !== true) {
-                    saved.push(gvpList.splice(i, 1)[0]);
-                }
-            }
-
-            $A.util.json.resolveRefsObject(responseMessage);
-
-            // Restore original provider (order doesn't matter)
-            responseMessage["context"]["globalValueProviders"] = gvpList.concat(saved);
-        } else {
-            $A.util.json.resolveRefsObject(responseMessage);
-        }
+    if ("actions" in responseMessage) {
+        $A.util.json.resolveRefsObject(responseMessage["actions"]);
     }
 
     ret["status"] = "SUCCESS";
@@ -1166,22 +1149,22 @@ AuraClientService.prototype.initDefs = function(config, resolved) {
     }
 
 
-    var evtConfigs = resolved ? config["eventDefs"] : $A.util.json.resolveRefsArray(config["eventDefs"]);
+    var evtConfigs = config["eventDefs"];
     for (i = 0; i < evtConfigs.length; i++) {
         $A.eventService.saveEventConfig(evtConfigs[i]);
     }
 
-    var libraryConfigs = resolved ? config["libraryDefs"] : $A.util.json.resolveRefsArray(config["libraryDefs"]);
+    var libraryConfigs = config["libraryDefs"];
     for (i = 0; i < libraryConfigs.length; i++) {
         $A.componentService.saveLibraryConfig(libraryConfigs[i]);
     }
 
-    var controllerConfigs =  resolved ? config["controllerDefs"] : $A.util.json.resolveRefsArray(config["controllerDefs"]);
+    var controllerConfigs = config["controllerDefs"];
     for (i = 0; i < controllerConfigs.length; i++) {
         $A.componentService.createControllerDef(controllerConfigs[i]);
     }
 
-    var comConfigs = resolved ? config["componentDefs"] : $A.util.json.resolveRefsArray(config["componentDefs"]);
+    var comConfigs = config["componentDefs"];
     for (i = 0; i < comConfigs.length; i++) {
         $A.componentService.saveComponentConfig(comConfigs[i]);
     }
@@ -1236,25 +1219,8 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
 
         // If is not coming from cache we need to clean the payload
         if (Aura["appBootstrapReady"] !== "cache") {
-            // Prevent collision between $Label value provider and serRefId properties (typically "s" and "r").
-            if (boot["context"] && boot["context"]["globalValueProviders"]) {
-                var saved = [];
-                var gvpList = boot["context"]["globalValueProviders"];
 
-                // Filter out providers without refs
-                for (var i = gvpList.length - 1; i >= 0; i--) {
-                    if (gvpList[i]["hasRefs"] !== true) {
-                        saved.push(gvpList.splice(i, 1)[0]);
-                    }
-                }
-
-                $A.util.json.resolveRefsObject(boot);
-
-                // Restore original provider (order doesn't matter)
-                boot["context"]["globalValueProviders"] = gvpList.concat(saved);
-            } else {
-                $A.util.json.resolveRefsObject(boot);
-            }
+            $A.util.json.resolveRefsObject(boot["data"]);
 
             $A.componentService.saveDefsToStorage(boot["context"], context);
 
@@ -1275,6 +1241,11 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
 
         try {
             // We can have a mismatch if we are upgrading framework or mode
+
+            if (boot["data"]["components"]) {
+                // we need to use the resolvedRefs for AuraContext components (componentConfigs aka partialConfigs)
+                boot["context"]["components"] = boot["data"]["components"];
+            }
             context['merge'](boot["context"]);
         } catch(e) {
             // Abort caching and wait for bootstrap.js to arrive
@@ -1283,7 +1254,7 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
             return;
         }
 
-        callback.call(this, boot["actions"][0]);
+        callback.call(this, boot["data"]["app"]);
 
 
     // Wait for bootstrap.js to arrive
@@ -2395,9 +2366,10 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         if(!priorAccess){
             context.setCurrentAccess($A.getRoot());
         }
-        if (responseMessage["context"]) {
-            context['merge'](responseMessage["context"]);
-            $A.componentService.saveDefsToStorage(responseMessage["context"], context);
+        if ("context" in responseMessage) {
+            var responseContext = responseMessage["context"];
+            context['merge'](responseContext);
+            $A.componentService.saveDefsToStorage(responseContext, context);
         }
     } catch (e) {
         $A.logger.reportError(e);
@@ -2616,69 +2588,69 @@ AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, 
 
     action.setCallback(action, function(a) {
         try {
-	        var root = $A.getRoot();
+            var root = $A.getRoot();
 
             if(!priorAccess){
                 context.setCurrentAccess(root);
             }
 
-	        var element = $A.util.getElement(locatorDomId);
+            var element = $A.util.getElement(locatorDomId);
 
-	        // Check for bogus locatorDomId
-	        var errors;
-	        if (!element) {
-	            // We have no other place to display this
-	            // critical failure - fallback to the
-	            // document.body
-	            element = document.body;
-	            errors = [
-	                    "Invalid locatorDomId specified - no element found in the DOM with id=" + locatorDomId
-	            ];
-	        } else {
-	            errors = a.getState() === "SUCCESS" ? undefined : action.getError();
-	        }
+            // Check for bogus locatorDomId
+            var errors;
+            if (!element) {
+                // We have no other place to display this
+                // critical failure - fallback to the
+                // document.body
+                element = document.body;
+                errors = [
+                        "Invalid locatorDomId specified - no element found in the DOM with id=" + locatorDomId
+                ];
+            } else {
+                errors = a.getState() === "SUCCESS" ? undefined : action.getError();
+            }
 
-	        var componentConfig;
-	        if (!errors) {
-	            componentConfig = a.getReturnValue();
-	        } else {
-	            //
-	            // Make sure we clear any configs associated with the action.
-	            //
-	            $A.getContext().clearComponentConfigs(a.getId());
-	            //
-	            // Display the errors in a ui:message instead
-	            //
-	            componentConfig = self.createIntegrationErrorConfig(errors);
-	        }
+            var componentConfig;
+            if (!errors) {
+                componentConfig = a.getReturnValue();
+            } else {
+                //
+                // Make sure we clear any configs associated with the action.
+                //
+                $A.getContext().clearComponentConfigs(a.getId());
+                //
+                // Display the errors in a ui:message instead
+                //
+                componentConfig = self.createIntegrationErrorConfig(errors);
+            }
 
-	        $A.util.apply(componentConfig, {
-	            "localId" : localId,
-	            "attributes" : {
-	                "valueProvider" : root
-	            }
-	        }, null, true);
+            $A.util.apply(componentConfig, {
+                "localId" : localId,
+                "attributes" : {
+                    "valueProvider" : root
+                }
+            }, null, true);
 
-	        var c = $A.componentService.createComponentPriv(componentConfig);
+            var c = $A.componentService.createComponentPriv(componentConfig);
 
-	        if (!errors) {
-	            // Wire up event handlers
-	            self.addComponentHandlers(c, config["actionEventHandlers"]);
-	        }
+            if (!errors) {
+                // Wire up event handlers
+                self.addComponentHandlers(c, config["actionEventHandlers"]);
+            }
 
-	        var body = root.get("v.body");
-	        body.push(c);
+            var body = root.get("v.body");
+            body.push(c);
 
-	        // Do not let Aura consider this initial setting into the surrogate app as a candiadate for rerendering
-	        root.set("v.body", body, true);
+            // Do not let Aura consider this initial setting into the surrogate app as a candiadate for rerendering
+            root.set("v.body", body, true);
 
-	        $A.render(c, element);
+            $A.render(c, element);
 
-	        $A.afterRender(c);
+            $A.afterRender(c);
         } finally {
-        	if (!priorAccess) {
-        		context.releaseCurrentAccess();
-        	}
+            if (!priorAccess) {
+                context.releaseCurrentAccess();
+            }
         }
     });
 
@@ -2771,7 +2743,7 @@ AuraClientService.prototype.injectComponentAsync = function(config, locator, eve
     var priorAccess = context.getCurrentAccess();
     var root = $A.getRoot();
     if (!priorAccess) {
-    	context.setCurrentAccess(root);
+        context.setCurrentAccess(root);
     }
 
     $A.componentService.newComponentAsync(undefined, function(component) {
@@ -2782,7 +2754,7 @@ AuraClientService.prototype.injectComponentAsync = function(config, locator, eve
         acs.renderInjection(component, locator, eventHandlers);
 
         if (!priorAccess) {
-        	context.releaseCurrentAccess();
+            context.releaseCurrentAccess();
         }
     }, config, root, false, false, true);
 
@@ -3002,7 +2974,7 @@ AuraClientService.prototype.isInternalNamespace = function(namespace) {
 };
 
 AuraClientService.prototype.isPrivilegedNamespace = function(namespace) {
-	return this.namespaces.privileged.hasOwnProperty(namespace);
+    return this.namespaces.privileged.hasOwnProperty(namespace);
 };
 
 AuraClientService.prototype.allowAccess = function(definition, component) {

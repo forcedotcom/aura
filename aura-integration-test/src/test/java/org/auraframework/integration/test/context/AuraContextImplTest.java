@@ -683,6 +683,9 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
     /**
      * GVP with refSupport should serialize reference IDs of data that supports references.
+     *
+     * RefSupport for GVP has been deprecated so GVPs will not have refs because AuraContext serialization
+     * has no refs
      */
     @Test
     public void testSerializeGlobalValueProviderWithRefSupport() throws Exception {
@@ -707,6 +710,9 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
     /**
      * GVP without refSupport should serialize data, that supports references, as-is (without reference IDs).
+     *
+     * RefSupport for GVP has been deprecated so GVPs will not have refs because AuraContext serialization
+     * has no refs
      */
     @Test
     public void testSerializeGlobalValueProviderWithoutRefSupport() throws Exception {
@@ -731,6 +737,9 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
     /**
      * GVP with refSupport should handle data without references.
+     *
+     * RefSupport for GVP has been deprecated so GVPs will not have refs because AuraContext serialization
+     * has no refs
      */
     @Test
     public void testSerializeGlobalValueProviderWithRefSupportWithoutAReference() throws Exception {
@@ -756,6 +765,9 @@ public class AuraContextImplTest extends AuraImplTestCase {
     /**
      * GVPs with mixed refSupport should handle respective data with and without references. Note: ordering of
      * serialized providers is not guaranteed, but should be consistent.
+     *
+     * RefSupport for GVP has been deprecated so GVPs will not have refs because AuraContext serialization
+     * has no refs
      */
     @Test
     public void testSerializeGlobalValueProvidersWithMixedRefSupport() throws Exception {

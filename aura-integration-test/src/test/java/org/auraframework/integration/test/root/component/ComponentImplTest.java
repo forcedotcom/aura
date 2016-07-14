@@ -67,8 +67,7 @@ public class ComponentImplTest extends AuraImplTestCase {
         Object cmp = vendor.makeComponent("test:parent", "foo");
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmp));
-        String componentClass = (String) ((Map<?, ?>) json.get(Json.ApplicationKey.VALUE.toString()))
-                .get("componentClass");
+        String componentClass = (String) json.get("componentClass");
 
         assertNull(componentClass);
     }

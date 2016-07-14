@@ -684,14 +684,10 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         List<?> defs = (List<?>) json.get("componentDefs");
 
         for (Object def : defs) {
-            Map<?, ?> value = ((Map<?, ?>) ((Map<?, ?>) def)
-                    .get(Json.ApplicationKey.VALUE.toString()));
-            if (value != null) {
-                String desc = (String) value.get("descriptor");
-                if (desc.equals("markup://aura:html")) {
-                    componentClass = value.get("componentClass");
-                    found = true;
-                }
+            String desc = (String) ((Map<?, ?>) def).get("descriptor");
+            if (desc.equals("markup://aura:html")) {
+                componentClass = ((Map<?, ?>) def).get("componentClass");
+                found = true;
             }
         }
 

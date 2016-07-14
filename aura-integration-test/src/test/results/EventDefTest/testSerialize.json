@@ -6,12 +6,7 @@
     "superDef":{
       "s":2,
       "v":{
-        "descriptor":"markup://aura:componentEvent",
-        "type":"COMPONENT",
-        "xs":"G",
-        "attributes":{
-
-        }
+        "descriptor":"markup://aura:componentEvent"
       }
     },
     "attributes":{

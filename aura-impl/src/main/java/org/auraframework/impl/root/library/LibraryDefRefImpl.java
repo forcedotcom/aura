@@ -68,14 +68,10 @@ public class LibraryDefRefImpl extends DefinitionImpl<LibraryDef> implements Lib
 
     @Override
     public void serialize(Json json) throws IOException {
-        if (json.getSerializationContext().refSupport()) {
-            json.writeMapBegin();
-            json.writeMapEntry("descriptor", descriptor.getQualifiedName());
-            json.writeMapEntry("property", property);
-            json.writeMapEnd();
-        } else {
-            json.writeMapEntry(property, descriptor.getDescriptorName());
-        }
+        json.writeMapBegin();
+        json.writeMapEntry("descriptor", descriptor.getQualifiedName());
+        json.writeMapEntry("property", property);
+        json.writeMapEnd();
     }
 
     public static class Builder extends DefinitionImpl.RefBuilderImpl<LibraryDef, LibraryDefRef> {

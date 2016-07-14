@@ -45,7 +45,7 @@ Aura.Event.Event = function(config) {
 
 /**
  * Gets the source component that fired this component event.
- * This method doesn't work for application events.
+ * This method doesn't work for application events. It's only for component events.
  *
  * @returns {Object}
  * @platform
@@ -131,7 +131,7 @@ Aura.Event.Event.prototype.pause = function() {
  * If the event is not paused, calling this does nothing. This will throw an error
  * if called in the "default" phase.
  * This API does not define whether or not any remaining event handlers will
- * execute in th current call stack or be deferred and executed in a new call stack,
+ * execute in the current call stack or be deferred and executed in a new call stack,
  * therefore the exact timing behavior is not dependable.
  * @platform
  * @export
@@ -159,7 +159,7 @@ Aura.Event.Event.prototype.setComponentEvent = function(){
 
 /**
  * Gets the name of the Event.
- * Returns a name of type String, the unique identifier that the component can use to call this Action.
+ * @returns {String} The event name
  * @platform
  * @export
  */
@@ -170,7 +170,7 @@ Aura.Event.Event.prototype.getName = function(){
 /**
  * Sets parameters for the Event. Does not modify an event that has already been fired.
  * Maps key in config to attributeDefs.
- * @param {Object} config The parameters for the Event.
+ * @param {Object} config - The parameters for the Event.
  * @platform
  * @export
  */
@@ -196,8 +196,8 @@ Aura.Event.Event.prototype.setParams = function(config) {
 
 /**
  * Sets a parameter for the Event. Does not modify an event that has already been fired.
- * @param {String} key The name of the parameter.
- * @param {Object} value The value of the parameter.
+ * @param {String} key - The name of the parameter.
+ * @param {Object} value - The value of the parameter.
  * @platform
  * @export
  */
@@ -213,8 +213,9 @@ Aura.Event.Event.prototype.setParam = function(key, value) {
 };
 
 /**
- * Gets an Event parameter. Returns the parameters.
+ * Gets an Event parameter.
  * @param {String} name The name of the Event. For example, <code>event.getParam("button")</code> returns the value of the pressed mouse button (0, 1, or 2).
+ * @returns {String} The parameter value
  * @platform
  * @export
  */
@@ -223,7 +224,8 @@ Aura.Event.Event.prototype.getParam = function(name){
 };
 
 /**
- * Gets all the Event parameters. Returns the collection of parameters.
+ * Gets all the Event parameters.
+ * @returns {Object} The collection of parameters
  * @platform
  * @export
  */
@@ -349,7 +351,7 @@ Aura.Event.Event.prototype.getHandlerIterator = function() {
 /**
  * Fires the Event. Checks if the Event has already been fired before firing.
  * Maps the component handlers to the event dispatcher.
- * @param {Object} params Optional A set of parameters for the Event. Any previous parameters of the same name will be overwritten.
+ * @param {Object} params - Optional. A set of parameters for the Event. Any previous parameters of the same name will be overwritten.
  * @platform
  * @export
  */

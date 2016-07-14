@@ -274,7 +274,7 @@ Aura.Utils.Util.prototype.isUndefinedOrNull = function(obj){
 /**
  * Checks if the object is empty.
  * An empty object's value is undefined, null, an empty array, or empty string. An object with no native
- * properties is not considered empty at this time.
+ * properties is not considered empty.
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is empty, or false otherwise.

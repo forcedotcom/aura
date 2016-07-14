@@ -38,7 +38,7 @@ function AuraLocalizationService() {
 
 /**
  * Formats a number with the default number format.
- * @param {Number} number The number to be formatted.
+ * @param {Number} number - The number to be formatted.
  * @return {Number} The formatted number
  * @memberOf AuraLocalizationService
  * @example 
@@ -55,7 +55,7 @@ AuraLocalizationService.prototype.formatNumber = function(number) {
 
 /**
  * Returns a formatted percentage number based on the default percentage format.
- * @param {Number} number The number to be formatted.
+ * @param {Number} number - The number to be formatted.
  * @return {Number} The formatted percentage
  * @memberOf AuraLocalizationService
  * @example
@@ -72,7 +72,7 @@ AuraLocalizationService.prototype.formatPercent = function(number) {
 
 /**
  * Returns a currency number based on the default currency format.
- * @param {Number} number The currency number to be formatted.
+ * @param {Number} number - The currency number to be formatted.
  * @return {Number} The formatted currency
  * @memberOf AuraLocalizationService
  * @example
@@ -90,7 +90,7 @@ AuraLocalizationService.prototype.formatCurrency = function(number) {
 
 /**
  * Returns a NumberFormat object.
- * @param {String} format The number format. <code>format=".00"</code> displays the number followed by two decimal places.
+ * @param {String} format - The number format. <code>format=".00"</code> displays the number followed by two decimal places.
  * @param {String} symbols
  * @return {Number} The number format
  * @memberOf AuraLocalizationService
@@ -166,8 +166,8 @@ AuraLocalizationService.prototype.getDefaultCurrencyFormat = function() {
 
 /**
  * Displays a length of time.
- * @param {Duration} d The duration object returned by localizationService.duration
- * @param {Boolean} noSuffix Set to true if the token should be displayed without a suffix
+ * @param {Duration} d - The duration object returned by localizationService.duration
+ * @param {Boolean} noSuffix - Set to true if the token should be displayed without a suffix
  * @return {String} A duration object
  * @memberOf AuraLocalizationService
  * @public
@@ -184,7 +184,7 @@ AuraLocalizationService.prototype.displayDuration = function(d, noSuffix) {
 
 /**
  * Displays a length of time in days.
- * @param {Duration} d The duration object returned by localizationService.duration
+ * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The length of time in days.
  * @memberOf AuraLocalizationService
  * @public
@@ -201,7 +201,7 @@ AuraLocalizationService.prototype.displayDurationInDays = function(d) {
 
 /**
  * Displays a length of time in hours.
- * @param {Duration} d The duration object returned by localizationService.duration
+ * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The length of time in hours.
  * @memberOf AuraLocalizationService
  * @example 
@@ -218,7 +218,7 @@ AuraLocalizationService.prototype.displayDurationInHours = function(d) {
 
 /**
  * Displays a length of time in milliseconds.
- * @param {Duration} d The duration object returned by localizationService.duration
+ * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The length of time in milliseconds.
  * @memberOf AuraLocalizationService
  * @example
@@ -235,7 +235,7 @@ AuraLocalizationService.prototype.displayDurationInMilliseconds = function(d) {
 
 /**
  * Displays a length of time in minutes.
- * @param {Duration} d The duration object returned by localizationService.duration
+ * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The length of time in minutes.
  * @memberOf AuraLocalizationService
  * @example
@@ -252,7 +252,7 @@ AuraLocalizationService.prototype.displayDurationInMinutes = function(d) {
 
 /**
  * Displays a length of time in months.
- * @param {Duration} d The duration object returned by localizationService.duration
+ * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The length of time in months.
  * @memberOf AuraLocalizationService
  * @example
@@ -269,7 +269,7 @@ AuraLocalizationService.prototype.displayDurationInMonths = function(d) {
 
 /**
  * Displays a length of time in seconds.
- * @param {Duration} d The duration object returned by localizationService.duration
+ * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The length of time in seconds.
  * @memberOf AuraLocalizationService
  * @example
@@ -286,7 +286,7 @@ AuraLocalizationService.prototype.displayDurationInSeconds = function(d) {
 
 /**
  * Displays a length of time in years.
- * @param {Duration} d The duration object returned by localizationService.duration
+ * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The length of time in years.
  * @memberOf AuraLocalizationService
  * example 
@@ -303,8 +303,8 @@ AuraLocalizationService.prototype.displayDurationInYears = function(d) {
 
 /**
  * Creates an object representing a length of time.
- * @param {Number|Object} num The length of milliseconds/unit
- * @param {String} unit The unit of measurement of time
+ * @param {Number|Object} num - The length of milliseconds/unit
+ * @param {String} unit - The unit of measurement of time
  * @return {Object} A duration object
  * @memberOf AuraLocalizationService
  * @example
@@ -320,8 +320,8 @@ AuraLocalizationService.prototype.duration = function(num, unit) {
 
 /**
  * Converts the passed in Date by setting it to the end of a unit of time.
- * @param {String|Number|Date} date A format that the JavaScript Date object can parse
- * @param {String} unit The unit of time in year, month, week, day, hour, minute or second
+ * @param {String|Number|Date} date - A format that the JavaScript Date object can parse
+ * @param {String} unit - The unit of time in year, month, week, day, hour, minute or second
  * @return {Date} A JavaScript Date object
  * @memberOf AuraLocalizationService
  * @example
@@ -339,10 +339,10 @@ AuraLocalizationService.prototype.endOf = function(date, unit) {
 
 /**
  * Formats a date.
- * @param {String|Number|Date} date The date format that the JavaScript Date object can parse.
- * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
- * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
- * @return A formatted and localized date string
+ * @param {String|Number|Date} date - The date format that the JavaScript Date object can parse.
+ * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
+ * @param {String} locale - A Java locale string. The default is from LocaleValueProvider.
+ * @return {String} A formatted and localized date string
  * @memberOf AuraLocalizationService
  * @example
  * var d = new Date();
@@ -367,10 +367,10 @@ AuraLocalizationService.prototype.formatDate = function(date, formatString, loca
 
 /**
  * Formats a date in UTC.
- * @param {String|Number|Date} date The date format that JS Date object can parse.
- * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
- * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
- * @return A formatted and localized date string
+ * @param {String|Number|Date} date - The date format that JS Date object can parse.
+ * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
+ * @param {String} locale - A Java locale string. The default is from LocaleValueProvider.
+ * @return {String} A formatted and localized date string
  * @memberOf AuraLocalizationService
  * @example
  * var d = new Date();
@@ -395,10 +395,10 @@ AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, l
 
 /**
  * Formats a datetime.
- * @param {String|Number|Date} date The datetime format that the JavaScript Date object can parse.
- * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
- * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
- * @return A formatted and localized datetime string
+ * @param {String|Number|Date} date - The datetime format that the JavaScript Date object can parse.
+ * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
+ * @param {String} locale - A Java locale string. The default is from LocaleValueProvider.
+ * @return {String} A formatted and localized datetime string
  * @memberOf AuraLocalizationService
  * @example
  * var d = new Date();
@@ -423,10 +423,10 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
 
 /**
  * Formats a datetime in UTC.
- * @param {String|Number|Date} date The datetime format that the JavaScript Date object can parse.
- * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
- * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
- * @return A formatted and localized datetime string
+ * @param {String|Number|Date} date - The datetime format that the JavaScript Date object can parse.
+ * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
+ * @param {String} locale - A Java locale string. The default is from LocaleValueProvider.
+ * @return {String} A formatted and localized datetime string
  * @example
  * var d = new Date();
  * // Returns datetime in UTC in the format "Oct 9, 2015 4:00:00 PM"
@@ -450,10 +450,10 @@ AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatStrin
 
 /**
  * Formats a time.
- * @param {String|Number|Date} date The time format that JavaScript Date object can parse
- * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
- * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
- * @return A formatted and localized time string
+ * @param {String|Number|Date} date - The time format that JavaScript Date object can parse
+ * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
+ * @param {String} locale - A Java locale string. The default is from LocaleValueProvider.
+ * @return {String} A formatted and localized time string
  * @memberOf AuraLocalizationService
  * @example
  * var d = new Date();
@@ -478,10 +478,10 @@ AuraLocalizationService.prototype.formatTime = function(date, formatString, loca
 
 /**
  * Formats a time in UTC.
- * @param {String|Number|Date} date The time format that JavaScript Date object can parse.
- * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
- * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
- * @return a formatted and localized time string
+ * @param {String|Number|Date} date - The time format that JavaScript Date object can parse.
+ * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
+ * @param {String} locale - A Java locale string. The default is from LocaleValueProvider.
+ * @return {String} a formatted and localized time string
  * @memberOf AuraLocalizationService
  * @example
  * var d = new Date();
@@ -506,7 +506,7 @@ AuraLocalizationService.prototype.formatTimeUTC = function(date, formatString, l
 
 /**
  * Gets the number of days in a duration.
- * @param {Duration} d The duration object returned by this.duration
+ * @param {Duration} d - The duration object returned by this.duration
  * @return {Number} The number of days in d.
  * @memberOf AuraLocalizationService
  * @example
@@ -523,7 +523,7 @@ AuraLocalizationService.prototype.getDaysInDuration = function(d) {
 
 /**
  * Gets the number of hours in a duration.
- * @param {Duration} d The duration object returned by this.duration
+ * @param {Duration} d - The duration object returned by this.duration
  * @return {Number} The number of hours in d.
  * @memberOf AuraLocalizationService
  * @example
@@ -553,9 +553,9 @@ AuraLocalizationService.prototype.getLocalizedDateTimeLabels = function() {
 };
 
 /**
- * Get the today's date based on a time zone.
- * @param {String} timezone A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
- * @param {Function} callback A function to be called after the "today" value is obtained
+ * Get today's date based on a time zone.
+ * @param {String} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
+ * @param {Function} callback - A function to be called after the "today" value is obtained
  * @return {String} the ISO8601 date string (yyyy-MM-dd).
  * @memberOf AuraLocalizationService
  * @public
@@ -569,9 +569,9 @@ AuraLocalizationService.prototype.getToday = function(timezone, callback) {
 
 /**
  * Get the date's date string based on a time zone.
- * @param {String} timezone A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
- * @param {Date} dateObj a date object
- * @param {Function} callback A function to be called after the "today" value is obtained
+ * @param {String} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
+ * @param {Date} dateObj - A date object
+ * @param {Function} callback - A function to be called after the "today" value is obtained
  * @return {String} the ISO8601 date string (yyyy-MM-dd).
  * @memberOf AuraLocalizationService
  * @example
@@ -597,7 +597,7 @@ AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timezo
 
 /**
  * Gets the number of milliseconds in a duration.
- * @param {Duration} d The duration object returned by localizationService.duration
+ * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The number of milliseconds in d.
  * @memberOf AuraLocalizationService
  * @public
@@ -610,7 +610,7 @@ AuraLocalizationService.prototype.getMillisecondsInDuration = function(d) {
 
 /**
  * Gets the number of minutes in a duration.
- * @param {Duration} d The duration object returned by localizationService.duration
+ * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The number of minutes in d.
  * @memberOf AuraLocalizationService
  * @example
@@ -627,7 +627,7 @@ AuraLocalizationService.prototype.getMinutesInDuration = function(d) {
 
 /**
  * Gets the number of months in a duration.
- * @param thisration object returned by localizationService.duration
+ * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The number of months in d.
  * @memberOf AuraLocalizationService
  * @example
@@ -644,7 +644,7 @@ AuraLocalizationService.prototype.getMonthsInDuration = function(d) {
 
 /**
  * Gets the number of seconds in a duration.
- * @param {Duration} d The duration object returned by localizationService.duration
+ * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The number of seconds in d.
  * @memberOf AuraLocalizationService
  * @example
@@ -661,7 +661,7 @@ AuraLocalizationService.prototype.getSecondsInDuration = function(d) {
 
 /**
  * Gets the number of years in a duration.
- * @param {Duration} d The duration object returned by localizationService.duration
+ * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The number of years in d.
  * @memberOf AuraLocalizationService
  * @example
@@ -677,8 +677,8 @@ AuraLocalizationService.prototype.getYearsInDuration = function(d) {
 };
 
 /**
- * An utility function to check if a datetime pattern string uses a 24-hour or period (12 hour with am/pm) time view.
- * @param {String} datetime pattern string
+ * A utility function to check if a datetime pattern string uses a 24-hour or period (12 hour with am/pm) time view.
+ * @param {String} pattern - datetime pattern string
  * @return {Boolean} Returns true if it uses period time view.
  * @memberOf AuraLocalizationService
  * @example 
@@ -710,9 +710,9 @@ AuraLocalizationService.prototype.isPeriodTimeView = function(pattern) {
 
 /**
  * Checks if date1 is after date2.
- * @param {String|Number|Date} date1 A date format that the JavaScript Date object can parse
- * @param {String|Number|Date} date2 A date format that the JavaScript Date object can parse
- * @param {String} unit The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
+ * @param {String|Number|Date} date1 - A date format that the JavaScript Date object can parse
+ * @param {String|Number|Date} date2 - A date format that the JavaScript Date object can parse
+ * @param {String} unit - The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
  *                 By default, millisecond is used.
  * @return {Boolean} Returns true if date1 is after date2, or false otherwise.
  * @memberOf AuraLocalizationService
@@ -731,9 +731,9 @@ AuraLocalizationService.prototype.isAfter = function(date1, date2, unit) {
 
 /**
  * Checks if date1 is before date2.
- * @param {String|Number|Date} date1 A date format that the JavaScript Date object can parse
- * @param {String|Number|Date} date2 A date format that the JavaScript Date object can parse
- * @param {String} unit The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
+ * @param {String|Number|Date} date1 - A date format that the JavaScript Date object can parse
+ * @param {String|Number|Date} date2 - A date format that the JavaScript Date object can parse
+ * @param {String} unit - The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
  *                 By default, millisecond is used.
  * @return {Boolean} Returns true if date1 is before date2, or false otherwise.
  * @memberOf AuraLocalizationService
@@ -752,9 +752,9 @@ AuraLocalizationService.prototype.isBefore = function(date1, date2, unit) {
 
 /**
  * Checks if date1 is the same as date2.
- * @param {String|Number|Date} date1 A date format that the JavaScript Date object can parse
- * @param {String|Number|Date} date2 A date format that the JavaScript Date object can parse
- * @param {String} unit The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
+ * @param {String|Number|Date} date1 - A date format that the JavaScript Date object can parse
+ * @param {String|Number|Date} date2 - A date format that the JavaScript Date object can parse
+ * @param {String} unit - The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
  *                 By default, millisecond is used.
  * @return {Boolean} Returns true if date1 is the same as date2, or false otherwise.
  * @memberOf AuraLocalizationService
@@ -775,10 +775,10 @@ AuraLocalizationService.prototype.isSame = function(date1, date2, unit) {
 
 /**
  * Parses a string to a JavaScript Date.
- * @param {String} dateTimeString The datetime string to be parsed.
- * @param {String} targetFormat A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
- * @param {String} locale A Java locale string used to parse datetime. The default is from LocaleValueProvider.
- * @param {Boolean} set to true to turn off moment's forgiving parsing and use strict validation
+ * @param {String} dateTimeString - The datetime string to be parsed.
+ * @param {String} targetFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
+ * @param {String} locale - A Java locale string used to parse datetime. The default is from LocaleValueProvider.
+ * @param {Boolean} strictParsing - set to true to turn off moment's forgiving parsing and use strict validation
  * @return {Date} A JavaScript Date object
  * @memberOf AuraLocalizationService
  * @public
@@ -800,7 +800,7 @@ AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, targe
 
 /**
  * Parses a date time string in an ISO-8601 format.
- * @param {String} dateTimeString The datetime string in an ISO-8601 format
+ * @param {String} dateTimeString - The datetime string in an ISO-8601 format
  * @return {Date} A JavaScript Date object
  * @memberOf AuraLocalizationService
  * @public
@@ -821,10 +821,10 @@ AuraLocalizationService.prototype.parseDateTimeISO8601 = function(dateTimeString
 
 /**
  * Parses a string to a JavaScript Date in UTC.
- * @param {String} dateTimeString The datetime string to be parsed
- * @param {String} targetFormat A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
- * @param {String} locale A Java locale string used to parse datetime. The default is from LocaleValueProvider.
- * @param {Boolean} set to true to turn off moment's forgiving parsing and use strict validation
+ * @param {String} dateTimeString - The datetime string to be parsed
+ * @param {String} targetFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
+ * @param {String} locale - A Java locale string used to parse datetime. The default is from LocaleValueProvider.
+ * @param {Boolean} strictParsing - Set to true to turn off moment's forgiving parsing and use strict validation
  * @return {Date} A JavaScript Date object
  * @memberOf AuraLocalizationService
  * @example
@@ -851,8 +851,8 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, ta
 
 /**
  * Converts the passed in Date by setting it to the start of a unit of time.
- * @param {String|Number|Date} date It could be anything that JS Date object can parse.
- * @param {String} unit Year, month, week, day, hour, minute or second
+ * @param {String|Number|Date} date - Anything that JS Date object can parse.
+ * @param {String} unit - Year, month, week, day, hour, minute or second
  * @return {Date} A JavaScript Date object
  * @memberOf AuraLocalizationService
  * @example
@@ -868,8 +868,8 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
 };
 
 /**
- * Most of modern browsers support this method on Date object. But that is not the case for IE8 and older.
- * @param {Date} date a Date object
+ * Most modern browsers support this method on Date object. But that is not the case for IE8 and older.
+ * @param {Date} date - a Date object
  * @return {String} An ISO8601 string to represent passed in Date object.
  * @memberOf AuraLocalizationService
  * @example 
@@ -900,7 +900,7 @@ AuraLocalizationService.prototype.toISOString = function(date) {
 
 /**
  * Translate the localized digit string to a string with Arabic digits if there is any.
- * @param {String} input a string with localized digits.
+ * @param {String} input - a string with localized digits.
  * @return {String} a string with Arabic digits.
  * @memberOf AuraLocalizationService
  * @public
@@ -931,7 +931,7 @@ AuraLocalizationService.prototype.translateFromLocalizedDigits = function(input)
 /**
  * Translate the input date from other calendar system (for example, Buddhist calendar) to Gregorian calendar
  * based on the locale.
- * @param {Date} date a Date Object.
+ * @param {Date} date - a Date Object.
  * @return {Date} an updated Date object.
  * @memberOf AuraLocalizationService
  * @public
@@ -949,7 +949,7 @@ AuraLocalizationService.prototype.translateFromOtherCalendar = function(date) {
 
 /**
  * Translate the input string to a string with localized digits (different from Arabic) if there is any.
- * @param {String} input a string with Arabic digits.
+ * @param {String} input - a string with Arabic digits.
  * @return {String} a string with localized digits.
  * @memberOf AuraLocalizationService
  * @public
@@ -979,7 +979,7 @@ AuraLocalizationService.prototype.translateToLocalizedDigits = function(input) {
 
 /**
  * Translate the input date to a date in other calendar system, for example, Buddhist calendar based on the locale.
- * @param {Date} date a Date Object.
+ * @param {Date} date - a Date Object.
  * @return {Date} an updated Date object.
  * @memberOf AuraLocalizationService
  * @public
@@ -997,9 +997,9 @@ AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
 
 /**
  * Converts a datetime from UTC to a specified timezone.
- * @param {Date} date A JavaScript Date object
- * @param {String} timezone A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
- * @param {Function} callback A function to be called after the conversion is done
+ * @param {Date} date - A JavaScript Date object
+ * @param {String} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
+ * @param {Function} callback - A function to be called after the conversion is done
  * @memberOf AuraLocalizationService
  * @example
  * // Provides locale information
@@ -1041,9 +1041,9 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
 
 /**
  * Converts a datetime from a specified timezone to UTC.
- * @param {Date} date A JavaScript Date object
- * @param {String} timezone A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
- * @param {Function} callback A function to be called after the conversion is done
+ * @param {Date} date - A JavaScript Date object
+ * @param {String} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
+ * @param {Function} callback - A function to be called after the conversion is done
  * @memberOf AuraLocalizationService
  * @example
  * $A.localizationService.WallTimeToUTC(d, timezone, function(walltime) {

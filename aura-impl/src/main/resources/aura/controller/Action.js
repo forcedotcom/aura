@@ -364,7 +364,7 @@ Action.prototype.getDef = function() {
  *
  * @public
  * @param {Object}
- *            config The key/value pairs that specify the Action. The key is an attribute on the given component.
+ *            config - The key/value pairs for action parameters.
  *             For example, <code>serverAction.setParams({ "record": id });</code> sets a parameter on <code>serverAction</code>.
  * @platform
  * @export
@@ -381,10 +381,10 @@ Action.prototype.setParams = function(config) {
  * Sets a single parameter for the Action.
  *
  * @public
- * @param {!string}
- *            key the name of the parameter to set.
+ * @param {string}
+ *            key - The name of the parameter to set.
  * @param {Object}
- *            value the value to set.
+ *            value - the value to set for the parameter.
  * @platform
  * @export
  */
@@ -397,11 +397,11 @@ Action.prototype.setParam = function(key, value) {
 };
 
 /**
- * Gets an Action parameter.
+ * Gets an action parameter value for a parameter name.
  *
  * @public
- * @param {!string}
- *            name The name of the Action.
+ * @param {string}
+ *            name - The name of the parameter.
  * @returns {Object} The parameter value
  * @platform
  * @export
@@ -414,7 +414,7 @@ Action.prototype.getParam = function(name) {
  * Gets the collection of parameters for this Action.
  *
  * @public
- * @returns {Object} The key/value pairs that specify the Action.
+ * @returns {Object} The key/value pairs that specify the action parameters.
  * @platform
  * @export
  */
@@ -433,7 +433,7 @@ Action.prototype.getComponent = function() {
 };
 
 /**
- * Sets the callback function that is executed after the server-side Action returns. Call a server-side Action from a
+ * Sets the callback function that is executed after the server-side action returns. Call a server-side action from a
  * client-side controller using <code>callback</code>.
  *
  * Note that you can register a callback for an explicit state, or you can use 'ALL' which registers callbacks for
@@ -447,13 +447,45 @@ Action.prototype.getComponent = function() {
  *  * ABORTED: if the action is aborted via abort()
  *  * REFRESH: for server side storable actions, this will be called instead of the SUCCESS action when the storage is refreshed.
  *
+ * @example
+ *
+ * action.setCallback(this, function(response) {
+ *     var state = response.getState();
+ *     // This callback doesn’t reference cmp. If it did,
+ *     // you should run an isValid() check
+ *     //if (cmp.isValid() && state === "SUCCESS") {
+ *     if (state === "SUCCESS") {
+ *         // Alert the user with the value returned 
+ *         // from the server
+ *         alert("From server: " + response.getReturnValue());
+ * 
+ *         // do something
+ *     }
+ *     //else if (cmp.isValid() && state === "INCOMPLETE") {
+ *     else if (state === "INCOMPLETE") {
+ *         // do something
+ *     }
+ *     //else if (cmp.isValid() && state === "ERROR") {
+ *     else if (state === "ERROR") {
+ *         var errors = response.getError();
+ *         if (errors) {
+ *             if (errors[0] && errors[0].message) {
+ *                 console.log("Error message: " + 
+ *                          errors[0].message);
+ *             }
+ *         } else {
+ *             console.log("Unknown error");
+ *         }
+ *     }
+ * });
+ * 
  * @public
  * @param {Object}
- *            scope The scope in which the function is executed.
+ *            scope - The scope in which the function is executed. You almost always want to set scope to the keyword this.
  * @param {function}
- *            callback The callback function to run for each controller.
+ *            callback - The callback function to run when the server-side action completes.
  * @param {String}
- *            name The action state for which the callback is to be associated with.
+ *            name - The action state that the callback is associated with.
  * @platform
  * @export
  */
@@ -495,7 +527,6 @@ Action.prototype.setCallback = function(scope, callback, name) {
  *
  * @private
  * @returns {Object} the callback scope and function that was set for this action.
- * @platform
  * @export
  */
  Action.prototype.getCallback = function (type) {
@@ -582,7 +613,7 @@ Action.prototype.wrapCallback = function(scope, callback) {
 
 /**
  * Deprecated. Note: This method is deprecated and should not be used. Instead, use the <code>enqueueAction</code>
- * method on the Aura type. For example, <code>$A.enqueueAction(action)</code>.
+ * method on $A. For example, <code>$A.enqueueAction(action)</code>.
  *
  * The deprecated run method runs client-side actions. Do not use it for running server-side actions.
  *
@@ -632,7 +663,8 @@ Action.prototype.runDeprecated = function(evt) {
 };
 
 /**
- * Gets the current state of the Action.
+ * Gets the current state of the Action. You should check the state of the action
+ * in the callback after the server-side action completes.
  *
  * @public
  * @returns {string} The possible action states are:
@@ -642,7 +674,7 @@ Action.prototype.runDeprecated = function(evt) {
  *   "FAILURE": Deprecated. ERROR is returned instead. The action failed. This state is only valid for client-side actions.
  *   "ERROR": The server returned an error
  *   "INCOMPLETE": The server didn't return a response. The server might be down or the client might be offline.
- *   "ABORTED": The action was aborted. You can register a callback for this explicitly
+ *   "ABORTED": The action was aborted. You can register a callback for this explicitly in setCallback().
  * @platform
  * @export
  */
@@ -668,6 +700,7 @@ Action.prototype.getReturnValue = function() {
  * describing the execution stack when the error occurred.
  *
  * @public
+ * @returns {Object[]} An array of error objects. Each error object has a message field.
  * @platform
  * @export
  */
@@ -688,7 +721,9 @@ Action.prototype.isBackground = function() {
 
 /**
  * Sets the action to run as a background action. This cannot be unset. Background actions are usually long running and
- * lower priority actions.
+ * lower priority actions. A background action is useful when you want your app to remain responsive to a user while it
+ * executes a low priority, long-running action. A rough guideline is to use a background action if it takes more than
+ * five seconds for the response to return from the server.
  *
  * @public
  * @platform
@@ -699,8 +734,8 @@ Action.prototype.setBackground = function() {
 };
 
 /**
- * Deprecated. Note: This method is deprecated and should not be used. Instead, use the <code>enqueueAction</code>
- * method on the Aura type. For example, <code>$A.enqueueAction(action)</code>.
+ * Deprecated. Note: This method is deprecated and should not be used.
+ * Use <code>$A.enqueueAction</code> instead.
  *
  * The deprecated <code>runAfter</code> method adds a specified server-side action to the action queue. It is for
  * server-side actions only. For example, <code>this.runAfter(serverAction);</code> sends the action to the server and
@@ -961,12 +996,13 @@ Action.prototype.abort = function() {
 
 /**
  * Set the action as abortable. Abortable actions are not sent to the server if the component is not valid.
+ * A component is automatically destroyed and marked invalid by the framework when it is unrendered.
  *
  * Actions not marked abortable are always sent to the server regardless of the validity of the component.
- * For example, a save/modify action should not be set abortable to cause it to go to the server even if
- * the component is deleted.
+ * For example, a save/modify action should not be set abortable to ensure it's always sent to the server
+ * even if the component is deleted.
  *
- * Setting an action as abortable can not be undone
+ * Setting an action as abortable cannot be undone
  *
  * @platform
  * @export
@@ -999,7 +1035,7 @@ Action.prototype.isRefreshAction = function() {
  * Returns the current state of the abortable flag.
  *
  * @public
- * @returns {Boolean} tha abortable flag
+ * @returns {Boolean} the abortable flag
  * @export
  */
 Action.prototype.isAbortable = function() {
@@ -1032,10 +1068,12 @@ Action.prototype.isExclusive = function() {
 
 /**
  * Marks the Action as storable. For server-side Actions only.
+ * Mark an action as storable to have its response stored in the client-side cache by the framework. Caching can be useful
+ * if you want your app to be functional for devices that temporarily don’t have a network connection.
  *
  * @public
  * @param {Object}
- *            config Optional. A set of key/value pairs that specify the storage options to set. You can set the
+ *            config - Optional. A set of key/value pairs that specify the storage options to set. You can set the
  *            following option:
  *            <code>ignoreExisting</code>: Set to <code>true</code> to refresh the stored item with a newly retrieved value,
  *              regardless of whether the item has expired or not. The default value is <code>false</code>.

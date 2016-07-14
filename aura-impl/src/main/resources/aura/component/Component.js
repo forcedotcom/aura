@@ -346,13 +346,16 @@ Component.prototype.deIndex = function(localId, globalId) {
 
 /**
  * Locates a component using the localId. Shorthand: <code>get("asdf")</code>,
- * where "asdf" is the <code>aura:id</code> of the component to look for. See
- * <a href="#help?topic=findById">Finding Components by ID</a> for more
- * information. Returns instances of a component using the format
+ * where "asdf" is the <code>aura:id</code> of the component to look for.
+ * Returns different types depending on the result.
+ * 	If the local ID is unique, find() returns the component.
+ *	If there are multiple components with the same local ID, find() returns an array of the components.
+ *  If there is no matching local ID, find() returns undefined.
+ * Returns instances of a component using the format
  * <code>cmp.find({ instancesOf : "auradocs:sampleComponent" })</code>.
  *
  * @param {String|Object}
- *            name If name is an object, return instances of it. Otherwise,
+ *            name - If name is an object, return instances of it. Otherwise,
  *            finds a component using its index.
  * @public
  * @platform
@@ -457,7 +460,7 @@ Component.prototype.findInstanceOf = function(type) {
  * interface name).
  *
  * @param {String}
- *            name The name of the component (or interface), with a format of
+ *            name - The name of the component (or interface), with a format of
  *            <code>namespace:componentName</code>.
  * @returns {Boolean} true if the component is an instance, or false otherwise.
  * @platform
@@ -479,23 +482,21 @@ Component.prototype.implementsDirectly = function(type) {
 /**
  * Adds an event handler. Resolving the handler Action happens at Event-handling
  * time, so the Action reference may be altered at runtime, and that change is
- * reflected in the handler. See <a
- * href="#help?topic=dynamicHandler">Dynamically Adding Event Handlers</a> for
- * more information.
+ * reflected in the handler.
  *
  * @param {String}
- *            eventName The event name
+ *            eventName - The event name
  * @param {Object}
- *            valueProvider The value provider to use for resolving the
+ *            valueProvider - The value provider to use for resolving the
  *            actionExpression.
  * @param {Object}
- *            actionExpression The expression to use for resolving the handler
+ *            actionExpression - The expression to use for resolving the handler
  *            Action against the given valueProvider.
  * @param {boolean}
- *            insert The flag to indicate if we should put the handler at the
+ *            insert - The flag to indicate if we should put the handler at the
  *            beginning instead of the end of handlers array.
  * @param {String}
- *            phase The target event phase; defaults to "bubble"
+ *            phase - The target event phase; defaults to "bubble"
  * @param {Boolean}
  *            includeFacets If true, this handler will also be invoked when events
  *            flow from facet values whose value provider hierarchy does not
@@ -536,7 +537,7 @@ Component.prototype.addHandler = function(eventName, valueProvider, actionExpres
  * Adds handlers to Values owned by the Component.
  *
  * @param {Object}
- *            config Passes in the value, event (e.g. "change"), and action
+ *            config - Passes in the value, event (e.g. "change"), and action
  *            (e.g. "c.myAction").
  * @public
  * @export
@@ -655,14 +656,16 @@ Component.prototype.finishDestroy = function() {
 
 /**
  * Destroys the component and cleans up memory.
+ * After a component that is declared in markup is no longer in use, the framework automatically destroys it
+ * and frees up its memory.
+ * If you create a component dynamically in JavaScript and that component isn't added to a facet (v.body or another
+ * attribute of type Aura.Component[]), you have to destroy it manually using destroy() to avoid memory leaks.
  *
  * <code>destroy()</code> destroys the component immediately while
- * <code>destroy(true)</code> destroys it asynchronously. See <a
- * href="#help?topic=dynamicCmp"/>Dynamically Creating Components</a> for more
- * information.
+ * <code>destroy(true)</code> destroys it asynchronously.
  * <p>
  * Note that when this is called with async = true, it makes a specific race
- * condition (i.e. calling functions after destroy) harder to trigger. this
+ * condition (i.e. calling functions after destroy) harder to trigger. This
  * means that we really would like to be able to for synchronous behaviour here,
  * or do something to make the destroy function appear much more like it is
  * doing a synchronous destroy. Unfortunately, the act
@@ -671,7 +674,7 @@ Component.prototype.finishDestroy = function() {
  * </p>
  *
  * @param {Boolean}
- *            async Set to true if component should be destroyed asynchronously.
+ *            async - Set to true if component should be destroyed asynchronously.
  *            The default value is false.
  * @public
  * @platform
@@ -854,7 +857,7 @@ Component.prototype.isRenderedAndValid = function() {
 
 
 /**
- * Execute the super components render method.
+ * Execute the super component's render method.
  * @protected
  * @export
  * @platform
@@ -866,7 +869,7 @@ Component.prototype.superRender = function() {
 };
 
 /**
- * Execute the super components afterRender method.
+ * Execute the super component's afterRender method.
  * @protected
  * @export
  * @platform
@@ -878,7 +881,7 @@ Component.prototype.superAfterRender = function() {
 };
 
 /**
- * Execute the super components rerender method.
+ * Execute the super component's rerender method.
  * @protected
  * @export
  * @platform
@@ -890,7 +893,7 @@ Component.prototype.superRerender = function() {
 };
 
 /**
- * Execute the super components superUnrender method.
+ * Execute the super component's superUnrender method.
  * @protected
  * @export
  * @platform
@@ -966,7 +969,7 @@ Component.prototype.getRenderable = function() {
 /**
  * Gets the globalId. This is the generated globally unique id of the component.
  * It can be used to locate the instance later, but will change across
- * pageloads.
+ * page loads.
  *
  * @public
  * @platform
@@ -977,7 +980,7 @@ Component.prototype.getGlobalId = function() {
 };
 
 /**
- * Get the id set using the <code>aura:id</code> attribute. Can be passed into
+ * Gets the id set using the <code>aura:id</code> attribute. Can be passed into
  * <code>find()</code> on the parent to locate this child.
  *
  * @public
@@ -1098,9 +1101,23 @@ Component.prototype.getElement = function() {
 
 /**
  * Returns a live reference to the value indicated using property syntax.
+ * This is useful when you dynamically create a component.
  *
+ * @example
+ * $A.createComponent(
+ *     "ui:button",
+ *     {
+ *         "aura:id": "findableAuraId",
+ *         "label": "Press Me",
+ *         "press": cmp.getReference("c.handlePress")
+ *     },
+ *     function(newButton){
+ *         // Do something with the new button
+ *     }
+ * );
+ * 
  * @param {String}
- *            key The data key for which to return a reference.
+ *            key - The data key for which to return a reference.
  * @return {PropertyReferenceValue}
  * @public
  * @platform
@@ -1139,9 +1156,10 @@ Component.prototype.clearReference = function(key) {
 
 /**
  * Returns the value referenced using property syntax.
+ * For example, <code>cmp.get("v.attr")</code> returns the value of the attr aura:attribute.
  *
  * @param {String}
- *            key The data key to look up on the Component.
+ *            key - The data key to look up on the Component.
  * @public
  * @platform
  * @export
@@ -1184,10 +1202,10 @@ Component.prototype.getShadowAttribute = function(key) {
  * Sets the value referenced using property syntax.
  *
  * @param {String}
- *            key The data key to set on the Component. E.g.
+ *            key - The data key to set on the Component. E.g.
  *            <code>cmp.set("v.key","value")</code>
  * @param {Object}
- *            value The value to set
+ *            value - The value to set
  *
  * @public
  * @platform
@@ -1299,9 +1317,10 @@ Component.prototype.fireChangeEvent=function(key,oldValue,newValue,index){
 
 /**
  * Sets a flag to tell the rendering service whether or not to destroy this component when it is removed
- * from it's rendering facet. Set to false if you plan to keep a reference to a component after it has
+ * from its rendering facet. Set to false if you plan to keep a reference to a component after it has
  * been unrendered or removed from a parent facet. Default is true: destroy once orphaned.
- * @param {Boolean} destroy The flag to specify whether or not to destroy this component automatically.
+ * @param {Boolean} destroy - The flag to specify whether or not to destroy this component automatically.
+ *   We don't recommend setting the value to false. If you do, be careful to avoid memory leaks.
  *
  * @public
  * @platform
@@ -1409,8 +1428,8 @@ Component.prototype.getContainerComponent = function() {
 
 /**
  * Adds Custom ValueProviders to a component
- * @param {String} key string by which to identify the valueProvider. Used in expressions in markup, etc.
- * @param {Object} valueProvider the object to request data from. Must implement .get(expression), can implement .set(key,value).
+ * @param {String} key - string by which to identify the valueProvider. Used in expressions in markup, etc.
+ * @param {Object} valueProvider - the object to request data from. Must implement .get(expression), can implement .set(key,value).
  * @public
  * @platform
  * @export
@@ -1445,11 +1464,13 @@ Component.prototype.getModel = function() {
 };
 
 /**
- * Return a new Event instance of the named component event. Shorthand:
- * <code>get("e.foo")</code>, where e is the name of the event.
+ * Returns a new event instance of the named component event.
+ * @example
+ * // evtName matches the name attribute in aura:registerEvent 
+ * cmp.getEvent("evtName")
  *
  * @param {String}
- *            name The name of the Event.
+ *            name - The name of the Event.
  * @public
  * @platform
  * @export

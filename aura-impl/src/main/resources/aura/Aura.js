@@ -831,7 +831,8 @@ AuraInstance.prototype.finishInit = function(doNotInitializeServices) {
 };
 
 /**
- * @description Use <code>$A.error()</code> in response to a serious error that has no recovery path.
+ * Deprecated. Use the standard JavaScript throw new Error(msg) instead for a serious error
+ * that has no recovery path.
  *
  * If this occurs during a test, the test will be stopped unless you add calls to '$A.test.expectAuraError' for
  * each error that occurs. <code>auraErrorsExpectedDuringInit</code> allows server side errors to not stop the
@@ -912,8 +913,8 @@ AuraInstance.prototype.handleError = function(message, e) {
  * Note that the method should only be used if try-catch mechanism
  * of error handling is not desired or not functional (ex: in nested promises)
  * @public
- * @param {String} message The message to display.
- * @param {Error} error An error object to be included in handling and reporting.
+ * @param {String} message - The message to display.
+ * @param {Error} error - An error object to be included in handling and reporting.
  * @platform
  */
 AuraInstance.prototype.reportError = function(message, error) {
@@ -944,11 +945,11 @@ AuraInstance.prototype.reportError = function(message, error) {
  * <code>$A.warning()</code> should be used in the case where poor programming practices have been used.
  *
  * These warnings will not, in general, be displayed to the user, but they will appear in the console (if
- * availiable), and in the aura debug window.
+ * available), and in the aura debug window.
  *
  * @public
- * @param {String} w The message to display.
- * @param {Error} e an error, if any.
+ * @param {String} w - The message to display.
+ * @param {Error} e - an error, if any.
  * @platform
  */
 AuraInstance.prototype.warning = function(w, e) {
@@ -977,9 +978,11 @@ AuraInstance.prototype.message = function(msg) {
 
 /**
  * Returns a callback which is safe to invoke from outside Aura, e.g. as an event handler or in a setTimeout.
+ * The $A.getCallback() call ensures that the framework rerenders the modified component
+ * and processes any enqueued actions.
  * @public
  * @function
- * @param {Function} callback The method to call after reestablishing Aura context.
+ * @param {Function} callback - The method to call after reestablishing Aura context.
  * @platform
  */
 AuraInstance.prototype.getCallback = function(callback) {
@@ -1018,9 +1021,11 @@ AuraInstance.prototype.getCallback = function(callback) {
 };
 
 /**
- * Returns the application token referenced by name.
+ * Returns the application configuration token referenced by name.
+ * A tokens file is configured with the tokens attribute in the aura:application tag.
+ * 
  * @function
- * @param {String} token The name of the application configuration token to retrieve, for example, <code>$A.getToken("section.configuration")</code>.
+ * @param {String} token - The name of the application configuration token to retrieve, for example, <code>$A.getToken("section.configuration")</code>.
  * @public
  * @platform
  */
@@ -1039,8 +1044,8 @@ AuraInstance.prototype.getToken = function(token){
  * Returns the value referenced using property syntax. Gets the value from the specified global value provider.
  * @public
  * @function
- * @param {String} key The data key to look up on element, for example, <code>$A.get("$Label.section.key")</code>.
- * @param {Function} callback The method to call with the result if a server trip is expected.
+ * @param {String} key - The data key to look up on element, for example, <code>$A.get("$Label.section.key")</code>.
+ * @param {Function} callback - The method to call with the result if a server trip is expected.
  * @platform
  */
 AuraInstance.prototype.get = function(key, callback) {
@@ -1069,8 +1074,8 @@ AuraInstance.prototype.get = function(key, callback) {
  * Sets the value referenced using property syntax on the specified global value provider.
  * @public
  * @function
- * @param {String} key The data key we want to change on the global value provider, for example, <code>$A.set("$Custom.something","new Value")</code>.
- * @param {Object} value The value to set the key location to. If the global value provider does not implement .set(), this method will throw an exception.</code>.
+ * @param {String} key - The data key we want to change on the global value provider, for example, <code>$A.set("$Custom.something","new value")</code>.
+ * @param {Object} value - The value to set the key location to. If the global value provider does not implement .set(), this method will throw an exception.</code>.
  * @platform
  */
 AuraInstance.prototype.set = function(key, value) {
@@ -1094,7 +1099,7 @@ AuraInstance.prototype.set = function(key, value) {
 /**
  * Returns a live reference to the global value indicated using property syntax.
  *
- * @param {String} key The data key for which to return a reference.
+ * @param {String} key - The data key for which to return a reference.
  * @return {PropertyReferenceValue}
  * @public
  * @platform
@@ -1149,7 +1154,7 @@ AuraInstance.prototype.uninstallOverride = function(name, fn) {
 };
 
 /**
- * Gets the component that is passed to a controller method. For example, <code>$A.getRoot().get("v.attrName");</code> returns the attribute from the root component.
+ * Gets the root component or application. For example, <code>$A.getRoot().get("v.attrName");</code> returns the attribute from the root component.
  * @public
  * @function
  * @platform
@@ -1178,10 +1183,10 @@ AuraInstance.prototype.getContext = function() {
 };
 
 /**
+ * Deprecated. Use <code>getCallback()</code> instead.
  * Runs a function within the standard Aura lifecycle.
  *
- * This ensures that <code>enqueueAction</code> methods and rerendering are handled properly.
- *
+ * This ensures that <code>enqueueAction</code> methods and rerendering are handled properly
  * from JavaScript outside of controllers, renderers, providers.
  * @param {Function} func The function to run.
  * @param {String} name an optional name for the stack.
@@ -1251,8 +1256,8 @@ AuraInstance.prototype.userAssert = function(condition, msg) {
  *  <p>For example, <code>$A.log(action.getError());</code> logs the error from an action.</p>
  *
  * @public
- * @param {Object} value The first object to log.
- * @param {Object} error The error messages to be logged in the stack trace.
+ * @param {Object} value - The object to log.
+ * @param {Object} error - The error messages to be logged in the stack trace.
  * @platform
  */
 AuraInstance.prototype.log = function(value, error) {

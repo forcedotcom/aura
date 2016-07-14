@@ -26,7 +26,9 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DescriptionDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
+import org.auraframework.def.MetaDef;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
+import org.auraframework.impl.root.MetaDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -85,9 +87,10 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
             String name = ex.getName();
             builder.addExample(name, ex);
 
-        } else if ("aura:meta".equalsIgnoreCase(tag)) {
-            // TODO: implement MetaDef
-            // allow aura:meta tags to be manually parsed outside of Aura
+        } else if (MetaDefHandler.TAG.equalsIgnoreCase(tag)) {
+            // The appropriate handler must call getElement()
+            // MetaDef is not currently used
+            new MetaDefHandler<>(this, xmlReader, source).getElement();
         } else {
             throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));
         }

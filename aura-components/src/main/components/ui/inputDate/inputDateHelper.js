@@ -33,31 +33,40 @@
 
     displayValue: function(component) {
         var value = component.get("v.value");
-        var displayValue = value;
+        var langLocale = component.get("v.langLocale");
+        var inputValue = value;
         var date;
-        if (!$A.util.isEmpty(value)) {
-            var langLocale = component.get("v.langLocale");
-            // since v.value is in UTC format like "2015-08-10T04:00:00.000Z", we want to make sure the date portion is
-            // valid
-            var dateValue = value.split("T", 1)[0] || value;
-            date = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", langLocale, true);
-            if (!$A.util.isEmpty(date)) {
-                var format = component.get("v.format"),
-                    timezone = component.get("v.timezone"),
-                    helper = this;
-                var setDisplayValue = function (convertedDate) {
-                    var translatedDate = $A.localizationService.translateToOtherCalendar(convertedDate);
-                    displayValue = $A.localizationService.formatDateUTC(translatedDate, format, langLocale);
 
-                    helper.setInputValue(component, displayValue);
-                };
-
-                this.convertToTimezone(value, timezone, $A.getCallback(setDisplayValue));
-            }
+        if ($A.util.isEmpty(value)) {
+            this.setInputValue(component, value);
+            return;
         }
 
-        if ($A.util.isEmpty(value) || $A.util.isEmpty(date)) {
-            this.setInputValue(component, displayValue);
+        // since v.value is in UTC format like "2015-08-10T04:00:00.000Z", we want to make sure the date portion is valid
+        var dateValue = value.split("T", 1)[0] || value;
+        date = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", langLocale, true);
+
+        if ($A.util.isEmpty(date)) {
+            this.setInputValue(component, value);
+            return;
+        }
+
+        var format = component.get("v.format");
+        var timezone = component.get("v.timezone");
+        var hasTime = dateValue !== value;
+        var helper = this;
+
+        var displayValue = function (convertedDate) {
+            var translatedDate = $A.localizationService.translateToOtherCalendar(convertedDate);
+            inputValue = $A.localizationService.formatDateUTC(translatedDate, format, langLocale);
+
+            helper.setInputValue(component, inputValue);
+        };
+
+        if (hasTime) {
+            this.convertToTimezone(value, timezone, $A.getCallback(displayValue));
+        } else {
+            displayValue(date);
         }
     },
 

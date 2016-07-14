@@ -318,7 +318,9 @@ AuraExpressionService.prototype.resolveLocator = function (component, localId) {
 
     while (!link && currentCmp) {
         currentCmp = currentCmp.getSuper();
-        link = currentCmp.find(localId);
+        if (currentCmp) {
+            link = currentCmp.find(localId);
+        }
     }
 
     if (!link) {

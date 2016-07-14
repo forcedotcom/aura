@@ -492,5 +492,11 @@
         test: function(cmp) {
             cmp.testNoAccessToParentNodeReturnsNull();
         }
+    },
+    
+    testParentNodeInsideOpaqueObject: {
+        test: function(cmp) {
+            cmp.testParentNodeInsideOpaqueObject();
+        }
     }
 })

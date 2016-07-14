@@ -56,6 +56,7 @@
         <aura:attribute name="targetElement" type="String"/>
     </aura:method>
     <aura:method name="testNoAccessToParentNodeReturnsNull" action="{!c.testNoAccessToParentNodeReturnsNull}"/>
+    <aura:method name="testParentNodeInsideOpaqueObject" action="{!c.testParentNodeInsideOpaqueObject}"/>
 
     <lockerTest:facet/>
 
@@ -83,4 +84,10 @@
 
   	<div aura:id="cacheTestA" id="cacheTestA"></div>
   	<div aura:id="cacheTestB" id="cacheTestB"></div>
+
+    <div id="outsideFacet">
+        <lockerTestOtherNamespace:facetLocked>
+           <div id="insideFacet">Inside facet</div>
+        </lockerTestOtherNamespace:facetLocked>
+    </div>
 </aura:component>

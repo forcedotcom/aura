@@ -240,5 +240,13 @@
         var parentParentNode = title.parentNode.parentNode;
 
         testUtils.assertEquals(null, parentParentNode, "Element.parentNode should return null when it is not accessible");
+    },
+
+    testParentNodeInsideOpaqueObject: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var div = document.getElementById("insideFacet");
+        var parent = div.parentNode;
+        testUtils.assertNotNull(parent, "parentNode of element nested in opaque element should not return null");
+        testUtils.assertEquals("outsideFacet", parent.id, "parentNode should be first non-opaque element in parent chain")
     }
 })

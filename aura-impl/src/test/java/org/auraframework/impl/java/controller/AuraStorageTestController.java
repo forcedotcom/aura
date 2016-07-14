@@ -107,7 +107,7 @@ public class AuraStorageTestController {
                 case APPEND://add cmdArg to buffer
                     getBuffer(testName).add(cmdArg);
                     break;
-                case READ: //get and remove info from buffer 
+                case READ: //get and remove info from buffer
                     List<Object> temp = buffer.remove(testName);
                     if (temp != null) {
                         result.addAll(temp);
@@ -332,35 +332,6 @@ public class AuraStorageTestController {
             }
             json.writeMapEnd();
         }
-    }
-
-    @AuraEnabled
-    public static List<Component> getBaseball(@Key("testName") String testName) throws Exception {
-        List<Component> ret = Lists.newArrayList();
-        staticCounter.putIfAbsent(testName, 0);
-        Integer currentCount = staticCounter.get(testName);
-        // On even count get team and on odd count get players
-        if (currentCount.intValue() % 2 == 0) {
-            Map<String, Object> attr = Maps.newHashMap();
-            attr.put("name", "Giants");
-            attr.put("city", "San Francisco");
-            Component cmp = Aura.getInstanceService()
-                    .getInstance("auraStorageTest:teamFacet", ComponentDef.class, attr);
-            ret.add(cmp);
-        } else {
-            Map<String, Object> attr = Maps.newHashMap();
-            attr.put("name", "Posey");
-            attr.put("nickName", "Buster");
-            Component cmp = Aura.getInstanceService().getInstance("auraStorageTest:playerFacet", ComponentDef.class,
-                    attr);
-            ret.add(cmp);
-            attr.put("name", "PSandavol");
-            attr.put("nickName", "Panda");
-            cmp = Aura.getInstanceService().getInstance("auraStorageTest:playerFacet", ComponentDef.class, attr);
-            ret.add(cmp);
-        }
-        staticCounter.put(testName, new Integer(currentCount.intValue() + 1));
-        return ret;
     }
 
     private static void getExecutorLock(String key) {

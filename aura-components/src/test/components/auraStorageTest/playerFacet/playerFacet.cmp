@@ -1,8 +1,0 @@
-<aura:component model="java://org.auraframework.components.test.java.model.PlayerFacetModel">
-    <aura:attribute name="name" type="String"/>
-    <aura:attribute name="nickName" type="String"/>
-    
-    <ui:Button label="Who am I?" press="{!c.revealMe}" aura:id="button"/>
-    <div aura:id="msg"/>
-    <div aura:id="Association">{!m.playerAssociation}</div>
-</aura:component>

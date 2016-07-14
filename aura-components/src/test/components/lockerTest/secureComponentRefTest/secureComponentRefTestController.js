@@ -68,9 +68,31 @@
         
         testUtils.assertEquals("Hello from onFooDynamic()", cmp.get("v.message"));       
     },
-    
+
+    testAddValueHandler: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var secureComponentRef = cmp.find("facet");
+        testUtils.assertDefined(secureComponentRef.addValueHandler, "addValueHandler should be defined on SecureComponenentRef");
+
+        var handlerCalled = false;
+        secureComponentRef.addValueHandler({
+            event: "change",
+            value: "v.label",
+            method: function(event) {
+                testUtils.assertStartsWith("SecureAuraEvent", event.toString(), "Event passed to addValueHandler callback" +
+                        " should be SecureAuraEvent");
+                testUtils.assertStartsWith("SecureWindow", window.toString(), "window inside addValueHandler callback" +
+                        " should be SecureWindow");
+                handlerCalled = true;
+            }
+        });
+        secureComponentRef.set("v.label", "New label");
+        testUtils.assertTrue(handlerCalled, "Value handler never called on SecureComponentRef via addValueHandler");
+    },
+
     onFooDynamic: function(cmp) {
-    	cmp.set("v.message", "Hello from onFooDynamic()");	
+        cmp.set("v.message", "Hello from onFooDynamic()");	
     },
     
     doFoo: function(cmp) {

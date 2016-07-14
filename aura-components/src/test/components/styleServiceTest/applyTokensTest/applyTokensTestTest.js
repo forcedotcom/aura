@@ -203,8 +203,10 @@
                 // we are testing that a client loaded cmp's styles are included in what css
                 // comes back from the server, when applicable
                 var toTest = addedCmp.getElement();
-                var expected = $A.util.isIE? "#39cccc" : this.map["#39CCCC"];
-                $A.test.assertEquals($A.util.style.getCSSProperty(toTest, "color"), expected);
+
+                var actual = $A.util.style.getCSSProperty(toTest, "color");
+                var expected = actual.indexOf("rgb"  > -1) ? this.map["#39CCCC"] : "#39cccc";
+                $A.test.assertEquals(expected, actual);
             });
         }
     },

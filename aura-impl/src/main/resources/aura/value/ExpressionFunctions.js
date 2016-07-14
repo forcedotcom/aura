@@ -136,7 +136,8 @@ ExpressionFunctions.prototype.token = function(token){
     try{
         return $A.getToken(token);
     }catch(e){
-        $A.warning(e);
+        var message = e["message"] || "ExpressionFunctions token error";
+        $A.warning(message, e);
     }
     return '';
 };

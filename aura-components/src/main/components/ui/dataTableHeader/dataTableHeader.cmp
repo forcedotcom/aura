@@ -20,27 +20,38 @@
     with treeGrid in 206, and deal with test fallout. NOT SUPPORTED ANYWHERE ELSE, DO NOT USE
  -->
 <aura:component implements="ui:visible" support="PROTO" description="A header for ui:virtualDataTable">
-    <aura:attribute name="name" type="String" description="Api name or field name on item. Can use dot notation."/>
+    
+    <!-- TH attributes -->
+    <aura:attribute name="title" type="String" description="The title attribute on the TH element"/>
+    <aura:attribute name="scope" type="String" default="col" description="{ col, row, colgroup, rowgroup }"/>    
+    
+    <!-- Labels -->
     <aura:attribute name="label" type="String" description="The text label displayed in column header."/>
     <aura:attribute name="hideLabel" type="Boolean" description="Whether to hide the label. A hidden label will be moved into an assistiveText span"/>
-    <aura:attribute name="title" type="String" description="The title attribute on the TH element"/>
+    
+    <aura:attribute name="ascLabel" type="String" default="Sorted Ascending" description="Accessibility label to use when column is ascending"/>
+    <aura:attribute name="descLabel" type="String" default="Sorted Descending" description="Accessibility label to use when column is descending"/>   
+    
+    <!-- Metadata -->
+    <aura:attribute name="name" type="String" description="Api name or field name on item. Can use dot notation."/>
     <aura:attribute name="type" type="String" description="Data type."/>
-    <aura:attribute name="sortable" type="Boolean"/>
-    <aura:attribute name="resizable" type="Boolean"/>
+    <aura:attribute name="required" type="Boolean" default="false" description="Required field in current layout."/>    
+    
+    <!-- Sorting -->
     <aura:attribute name="disabled" type="Boolean" default="false" description="Sets whether the column header's interactions should be disabled"/>
-    <aura:attribute name="required" type="Boolean" default="false" description="Required field in current layout."/>
+    
+    <aura:attribute name="sortable" type="Boolean"/>
     <aura:attribute name="direction" type="String" description="{ '', ascending, descending }"/>
     <aura:attribute name="initialDirectionOnSort" type="String" default="descending" description="The initial sort direction when user clicks on the column header: {ascending, descending}"/>
-    <aura:attribute name="ascLabel" type="String" default="Sorted Ascending" description="Accessibility label to use when column is ascending"/>
-    <aura:attribute name="descLabel" type="String" default="Sorted Descending" description="Accessibility label to use when column is descending"/>
-    <aura:attribute name="order" type="Integer" default="0" description="The ordering of the sort (non-zero applies to multilevel sort only)."/>
-    <aura:attribute name="scope" type="String" default="col" description="{ col, row, colgroup, rowgroup }"/>
     <aura:attribute name="onsortchange" type="Aura.Action"/>
-    
     <aura:attribute name="assistiveSortText" type="String" default="Sort" description="Accessibility label for sort trigger links"/>
     
+    
+    <!-- Resizing -->
+    <aura:attribute name="resizable" type="Boolean"/>
     <aura:attribute name="width" type="Integer" default="-1" description="Fixed width of the column in pixels."/>
     
+    <!-- Cell payload -->
     <aura:attribute name="outputComponent" 
                     type="Aura.ComponentDefRef[]" 
                     description="Used by cells to override render output. Default value is wired to item's name field.">
@@ -51,11 +62,11 @@
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.disabled}" action="{!c.handleDisabledChange}"/>
     
-    <!-- Currently works only for output components -->
     <aura:handler name="change" value="{!v.name}" action="{!c.updateNameRef}" description="Handles a change to the name attribute by updating the wiring between the component and the name attribute."/>
     
     <th scope="{!v.scope}" class="{! v.class + ' ' + (v.disabled ? 'disabled' : v.direction) + (v.sortable ? ' slds-is-sortable ' : '') + (v.resizable ? ' slds-is-resizable' : '')}" title="{!v.title}"
                            style="{! (v.width gt 0) ? 'width:' + v.width + 'px' : ''}">
+        <div aura:id="wrapper" class="" style="{! (v.width gt 0) ? 'width:' + v.width + 'px' : ''}">
         <aura:if isTrue="{! v.body.length == 0 }">
             <!-- Conditionally insert link for column sorting. -->
             <aura:if isTrue="{!v.sortable}">
@@ -74,5 +85,6 @@
             </aura:if>
         </aura:if>
         {!v.body}
+        </div>
     </th>
 </aura:component>

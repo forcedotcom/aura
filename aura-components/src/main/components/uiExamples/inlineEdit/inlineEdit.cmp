@@ -32,31 +32,30 @@
 		<ui:button label="Edit Active Cell" class="{! (v.inKeyboardMode ? ' ' : ' hidden')}" press="{!c.editActiveCell}" />
 
 		<ui:inlineEditGrid aura:id="grid" class="inline-edit-example" items="{!v.items}" onEdit="{!c.onEdit}" editable="{!v.editable}" dataVar="record"
-			onKeyboardModeEnter="{!c.onKeyboardModeEnter}"  onKeyboardModeExit="{!c.onKeyboardModeExit}">
+			enableResizableColumns="true" onKeyboardModeEnter="{!c.onKeyboardModeEnter}"  onKeyboardModeExit="{!c.onKeyboardModeExit}">
 			<aura:set attribute="headerColumns">
-				<uiExamples:headerGridActionCell />
-				<ui:dataGridColumn name="id"	     label="Id" sortable="true"/>
-				<ui:dataGridColumn name="name"	     label="Name"/>
-				<ui:dataGridColumn name="bloodtype"  label="Blood Type"/>
-				<ui:dataGridColumn name="phone"      label="Phone"/>
+				<ui:dataTableHeader name="id"	     label="Id" sortable="true"/>
+				<ui:dataTableHeader name="name"	     label="Name" resizable="true"/>
+				<ui:dataTableHeader name="bloodtype"  label="Blood Type" resizable="true"/>
+				<ui:dataTableHeader name="phone"      label="Phone"/>
 			</aura:set>
 			
 			<aura:set attribute="columns">
 				<uiExamples:gridActionCell />
 				<ui:inlineEditCell name="id" isPsuedoInput="true" class="pseudoInput" triggerLabel="Edit Id">
-					<ui:outputText value="{!item.record.id}"/>
+					<ui:outputText class="truncate" value="{!item.record.id}"/>
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="name"  triggerLabel="Edit Name">
-					<ui:outputText value="{!item.record.name}"/>
+					<ui:outputText class="truncate" value="{!item.record.name}"/>
 					<aura:set attribute="triggerIcon">
 						<uiExamples:iconCmp key="{! item.status.name.disabled ? 'L' : 'P'}" />
 					</aura:set>					
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="bloodtype"  triggerLabel="Edit Blood Type">
-					<ui:outputText value="{!item.record.bloodtype}"/>
+					<ui:outputText class="truncate" value="{!item.record.bloodtype}"/>
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="phone" triggerLabel="Edit Phone">
-					<ui:outputDate value="{!item.record.phone}"/>
+					<ui:outputDate class="truncate" value="{!item.record.phone}"/>
 					<aura:set attribute="triggerIcon">
 						<uiExamples:iconCmp key="{! item.status.phone.disabled ? 'L' : 'P'}" />
 					</aura:set>

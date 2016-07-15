@@ -32,39 +32,20 @@
 
     },
     afterRender: function (cmp, helper) {
-        if (cmp.get("v.fixedHeader")) {
-            helper.initializeFixedHeader(cmp);
-        }
+        this.superAfterRender();
         
         if (cmp.get("v.enableResizableColumns")) {
             helper.enableColumnResizer(cmp);
         }
-        
-        // TODO: provide generic hooks for keyNav plugin to listen to
-        if (cmp.get("v.keyboardNavigation")) {
-            helper.lib.keyNav.initialize(cmp.find("tbody").getElement(), cmp._virtualItems);
-        }
-
-
-        this.superAfterRender();
     },
     rerender: function (cmp, helper) {
         this.superRerender();
         
         helper._selectiveRerender(cmp);
         
-        if (cmp.get("v.fixedHeader")) {
-            helper.updateSizesForFixedHeader(cmp);
-        }
-        
         if (cmp.get("v.enableResizableColumns") && !helper.hasResizerHandles(cmp)) {
             helper.updateColumnResizer(cmp);
             cmp._updateResizer = null;
-        }
-        
-        // TODO: provide generic hook for plugin to listen to
-        if (cmp.get("v.keyboardNavigation")) {
-            helper.lib.keyNav.updateRowElements(cmp._virtualItems);
         }
     },
     unrender: function (cmp, helper) {

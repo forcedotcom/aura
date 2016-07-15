@@ -24,24 +24,32 @@
         <div class="header">
             <ui:button label="Update Row 2" press="{!c.updateRow}"/>
             <ui:button label="Append 25 Rows" press="{!c.appendRows}"/>
+            <ui:button label="Replace Headers" press="{!c.replaceHeaders}"/>
+            <ui:button label="Manual Resize" press="{!c.resizeColumns}"/>
         </div>
         
         <div class="body">
-            <ui:scrollerWrapper class="scroller">
-                <ui:virtualDataTable aura:id="grid" onsort="{!c.sort}">
+            <ui:scroller aura:id="scroller"
+                         class="scrollWrapper"
+                         
+                         useNativeScroller="true"
+                         infiniteLoading="true"
+                         infiniteLoadingThreshold="10"
+                         infiniteLoadingDataProvider="{!c.loadMore}">
+                <ui:virtualDataTable aura:id="grid" onsort="{!c.sort}" enableResizableColumns="true">
                     <aura:set attribute="headerColumns">
                         <ui:dataTableHeader name="id"       label="Id" sortable="true"/>
-                        <ui:dataTableHeader name="name"     label="Name" />
-                        <ui:dataTableHeader name="longName" label="Long Name" />
+                        <ui:dataTableHeader name="name"     label="Name" sortable="true" resizable="true"/>
+                        <ui:dataTableHeader name="longName" label="Long Name" resizable="true"/>
                     </aura:set>
                     
                     <aura:set attribute="columns">
-                        {!item.id}
-                        {!item.name}
-                        {!item.longName}
+                        <div class="slds-truncate">{!item.id}</div>
+                        <div class="slds-truncate">{!item.name}</div>
+                        <div class="slds-truncate">{!item.longName}</div>
                     </aura:set>
                 </ui:virtualDataTable>
-            </ui:scrollerWrapper>
+            </ui:scroller>
         </div>
     </div>
 	

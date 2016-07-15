@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-.THIS.resizable-cols {
-    table-layout:fixed;
-}
-
-.THIS.indicator {
-    position: absolute;
-    display: block;
-    cursor: col-resize;
-    opacity: 0;
-    z-index: 5000;
-    user-select:none;
-}
-
-.THIS.indicator.active {
-    opacity: 1;
-}
-
-.THIS.indicator .divider {
-    position: absolute;
-    right: 0;
-    height: 100vh;
-}
+({
+    afterRender: function(cmp) {
+        cmp.find("grid").set("v.resizableColumnsConfig", {
+            container : cmp.getElement().querySelector('.body'),
+            initialWidths : [100, 200, 400],
+            step : 10,
+            minWidth: 100,
+            maxWidth: 1000
+        });
+        
+        this.superAfterRender();
+    }
+})

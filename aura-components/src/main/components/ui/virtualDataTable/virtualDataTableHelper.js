@@ -15,7 +15,7 @@
  */
 ({
     NS: "UIPERF",
-    NAME: "ui:virtualDataGrid",
+    NAME: "ui:virtualDataTable",
     
     DELEGATED_EVENTS : [],
     USE_CAPTURE : ['focus', 'blur'],
@@ -25,6 +25,7 @@
         column : 'td',
         header : 'th'
     },
+    
     initialize: function (cmp) {
         // Internal variables we use
         cmp._templates        = [];
@@ -90,19 +91,6 @@
             value  : itemVar,
             method : this.onItemChange.bind(this, ptv)
         });
-    },
-    initializeFixedHeader: function (cmp) {
-        if (cmp.get("v.fixedHeader")) {
-            $A.util.toggleClass(cmp, "fixedHeaderTable", true);
-            this.updateSizesForFixedHeader(cmp);
-        }
-    },
-    updateSizesForFixedHeader: function (cmp) {
-        var table = cmp.getElement(),
-            header = cmp.find("thead").getElement(),
-            body = cmp.find("tbody").getElement();
-    
-        body.style.height = (table.clientHeight - header.clientHeight) + "px";
     },
     virtualRerender: function (cmp) {
         this.bootstrapVirtualGrid(cmp);
@@ -518,9 +506,8 @@
      */
     
     enableColumnResizer : function(cmp) {
-        $A.util.toggleClass(cmp, 'resizable-cols', true);
         var configs = cmp.get("v.resizableColumnsConfig") || {};
-        configs.indicatorClasses = configs.indicatorClasses ? configs.indicatorClasses += ' uiVirtualDataGrid' : 'uiVirtualDataGrid';
+        configs.indicatorClasses = configs.indicatorClasses ? configs.indicatorClasses += ' uiVirtualDataTable' : 'uiVirtualDataTable';
         
         var resizer = this.lib.columnResize.initializeColumnResizer(cmp.getElement(), configs);
         
@@ -595,7 +582,8 @@
      * rerender the resizer handles natively. 
      */
     hasResizerHandles : function(cmp) {
-        var handles = cmp.getElement().querySelectorAll(".handle").length;
+        // TODO: Use getHandles from the resizer instead of grabbing the elements ourselves
+        var handles = cmp.getElement().querySelectorAll(".slds-resizable").length;
         var headers = cmp.get("v.headerColumns").length;
         return handles === headers;
     },

@@ -184,3 +184,10 @@
 .THIS .hidden {
 	display: none;
 }
+
+.THIS .truncate {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

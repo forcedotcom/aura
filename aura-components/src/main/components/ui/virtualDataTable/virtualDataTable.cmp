@@ -21,7 +21,7 @@
     with treeGrid in 206, and deal with test fallout. NOT SUPPORTED ANYWHERE ELSE, DO NOT USE
  -->
 <aura:component implements="ui:virtualComponent" extensible="false" support="PROTO" description="Displays a table of data">
-    <aura:import library="ui:virtualDataGridLib" property="lib"/>
+    <aura:import library="ui:virtualDataTableLib" property="lib"/>
     <aura:attribute name="sortBy" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
     
     <!-- This is deprecated, used in old grid, eventually this should be a <method> -->
@@ -63,8 +63,6 @@
     <aura:attribute name="fixedHeader"      type="Boolean"              default="false" description="Specifies whether the grid should use CSS to fix the header's position. If true, content in the table body is set to overflow and scrolling is enabled. 
                                                                         To support overflow and scrolling, you must include a fixed or max-height CSS style for the table. The default is false."/>
 
-    <aura:attribute name="keyboardNavigation" type="boolean"            default="false" description="Enables keyboard navigation with up/down arrows. Requires having an input element in every row."/>
-
     <!-- Resizable Columns -->
     <aura:attribute name="enableResizableColumns"   type="Boolean"      default="false" description="Enables the column resize plugin. The default is false."/>
     <aura:attribute name="resizableColumnsConfig"   type="Object" description="The column resize configuration. If not provided, the default configuration is used."/>
@@ -80,7 +78,7 @@
     <aura:registerEvent name="onsort" type="ui:sort" description="The event fired when a column is sorted."/>
     <aura:registerEvent name="onColumnResize" type="ui:resize" description="The event fired when a column is resized."/>
 
-    <table aura:id="table" class="{! 'slds-table ' + v.class}" aura:flavorable="true">
+    <table aura:id="table" class="{! 'slds-table ' + v.class + ( v.fixedHeader ? ' fixedHeader' : '') + (v.enableResizableColumns ? ' resizable-cols' : '')}" aura:flavorable="true">
         <thead aura:id="thead">
             <tr aura:id="headerRow" class="slds-text-title--caps">{!v.headerColumns}</tr>
         </thead>

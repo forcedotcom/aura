@@ -35,7 +35,7 @@
 	    items.reverse();
 	    
 	    cmp.find("grid").set("v.items", items);
-	    cmp.find("grid").sortBy(evt.getParam("sortBy"));
+	    cmp.find("grid").sort(evt.getParam("sortBy"));
 	},
 	
 	updateRow: function(cmp, evt, helper) {
@@ -50,6 +50,39 @@
 	    var newItems = helper.generateItems(25, startIndex);
 
 	    grid.appendItems(newItems);
-	}
+	},
+	
+	loadMore: function(cmp, callback, helper) {
+	    var grid = cmp.find("grid");
+        var startIndex = grid.get("v.items").length;
+        var newItems = helper.generateItems(25, startIndex);
+
+        grid.appendItems(newItems);
+        
+        callback();
+	},
+	
+	replaceHeaders: function(cmp, evt, helper) {
+	    var headers = [];
+	    
+	    for (var i = 0; i < 3; i++) {
+	        $A.createComponent("ui:dataTableHeader", {
+	            name : "header" + i,
+	            label : "Header " + i,
+	            sortable: true,
+	            resizable: true
+	        }, function(header) {
+	            headers.push(header);
+	        });
+	    }
+	    
+	    cmp.find("grid").set("v.headerColumns", headers);
+	},
+	
+	resizeColumns: function(cmp, evt, helper) {
+	    var widths = [150, 200, 400];
+	    
+	    cmp.find("grid").resizeColumns(widths);
+	},
 })
 

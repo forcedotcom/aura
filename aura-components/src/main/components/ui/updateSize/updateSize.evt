@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" support="BETA" description="Indicates that the size of one or more regions in the DOM have been changed and any components that need to recalculate dimension information should do so.">
+<aura:event access="PRIVILEGED" type="APPLICATION" support="BETA" description="Indicates that the size of one or more regions in the DOM have been changed and any components that need to recalculate dimension information should do so.">
 </aura:event>

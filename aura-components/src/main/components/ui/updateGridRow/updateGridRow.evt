@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" description="Updates attributes on a dataGrid row">
+<aura:event access="PRIVILEGED" type="COMPONENT" description="Updates attributes on a dataGrid row">
     <aura:attribute name="index" type="Integer" description="Index of the row to update" />
     
     <aura:attribute name="className" type="String" description="Class attribute to update. An undefined or null value will leave the class attribute unchanged" />

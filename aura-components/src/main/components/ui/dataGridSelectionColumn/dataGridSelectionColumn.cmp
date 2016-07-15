@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:dataGridActionColumn" description="A column of checkboxes for individual and multiple row selection in ui:dataGrid">
+<aura:component access="PRIVILEGED" extends="ui:dataGridActionColumn" description="A column of checkboxes for individual and multiple row selection in ui:dataGrid">
 	<aura:attribute name="selectAll" type="Boolean" description="Allows grid to control 'selectAll' visual state."/>
 
 	<aura:set attribute="header">

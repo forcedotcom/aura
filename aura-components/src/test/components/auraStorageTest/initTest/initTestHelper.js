@@ -19,8 +19,8 @@
             that.findAndSetText(cmp, "staticCounter", returnValue.Counter);
             that.findAndSetText(cmp, "responseData", returnValue.Data);
             that.findAndSetText(cmp, "isFromStorage", a.isFromStorage());
-            that.findAndSetText(cmp, "callbackCounter",
-                    parseInt(cmp.find("callbackCounter").getElement().innerHTML, 10) + 1);
+            var callbackCounter = parseInt($A.util.getText(cmp.find("callbackCounter").getElement()), 10);
+            that.findAndSetText(cmp, "callbackCounter", callbackCounter + 1);
             if (extraCallback) {
                 extraCallback(a);
             }
@@ -33,6 +33,6 @@
     },
 
     findAndSetText : function(cmp, targetCmpId, msg) {
-        cmp.find(targetCmpId).getElement().innerHTML = msg;
+        $A.util.setText(cmp.find(targetCmpId).getElement(), msg);
     }
 })

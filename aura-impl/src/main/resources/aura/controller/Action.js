@@ -60,7 +60,7 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.deferred = false;
 
     this.returnValue = undefined;
-    this.returnValueUnmodified = undefined;
+    this.returnValueClone = undefined;
 
     // FIXME: only for runActions - deprecated
     this.completion = undefined;
@@ -454,10 +454,10 @@ Action.prototype.getComponent = function() {
  *     // you should run an isValid() check
  *     //if (cmp.isValid() && state === "SUCCESS") {
  *     if (state === "SUCCESS") {
- *         // Alert the user with the value returned 
+ *         // Alert the user with the value returned
  *         // from the server
  *         alert("From server: " + response.getReturnValue());
- * 
+ *
  *         // do something
  *     }
  *     //else if (cmp.isValid() && state === "INCOMPLETE") {
@@ -469,7 +469,7 @@ Action.prototype.getComponent = function() {
  *         var errors = response.getError();
  *         if (errors) {
  *             if (errors[0] && errors[0].message) {
- *                 console.log("Error message: " + 
+ *                 console.log("Error message: " +
  *                          errors[0].message);
  *             }
  *         } else {
@@ -477,7 +477,7 @@ Action.prototype.getComponent = function() {
  *         }
  *     }
  * });
- * 
+ *
  * @public
  * @param {Object}
  *            scope - The scope in which the function is executed. You almost always want to set scope to the keyword this.
@@ -648,11 +648,11 @@ Action.prototype.runDeprecated = function(evt) {
     try {
         var secureCmp = $A.lockerService.wrapComponent(this.cmp);
         var secureEvt = $A.lockerService.wrapComponentEvent(secureCmp, evt);
-        
+
         this.returnValue = this.meth.call(undefined, secureCmp, secureEvt, this.cmp["helper"]);
-        
+
     	// TODO W-3199680 Locker Service - Action.runDeprecated() is not unfiltering/writing back expandos of secure event params
-        
+
         this.state = "SUCCESS";
     } catch (e) {
         this.markException(e);
@@ -762,21 +762,21 @@ Action.prototype.updateFromResponse = function(response) {
     this.state = response["state"];
     this.responseState = response["state"];
 
-    // returnValue may be modified by Action handlers. If the Action is storable
-    // then make a deep copy (which may not be cheap) so an unmodified version of the
-    // original is available for persistence.
+    this.returnValue = response["returnValue"];
+    // make deep copies to prevent userland code from changing values put into storage
     if (this.storable && this.responseState === "SUCCESS") {
-        this.returnValueUnmodified = response["returnValue"];
         // deep copy only for objects and arrays
-        if ($A.util.isArray(response["returnValue"])) {
-            this.returnValue = $A.util.apply([], this.returnValueUnmodified, true, true);
-        } else if ($A.util.isObject(response["returnValue"])) {
-            this.returnValue = $A.util.apply({}, this.returnValueUnmodified, true, true);
+        if ($A.util.isArray(this.returnValue)) {
+            this.returnValueClone = $A.util.apply([], this.returnValue, true, true);
+        } else if ($A.util.isObject(this.returnValue)) {
+            this.returnValueClone = $A.util.apply({}, this.returnValue, true, true);
         } else {
-            this.returnValue = this.returnValueUnmodified;
+            this.returnValueClone = this.returnValue;
         }
-    } else {
-        this.returnValue = response["returnValue"];
+
+        // TODO W-3233036 - must deep copy response["components"], and store the clone, to prevent
+        // userland code from modifying partial configs
+
     }
 
     this.error = response["error"];
@@ -815,8 +815,8 @@ Action.prototype.updateFromResponse = function(response) {
         this.error = newErrors;
     } else if (this.originalResponse && this.state === "SUCCESS") {
         // Compare the refresh response with the original response and return false if they are equal (no update)
-        var originalValue = $A.util.json.orderedEncode(this.originalResponse["returnValue"]);
-        var refreshedValue = $A.util.json.orderedEncode(response["returnValue"]);
+        var originalValue = $A.util.json.orderedEncode(this.originalReturnValueClone);
+        var refreshedValue = $A.util.json.orderedEncode(this.returnValueClone);
         if (refreshedValue === originalValue) {
             var originalComponents = $A.util.json.orderedEncode(this.originalResponse["components"]);
             var refreshedComponents = $A.util.json.orderedEncode(response["components"]);
@@ -845,8 +845,8 @@ Action.prototype.updateFromResponse = function(response) {
 Action.prototype.getStored = function() {
     if (this.storable && this.responseState === "SUCCESS") {
         return {
-            "returnValue" : this.returnValueUnmodified,
-            "components" : this.components,
+            "returnValue" : this.returnValueClone,
+            "components" : this.components, // TODO W-3233036 use this.componentClone
             "state" : "SUCCESS",
             "storage" : {
                 "created" : new Date().getTime()
@@ -1274,8 +1274,8 @@ Action.prototype.copyToRefresh = function() {
 };
 
 /**
- * Refreshes the Action. Used with storage.
- *
+ * Gets a new action instance that can be used to refresh this storable action.
+ * @return {Action} a new instance of this action.
  * @private
  */
 Action.prototype.getRefreshAction = function(originalResponse) {
@@ -1287,17 +1287,15 @@ Action.prototype.getRefreshAction = function(originalResponse) {
                     ? this.storableConfig["refresh"] * 1000
                     : storageService.getDefaultAutoRefreshInterval();
 
-    // Only auto refresh if the data we have is more than
-    // autoRefreshInterval seconds old
+    // only refresh the action if it is sufficiently old
     var now = new Date().getTime();
     if ((now - storage["created"]) >= autoRefreshInterval && this.def) {
         var refreshAction = this.copyToRefresh();
         storageService.log("Action.refresh(): auto refresh begin: " + this.getId() + " to " + refreshAction.getId());
         refreshAction.originalResponse = originalResponse;
+        refreshAction.originalReturnValueClone = this.returnValueClone;
 
-        //
-        // This is really ugly. We will be changing it shortly.
-        //
+        // TODO W-2835710 - remove support for supressing callbacks
         var executeCallbackIfUpdated = (this.storableConfig && !$A.util.isUndefined(this.storableConfig["executeCallbackIfUpdated"]))
                 ? this.storableConfig["executeCallbackIfUpdated"] : true;
         if (executeCallbackIfUpdated !== false) {

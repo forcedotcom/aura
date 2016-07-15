@@ -26,6 +26,17 @@
         cmp.find(targetCmpId).getElement().innerHTML = msg;
     },
 
+    textForName : function(cmp, name) {
+        var subcmp = cmp.find(name);
+        if(!subcmp) {
+            subcmp = cmp.getSuper().find(name);
+        }
+        if(!subcmp) {
+            return null;
+        }
+        return $A.test.getText(subcmp.getElement());
+    },
+
     /**
      * Verify the default adapter selected when auraStorage:init is used without
      * any specification.
@@ -68,6 +79,7 @@
                 $A.test.assertFalse(a.isStorable());
             } ]
     },
+
     /**
      * Verify Action.isStorable()
      */
@@ -87,25 +99,15 @@
         } ]
     },
 
-    textForName : function(cmp, name) {
-        var subcmp = cmp.find(name);
-        if(!subcmp) {
-            subcmp = cmp.getSuper().find(name);
-        }
-        if(!subcmp) {
-            return null;
-        }
-        return $A.test.getText(subcmp.getElement());
-    },
-
     /**
      * Verify Action.setStorable() and auto refresh setStorage() accepts
      * configuration. These configuration are helpful for follow up actions but
      * not the first action to be stored.
      *
-     * {ignoreExisting: "Ignore existing stored response, but cache my response
-     * after the action is complete" "refresh": "Time in seconds to override
-     * action's current storage expiration"}
+     * {
+     *  ignoreExisting: "Ignore existing stored response, but cache my response after the action is complete"
+     *  refresh: "Time in seconds to override action's current storage expiration"
+     * }
      *
      * We crank up the default refresh and expiration to make them irrelevant here.
      */

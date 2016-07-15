@@ -1009,7 +1009,7 @@ Test.Aura.Controller.ActionTest = function() {
             // Arrange
             var target = newAction();
             target.storable = true;
-            target.returnValueUnmodified = "NONE";
+            target.returnValueClone = "NONE";
             target.state = "SUCCESS";
             target.responseState = "SUCCESS";
 
@@ -1067,7 +1067,7 @@ Test.Aura.Controller.ActionTest = function() {
             target.returnValue.foo = "baz";
 
             // Assert
-            Assert.Equal({foo:"bar"}, target.returnValueUnmodified);
+            Assert.Equal({foo:"bar"}, target.returnValueClone);
         }
 
         [Fact]
@@ -1087,7 +1087,7 @@ Test.Aura.Controller.ActionTest = function() {
             target.returnValue.foo = "baz";
 
             // Assert
-            Assert.Equal(undefined, target.returnValueUnmodified);
+            Assert.Equal(undefined, target.returnValueClone);
         }
 
         [Fact]
@@ -1105,7 +1105,7 @@ Test.Aura.Controller.ActionTest = function() {
             target.returnValue.foo = "baz";
 
             // Assert
-            Assert.Equal(undefined, target.returnValueUnmodified);
+            Assert.Equal(undefined, target.returnValueClone);
         }
     }
 

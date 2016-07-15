@@ -288,6 +288,7 @@
 
             virtualItems[index] = updatedRow;
             this._replaceDOMElement(gridBody, updatedRow, target);
+            this.fireRenderEvent(cmp, "update", index);
         }
     },
     
@@ -344,6 +345,7 @@
             fragment.appendChild(virtualItem);
         }
         container.appendChild(fragment);
+        this.fireRenderEvent(cmp, "append", offset);
         
         cmp.set("v.renderInfo", { type : "append" });
         cmp.set('v.items', (cmp.get('v.items') || []).concat(items), true);
@@ -429,6 +431,15 @@
             container.removeChild(container.firstChild);
         }
         container.appendChild(fragment);
+        this.fireRenderEvent(cmp, "rerender", 0);
+    },
+    
+    fireRenderEvent: function(cmp, type, index) {
+        cmp.getEvent("gridAction").setParams({
+            action: type,
+            index: index,
+            payload: {}
+        }).fire();
     },
     
     /*

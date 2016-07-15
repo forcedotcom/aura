@@ -19,13 +19,19 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
-import org.auraframework.system.*;
+import org.auraframework.system.Parser;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
-import org.auraframework.throwable.quickfix.*;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;

@@ -16,12 +16,25 @@
 package org.auraframework.impl.root.application;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
-import org.auraframework.def.*;
-import org.auraframework.expression.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.TokenDef;
+import org.auraframework.def.TokensDef;
+import org.auraframework.expression.Expression;
+import org.auraframework.expression.Literal;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;

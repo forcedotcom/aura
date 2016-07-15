@@ -15,14 +15,19 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.Sets;
+import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
 import org.junit.Test;
 
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     protected Set<String> publicAttrs;
@@ -74,7 +79,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
                         "extends", "template");
             internalAttrs = Sets.newHashSet("preload", "track", "locationChangeEvent", "isOnePageApp",
                     "render", "provider", "style", "helper", "renderer", "whitespace",
-                    "support", "tokens", "flavorOverrides", "defaultFlavor", "dynamicallyFlavorable");
+                    "support", "tokens", "flavorOverrides", "defaultFlavor", "dynamicallyFlavorable", "bootstrapPublicCacheExpiration");
             super.setUp();
         }
 

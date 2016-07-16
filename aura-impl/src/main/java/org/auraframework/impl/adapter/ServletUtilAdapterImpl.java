@@ -527,7 +527,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * the last-modified header, which is set to a day ago so that browsers consider it to be safe.
      *
      * @param response the HTTP response to which we will add headers.
-     * @param expiration timeout value in seconds.
+     * @param expiration timeout value in milliseconds.
      */
     @Override
     public void setCacheTimeout(HttpServletResponse response, long expiration) {

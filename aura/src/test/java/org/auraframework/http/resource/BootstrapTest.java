@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -48,20 +50,24 @@ public class BootstrapTest extends UnitTestCase {
      * @throws Exception
      */
     private void verifyCacheHeaders(Integer expirationSetting, boolean shouldCache) throws Exception {
+        DefDescriptor<ApplicationDef> appDefDesc = Mockito.mock(DefDescriptor.class);
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         ApplicationDef appDef = Mockito.mock(ApplicationDef.class);
         
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.setServletUtilAdapter(servletUtilAdapter);
-        
+
+        Mockito.when(appDefDesc.getDefType()).thenReturn(DefType.APPLICATION);
+        Mockito.when(appDefDesc.getDef()).thenReturn(appDef);
+
         // Public cache expiration not set, should be no cache
         Mockito.when(appDef.getBootstrapPublicCacheExpiration()).thenReturn(expirationSetting);
-        bootstrap.setCacheHeaders(response, appDef);
+        bootstrap.setCacheHeaders(response, appDefDesc);
         
         if (shouldCache) {
             Mockito.verify(servletUtilAdapter).setCacheTimeout(Mockito.any(HttpServletResponse.class), 
-                    Mockito.eq(expirationSetting.intValue()));
+                    Mockito.eq(expirationSetting.longValue()));
         } else {
             Mockito.verify(servletUtilAdapter).setNoCache(Mockito.any(HttpServletResponse.class));
         }

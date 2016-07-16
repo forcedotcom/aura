@@ -79,8 +79,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * Cache-Control: no-cache.
      * Same as auraBaseServlet.java
      */
-    protected static final long LONG_EXPIRE_SECONDS = 45 * SHORT_EXPIRE_SECONDS;
-    protected static final long LONG_EXPIRE = LONG_EXPIRE_SECONDS * 1000;
+    protected static final long LONG_EXPIRE = 45 * SHORT_EXPIRE;
     protected static final String UTF_ENCODING = "UTF-8";
     protected static final String HTML_CONTENT_TYPE = "text/html";
     protected static final String JAVASCRIPT_CONTENT_TYPE = "text/javascript";
@@ -505,7 +504,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     @Override
     public void setLongCache(HttpServletResponse response) {
-        this.setCacheTimeout(response, (int) LONG_EXPIRE_SECONDS);
+        this.setCacheTimeout(response, LONG_EXPIRE);
     }
 
     /**
@@ -518,7 +517,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     @Override
     public void setShortCache(HttpServletResponse response) {
-        this.setCacheTimeout(response, (int) SHORT_EXPIRE_SECONDS);
+        this.setCacheTimeout(response, SHORT_EXPIRE);
     }
 
     /**
@@ -531,11 +530,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * @param expiration timeout value in seconds.
      */
     @Override
-    public void setCacheTimeout(HttpServletResponse response, int expiration) {
+    public void setCacheTimeout(HttpServletResponse response, long expiration) {
         long now = System.currentTimeMillis();
         response.setHeader(HttpHeaders.VARY, "Accept-Encoding");
-        response.setHeader(HttpHeaders.CACHE_CONTROL, String.format("max-age=%s, public", expiration));
-        response.setDateHeader(HttpHeaders.EXPIRES, now + (expiration * 1000));
+        response.setHeader(HttpHeaders.CACHE_CONTROL, String.format("max-age=%s, public", expiration / 1000));
+        response.setDateHeader(HttpHeaders.EXPIRES, now + expiration);
         response.setDateHeader(HttpHeaders.LAST_MODIFIED, now - SHORT_EXPIRE);
     }
 

@@ -42,8 +42,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * and should be expanded to include more of the support routines from the servlets.
  */
 public interface ServletUtilAdapter extends AuraAdapter {
-    public static final String AURA_PREFIX = "aura.";
-    public static final String CSRF_PROTECT = "while(1);\n";
+    String AURA_PREFIX = "aura.";
+    String CSRF_PROTECT = "while(1);\n";
 
     /**
      * Hook at the beginning of any resource request.
@@ -201,11 +201,11 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * Set a page to cache for a 'long' time.
      */
     void setLongCache(HttpServletResponse response);
-    
+
     /**
      * Set cache timeout for a resource in seconds.
      */
-    void setCacheTimeout(HttpServletResponse response, int expiration);
+    void setCacheTimeout(HttpServletResponse response, long expiration);
 
     /**
      * are we in production mode?

@@ -66,10 +66,16 @@ public class Bootstrap extends AuraResourceImpl {
         return Boolean.TRUE;
     }
     
-    public void setCacheHeaders(HttpServletResponse response, ApplicationDef appDef) throws QuickFixException {
-        Integer cacheExpiration = appDef.getBootstrapPublicCacheExpiration();
-        if (cacheExpiration != null && cacheExpiration.intValue() > 0) {
-            servletUtilAdapter.setCacheTimeout(response, cacheExpiration);
+    protected void setCacheHeaders(HttpServletResponse response, DefDescriptor<? extends BaseComponentDef> appDesc)
+            throws QuickFixException {
+        Integer cacheExpiration = null;
+        if (appDesc.getDefType() == DefType.APPLICATION) {
+            // only app has bootstrap cache capability
+            ApplicationDef appDef = (ApplicationDef) appDesc.getDef();
+            cacheExpiration = appDef.getBootstrapPublicCacheExpiration();
+        }
+        if (cacheExpiration != null && cacheExpiration > 0) {
+            servletUtilAdapter.setCacheTimeout(response, cacheExpiration.longValue());
         } else {
             servletUtilAdapter.setNoCache(response);
         }
@@ -86,8 +92,7 @@ public class Bootstrap extends AuraResourceImpl {
         DefDescriptor<?> desc = definitionService.getDefDescriptor(app.getDescriptorName(), type.getPrimaryInterface());
 
         try {
-            ApplicationDef appDef = (ApplicationDef) desc.getDef();
-            setCacheHeaders(response, appDef);
+            setCacheHeaders(response, app);
 
             Instance<?> appInstance = Aura.getInstanceService().getInstance(desc, getComponentAttributes(request));
             definitionService.updateLoaded(desc);

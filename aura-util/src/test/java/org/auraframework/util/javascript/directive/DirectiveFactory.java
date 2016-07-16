@@ -16,10 +16,7 @@
 package org.auraframework.util.javascript.directive;
 
 import java.io.IOException;
-import java.util.List;
 
-import org.auraframework.util.javascript.JavascriptProcessingError;
-import org.auraframework.util.javascript.JavascriptValidator;
 import org.auraframework.util.javascript.directive.impl.DirectiveImpl;
 
 /**
@@ -43,11 +40,6 @@ public class DirectiveFactory {
         @Override
         public void processDirective(DirectiveBasedJavascriptGroup parser) throws IOException {
 
-        }
-
-        @Override
-        public List<JavascriptProcessingError> validate(JavascriptValidator validator) {
-            return null;
         }
     }
 
@@ -85,12 +77,6 @@ public class DirectiveFactory {
         public void processDirective(DirectiveBasedJavascriptGroup parser) throws IOException {
 
         }
-
-        @Override
-        public List<JavascriptProcessingError> validate(JavascriptValidator validator) {
-            return null;
-        }
-
     }
 
     private static class MockDirectiveType implements DirectiveType<MockDirective> {
@@ -124,11 +110,6 @@ public class DirectiveFactory {
         @Override
         public void processDirective(DirectiveBasedJavascriptGroup parser) throws IOException {
 
-        }
-
-        @Override
-        public List<JavascriptProcessingError> validate(JavascriptValidator validator) {
-            return null;
         }
 
     }
@@ -172,11 +153,6 @@ public class DirectiveFactory {
         @Override
         public void processDirective(DirectiveBasedJavascriptGroup parser) throws IOException {
 
-        }
-
-        @Override
-        public List<JavascriptProcessingError> validate(JavascriptValidator validator) {
-            return null;
         }
 
         @Override

@@ -16,10 +16,6 @@
 package org.auraframework.util.javascript.directive;
 
 import java.io.IOException;
-import java.util.List;
-
-import org.auraframework.util.javascript.JavascriptProcessingError;
-import org.auraframework.util.javascript.JavascriptValidator;
 
 /**
  * Directive to the parser, matching lines beginning with //#. The rest of the
@@ -66,11 +62,6 @@ public interface Directive {
      * @return whether or not to call generate
      */
     boolean hasOutput(JavascriptGeneratorMode mode);
-
-    /**
-     * Do extra validation on the content generated, mainly only for include
-     */
-    List<JavascriptProcessingError> validate(JavascriptValidator validator);
 
     /**
      * generates the actual output that should go into the file

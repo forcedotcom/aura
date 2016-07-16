@@ -27,8 +27,6 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
-import org.auraframework.util.javascript.JavascriptProcessingError;
-import org.auraframework.util.javascript.JavascriptValidator;
 import org.auraframework.util.text.Hash;
 
 /**
@@ -137,9 +135,6 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         if (parser == null) {
             throw new RuntimeException("No parser available to generate with");
         }
-        if (doValidation) {
-            validate();
-        }
 
         counter = new CountDownLatch(modes.size());
         errors = new HashMap<>();
@@ -155,19 +150,6 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             throw new CompositeRuntimeException("Errors generating javascript for " + getName(), errors);
         }
         errors = null;
-    }
-
-    public void validate() throws IOException {
-        JavascriptValidator jsv = new JavascriptValidator();
-        List<JavascriptProcessingError> errors = parser.validate(jsv);
-        if (!errors.isEmpty()) {
-            StringBuilder errorSb = new StringBuilder();
-            for (JavascriptProcessingError error : errors) {
-                errorSb.append(error.toString());
-                errorSb.append('\n');
-            }
-            throw new RuntimeException(errorSb.toString());
-        }
     }
 
     protected void generateForMode(File destRoot, final JavascriptGeneratorMode mode) throws IOException {

@@ -27,7 +27,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.auraframework.util.javascript.JavascriptProcessingError;
-import org.auraframework.util.javascript.JavascriptValidator;
 
 /**
  * parses files for directives
@@ -144,18 +143,6 @@ public class DirectiveParser {
         e.setMessage(message);
         e.setEvidence(code);
         this.parseErrors.add(e);
-    }
-
-    public List<JavascriptProcessingError> validate(JavascriptValidator validator) {
-        List<JavascriptProcessingError> errors = new LinkedList<>(parseErrors);
-        errors.addAll(validator.validate(file.getName(), content.toString(), false, true));
-        for (Directive d : directives) {
-            List<JavascriptProcessingError> dErrors = d.validate(validator);
-            if (dErrors != null && dErrors.size() > 0) {
-                errors.addAll(dErrors);
-            }
-        }
-        return errors;
     }
 
     public String generate(JavascriptGeneratorMode mode) {

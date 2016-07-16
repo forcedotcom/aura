@@ -17,10 +17,7 @@ package org.auraframework.util.javascript.directive.impl;
 
 import java.io.IOException;
 import java.util.EnumSet;
-import java.util.List;
 
-import org.auraframework.util.javascript.JavascriptProcessingError;
-import org.auraframework.util.javascript.JavascriptValidator;
 import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import org.auraframework.util.test.util.UnitTestCase;
@@ -198,11 +195,6 @@ public class DirectiveImplTest extends UnitTestCase {
         @Override
         public void processDirective(DirectiveBasedJavascriptGroup parser) throws IOException {
 
-        }
-
-        @Override
-        public List<JavascriptProcessingError> validate(JavascriptValidator validator) {
-            return null;
         }
     }
 }

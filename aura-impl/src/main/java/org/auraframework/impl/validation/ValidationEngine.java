@@ -31,11 +31,6 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
 import org.auraframework.util.css.CSSLintValidator;
-import org.auraframework.util.javascript.JavascriptProcessingError;
-import org.auraframework.util.javascript.JavascriptProcessingError.Level;
-import org.auraframework.util.javascript.JavascriptValidator;
-import org.auraframework.util.json.JsonConstant;
-import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.validation.ValidationError;
 
 import com.google.common.collect.ImmutableList;
@@ -120,45 +115,6 @@ public final class ValidationEngine {
         // TODO: all other prefixes
 
         return ValidationUtil.patchErrors(errors);
-    }
-
-    private List<ValidationError> validateJavascript(Source<?> source, DefType defType) throws IOException {
-        String sourceUrl = source.getUrl().toString();
-        String sourceCode = source.getContents() + ';';
-
-        // check if needs to add "var actions=" line before '{' to prevent jslint parser errors
-        JsonStreamReader jreader = new JsonStreamReader(sourceCode);
-        jreader.setRecursiveReadEnabled(false);
-        // skip comment and whitespace
-        JsonConstant token = jreader.next();
-        int lineOffset = 0;
-        JavascriptProcessingError customError = null;
-        if (token == JsonConstant.OBJECT_START) {
-            // fix, but report a ValidationError also
-            int charNum = jreader.getCharNum();
-            sourceCode = "var actions=\n" + sourceCode.substring(charNum - 1);
-            //
-            // We do some fancy footwork here to get the line number right.
-            // (1) we take off 1 to remove the (first line = 1) from the reader.
-            // (2) we take off 1 for the '\n' just above in the fixup.
-            // (3) we add back two when creating the error to make the line correct
-            //     here while having the line offset adjusted correctly.
-            // A little confusing, but it does do the right thing.
-            //
-            lineOffset = jreader.getLineNum() - 2;
-            customError = new JavascriptProcessingError("Starting '(' missing", lineOffset + 2, 1,
-                    sourceUrl,
-                    null, Level.Error);
-        }
-
-        // TODO: reuse validators for optimization?
-        List<ValidationError> errors = Lists.newArrayList();
-        List<JavascriptProcessingError> jsErrors = new JavascriptValidator()
-                .validate(sourceUrl, sourceCode, false, false);
-        errors.addAll(ValidationUtil.patchErrorLines(jsErrors, lineOffset));
-        if (customError != null)
-            errors.add(0, customError);
-        return errors;
     }
 
     private List<ValidationError> validateCSS(Source<?> source, DefType defType) throws IOException {

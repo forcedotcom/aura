@@ -19,11 +19,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedList;
-import java.util.List;
 
-import org.auraframework.util.javascript.JavascriptProcessingError;
-import org.auraframework.util.javascript.JavascriptValidator;
-import org.auraframework.util.javascript.directive.impl.IncludeDirectiveType;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
@@ -97,79 +93,6 @@ public class DirectiveParserTest extends UnitTestCase {
      * Tests for the parse() method in DirectiveParser
      */
     /**
-     * What if the javascript that is being processed has a standard
-     * DirectiveType but the Javascript Group does not have a reference to that
-     * type.
-     */
-    @Test
-    public void testMissingDirectiveSpecification() throws Exception {
-        File file = getResourceFile("/testdata/javascript/testMissingDirectiveSpecification.js");
-        DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy", file.getParentFile(),
-                file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveFactory.getMockDirective()),
-                EnumSet.of(JavascriptGeneratorMode.TESTING));
-        DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
-        dp.parseFile();
-        List<JavascriptProcessingError> error = dp.validate(new JavascriptValidator());
-        assertTrue("Should have thrown one error for unrecognized directive", error.size() == 1);
-    }
-
-    /**
-     * Negative test: Multi line directive without an END directive
-     */
-    @Test
-    public void testMultilineWithoutEndDirective() throws Exception {
-        File file = getResourceFile("/testdata/javascript/testMultilineWithoutEndDirective.js");
-        DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy", file.getParentFile(),
-                file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveFactory.getMultiLineMockDirectiveType()),
-                EnumSet.of(JavascriptGeneratorMode.TESTING));
-        DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
-        dp.parseFile();
-        List<JavascriptProcessingError> error = dp.validate(new JavascriptValidator());
-        assertTrue("Should have thrown an error for not closing a multiline directive", error.size() == 1);
-        assertTrue("The only error should have been for an missing end directive.", error.listIterator().next()
-                .getMessage().equals("no end found for directive"));
-    }
-
-    /**
-     * Negative test: Multi line directive with no opening directive statement
-     */
-    
-    @Test
-    public void testJustEndDirective() throws Exception {
-        File file = getResourceFile("/testdata/javascript/testJustEndDirective.js");
-        DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy", file.getParentFile(),
-                file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveFactory.getMultiLineMockDirectiveType()),
-                EnumSet.of(JavascriptGeneratorMode.TESTING));
-        DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
-        dp.parseFile();
-        List<JavascriptProcessingError> error = dp.validate(new JavascriptValidator());
-        assertTrue(
-                "Should have thrown an error for having just an end directive without a matching opening multiline directive",
-                error.size() == 1);
-        assertTrue("The only error should have been for an unmatched end directive.", error.listIterator().next()
-                .getMessage().equals("unmatched end directive"));
-    }
-
-    /**
-     * Negative test: A nested directive is not supported yet. So an error
-     * should be flagged when such directives are encountered.
-     */
-    @Test
-    public void testNestedDirective() throws Exception {
-        File file = getResourceFile("/testdata/javascript/testNestedDirective.js");
-        DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy", file.getParentFile(),
-                file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveFactory.getMultiLineMockDirectiveType(),
-                        new IncludeDirectiveType()), EnumSet.of(JavascriptGeneratorMode.TESTING));
-        DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
-        dp.parseFile();
-        List<JavascriptProcessingError> error = dp.validate(new JavascriptValidator());
-        assertTrue("Should have thrown an error for encoutering a multi-line directive", error.size() == 1);
-        assertTrue("The only error should have been for an unmatched end directive.", error.listIterator().next()
-                .getMessage().equals("nested directive found, ignored"));
-
-    }
-
-    /**
      * Positive test: Test a multiline directive by gold filing the contents
      * passed to the directive object
      */
@@ -206,33 +129,7 @@ public class DirectiveParserTest extends UnitTestCase {
         } catch (Exception expected) {
             // Should say generate cannot be called before parsing the group
         }
-    }
-
-    /**
-     * Gold filing the output generated by different kinds of generation modes
-     */
-    /*
-    @Test
-    public void testAllKindsOfDirectiveGenerate() throws Exception {
-        File file = getResourceFile("/testdata/javascript/testAllKindsOfDirectiveGenerate.js");
-        DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy", file.getParentFile(),
-                file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveFactory.getMultiLineMockDirectiveType(),
-                        DirectiveFactory.getMockDirective(), DirectiveFactory.getDummyDirectiveType()), null);
-        DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
-        dp.parseFile();
-        goldFileText(dp.generate(JavascriptGeneratorMode.TESTING), "_test.js");
-        goldFileText(dp.generate(JavascriptGeneratorMode.AUTOTESTING), "_auto.js");
-        // The content generated in PRODUCTION mode still has comments because
-        // the DirectiveParser doesn't really
-        // compress the JS files.
-        // Compression is handled in DirectivebasedJavascriptGroup
-        goldFileText(dp.generate(JavascriptGeneratorMode.PRODUCTION), "_prod.js");
-        goldFileText(dp.generate(JavascriptGeneratorMode.DEVELOPMENT), "_dev.js");
-        // There should be just one error for the Nested Multiline Directive
-        assertTrue("Should not have found any error while processing this file", dp.validate(new JavascriptValidator())
-                .size() == 1);
-    }
-    */
+    }  
 
     @Test
     public void testParser() throws Exception {
@@ -252,8 +149,6 @@ public class DirectiveParserTest extends UnitTestCase {
         assertTrue(first.hasOutput(JavascriptGeneratorMode.MOCK1));
         assertFalse(first.hasOutput(JavascriptGeneratorMode.MOCK2));
         assertFalse(first.hasOutput(JavascriptGeneratorMode.PRODUCTION));
-        List<JavascriptProcessingError> errors = parser.validate(new JavascriptValidator());
-        assertTrue("should not have been any validation errors", errors.isEmpty());
     }
 
     /**
@@ -277,8 +172,6 @@ public class DirectiveParserTest extends UnitTestCase {
         assertFalse(second.hasOutput(JavascriptGeneratorMode.MOCK2));
         assertEquals(second.getLine(), "{\"modes\": [\"MOCK1\"], \"blah\": \"spatula\"}");
         assertTrue(third.isMultiline());
-        List<JavascriptProcessingError> errors = parser.validate(new JavascriptValidator());
-        assertTrue("should not have been any validation errors", errors.isEmpty());
     }
 }
 

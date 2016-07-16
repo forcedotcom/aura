@@ -17,11 +17,8 @@ package org.auraframework.util.javascript.directive.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
-import org.auraframework.util.javascript.JavascriptProcessingError;
-import org.auraframework.util.javascript.JavascriptValidator;
 import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
 import org.auraframework.util.javascript.directive.DirectiveParser;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
@@ -63,11 +60,6 @@ public class IncludeDirective extends DirectiveImpl {
     @Override
     public String generateOutput(JavascriptGeneratorMode mode) {
         return includedParser.generate(mode);
-    }
-
-    @Override
-    public List<JavascriptProcessingError> validate(JavascriptValidator validator) {
-        return includedParser.validate(validator);
     }
 
 }

@@ -2,6 +2,7 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:import library="performance:perfLib" property="lib" />
+    <aura:attribute type="Boolean" default="false" name="loaded"/>
 
     <section aura:id="container">
         <div style="margin: 10px; padding:10px; border: 1px solid black">

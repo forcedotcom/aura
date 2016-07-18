@@ -13,6 +13,7 @@
                 finishRun(function (results) {
                     // This callback is for postprocessing
                     // You can add your own custom metrics on results
+                	cmp.set("v.loaded", true);
                     results.customMetrics.test = true;
                 });
             

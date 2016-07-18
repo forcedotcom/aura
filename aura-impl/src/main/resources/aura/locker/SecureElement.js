@@ -415,9 +415,12 @@ SecureElement.addElementSpecificProperties = function(se, el) {
         var whitelist = SecureElement.elementSpecificAttributeWhitelists[tagName];
         if (whitelist) {
             whitelist.forEach(function(name) {
-                SecureObject.addPropertyIfSupported(se, el, $A.util.hyphensToCamelCase(name), {
-                    filterOpaque : true
-                });
+            	name = $A.util.hyphensToCamelCase(name);
+            	if (!(name in se)) {
+	                SecureObject.addPropertyIfSupported(se, el, name, {
+	                    filterOpaque : true
+	                });
+            	}
             });
         }
 
@@ -487,7 +490,7 @@ SecureElement.elementSpecificAttributeWhitelists = {
     "INS" : [ "cite", "dateTime" ],
     "LABEL" : [ "accesKey", "htmlFor", "form" ],
     "LI" : [ "value" ],
-    "LINK" : [ "crossOrigin", "href", "hreflang", "media", "rel", "sizes", "title", "type" ],
+    "LINK" : [ "crossOrigin", "href", "hreflang", "media", "rel", "sizes", "type" ],
     "MAP" : [ "name" ],
 
     // DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values

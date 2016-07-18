@@ -16,18 +16,41 @@
 ({
     formatValue: function(component) {
         var value = component.get("v.value");
+
+        if ($A.util.isEmpty(value)) {
+            this.setInputValue(component, value);
+            return;
+        }
+
+        var timezone = component.get("v.timezone");
+        var dateValue = value.split("T", 1)[0] || value;
+        var hasTime = dateValue !== value;
+        var helper = this;
+
+        var displayValue = function(date) {
+            var formattedDate = !$A.util.isEmpty(date) ? $A.localizationService.formatDateUTC(date, "YYYY-MM-DD") : "";
+            helper.setInputValue(component, formattedDate);
+        };
+
+        if (hasTime) {
+            this.convertToTimezone(value, timezone, $A.getCallback(displayValue));
+        } else {
+            var parsedDate = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD");
+            displayValue(parsedDate);
+        }
+    },
+
+    convertToTimezone: function(value, timezone, callback) {
+        var date = $A.localizationService.parseDateTimeISO8601(value);
+        if (!$A.util.isUndefinedOrNull(date)) {
+            $A.localizationService.UTCToWallTime(date, timezone, callback);
+        }
+    },
+
+    setInputValue: function(component, displayValue) {
         var inputElement = component.find("inputDateHtml").getElement();
-
-        if (value && inputElement) {
-            var isoDate = $A.localizationService.parseDateTimeISO8601(value);
-            var timezone = component.get("v.timezone");
-
-            $A.localizationService.UTCToWallTime(isoDate, timezone, function(walltime) {
-                // HTML5 date input requires a full date format equal to YYYY-MM-DD.
-                inputElement.value = $A.localizationService.formatDateUTC(walltime, "YYYY-MM-DD");
-            });
-        } else if ($A.util.isEmpty(value)) {
-            inputElement.value = "";
+        if (!$A.util.isUndefinedOrNull(inputElement)) {
+            inputElement.value = displayValue ? displayValue : "";
         }
     }
 });

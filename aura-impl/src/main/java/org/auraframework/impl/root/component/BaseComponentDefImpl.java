@@ -86,12 +86,12 @@ import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonSerializationContext;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.auraframework.util.json.JsonSerializationContext;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
@@ -1326,8 +1326,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     @Override
-    public DefDescriptor<FlavorsDef> getFlavorOverrides() {
-        return flavorOverrides;
+    public DefDescriptor<FlavorsDef> getFlavorOverrides() throws QuickFixException {
+        if (flavorOverrides != null) {
+            return flavorOverrides;
+        }
+        if (extendsDescriptor != null) {
+            return extendsDescriptor.getDef().getFlavorOverrides();
+        }
+        return null;
     }
 
     @Override

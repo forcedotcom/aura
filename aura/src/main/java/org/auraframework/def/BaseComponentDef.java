@@ -163,8 +163,9 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
 
     /**
      * Gets the application-wide default flavor override.
+     * @throws QuickFixException
      */
-    DefDescriptor<FlavorsDef> getFlavorOverrides();
+    DefDescriptor<FlavorsDef> getFlavorOverrides() throws QuickFixException;
 
     /**
      * Gets the default flavor name, or if an explicit defaultFlavor is not specified, and a {@link FlavoredStyleDef}

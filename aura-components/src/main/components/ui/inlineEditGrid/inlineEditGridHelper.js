@@ -66,14 +66,18 @@
             }
 
 			editLayout.attributes.values.value = payload.value;
-			editLayout.attributes.values.errors = payload.errors;
+			// We have to create the component first because ui:input doesn't render the errors on
+			// creation time, but only when being triggered through a change handler.
+			// so, we set the errors via cmp.set in order to trigger the change handler
+			var inputComponent = $A.createComponentFromConfig(editLayout);
+			inputComponent.set("v.errors", payload.errors);
 
             var panelBodyConfig = this.getPanelBodyConfig(cmp, payload.name);
             var panelBodyAttributes = {
                     index : index,
                     submitOn : panelBodyConfig.submitOn,
                     updateMap : panelBodyConfig.updateMap,
-                    inputComponent : $A.createComponentFromConfig(editLayout)
+                    inputComponent : inputComponent
             };
             
             this.displayEditPanel(cmp, panelBodyAttributes, payload.targetElement);

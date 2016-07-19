@@ -240,6 +240,18 @@
              this.verifyCellContent(cmp, 0, 10, '$101.99');
          }]
      },
+     
+     /**
+      * Test column header names.
+      */
+     testColumnHeaderNames : {
+         test : function(cmp) {
+             var expectedColNames = ['Id', 'Name', 'Grade', 'Link', 'Issue Date', 'Passing', 
+                             'Notes', 'Modified', 'Blood Type', 'Progress', 'Dues'];
+             var headers = this.getHeaderRow();
+             this.verifyHeaderColumnNames(expectedColNames, headers);
+         }
+     },
           
 	 triggerEditOnCell : function(cmp, rowIndex, colIndex) {
 		 var tbody = document.getElementsByTagName("tbody")[0];
@@ -436,5 +448,18 @@
          var actual = cellCmp.get('v.edited');
          actual = actual ? actual : false;
          $A.test.assertEquals(isEdited, actual, 'Cell\'s editied status is incorrect');
+	 },
+	 
+	 getHeaderRow : function() {
+	     var thead = document.getElementsByTagName('thead')[0];
+	     return thead.getElementsByTagName('th');
+	 },
+	 
+	 verifyHeaderColumnNames : function(expected, headers) {
+	     $A.test.assertEquals(expected.length, headers.length, 'Number of expected columns incorrect');
+         for (var i=0; i<headers.length; i++) {
+             var colText = $A.test.getText(headers[i]).replace('Sort ', ''); //Ignoring sort assistive text
+             $A.test.assertEquals(expected[i], colText, 'Column header label incorrect');
+         }
 	 }
  })

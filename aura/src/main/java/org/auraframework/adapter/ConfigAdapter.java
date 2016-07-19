@@ -29,8 +29,6 @@ public interface ConfigAdapter extends AuraAdapter {
 
     boolean isProduction();
 
-    boolean isSysAdmin();
-
     Set<Mode> getAvailableModes();
 
     Mode getDefaultMode();
@@ -90,6 +88,12 @@ public interface ConfigAdapter extends AuraAdapter {
      * @return encryption key
      */
     String getEncryptionKey();
+
+    /**
+     * Validate the app.encryptionkey request
+     * @return true if the request has a valid ssid.
+     */
+    boolean validateGetEncryptionKey(String ssid);
 
     boolean isInternalNamespace(String namespace);
     Set<String> getInternalNamespaces();

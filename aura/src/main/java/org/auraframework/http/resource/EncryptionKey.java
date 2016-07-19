@@ -15,14 +15,15 @@
  */
 package org.auraframework.http.resource;
 
-import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.system.AuraContext;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+
+import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.system.AuraContext;
 
 /**
  * Handles /l/{}/app.encryptionkey requests to retrieve encryption key.
@@ -37,13 +38,17 @@ public class EncryptionKey extends AuraResourceImpl {
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
-        String key = configAdapter.getEncryptionKey();
-        System.out.println("RESPONSE="+response);
-        System.out.println("OUTPUTSTREAM="+response.getOutputStream());
-        servletUtilAdapter.setNoCache(response);
-        response.getOutputStream().write(key.getBytes(StandardCharsets.UTF_8));
+        if (this.configAdapter.validateGetEncryptionKey(request.getParameter("ssid"))) {
+            String key = configAdapter.getEncryptionKey();
+            System.out.println("RESPONSE="+response);
+            System.out.println("OUTPUTSTREAM="+response.getOutputStream());
+            servletUtilAdapter.setNoCache(response);
+            response.getOutputStream().write(key.getBytes(StandardCharsets.UTF_8));
+        } else {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        }
     }
-    
+
     public void setConfigAdapter(ConfigAdapter configAdapter) {
     	this.configAdapter = configAdapter;
     }

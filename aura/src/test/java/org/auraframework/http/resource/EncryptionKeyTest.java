@@ -47,10 +47,10 @@ public class EncryptionKeyTest extends UnitTestCase{
     public void testFormat() {
         assertEquals(Format.HTML, new EncryptionKey().getFormat());
     }
-    
-    
+
+
     /**
-     * sanity test : verify we write out encryptionKey to response 
+     * sanity test : verify we write out encryptionKey to response
      * Lin TODO: this needs more work
      */
     @Test
@@ -61,11 +61,11 @@ public class EncryptionKeyTest extends UnitTestCase{
         DummyHttpServletResponse response = new DummyHttpServletResponse() {
             ServletOutputStream out = null;
 
-            @Override 
+            @Override
             public ServletOutputStream getOutputStream() throws IOException {
                 if(out == null) {
                     this.out = new ServletOutputStreamExt();
-                } 
+                }
                 return this.out;
             }
             //just a outputStream we can write to
@@ -108,17 +108,18 @@ public class EncryptionKeyTest extends UnitTestCase{
                 }
             }
         };
-        
+
         String expectedKey = "foo-fah-fum";
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
         Mockito.when(configAdapter.getEncryptionKey()).thenReturn(expectedKey);
+        Mockito.when(configAdapter.validateGetEncryptionKey(Mockito.anyString())).thenReturn(true);
         EncryptionKey encryptionKey = new EncryptionKey();
         encryptionKey.setConfigAdapter(configAdapter);
         encryptionKey.setServletUtilAdapter(servletUtilAdapter);
 
         encryptionKey.write(request, response, null);
-        
+
         assertEquals(expectedKey, response.getOutputStream().toString());
     }
 

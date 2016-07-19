@@ -482,6 +482,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
+    public boolean validateGetEncryptionKey(String ssid) {
+        return true;
+    }
+    
+    @Override
     public long getAuraJSLastMod() {
         regenerateAuraJS();
         return jsGroup != null ? jsGroup.getLastMod() : getBuildTimestamp();
@@ -499,11 +504,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public boolean isClientAppcacheEnabled() {
         return !Boolean.parseBoolean(System.getProperty("aura.noappcache"));
-    }
-
-    @Override
-    public boolean isSysAdmin() {
-        return false;
     }
 
     private static final FileFilter JS_ONLY = new FileFilter() {

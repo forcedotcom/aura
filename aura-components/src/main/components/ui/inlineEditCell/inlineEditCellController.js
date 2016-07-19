@@ -26,6 +26,7 @@
                 payload : {
                     targetElement : cmp.getElement().parentNode,
                     name : cmp.get("v.name"),
+                    errors : cmp.get("v.errors"),
                     value : value
                 }
             }).fire();

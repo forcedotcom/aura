@@ -64,9 +64,10 @@
             if (!editLayout.attributes) {
                 editLayout.attributes = { values : {} };
             }
-            
-            editLayout.attributes.values.value = payload.value;
-            
+
+			editLayout.attributes.values.value = payload.value;
+			editLayout.attributes.values.errors = payload.errors;
+
             var panelBodyConfig = this.getPanelBodyConfig(cmp, payload.name);
             var panelBodyAttributes = {
                     index : index,

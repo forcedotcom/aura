@@ -16,8 +16,17 @@
 
 -->
 <aura:component isTemplate="true" extensible="true" extends="aura:template" style="templateCss://auradocs.template">
+    <aura:set attribute="extraStyleTags">
+        <link rel="stylesheet" href="/auraFW/resources/codemirror/lib/codemirror.css"></link>
+    </aura:set>
     <aura:set attribute="extraScriptTags">
-        <script src="/auraFW/resources/codemirror/js/codemirror.js"></script>
+        <script src="/auraFW/resources/codemirror/lib/codemirror.js"></script>
+        <script src="/auraFW/resources/codemirror/addon/display/autorefresh.js"></script>
+        <script src="/auraFW/resources/codemirror/mode/clike/clike.js"></script>
+        <script src="/auraFW/resources/codemirror/mode/css/css.js"></script>
+        <script src="/auraFW/resources/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+        <script src="/auraFW/resources/codemirror/mode/javascript/javascript.js"></script>
+        <script src="/auraFW/resources/codemirror/mode/xml/xml.js"></script>
     </aura:set>
     <aura:set attribute="title" value="Aura Documentation"/>
     

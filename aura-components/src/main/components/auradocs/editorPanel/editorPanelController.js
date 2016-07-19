@@ -22,5 +22,5 @@
 		});
 		evt.fire();
 		cmp.getDef().getHelper().createCodeMirror(cmp);
-	    }
+	}
 })

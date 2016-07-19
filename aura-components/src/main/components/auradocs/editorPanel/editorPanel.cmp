@@ -24,6 +24,6 @@
     <aura:registerevent name="open" type="auradocs:openDef"/>
 
     <ui:tab title="{!v.title}" aura:id="panel" scroll="true">
-        <div aura:id="container"/>
+        <textarea aura:id="container" name="code">{!m.code}</textarea>
     </ui:tab>
 </aura:component>

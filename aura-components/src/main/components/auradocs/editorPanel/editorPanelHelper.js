@@ -17,64 +17,26 @@
 	createCodeMirror: function(cmp) {
 		var container = cmp.find("container").getElement();
 		var descriptor = cmp.get("v.descriptor");
-	    var stylesheet = "/auraFW/resources/codemirror/css/xmlcolors.css";
-		var parserFile = "parsexml.js";
+		var mode = "htmlmixed";
 		var useLines = true;
         var codeContent = cmp.get("m.code");
 		
 		if (codeContent == null) {
 			useLines = false;
 			codeContent = "(Source code not available for " + descriptor + ")";
-		} else if (descriptor.indexOf("apex://") === 0) {
-			parserFile = ["../contrib/apex/js/tokenizeapex.js", "../contrib/apex/js/parseapex.js"];
-			stylesheet = "/auraFW/resources/codemirror/contrib/apex/css/apexcolors.css";
-		} else if (descriptor.indexOf("java://") === 0) {
-			parserFile = ["../contrib/java/js/tokenizejava.js", "../contrib/java/js/parsejava.js"];
-			stylesheet = "/auraFW/resources/codemirror/contrib/java/css/javacolors.css";
+		} else if (descriptor.indexOf("apex://") === 0 || descriptor.indexOf("java://") === 0) {
+			mode = "text/x-java";
 		} else if (descriptor.indexOf("js://") === 0 || descriptor.indexOf("markup://aura:library") === 0) {
-			parserFile = ["tokenizejavascript.js", "parsejavascript.js"];
-			stylesheet = "/auraFW/resources/codemirror/css/jscolors.css";
+			mode = "javascript";
 		} else if (descriptor.indexOf("css://") === 0) {
-			parserFile = "parsecss.js";
-			stylesheet = "/auraFW/resources/codemirror/css/csscolors.css";
+			mode = "css";
 		}
 
 		/*eslint-disable no-undef*/
-		cmp.codeMirror = new CodeMirror(container, {
-			path: "/auraFW/resources/codemirror/js/",
-			parserfile: parserFile,
-			stylesheet: stylesheet,
-			height: 'dynamic',
-			content: codeContent,
+		cmp.codeMirror = CodeMirror.fromTextArea(container, {
+			mode: mode,
 			lineNumbers: useLines,
-			activeTokens: function(element, token) {
-				if (token.style === 'xml-tagname') {
-					var name = $A.util.trim(token.value);
-					var s = element.style;
-					var on = $A.util.on;
-					on(element,"click", function(e){
-						if (e.ctrlKey || e.metaKey) {
-							cmp.get('c.open').runDeprecated(name);
-							s.textDecoration = 'none';
-							s.fontWeight = 'normal';
-						}
-					});
-
-					on(element,"mouseover", function(e){
-						if (e.ctrlKey || e.metaKey) {
-							s.textDecoration = 'underline';
-							s.fontWeight = 'bold';
-							s.cursor = 'pointer';
-						}
-					});
-
-					on(element,"mouseout", function(){
-						s.textDecoration = 'none';
-						s.fontWeight = 'normal';
-						s.cursor = 'default';
-					});
-				}
-			}
+			autoRefresh: true
 		});
 	}
 })

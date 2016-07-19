@@ -36,7 +36,7 @@
     <aura:if isTrue='{!v.testScriptSource}'> 
         <div>
             <br/>for ScriptSources, we allow same origin, eval(..)  <br/>
-            <script src="/auraFW/resources/codemirror/js/codemirror.js"></script>
+            <script src="/auraFW/resources/codemirror/lib/codemirror.js"></script>
         </div>
         <div>
             <br/>component below will load, but it's custom script is gone<br/> 

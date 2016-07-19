@@ -73,7 +73,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
                 String.format(baseApplicationTag, "render='server'",
                 "<link href='http://www2.sfdcstatic.com/common/assets/css/min/standard-rwd-min.css' rel='stylesheet' type='text/css'/>"
                         +
-                "<script src='/auraFW/resources/codemirror/js/codemirror.js'></script>"));
+                "<script src='/auraFW/resources/codemirror/lib/codemirror.js'></script>"));
         String uri = String.format("/%s/%s.app", appDesc.getNamespace(), appDesc.getName());
 
         openNoAura(uri);

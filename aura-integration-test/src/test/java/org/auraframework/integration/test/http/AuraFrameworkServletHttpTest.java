@@ -404,12 +404,12 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     public void testNonExistentMinifiedResource() throws Exception {
         getMockConfigAdapter().setIsProduction(true);
 
-        HttpGet get = obtainGetMethod("/auraFW/resources/codemirror/js/codemirror.js");
+        HttpGet get = obtainGetMethod("/auraFW/resources/codemirror/lib/codemirror.js");
         HttpResponse httpResponse = perform(get);
         String response = getResponseBody(httpResponse);
 
         checkExpired(httpResponse, "text/javascript");
-        assertTrue(response.contains("function setDefaults("));
+        assertTrue(response.contains("function CodeMirror(place, options)"));
         assertDefaultAntiClickjacking(httpResponse, true, false);
 
         get.releaseConnection();

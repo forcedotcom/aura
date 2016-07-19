@@ -1234,7 +1234,8 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
             Aura["afterBootstrapReady"].push(function () {
                 $A.log('Checking bootstrap signature');
                 Aura["bootstrapUpgrade"] = boot["md5"] !== Aura["appBootstrap"]["md5"];
-            });
+                this.checkBootstrapUpgrade($A.finishedInit);
+            }.bind(this));
         }
 
         // We just have bootstrap data processed either from js or from cache
@@ -1260,6 +1261,19 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
     // Wait for bootstrap.js to arrive
     } else {
         Aura["afterBootstrapReady"].push(this.runAfterBootstrapReady.bind(this, callback));
+    }
+};
+
+/**
+ * Fire an aura:applicationRefreshed application level event if bootstrap returned from server differs from what is
+ * currently loaded from cache. 
+ * 
+ * @param {Boolean} finishedInit true if Aura has finished initializing
+ * @private
+ */
+AuraClientService.prototype.checkBootstrapUpgrade = function(finishedInit) {
+    if (finishedInit && Aura["bootstrapUpgrade"]) {
+        $A.eventService.getNewEvent("markup://aura:applicationRefreshed").fire();
     }
 };
 

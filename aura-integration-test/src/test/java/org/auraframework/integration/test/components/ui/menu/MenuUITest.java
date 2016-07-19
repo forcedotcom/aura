@@ -114,16 +114,7 @@ public class MenuUITest extends WebDriverTestCase {
         waitForFocusOnElement(actionItem2Element);
 
         // actionItem2 is not clickable as it's disabled via markup
-        try {
-            actionItem2Element.click();
-            // The Firefox used in autobuild environments does not throw an exception. Passes locally on Firefox 42.
-            // IE11 doesn't throw an exception either
-            if (getBrowserType() != BrowserType.FIREFOX && getBrowserType() != BrowserType.IE11) {
-                fail("Expected exception trying to click an unclickable element");
-            }
-        } catch (Exception e) {
-            checkExceptionContains(e, WebDriverException.class, "Element is not clickable");
-        }
+        tryToClickDisabledElm(actionItem2Element);
 
         if (verifyLabelUpdate) {
             // click on an item and verify the menu text is updated
@@ -268,9 +259,8 @@ public class MenuUITest extends WebDriverTestCase {
         testMenuCheckboxForApp(MENUTEST_APP);
     }
 
-    //it's a flapper on jenkins, fix and enable please. W-3188508
     @Test
-    public void _testCheckboxMenuGeneratedFromMetaData() throws Exception {
+    public void testCheckboxMenuGeneratedFromMetaData() throws Exception {
         testMenuCheckboxForApp(MENUTEST_METADATA_APP);
     }
 
@@ -281,11 +271,6 @@ public class MenuUITest extends WebDriverTestCase {
         String menuName = "checkboxMenu";
         String menuItem3 = "checkboxItem3";
         String menuItem4 = "checkboxItem4";
-        String globalIdItem3 = getAuraUITestingUtil().getCmpGlobalIdGivenElementClassName(menuItem3);
-        String globalIdItem4 = getAuraUITestingUtil().getCmpGlobalIdGivenElementClassName(menuItem4);
-        String disableValueM4Exp = getAuraUITestingUtil().getValueFromCmpExpression(globalIdItem4, "v.disabled");
-        String selectedValueM4Exp = getAuraUITestingUtil().getValueFromCmpExpression(globalIdItem4, "v.selected");
-        String selectedValueM3Exp = getAuraUITestingUtil().getValueFromCmpExpression(globalIdItem3, "v.selected");
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement menu = driver.findElement(By.className(menuName));
         WebElement button = driver.findElement(By.className("checkboxButton"));
@@ -309,51 +294,46 @@ public class MenuUITest extends WebDriverTestCase {
             Boolean.valueOf(item4Element.getAttribute("aria-checked")));
 
         // verify item4 is disabled and selected
-        assertTrue("Item4 should be disabled", (Boolean) getAuraUITestingUtil().getEval(disableValueM4Exp));
-        assertTrue("Item4 should be selected", (Boolean) getAuraUITestingUtil().getEval(selectedValueM4Exp));
+        assertTrue("Item4 should be disabled", getCmpBoolAttribute(menuItem4, "v.disabled"));
+        assertTrue("Item4 should be selected", getCmpBoolAttribute(menuItem4, "v.selected"));
 
         // item4Element is not clickable as it's disabled via markup
-        try {
-            item4Element.click();
-            // The Firefox used in autobuild environments does not throw an exception. Passes locally on Firefox 42.
-            // IE11 doesn't throw an exception either
-            if (getBrowserType() != BrowserType.FIREFOX && getBrowserType() != BrowserType.IE11) {
-                fail("Expected exception trying to click an unclickable element");
-            }
-        } catch (Exception e) {
-            checkExceptionContains(e, WebDriverException.class, "Element is not clickable");
-        }
+        tryToClickDisabledElm(item4Element);
 
         assertTrue("Item4 aria attribute should be Selected even when clicked",
             Boolean.valueOf(item4Element.getAttribute("aria-checked")));
         assertTrue("Item4 should be Selected even when clicked",
-            (Boolean) getAuraUITestingUtil().getEval(selectedValueM4Exp));
+            getCmpBoolAttribute(menuItem4, "v.selected"));
 
         assertFalse("default: Item3 aria attribute should be Unchecked",
             Boolean.valueOf(item3Element.getAttribute("aria-checked")));
-        assertFalse("default: Item3 should be Unchecked", (Boolean) getAuraUITestingUtil().getEval(selectedValueM3Exp));
+        assertFalse("default: Item3 should be Unchecked",
+            getCmpBoolAttribute(menuItem3, "v.selected"));
 
-        // click on item3
+        // check item3 with click
         item3Element.click();
-        assertTrue("Item3 aria attribute should be Selected after the click",
-            Boolean.valueOf(item3Element.getAttribute("aria-checked")));
-        assertTrue("Item3 should be Selected after the click", (Boolean) getAuraUITestingUtil().getEval(selectedValueM3Exp));
+        getAuraUITestingUtil().waitUntil(check -> {
+            return Boolean.valueOf(item3Element.getAttribute("aria-checked"));
+        }, "Item3 aria attribute should be checked after the click");
+        assertTrue("Item3 v.selected should be true after the click",
+            getCmpBoolAttribute(menuItem3, "v.selected"));
 
-        // click on item3 again
-        // Keys.Enter does not work with chrome v40.0.2214.91
+        // uncheck item3 with ENTER key
+        item3Element.sendKeys(Keys.ENTER);
+        getAuraUITestingUtil().waitUntil(check -> {
+            return !Boolean.valueOf(item3Element.getAttribute("aria-checked"));
+        }, "Item3 aria attribute should be uncheked after pressing ENTER");
+        assertFalse("Item3 v.selected should be false after pressing ENTER",
+            getCmpBoolAttribute(menuItem3, "v.selected"));
+
+        // check item3 with SPACE key
         item3Element.sendKeys(Keys.SPACE);
-        // verify not selected
-        assertFalse("Item3 aria attribute should be Uncheked after Pressing Enter",
-            Boolean.valueOf(item3Element.getAttribute("aria-checked")));
-        assertFalse("Item3 should be Uncheked after Pressing Enter",
-            (Boolean) getAuraUITestingUtil().getEval(selectedValueM3Exp));
-
-        item3Element.sendKeys(Keys.SPACE);
-        assertTrue("Item3 aria attribute should be checked after Pressing Space",
-            Boolean.valueOf(item3Element.getAttribute("aria-checked")));
-        assertTrue("Item3 should be checked after Pressing Space",
-            (Boolean) getAuraUITestingUtil().getEval(selectedValueM3Exp));
-
+        getAuraUITestingUtil().waitUntil(check -> {
+            return Boolean.valueOf(item3Element.getAttribute("aria-checked"));
+        }, "Item3 aria attribute should be checked after pressing SPACE");
+        assertTrue("Item3 v.selected should be true after pressing SPACE",
+            getCmpBoolAttribute(menuItem3, "v.selected"));
+        
         // check if focus changes when you use up and down arrow using keyboard
         item3Element.sendKeys(Keys.DOWN);
         waitForFocusOnElement(item4Element);
@@ -370,8 +350,7 @@ public class MenuUITest extends WebDriverTestCase {
         waitForElementTextPresent(result, "St. Louis Rams,Arizona Cardinals");
     }
 
-    // W-2721266 : disable this test because it's a flapper.
-    public void _testMenuRadio() throws Exception {
+    public void testMenuRadio() throws Exception {
         open(MENUTEST_APP);
         WebDriver driver = this.getDriver();
         String label = "radioMenuLabel";
@@ -379,7 +358,6 @@ public class MenuUITest extends WebDriverTestCase {
         String menuItem3 = "radioItem3";
         String menuItem4 = "radioItem4";
         String menuItem5 = "radioItem5";
-        String disableValueM4Exp = getAuraUITestingUtil().getValueFromCmpRootExpression(menuItem4, "v.disabled");
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement menu = driver.findElement(By.className(menuName));
         WebElement item3 = driver.findElement(By.className(menuItem3));
@@ -394,42 +372,47 @@ public class MenuUITest extends WebDriverTestCase {
         // check for default label present
         assertEquals("label is wrong", "National League West", menuLabel.getText());
         assertFalse("Default: CheckboxMenu list should not be visible", menu.getAttribute("class").contains("visible"));
+
         // open menu list
-        menuLabel.click();
-        // verify menu list is visible
-        assertTrue("CheckboxMenu list should be visible", menu.getAttribute("class").contains("visible"));
-        item3.click();
-        // verify item3 got selected
-        assertTrue("Item3 should be selected after the click", item3Element.getAttribute("class").contains("selected"));
+        openMenu(menuLabel, menu);
+        
+        // click and verify item3 got selected
+        item3Element.click();
+        getAuraUITestingUtil().waitUntil(check -> {
+            return item3Element.getAttribute("class").contains("selected");
+        }, "Item3 should be selected after the click");
 
         // send key to go to item 4 using 'd'
         item3Element.sendKeys("d");
-        // verify focus on item 4
-        assertEquals("Focus should be on item4 after the search", item4Element.getText(),
-            getAuraUITestingUtil().getActiveElementText());
+        waitForFocusOnElement(item4Element);
+
         // verify item is disabled
         assertTrue("Item4 aria attribute should be defaulted to disable",
             Boolean.valueOf(item4Element.getAttribute("aria-disabled")));
-        assertTrue("Item4 should be defaulted to disable", (Boolean) getAuraUITestingUtil().getEval(disableValueM4Exp));
+        assertTrue("Item4 v.disabled should default to true",
+            getCmpBoolAttribute(menuItem4, "v.disabled"));
 
-        // click on item4
-        item4Element.click();
-        // verify item4 should not be selectable
-        assertFalse("Item4 should not be selectable as its disable item",
+        // click on item4 and verify item4 should not be selectable
+        tryToClickDisabledElm(item4Element);
+        assertFalse("Item4 should not be selectable as it's disable item",
             item4Element.getAttribute("class").contains("selected"));
-        // goto item 5 using down arrow
+        
+        // goto item 5 using down arrow and check focus
         item4Element.sendKeys(Keys.DOWN);
-        // verify focus on item 5
-        assertEquals("Focus should be on item5 after pressing down key", item5Element.getText(),
-            getAuraUITestingUtil().getActiveElementText());
+        waitForFocusOnElement(item5Element);
+
         // click on item 5 using space
         item5Element.sendKeys(Keys.SPACE);
-        assertTrue("Item5 should be checked after pressing Space",
-            item5Element.getAttribute("class").contains("selected"));
+        getAuraUITestingUtil().waitUntil(check -> {
+            return item5Element.getAttribute("class").contains("selected");
+        }, "Item5 should be checked after pressing Space");
+
         assertFalse("Item3 should be unchecked after clicking item 5",
             item3Element.getAttribute("class").contains("selected"));
+
         // close the menu using esc key
         item5Element.sendKeys(Keys.ESCAPE);
+
         // check the result
         button.click();
         assertEquals("Checkbox items selected are not correct", "Colorado", result.getText());
@@ -750,4 +733,31 @@ public class MenuUITest extends WebDriverTestCase {
         }, "Menu text not updated after clicking menu item");
     }
 
+    /**
+     * Use javascript expression to get component's attribute,
+     * such as v.disabled, v.selected, etc.
+     */
+    private boolean getCmpBoolAttribute(final String cmpClassName, final String attrName) {
+        String globalIdItem = getAuraUITestingUtil().getCmpGlobalIdGivenElementClassName(cmpClassName);
+        String jsExp = getAuraUITestingUtil().getValueFromCmpExpression(globalIdItem, attrName);
+        return (Boolean) getAuraUITestingUtil().getEval(jsExp);
+    }
+
+    /**
+     * Helper method to click on a disabled item
+     * Non-firebox/IE browsers would throw an exception, so check the exception for those
+     * browsers
+     */
+    private void tryToClickDisabledElm(final WebElement elm) {
+        try {
+            // The Firefox used in autobuild environments does not throw an exception. Passes locally on Firefox 42.
+            // IE11 doesn't throw an exception either
+            if (getBrowserType() != BrowserType.FIREFOX && getBrowserType() != BrowserType.IE11) {
+                elm.click();
+                fail("Expected exception trying to click an unclickable element");
+            }
+        } catch (Exception e) {
+            checkExceptionContains(e, WebDriverException.class, "Element is not clickable");
+        }
+    }
 }

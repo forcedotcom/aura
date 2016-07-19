@@ -285,15 +285,18 @@ AuraExpressionService.prototype.resolveLocatorContext = function (cmp, locatorDe
     if (!locatorDef) {
         return undefined;
     }
+
     var contextDefs = locatorDef["context"];
     if (!contextDefs) {
         return undefined;
     }
+    
     var context = {};
     for (var key in contextDefs) {
-        var unresolvedValue = contextDefs[key];
-        var value = this.create(cmp, unresolvedValue).evaluate();
-        context[key] = value;
+        var expression = this.create(cmp, contextDefs[key]);
+        if (expression) {
+            context[key] = typeof expression === "string" ? expression : expression.evaluate();
+        }
     }
     return context;
 };
@@ -327,7 +330,11 @@ AuraExpressionService.prototype.resolveLocator = function (component, localId) {
         return locator;
     }
 
-    var ownerCmp = component.getComponentValueProvider();    
+    var ownerCmp = component.getComponentValueProvider();
+
+    if (ownerCmp.isInstanceOf('ui:virtualComponent')) {
+        ownerCmp = ownerCmp.getComponentValueProvider();
+    }
     
     var rootLocatorDefs = currentCmp.getDef().getLocatorDefs();
     var rootLocatorDef = rootLocatorDefs && rootLocatorDefs[localId];

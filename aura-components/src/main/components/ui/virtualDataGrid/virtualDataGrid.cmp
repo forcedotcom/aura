@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="PRIVILEGED" extensible="true" support="PROTO" description="Displays a table of data">
+<aura:component access="PRIVILEGED" extensible="true" support="PROTO" implements="ui:virtualComponent" description="Displays a table of data">
 	<aura:import library="ui:virtualDataGridLib" property="lib"/>
     <aura:attribute name="sortBy" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
     

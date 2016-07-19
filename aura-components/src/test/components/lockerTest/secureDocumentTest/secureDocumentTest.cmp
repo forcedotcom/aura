@@ -36,6 +36,7 @@
     <aura:method name="testGetElementsByTagNameForScriptTag" action="{!c.testGetElementsByTagNameForScriptTag}"/>
     <aura:method name="testCreateEvent" action="{!c.testCreateEvent}"/>
     <aura:method name="testDefaultView" action="{!c.testDefaultView}"/>
+    <aura:method name="testDocumentImplementationHTMLDocumentCreation" action="{!c.testDocumentImplementationHTMLDocumentCreation}" />
 
     <div id="title">SecureDocument test</div>
 

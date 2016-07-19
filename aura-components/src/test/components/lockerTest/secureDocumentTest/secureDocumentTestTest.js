@@ -111,5 +111,11 @@
         test: function(cmp) {
             cmp.testDefaultView();
         }
+    },
+
+    testDocumentImplementationHTMLDocumentCreation: {
+        test: function(cmp) {
+            cmp.testDocumentImplementationHTMLDocumentCreation();
+        }
     }
 })

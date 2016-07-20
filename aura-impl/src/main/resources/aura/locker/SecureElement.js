@@ -525,3 +525,5 @@ SecureElement.elementSpecificMethodWhitelists = {
     "SVG" : [ "createSVGRect" ],
     "VIDEO" : [ "addTextTrack", "canPlayType", "load", "play", "pause" ]
 };
+
+Aura.Locker.SecureElement = SecureElement;

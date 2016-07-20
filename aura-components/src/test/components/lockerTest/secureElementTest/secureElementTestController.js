@@ -248,5 +248,14 @@
         var parent = div.parentNode;
         testUtils.assertNotNull(parent, "parentNode of element nested in opaque element should not return null");
         testUtils.assertEquals("outsideFacet", parent.id, "parentNode should be first non-opaque element in parent chain")
+    },
+
+    testLinkElement: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var link = document.createElement("LINK");
+
+        testUtils.assertDefined(link.title, "property 'title' is not defined");
+        testUtils.assertStartsWith("SecureElement", link.toString(),
+            "Link element should be SecureElement")
     }
 })

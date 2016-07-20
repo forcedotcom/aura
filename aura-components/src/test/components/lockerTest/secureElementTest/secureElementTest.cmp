@@ -58,6 +58,8 @@
     <aura:method name="testNoAccessToParentNodeReturnsNull" action="{!c.testNoAccessToParentNodeReturnsNull}"/>
     <aura:method name="testParentNodeInsideOpaqueObject" action="{!c.testParentNodeInsideOpaqueObject}"/>
 
+    <aura:method name="testLinkElement" action="{!c.testLinkElement}"/>
+
     <lockerTest:facet/>
 
     <div aura:id="title" class="title" id="title">SecureElement test</div>

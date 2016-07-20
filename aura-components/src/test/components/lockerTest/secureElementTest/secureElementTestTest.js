@@ -493,10 +493,16 @@
             cmp.testNoAccessToParentNodeReturnsNull();
         }
     },
-    
+
     testParentNodeInsideOpaqueObject: {
         test: function(cmp) {
             cmp.testParentNodeInsideOpaqueObject();
+        }
+    },
+
+    testLinkElement:{
+        test: function(cmp) {
+            cmp.testLinkElement();
         }
     }
 })

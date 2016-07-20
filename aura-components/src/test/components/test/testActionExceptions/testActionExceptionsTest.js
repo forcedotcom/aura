@@ -17,82 +17,109 @@
 
 
     testThrowable: {
-        attributes : { throwableClass:"java.lang.Throwable",
-                       throwableCause:"couldn't decide" },
+        attributes : {
+            throwableClass:"java.lang.Throwable",
+            throwableCause:"couldn't decide"
+        },
         test: function(cmp){
-            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.components.test.java.controller.JavaTestController: " +
-                                                "java.lang.Throwable: couldn't decide");
+            var expectedMessage = "java://org.auraframework.components.test.java.controller.JavaTestController: " +
+                    "java.lang.Throwable: couldn't decide";
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", expectedMessage);
         }
     },
 
     testRuntimeException: {
-        attributes : { throwableClass:"java.lang.RuntimeException",
-                       throwableCause:"java.lang.IllegalAccessException" },
+        attributes : {
+            throwableClass:"java.lang.RuntimeException",
+            throwableCause:"java.lang.IllegalAccessException"
+        },
         test: function(cmp){
-            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.components.test.java.controller.JavaTestController: " +
-                                                "java.lang.RuntimeException: java.lang.IllegalAccessException");
+            var expectedMessage = "java://org.auraframework.components.test.java.controller.JavaTestController: " +
+                    "java.lang.RuntimeException: java.lang.IllegalAccessException";
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", expectedMessage);
         }
     },
 
     testError: {
-        attributes : { throwableClass:"java.lang.Error",
-                       throwableCause:"java.lang.RuntimeException" },
+        attributes : {
+            throwableClass:"java.lang.Error",
+            throwableCause:"java.lang.RuntimeException"
+        },
         test: function(cmp){
-        	this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.components.test.java.controller.JavaTestController: " +
-                                                "java.lang.Error: java.lang.RuntimeException");
+            var expectedMessage = "java://org.auraframework.components.test.java.controller.JavaTestController: " +
+                    "java.lang.Error: java.lang.RuntimeException";
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", expectedMessage);
         }
     },
 
     testInvocationTargetException: {
-        attributes : { throwableClass:"java.lang.reflect.InvocationTargetException",
-                       throwableCause:"java.lang.IllegalArgumentException" },
+        attributes : {
+            throwableClass:"java.lang.reflect.InvocationTargetException",
+            throwableCause:"java.lang.IllegalArgumentException"
+        },
         test: function(cmp){
-            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.components.test.java.controller.JavaTestController: " +
-                                                "java.lang.reflect.InvocationTargetException");
+            var expectedMessage = "java://org.auraframework.components.test.java.controller.JavaTestController: " +
+                    "java.lang.reflect.InvocationTargetException";
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", expectedMessage);
         }
     },
 
     testInvocationTargetExceptionHanlded: {
-        attributes : { throwableClass:"java.lang.reflect.InvocationTargetException",
-                       throwableCause:"aura.throwable.AuraHandledException" },
+        attributes : {
+            throwableClass:"java.lang.reflect.InvocationTargetException",
+            throwableCause:"aura.throwable.AuraHandledException"
+        },
         test: function(cmp){
-            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.components.test.java.controller.JavaTestController: " +
-                                                "java.lang.reflect.InvocationTargetException");
+            var expectedMessage = "java://org.auraframework.components.test.java.controller.JavaTestController: " +
+                    "java.lang.reflect.InvocationTargetException";
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", expectedMessage);
         }
     },
 
     testIllegalArgumentException: {
-        attributes : { throwableClass:"java.lang.IllegalArgumentException",
-                       throwableCause:"you're not listening" },
+        attributes : {
+            throwableClass:"java.lang.IllegalArgumentException",
+            throwableCause:"you're not listening"
+        },
         test: function(cmp){
-            this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.components.test.java.controller.JavaTestController: " +
-                                                "java.lang.IllegalArgumentException: you're not listening");
+            var expectedMessage = "java://org.auraframework.components.test.java.controller.JavaTestController: " +
+                    "java.lang.IllegalArgumentException: you're not listening";
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", expectedMessage);
         }
     },
 
     testIllegalAccessException: {
-        attributes : { throwableClass:"java.lang.IllegalAccessException",
-                       throwableCause:"under 21" },
+        attributes : {
+            throwableClass:"java.lang.IllegalAccessException",
+            throwableCause:"under 21"
+        },
         test: function(cmp){
-        	this.checkUnHandledExceptionResponse(cmp, "ERROR", "java://org.auraframework.components.test.java.controller.JavaTestController: " +
-                                                "java.lang.IllegalAccessException: under 21");
+            var expectedMessage = "java://org.auraframework.components.test.java.controller.JavaTestController: " +
+                    "java.lang.IllegalAccessException: under 21";
+            this.checkUnHandledExceptionResponse(cmp, "ERROR", expectedMessage);
         }
     },
 
     testAuraHandledException: {
-        attributes : { throwableClass:"aura.throwable.AuraHandledException",
-                       throwableCause:"java.lang.IllegalArgumentException" },
+        attributes : {
+            throwableClass:"aura.throwable.AuraHandledException",
+            throwableCause:"java.lang.IllegalArgumentException"
+        },
         test: function(cmp){
-            this.checkHandledExceptionResponse(cmp, "ERROR", "", "org.auraframework.throwable.AuraHandledException");
+            var expectedStack = "org.auraframework.throwable.AuraHandledException";
+            this.checkHandledExceptionResponse(cmp, "ERROR", "", expectedStack);
         }
     },
 
     testAuraHandledExceptionString: {
-        attributes : { throwableClass:"aura.throwable.AuraHandledException",
-                       throwableCause:"something to say" },
-        test: function(cmp){
-            this.checkHandledExceptionResponse(cmp, "ERROR", "something to say", "org.auraframework.throwable.AuraHandledException: " +
-                                                                    "something to say");
+        attributes : {
+            throwableClass: "aura.throwable.AuraHandledException",
+            throwableCause: "something to say"
+        },
+        test: function(cmp) {
+            var expectedMessage = "something to say";
+            var expectedStack = "org.auraframework.throwable.AuraHandledException: something to say";
+            this.checkHandledExceptionResponse(cmp, "ERROR", expectedMessage, expectedStack);
         }
     },
 
@@ -104,13 +131,33 @@
      * to create and verify behavior of an access context-less XHR receive loop.
      */
     testXhrLevelException: {
-        attributes : { throwableClass:"aura.throwable.AuraHandledException",
-                       throwableCause:"something to say" },
         test: [
             function(cmp){
                 // set an invalid token to trigger an XHR-level exception event
                 $A.clientService.resetToken("invalid");
-                this.checkHandledExceptionResponse(cmp, "ERROR", "Received exception event from server", "Error: Received exception event from server");
+
+                cmp.find("trigger").get("e.press").fire();
+                $A.test.addWaitForWithFailureMessage(true, function(){ return !!cmp.get("v.response");},
+                    "response attribute is never set",
+                    function() {
+                        var action = cmp.get("v.response");
+                        $A.test.assertEquals("ERROR", action.state, "Found unexpected state");
+
+                        var msg = action.error[0].message;
+                        var expectedMessage = "Received exception event from server";
+                        $A.test.assertStartsWith(expectedMessage, msg, "Found unexpected error message");
+
+                        // For client side error, different browsers may have different format of stacktrace.
+                        // Only check stack exists.
+                        // On IE, stack is added when error is thrown. For error in action, we create a new Error
+                        // instance in AuraClientService.prototype.processErrors, so there is no stack for IE.
+                        var stack = action.error[0].stack;
+                        var browser = $A.get("$Browser");
+                        if(!browser.isIE10 || !browser.isIE11) {
+                            $A.test.assertTrue(stack.length > 0, "Unexpected stack: " + stack);
+                        }
+                    }
+                );
             },
             function(cmp) {
                 $A.test.assertTrue(cmp.get("v.invalidSessionReceived"), "aura:invalidSession event was not fired / received");
@@ -118,23 +165,23 @@
         ]
     },
 
-
-
     //Because AuraHandledExceptions are treated differently
     checkHandledExceptionResponse : function(cmp, expectedState, expectedMessage, expectedStack){
         cmp.find("trigger").get("e.press").fire();
-        $A.test.runAfterIf(
-            function(){ return cmp.get("v.response"); },
-            function(){
+        $A.test.addWaitForWithFailureMessage(true, function(){ return !!cmp.get("v.response");},
+            "response attribute is never set",
+            function() {
                 var action = cmp.get("v.response");
                 var msg = action.error[0].message;
                 var stack = action.error[0].stack;
-                $A.test.assertEquals(expectedState, action.state, "Unexpected state: ");
+                $A.test.assertEquals(expectedState, action.state, "Found unexpected state");
+
                 if(expectedMessage){
-                    $A.test.assertTrue(msg.indexOf(expectedMessage)==0, "Unexpected error message: ");
+                    $A.test.assertStartsWith(expectedMessage, msg, "Found unexpected error message");
                 }
+
                 if(expectedStack){
-                	$A.test.assertTrue(stack.indexOf(expectedStack) === 0, "Unexpected stack: " + stack);
+                    $A.test.assertTrue(stack.indexOf(expectedStack) > -1, "Unexpected stack: " + stack);
                 }
             }
         );
@@ -151,15 +198,15 @@
                 $A.test.assertEquals(expectedState, action.state, "Unexpected state: ");
                 if(expectedMessage){
                     $A.test.assertNotNull(
-                    		msg.match(/^An internal server error has occurred\nError ID:.*\n\norg\.auraframework\.throwable\.AuraExecutionException:/)
-                    		||
-                    		msg.match(/^Unable to process your request\n\norg\.auraframework\.throwable\.AuraExecutionException:/)
+                            msg.match(/^An internal server error has occurred\nError ID:.*\n\norg\.auraframework\.throwable\.AuraExecutionException:/)
+                            ||
+                            msg.match(/^Unable to process your request\n\norg\.auraframework\.throwable\.AuraExecutionException:/)
                     );
-                	$A.test.assertTrue(msg.indexOf(expectedMessage)!= -1,
-                			"Expected error message not seen: Expected {"+expectedMessage+"} but saw {"+msg+"}");
+                    $A.test.assertTrue(msg.indexOf(expectedMessage)!= -1,
+                            "Expected error message not seen: Expected {"+expectedMessage+"} but saw {"+msg+"}");
                 }
                 if(expectedStack){
-                	$A.test.assertTrue(stack.indexOf(expectedStack) === 0, "Unexpected stack: " + stack);
+                    $A.test.assertTrue(stack.indexOf(expectedStack) === 0, "Unexpected stack: " + stack);
                 } else {
                     $A.test.assertTrue(stack.indexOf("org.auraframework.throwable.AuraUnhandledException: ") === 0, "Unexpected stack: " + stack);
                 }

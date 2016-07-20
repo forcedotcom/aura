@@ -43,7 +43,7 @@
             <ui:outputTextArea value="{!row.data.notes}" />
         </ui:inlineEditCell>
         <ui:inlineEditCell name="modDateTime">
-            <ui:outputDateTime value="{!row.data.modDateTime}" />
+            <ui:outputDateTime value="{!row.data.modDateTime}"/>
         </ui:inlineEditCell>
         <ui:inlineEditCell aura:id="url" name="url">
             <ui:outputURL value="{!row.data.url}" />

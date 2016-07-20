@@ -81,9 +81,11 @@
                 var rowItem = cmp.find("grid").get("v.items")[0];
                 var actual = rowItem.data.checkbox;
                 $A.test.assertTrue(actual, "The checkbox should be checked");
+                
                 var cell = this.getCell(0, 4);
                 var cellElm = cell.querySelector("span > img");
                 $A.test.assertTrue($A.util.hasClass(cellElm, "checked"), "The dom isn't displaying correctly");
+                
                 cell = this.getCell(0, 3);
                 cellElm = cell.querySelector("span.uiOutputDate");
                 $A.test.assertNotNull($A.test.getText(cellElm), "The dom isn't displaying Date");
@@ -93,17 +95,27 @@
                 var rowItem = cmp.find("grid").get("v.items")[1];
                 var actual = rowItem.data.checkbox;
                 $A.test.assertFalse(actual, "The checkbox shouldn't be checked");
+                
                 var cell = this.getCell(1, 4);
                 var cellElm = cell.querySelector("span > img");
                 $A.test.assertTrue($A.util.hasClass(cellElm, "unchecked"), "The dom isn't displaying correctly");
+                
                 cell = this.getCell(2, 5);
                 cellElm = cell.querySelector("span.uiOutputTextArea");
                 $A.test.assertEquals($A.test.getText(cellElm), "special string that is long with special char!@#$%^&*()", "The dom isn't displaying output text");
-                var expectedDateText = "Jan 1, 2000";
+                
                 cell = this.getCell(3, 6);
+                var expectedDateText = "Jan 1, 2000";
+                var d = new Date(Date.UTC(2000, 0, 1, 0, 0, 0)); // when running on autobuilds datetime gets set in UTC
+                var darr = d.toString().split(' ');
+                var expectedDateText2 = darr[1] + ' ' + darr[2] + ', ' + darr[3];
                 cellElm = cell.querySelector("span.uiOutputDateTime");
                 var cellText = $A.test.getText(cellElm);
-                $A.test.assertTrue((cellText.indexOf(expectedDateText) >= 0), "The dom isn't displaying dateTime");
+                $A.test.assertTrue((cellText.indexOf(expectedDateText) >= 0) ||
+                        (cellText.indexOf(expectedDateText2) >= 0), "The dom isn't displaying dateTime. " +
+                        "Expected either " + expectedDateText + " or " + expectedDateText2 + " in " + cellText +
+                        ". Client locale = " + $A.get('$Locale').timezone + ". Timezone = " + d.getTimezoneOffset());
+                
                 cell = this.getCell(4, 7);
                 $A.test.assertEquals(cell.querySelectorAll('[href*="www.salesforce.com"]').length, 1, "There is no outputURL in the dom");
                 cell = this.getCell(1, 8);

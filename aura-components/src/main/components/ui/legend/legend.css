@@ -13,19 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    doInit : function(component, event, helper) {
-        var today = new Date();
-        component.set('v.today', today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate());
-    },
 
-    setOutput : function(component, event, helper) {
-    	var cmpMsg = component.find("msg");
-    	$A.util.removeClass(cmpMsg, 'hide');
-        var expdate = component.find("expdate").get("v.value");
+.THIS.uiLegend-left, .THIS.uiLegend-bottom {
+	float: left;
+}
 
-        var oDate = component.find("oDate");
-        oDate.set("v.value", expdate);
-
-    }
-})
+.THIS.uiLegend-right {
+	float: right;
+}

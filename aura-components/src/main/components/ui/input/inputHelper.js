@@ -15,73 +15,118 @@
  */
 ({
     buildBody: function (component) {
-        var innerBody = component.get("v.body")
-            , labelAttribute = component.get("v.label")
-            , body = []
-            , domId
-            , labelPositionAttribute
-            , labelClass
-            , labelDisplay
-            , requiredIndicator
-            , labelComponent
-            , divComponent;
+        var labelAttribute = component.get("v.label");
+        var isCompound = component.get("v.isCompound");
+        var innerBody;
+        var body = [];
+        var wrapperTag;
+        var wrapperComponent;
 
         if (!$A.util.isEmpty(labelAttribute)) {
+            if (isCompound) {
+                wrapperTag = 'fieldset';
+                innerBody = this.addLegendToBody(component, labelAttribute);
+            } else {
+                wrapperTag = 'div';
+                innerBody = this.addLabelToBody(component, labelAttribute);
+            }
 
-            // setting attributes
-            domId = this.getGlobalId(component);
-            labelPositionAttribute = this.checkValidPosition(component.get("v.labelPosition"));
-            labelClass = component.get("v.labelClass") + " uiLabel-" + labelPositionAttribute + " form-element__label";
-            labelDisplay = labelPositionAttribute !== "hidden";
-            requiredIndicator = labelDisplay && component.get("v.required") ? component.get("v.requiredIndicator") : null;
-
-            // creating label component
-            labelComponent = $A.createComponentFromConfig({
-                descriptor: 'markup://ui:label',
-                localId: 'inputLabel',
-                valueProvider: component,
-                attributes: {
-                    label: labelAttribute,
-                    "class": labelClass,
-                    "for": domId,
-                    labelDisplay: labelDisplay,
-                    title: component.get("v.labelTitle"),
-                    requiredIndicator: requiredIndicator
-                }
-            }); 
-            
-            // Inserting label inside of innerBody
-            (labelPositionAttribute === 'left' || labelPositionAttribute === 'top') ?
-                innerBody.unshift(labelComponent) : innerBody.push(labelComponent);
-
-            // creating HTML div
-            divComponent = $A.createComponentFromConfig({
+            // creating HTML div (simple input) or fieldset (compound input)
+            wrapperComponent = $A.createComponentFromConfig({
                 descriptor: 'markup://aura:html',
                 attributes: {
                     body: innerBody,
-                        tag: 'div',
-                        "class": "form-element"
-                    }
-                });
+                    tag: wrapperTag,
+                    "class": "form-element"
+                }
+            });
 
             // Setting new body
-            body.push(divComponent);
+            body.push(wrapperComponent);
             component.set("v.body", body);
         }
     },
+
+    addLabelToBody: function (component, labelAttribute) {
+        var innerBody = component.get("v.body");
+
+        // setting attributes
+        var domId = this.getGlobalId(component);
+        var labelPositionAttribute = this.checkValidPosition(component.get("v.labelPosition"));
+        var labelClass = component.get("v.labelClass") + " uiLabel-" + labelPositionAttribute + " form-element__label";
+        var labelDisplay = labelPositionAttribute !== "hidden";
+        var requiredIndicator = labelDisplay && component.get("v.required") ? component.get("v.requiredIndicator") : null;
+
+        // creating label component
+        var labelComponent = $A.createComponentFromConfig({
+            descriptor: 'markup://ui:label',
+            localId: 'inputLabel',
+            valueProvider: component,
+            attributes: {
+                label: labelAttribute,
+                "class": labelClass,
+                "for": domId,
+                labelDisplay: labelDisplay,
+                title: component.get("v.labelTitle"),
+                requiredIndicator: requiredIndicator
+            }
+        });
+
+        // Inserting label inside of innerBody
+        if (labelPositionAttribute === 'left' || labelPositionAttribute === 'top') {
+            innerBody.unshift(labelComponent);
+        } else {
+            innerBody.push(labelComponent);
+        }
+
+        return innerBody;
+    },
+
+    addLegendToBody: function (component, labelAttribute) {
+        var innerBody = component.get("v.body");
+
+        // setting attributes
+        var labelPositionAttribute = this.checkValidPosition(component.get("v.labelPosition"));
+        var labelClass = component.get("v.labelClass") + " uiLegend-" + labelPositionAttribute + " form-element__label";
+        var labelDisplay = labelPositionAttribute !== "hidden";
+        var requiredIndicator = labelDisplay && component.get("v.required") ? component.get("v.requiredIndicator") : null;
+
+        // creating legend component
+        var legendComponent = $A.createComponentFromConfig({
+            descriptor: 'markup://ui:legend',
+            localId: 'inputLabel',
+            valueProvider: component,
+            attributes: {
+                legend: labelAttribute,
+                "class" : labelClass,
+                labelDisplay: labelDisplay,
+                title: component.get("v.labelTitle"),
+                requiredIndicator: requiredIndicator
+            }
+        });
+
+        // Inserting legend inside of innerBody
+        if (labelPositionAttribute === 'bottom') {
+            innerBody.push(legendComponent);
+        } else {
+            innerBody.unshift(legendComponent);
+        }
+
+        return innerBody;
+    },
     /**
-     * The reason for passing a fieldHelpComponent instead of setting a 
-     * fieldHelp string is because we want to handle the tooltip differently 
-     * on SFX and S1. Adding the switch logic to a generic ui:input component 
-     * didn't seem like the best way to do it. Also it would have dependencies on 
+     * The reason for passing a fieldHelpComponent instead of setting a
+     * fieldHelp string is because we want to handle the tooltip differently
+     * on SFX and S1. Adding the switch logic to a generic ui:input component
+     * didn't seem like the best way to do it. Also it would have dependencies on
      * components like force:icon which is not in the ui namespace.
      **/
     renderFieldHelpComponent: function(component){
     	var fieldHelpComponent = component.get('v.fieldHelpComponent');
-		if($A.util.isArray(fieldHelpComponent)  && 
-		   !$A.util.isEmpty(fieldHelpComponent)	&& 
+		if($A.util.isArray(fieldHelpComponent)  &&
+		   !$A.util.isEmpty(fieldHelpComponent)	&&
 		   fieldHelpComponent[0].isInstanceOf('ui:tooltip')){
-			
+
 		var labelComponent = component.find('inputLabel');
 	    	labelComponent.get('v.body').push(fieldHelpComponent[0]);
 	    }

@@ -25,6 +25,9 @@
     <aura:attribute name="timePlaceholder" type="String" description="The text that is displayed for time input by default. Set during init based on the 'format' value."/>
     <aura:attribute name="loadDatePicker" type="Boolean" default="true" description="Set to true to load the date picker. The default is true."/>
 
+    <aura:set attribute="isCompound" value="true"/>
+    <aura:set attribute="labelPosition" value="top"/>
+
     <aura:dependency resource="markup://ui:inputDateTimeHtml" type="COMPONENT"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>

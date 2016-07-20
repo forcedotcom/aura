@@ -31,7 +31,7 @@
             resizer._resizerComponentSet = {};
             resizer._resizing = false;
 
-            resizer._resizer = function() {
+            resizer._resizer = $A.getCallback(function() {
                 if (!resizer._resizing) {
                     resizer._resizing = true;
 
@@ -50,7 +50,7 @@
                         }
                     }), 0);
                 }
-            };
+            });
 
             $A.util.on(window, "resize", resizer._resizer, false, 400);
         }

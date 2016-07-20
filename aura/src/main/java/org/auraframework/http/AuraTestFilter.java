@@ -155,7 +155,7 @@ public class AuraTestFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
             IOException {
 
-        if (!configAdapter.isTestAllowed()) {
+        if (Aura.getConfigAdapter().isProduction()) {
             chain.doFilter(req, res);
             return;
         }

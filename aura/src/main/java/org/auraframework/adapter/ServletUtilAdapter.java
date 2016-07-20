@@ -25,7 +25,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.AuraContext;
@@ -34,13 +33,6 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.AuraResource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-/**
- * <p>
- * Service for responding to requests from a Aura Client.
- * </p>
- * Instances of all AuraServices should be retrieved from {@link Aura} </p> Note that this service is rather incomplete
- * and should be expanded to include more of the support routines from the servlets.
- */
 public interface ServletUtilAdapter extends AuraAdapter {
     String AURA_PREFIX = "aura.";
     String CSRF_PROTECT = "while(1);\n";

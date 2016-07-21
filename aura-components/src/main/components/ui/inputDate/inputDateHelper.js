@@ -32,42 +32,20 @@
     },
 
     displayValue: function(component) {
-        var value = component.get("v.value");
-        var langLocale = component.get("v.langLocale");
-        var inputValue = value;
-        var date;
-
-        if ($A.util.isEmpty(value)) {
-            this.setInputValue(component, value);
-            return;
-        }
-
-        // since v.value is in UTC format like "2015-08-10T04:00:00.000Z", we want to make sure the date portion is valid
-        var dateValue = value.split("T", 1)[0] || value;
-        date = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", langLocale, true);
-
-        if ($A.util.isEmpty(date)) {
-            this.setInputValue(component, value);
-            return;
-        }
-
-        var format = component.get("v.format");
-        var timezone = component.get("v.timezone");
-        var hasTime = dateValue !== value;
-        var helper = this;
-
-        var displayValue = function (convertedDate) {
-            var translatedDate = $A.localizationService.translateToOtherCalendar(convertedDate);
-            inputValue = $A.localizationService.formatDateUTC(translatedDate, format, langLocale);
-
-            helper.setInputValue(component, inputValue);
+        var config = {
+            langLocale : component.get("v.langLocale"),
+            format : component.get("v.format"),
+            timezone : component.get("v.timezone"),
+            validateString : true
         };
 
-        if (hasTime) {
-            this.convertToTimezone(value, timezone, $A.getCallback(displayValue));
-        } else {
-            displayValue(date);
-        }
+        var helper = this;
+        var displayValue = function (returnValue) {
+            helper.setInputValue(component, returnValue);
+        };
+
+        var value = component.get("v.value");
+        this.dateTimeLib.dateTimeService.getDisplayValue(value, config, displayValue);
     },
 
     displayDatePicker: function(component) {
@@ -221,13 +199,6 @@
         var dateValue = event.getParam("value") || event.getParam("arguments").value;
         if (dateValue) {
             component.set("v.value", dateValue);
-        }
-    },
-
-    convertToTimezone: function(value, timezone, callback) {
-        var date = $A.localizationService.parseDateTimeISO8601(value);
-        if (!$A.util.isUndefinedOrNull(date)) {
-            $A.localizationService.UTCToWallTime(date, timezone, callback);
         }
     },
 

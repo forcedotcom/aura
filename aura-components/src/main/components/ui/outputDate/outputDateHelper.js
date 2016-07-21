@@ -15,23 +15,30 @@
  */
 ({
     formatDate: function(component) {
-        var value = component.get("v.value");
-        var format = component.get("v.format");
-        var langLocale = component.get("v.langLocale") || $A.get("$Locale.langLocale");
-        var displayValue = value ? value : "";
-        if (value) {
-            var d = $A.localizationService.parseDateTimeUTC(value, "YYYY-MM-DD", langLocale);
-            if (d) {
-                d = $A.localizationService.translateToOtherCalendar(d);
-                var v = $A.localizationService.formatDateUTC(d, format, langLocale);
-                displayValue = v ? v : displayValue;
-            }
-        }
+        var config = {
+            langLocale : component.get("v.langLocale"),
+            format : component.get("v.format"),
+            timezone : component.get("v.timezone"),
+            validateString : true
+        };
 
-        var outputCmp = component.find("span");
-        var elem = outputCmp ? outputCmp.getElement() : null;
-        if (elem) {
-            elem.textContent = elem.innerText = $A.localizationService.translateToLocalizedDigits(displayValue);
+        var helper = this;
+        var displayValue = function (returnValue) {
+            helper.setOutputValue(component, returnValue);
+        };
+
+        var value = component.get("v.value");
+        this.dateTimeLib.dateTimeService.getDisplayValue(value, config, displayValue);
+    },
+
+    setOutputValue: function(component, displayValue) {
+        var outputElement = component.find("span").getElement();
+        if (!$A.util.isUndefinedOrNull(outputElement)) {
+            var textContent = displayValue ? $A.localizationService.translateToLocalizedDigits(displayValue) : "";
+            outputElement.textContent = textContent;
+
+            // I think this was added for older versions of IE that didn't support textContent.
+            outputElement.innerText = textContent;
         }
     }
 })// eslint-disable-line semi

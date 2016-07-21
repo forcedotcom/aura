@@ -26,6 +26,8 @@
     <aura:registerEvent name="openPicker" type="ui:openPicker" description="The event fired when the date picker is opened."/>
     <aura:handler name="openPicker" action="{!c.openDatePicker}"/>
 
+    <aura:import library="ui:dateTimeLib" property="dateTimeLib"/>
+
     <aura:if isTrue="{!$Browser.isPhone || $Browser.isTablet}">
         <input aura:id="inputText" id="{!v.domId}" class="{!v.class + ' input'}" type="text" placeholder="{!v.placeholder}" readonly="true" onclick="{!c.click}" aria-describedby="{!v.ariaDescribedBy}"/>
 

@@ -15,36 +15,19 @@
  */
 ({
     formatValue: function(component) {
-        var value = component.get("v.value");
-
-        if ($A.util.isEmpty(value)) {
-            this.setInputValue(component, value);
-            return;
-        }
-
-        var timezone = component.get("v.timezone");
-        var dateValue = value.split("T", 1)[0] || value;
-        var hasTime = dateValue !== value;
-        var helper = this;
-
-        var displayValue = function(date) {
-            var formattedDate = !$A.util.isEmpty(date) ? $A.localizationService.formatDateUTC(date, "YYYY-MM-DD") : "";
-            helper.setInputValue(component, formattedDate);
+        var config = {
+            format : "YYYY-MM-DD",
+            timezone : component.get("v.timezone"),
+            validateString : false
         };
 
-        if (hasTime) {
-            this.convertToTimezone(value, timezone, $A.getCallback(displayValue));
-        } else {
-            var parsedDate = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD");
-            displayValue(parsedDate);
-        }
-    },
+        var helper = this;
+        var displayValue = function (returnValue) {
+            helper.setInputValue(component, returnValue);
+        };
 
-    convertToTimezone: function(value, timezone, callback) {
-        var date = $A.localizationService.parseDateTimeISO8601(value);
-        if (!$A.util.isUndefinedOrNull(date)) {
-            $A.localizationService.UTCToWallTime(date, timezone, callback);
-        }
+        var value = component.get("v.value");
+        this.dateTimeLib.dateTimeService.getDisplayValue(value, config, displayValue);
     },
 
     setInputValue: function(component, displayValue) {

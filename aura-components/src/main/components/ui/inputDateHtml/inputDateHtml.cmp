@@ -20,6 +20,8 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
+    <aura:import library="ui:dateTimeLib" property="dateTimeLib"/>
+
     <!-- update the value binding on blur, which is the event fired when the date/time picker is dismissed -->
     <aura:set attribute="updateOn" value="blur"/>
 

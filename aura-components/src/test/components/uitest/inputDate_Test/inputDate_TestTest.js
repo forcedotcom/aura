@@ -143,7 +143,7 @@
     /**
      * Acessibility test, making sure that any functionality added is still accessible
      */
-    testAccessibile: {
+    testAccessible: {
         browsers: ['DESKTOP'],
         attributes: {value: "2038-09-10", format: "MM-dd-yyyy"},
         test: [function (cmp) {
@@ -156,7 +156,7 @@
     /**
      * Acessibility test, making sure that any functionality added is still accessible
      */
-    testMobileAccessibile: {
+    testMobileAccessible: {
         browsers: ['MOBILE'],
         attributes: {value: "2038-09-10"},
         test: function (cmp) {

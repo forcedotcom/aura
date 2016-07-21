@@ -24,8 +24,8 @@
       after datePicker show up, click me or any other place on the page to make it disappear
     </div>
     <ui:outputText class="outputStatus" aura:id="outputStatus" value=""/><br/><br/>
-    <ui:label for="datePickerTestCmp" label="date picker with label" />
     <ui:inputDate aura:id="datePickerTestCmp"
+                label="date picker with label"
                 displayDatePicker="true"
                 class="date_input_box"
                 timezone="{!v.timezone}"

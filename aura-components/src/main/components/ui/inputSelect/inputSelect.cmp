@@ -29,7 +29,8 @@
     <!-- The size attribute behaviors weird in Google Chrome and Safari. -->
     <aura:attribute name="size" type="Integer" default="1" description="The number of options displayed at one time. Default value is &#8220;1&#8221;."/>
 
-    <aura:attribute name="useMenu" type="Boolean" default="false"/>
+    <aura:attribute name="useMenu" type="Boolean" default="false" description="Use a ui:menu to show the options, only works with v.options provided items."/>
+
     <aura:attribute access="PRIVATE" name="selectedLabel" type="String"/>
     <aura:attribute access="PRIVATE" name="renderBody" type="Boolean" default="false"/>
 

@@ -68,8 +68,9 @@
             return;
         }
 
-        cmp._createMenuItems = false;
+        helper.updateMenuListWidth(cmp);
 
+        cmp._createMenuItems = false;
         helper.createMenuItems(cmp);
     }
 

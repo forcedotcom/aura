@@ -32,6 +32,19 @@
         }
     },
 
+    updateMenuListWidth: function(cmp) {
+        var menuListElement = cmp.find("options").getElement();
+        if (menuListElement) {
+            var triggerRect = cmp.find("selectTrigger").getElement().getBoundingClientRect();
+            var width = typeof triggerRect.width !== 'undefined' ? triggerRect.width : triggerRect.right - triggerRect.left;
+            if (width > 0) {
+                menuListElement.style.width = width + "px";
+                // In case the width exceeds the max width we want to still limit to the width of the trigger
+                menuListElement.style.maxWidth = menuListElement.style.width;
+            }
+        }
+    },
+
     /**
      * Iterates over the options in the select element and returns a semicolon-delimited string of the selected values
      */

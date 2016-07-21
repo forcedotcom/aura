@@ -38,15 +38,11 @@ public class EncryptionKey extends AuraResourceImpl {
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
-        if (this.configAdapter.validateGetEncryptionKey(request.getParameter("ssid"))) {
-            String key = configAdapter.getEncryptionKey();
-            System.out.println("RESPONSE="+response);
-            System.out.println("OUTPUTSTREAM="+response.getOutputStream());
-            servletUtilAdapter.setNoCache(response);
-            response.getOutputStream().write(key.getBytes(StandardCharsets.UTF_8));
-        } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
-        }
+        String key = configAdapter.getEncryptionKey();
+        System.out.println("RESPONSE="+response);
+        System.out.println("OUTPUTSTREAM="+response.getOutputStream());
+        servletUtilAdapter.setNoCache(response);
+        response.getOutputStream().write(key.getBytes(StandardCharsets.UTF_8));
     }
 
     public void setConfigAdapter(ConfigAdapter configAdapter) {

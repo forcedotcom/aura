@@ -113,7 +113,6 @@ public class EncryptionKeyTest extends UnitTestCase{
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
         Mockito.when(configAdapter.getEncryptionKey()).thenReturn(expectedKey);
-        Mockito.when(configAdapter.validateGetEncryptionKey(Mockito.anyString())).thenReturn(true);
         EncryptionKey encryptionKey = new EncryptionKey();
         encryptionKey.setConfigAdapter(configAdapter);
         encryptionKey.setServletUtilAdapter(servletUtilAdapter);

@@ -62,42 +62,52 @@ DomHandlersPlugin.prototype.disable = function () {
     }
 };
 
+/*
+// We might need this method somewhere in the future
+
+DomHandlersPlugin.prototype.stringifyLocator = function (locator) {
+    var ordered = { 
+        target  : locator.target, 
+        scope   : locator.scope, 
+        context : locator.context && Object.keys(locator.context).sort().reduce(function (r, k) { r[k] = locator.context[k]; return r; }, {}) 
+    };
+
+    if (!locator.context) {
+        delete locator.context;
+    }
+    
+    return JSON.stringify(ordered);
+};
+*/
+
 DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
-    // We want to get the localId of the component with the handler 
-    // and the component who owns the action (its lexical scope)
     var localCmpId = cmp.getLocalId();
-    // TODO: can this be simplified to cmp.getOwner() once jbuch adds that?
-    var ownerCmp = action.getComponent().getConcreteComponent();
-    var dispatchCmpId = ownerCmp.getLocalId();
-    var locator = ownerCmp.getLocator(localCmpId);
-    var ms = this.metricsService;
-    // Only if we have a unique, identifier send the interaction
-    if (locator && (event.type in DomHandlersPlugin.WHITELISTEVENTS)) { 
-        var locatorStr = localCmpId + ":" + dispatchCmpId;
-        var target = cmp["getElement"]();
-        var meta = target && target.getAttribute("data-refid"); // optional metadata
+    if (localCmpId && event.type in DomHandlersPlugin.WHITELISTEVENTS) {
+        var ownerCmp = action.getComponent().getConcreteComponent();
+        var locator = ownerCmp.getLocator(localCmpId);
+        var ms = this.metricsService;
 
-        var context = {
-            "locator" : locator,
-            "eventType"   : DomHandlersPlugin.DEFAULT_INTERACTION_TYPE,
-            "eventSource" : event.type, // type of event (click, hover, scroll)
-            "attributes"  : {
-                "auraAction"  : action.getDef().getDescriptor().toString()    
+        // Only if we have a unique, identifier send the interaction
+        if (locator) { 
+            var target = cmp["getElement"]();
+            var meta = target && target.getAttribute("data-refid"); // optional metadata
+
+            var context = {
+                "locator"     : locator,
+                "eventType"   : DomHandlersPlugin.DEFAULT_INTERACTION_TYPE,
+                "eventSource" : event.type, // type of event (click, hover, scroll)
+                "attributes"  : {
+                    "auraAction"  : action.getDef().getDescriptor().toString()    
+                }
+            };
+
+            if (meta && !locator["context"][meta]) {
+                var metaValue = target.getAttribute("data-" + meta);
+                locator["context"][meta] = metaValue;
             }
-        };
 
-        if (meta) {
-            var state = {};
-            state[meta] = target.getAttribute("data-" + meta);
-            // append this meta data to locator 
-            // dom based meta data can append to the locator context, but won't override existing values
-            locator["context"] = $A.util.apply(locator["context"] || {}, state);
+            ms.transaction("aura", "interaction", { "context": context });
         }
-
-        ms.transaction("aura", "interaction", { "context": context, "postProcess" : function (trx) {
-            var mark = ms.mark("interactions", event.type, { "locator": locatorStr });
-            mark["ts"] = trx["ts"];
-        }});
     }
 };
 

@@ -175,8 +175,8 @@
 	 /**
 	  * Test update picklist
 	  */
-	 // Disabled while .editPanel and .clickOutOfEditPanel are investigated;
-	 // .clickOutOfEditPanel isn't working consistently
+	 // Disabled because enter key event is not being fired and
+	 // clicking out does not save value
 	 _testUpdatePicklist : {
 	     test : [function(cmp) {
              this.triggerEditOnCell(cmp, 0, 8);
@@ -184,7 +184,7 @@
              this.waitForPanelOpen(cmp);
          }, function(cmp) {
              this.verifyPanelContent(cmp, 'A');
-             this.editPanel(cmp, 'O', 0, 'picklist');
+             this.editPanel(cmp, 'O', 0, true);
          }, function(cmp) {
              this.waitForCellContent(cmp, 0, 8, 'O');
          }]
@@ -195,15 +195,16 @@
 	  */
      testUpdateCheckbox : {
          test : [function(cmp) {
-             //this.verifyCellEditStatus(cmp, 0, 5, false);
+             this.verifyCellEditStatus(cmp, 0, 5, false);
              this.triggerEditOnCell(cmp, 0, 5);
          }, function(cmp) {
              this.waitForPanelOpen(cmp);
          }, function(cmp) {
              this.verifyPanelContent(cmp, false);
-             this.editPanel(cmp, true, 0, 'checkbox');
+             this.editPanel(cmp, true, 0);
          }, function(cmp) {
              this.verifyCellContent(cmp, 0, 5, true);
+             //this.verifyCellEditStatus(cmp, 0, 5, true);
          }]
      },
      
@@ -219,7 +220,7 @@
              this.verifyPanelContent(cmp, 0.98);
              this.editPanel(cmp, 1.01, 0);
          }, function(cmp) {
-             this.verifyCellContent(cmp, 0, 9, '101%');
+             this.waitForCellContent(cmp, 0, 9, '101%');
          }]
      },
      
@@ -236,8 +237,8 @@
              this.verifyPanelContent(cmp, 1234.56);
              this.editPanel(cmp, 101.99, 0);
          }, function(cmp) {
+             this.waitForCellContent(cmp, 0, 10, '$101.99');
              this.verifyCellEditStatus(cmp, 0, 10, true);
-             this.verifyCellContent(cmp, 0, 10, '$101.99');
          }]
      },
      
@@ -251,6 +252,21 @@
              var headers = this.getHeaderRow();
              this.verifyHeaderColumnNames(expectedColNames, headers);
          }
+     },
+     
+     /**
+      * Test edit cell content and click out to save value change.
+      */
+     _testEditPanelThenClickOut : {
+         test : [function(cmp) {
+             this.triggerEditOnCell(cmp, 0, 2);
+         }, function(cmp) {
+             this.waitForPanelOpen(cmp);
+         }, function(cmp) {
+             this.editPanel(cmp, 99, 0, true);
+         }, function(cmp) {
+             this.waitForCellContent(cmp, 0, 2, '99');
+         }]
      },
           
 	 triggerEditOnCell : function(cmp, rowIndex, colIndex) {
@@ -355,17 +371,17 @@
 		 }, 'Expected text in edit panel for cell is supposed to be "' + expected + '" but was "' + actual + '"');
 	 },
 	 
-	 editPanel : function(cmp, newInput, panelIndex, inputType) {
+	 editPanel : function(cmp, newInput, panelIndex, isClickOut) {
 	     panelIndex = panelIndex ? panelIndex : 0;
-	     inputType = inputType ? inputType : 'text';
 		 var panel = this.getPanelFromDomElement(cmp, panelIndex);
 		 
 	     if (!$A.util.isUndefinedOrNull(panel)) {
-			 var input = panel.get('v.inputComponent')[0];
+	         var input = panel.get('v.inputComponent')[0];
+	         var inputType = input.getDef().getDescriptor().getQualifiedName();
 			 
-			 if (inputType === 'checkbox') {
+			 if (inputType === 'markup://ui:inputCheckbox') {
 			     $A.test.clickOrTouch(input.getElement());    
-			 } else if (inputType === 'picklist') {
+			 } else if (inputType === 'markup://ui:inputSelect') {
 			     $A.test.clickOrTouch(input.getElement());
 			     var options = input.get('v.options');
 			     
@@ -379,31 +395,33 @@
 			         }
 			     }
 			     input.set('v.options', options);
-			     this.clickOutOfEditPanel(cmp);
 			 } else {
 			     input.set('v.value', newInput);
 			 }
 		
-			 this.commitCellContent(panel);
+			 this.commitCellContent(isClickOut ? cmp : panel, isClickOut);
 		 }
 	 },
 	 
-	 commitCellContent : function(panelCmp) {
-	     var input = panelCmp.get("v.inputComponent")[0];
-	     
-         input.getEvent("keydown").setParams({
-             keyCode : 13,
-             domEvent : {
-                 type : "keydown",
-                 preventDefault : function() {}
-             }
-         }).fire();
+	 commitCellContent : function(targetCmp, isClickOut) {
+	     if (isClickOut) {
+	         this.clickOutOfEditPanel(targetCmp)
+	     } else {
+    	     var input = targetCmp.get("v.inputComponent")[0];
+    	     input.getEvent("keydown").setParams({
+                 keyCode : 13,
+                 domEvent : {
+                     type : "keydown",
+                     preventDefault : function() {}
+                 }
+             }).fire();
+	     }
      },
-	 
-	 clickOutOfEditPanel : function(cmp) {
-		 var input = cmp.find('inputTxt').getElement();
-		 $A.test.clickOrTouch(input);
-	 },
+     
+     clickOutOfEditPanel : function(cmp) {
+         var input = cmp.find('inputTxt').getElement();
+         $A.test.clickOrTouch(input);
+     },
 	 
 	 getCellElem : function(cmp, rowIndex, colIndex) {
 		 var tbody = document.getElementsByTagName('tbody')[0];

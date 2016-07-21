@@ -18,10 +18,10 @@ Function.RegisterNamespace("Test.Aura.Storage.Adapters");
 [Fixture]
 Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
     var Aura = {
-            Storage: {
-                IndexedDBAdapter: function(){}
-            },
+        Storage: {
             IndexedDBAdapter: function(){}
+        },
+        IndexedDBAdapter: function(){}
     };
 
     Mocks.GetMocks(Object.Global(), {

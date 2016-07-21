@@ -43,9 +43,16 @@ var IndexedDBAdapter = function IndexedDBAdapter(config) {
     this.keyPrefix = config["keyPrefix"];
 
     this.db = undefined;
-    // whether the ObjectStore is ready to service operations
-    // undefined = being setup, true = ready, false = permanent error
+
+    // whether the adapter is ready to service operations
+    // - undefined = being setup (requests are queued)
+    // - true = ready (requests are immediately run)
+    // - false = permanent error (requests are immediately rejected)
     this.ready = undefined;
+
+    // multiple async operations + timeouts are used during initialize(). ensure executeQueue() is run only once.
+    this.executeQueueInvoked = false;
+
     // whether the ObjectStore should be cleared as part of the setup process
     this.clearBeforeReady = config["clearOnInit"];
     // requests received before this.ready is moved to true or false
@@ -76,6 +83,8 @@ var IndexedDBAdapter = function IndexedDBAdapter(config) {
 
     this.sweepingSuspended = false;
 
+    // initialize()'s timer id
+    this.initializeTimeoutId = undefined;
     this.initialize();
 };
 
@@ -88,6 +97,8 @@ IndexedDBAdapter.LOG_LEVEL = {
     WARNING: { id: 1, fn: "warning" }
 };
 
+/** Max time for initialize to complete */
+IndexedDBAdapter.INITIALIZE_TIMEOUT = 30 * 1000;
 
 /**
  * Returns the name of the adapter.
@@ -99,15 +110,27 @@ IndexedDBAdapter.prototype.getName = function() {
 
 /**
  * Initializes the adapter by setting up the DB and ObjectStore.
+ * @param {Number=} version Optional version value for IndexedDB.open(). Set
+ *  to a new value if schema needs to change (eg new table, new index).
  * @private
  */
 IndexedDBAdapter.prototype.initialize = function(version) {
-    // Set version number when changing schema ie adding index, etc
     var dbRequest;
     var that = this;
 
+    // it's been observed that indexedDB.open() does not trigger any event when it is under significant
+    // load (eg multiple frames concurrently calling open()). this hangs this adapter's init so apply
+    // a maximum wait time before moving to a permanent error state.
+    if (!this.initializeTimeoutId) {
+        this.initializeTimeoutId = setTimeout(function() {
+            // setup hasn't completed so move to permanenet error state
+            that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, "initialize(): timed out setting up DB");
+            that.executeQueue(false);
+        }, IndexedDBAdapter.INITIALIZE_TIMEOUT);
+    }
+
     // Firefox private browsing mode throws an uncatchable (except by window.onerror) InvalidStateError when
-    // indexedDB.open is called. the onerror handler is also invoked which allows us to set the adapter to a
+    // indexedDB.open() is called. the onerror handler is also invoked which allows us to set the adapter to a
     // permanent error state. FYI Logging.js suppresses InvalidStateError messages.
     // see https://bugzilla.mozilla.org/show_bug.cgi?id=781982.
 
@@ -122,6 +145,8 @@ IndexedDBAdapter.prototype.initialize = function(version) {
     }
 
     dbRequest.onupgradeneeded = function (e) {
+        // this is fired if there's a version mismatch. if createTable() doesn't throw
+        // then onsuccess() is fired, else onerror() is fired.
         that.createTables(e);
     };
     dbRequest.onsuccess = function(e) {
@@ -322,6 +347,12 @@ IndexedDBAdapter.prototype.createTables = function(event) {
  * @private
  */
 IndexedDBAdapter.prototype.executeQueue = function(ready) {
+    if (this.executeQueueInvoked) {
+        return;
+    }
+    this.executeQueueInvoked = true;
+    clearTimeout(this.initializeTimeoutId);
+
     var that = this;
     var promise;
 
@@ -339,9 +370,14 @@ IndexedDBAdapter.prototype.executeQueue = function(ready) {
     promise.then(function() {
         // finally flip the switch so subsequent requests are immediately processed
         that.ready = ready;
-
         var queue = that.pendingRequests;
         that.pendingRequests = [];
+
+        if (!that.ready) {
+            that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, "executeQueue(): entered permanent error state. All future operations will fail. Failing " + queue.length + " enqueued operations.");
+        } else {
+            that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "executeQueue(): entered ready state. Processing " + queue.length + " operations.");
+        }
 
         for (var i = 0; i < queue.length; i++) {
             if (!that.ready) {
@@ -380,7 +416,7 @@ IndexedDBAdapter.prototype.enqueue = function(execute) {
     var promise;
 
     if (this.ready === false) {
-        promise = Promise["reject"](new Error("IndexedDBStorageAdapter.enqueue: database failed to initialize"));
+        promise = Promise["reject"](new Error("IndexedDBAdapter.enqueue: database failed to initialize"));
     } else if (this.ready === undefined) {
         promise = new Promise(function(resolve, reject) {
             that.pendingRequests.push({ "execute":execute, "resolve":resolve, "reject":reject });

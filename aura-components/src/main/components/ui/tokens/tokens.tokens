@@ -35,4 +35,5 @@
   <aura:token name="uiPanel.truncate" value=""/>
 
   <aura:token name="uiLabel.label" value=""/>
+  <aura:token name="uiLabel.assistive" value=""/>
 </aura:tokens>

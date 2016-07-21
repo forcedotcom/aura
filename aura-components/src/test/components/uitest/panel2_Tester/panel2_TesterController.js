@@ -15,6 +15,13 @@
  */
 ({
 	init : function(cmp, event, helper) {
+		var opts = [{ "label": "Option1", "value": "Option1", "class": "option" },
+		            { "label": "Option2", "value": "Option2", "class": "option", "selected": true },
+		            { "label": "Option3", "value": "Option3", "class": "option" },
+		            { "label": "Option4", "value": "Option4", "class": "option" }];
+		
+		cmp.find("inputSelectionOptions").set("v.options", opts);
+		
 		helper.createHeaderFooterInstance(cmp);
 	},
 

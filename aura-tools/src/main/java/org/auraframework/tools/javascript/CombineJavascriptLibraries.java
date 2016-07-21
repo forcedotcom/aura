@@ -105,6 +105,8 @@ public class CombineJavascriptLibraries {
             logging.append(devPath.toString()).append(" ");
         }
 
+        Files.write(destDir.resolve("libs.js"), outputDev.toString().getBytes());
+
         LOG.info(logging.toString());
         logging.setLength(0);
 
@@ -115,6 +117,8 @@ public class CombineJavascriptLibraries {
             outputMin.append(readFile(minFile)).append(System.lineSeparator()).append(";");
             logging.append(minFile.toString()).append(" ");
         }
+
+        Files.write(destDir.resolve("libs.min.js"), outputMin.toString().getBytes());
 
         LOG.info(logging.toString());
 
@@ -134,31 +138,10 @@ public class CombineJavascriptLibraries {
                     // skip minified files to prevent duplicates
                     continue;
                 }
-                String tzContent = readFile(path);
-                String tzContentMin;
 
-                Path minFilePath = walltimeLocaleDirectory.resolve(getMinFilePath(fileName));
-                if (Files.exists(minFilePath)) {
-                    tzContentMin = readFile(minFilePath);
-                } else {
-                    tzContentMin = tzContent;
-                }
-
-                // include timezone code and with cached output
-                StringBuilder dev = new StringBuilder(tzContent);
-                StringBuilder min = new StringBuilder(tzContentMin);
-                dev.append(System.lineSeparator()).append(";").append(outputDev);
-                min.append(System.lineSeparator()).append(";").append(outputMin);
-                // write both non-minified and minified files
-                Files.write(destDir.resolve("libs_" + timezone + ".js"), dev.toString().getBytes());
-                Files.write(destDir.resolve("libs_" + timezone + ".min.js"), min.toString().getBytes());
                 existingTimezones.add(timezone.replace("-", "/"));
             }
         }
-
-        // write versions without timezone code for "GMT"
-        Files.write(destDir.resolve("libs_GMT.js"), outputDev.toString().getBytes());
-        Files.write(destDir.resolve("libs_GMT.min.js"), outputMin.toString().getBytes());
 
         LOG.info("Generating equivalent timezones json");
         String timezonesJson = generateEquivalentTimezonesJson(existingTimezones, gson);

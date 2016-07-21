@@ -35,6 +35,8 @@ import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Automation to verify the implementation of AuraFrameworkServlet. AuraFrameworkServlet responds to requests of pattern
  * /auraFW/* This config is stored in aura/dist/config/web.xml for aura running on jetty. In SFDC build, the config is
@@ -429,5 +431,32 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         assertDefaultAntiClickjacking(httpResponse, true, false);
 
         get.releaseConnection();
+    }
+
+    public void testLibsJavascriptResources() throws Exception {
+        HttpGet get = obtainNoncedGetMethod("/auraFW/resources/%s/libs_GMT.js", false);
+        HttpResponse response = perform(get);
+        assertEquals("libs_GMT.js response should be 200", HttpServletResponse.SC_OK,
+                response.getStatusLine().getStatusCode());
+        get.releaseConnection();
+
+        get = obtainNoncedGetMethod("/auraFW/resources/%s/libs_GMT.js", true);
+        response = perform(get);
+        assertEquals("libs_GMT.js response should be 200", HttpServletResponse.SC_OK,
+                getStatusCode(response));
+        get.releaseConnection();
+
+        get = obtainNoncedGetMethod("/auraFW/resources/%s/libs_America-Los_Angeles.js", false);
+        response = perform(get);
+        assertEquals("libs_America-Los_Angeles.js response should be 200", HttpServletResponse.SC_OK,
+                getStatusCode(response));
+        get.releaseConnection();
+
+        get = obtainNoncedGetMethod("/auraFW/resources/%s/libs_bob.js", false);
+        response = perform(get);
+        assertEquals("libs_bob.js response should be 404", HttpServletResponse.SC_NOT_FOUND,
+                getStatusCode(response));
+        get.releaseConnection();
+
     }
 }

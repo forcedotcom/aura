@@ -28,13 +28,16 @@ import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.http.resource.CombinedLibsResource;
+import org.auraframework.http.resource.FileStaticResource;
+import org.auraframework.http.resource.StaticResourceFactory;
+import org.auraframework.system.StaticResource;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
 
 public class AuraFrameworkServlet extends AuraBaseServlet {
 
     private static final long serialVersionUID = 6034969764380397480L;
-    private static final String MINIFIED_FILE_SUFFIX = ".min";
     private ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
     private ConfigAdapter configAdapter = Aura.getConfigAdapter();
     private ResourceLoader resourceLoader = configAdapter.getResourceLoader();
@@ -129,44 +132,27 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 matchedUid = false;
             }
 
-            String resStr = String.format(format, file);
+            boolean isProduction = Aura.getConfigAdapter().isProduction();
+            StaticResource staticResource = StaticResourceFactory.getResource(file, format, nonceUid, isProduction,
+                    resourceLoader);
 
             //
             // Check whether path has wrong nonce or the path contains no nonce
             //
             if (nonceUid != null && !matchedUid) {
 
-                // has "nonce" like path but uids don't match
-                if (resourceLoader.getResource(resStr) == null) {
-                    // Check if resource exists with nonced path
-                    resStr = String.format(format, "/" + nonceUid + file);
-                    if (resourceLoader.getResource(resStr) != null) {
-                        // file exists so doesn't have a nonce
-                        haveUid = false;
-                    } else {
-                        // no resource found
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                        return;
-                    }
-                } else {
-                    // nonce exists but not matching
-                    haveUid = true;
+                Boolean hasUid = staticResource.hasUid();
+
+                if (hasUid == null) {
+                    // no resource found
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    return;
                 }
+
+                haveUid = hasUid;
             }
 
-            // Checks for a minified version of the external resource file
-            // Uses the minified version if in production mode.
-            if (resStr.startsWith("/aura/resources/") && Aura.getConfigAdapter().isProduction()) {
-                int extIndex = resStr.lastIndexOf(".");
-                if (extIndex > 0) {
-                    String minFile = resStr.substring(0, extIndex) + MINIFIED_FILE_SUFFIX + resStr.substring(extIndex);
-                    if (resourceLoader.getResource(minFile) != null) {
-                        resStr = minFile;
-                    }
-                }
-            }
-
-            in = resourceLoader.getResourceAsStream(resStr);
+            in = staticResource.getResourceStream();
 
             //
             // Check if it exists. DANGER: if there is a nonce, this is really an

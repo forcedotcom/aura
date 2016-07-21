@@ -16,13 +16,13 @@
 
 -->
 <aura:component access="PRIVILEGED" extensible="true" support="PROTO" description="A column of actionable buttons or links in ui:dataGrid">
-	<aura:attribute name="name" type="String"/>
+	<aura:attribute name="name" access="PRIVILEGED" type="String"/>
 	<aura:attribute name="label" type="String"/>
 	<aura:attribute name="assistiveLabel" type="String" default="Actions" description="Hidden assistive text for the header."/>
-	<aura:attribute name="class" type="String"/>
+	<aura:attribute name="class" access="PRIVILEGED" type="String"/>
 	<aura:attribute name="scope" type="String" default="col" description="{ col, row, colgroup, rowgroup }"/>
-	<aura:attribute name="header" type="Aura.Component[]"/>
-	<aura:attribute name="outputComponent" type="Aura.ComponentDefRef[]"/>
+	<aura:attribute name="header" access="PRIVILEGED" type="Aura.Component[]"/>
+	<aura:attribute name="outputComponent" access="PRIVILEGED" type="Aura.ComponentDefRef[]"/>
 	<aura:attribute name="body" type="Aura.ComponentDefRef[]"/>
 	<aura:attribute name="disabled" type="Boolean"/>
 

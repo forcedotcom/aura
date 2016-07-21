@@ -17,18 +17,18 @@
 -->
 <aura:component access="PRIVILEGED" description="A tab that is rendered by the ui:tabBar component for its overflow menu">
     <aura:attribute name="class" type="String" description="The class to apply to the tab item"/>
-    <aura:attribute name="title" type="String" description="The text to display on the tab."/>
+    <aura:attribute name="title" access="PRIVILEGED" type="String" description="The text to display on the tab."/>
     <aura:attribute name="icon" type="Aura.Component[]" description="The graphical image displayed on the tab."/>
     <aura:attribute name="active" type="Boolean" description="Specifies whether a tab is active (true) or not (false)."/>
     <aura:attribute name="iconClass" type="String" description="The CSS style used to display the icon on the tab."/>
     <aura:attribute name="ariaControlId" type="String" description="Internal use for aria-controls attribute."/>
 
-    <aura:attribute name="menuItems" type="Object[]" description="List of objects that represent the menu items to be generated. Should be of the form {id: String, label: String}"/>
+    <aura:attribute name="menuItems" access="PRIVILEGED" type="Object[]" description="List of objects that represent the menu items to be generated. Should be of the form {id: String, label: String}"/>
     <aura:attribute name="menuItemCache" type="Object" access="PRIVATE" />
 
     <aura:registerevent name="onTabHover" type="ui:onTabHover" description="The event is fired when the mouse moves over a tab or when a tab is put into focus." />
     <aura:registerevent name="onTabUnhover" type="ui:onTabHover" description="The event is fired when the mouse moves off of a tab or when focus is moved away from a tab." />
-    <aura:registerEvent name="onTabSelection" type="ui:tabsetEvent" description="The event is fired when a tab from the overflow menu is selected."/>
+    <aura:registerEvent name="onTabSelection" access="PRIVILEGED" type="ui:tabsetEvent" description="The event is fired when a tab from the overflow menu is selected."/>
 
     <aura:dependency resource="markup://ui:actionMenuItem" />
 

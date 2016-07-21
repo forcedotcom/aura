@@ -21,6 +21,6 @@
     <aura:attribute name="pageCount" type="Integer" default="0"        description="Gets the total number of pages based on pageSize and totalItems."/>
     <aura:attribute name="pageSize" type="Integer" default="25"        description="Gets or sets the number of items per page."/>
     <aura:attribute name="startIndex" type="Integer" default="-1"       description="Gets the index of the first item in the current page based on pageSize and totalItems."/>
-    <aura:attribute name="totalItems" type="Integer" default="0"       description="Gets or sets the total number of items the pager is describing."/>
+    <aura:attribute name="totalItems" access="PRIVILEGED" type="Integer" default="0"       description="Gets or sets the total number of items the pager is describing."/>
     <aura:attribute name="type" type="String"                          description="The concrete type of the pager. Accepted values are 'JumpToPage', 'NextPrevious', 'PageInfo', 'PageSize', or any namespaced component descriptor, e.g. ns:CustomPager."/>
 </aura:interface>

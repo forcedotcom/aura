@@ -16,10 +16,10 @@
 
 -->
 <aura:event access="PRIVILEGED" type="APPLICATION" description="Create panel event">
-    <aura:attribute name="panelType"                  type="String"  description="The panel type registered to the panel manager. Valid values: panel, modal"/>
-    <aura:attribute name="visible"                    type="String"  description="Set to true if the panel should be visible"/>
+    <aura:attribute name="panelType"                  type="String"  description="The panel type registered to the panel manager. Valid values: panel, modal" access="PRIVILEGED"/>
+    <aura:attribute name="visible"                    type="String"  description="Set to true if the panel should be visible" access="PRIVILEGED"/>
     <aura:attribute name="owner"                      type="String"  description="The context that creates the panel"/>
-    <aura:attribute name="panelConfig"                type="Object"  description="The attributes to be set on the panel"/>
+    <aura:attribute name="panelConfig"                type="Object"  description="The attributes to be set on the panel" access="PRIVILEGED"/>
     <aura:attribute name="closeOnLocationChange"      type="Boolean" description="Set to false if the panel shouldn't be closed when the browser's location changes"/>
 
     <aura:attribute name="onCreate"                   type="Object"  description="The callback after a panel is created"/>

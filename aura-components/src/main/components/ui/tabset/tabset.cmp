@@ -45,7 +45,7 @@
     <aura:registerevent name="activateTab" type="ui:tabsetEvent" description="Activate a tab." />
     <aura:registerevent name="getActiveTab" type="ui:tabsetEvent" description="Get the currently active tab." />
 
-    <aura:registerevent name="beforeActivate" type="ui:tabsetEvent" description="The event is triggered before the tab is activated. Can be canceled to prevent the tab from activating." />
+    <aura:registerevent name="beforeActivate" access="PRIVILEGED" type="ui:tabsetEvent" description="The event is triggered before the tab is activated. Can be canceled to prevent the tab from activating." />
     <aura:registerevent name="onActivate" type="ui:tabsetEvent" description="The event is triggered when the tab is activated."/>
     <aura:registerevent name="onRemove" type="ui:tabsetEvent" description="The event is triggered when the tab is removed."/>
 

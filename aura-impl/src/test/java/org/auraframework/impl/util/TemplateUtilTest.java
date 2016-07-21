@@ -61,7 +61,7 @@ public class TemplateUtilTest extends UnitTestCase {
 
             templateUtil.writeHtmlScripts(context, Lists.newArrayList("x"), true, buffer);
 
-            if (!buffer.toString().contains("<script src=\"x\" defer ></script>")) {
+            if (!buffer.toString().contains("<script src=\"x\" defer></script>")) {
                 fail(String.format("Expected 'defer' for %s: %s", type, buffer));
             }
         }
@@ -80,15 +80,15 @@ public class TemplateUtilTest extends UnitTestCase {
 
             templateUtil.writeHtmlScripts(context, Lists.newArrayList("x", "y"), false, buffer);
 
-            if (!buffer.toString().contains("<script src=\"x\"></script>")
-                    || !buffer.toString().contains("<script src=\"y\"></script>")) {
+            if (!buffer.toString().contains("<script src=\"x\" defer></script>")
+                    || !buffer.toString().contains("<script src=\"y\" defer></script>")) {
                 fail(String.format("Expected undecorated scripts for %s: %s", type, buffer));
             }
         }
     }
 
     @Test
-    public void testWriteHtmlScriptsHasAsyncAndDeferForDefault() throws Exception {
+    public void testWriteHtmlScriptsHasNoAsyncNorDeferForDefault() throws Exception {
         TemplateUtil templateUtil = new TemplateUtil();
         AuraContext context = Mockito.mock(AuraContext.class);
         Client client = Mockito.mock(Client.class);
@@ -100,9 +100,9 @@ public class TemplateUtilTest extends UnitTestCase {
 
             templateUtil.writeHtmlScripts(context, Lists.newArrayList("a", "b"), false, buffer);
 
-            if (!buffer.toString().contains("<script src=\"a\" async defer></script>")
-                    || !buffer.toString().contains("<script src=\"b\" async defer></script>")) {
-                fail(String.format("Expected 'async' and 'defer' for %s: %s", type, buffer));
+            if (!buffer.toString().contains("<script src=\"a\"></script>")
+                    || !buffer.toString().contains("<script src=\"b\"></script>")) {
+                fail(String.format("Unexpected 'async' or 'defer' for %s: %s", type, buffer));
             }
         }
     }

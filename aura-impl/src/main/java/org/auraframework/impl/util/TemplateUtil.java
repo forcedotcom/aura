@@ -24,7 +24,7 @@ public class TemplateUtil {
 
     private static final String HTML_STYLE = "        <link href=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     private static final String HTML_INLINE_SCRIPT = "       <script src=\"%s\"></script>\n";
-    private static final String HTML_DEFER_SCRIPT = "       <script src=\"%s\" defer ></script>\n";
+    private static final String HTML_DEFER_SCRIPT = "       <script src=\"%s\" defer></script>\n";
     private static final String HTML_ASYNC_SCRIPT = "       <script src=\"%s\" async defer></script>\n";
 
     public void writeHtmlStyle(String url, Appendable out) throws IOException {

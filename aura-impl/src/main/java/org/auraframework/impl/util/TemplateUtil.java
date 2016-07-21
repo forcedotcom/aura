@@ -58,14 +58,14 @@ public class TemplateUtil {
             case IE8:
             case IE7:
             case IE6:
+                format = HTML_DEFER_SCRIPT;
+                break;
+            default:
                 if (canBeAsync) {
-                    format = HTML_DEFER_SCRIPT;
+                    format = HTML_ASYNC_SCRIPT;
                 } else {
                     format = HTML_INLINE_SCRIPT;
                 }
-                break;
-            default:
-                format = HTML_ASYNC_SCRIPT;
                 break;
             }
             for (String script : scripts) {

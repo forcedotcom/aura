@@ -357,12 +357,13 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         if (safeInlineJs) {
             ret.add(getInlineJsUrl(context, attributes));
         }
+
+        ret.add(getAppJsUrl(context, null));
         
         if (!ignoreNonCacheableScripts) {
             ret.add(getBootstrapUrl(context, attributes));
         }
 
-        ret.add(getAppJsUrl(context, null));
 
         return ret;
     }

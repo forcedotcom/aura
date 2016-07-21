@@ -85,14 +85,14 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 if (manifestUtil.isManifestEnabled()) {
                     attributes.put("manifest", Aura.getServletUtilAdapter().getManifestUrl(context, componentAttributes));
                 }
-
+                
                 sb.setLength(0);
-                writeHtmlScripts(context, Aura.getServletUtilAdapter().getBaseScripts(context, componentAttributes), true/*async*/, sb);
-                attributes.put("auraBaseScriptTags", sb.toString());
-
-                sb.setLength(0);
-                writeHtmlScripts(context, Aura.getServletUtilAdapter().getFrameworkScripts(context, true/*inlineJS*/, false/*dontIgnoreBootstrap*/, componentAttributes), true/*async*/, sb);
+                writeHtmlScripts(context, Aura.getServletUtilAdapter().getFrameworkScripts(context, true/*inlineJS*/, false/*dontIgnoreBootstrap*/, componentAttributes), false/*async*/, sb);
                 attributes.put("auraNamespacesScriptTags", sb.toString());
+
+                sb.setLength(0);
+                writeHtmlScripts(context, Aura.getServletUtilAdapter().getBaseScripts(context, componentAttributes), true /*async*/, sb);
+                attributes.put("auraBaseScriptTags", sb.toString());
 
                 Map<String, Object> auraInit = Maps.newHashMap();
                 if (componentAttributes != null && !componentAttributes.isEmpty()) {

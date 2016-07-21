@@ -25,6 +25,7 @@
     <aura:attribute name="title"                    type="String" access="GLOBAL" default="Aura" description="The title of the template."/>
 
     <aura:attribute name="auraStyleTags"            type="String" description="Loads Aura CSS files."/>
+    <aura:attribute name="afterBody"                type="String" description="Bottom scripts"/>
     <aura:attribute name="auraScriptTags"           type="String" description="Loads the js framework, preloads the definitions of all preload namespaces, and any other framework script"/>
     <aura:attribute name="auraBaseScriptTags"       type="String" />
     <aura:attribute name="auraNamespacesScriptTags" type="String" />
@@ -105,6 +106,7 @@ var pageStartTime = (new Date()).getTime();</script>
     {!v.body}
     {!v.auraScriptTags}
     {!v.auraBaseScriptTags}
+    {!v.afterBody}
 
     <script>
 (function () {

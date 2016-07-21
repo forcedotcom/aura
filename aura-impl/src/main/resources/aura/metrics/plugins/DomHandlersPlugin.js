@@ -101,9 +101,11 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
                 }
             };
 
-            if (meta && !locator["context"][meta]) {
-                var metaValue = target.getAttribute("data-" + meta);
-                locator["context"][meta] = metaValue;
+            if (meta) {
+                locator["context"] = locator["context"] || {};
+                if (!locator["context"][meta]) {
+                    locator["context"][meta] = target.getAttribute("data-" + meta);
+                }
             }
 
             ms.transaction("aura", "interaction", { "context": context });

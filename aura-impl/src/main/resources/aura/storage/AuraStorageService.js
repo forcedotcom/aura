@@ -55,8 +55,21 @@ AuraStorageService.prototype.getStorages = function() {
 
 /**
  * Initializes and returns a new storage.
- * @param {Object} config The configuration for the new storage.
- * @param {String} config.name The unique name of the storage to be initialized.
+ * 
+ * @example
+ * var storage = $A.storageService.initStorage({
+ *     "name":                "MyStorage",
+ *     "persistent":          true,
+ *     "secure":              true,
+ *     "maxSize":             524288, // (bytes) (512 * 1024)
+ *     "expiration":          600,    // (seconds)
+ *     "autoRefreshInterval": 600,    // (seconds)
+ *     "debugLogging":        true,
+ *     "clearOnInit":         false
+ * });
+ *
+ * @param {Object} config The configuration for the new storage. The name property is required. All other properties are optional.
+ * @param {String} config.name Required. The unique name of the storage to be initialized.
  * @param {Boolean=} config.persistent Set to true if storage can be persistent. Default is false.
  * @param {Boolean=} config.secure Set to true if storage must be secure. Default is false.
  * @param {Number=} config.maxSize Specifies the maximum storage size (bytes). Default is 1000KB.

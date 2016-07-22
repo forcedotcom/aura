@@ -27,16 +27,16 @@
 	onEdit : function(cmp, evt) {
 	    // TODO: onEdit handler
 	},
-
-	onKeyboardModeEnabled : function(cmp, evt) {
+	
+	onKeyboardModeEnter: function(cmp, evt) {
 	    // TODO: onKeyboardModeEnabled handler
-	    alert('enabled');
+	    cmp.set('v.inKeyboardMode', true);
 	},	
 
-	onKeyboardModeDisabled : function(cmp, evt) {
+	onKeyboardModeExit : function(cmp, evt) {
 	    // TODO: onKeyboardModeDisabled handler
-	    alert('disabled');
-	},	
+	    cmp.set('v.inKeyboardMode', false);
+	},
 
 	handleEditableChange: function(cmp, evt, helper){
 		var editable = cmp.get('v.editable');
@@ -49,10 +49,10 @@
 		cmp.set('v.inKeyboardMode', !inKeyboardMode);
 
 		if (!inKeyboardMode) {
-			cmp.find('grid').enableKeyboardMode(cmp);
+			cmp.find('grid').enterKeyboardMode(false); // true if you want to edit the first active cell right after enabling the keyboard mode
 		}
 		else {
-			cmp.find('grid').disableKeyboardMode(cmp);
+			cmp.find('grid').exitKeyboardMode();
 		}
 	},
 

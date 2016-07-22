@@ -173,11 +173,11 @@
 	border: 3px solid red;
 }
 
-.THIS .inlineEditGrid.keyboardMode--enabled .activeCell {
+.THIS .inlineEditGrid.keyboardMode--enabled .slds-has-focus {
 	background: rgba(0,0,0,.5);
 }
 
-.THIS .activeCell {
+.THIS .slds-has-focus {
 	background: rgba(0,0,0,.15);
 }
 

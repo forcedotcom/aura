@@ -32,8 +32,9 @@
 		<ui:button label="Edit Active Cell" class="{! (v.inKeyboardMode ? ' ' : ' hidden')}" press="{!c.editActiveCell}" />
 
 		<ui:inlineEditGrid aura:id="grid" class="inline-edit-example" items="{!v.items}" onEdit="{!c.onEdit}" editable="{!v.editable}" dataVar="record"
-			onKeyboardModeEnabled="{!c.onKeyboardModeEnabled}"  onKeyboardModeDisabled="{!c.onKeyboardModeDisabled}">
+			onKeyboardModeEnter="{!c.onKeyboardModeEnter}"  onKeyboardModeExit="{!c.onKeyboardModeExit}">
 			<aura:set attribute="headerColumns">
+				<uiExamples:headerGridActionCell />
 				<ui:dataGridColumn name="id"	     label="Id" sortable="true"/>
 				<ui:dataGridColumn name="name"	     label="Name"/>
 				<ui:dataGridColumn name="bloodtype"  label="Blood Type"/>
@@ -41,6 +42,7 @@
 			</aura:set>
 			
 			<aura:set attribute="columns">
+				<uiExamples:gridActionCell />
 				<ui:inlineEditCell name="id" isPsuedoInput="true" class="pseudoInput" triggerLabel="Edit Id">
 					<ui:outputText value="{!item.record.id}"/>
 				</ui:inlineEditCell>

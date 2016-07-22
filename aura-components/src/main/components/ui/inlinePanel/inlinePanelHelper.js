@@ -29,10 +29,11 @@
         if(!cmp.isValid()) {
             return undefined; // undefined if the component is not valid
         }
-
+        
         var handleName = "_" + type + "Handler";
         var libMethod = "get" + type.charAt(0).toUpperCase() + type.slice(1) + "EventListener";
         var conf = {};
+        var closeAction = cmp.get("v.closeAction");
 
         if(type === 'key') {
             conf = {closeOnEsc: true, closeOnTabOut:true};
@@ -40,7 +41,7 @@
             conf = {closeOnClickOut: cmp.get('v.closeOnClickOut')};
         }
         if(!cmp[handleName]) {
-            cmp[handleName] = this.lib.panelLibCore[libMethod](cmp, conf);
+            cmp[handleName] = this.lib.panelLibCore[libMethod](cmp, conf, closeAction);
         }
         return cmp[handleName];
     },

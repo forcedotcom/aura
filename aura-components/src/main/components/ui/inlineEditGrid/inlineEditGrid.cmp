@@ -20,12 +20,13 @@
 	
 	<aura:import library="ui:inlineEditGridLib" property="lib"/>	
 	
-	<aura:attribute name="class"       type="String" />
-	<aura:attribute name="editLayouts" type="Object"/>
-    <aura:attribute name="editPanelConfigs" type="Object" description="A map of attributes for each edit panel by columnName. Sample map : {columnName : {attr1:value1, attr2:value2} }"/>
-	<aura:attribute name="editable"    type="Boolean" default="true" description="Editable status of the inline edit grid. If false, no inline edit functionality will be available."/>
-	<aura:attribute name="inKeyboardMode"  type="Boolean" default="false" description="Keyboard Mode status of the inline edit grid. If true, a visual indicator will be present and keyboard events will be captured."/>
-	
+	<aura:attribute name="class"               type="String" />
+	<aura:attribute name="editLayouts"         type="Object"/>
+    <aura:attribute name="editPanelConfigs"    type="Object"                   description="A map of attributes for each edit panel by columnName. Sample map : {columnName : {attr1:value1, attr2:value2} }"/>
+	<aura:attribute name="editable"            type="Boolean" default="true"   description="Editable status of the inline edit grid. If false, no inline edit functionality will be available."/>
+	<aura:attribute name="inKeyboardMode"      type="Boolean" default="false"  description="Keyboard Mode status of the inline edit grid. If true, a visual indicator will be present and keyboard events will be captured."/>
+	<aura:attribute name="enableKeyboardMode"  type="Boolean" default="true"   description="When true this grid allows a spreadsheet like navigation."/>
+
 	<aura:attribute name="dataVar" type="String" default="data" description="The name of the variable to use for the data in each item inside the grid."/>
     
 	<!-- Attributes used by the virtualDataGrid -->
@@ -46,20 +47,23 @@
     <aura:handler name="gridAction" event="ui:gridAction" action="{!c.handleGridAction}"/>
     <aura:handler name="change" value="{!v.columns}" action="{!c.handleColumnsChange}"/>
 	<aura:handler name="change" value="{!v.headerColumns}" action="{!c.handleHeadersChange}"/>
-    
+	<aura:handler name="change" value="{!v.enableKeyboardMode}" action="{!c.handleEnableKeyboardMode}"/>
+
     <aura:registerEvent name="onEdit"   type="ui:collectionValueChanged"    description="Event fired when a cell of the grid has been edited" />
-	<aura:registerEvent name="onKeyboardModeEnabled"  type="ui:focus"    description="Event fired when user enables keyboard mode" />
- 	<aura:registerEvent name="onKeyboardModeDisabled"   type="ui:blur"    description="Event fired when user disables keyboard mode" />
-    
+	<aura:registerEvent name="onKeyboardModeEnter"  type="ui:focus"         description="Event fired when user enters keyboard mode" />
+	<aura:registerEvent name="onKeyboardModeExit"   type="ui:blur"          description="Event fired when user exits keyboard mode" />
+	<aura:registerEvent name="onKeyboardShortcut"   type="ui:gridAction"    description="Event fired when user presses Ctrl+S or Ctrl+. whilst in keyboard mode" />
+
 	<!-- Events passed from the virtualDataGrid -->
 	<aura:registerEvent name="onSort"          type="ui:sort"      description="The event fired when a column is sorted."/>
 	<aura:registerEvent name="onColumnResize"  type="ui:resize"    description="The event fired when a column is resized."/>
 	
 	<!-- Grid Methods -->
-	<aura:method name="enableKeyboardMode"></aura:method>
-	<aura:method name="disableKeyboardMode"></aura:method>
-	<aura:method name="editActiveCell"></aura:method>
-	
+	<aura:method name="enterKeyboardMode" description="Enters keyboard mode. Won't do anything if keyboard mode has been disabled">
+		<aura:attribute name="editActiveCell" type="Boolean" description="If true, after keyboard mode is entered, the first activeCell will be set to edit"/>
+	</aura:method>
+	<aura:method name="exitKeyboardMode" description="Exits keyboard mode"/>
+
 	<aura:method name="appendItems">
 	   <aura:attribute name="items" type="Object"/>
 	</aura:method>
@@ -79,7 +83,7 @@
 	
 	<!-- Component markup begins -->
 	<!-- TODO: This could conflict if the Records Experience's inlineEdit feature uses the same classes. Revisit with SLDS integration -->
-    <div class="{! 'slds-table--edit_container slds-is-relative ' + (v.editable ? ' inlineEdit--enabled' : ' inlineEdit--disabled') + (v.inKeyboardMode 			? ' keyboardMode--enabled' 		: ' keyboardMode--disabled') +
+    <div class="{! 'slds-table--edit_container slds-is-relative ' + (v.editable ? ' inlineEdit--enabled' : ' inlineEdit--disabled') + (v.inKeyboardMode ? ' keyboardMode--active' : ' keyboardMode--inactive') +
 					' inlineEditGrid'}">
 
         <ui:virtualDataTable

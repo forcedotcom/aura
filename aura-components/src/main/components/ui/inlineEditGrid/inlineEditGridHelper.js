@@ -80,7 +80,7 @@
 	},
 	
 	createEditPanel : function(cmp, newPanelBody, referenceElement) {
-
+		var _keyNav = this.lib.keyNav;
 		var config = this.getPanelConfig(referenceElement);
 		
 		newPanelBody.addHandler('submit', cmp, 'c.handlePanelSubmit');
@@ -92,6 +92,11 @@
 			panelConfig : config,
 			onCreate : function(panel) {
 				cmp._panelCmp = panel;
+			},
+			onDestroy : function(){
+				// On Esc set focus for keyboard interaction and resume keyboard mode
+				_keyNav._setActiveCell(_keyNav.activeRowIndex,_keyNav.activeColumnIndex);
+				_keyNav.resumeKeyboardMode();
 			}
 		}).fire();
 	},
@@ -139,15 +144,31 @@
         return {
             referenceElement: referenceElement,
             closeOnClickOut: true,
-            closeAction: function(panel) {
-
-                panel.get("v.body")[0].submitValues();
-            }
+			closeAction: $A.getCallback(function(panel, closeBehavior) {
+				if (closeBehavior !== "closeOnEsc") {
+					panel.get("v.body")[0].submitValues();
+				}
+				else {
+					panel.hide(); // TODO: Why does it take 1 second to hide this ?
+					this.lib.keyNav.resumeKeyboardMode();
+				}
+			}.bind(this))
         };
     },
 
 	initKeyboardEntry: function(cmp){
 		this.lib.keyNav.initKeyboardEntry(cmp);
+	},
+	destroyKeyboard: function(cmp){
+		this.lib.keyNav.destroyKeyboard(cmp);
+	},
+	handleEnableKeyboardMode: function(cmp){
+		if (cmp.get("v.enableKeyboardMode")) {
+			this.initKeyboardEntry(cmp);
+		}
+		else {
+			this.destroyKeyboard(cmp);
+		}
 	},
 	updateItem: function(cmp, item, index){
 		cmp.find('grid').updateItem(item, index);
@@ -161,10 +182,6 @@
 	    return map;
 	},
 
-	initActiveCell: function(cmp){
- 		this.lib.keyNav.initActiveCell(cmp);
-	},
-
 	/* UTILITY FUNCTIONS */
 	bubbleEvent : function(cmp, evt, eventName) {
 		cmp.getEvent(eventName).setParams(evt.getParams()).fire();
@@ -175,10 +192,22 @@
             values : params.values
         }).fire();
 	},
-	fireKeyboardModeEnabledEvent: function(cmp) {
- 		cmp.getEvent("onKeyboardModeEnabled").fire();
+	fireKeyboardModeEnterEvent: function(cmp) {
+ 		cmp.getEvent("onKeyboardModeEnter").fire();
  	},
- 	fireKeyboardModeDisabledEvent: function(cmp) {
-		cmp.getEvent("onKeyboardModeDisabled").fire();
-  	}	
+ 	fireKeyboardModeExitEvent: function(cmp) {
+ 		cmp.getEvent("onKeyboardModeExit").fire();
+ 	},
+	fireShortcutSaveEvent: function(cmp) {
+		cmp.getEvent("onKeyboardShortcut").setParams({
+			action : "shortcut",
+			payload : "save"
+		}).fire();
+	},
+	fireShortcutCancelEvent: function(cmp) {
+		cmp.getEvent("onKeyboardShortcut").setParams({
+			action : "shortcut",
+			payload : "cancel"
+		}).fire();
+	}
 })// eslint-disable-line semi

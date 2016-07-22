@@ -31,7 +31,7 @@
 	<aura:attribute name="hasErrors" type="Boolean" default="false"/>
 
 	<!-- Potentially move psuedo input version into separate component -->
-	<span class="{! 'slds-grid slds-grid--align-spread slds-cell-edit cellContainer ' + v.class + (v.edited ? ' slds-is-edited' : '') + (v.hasErrors ? ' slds-has-error' : '')}">
+	<span class="{! 'slds-grid slds-grid--align-spread slds-cell-edit cellContainer ' + v.class + (v.edited ? ' slds-is-edited' : '') + (v.hasErrors ? ' slds-has-error' : '')}" tabindex="-1">
 		<aura:renderIf isTrue="{!!v.isPsuedoInput}">
 			{!v.body}
 		</aura:renderIf>

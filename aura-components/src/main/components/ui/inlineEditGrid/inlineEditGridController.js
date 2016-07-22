@@ -40,6 +40,7 @@
                 return;
             }
 		    helper.handleEditAction(cmp, evt);
+		    helper.lib.keyNav.pauseKeyboardMode();
 		}
 	},
 	
@@ -69,21 +70,23 @@
 		cmp._panelCmp.hide();
 		
 		helper.fireEditEvent(cmp, payload);
+		helper.lib.keyNav.resumeKeyboardMode();
 	},
 	
-	enableKeyboardMode: function(cmp, evt, helper){
-		helper.lib.keyNav.enableKeyboardMode(cmp);
-		helper.fireKeyboardModeEnabledEvent(cmp);	
+	enterKeyboardMode: function(cmp, evt, helper){
+		var editActiveCell = evt.getParam('arguments').editActiveCell;
+		helper.lib.keyNav.enterKeyboardMode(cmp, editActiveCell);
+		helper.fireKeyboardModeEnterEvent(cmp);
 	},
 	
-	disableKeyboardMode: function(cmp, evt, helper){	
-		helper.lib.keyNav.disableKeyboardMode(cmp);
-		helper.fireKeyboardModeDisabledEvent(cmp);
+	exitKeyboardMode: function(cmp, evt, helper){
+		helper.lib.keyNav.exitKeyboardMode(cmp);
+		helper.fireKeyboardModeExitEvent(cmp);
 	},
 
-	editActiveCell: function(cmp, evt, helper){	
-		helper.lib.keyNav.triggerEditOnActiveCell();
-	},	
+	handleEnableKeyboardMode: function(cmp, evt, helper){
+		helper.handleEnableKeyboardMode(cmp);
+	},
 
 	/* Passthrough handlers & methods */
 	handleSort : function(cmp, evt, helper) {
@@ -108,8 +111,9 @@
 		var sortBy = evt.getParam('arguments').sortBy;
 		cmp.find("grid").sort(sortBy);
 	},
+
     updateItem: function (cmp, event, helper) {
         var params = event.getParam('arguments');
         helper.updateItem(cmp, params.item, params.index);
-    }    	
+    }
 })// eslint-disable-line semi

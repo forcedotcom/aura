@@ -17,7 +17,15 @@
 
     afterRender: function (cmp, helper) {
         this.superAfterRender();
-        helper.initKeyboardEntry(cmp);
-        helper.initActiveCell(cmp);
+        if (cmp.get("v.enableKeyboardMode")) {
+            helper.initKeyboardEntry(cmp);
+        }
+    },
+    unrender: function (cmp, helper) {
+        if (cmp.get("v.enableKeyboardMode")) {
+            helper.destroyKeyboard(cmp);
+        }
+        this.superUnrender();
     }
+
 })// eslint-disable-line semi

@@ -139,6 +139,26 @@
     },
     
     /**
+     * inputSelect with useMenu=true inside a panel set's width correctly
+     * Bug: W-3204083
+     */
+    testMenuPicklistOnModal: {
+        test: [function(cmp) {
+            this.createPanel(cmp);
+        }, function(cmp) {
+            this.waitForModalOpen();
+        }, function(cmp) {
+        	var modal = this.getPanelTesterComponent(cmp.find("tester"));
+        	var modalElement = modal.getElement();
+        	var modalWidth = parseInt($A.test.getStyle(modalElement,"width"));
+        	var pickList = modal.find("inputSelectionOptions").getElement();
+        	$A.test.addWaitForWithFailureMessage(modalWidth, function () {
+        		return parseInt($A.test.getStyle(pickList,"width"));
+            }, "Modal Width and menuPicklist width should be the same:" + modalWidth);
+        }]
+    },
+    
+    /**
      * Test close button is not displayed on panel
      */
     testCloseButtonHiddenOnPanelDialog: {

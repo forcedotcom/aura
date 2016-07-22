@@ -255,11 +255,13 @@ public class MenuUITest extends WebDriverTestCase {
 
     @PerfTest
     @Test
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testCheckboxMenu() throws Exception {
         testMenuCheckboxForApp(MENUTEST_APP);
     }
 
     @Test
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testCheckboxMenuGeneratedFromMetaData() throws Exception {
         testMenuCheckboxForApp(MENUTEST_METADATA_APP);
     }
@@ -350,6 +352,7 @@ public class MenuUITest extends WebDriverTestCase {
         waitForElementTextPresent(result, "St. Louis Rams,Arizona Cardinals");
     }
 
+    @ExcludeBrowsers({BrowserType.IE11})
     public void testMenuRadio() throws Exception {
         open(MENUTEST_APP);
         WebDriver driver = this.getDriver();

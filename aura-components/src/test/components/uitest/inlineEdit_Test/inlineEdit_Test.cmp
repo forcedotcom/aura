@@ -20,7 +20,7 @@
 	<aura:attribute name="items" type="Object[]" />
     <aura:attribute name="lastEdited" type="Object" />
     <aura:attribute name="index" type="Integer" />
-	
+	<aura:attribute name="inKeyboardMode" type="Boolean" default="false" description="Tracks keyboard mode status of the inline edit grid, this is attr is just for the label." />
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
 	<div>
@@ -28,6 +28,7 @@
             <ui:inputText aura:id="inputTxt" class="inputTxt"/>
             <ui:button aura:id="appendButton" label="Append Item" press="{!c.appendItem}" />
             <ui:button aura:id="updateButton" label="Update Item" press="{!c.updateItem}" />
+            <ui:button label="{! (v.inKeyboardMode ? 'Disable Keyboard Mode' : 'Enable Keyboard Mode')}" press="{!c.handleKeyboardModeChange}" />
         </div>
 		<ui:inlineEditGrid
 		    aura:id="grid"        
@@ -37,7 +38,9 @@
 		    items="{!v.items}"
 		    rowHeaderIndex="1"    
 		    delegatedEvents="click,keydown,mouseover"
-		    onEdit="{!c.onEdit}">
+		    onEdit="{!c.onEdit}"
+            onKeyboardModeEnter="{!c.onKeyboardModeEnter}"  
+            onKeyboardModeExit="{!c.onKeyboardModeExit}">
 		    
 			<aura:set attribute="headerColumns">
 				<ui:dataGridColumn name="id"	    label="Id" sortable="true"/>

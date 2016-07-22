@@ -34,7 +34,6 @@
 			});
 		}
 		// empty row
-		items[5].myData.name = '';
 		items[5].myData.grade = '';
 		items[5].myData.linkLabel = '';
 		items[5].myData.bloodtype = '';
@@ -88,6 +87,25 @@
 	    cmp.find('grid').updateItem(item, index);
 	},
 	
+	onKeyboardModeEnter: function(cmp, evt) {
+        cmp.set('v.inKeyboardMode', true);
+    },  
+
+    onKeyboardModeExit : function(cmp, evt) {
+        cmp.set('v.inKeyboardMode', false);
+    },
+	
+	handleKeyboardModeChange: function(cmp, evt, handler){
+	      var inKeyboardMode = cmp.get('v.inKeyboardMode');
+	      cmp.set('v.inKeyboardMode', !inKeyboardMode);
+	      if (!inKeyboardMode) {
+	          cmp.find('grid').enterKeyboardMode(false);
+	      }
+	      else {
+	          cmp.find('grid').exitKeyboardMode();
+	      }
+	},
+    
 	onEdit : function(cmp, evt, helper) {
 	    helper.updateLastEdited(cmp, evt.getParams());
 	}

@@ -69,6 +69,22 @@
 		 }]
 	 },
 	 
+	 /**
+      *  Verifies there is an icon class inside each cell
+      */
+     testInlineEditCellContainsIconClass : {
+         test : [function(cmp) {
+             cmp.find('cell1DisableBtn').get('e.press').fire();
+         }, function(cmp) { 
+             this.waitForEditDisabled(cmp);
+             // loop through all 7 cells
+             for(var i = 1; i < 8; ++i) {
+                 var cellElem = cmp.find('cell' + i).find('editTrigger').getElement().querySelector('span:last-child');
+                 $A.test.assertTrue($A.util.hasClass(cellElem, 'iconCmp'), "The icon class isn't in the cell: " + i);
+             }
+         }]
+     },
+     
 	 getEditTriggerState : function(cmp) {
 		 return cmp.find('cell1').find('editTrigger').getElement().disabled;
 	 },

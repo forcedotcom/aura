@@ -146,14 +146,14 @@
       */
      testEditEmptyCell : {
          test : [function(cmp) {
-             this.triggerEditOnCell(cmp, 5, 1);
+             this.triggerEditOnCell(cmp, 5, 2);
          }, function(cmp) {
              this.waitForPanelOpen(cmp);
          }, function(cmp) {
              this.verifyPanelContent(cmp, '');
-             this.editPanel(cmp, 'something new');
+             this.editPanel(cmp, 555);
          }, function(cmp) {
-             this.waitForCellContent(cmp, 5, 1, 'something new');
+             this.waitForCellContent(cmp, 5, 2, '555');
          }]
      },
      

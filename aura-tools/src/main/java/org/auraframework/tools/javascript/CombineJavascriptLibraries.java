@@ -75,6 +75,7 @@ public class CombineJavascriptLibraries {
         }
 
         StringBuilder outputDev = new StringBuilder();
+        outputDev.append(System.lineSeparator()).append(";"); // prevent syntax issues with combining files
         StringBuilder logging = new StringBuilder("Non minified version includes ");
 
         // calculate non-minified and minified paths
@@ -111,6 +112,7 @@ public class CombineJavascriptLibraries {
         logging.setLength(0);
 
         StringBuilder outputMin = new StringBuilder();
+        outputMin.append(System.lineSeparator()).append(";"); // prevent syntax issues with combining files
         logging.append("Minified version includes ");
         for (Path minFile : minFiles) {
             // cache minified output

@@ -54,11 +54,8 @@ public final class ValidationTestUtil {
         // csslint doesn't work when running with 1.6
         boolean cssLintErrorsReported = !System.getProperty("java.version").startsWith("1.6");
 
-        Assert.assertEquals(cssLintErrorsReported ? 5 : 3, errors.size());
+        Assert.assertEquals(cssLintErrorsReported ? 3 : 0, errors.size());
         ArrayList<String> expectedErrors = new ArrayList<>();
-        expectedErrors.add("basicController.js [line 5, column 1] js/custom: Starting '(' missing");
-        expectedErrors.add("basicController.js [line 7, column 20] jslint: Expected ';' and instead saw '}'");
-        expectedErrors.add("basic.cmp [line 1, column 1] cmp/custom: Abstract component markup://validationTest:basic must be extensible");
         if(cssLintErrorsReported){
             expectedErrors.add("basic.css [line 1, column 1] cssparser: CSS selector must begin with '.validationTestBasic' or '.THIS'");
             expectedErrors.add("basic.css [line 2, column 5] csslint @ box-sizing: The box-sizing property isn't supported in IE6 and IE7");

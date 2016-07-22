@@ -1234,7 +1234,14 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
             Aura["afterBootstrapReady"].push(function () {
                 $A.log('Checking bootstrap signature');
                 Aura["bootstrapUpgrade"] = boot["md5"] !== Aura["appBootstrap"]["md5"];
+
+                if (this._token !== boot["token"]) {
+                    this._token = boot["token"];
+                    this.saveTokenToStorage(); // async fire-and-forget
+                }
+
                 this.checkBootstrapUpgrade($A.finishedInit);
+
             }.bind(this));
         }
 

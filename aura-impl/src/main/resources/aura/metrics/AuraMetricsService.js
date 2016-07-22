@@ -38,7 +38,7 @@ Aura.Services.MetricsService = function MetricsService() {
 Aura.Services.MetricsService.VERSION  = '2.1.0';
 
 Aura.Services.MetricsService.PERFTIME = !!(window.performance && window.performance.now);
-Aura.Services.MetricsService.TIMER    = Aura.Services.MetricsService.PERFTIME ? function () { return Math.round(window.performance.now() * 100) / 100; } : Date.now.bind(Date);
+Aura.Services.MetricsService.TIMER    = Aura.Services.MetricsService.PERFTIME ? function () { return Math.floor(window.performance.now() * 100) / 100; } : Date.now.bind(Date);
 Aura.Services.MetricsService.START    = 'start';
 Aura.Services.MetricsService.END      = 'end';
 Aura.Services.MetricsService.STAMP    = 'stamp';
@@ -54,7 +54,7 @@ Aura.Services.MetricsService.prototype.initialize = function () {
         this.setClearCompletedTransactions(false);
     // #end
     this.getPageStartTime();
-    this.transactionStart('bootstrap','app');
+    this.transactionStart('aura','bootstrap');
     this.initializePlugins();
 };
 
@@ -156,12 +156,18 @@ Aura.Services.MetricsService.prototype.applicationReady = function () {
 
     var bootstrap = this.getBootstrapMetrics();
     var now = this.time();
-    this.transactionEnd('bootstrap','app', function (transaction) {
+    this.transactionEnd('aura','bootstrap', function (transaction) {
         // We need to override manually the duration to add the time before aura was initialized
         var bootstrapStart = Aura.Services.MetricsService.PERFTIME ? 0 : transaction["pageStartTime"];
-        transaction["marks"]["bootstrap"] = bootstrap;
+        
+        transaction["context"] = {
+            "eventType"   : "bootstrap",
+            "eventSource" : "framework",
+            "attributes"  : bootstrap 
+        };
+
         transaction["ts"] = bootstrapStart;
-        transaction["duration"] = Math.round((now - bootstrapStart) * 100) / 100;
+        transaction["duration"] = parseInt(now - bootstrapStart, 10);
     });
 
     if (!this.inTransaction()) {
@@ -335,7 +341,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
         var parsedTransaction = {
                 "id"            : id,
                 "ts"            : transaction["ts"],
-                "duration"      : Math.round((this.time() - transaction["ts"]) * 100) / 100,
+                "duration"      : Math.floor((this.time() - transaction["ts"]) * 100) / 100,
                 "pageStartTime" : this.pageStartTime,
                 "marks"         : {},
                 "context"       : transactionCfg["context"] || {},
@@ -385,7 +391,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
         // Cleanup transaction
         if (!this.clearCompleteTransactions) {
             // Only for non-prod, to keep the transactions stored
-            var newId = id + ':' + Math.round(parsedTransaction["ts"]);
+            var newId = id + ':' + parseInt(parsedTransaction["ts"], 10);
             parsedTransaction["config"] = transactionCfg;
             this.transactions[newId] = parsedTransaction;
             parsedTransaction["id"] = newId;
@@ -510,7 +516,7 @@ Aura.Services.MetricsService.prototype.defaultPostProcessing = function (customM
         } else if (phase === 'end' && queue[id]) {
             var mark = queue[id];
             mark["context"]  = $A.util.apply(mark["context"] || {}, customMarks[i]["context"] || {});
-            mark["duration"] = Math.round((customMarks[i]["ts"] - mark["ts"]) * 100) / 100;
+            mark["duration"] = Math.floor((customMarks[i]["ts"] - mark["ts"]) * 100) / 100;
             procesedMarks.push(mark);
             delete mark["phase"];
             delete queue[id];
@@ -795,6 +801,20 @@ Aura.Services.MetricsService.prototype.registerBeacon = function (beacon) {
     this.beaconProviders[beacon["name"] || Aura.Services.MetricsService.DEFAULT] = beacon["beacon"] || beacon;
 };
 
+Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) {
+    return {
+        "name"         : r.name,
+        "duration"     : parseInt(r.responseEnd - r.startTime, 10),
+        "startTime"    : parseInt(r.startTime, 10),
+        "fetchStart"   : parseInt(r.fetchStart, 10),
+        "requestStart" : parseInt(r.requestStart, 10),
+        "dns"          : parseInt(r.domainLookupEnd - r.domainLookupStart, 10),
+        "tcp"          : parseInt(r.connectEnd - r.connectStart, 10),
+        "ttfb"         : parseInt(r.responseStart - r.startTime, 10),
+        "transfer"     : parseInt(r.responseEnd - r.responseStart, 10)
+    };
+};
+
 /**
  * Returns a JSON Object which contains the bootstrap metrics of the framework and the application
  * @public
@@ -808,7 +828,7 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
     // We cache it after the first call
     if (!pageStartTime) {
         for (var m in Aura["bootstrap"]) {
-            bootstrap[m] = Math.round(Aura["bootstrap"][m] * 100) / 100;
+            bootstrap[m] = parseInt(Aura["bootstrap"][m], 10);
         }
 
         pageStartTime = this.getPageStartTime();
@@ -848,40 +868,32 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
             };
 
             if (performance.getEntries) {
-                var frameworkRequests = {};
-                var tmp = {};
+                var frameworkRequests = {
+                    "encryptionKeyJs" : "app.encryptionkey.js",
+                    "bootstrapJs"     : "bootstrap.js",
+                    "inlineJs"        : "inline.js",
+                    "appCss"          : "app.css",
+                    "appJs"           : "app.js",
+                    "auraJs"          : "/aura_",
+                    "auraLibs"        : "/libs_" 
+                };
+
                 var bootstrapRequests = ($A.util.filter(performance.getEntries(),
                     function (resource) {
                         return resource.responseEnd < bootstrap["bootstrapEPT"];
-                    })).map(function (resource) {
-                        return {
-                            "name"         : resource.name,
-                            "duration"     : resource.duration,
-                            "startTime"    : resource.startTime,
-                            "redirectTime" : resource.redirectEnd - resource.redirectStart,
-                            "dnsTime"      : resource.domainLookupEnd - resource.domainLookupStart,
-                            "requestStart" : resource.requestStart,
-                            "responseEnd"  : resource.responseEnd
-                        };
+                    })).map(this.summarizeResourcePerfInfo);
+
+               frameworkRequests = $A.util.reduce(window.performance.getEntries(), function (r, item) { 
+                    for (var i in frameworkRequests) {
+                        if (item.name.indexOf(frameworkRequests[i]) !== -1) {
+                            r[i] = this.summarizeResourcePerfInfo(item);
+                            return r;       
+                        }
                     }
-                );
+                    return r;
+                }.bind(this), {});
 
-                frameworkRequests["bootstrapJs"] = bootstrapRequests.filter(function (r) { return r.name.indexOf('bootstrap.js') !== -1; })[0];
-                frameworkRequests["inlineJs"]    = bootstrapRequests.filter(function (r) { return r.name.indexOf('inline.js') !== -1; })[0];
-                frameworkRequests["appCss"]      = bootstrapRequests.filter(function (r) { return r.name.indexOf('app.css') !== -1; })[0];
-                frameworkRequests["appJs"]       = bootstrapRequests.filter(function (r) { return r.name.indexOf('app.js') !== -1; })[0];
-                frameworkRequests["auraJs"]      = bootstrapRequests.filter(function (r) { return r.name.indexOf('/aura_') !== -1; })[0];
-                frameworkRequests["auraLibs"]    = bootstrapRequests.filter(function (r) { return r.name.indexOf('/libs_') !== -1; })[0];
-
-                for (var i in frameworkRequests) {
-                    var entry = frameworkRequests[i];
-                    if (entry) {
-                        tmp[i + 'Init'] = Math.round(entry["startTime"] * 100) / 100;
-                        tmp[i + 'Duration'] = Math.round((entry["responseEnd"] - entry["startTime"]) * 100) / 100;
-                    }
-                }
-
-                bootstrap["coreRequests"] = tmp;
+                bootstrap["coreRequests"] = frameworkRequests;
                 bootstrap["allRequests"] = bootstrapRequests;
             }
         }

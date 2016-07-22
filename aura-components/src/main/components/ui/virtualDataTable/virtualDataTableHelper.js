@@ -179,7 +179,13 @@
         actionHandler.runDeprecated(event);
     },
     _getActionHandler: function (htmlCmp, eventType) {
-        return htmlCmp.isInstanceOf("aura:html")&&htmlCmp.get("v.HTMLAttributes")["on"+eventType];
+        if (htmlCmp.isInstanceOf("aura:html")) {
+            var attributes = htmlCmp.get("v.HTMLAttributes");
+            if (attributes) {
+                return attributes["on"+eventType];
+            }
+        }
+        return null;
     },
     _eventDelegator: function (cmp, e) {
 

@@ -16,7 +16,7 @@
 ({
     optionSeparator: ";",
 
-    init: function (cmp) {
+    init: function(cmp) {
         var currentValue = cmp.get("v.value");
 
         if ($A.util.isEmpty(cmp.get("v.options")) && !$A.util.isEmpty(cmp.get("v.body"))) {
@@ -48,7 +48,7 @@
     /**
      * Iterates over the options in the select element and returns a semicolon-delimited string of the selected values
      */
-    getDomElementValue: function (el) {
+    getDomElementValue: function(el) {
         var selectedOptions = [];
         for (var i = 0; i < el.options.length; i++) {
             if (el.options[i].selected) {
@@ -62,7 +62,7 @@
      * Returns a package with the array of options (as either an array of components or an array of JS objects)
      * and the strategy to work with that array
      */
-    getOptionsWithStrategy: function (cmp) {
+    getOptionsWithStrategy: function(cmp) {
         var strat = this.optionsStrategy,
             opts = strat.getOptions(cmp);
 
@@ -74,42 +74,25 @@
         return {options: opts, strategy: strat};
     },
 
-    menuOptionSelected: function (cmp) {
-        var multiSelect = cmp.get("v.multiple");
+    menuOptionSelected: function(cmp) {
+        var menuItems = cmp.find("options").get("v.body");
 
-        var selectedLabel = "";
-        var newValue = "";
-        var menuItems = cmp.find("options").get("v.childMenuItems");
-        var options = cmp.get("v.options");
-
-        for (var i = 0; i < menuItems.length; i++) {
-            var menuItem = menuItems[i];
-            var isSelected = menuItem.get("v.selected");
-
-            options[i].selected = isSelected;
-
-            if (isSelected) {
-                if (multiSelect) {
-                    if (selectedLabel.length > 0) {
-                        selectedLabel += this.optionSeparator;
-                        newValue += this.optionSeparator;
-                    }
-
-                    selectedLabel += menuItem.get("v.label");
-                    newValue += options[i].value;
-                } else {
-                    selectedLabel = menuItem.get("v.label");
-                    newValue = options[i].value;
-                    break;
-                }
+        var buildAListOfSelectedOptions = function(accumulator, menuItem) {
+            if (menuItem.get("v.selected")) {
+                accumulator.push({label: menuItem.get("v.label"), value: menuItem.get("v.value")});
             }
-        }
+            return accumulator;
+        };
+        var selectedOptions = menuItems.reduce(buildAListOfSelectedOptions, []);
 
-        if (cmp.get("v.value") === newValue) {
+        var newSelectedLabel = selectedOptions.map(function(value) { return value.label; }).join(this.optionSeparator);
+        var newValue = selectedOptions.map(function(value) { return value.value; }).join(this.optionSeparator);
+
+        if (cmp.get("v.selectedLabel") === newSelectedLabel) {
             return;
         }
 
-        cmp.set("v.selectedLabel", selectedLabel);
+        cmp.set("v.selectedLabel", newSelectedLabel);
         cmp._suspendChangeHandlers = true;
         cmp.set("v.value", newValue);
         cmp.get("e.change").fire();
@@ -120,7 +103,7 @@
         var options = cmp.get("v.options");
         var menuItems = [];
 
-        var handleCreatedMenuItem = function (menuItem) {
+        var handleCreatedMenuItem = function(menuItem) {
             menuItems.push(menuItem);
             if (menuItems.length === options.length) {
                 cmp.find("options").set("v.body", menuItems);
@@ -129,10 +112,11 @@
         var multiSelect = cmp.get("v.multiple");
         var menuItemComponentName = multiSelect ? "ui:checkboxMenuItem" : "ui:radioMenuItem";
 
-        $A.getDefinition(menuItemComponentName, function () {
+        $A.getDefinition(menuItemComponentName, function() {
             for (var i = 0; i < options.length; i++) {
                 $A.createComponent(menuItemComponentName, {
                     "label": options[i].label,
+                    "value": options[i].value,
                     "selected": $A.util.getBooleanValue(options[i].selected),
                     "hideMenuAfterSelected": !multiSelect
                 }, handleCreatedMenuItem);
@@ -141,29 +125,14 @@
     },
 
     updateMenuLabel: function(cmp) {
-        var multiSelect = cmp.get("v.multiple");
         var options = cmp.get("v.options");
-        var newLabel = "";
-        var optionSelected = false;
 
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-            if (option.selected === true) {
-                optionSelected = true;
-
-                if (multiSelect && newLabel.length > 0) {
-                    newLabel += this.optionSeparator;
-                }
-                newLabel += option.label;
-
-                if (!multiSelect) {
-                    break;
-                }
-            }
-        }
+        var newLabel = options.filter(function(option) { return option.selected; })
+            .map(function(option) { return option.label; })
+            .join(this.optionSeparator);
 
         // If nothing was selected, just default the label to the first item
-        if (!optionSelected && options.length > 0) {
+        if (newLabel === "" && options[0]) {
             newLabel = options[0].label;
         }
 
@@ -173,7 +142,7 @@
     /**
      * Updates all options' "selected" attributes in the select element, based on the semicolon-delimited newValue string
      */
-    updateOptionsFromValue: function (cmp, createNewOptions) {
+    updateOptionsFromValue: function(cmp, createNewOptions) {
         if (cmp._suspendChangeHandlers) {
             return;
         }
@@ -224,7 +193,7 @@
     /**
      * Updates this component's "value" attribute based on the state of its options' "selected" attributes
      */
-    updateValueFromOptions: function (cmp, optionsPack) {
+    updateValueFromOptions: function(cmp, optionsPack) {
         if (cmp._suspendChangeHandlers) {
             return;
         }
@@ -273,7 +242,7 @@
         },
 
         // If an option is in newValues, we want to select it
-        updateOptions: function (cmp, options, newValues, createNewOptions) {
+        updateOptions: function(cmp, options, newValues, createNewOptions) {
             var found = false;
             var i;
 
@@ -302,7 +271,7 @@
             return found;
         },
         // If an option is selected, we want to aggregate it into our list
-        getSelected: function (options) {
+        getSelected: function(options) {
             var values = [];
 
             for (var i = 0; i < options.length; i++) {
@@ -314,20 +283,20 @@
 
             return values;
         },
-        getValue: function (options, index) {
+        getValue: function(options, index) {
             if (!$A.util.isUndefinedOrNull(options[index])) {
                 return options[index].value;
             }
             return undefined;
         },
-        setOptionSelected: function (options, index, selected) {
+        setOptionSelected: function(options, index, selected) {
             if (!$A.util.isUndefinedOrNull(options[index])) {
                 options[index].selected = selected;
             // } else {
                 // TODO: somehow expose that the option couldn't be set.
             }
         },
-        persistOptions: function (cmp, options) {
+        persistOptions: function(cmp, options) {
             cmp.set("v.options", options);
         }
     },
@@ -344,36 +313,36 @@
             return options;
         },
         // Updates options based on their existence in newValues
-        updateOptions: function (cmp, options, newValues) {
+        updateOptions: function(cmp, options, newValues) {
             var result = {found: false};
             // Perform single option update function on all of our options
             this.performOperationOnCmps(options, this.updateOption, result, newValues);
             return result.found;
         },
-        getSelected: function (bodyCmps) {
+        getSelected: function(bodyCmps) {
             var values = [];
             this.performOperationOnCmps(bodyCmps, this.pushIfSelected, values);
             return values;
         },
-        getValue: function (options, index) {
+        getValue: function(options, index) {
             if (options[index]) {
                 return options[index].get("v.text");
             }
             return undefined;
         },
-        setOptionSelected: function (options, index, selected) {
+        setOptionSelected: function(options, index, selected) {
             if (!$A.util.isUndefinedOrNull(options[index])) {
                 options[index].set("v.value", selected);
             // } else {
                 // TODO: somehow expose that the option couldn't be set.
             }
         },
-        persistOptions: function () {
+        persistOptions: function() {
             // v.body should remain the same in case iteration options change. See W-2926861
             //cmp.set("v.body", options);
         },
         // Performs op on every ui:inputSelectOption in opts, where op = function(optionCmp, resultsObject, optionalArguments)
-        performOperationOnCmps: function (opts, op, result, newValues) {
+        performOperationOnCmps: function(opts, op, result, newValues) {
             for (var i = 0; i < opts.length; i++) {
                 var cmp = opts[i];
                 if (cmp.isInstanceOf("ui:inputSelectOption")) {
@@ -394,7 +363,7 @@
         },
         // Helper function for updateOptions
         // Update optionCmp if it exists in newValues; passes result back in result object
-        updateOption: function (optionCmp, result, newValues) {
+        updateOption: function(optionCmp, result, newValues) {
             var text = optionCmp.get("v.text");
             var selectOption = (newValues.length > 1 && newValues.indexOf(text) > -1) || newValues[0] === text;
 
@@ -404,7 +373,7 @@
         },
         // Helper function for getValues
         // Push optionCmp's value into valueList if selected
-        pushIfSelected: function (optionCmp, valueList) {
+        pushIfSelected: function(optionCmp, valueList) {
             if ($A.util.getBooleanValue(optionCmp.get("v.value")) === true) {
                 var text = optionCmp.get("v.text");
                 if (!$A.util.isUndefined(text)) {
@@ -412,10 +381,10 @@
                 }
             }
         },
-        addOptionToList: function (cmp, list) {
+        addOptionToList: function(cmp, list) {
             list.push(cmp);
         },
-        canSupportOptions: function (cmp) {
+        canSupportOptions: function(cmp) {
             for (var i = 0; i < this.SUPPORTEDCONTAINERS.length; i++) {
                 if (cmp.isInstanceOf(this.SUPPORTEDCONTAINERS[i])) {
                     return true;

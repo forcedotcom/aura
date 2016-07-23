@@ -76,20 +76,20 @@
     position: function (component) {
         var elements = this.getElementCache(component),
             attachToBody = elements.target.get("v.attachToBody"),
-            manualPosition = elements.target.get("v.manualPosition"),
-            visible,
             autoPosition,
             elemRect,
             viewPort,
             height;
 
+        var manualPosition = elements.target.get("v.manualPosition");
+        var visible = elements.target.get("v.visible");
+
         if (attachToBody === true) {
-            return this.positionAsBodyChild(component);
+            return this.positionAsBodyChild(component, manualPosition);
         }
 
         if (elements.targetDiv && !manualPosition) {
             elements.targetDiv.style.top = "auto";
-            visible = elements.target.get("v.visible");
 
             if (visible) {
                 autoPosition = component.get('v.autoPosition');
@@ -130,31 +130,34 @@
 
     },
 
-    positionAsBodyChild: function (component) {
+    positionAsBodyChild: function (component, manualPosition) {
         var element = component.find("popupTarget").getElement();
         var target = component.get("v.referenceElement");
         var self = this;
         if (target && element) {
-            var cornerAlign = this.rightCornerFitsInViewport(element, target) ? "left" : "right";
-            component._constraint = component.positionConstraint = this.lib.panelPositioning.createRelationship({
-                element: element,
-                target: target,
-                appendToBody: true,
-                align: cornerAlign + " top",
-                targetAlign: cornerAlign + " bottom",
-                padTop: 2
-            });
-            
-
-            // make sure reposition happens outside the render cycle,
-            // and that the panel is not visible until it is in position.
-            element.style.opacity = 0;
-            setTimeout($A.getCallback(function() {
-                self.lib.panelPositioning.reposition(function() {
-                    element.style.opacity = 1;
+            if (manualPosition) {
+                $A.util.attachToDocumentBody(component.getElement());
+            } else {
+                var horizontalCornerAlignment = this.rightCornerFitsInViewport(element, target) ? "left" : "right";
+                var verticalCornerAlignment = this.bottomCornerFitsInViewport(element, target) ? "top" : "bottom";
+                component._constraint = component.positionConstraint = this.lib.panelPositioning.createRelationship({
+                    element: element,
+                    target: target,
+                    appendToBody: true,
+                    align: horizontalCornerAlignment + " " + verticalCornerAlignment,
+                    targetAlign: horizontalCornerAlignment + " " + (verticalCornerAlignment === "top" ? "bottom" : "top"),
+                    padTop: 2
                 });
-            }), 50);
-            
+
+                // make sure reposition happens outside the render cycle,
+                // and that the panel is not visible until it is in position.
+                element.style.opacity = 0;
+                setTimeout($A.getCallback(function () {
+                    self.lib.panelPositioning.reposition(function () {
+                        element.style.opacity = 1;
+                    });
+                }), 50);
+            }
         }
     },
 
@@ -165,13 +168,23 @@
         }
     },
 
-    rightCornerFitsInViewport: function(element, targetElement) {
+    rightCornerFitsInViewport: function(element, referenceElement) {
         var viewPort = $A.util.getWindowSize();
         var elemRect = element.getBoundingClientRect();
-        var referenceElemRect = targetElement.getBoundingClientRect();
+        var referenceElemRect = referenceElement.getBoundingClientRect();
         var width = typeof elemRect.width !== 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
 
         return (viewPort.width - referenceElemRect.left) > width;
+
+    },
+
+    bottomCornerFitsInViewport: function(element, referenceElement) {
+        var viewPort = $A.util.getWindowSize();
+        var elemRect = element.getBoundingClientRect();
+        var referenceElemRect = referenceElement.getBoundingClientRect();
+        var height = typeof elemRect.height !== 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
+
+        return (viewPort.height - referenceElemRect.bottom) > height;
 
     },
 

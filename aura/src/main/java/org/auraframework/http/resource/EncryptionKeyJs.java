@@ -15,15 +15,14 @@
  */
 package org.auraframework.http.resource;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.system.AuraContext;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * Handles /l/{}/app.encryptionkey requests to retrieve encryption key.
@@ -40,19 +39,15 @@ public class EncryptionKeyJs extends AuraResourceImpl {
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
-        if (this.configAdapter.validateGetEncryptionKey(request.getParameter("ssid"))) {
-            servletUtilAdapter.setNoCache(response);
-
-            String key = configAdapter.getEncryptionKey();
-            PrintWriter out = response.getWriter();
-            out.append(PREPEND_JS);
-            out.append(key);
-            out.append(APPEND_JS);
-        } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
-        }
+    	servletUtilAdapter.setNoCache(response);
+    	
+        String key = configAdapter.getEncryptionKey();
+        PrintWriter out = response.getWriter();
+        out.append(PREPEND_JS);
+        out.append(key);
+        out.append(APPEND_JS);
     }
-
+    
     public void setConfigAdapter(ConfigAdapter configAdapter) {
     	this.configAdapter = configAdapter;
     }

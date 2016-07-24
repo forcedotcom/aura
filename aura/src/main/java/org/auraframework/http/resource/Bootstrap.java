@@ -92,34 +92,30 @@ public class Bootstrap extends AuraResourceImpl {
         DefDescriptor<?> desc = definitionService.getDefDescriptor(app.getDescriptorName(), type.getPrimaryInterface());
 
         try {
-            if (Aura.getConfigAdapter().validateGetEncryptionKey(request.getParameter("ssid"))) {
-                setCacheHeaders(response, app);
+            setCacheHeaders(response, app);
 
-                Instance<?> appInstance = Aura.getInstanceService().getInstance(desc, getComponentAttributes(request));
-                definitionService.updateLoaded(desc);
-                loadLabels();
+            Instance<?> appInstance = Aura.getInstanceService().getInstance(desc, getComponentAttributes(request));
+            definitionService.updateLoaded(desc);
+            loadLabels();
 
-                JsonSerializationContext serializationContext = context.getJsonSerializationContext();
+            JsonSerializationContext serializationContext = context.getJsonSerializationContext();
 
-                WrappedPrintWriter out = new WrappedPrintWriter(response.getWriter());
-                out.append(PREPEND_JS);
-                JsonEncoder json = JsonEncoder.createJsonStream(out, serializationContext);
-                json.writeMapBegin();
-                json.writeMapKey("data");
-                json.writeMapBegin();
-                json.writeMapEntry("app", appInstance);
-                context.getInstanceStack().serializeAsPart(json);
-                json.writeMapEnd();
-                serializationContext.pushRefSupport(false);
-                json.writeMapEntry("md5", out.getMD5());
-                json.writeMapEntry("context", context);
-                json.writeMapEntry("token", Aura.getConfigAdapter().getCSRFToken());
-                serializationContext.popRefSupport();
-                json.writeMapEnd();
-                out.append(APPEND_JS);
-            } else {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN);
-            }
+            WrappedPrintWriter out = new WrappedPrintWriter(response.getWriter());
+            out.append(PREPEND_JS);
+            JsonEncoder json = JsonEncoder.createJsonStream(out, serializationContext);
+            json.writeMapBegin();
+            json.writeMapKey("data");
+            json.writeMapBegin();
+            json.writeMapEntry("app", appInstance);
+            context.getInstanceStack().serializeAsPart(json);
+            json.writeMapEnd();
+            serializationContext.pushRefSupport(false);
+            json.writeMapEntry("md5", out.getMD5());
+            json.writeMapEntry("context", context);
+            json.writeMapEntry("token", Aura.getConfigAdapter().getCSRFToken());
+            serializationContext.popRefSupport();
+            json.writeMapEnd();
+            out.append(APPEND_JS);
         } catch (Throwable t) {
             t = Aura.getExceptionAdapter().handleException(t);
             writeError(t, response, context);

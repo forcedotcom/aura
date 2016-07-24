@@ -58,6 +58,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 
+import aQute.bnd.annotation.component.Component;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -405,14 +407,9 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     @Override
     public String getBootstrapUrl(AuraContext context, Map<String,Object> attributes) {
-        String ret = commonJsUrl("/bootstrap.js", context, attributes);
-        String token = configAdapter.generateJwtToken();
-        if (token != null) {
-            ret = ret + "?ssid=" + token;
-        }
-        return ret;
+        return commonJsUrl("/bootstrap.js", context, attributes);
     }
-
+    
     @Override
     public String getInlineJsUrl(AuraContext context, Map<String,Object> attributes) {
         return commonJsUrl("/inline.js", context, attributes);

@@ -90,12 +90,6 @@ public interface ConfigAdapter extends AuraAdapter {
     String getEncryptionKey();
 
     /**
-     * Returns the token for bootstrap resources
-     * @Return a token
-     */
-    String generateJwtToken();
-
-    /**
      * Validate the app.encryptionkey request
      * @return true if the request has a valid ssid.
      */

@@ -472,11 +472,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return String.format("%s/l/%s/app.encryptionkey" + (jsFormat ? ".js" : ""), contextPath, encodedContext);
     }
 
-    @Override
-    public String generateJwtToken() {
-        return null;
-    }
-
     /**
      * Returns default aura encryption key. Key needs to be either 16 or 32 characters in length for AES
      * @return default aura key

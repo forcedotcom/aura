@@ -16,5 +16,5 @@
 
 -->
 <aura:event access="PRIVILEGED" type="COMPONENT" description="Fired when there is an error to fetch data from a dataProvider.">
-    <aura:attribute name="error" type="Object" description="The object data provider uses to store errors."/>
+    <aura:attribute name="error" access="PRIVILEGED" type="Object" description="The object data provider uses to store errors."/>
 </aura:event>

@@ -16,11 +16,11 @@
 
 -->
 <aura:event access="PRIVILEGED" type="COMPONENT" description="Event for ui:tabset component.">
-    <aura:attribute name="index" type="Integer" description="The index position of the tab."/>
-    <aura:attribute name="name" type="String" description="The internal name of the tab."/>
-    <aura:attribute name="focus" type="Boolean" description="Whether to focus the tabset item or not."/>
-    <aura:attribute name="tab" type="Object" description="The tab object."/>
-    <aura:attribute name="oldTab" type="Object" description="The tab that was just deactivated."/>
-    <aura:attribute name="active" type="Boolean" description="Indicates the tab is active or not."/>
+    <aura:attribute name="index" access="PRIVILEGED" type="Integer" description="The index position of the tab."/>
+    <aura:attribute name="name" access="PRIVILEGED" type="String" description="The internal name of the tab."/>
+    <aura:attribute name="focus" access="PRIVILEGED" type="Boolean" description="Whether to focus the tabset item or not."/>
+    <aura:attribute name="tab" access="PRIVILEGED" type="Object" description="The tab object."/>
+    <aura:attribute name="oldTab" access="PRIVILEGED" type="Object" description="The tab that was just deactivated."/>
+    <aura:attribute name="active" access="PRIVILEGED" type="Boolean" description="Indicates the tab is active or not."/>
     <aura:attribute name="callback" type="Object" description="A callback function." />
 </aura:event>

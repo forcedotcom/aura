@@ -26,7 +26,7 @@
 	<aura:attribute name="createable" type="Boolean" default="false" description="Describes whether the implementation should enable a creation pattern."/>
     <aura:attribute name="selectAll" type="Boolean" default="false" description="All selected."/>
 	<aura:attribute name="selectedItems" type="List" description="A list of selected items."/>
-	<aura:attribute name="sortBy" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
+	<aura:attribute name="sortBy" access="PRIVILEGED" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
 
 
 	<!-- Facets for advanced configuration -->

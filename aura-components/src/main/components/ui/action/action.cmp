@@ -20,7 +20,7 @@
 	<aura:attribute name="label" type="String" description="The text label for the component."/>
 	<aura:attribute name="labelClass" type="String" description="The class for the label on the component."/>
 	<aura:attribute name="index" type="Integer" description="The index for the item-index data attribute value specified on the DOM element."/>
-	<aura:attribute name="value" type="Object" description="Use this to bind some value to the action. Must be serializable {String, Number, Boolean}."/>
+	<aura:attribute name="value" access="PRIVILEGED" type="Object" description="Use this to bind some value to the action. Must be serializable {String, Number, Boolean}."/>
 
     <aura:handler name="change" value="{!v.value}" action="{!c.handleValueChange}"/>
 

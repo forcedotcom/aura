@@ -22,7 +22,7 @@
     <aura:attribute name="maxLines" access="PRIVILEGED" type="Integer" default="0" description="Maximum lines to show. Hidden lines can be expanded. Use 0 to disable."/>
     <aura:attribute name="focusOnInput" access="PRIVILEGED" type="Boolean" default="true" description="Focus on input box when the component is created."/>
     <aura:attribute name="allowRemove" access="PRIVILEGED" type="Boolean" default="true" description="Allows deleting pills from container."/>
-    <aura:attribute name="pillInput" type="Aura.Component[]" description="An input component that will be added to the end of the list of pills"/>
+    <aura:attribute name="pillInput" access="PRIVILEGED" type="Aura.Component[]" description="An input component that will be added to the end of the list of pills"/>
     <aura:attribute name="showMoreLabel" type="String" default="Show More &#9662;" description="The label for the show more button. The default is 'Show More&#9662;'."/>
     <aura:attribute name="pillFlavor" access="PRIVILEGED" type="String" default="default" description="The flavor for the pills."/>
     <aura:attribute name="assistiveTextLabel" type="String"  description="Assistive text for the pill container."/>

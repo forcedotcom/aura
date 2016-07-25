@@ -52,6 +52,9 @@
             document.removeEventListener('click', handler);
         }
 
+        var el = cmp.getElement();
+        el.classList.remove('open');
+
         this.lib.panelLibCore.hide(cmp, {
             onFinish: function() {
                 cmp.set('v.visible', false);

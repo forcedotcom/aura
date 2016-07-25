@@ -107,14 +107,16 @@
                 cell = this.getCell(3, 6);
                 var expectedDateText = "Jan 1, 2000";
                 var d = new Date(Date.UTC(2000, 0, 1, 0, 0, 0)); // when running on autobuilds datetime gets set in UTC
-                var darr = d.toString().split(' ');
+                var dLocal = new Date(d.toUTCString() + ' UTC');
+                var darr = dLocal.toString().split(' ');
                 var expectedDateText2 = darr[1] + ' ' + darr[2] + ', ' + darr[3];
                 cellElm = cell.querySelector("span.uiOutputDateTime");
                 var cellText = $A.test.getText(cellElm);
                 $A.test.assertTrue((cellText.indexOf(expectedDateText) >= 0) ||
                         (cellText.indexOf(expectedDateText2) >= 0), "The dom isn't displaying dateTime. " +
                         "Expected either " + expectedDateText + " or " + expectedDateText2 + " in " + cellText +
-                        ". Client locale = " + $A.get('$Locale').timezone + ". Timezone = " + d.getTimezoneOffset());
+                        ". Client locale = " + $A.get('$Locale').timezone + ". Timezone = " + d.getTimezoneOffset() +
+                        ". Timezone local = " + dLocal.getTimezoneOffset());
                 
                 cell = this.getCell(4, 7);
                 $A.test.assertEquals(cell.querySelectorAll('[href*="www.salesforce.com"]').length, 1, "There is no outputURL in the dom");

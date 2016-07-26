@@ -205,6 +205,11 @@
             item, targetCmp, actionHandler, actionHandlerScope;
 
         while (target) {
+            if (target.getAttribute("data-virtualDataTable-skipEventDelegation")) {
+                // only clear out the handlers but continue in case there are more event handlers to be executed
+                handlers  = [];
+            }
+
             targetCmp = this._getRenderingComponentForElement(target);
             // Guard for existance since there are cases like container components 
             // that might not have elements associated with them.

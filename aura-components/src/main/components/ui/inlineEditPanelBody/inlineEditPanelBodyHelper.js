@@ -14,7 +14,19 @@
  * limitations under the License.
  */
 ({
-	submit : function(cmp) {
+	submit : function(cmp, closeBehavior) {
+		if (closeBehavior !== "closeOnClickOut") {
+			// this force the change event on the currently active element in the panel
+			document.activeElement && document.activeElement.blur();
+		}
+		// we give the browser enough time to set the focus on another element and fire the change event
+		window.requestAnimationFrame($A.getCallback(function() {
+			// now we finally have the new value!
+			this._submit(cmp);
+		}.bind(this)));
+	},
+
+	_submit : function(cmp) {
 		var values = {},
 			status = {},
 			updateMap = cmp.get("v.updateMap");
@@ -35,7 +47,7 @@
 			}
 		}).fire();
 	},
-	
+
 	updateNestedMap : function(inputMap, name, value) {
 		var keys = name.split(".");
 		var map = inputMap;

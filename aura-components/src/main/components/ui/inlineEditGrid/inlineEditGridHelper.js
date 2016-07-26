@@ -151,10 +151,10 @@
             closeOnClickOut: true,
 			closeAction: $A.getCallback(function(panel, closeBehavior) {
 				if (closeBehavior !== "closeOnEsc") {
-					panel.get("v.body")[0].submitValues();
+					panel.get("v.body")[0].submitValues(closeBehavior);
 				}
 				else {
-					panel.hide(); // TODO: Why does it take 1 second to hide this ?
+					panel.hide();
 					this.lib.keyNav.resumeKeyboardMode();
 				}
 			}.bind(this))

@@ -33,6 +33,7 @@
 	},
 	
 	submitValues : function(cmp, evt, helper) {
-	    helper.submit(cmp);
+		var params = evt.getParam('arguments');
+	    helper.submit(cmp, (params)?params.closeBehavior:null);
 	}
 })// eslint-disable-line semi

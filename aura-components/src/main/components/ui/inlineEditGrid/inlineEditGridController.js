@@ -66,6 +66,7 @@
 		}
 		
 		// Update only the specified item
+		// TODO: Revisit post feature freeze as right now we are doing two updates. - One here and one in the listViewManagerGrid
 		helper.updateItem(cmp, item, index);
 		cmp._panelCmp.hide();
 		

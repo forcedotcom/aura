@@ -15,19 +15,12 @@
  */
 package org.auraframework.impl.util;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.*;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImpl;
@@ -272,7 +265,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
                 result = raw;
             }
 
-            if (propRefs != null) {
+            if (propRefs != null && cmpHandler != null ) {
                 cmpHandler.addExpressionReferences(propRefs);
             }
 

@@ -140,6 +140,43 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
     }
 
     @Test
+    public void testChecksForTokenFunctionInValue() throws Exception {
+        // test values that should throw error for using the token function
+        List<String> tests = ImmutableList.of(
+                    "token(foo)",
+                    "  token(foo)",
+                    "1px token(foo)",                    
+                    "t(foo)",
+                    "  t(foo)",
+                    "1px t(foo)"
+                );
+
+        for (String test : tests) {
+            builder.setValue(test);
+            try {
+                buildDefinition().validateDefinition();
+                fail("Expected an exception for referencing token function: " + test);
+            } catch (Exception e) {
+                assertExceptionMessageStartsWith(e, InvalidDefinitionException.class, "Token function not allowed");
+            }
+        }
+        
+        // stuff that should not throw an error
+        tests = ImmutableList.of(
+                "linear-gradient()"
+                );
+
+        for (String test : tests) {
+            builder.setValue(test);
+            try {
+                buildDefinition().validateDefinition();               
+            } catch (Exception e) {
+                fail("Did NOT expect an exception for referencing token function: " + test);
+            }
+        }
+    }
+    
+    @Test
     public void testUntrustedNamspaceAllowedTokenValues() throws Exception {
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         Mockito.when(configAdapter.isInternalNamespace(parentDescriptor.getNamespace())).thenReturn(true);

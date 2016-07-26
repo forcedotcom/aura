@@ -48,6 +48,7 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
     private static final String ILLEGAL_EXPR = "Illegal expression in token value";
     private static final String ILLEGAL_CHARS = "Illegal character in token value";
     private static final String ILLEGAL_VALUE = "'%s' is not allowed in token values";
+    private static final String ILLEGAL_TOKEN_REF = "Token function not allowed in value for token '%s'";
 
     /**
      * allows all alpha-numeric, spaces, underscores, hyphens, commas (for font lists), dots (for numbers), % (for
@@ -56,8 +57,14 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
      */
     private static final Pattern ALLOWED_CHARS = Pattern.compile("[ a-zA-Z0-9_\\-%#.,()'/]*");
     private static final List<String> DISALLOWED = ImmutableList.of("url", "expression", "javascript");
-
+    private static final List<Pattern> TOKEN_PATTERNS = ImmutableList.of(
+        Pattern.compile("token\\("), // token() anywhere
+        Pattern.compile("^t\\("), // t() at the start (don't catch linear-gradient())
+        Pattern.compile(" +t\\(") // t() following one or more spaces, e.g., 1px t(foo)
+    );
+    
     private static final Set<String> EXTRA_PROPERTIES = ImmutableSet.of("box-flex");
+    
     private static final long serialVersionUID = 344237166606014917L;
 
     private final Object value;
@@ -125,6 +132,16 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
             if (Property.lookup(property) == null && !EXTRA_PROPERTIES.contains(property)) {
                 throw new InvalidDefinitionException(String.format(UNKNOWN_PROPERTY, property), getLocation());
             }
+        }
+        
+        // cannot reference the token function
+        if (!(value instanceof Expression)) {
+            String check = value.toString().trim().toLowerCase();
+            for (Pattern pattern: TOKEN_PATTERNS) {
+                if (pattern.matcher(check).find()) {
+                    throw new InvalidDefinitionException(String.format(ILLEGAL_TOKEN_REF, name), getLocation());
+                }
+            }            
         }
 
         // for external namespaces, enforce extra security measures to prevent XSS attacks or other abuse:

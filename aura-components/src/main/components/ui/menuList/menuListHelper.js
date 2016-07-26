@@ -202,6 +202,9 @@
 		var closeOnTab = component.get('v.closeOnTabKey');
         var concreteComponent = component.getConcreteComponent();
         if (concreteComponent && closeOnTab) {
+            if (component.get("v.attachToBody")) {
+                this.setFocusToTrigger(component);
+            }
             concreteComponent.get("e.doClose").fire();
         }
     },

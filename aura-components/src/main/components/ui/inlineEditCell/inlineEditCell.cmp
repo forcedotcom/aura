@@ -29,6 +29,7 @@
 	<!-- Cell states -->
 	<aura:attribute name="disabled"  type="Boolean" default="false"/>
 	<aura:attribute name="hasErrors" type="Boolean" default="false"/>
+	<aura:attribute name="errors"    type="Object[]"  description="The list of errors to be displayed."/>
 
 	<!-- Potentially move psuedo input version into separate component -->
 	<span class="{! 'slds-grid slds-grid--align-spread slds-cell-edit cellContainer ' + v.class + (v.edited ? ' slds-is-edited' : '') + (v.hasErrors ? ' slds-has-error' : '')}" tabindex="-1">

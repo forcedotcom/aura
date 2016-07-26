@@ -32,7 +32,7 @@ var DomHandlersPlugin = function DomHandlersPlugin(config) {
 };
 
 DomHandlersPlugin.NAME = "domHandlers";
-DomHandlersPlugin.DEFAULT_INTERACTION_TYPE = "userInteraction";
+DomHandlersPlugin.DEFAULT_INTERACTION_TYPE = "user";
 DomHandlersPlugin.WHITELISTEVENTS = { 
     "click" : true // only click for now
 };

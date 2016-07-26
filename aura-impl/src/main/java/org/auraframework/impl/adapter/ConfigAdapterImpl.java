@@ -482,6 +482,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
+    public String generateJwtToken() {
+        return null;
+    }
+
+    @Override
     public boolean validateGetEncryptionKey(String ssid) {
         return true;
     }

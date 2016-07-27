@@ -21,6 +21,7 @@
         helper.initialize(cmp);
         helper.initializeDataModel(cmp);
         
+        helper.initializeHeaderColumns(cmp);
         helper.initializeTemplates(cmp);
         helper.initializeSorting(cmp);
         
@@ -57,6 +58,9 @@
         helper.createVirtualRows(cmp);
         helper.markDirty(cmp); // So we go into the rerender
     },
+    handleHeaderColumnsChange: function (cmp, event, helper) {
+        helper.initializeHeaderColumns(cmp);
+    },    
     handleDataChange: function(cmp, evt) {
         cmp.set("v.items", evt.getParam("data"), cmp._initializing);
     },

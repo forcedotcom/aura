@@ -62,6 +62,18 @@
             dataModel.getEvent('provide').fire();
         }
     },
+    initializeHeaderColumns: function (cmp) {
+        var headerDefs = cmp.get('v.headerColumns');
+        if (!headerDefs) {
+            return;
+        }
+
+        for (var i = 0; i < headerDefs.length; i++) {
+            if (headerDefs[i].isInstanceOf("ui:hasGridEvents")) {
+                headerDefs[i].addHandler("gridAction", cmp, "c.handleGridAction");
+            }
+        }
+    },     
     initializeTemplates: function (cmp) {
         var columnsDefs = cmp.get('v.columns');
         if (!columnsDefs) {

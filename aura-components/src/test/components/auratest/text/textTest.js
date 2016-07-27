@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 ({
+    // these tests do not work in core because bootstrap.js request requires a valid user for jwtToken generation.
+    labels : [ "UnAdaptableTest" ],
+
     /**
      * No truncate value means no truncation.
      */

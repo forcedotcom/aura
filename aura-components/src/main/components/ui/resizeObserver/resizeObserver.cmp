@@ -17,7 +17,7 @@
 -->
 <aura:component access="PRIVILEGED" support="BETA" description="Detects a window resize or orientation change event and runs the updateSize controller method. Ensures the order of component composition.">
 
-    <aura:attribute name="onresize" type="Aura.Action" description="The action that is run on resize."/>
+    <aura:attribute name="onresize" access="PRIVILEGED" type="Aura.Action" description="The action that is run on resize."/>
 
     <aura:method name="update"/>
 

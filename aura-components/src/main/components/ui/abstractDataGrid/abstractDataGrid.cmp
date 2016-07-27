@@ -18,23 +18,23 @@
 <aura:component access="PRIVILEGED" abstract="true" extensible="true" implements="ui:visible" support="PROTO" description="An abstract component that provides a basic layout for the ui:dataGrid component.">
 	
 	<!-- Public attributes -->
-	<aura:attribute name="items" type="List" description="Arbitrary list of objects to iterate over. Object type to avoid expensive wrapping."/>
+	<aura:attribute name="items" access="PRIVILEGED" type="List" description="Arbitrary list of objects to iterate over. Object type to avoid expensive wrapping."/>
 	<aura:attribute name="itemShape" type="Object" description="Template object with null fields to describe item shape. If not set, then concrete should derive shape from columns facet."/>
 	<aura:attribute name="mode" type="String" default="VIEW" description="{ VIEW, VIEW_ONLY, EDIT, EDIT_ONLY }"/>
 	<aura:attribute name="state" type="String" default="idle" description="{ idle, loading, error }"/>
 	<aura:attribute name="sortable" type="Boolean" default="true" description="Toggle sorting by columns (via column header)."/>
 	<aura:attribute name="createable" type="Boolean" default="false" description="Describes whether the implementation should enable a creation pattern."/>
     <aura:attribute name="selectAll" type="Boolean" default="false" description="All selected."/>
-	<aura:attribute name="selectedItems" type="List" description="A list of selected items."/>
+	<aura:attribute name="selectedItems" access="PRIVILEGED" type="List" description="A list of selected items."/>
 	<aura:attribute name="sortBy" access="PRIVILEGED" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
 
 
 	<!-- Facets for advanced configuration -->
-	<aura:attribute name="dataProvider" type="Aura.Component[]" description="Facet for ui:dataProvider - responsible for fetching data."/>	
+	<aura:attribute name="dataProvider" access="PRIVILEGED" type="Aura.Component[]" description="Facet for ui:dataProvider - responsible for fetching data."/>	
 	<aura:attribute name="dataWriter" type="Aura.Component[]" description="Facet for ui:dataWriter - responsible for writing data. Implementation TBD."/>	
-	<aura:attribute name="columns" type="Aura.Component[]" description="Configuration for columns."/>
+	<aura:attribute name="columns" access="PRIVILEGED" type="Aura.Component[]" description="Configuration for columns."/>
 	<aura:attribute name="summaryRow" type="Aura.ComponentDefRef[]" description="Configuration for summary rows."/>
-	<aura:attribute name="actionDelegate" type="Aura.Component[]" description="Row action delegate."/>
+	<aura:attribute name="actionDelegate" access="PRIVILEGED" type="Aura.Component[]" description="Row action delegate."/>
 
 	<aura:registerEvent name="refresh" type="ui:refresh" description="Provides fresh data from the dataProvider."/>
 	<aura:registerEvent name="addRemove" type="ui:addRemove" description="Command event for grid to insert or delete items as rows."/>

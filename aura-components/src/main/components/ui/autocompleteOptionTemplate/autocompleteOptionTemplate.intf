@@ -15,8 +15,8 @@
     limitations under the License.
 
 -->
-<aura:interface support="beta">
+<aura:interface access="PRIVILEGED" support="beta">
     <aura:attribute name="highlighted" type="Boolean" default="false" description="Indicate this component is highlighted or not."/>
-    <aura:attribute name="keyword" type="String" description="The keyword to match."/>
-    <aura:attribute name="visible" type="Boolean" default="true" description="Controls the visibility of the component."/>
+    <aura:attribute name="keyword" access="PRIVILEGED" type="String" description="The keyword to match."/>
+    <aura:attribute name="visible" access="PRIVILEGED" type="Boolean" default="true" description="Controls the visibility of the component."/>
 </aura:interface>

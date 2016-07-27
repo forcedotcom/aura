@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:interface support="GA" description="The standard interface for sorting components.">
-    <aura:attribute name="sortBy" type="String"        description="The name of the field or term on which to sort."/>
+<aura:interface access="PRIVILEGED" support="GA" description="The standard interface for sorting components.">
+    <aura:attribute name="sortBy" access="PRIVILEGED" type="String"        description="The name of the field or term on which to sort."/>
     <aura:attribute name="sortDirection" type="String" description="The direction in which to sort."/>
 </aura:interface>

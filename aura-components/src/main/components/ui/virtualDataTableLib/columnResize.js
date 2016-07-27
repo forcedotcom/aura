@@ -296,7 +296,13 @@ function lib(w){ //eslint-disable-line no-unused-vars
          * @private
          */
         _slideIndicator : function(x) {
-            this.indicator.style[this.transformStyle] = 'translate3d(' + x + 'px,0px,0px)';
+            var pos = x;
+            var offsetParent = this.indicator.offsetParent;
+            if (offsetParent) {
+                // Take care of the indicator's container's offset
+                pos -= offsetParent.getBoundingClientRect().left;
+            }
+            this.indicator.style[this.transformStyle] = 'translate3d(' + pos + 'px,0px,0px)';
         },
 
         _addTableWidth: function(width) {

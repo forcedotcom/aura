@@ -418,8 +418,8 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this.itemWidth             = opts.itemWidth;
 
             this.acceleration          = opts.acceleration || ACCELERATION_CONSTANT;
-            this.scrollVertical        = this.scroll === SCROLL_VERTICAL;
-            this.scrollHorizontal      = this.scroll === SCROLL_HORIZONTAL;
+            this.scrollVertical        = this.scroll === SCROLL_VERTICAL || this.scroll === SCROLL_BIDIRECTIONAL;
+            this.scrollHorizontal      = this.scroll === SCROLL_HORIZONTAL || this.scroll === SCROLL_BIDIRECTIONAL;
 
             // Guard for missconfigurations
 

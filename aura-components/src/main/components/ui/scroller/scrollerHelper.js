@@ -110,8 +110,8 @@
 
         if (dest === 'custom') {
             if (isNative) {
-                wrapper.scrollTop  = scroller.scrollVertical ? Math.abs(y) : wrapper.scrollTop;
-                wrapper.scrollLeft = scroller.scrollVertical ? wrapper.scrollLeft : Math.abs(x) ;
+                if (scroller.scrollVertical) { wrapper.scrollTop  = Math.abs(y); }
+                if (scroller.scrollHorizontal) { wrapper.scrollLeft =  Math.abs(x); }
             } else {
                 scroller.scrollTo(x, y, time);
             }

@@ -1239,7 +1239,7 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
                     this.saveTokenToStorage(); // async fire-and-forget
                 }
 
-                this.checkBootstrapUpgrade($A.finishedInit);
+                this.checkBootstrapUpgrade();
 
             }.bind(this));
         }
@@ -1273,12 +1273,11 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
 /**
  * Fire an aura:applicationRefreshed application level event if bootstrap returned from server differs from what is
  * currently loaded from cache. 
- * 
- * @param {Boolean} finishedInit true if Aura has finished initializing
+ *
  * @private
  */
-AuraClientService.prototype.checkBootstrapUpgrade = function(finishedInit) {
-    if (finishedInit && Aura["bootstrapUpgrade"]) {
+AuraClientService.prototype.checkBootstrapUpgrade = function() {
+    if ($A["finishedInit"] && Aura["bootstrapUpgrade"]) {
         $A.eventService.getNewEvent("markup://aura:applicationRefreshed").fire();
     }
 };

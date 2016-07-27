@@ -124,7 +124,7 @@
     /**
      * Carousel with one tab renders correctly.
      */
- 	testCarouselWithOneTab : {
+ 	_testCarouselWithOneTab : {
  		browsers: ["-IE7","-IE8"],
  		test : function(cmp){
  		    var carousel = cmp.find("carousel2");

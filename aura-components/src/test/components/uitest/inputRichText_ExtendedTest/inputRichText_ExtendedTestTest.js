@@ -17,7 +17,7 @@
 	/**
 	 * Able to extend rich text editor.
 	 */
-	testRichTextExtended: {
+	_testRichTextExtended: {
 		test : function(component) {
 			this.assertRichTextInitalized();
 		}

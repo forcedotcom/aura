@@ -141,7 +141,7 @@
     /**
      * Test basic tool bar is loaded.
      */
-    testToolbarTypeBasic:{
+    _testToolbarTypeBasic:{
     	attributes : {toolbar: "basic"},
     	test : [function() {
     		this.assertRichTextInitalized();
@@ -153,7 +153,7 @@
     /**
      * Test full tool bar is loaded.
      */
-    testToolbarTypeFull:{
+    _testToolbarTypeFull:{
     	attributes : {toolbar: "full"},
     	test : [function() {
     		this.assertRichTextInitalized();
@@ -165,7 +165,7 @@
     /**
      * Test standard tool bar is loaded.
      */
-    testToolbarTypeStandard:{
+    _testToolbarTypeStandard:{
     	attributes : {toolbar: "standard"},
     	test : [function() {
     		this.assertRichTextInitalized();
@@ -177,7 +177,7 @@
     /**
      * Test email tool bar is loaded.
      */
-    testToolbarTypeEmail:{
+    _testToolbarTypeEmail:{
     	attributes : {toolbar: "email"},
     	test : [function() {
     		this.assertRichTextInitalized();
@@ -204,7 +204,7 @@
     /**
      * Test custom tool bar is loaded.
      */
-    testToolbarTypeCustom : {
+    _testToolbarTypeCustom : {
         attributes : {
             toolbar : "custom",
             customToolbarConfig : '[{"name" : "format", "items" : ["Font","FontSize"]}]'
@@ -219,7 +219,7 @@
     /**
      * Test default tool bar is loaded for an empty custom tool bar configuration.
      */
-    testToolbarTypeCustomWithEmptyConfig : {
+    _testToolbarTypeCustomWithEmptyConfig : {
         attributes : {
             toolbar : "custom",
             customToolbarConfig : ""
@@ -234,7 +234,7 @@
     /**
      * Test default tool bar is loaded for no custom tool bar configuration.
      */
-    testToolbarTypeCustomWithNoConfig : {
+    _testToolbarTypeCustomWithNoConfig : {
         attributes : {
             toolbar : "custom"
         },
@@ -248,7 +248,7 @@
     /**
      * Test default tool bar is loaded for a bad custom tool bar configuration.
      */
-    testToolbarTypeCustomWithBadConfig : {
+    _testToolbarTypeCustomWithBadConfig : {
         attributes : {
             toolbar : "custom",
             customToolbarConfig : false
@@ -263,7 +263,7 @@
     /**
      * Valid toolbar location value. ckeditor is loaded with toolbar in proper place bottom.
      */
-    testToolbarLocationBottom:{
+    _testToolbarLocationBottom:{
     	attributes : {toolbarLocation: "outerspace"},
     	test : [function() {
     		this.assertRichTextInitalized();
@@ -275,7 +275,7 @@
     /**
      * Invalid toolbar location value. ckeditor is loaded but no toolbar present.
      */
-    testToolbarLocationInvalid:{
+    _testToolbarLocationInvalid:{
     	attributes : {toolbarLocation: "outerspace"},
     	test : [function() {
     		this.assertRichTextInitalized();
@@ -287,7 +287,7 @@
     /**
      * Disable richText.
      */
-    testDisableRichText:{
+    _testDisableRichText:{
     	attributes : {isRichText: false},
     	test : function() {
     		this.assertCkeEditorPresent(false);
@@ -298,7 +298,7 @@
      * Test invalid dimensions.
      * Exclude IE 7, 8 since they don't support negative dimensions
      */
-    testRichTextInvalidDimensions:{
+    _testRichTextInvalidDimensions:{
         browsers: ["-IE7", "-IE8"],
         attributes : {width: -100, height:-10},
         test : function() {
@@ -310,7 +310,7 @@
     /**
      * Test rich text editor content.
      */
-    testRichTextContent:{
+    _testRichTextContent:{
     	attributes : {value: "<h3 style='color:red;'><span style='font-family:courier new,courier,monospace;'><span style='font-size:8px;'>test content</span></span></h3>"},
     	test : [function() {
     		this.assertRichTextInitalized();
@@ -339,7 +339,7 @@
     /**
      * Verify setting disabled attribute to true, then switching to false.
      */
-    testDisabled: {
+    _testDisabled: {
         attributes : {isRichText: false, disabled: true},
         test: [function(component){
             $A.test.assertTrue(component.getElement().disabled, "Textarea not correctly disabled");
@@ -352,7 +352,7 @@
     /**
      * Verify not setting disabled attribute to false, then switching to true.
      */
-    testNotDisabled: {
+    _testNotDisabled: {
         attributes : {isRichText: false, disabled: false},
         test: [function(component){
             $A.test.assertFalse(component.getElement().disabled, "Textarea not correctly enabled");
@@ -365,7 +365,7 @@
     /**
      * Verify setting readonly attribute to true, then switching to false.
      */
-    testReadonly: {
+    _testReadonly: {
         attributes : {isRichText: false, readonly: 'true'},
         test: [function(component){
             $A.test.assertTrue(component.getElement().readOnly, "Textarea readonly attribute not correct");
@@ -378,7 +378,7 @@
     /**
      * Verify setting readonly attribute to false, then switching to true.
      */
-    testNotReadonly: {
+    _testNotReadonly: {
         attributes : {isRichText: false, readonly: 'false'},
         test: [function(component){
             $A.test.assertFalse(component.getElement().readOnly, "Textarea readonly attribute not correct");
@@ -391,7 +391,7 @@
     /**
      * Verify setting rows attribute.
      */
-    testRows: {
+    _testRows: {
         attributes : {isRichText: false, rows: "15"},
         test: function(component){
             $A.test.assertEquals(15, component.getElement().rows, "Textarea rows attribute not correct");
@@ -401,7 +401,7 @@
     /**
      * Verify setting columns attribute.
      */
-    testCols: {
+    _testCols: {
         attributes : {isRichText: false, cols: "15"},
         test: function(component){
             $A.test.assertEquals(15, component.getElement().cols, "Textarea cols attribute not correct");
@@ -412,7 +412,7 @@
      * Verify setting resizable attribute to true, then switching to false.
      * Do not run in IE7 because hasAttribute() support is IE8+
      */
-    testResizable: {
+    _testResizable: {
     	browsers : ["-IE7"],
         attributes : {isRichText: false, resizable: true},
         doNotWrapInAuraRun : true,

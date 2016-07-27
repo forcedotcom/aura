@@ -86,7 +86,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
             BrowserType.IPHONE })
     @ThreadHostileTest("testHtmlContentEscaped is not thread-safe")
     @Test
-    public void testHtmlContentEscaped() throws Exception {
+    public void _testHtmlContentEscaped() throws Exception {
         open(URL);
         WebElement ckEditor = getAuraUITestingUtil().waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
         WebElement ckEditorInput = ckEditor.findElement(By.tagName("iframe"));
@@ -105,7 +105,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
     // Excluding test as switchTo not supported with android drivers
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     @Test
-    public void testRenderInitialValueOfRichText() throws Exception {
+    public void _testRenderInitialValueOfRichText() throws Exception {
         String defaultText = "testing text";
         WebDriver driver = this.getDriver();
         open(String.format("%s?value=%s", CMP_URL, defaultText));

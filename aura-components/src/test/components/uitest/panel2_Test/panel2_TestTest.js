@@ -177,7 +177,7 @@
      * Test to verify positioned panels have display:none added when hiding it. 
      * Bug: W-2653120
      */
-    testPositionedPanelHideAndShow: {
+    _testPositionedPanelHideAndShow: {
         labels : ["flapper"],
         attributes : {"testPanelType" : "panel", "testDirection" : "east", "testShowPointer" : true, "testReferenceElementSelector" : ".createPanelBtnClass"},
         test: [function(cmp) {

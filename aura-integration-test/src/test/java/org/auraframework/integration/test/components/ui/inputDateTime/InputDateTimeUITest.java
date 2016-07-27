@@ -195,7 +195,7 @@ public class InputDateTimeUITest extends WebDriverTestCase {
      * @throws Exception
      */
     @Test
-    public void testTPLeftArrow() throws Exception {
+    public void _testTPLeftArrow() throws Exception {
         open(URL);
 
         selectTimePicker(Keys.ARROW_LEFT, TIME_1230_XPATH, "12:00 PM");

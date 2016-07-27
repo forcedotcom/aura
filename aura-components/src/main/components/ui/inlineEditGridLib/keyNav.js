@@ -14,6 +14,34 @@
  * limitations under the License.
  */
 
+/**
+ * This keyboard manager for the grid supports the following usecases:
+ *  1) Navigate with arrow keys left, top, right, bottom
+ *  2) Arrow key navigation stops at the boundaries
+ *  3) Navigating with Tab and Shift+Tab back and forward.
+ *  4) Tab navigation wraps around to the previous or next row if one hits the left or right side
+ *  5) If there are multiple focusable elements such as a link and the trigger, the navigation cycles over each of those,
+ *       selecting from first to last when navigating right and selecting from last to first when navigating left
+ *  6) If there are multiple focusable elements such as a link and the trigger, the navigation stays on the same vertically
+ *      aligned element when moving up or down
+ *  7) When there is no focusable element, the wrapper span with tabindex=-1 receives focus as fallback.
+ *  8) When the focused element has an aria-haspopup and the user presses key down, then the event is passed on and
+ *      no navigation happens -> This is for menu items
+ *  9) When a focusable element has the class 'keyboardMode--skipArrowNavigation' it is skipped with arrow key navigation
+ *      and it can only be reach bt using the tab keys
+ * 10) When a focusable element has the class 'keyboardMode--pauseOnFocus' it pauses the keyboard mode which means
+ *      that no events are captured and all events have to be handled by the focused element. On blur
+ *      the system re-enables the keyboard mode again
+ * 11) Entering keyboard mode has 2 modes:
+ *     a) focus: This will select the first data cell in the grid or the last selected one.
+ *     b) edit: This will select the first editable cell and start edit mode of that cell.
+ *         If the last selected cell is editable, this one will be edited instead.
+ *         If the last selected cell is not editable, the system will start the search from the top.
+ * Notes:
+ * - Navigating to the next available cell skips hidden columns and disabled triggers
+ * - Non-editable cells have a disabled trigger. This leads to either no focusable element and/or just a link element
+ * - Also support cells that don't have a span with tabindex=-1 and only a focusable element
+ */
 function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
@@ -362,6 +390,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
         /**
          * Focuses the active cell input
+         * @return false in case setting the focus did not succeed, otherwise true
          */
         _focusActiveCellInput: function(){
 
@@ -372,27 +401,33 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 if (focusableElements.length>0) { // if there is at least one input which is also visible
                     if (this.activeCellInput && !this.isElementHidden(this.activeCellInput)) {
                         // try to focus the input element that was calculated earlier
-                        this._focusElement(this.activeCellInput);
+                        return this._focusElement(this.activeCellInput);
                     } else {
                         // if that is not possible, focus the first visible one
-                        this._focusElement(focusableElements[0]);
+                        return this._focusElement(focusableElements[0]);
                     }
                 } else {
                     // if there is no visible, focusable element, simply select the first one (which should be the inner span)
-                    this._focusElement(this.activeCell.firstChild);
+                    return this._focusElement(this.activeCell.firstChild);
                 }
             }
+            return false;
         },
 
+        /**
+         * @return false in case setting the focus did not succeed, otherwise true
+         */
         _focusElement: function(element) {
-            if (element) {
+            if (element && element.focus) {
                 element.focus();
                 if (element.classList.contains("keyboardMode--pauseOnFocus")) {
                     this.pauseKeyboardMode();
                     this._onAutoResumeKeyboardModeHandler = this._onAutoResumeKeyboardMode.bind(this);
                     element.addEventListener("blur", this._onAutoResumeKeyboardModeHandler, true);
                 }
+                return true;
             }
+            return false;
         },
 
         _onAutoResumeKeyboardMode: function(e) {
@@ -468,6 +503,13 @@ function lib(w) { //eslint-disable-line no-unused-vars
             // Need to ensure column and row index are in range
             if (this._targetRowAvailable(rowIndex) && this._targetColumnAvailable(rowIndex, columnIndex)){
 
+                var failsafe = {
+                    activeCell : this.activeCell,
+                    activeRowIndex : this.activeRowIndex,
+                    activeColumnIndex : this.activeColumnIndex,
+                    activeCellInput : this.activeCellInput
+                };
+
                 this._blurActiveCell();
                 this.activeCell = this._getRow(rowIndex).cells[columnIndex];
                 this.activeRowIndex = rowIndex;
@@ -484,7 +526,15 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 else {
                     this.activeCellInput = null;
                 }
-                this._focusActiveCell();
+                if (!this._focusActiveCell()) {
+                    // this is a failsafe in case the cell we move to doesn't have ANY focusable element
+                    this.activeCell = failsafe.activeCell;
+                    this.activeRowIndex = failsafe.activeRowIndex;
+                    this.activeColumnIndex = failsafe.activeColumnIndex;
+                    this.activeCellInput = failsafe.activeCellInput;
+                    // now select the old cell
+                    this._focusActiveCell();
+                }
 
             }
         },
@@ -506,12 +556,16 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * Add active class to TD and set focus to input (if exists)
          * @param rowIndex - index of the row
          * @param columnIndex - index of the column
+         * @return false in case setting the focus did not succeed, otherwise true
          */
         _focusActiveCell: function() {
-            // we have to set teh style on the cellContainer because slds requires this to be on the same element as slds-cell-edit and not on the TD
-            var cellContainer = this.activeCell.querySelector(".cellContainer");
-            $A.util.addClass((cellContainer)?cellContainer:this.activeCell, "slds-has-focus");
-            this._focusActiveCellInput();
+            var result = this._focusActiveCellInput();
+            if (result) {
+                // we have to set the style on the cellContainer because slds requires this to be on the same element as slds-cell-edit and not on the TD
+                var cellContainer = this.activeCell.querySelector(".cellContainer");
+                $A.util.addClass((cellContainer)?cellContainer:this.activeCell, "slds-has-focus");
+            }
+            return result;
         },
 
         /**

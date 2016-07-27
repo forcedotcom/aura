@@ -72,7 +72,6 @@ public class JavascriptValidator extends RhinoBasedValidator {
     }
 
     //
-
     public static void main(String[] args) throws Exception {
         String filename = args[0];
         String source = IOUtil.readTextFile(new File(filename));

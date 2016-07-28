@@ -207,7 +207,7 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
             adHandler.getElement();
             fail("Expected Exception to be thrown when attribute is missing");
         } catch (Throwable t) {
-            assertExceptionMessage(t, AuraRuntimeException.class, "descriptor is null");
+            assertExceptionMessageContains(t, AuraRuntimeException.class, "Attribute 'type' is required on <aura:attribute>");
         }
     }
 
@@ -218,7 +218,7 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
             adHandler.getElement();
             fail("Expected Exception to be thrown when attribute is an empty string");
         } catch (Throwable t) {
-            assertExceptionMessage(t, AuraRuntimeException.class, "QualifiedName is required for descriptors");
+            assertExceptionMessageContains(t, AuraRuntimeException.class, "Attribute 'type' is required on <aura:attribute>");
         }
     }
 

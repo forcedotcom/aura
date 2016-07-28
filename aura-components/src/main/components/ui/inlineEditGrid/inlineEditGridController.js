@@ -74,8 +74,10 @@
 	},
 	
 	enterKeyboardMode: function(cmp, evt, helper){
-		var editActiveCell = evt.getParam('arguments').editActiveCell;
-		helper.lib.keyNav.enterKeyboardMode(cmp, editActiveCell);
+		var args = evt.getParam('arguments'),
+			editActiveCell = args.editActiveCell,
+			clearActiveCell = args.clearActiveCell;
+		helper.lib.keyNav.enterKeyboardMode(cmp, editActiveCell, clearActiveCell);
 		helper.fireKeyboardModeEnterEvent(cmp);
 	},
 	

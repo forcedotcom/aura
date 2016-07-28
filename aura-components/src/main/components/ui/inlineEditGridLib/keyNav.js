@@ -93,6 +93,8 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this.handlersAdded = false;
                 this.grid = null;
                 this.cmp = null;
+
+                this._resetActiveCell();
             }
         },
 
@@ -154,7 +156,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * Enters the keyboard mode status of the specified cmp
          * @param cmp
          */
-        enterKeyboardMode: function(cmp, startEdit, skipCellHandling) {
+        enterKeyboardMode: function(cmp, editActiveCell, clearActiveCell, skipCellHandling) {
             if (!this.initialized) {
                 // if the keyboard navigation feature has not been initialized, it was deactivated
                 return;
@@ -168,11 +170,22 @@ function lib(w) { //eslint-disable-line no-unused-vars
             cmp.set('v.inKeyboardMode', true);
 
             if (!skipCellHandling) {
+                if (clearActiveCell) {
+                    this._resetActiveCell();
+                }
                 if (!this._activeCellExists()){
-                    this._initActiveCell(startEdit);
+                    // we need to check if there is a row and column index available because if there is it probably
+                    // means that the row was updated and therefore the active dom element doesn't exist anymore
+                    // in these cases we have to get the activeCell from the row and column index
+                    if (!$A.util.isUndefined(this.activeRowIndex) && !$A.util.isUndefined(this.activeColumnIndex) && !clearActiveCell) {
+                        this._setActiveCell(this.activeRowIndex, this.activeColumnIndex, false);
+                    }
+                    else {
+                        this._initActiveCell(editActiveCell);
+                    }
                 }
 
-                if (startEdit){
+                if (editActiveCell){
                     this._triggerEditOnActiveCell();
                 }
                 else {
@@ -195,8 +208,17 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this._removeEventHandlers();
             cmp.set('v.inKeyboardMode', false);
             cmp.helper.fireKeyboardModeExitEvent(cmp);
-            this._blurActiveCellInput();
-            this.grid.blur();
+        },
+
+        /**
+         * Resets the current active cell
+         * @param cmp
+         */
+        _resetActiveCell: function() {
+            this.activeCell = null;
+            this.activeRowIndex = undefined; // important that it is set to defined
+            this.activeColumnIndex = undefined; // important that it is set to defined
+            this.activeCellInput = null;
         },
 
         /**
@@ -209,7 +231,6 @@ function lib(w) { //eslint-disable-line no-unused-vars
             // Find and set the active cell based on just the dom
             // we start at 1 because 0 is the header
             for (var rowIndex=1; rowIndex<rowLength; rowIndex++){
-
                 var columnIndex = this._findUsableColumnInRow(true, rowIndex, true, mustBeTriggerCell);
                 if (columnIndex !== -1) {
                     this._setActiveCell(rowIndex, columnIndex);
@@ -341,6 +362,10 @@ function lib(w) { //eslint-disable-line no-unused-vars
         _filterHiddenElements: function(elements) {
             return $A.util.filter(elements,
                 function (element) {
+                    // don't skip triggers
+                    if (this._isTrigger(element)) {
+                        return true;
+                    }
                     return !this.isElementHidden(element);
                 }.bind(this));
         },
@@ -370,7 +395,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * Returns true if the trigger of this element is set to disabled or hidden (which happens if v.editable is set to false)
          */
         _isTriggerDisabledByElement: function(element) {
-            return element.classList.contains("disabled") || this.isElementHidden(element);
+            return element.classList.contains("disabled");// || this.isElementHidden(element);
         },
 
         _isTrigger: function(element) {
@@ -378,7 +403,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         },
 
         _getTriggerOfCellNode: function(cellNode) {
-            return cellNode.querySelector('.trigger');
+            return cellNode && cellNode.querySelector('.trigger');
         },
 
         /**
@@ -425,7 +450,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                     this._onAutoResumeKeyboardModeHandler = this._onAutoResumeKeyboardMode.bind(this);
                     element.addEventListener("blur", this._onAutoResumeKeyboardModeHandler, true);
                 }
-                return true;
+                return (document.activeElement === element);
             }
             return false;
         },
@@ -535,7 +560,6 @@ function lib(w) { //eslint-disable-line no-unused-vars
                     // now select the old cell
                     this._focusActiveCell();
                 }
-
             }
         },
 
@@ -548,8 +572,12 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * @param columnIndex - index of the column
          */
         _cellIsEditable: function (rowIndex, columnIndex){
-            var node = this._getTriggerOfCellNode(this._getRow(rowIndex).cells[columnIndex]);
-            return node !==null && !this._isTriggerDisabledByElement(node) && !this.isElementHidden(node);
+            if (this._targetRowAvailable(rowIndex)) {
+                var node = this._getTriggerOfCellNode(this._getRow(rowIndex).cells[columnIndex]);
+                return node !== null && !this._isTriggerDisabledByElement(node);
+                // && !this.isElementHidden(node); // we removed the hidden check because triggers are only visible when focused
+            }
+            return false;
         },
 
         /**
@@ -559,11 +587,15 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * @return false in case setting the focus did not succeed, otherwise true
          */
         _focusActiveCell: function() {
+            // we have to set the slds class before hand to make the trigger visible - VERY IMPORTANT
+
+            // we have to set the style on the cellContainer because slds requires this to be on the same element as slds-cell-edit and not on the TD
+            var cellContainer = this.activeCell.querySelector(".cellContainer");
+            $A.util.addClass((cellContainer)?cellContainer:this.activeCell, "slds-has-focus");
+
             var result = this._focusActiveCellInput();
-            if (result) {
-                // we have to set the style on the cellContainer because slds requires this to be on the same element as slds-cell-edit and not on the TD
-                var cellContainer = this.activeCell.querySelector(".cellContainer");
-                $A.util.addClass((cellContainer)?cellContainer:this.activeCell, "slds-has-focus");
+            if (!result) {
+                $A.util.removeClass((cellContainer)?cellContainer:this.activeCell, "slds-has-focus");
             }
             return result;
         },
@@ -900,7 +932,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
             // Check if keyboard mode is enabled, if disabled, enable it
             if (!this.inKeyboardMode){
-                this.enterKeyboardMode(this.cmp, null, true);
+                this.enterKeyboardMode(this.cmp, null, null, true);
             }
 
             this._setActiveCell(cellLocation.row, cellLocation.column);
@@ -919,7 +951,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
             // Check if keyboard mode is enabled, if disabled, enable it
             if (!this.inKeyboardMode){
-                this.enterKeyboardMode(this.cmp, null, true);
+                this.enterKeyboardMode(this.cmp, null, null, true);
             }
 
             this._setActiveCell(cellLocation.row, cellLocation.column);

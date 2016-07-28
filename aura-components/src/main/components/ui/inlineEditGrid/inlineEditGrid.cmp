@@ -61,6 +61,7 @@
 	<!-- Grid Methods -->
 	<aura:method name="enterKeyboardMode" description="Enters keyboard mode. Won't do anything if keyboard mode has been disabled">
 		<aura:attribute name="editActiveCell" type="Boolean" description="If true, after keyboard mode is entered, the first activeCell will be set to edit"/>
+		<aura:attribute name="clearActiveCell" type="Boolean" description="If true, keyboard mode starts from the top and doesn't use the last remembered cell"/>
 	</aura:method>
 	<aura:method name="exitKeyboardMode" description="Exits keyboard mode"/>
 

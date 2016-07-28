@@ -579,19 +579,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         get.releaseConnection();
     }
 
-    @Test
-    public void testGetUnhandledError() throws Exception {
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                "<aura:application><aura:attribute name='bah'/></aura:application>");
-        HttpGet get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
-        HttpResponse httpResponse = perform(get);
-        assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
-        String response = getResponseBody(httpResponse);
-        assertTrue("Expected null descriptor error message but got: " + response,
-                response.contains("descriptor is null"));
-        get.releaseConnection();
-    }
-
     /**
      * Verify providing invalid DefDescriptor format to the aura.tag param results in the proper handled Exception and
      * not an AuraUnhandledException, which results in a Gack on SFDC.

@@ -556,8 +556,6 @@ function lib(w){ //eslint-disable-line no-unused-vars
          * @private
          */
         _fire: function(eventType) {
-            
-
             var eventQueue = this._events[eventType],
                 eventFncs = eventQueue && eventQueue.length,
                 params = Array.prototype.slice.call(arguments, 1),
@@ -661,16 +659,30 @@ function lib(w){ //eslint-disable-line no-unused-vars
         
         /**
          * Manually resize all columns
+         * 
+         * Since we have all the info we need in this function, wipe the existing
+         * widths, apply all the widths to the columns, and set the table to the sum
+         * of the given widths
          */
         resizeAll : function(widths) {
             this.tableWidth = 0;
             this.table.style.width = null;
-            for (var i = 0; i < widths.length; i++) {
-                this.resize(i, widths[i]);
+            
+            for (var i = 0; i < this.columns.length; i++) {
+                var column = this.columns[i];
+                var width = widths[i];
+                
+                if ($A.util.isUndefinedOrNull(width)) {
+                    width = this.config.minWidth;
+                }
+                
+                this._resize(column, width);
+                this._resize(column.firstChild, width);
+                
+                this.tableWidth += width;
             }
-            for (var j = i; j < this.columns.length; j++) {
-                this.resize(j, this.config.minWidth);
-            }
+            
+            this.table.style.width = this.tableWidth + 'px';
         },
         
         /**

@@ -35,7 +35,12 @@
         }
     },
     
-    testResizeEvent : {
+    /** Resize events don't fire anymore if the resize is manually triggered by the user.
+     *  // TODO: refacor the test
+     *  Sshould check if the event fires when the resize is done through the UI,
+     *  orr if the DOM matches the data passed in.
+     */
+    _testResizeEvent : {
         test : [function(cmp) {
             cmp.find("grid").resizeColumns(this.WIDTHS.smallerWidths);
         }, function(cmp) {

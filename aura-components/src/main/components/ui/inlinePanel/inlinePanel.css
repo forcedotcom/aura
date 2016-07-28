@@ -17,9 +17,6 @@
 .THIS {
     display: none;
     position: absolute;
-    border: 1px solid #B6B6B6;
-    border-radius: 5px;
-    background-color: #FFFFFF;
     overflow: visible;
     opacity: 0;
     top: 0;
@@ -39,10 +36,6 @@
 
 .THIS .container {
     position: relative;
-}
-
-.THIS .content {
-    padding: 1px 14px;
 }
 
 .THIS .panel-header {

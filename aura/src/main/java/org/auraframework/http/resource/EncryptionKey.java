@@ -21,8 +21,6 @@ import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.system.AuraContext;
 
 /**
@@ -30,26 +28,18 @@ import org.auraframework.system.AuraContext;
  */
 public class EncryptionKey extends AuraResourceImpl {
 
-    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
-
     public EncryptionKey() {
         super("app.encryptionkey", AuraContext.Format.HTML);
     }
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
-        if (this.configAdapter.validateGetEncryptionKey(request.getParameter("ssid"))) {
+        if (configAdapter.validateGetEncryptionKey(request.getParameter("ssid"))) {
             String key = configAdapter.getEncryptionKey();
-            System.out.println("RESPONSE="+response);
-            System.out.println("OUTPUTSTREAM="+response.getOutputStream());
             servletUtilAdapter.setNoCache(response);
             response.getOutputStream().write(key.getBytes(StandardCharsets.UTF_8));
         } else {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
         }
-    }
-
-    public void setConfigAdapter(ConfigAdapter configAdapter) {
-    	this.configAdapter = configAdapter;
     }
 }

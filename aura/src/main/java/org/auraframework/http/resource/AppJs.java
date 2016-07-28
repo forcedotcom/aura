@@ -24,10 +24,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -37,51 +34,36 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
 public class AppJs extends AuraResourceImpl {
-    private ServerService serverService = Aura.getServerService();
-    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
 
     public AppJs() {
         super("app.js", Format.JS);
     }
-    
+
     private void prependBootstrapJsPayload (PrintWriter writer) {
-    	String tmp = "";
+        String tmp = "";
         ResourceLoader resourceLoader = configAdapter.getResourceLoader();
-		try {
-			URL url = resourceLoader.getResource("js/prependAppJs.js");
-			tmp = Resources.toString(url, Charsets.UTF_8);
-		} catch (IOException e) {
-			throw new AuraRuntimeException(e);
-		}
-		
-		writer.append(tmp);
+        try {
+            URL url = resourceLoader.getResource("js/prependAppJs.js");
+            tmp = Resources.toString(url, Charsets.UTF_8);
+        } catch (IOException e) {
+        	throw new AuraRuntimeException(e);
+        }
+
+        writer.append(tmp);
     }
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
-
         Set<DefDescriptor<?>> dependencies = servletUtilAdapter.verifyTopLevel(request, response, context);
         if (dependencies == null) {
             return;
         }
         try {
-        	PrintWriter writer = response.getWriter();
-        	prependBootstrapJsPayload(writer);
+            PrintWriter writer = response.getWriter();
+            prependBootstrapJsPayload(writer);
             serverService.writeDefinitions(dependencies, writer);
         } catch (Throwable t) {
             servletUtilAdapter.handleServletException(t, false, context, request, response, false);
         }
     }
-
-    /**
-     * @param serverService the serverService to set
-     */
-    public void setServerService(ServerService serverService) {
-        this.serverService = serverService;
-    }
-    public void setConfigAdapter (ConfigAdapter configAdapter) {
-    	this.configAdapter = configAdapter;
-    }
-
 }
-

@@ -21,19 +21,16 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.SVGDef;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.http.RequestParam.StringParam;
-import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class ResourceSvg extends AuraResourceImpl {
     private static final StringParam lookup = new StringParam(AuraServlet.AURA_PREFIX + "lookup", 0, false);
-    private ServerService serverService = Aura.getServerService();
 
     public ResourceSvg() {
         super("resources.svg", Format.SVG);
@@ -74,12 +71,4 @@ public class ResourceSvg extends AuraResourceImpl {
             servletUtilAdapter.handleServletException(qfe, true, context, request, response, false);
         }
     }
-
-    /**
-     * @param serverService the serverService to set
-     */
-    public void setServerService(ServerService serverService) {
-        this.serverService = serverService;
-    }
 }
-

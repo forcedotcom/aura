@@ -22,14 +22,11 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 
 public class AppCss extends AuraResourceImpl {
-    private ServerService serverService = Aura.getServerService();
 
     public AppCss() {
         super("app.css", Format.CSS);
@@ -46,15 +43,6 @@ public class AppCss extends AuraResourceImpl {
         } catch (Throwable t) {
             servletUtilAdapter.handleServletException(t, false, context, request, response, false);
         }
-    }
-
-    /**
-     * Injection Override
-     *
-     * @param serverService the serverService to set
-     */
-    public void setServerService(ServerService serverService) {
-        this.serverService = serverService;
     }
 }
 

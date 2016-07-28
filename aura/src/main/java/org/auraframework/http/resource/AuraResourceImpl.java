@@ -24,9 +24,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraResource;
@@ -41,7 +44,10 @@ public abstract class AuraResourceImpl implements AuraResource {
 
     protected DefinitionService definitionService = Aura.getDefinitionService();
     protected ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
-    
+    protected ConfigAdapter configAdapter = Aura.getConfigAdapter();
+    protected ServerService serverService = Aura.getServerService();
+    protected InstanceService instanceService = Aura.getInstanceService();
+
     public AuraResourceImpl(String name, Format format) {
         this(name, format, false);
     }
@@ -92,6 +98,33 @@ public abstract class AuraResourceImpl implements AuraResource {
      */
     public void setServletUtilAdapter(ServletUtilAdapter servletUtilAdapter) {
         this.servletUtilAdapter = servletUtilAdapter;
+    }
+
+    /**
+     * Injection override.
+     *
+     * @param configAdapter the ConfigAdapter to set
+     */
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
+    }
+
+    /**
+     * Injection Override
+     *
+     * @param serverService the serverService to set
+     */
+    public void setServerService(ServerService serverService) {
+        this.serverService = serverService;
+    }
+
+    /**
+     * Injection Override
+     * 
+     * @param instanceService the instanceService to set
+     */
+    public void setInstanceService(InstanceService instanceService) {
+        this.instanceService = instanceService;
     }
 
     private final StringParam attributesParam = new StringParam("aura.attributes", 0, false);

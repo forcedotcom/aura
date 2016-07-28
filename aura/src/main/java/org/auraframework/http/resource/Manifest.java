@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -32,7 +31,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.Component;
-import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
@@ -46,8 +44,6 @@ public class Manifest extends AuraResourceImpl {
     private static final String UID = "uid";
     private static final String RESOURCE_URLS = "resourceURLs";
 
-    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
-    private InstanceService instanceService = Aura.getInstanceService();
     // FIXME: this is horrendous we actually render the manifest as a component.
     private RenderingService renderingService = Aura.getRenderingService();
     private ManifestUtil manifestUtil = new ManifestUtil();
@@ -207,20 +203,6 @@ public class Manifest extends AuraResourceImpl {
             }
         }
         return null;
-    }
-
-    /**
-     * @param configAdapter the configAdapter to set
-     */
-    public void setConfigAdapter(ConfigAdapter configAdapter) {
-        this.configAdapter = configAdapter;
-    }
-
-    /**
-     * @param instanceService the instanceService to set
-     */
-    public void setInstanceService(InstanceService instanceService) {
-        this.instanceService = instanceService;
     }
 
     /**

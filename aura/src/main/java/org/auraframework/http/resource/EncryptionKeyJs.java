@@ -21,16 +21,12 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.system.AuraContext;
 
 /**
  * Handles /l/{}/app.encryptionkey requests to retrieve encryption key.
  */
 public class EncryptionKeyJs extends AuraResourceImpl {
-
-    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
     private final String PREPEND_JS = "window.Aura || (window.Aura = {});\nwindow.Aura.bootstrap || (window.Aura.bootstrap = {});\nwindow.Aura.Crypto = {};\nwindow.Aura.Crypto.key =";
     private final String APPEND_JS = ";\n(function () {\n\twindow.Aura.bootstrap.execEncryptionKey = window.performance && window.performance.now ? window.performance.now() : Date.now();\n\twindow.Aura.encryptionKeyReady = true;\n\tif (window.Aura.afterEncryptionKeyReady){\n\t\twindow.Aura.afterEncryptionKeyReady();\n\t}\n}());";
 
@@ -40,7 +36,7 @@ public class EncryptionKeyJs extends AuraResourceImpl {
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
-        if (this.configAdapter.validateGetEncryptionKey(request.getParameter("ssid"))) {
+        if (configAdapter.validateGetEncryptionKey(request.getParameter("ssid"))) {
             servletUtilAdapter.setNoCache(response);
 
             String key = configAdapter.getEncryptionKey();
@@ -51,9 +47,5 @@ public class EncryptionKeyJs extends AuraResourceImpl {
         } else {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
         }
-    }
-    
-    public void setConfigAdapter(ConfigAdapter configAdapter) {
-    	this.configAdapter = configAdapter;
     }
 }

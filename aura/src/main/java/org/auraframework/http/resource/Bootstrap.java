@@ -32,7 +32,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.instance.Instance;
-import org.auraframework.service.DefinitionService;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -44,6 +44,8 @@ import org.auraframework.util.json.JsonSerializationContext;
  */
 public class Bootstrap extends AuraResourceImpl {
 
+    private ContextService contextService = Aura.getContextService();
+
     public Bootstrap() {
         super("bootstrap.js", Format.JS);
     }
@@ -52,7 +54,7 @@ public class Bootstrap extends AuraResourceImpl {
     private final static String APPEND_JS = ";\n(function () {\n\twindow.Aura.bootstrap.execBootstrapJs = window.performance && window.performance.now ? window.performance.now() : Date.now();\n\twindow.Aura.appBootstrapReady = \"new\";\n\tif (window.Aura.afterBootstrapReady && window.Aura.afterBootstrapReady.length){\n\t\t for (var i = 0; i < window.Aura.afterBootstrapReady.length; i++) {\n\t\t\twindow.Aura.afterBootstrapReady[i]();\n\t\t}\n\t}\n}());";
 
     public Boolean loadLabels() throws QuickFixException {
-        AuraContext ctx = Aura.getContextService().getCurrentContext();
+        AuraContext ctx = contextService.getCurrentContext();
         Map<DefDescriptor<? extends Definition>, Definition> defMap;
 
         ctx.getDefRegistry().getDef(ctx.getApplicationDescriptor());
@@ -65,7 +67,7 @@ public class Bootstrap extends AuraResourceImpl {
         }
         return Boolean.TRUE;
     }
-    
+
     protected void setCacheHeaders(HttpServletResponse response, DefDescriptor<? extends BaseComponentDef> appDesc)
             throws QuickFixException {
         Integer cacheExpiration = null;
@@ -86,16 +88,15 @@ public class Bootstrap extends AuraResourceImpl {
             throws IOException {
         DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
 
-        DefinitionService definitionService = Aura.getDefinitionService();
         DefType type = app.getDefType();
 
         DefDescriptor<?> desc = definitionService.getDefDescriptor(app.getDescriptorName(), type.getPrimaryInterface());
 
         try {
-            if (Aura.getConfigAdapter().validateGetEncryptionKey(request.getParameter("ssid"))) {
+            if (configAdapter.validateGetEncryptionKey(request.getParameter("ssid"))) {
                 setCacheHeaders(response, app);
 
-                Instance<?> appInstance = Aura.getInstanceService().getInstance(desc, getComponentAttributes(request));
+                Instance<?> appInstance = instanceService.getInstance(desc, getComponentAttributes(request));
                 definitionService.updateLoaded(desc);
                 loadLabels();
 
@@ -113,7 +114,7 @@ public class Bootstrap extends AuraResourceImpl {
                 serializationContext.pushRefSupport(false);
                 json.writeMapEntry("md5", out.getMD5());
                 json.writeMapEntry("context", context);
-                json.writeMapEntry("token", Aura.getConfigAdapter().getCSRFToken());
+                json.writeMapEntry("token", configAdapter.getCSRFToken());
                 serializationContext.popRefSupport();
                 json.writeMapEnd();
                 out.append(APPEND_JS);
@@ -178,5 +179,14 @@ public class Bootstrap extends AuraResourceImpl {
         json.writeMapEntry("error", t);
         json.writeMapEnd();
         out.print(";\n" + APPEND_JS);
+    }
+
+    /**
+     * Injection override.
+     *
+     * @param contextService the ContextService to set
+     */
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
     }
 }

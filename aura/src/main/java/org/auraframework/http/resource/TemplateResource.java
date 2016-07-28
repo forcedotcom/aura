@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -35,7 +34,6 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
-import org.auraframework.service.InstanceService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
@@ -49,9 +47,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public abstract class TemplateResource extends AuraResourceImpl {
-    protected ConfigAdapter configAdapter = Aura.getConfigAdapter();
     protected LoggingService loggingService = Aura.getLoggingService();
-    protected InstanceService instanceService = Aura.getInstanceService();
     protected RenderingService renderingService = Aura.getRenderingService();
     protected ManifestUtil manifestUtil = new ManifestUtil();
 
@@ -81,7 +77,7 @@ public abstract class TemplateResource extends AuraResourceImpl {
 
         servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
 
-        context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+        context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
         context.setApplicationDescriptor(defDescriptor);
         definitionService.updateLoaded(defDescriptor);
@@ -174,7 +170,7 @@ public abstract class TemplateResource extends AuraResourceImpl {
             auraInit.put("deftype", value.getDescriptor().getDefType());
             auraInit.put("host", contextPath);
 
-            String lockerWorkerURL = Aura.getConfigAdapter().getLockerWorkerURL();
+            String lockerWorkerURL = configAdapter.getLockerWorkerURL();
             if (lockerWorkerURL != null) {
                 auraInit.put("safeEvalWorker", lockerWorkerURL);
             }

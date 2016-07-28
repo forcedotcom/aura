@@ -15,18 +15,78 @@
  */
 package org.auraframework.http.resource;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class BootstrapTest extends UnitTestCase {
-    
+	@Test
+    public void testName() {
+        assertEquals("bootstrap.js", new Bootstrap().getName());
+    }
+
+    @Test
+    public void testFormat() {
+        assertEquals(Format.JS, new Bootstrap().getFormat());
+    }
+
+    @SuppressWarnings("unchecked")
+	@Test
+    public void testSendErrorWhenEncryptionKeyValidationFails() throws Exception {
+        class DummyResponse extends DummyHttpServletResponse {
+            private int error;
+
+            @Override
+            public void sendError(int sc) {
+                error = sc;
+            }
+
+            public int getError() {
+                return error;
+            }
+        };
+
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        DummyResponse response = new DummyResponse();
+        DefDescriptor<ApplicationDef> appDef = Mockito.mock(DefDescriptor.class);
+        Mockito.when(appDef.getDescriptorName()).thenReturn("");
+        AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(context.getApplicationDescriptor()).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                return appDef;
+            }
+        });
+        Mockito.when(((DefDescriptor<? extends BaseComponentDef>) appDef).getDefType()).thenReturn(DefType.APPLICATION);
+        DefinitionService definitionService = Mockito.mock(DefinitionService.class);
+        Mockito.when(definitionService.getDefDescriptor(Mockito.any(), Mockito.any())).thenReturn(null);
+        ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
+        Mockito.when(configAdapter.validateGetEncryptionKey(Mockito.anyString())).thenReturn(false);
+        Bootstrap bootstrap = new Bootstrap();
+        bootstrap.setConfigAdapter(configAdapter);
+        bootstrap.setDefinitionService(definitionService);
+
+        bootstrap.write(request, response, context);
+
+        assertEquals("Expected 403 error code to be sent when encryption key validation fails",
+                HttpServletResponse.SC_FORBIDDEN, response.getError());
+    }
+
     @Test
     public void testPublicCacheExpirationNotSet() throws Exception {
         verifyCacheHeaders(null, false);
@@ -50,6 +110,7 @@ public class BootstrapTest extends UnitTestCase {
      * @throws Exception
      */
     private void verifyCacheHeaders(Integer expirationSetting, boolean shouldCache) throws Exception {
+        @SuppressWarnings("unchecked")
         DefDescriptor<ApplicationDef> appDefDesc = Mockito.mock(DefDescriptor.class);
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);

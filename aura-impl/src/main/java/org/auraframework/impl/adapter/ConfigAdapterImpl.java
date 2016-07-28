@@ -490,7 +490,12 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public boolean validateGetEncryptionKey(String ssid) {
         return true;
     }
-    
+
+    @Override
+    public boolean validateBootstrap(String ssid) {
+        return true;
+    }
+
     @Override
     public long getAuraJSLastMod() {
         regenerateAuraJS();

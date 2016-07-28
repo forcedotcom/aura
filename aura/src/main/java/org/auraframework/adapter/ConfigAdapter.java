@@ -101,6 +101,12 @@ public interface ConfigAdapter extends AuraAdapter {
      */
     boolean validateGetEncryptionKey(String ssid);
 
+    /**
+     * Validate the bootstrap.js request
+     * @return true if the request has a valid ssid.
+     */
+    boolean validateBootstrap(String ssid);
+
     boolean isInternalNamespace(String namespace);
     Set<String> getInternalNamespaces();
     void addInternalNamespace(String namespace);

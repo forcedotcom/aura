@@ -131,6 +131,7 @@
                                 <argument>handleEventTest</argument>
                                 <argument>validationTest</argument>
                                 <argument>test</argument>
+                                <argument>testCustomNS1</argument>
                             </arguments>
                         </configuration>
                     </execution>

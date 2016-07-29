@@ -16,6 +16,6 @@
 
 -->
 <aura:component access="GLOBAL">
-    <aura:attribute name="attr" type="String" default="INTERNAL" access="INTERNAL"/>
+    <aura:attribute name="attr" type="String" default="GLOBAL" access="GLOBAL"/>
     {!v.attr}
 </aura:component>

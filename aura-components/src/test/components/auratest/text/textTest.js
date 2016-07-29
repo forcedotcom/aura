@@ -23,7 +23,8 @@
     testTruncateNone: {
         attributes : {value: 'truncate me'},
         test: function(component){
-            aura.test.assertEquals('truncate me', $A.test.getText(component.getElement()), "value not expected");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('truncate me', text, "value not expected");
         }
     },
 
@@ -33,7 +34,8 @@
     testTruncateZeroAttributeValue: {
         attributes : {value: 'truncate me', truncate: '0'},
         test: function(component){
-            aura.test.assertEquals('truncate me', $A.test.getText(component.getElement()), "value not truncated as expected");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('truncate me', text, "value not truncated as expected");
         }
     },
 
@@ -43,7 +45,8 @@
     testTruncateZeroAttributeValueWithoutEllipsis: {
         attributes : {value: 'truncate me', truncate: '0', ellipsis: 'false'},
         test: function(component){
-            aura.test.assertEquals('truncate me', $A.test.getText(component.getElement()), "value not truncated as expected");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('truncate me', text, "value not truncated as expected");
         }
     },
 
@@ -53,7 +56,8 @@
     testTruncateOneAttributeValue: {
         attributes : {value: 'truncate me', truncate: '1'},
         test: function(component){
-            aura.test.assertEquals('t...', $A.test.getText(component.getElement()), "value not truncated as expected");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('t...', text, "value not truncated as expected");
         }
     },
 
@@ -63,7 +67,8 @@
     testTruncateOneAttributeValueWithoutEllipsis: {
         attributes : {value: 'truncate me', truncate: '1', ellipsis: 'false'},
         test: function(component){
-            aura.test.assertEquals('t', $A.test.getText(component.getElement()), "value not truncated as expected");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('t', text, "value not truncated as expected");
         }
     },
 
@@ -73,7 +78,8 @@
     testTruncateThreeAttributeValue: {
         attributes : {value: 'truncate me', truncate: '3'},
         test: function(component){
-            aura.test.assertEquals('t...', $A.test.getText(component.getElement()), "value not truncated as expected");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('t...', text, "value not truncated as expected");
         }
     },
 
@@ -83,7 +89,8 @@
     testTruncateThreeAttributeValueWithoutEllipsis: {
         attributes : {value: 'truncate me', truncate: '3', ellipsis: 'false'},
         test: function(component){
-            aura.test.assertEquals('tru', $A.test.getText(component.getElement()), "value not truncated as expected");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('tru', text, "value not truncated as expected");
         }
     },
 
@@ -93,7 +100,8 @@
     testTruncateFourAttributeValue: {
         attributes : {value: 'truncate me', truncate: '4'},
         test: function(component){
-            aura.test.assertEquals('t...', $A.test.getText(component.getElement()), "value not truncated as expected");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('t...', text, "value not truncated as expected");
         }
     },
 
@@ -103,7 +111,8 @@
     testTruncateFourAttributeValueWithoutEllipsis: {
         attributes : {value: 'truncate me', truncate: '4', ellipsis: 'false'},
         test: function(component){
-            aura.test.assertEquals('trun', $A.test.getText(component.getElement()), "value not truncated as expected");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('trun', text, "value not truncated as expected");
         }
     },
 
@@ -113,7 +122,8 @@
     testTruncateExactAttributeValue: {
         attributes : {value: 'truncate me', truncate: '11'},
         test: function(component){
-            aura.test.assertEquals('truncate me', $A.test.getText(component.getElement()), "value shouldn't need truncating");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('truncate me', text, "value shouldn't need truncating");
         }
     },
 
@@ -123,7 +133,8 @@
     testTruncateExactAttributeValueWithoutEllipsis: {
         attributes : {value: 'truncate me', truncate: '11', ellipsis: 'false'},
         test: function(component){
-            aura.test.assertEquals('truncate me', $A.test.getText(component.getElement()), "value shouldn't need truncating");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('truncate me', text, "value shouldn't need truncating");
         }
     },
 
@@ -133,7 +144,8 @@
     testTruncateEnoughAttributeValue: {
         attributes : {value: 'truncate me', truncate: '13'},
         test: function(component){
-            aura.test.assertEquals('truncate me', $A.test.getText(component.getElement()), "value shouldn't need truncating");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('truncate me', text, "value shouldn't need truncating");
         }
     },
 
@@ -143,7 +155,8 @@
     testTruncateMoreThanEnoughAttributeValue: {
         attributes : {value: 'truncate me', truncate: '14'},
         test: function(component){
-            aura.test.assertEquals('truncate me', $A.test.getText(component.getElement()), "value shouldn't need truncating");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('truncate me', text, "value shouldn't need truncating");
         }
     },
 
@@ -153,7 +166,8 @@
     testTruncateNegativeAttributeValue: {
         attributes : {value: 'truncate me', truncate: '-1'},
         test: function(component){
-            aura.test.assertEquals('truncate me', $A.test.getText(component.getElement()), "negative truncate value not ignored");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('truncate me', text, "negative truncate value not ignored");
         }
     },
 
@@ -163,7 +177,8 @@
     testTruncateByWordWithEllipsis: {
         attributes : {value: 'this word fits', truncate: '13', ellipsis: 'true', truncateByWord: 'true'},
         test: function(component){
-            aura.test.assertEquals('this word...', $A.test.getText(component.getElement()), "value wasn't truncated");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('this word...', text, "value wasn't truncated");
         }
     },
 
@@ -173,7 +188,8 @@
     testTruncateByWordWithEllipsisExact: {
         attributes : {value: 'this word fits', truncate: '14', ellipsis: 'true', truncateByWord: 'true'},
         test: function(component){
-            aura.test.assertEquals('this word fits', $A.test.getText(component.getElement()), "value shouldn't need truncating");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('this word fits', text, "value shouldn't need truncating");
         }
     },
 
@@ -183,7 +199,8 @@
     testTruncateByWordWithoutEllipsis: {
         attributes : {value: 'this word fits', truncate: '13', ellipsis: 'false', truncateByWord: 'true'},
         test: function(component){
-            aura.test.assertEquals('this word', $A.test.getText(component.getElement()), "value wasn't truncated");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('this word', text, "value wasn't truncated");
         }
     },
 
@@ -193,7 +210,8 @@
     testTruncateEmpty: {
         attributes : {value: 'truncate me', truncate: ''},
         test: function(component){
-            aura.test.assertEquals('truncate me', $A.test.getText(component.getElement()), "empty truncate value not ignored");
+            var text = $A.test.getText(component.find("content").getElement());
+            $A.test.assertEquals('truncate me', text, "empty truncate value not ignored");
         }
     }
 })

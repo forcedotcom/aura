@@ -60,12 +60,12 @@ public class DependenciesController {
 			matcher = new DescriptorFilter("markup://*:*", DefType.LIBRARY);
 			descriptors.addAll(definitionService.find(matcher));
 			
-			Set<String> list = new HashSet<String>();
+			Set<String> list = new HashSet<>();
 			for (DefDescriptor<?> descriptor : descriptors) {
 				list.add(descriptor.toString() + "@" + descriptor.getDefType());
 			}
 			
-			return (Set<String>) list;
+			return list;
 		} catch (QuickFixException e) {
 			return null;
 		}

@@ -66,7 +66,7 @@
     /**
      * Verify rendering component array declared in the current component's markup.
      * W-1198083: At one point, we didn't want to allow findInstancesOf to work on facets.
-     * 			  This is no longer the case, so this has changed a little bit. 
+     * 			  This is no longer the case, so this has changed a little bit.
      */
     testRenderingComponentArrayInMyBody : {
         test : [ function(cmp) {
@@ -91,32 +91,33 @@
         attributes : {
             flag : false
         },
-        test : [
-                function(cmp) {
-                    var conditionalRendering = cmp.find('conditionalRendering');
-                    $A.test.assertEquals(cmp.get('v.stringAttribute'),
-                            conditionalRendering.get('v.stuffToRender'));
+        test: [
+            function(cmp) {
+                var conditionalRendering = cmp.find('conditionalRendering');
+                $A.test.assertEquals(cmp.get('v.stringAttribute'),
+                        conditionalRendering.get('v.stuffToRender'));
 
-                    $A.test.assertEquals("London", $A.test
-                            .getTextByComponent(conditionalRendering));
-                },
-                
-                /**
-                 * Currently fails because we use getElement() of the component and after a rerender, the new elements don't get associated.
-                 */
-                function(cmp) {
-                    var conditionalRendering = cmp.find('conditionalRendering');
-                    $A.test.assertTruthy(conditionalRendering);
+                $A.test.assertEquals("London",
+                        $A.test.getTextByComponent(conditionalRendering));
+            },
 
-                    cmp.set('v.flag', true);
-                    // Verify that expression evaluates to provide component
-                    // array as attribute value
-                    $A.test.assertEquals(cmp.get('v.cmps'),
-                            conditionalRendering.get('v.stuffToRender'));
+            /**
+             * Currently fails because we use getElement() of the component and after a rerender, the new elements don't get associated.
+             */
+            function(cmp) {
+                var conditionalRendering = cmp.find('conditionalRendering');
+                $A.test.assertTruthy(conditionalRendering);
 
-                    $A.rerender(cmp);
-                    $A.test.assertEquals("textOnBodydivOnBody", $A.test
-                            .getTextByComponent(conditionalRendering));
-                } ]
+                cmp.set('v.flag', true);
+                // Verify that expression evaluates to provide component
+                // array as attribute value
+                $A.test.assertEquals(cmp.get('v.cmps'),
+                        conditionalRendering.get('v.stuffToRender'));
+
+                $A.rerender(cmp);
+                $A.test.assertEquals("textOnBodydivOnBody",
+                        $A.test.getTextByComponent(conditionalRendering));
+            }
+        ]
     }
 })

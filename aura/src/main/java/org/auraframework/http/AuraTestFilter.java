@@ -447,7 +447,7 @@ public class AuraTestFilter implements Filter {
         String testUrl = Aura.getConfigAdapter().getAuraJSURL(); // Dependent on mode being a test mode
         if (original == null
                 || !original.matches(String.format("(?is).*<script\\s*src\\s*=\\s*['\"]%s['\"][^>]*>.*", testUrl))) {
-            tag = String.format("\n<script src='%s'></script>", testUrl);
+            tag = String.format("<script src='%s'></script>", testUrl);
         }
 
         switch (Aura.getContextService().getCurrentContext().getClient().getType()) {
@@ -467,7 +467,7 @@ public class AuraTestFilter implements Filter {
                 System.nanoTime());
         String suiteSrcUrl = createURI(targetDescriptor.getNamespace(), targetDescriptor.getName(),
                 targetDescriptor.getDefType(), null, Format.JS, Authentication.AUTHENTICATED.name(), qs);
-        tag = tag + String.format("\n<script src='%s'%s></script>\n", suiteSrcUrl, defer);
+        tag = tag + String.format("<script src='%s'%s></script>\n", suiteSrcUrl, defer);
         return tag;
     }
 

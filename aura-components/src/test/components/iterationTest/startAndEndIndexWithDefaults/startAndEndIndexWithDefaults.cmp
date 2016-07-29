@@ -32,4 +32,7 @@
         {!idx + ':' + var + ','}
     </aura:iteration>
 
+    <!-- Workaround for W-3262691, prevent extra linebreak in the content -->
+    <div/>
+
 </aura:component>

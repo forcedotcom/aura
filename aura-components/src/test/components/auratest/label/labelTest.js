@@ -30,6 +30,14 @@
 	    ]
     },
 
+    testValueEmpty: {
+        attributes : {value: ""},
+        test: function(component){
+            var actual = $A.test.getText(component.find("bodyEmpty").getElement());
+            $A.test.assertEquals("", actual);
+        }
+    },
+
     /**
      * Label without tokens does not use substitutions.
      */
@@ -75,7 +83,7 @@
         attributes : {value: "A{0}B{1}C{2}D{3}E"},
         test: [function(component){
             $A.test.assertEquals("A{0}B{1}C{2}D{3}E", $A.test.getText(component.find("bodyEmpty").getElement()), "value not expected for no body");
-            $A.test.assertNotNull($A.test.getText(component.find("bodyHtml").getElement()).match(/A\s*logout\s*B\{1\}C\{2\}D\{3\}E/), "value not expected for HtmlElement substitution");            
+            $A.test.assertNotNull($A.test.getText(component.find("bodyHtml").getElement()).match(/A\s*logout\s*B\{1\}C\{2\}D\{3\}E/), "value not expected for HtmlElement substitution");
             $A.test.assertEquals("AhomeB{1}C{2}D{3}E", $A.test.getText(component.find("bodyComponent").getElement()), "value not expected for component substitution");
             $A.test.assertEquals("AtestBfalseC20DspannedE", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
             $A.test.assertEquals("Atestfalse20B{1}C{2}D{3}E", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
@@ -184,5 +192,5 @@
             $A.test.assertEquals("blah 60 meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
         }]
     }
-    
+
 })

@@ -20,5 +20,8 @@
     <aura:attribute name="truncate" type="Integer"/>
     <aura:attribute name="ellipsis" type="Boolean" default="true"/>
     <aura:attribute name="truncateByWord" type="Boolean" default="false"/>
-    <aura:text value="{!v.value}" truncate="{!v.truncate}" ellipsis="{!v.ellipsis}" truncateByWord="{!v.truncateByWord}"/>
+    <!-- wrapped in div to prevent test.getText() takes the noise from body -->
+    <div aura:id="content">
+        <aura:text value="{!v.value}" truncate="{!v.truncate}" ellipsis="{!v.ellipsis}" truncateByWord="{!v.truncateByWord}"/>
+    </div>
 </aura:component>

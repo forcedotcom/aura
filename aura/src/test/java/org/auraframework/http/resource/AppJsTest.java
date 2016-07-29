@@ -83,9 +83,10 @@ public class AppJsTest extends UnitTestCase {
         
         Mockito.when(loader.getResource(Mockito.anyString())).thenReturn(url);
      
+        HashSet<DefDescriptor<?>> dependencies = new HashSet<DefDescriptor<?>>();
         Mockito.when(servletUtilAdapter.verifyTopLevel(Mockito.any(HttpServletRequest.class),
                     Mockito.any(HttpServletResponse.class), Mockito.any(AuraContext.class)))
-            .thenReturn(new HashSet<DefDescriptor<?>>());
+            .thenReturn(dependencies);
         Mockito.doThrow(t).when(serverService).writeDefinitions(Mockito.anySet(), Mockito.any(Writer.class));
         PrintWriter writer = new PrintWriter(System.out);
         Mockito.when(response.getWriter()).thenReturn(writer);
@@ -99,7 +100,7 @@ public class AppJsTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter, Mockito.times(1)).verifyTopLevel(Mockito.any(HttpServletRequest.class),
                 Mockito.any(HttpServletResponse.class), Mockito.any(AuraContext.class));
         Mockito.verify(response, Mockito.times(1)).getWriter();
-        Mockito.verify(serverService, Mockito.times(1)).writeDefinitions(Mockito.anySet(), Mockito.any(Writer.class));
+        Mockito.verify(serverService, Mockito.times(1)).writeDefinitions(Mockito.eq(dependencies), Mockito.eq(writer));
 
         //
         // And this is the expected call. This must stay.

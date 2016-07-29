@@ -637,11 +637,27 @@ public class MenuUITest extends WebDriverTestCase {
     @Test
     public void testFocusWhenTabOnOpenMenu() throws Exception {
         open(MENUTEST_APP);
-        WebDriver driver = this.getDriver();
+        String nextFocusableElmClassName = "checkboxMenuLabel";
+        verifyFocusOnTabOnOpenMenu(nextFocusableElmClassName);
+    }
+
+    /**
+     * Tabbing out of open menu should close menu and focuses on next DOM element
+     * Bug: W-3197504
+     */
+    @Test
+    public void testFocusWhenTabOnOpenMenuWithAttachToBodySet() throws Exception {
+        open(MENUTEST_ATTACHTOBODY_APP);
+        String nextFocusableElmClassName = "triggerAttachToBody";
+        verifyFocusOnTabOnOpenMenu(nextFocusableElmClassName);
+    }
+    
+    private void verifyFocusOnTabOnOpenMenu(String nextFocusableElmClassName) {
+    	WebDriver driver = this.getDriver();
         WebElement menuElm = driver.findElement(By.className("actionMenu"));
         WebElement item1Elm = driver.findElement(By.className("actionItem1"));
         WebElement triggerElm = driver.findElement(By.className("trigger"));
-        WebElement nextFocusableElm = driver.findElement(By.className("checkboxMenuLabel"));
+        WebElement nextFocusableElm = driver.findElement(By.className(nextFocusableElmClassName));
 
         // open menu and make sure focus is on the trigger label
         openMenu(triggerElm, menuElm);
@@ -661,9 +677,9 @@ public class MenuUITest extends WebDriverTestCase {
         }
 
         waitForFocusOnElement(nextFocusableElm);
-    }
+	}
 
-    /**
+	/**
      * Open the menu and wait for it to have the visible class.
      *
      * @param menuLabel  The WebElement to click on that opens the menu

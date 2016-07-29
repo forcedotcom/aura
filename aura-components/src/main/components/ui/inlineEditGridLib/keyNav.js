@@ -924,9 +924,10 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * @param e
          */
         _onClick: function (e) {
-            if (this.keyboardModePaused) {
+            // Check if we should ignore the click
+            if (this._ignoreClick(e)) {
                 return;
-            }
+            }      
 
             var cellLocation = this._getClickedCellLocation(e);
 
@@ -943,7 +944,8 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * @param e
          */
         _onDoubleClick: function (e) {
-            if (this.keyboardModePaused) {
+            // Check if we should ignore the clicks
+            if (this._ignoreClick(e)) {
                 return;
             }
 
@@ -956,6 +958,26 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
             this._setActiveCell(cellLocation.row, cellLocation.column);
             this._triggerEditOnActiveCell(true);
+        },
+
+        /**
+         * Check if we should ignore the click by checking:
+         *  - if keyboard mode is paused 
+         *  - OR if the click target is in the ignore list
+         * @param e
+         * @return boolean
+         */
+        _ignoreClick: function(e) {
+            return this.keyboardModePaused || this._ignoreEventTarget(e);
+        },
+
+        /**
+         * Check if the event target type is in an ignore list, if true, we should ignore the event
+         * @param e
+         * @return boolean
+         */
+        _ignoreEventTarget: function(e) {
+            return this.IGNORE_CLICK_EVENT_TARGETS.indexOf(e.target.tagName.toLowerCase())>-1;
         },
 
         /**
@@ -980,7 +1002,11 @@ function lib(w) { //eslint-disable-line no-unused-vars
          */
         _getCellElement: function(element) {
 
-            while (element.nodeName !== "TD" && element.nodeName !== "TH") {
+            while (element && element.nodeName !== "TD" && element.nodeName !== "TH") {
+                if (element.parentElement === null) {
+                    return null;
+                }
+
                 element = element.parentElement;
             }
 
@@ -1024,7 +1050,8 @@ function lib(w) { //eslint-disable-line no-unused-vars
         /**
          * Helper constants to keep track of class names
          */
-        ACTIVE_CELL_CLASS: 'slds-has-focus'
+        ACTIVE_CELL_CLASS: 'slds-has-focus',
+        IGNORE_CLICK_EVENT_TARGETS: ['table','tr']
     };
 
     // TODO: Library needs to return a new instance of the object for each grid, rather than one single lib object

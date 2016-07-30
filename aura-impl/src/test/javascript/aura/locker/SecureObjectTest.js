@@ -51,7 +51,9 @@ Test.Aura.Locker.SecureObjectTest = function() {
             SecureObject: Aura.Locker.SecureObject,
             
             document: {},
-            window: {}
+            window: {},
+            File: function(){},
+            FileList: function(){}
         });
 
         [Fact]

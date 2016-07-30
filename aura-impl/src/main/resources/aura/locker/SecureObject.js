@@ -83,7 +83,7 @@ SecureObject.filterEverything = function (st, raw, options) {
     var t = typeof raw;
     if (t === "object") {
         if (raw instanceof File || raw instanceof FileList) {
-            // Passthru for objects without priviledges.
+            // Passthru for objects without privileges.
             return raw;
         }
     }
@@ -215,8 +215,10 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 
 	var t = typeof value;
 
-	if (!value || (t !== "object" && t !== "function") || value === window || value === document) {
-		// ignoring falsy, nully references, non-objects and non-functions, and global window/document
+	if (!value || (t !== "object" && t !== "function") || value === window || value === document || value instanceof File
+			|| value instanceof FileList) {
+		// ignoring falsy, nully references, non-objects and non-functions, global window/document, and any passthroughs
+		// from filterEverything
 		return value;
 	}
 

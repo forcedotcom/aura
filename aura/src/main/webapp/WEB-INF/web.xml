@@ -38,27 +38,14 @@
     </listener>
     
     <filter>
-        <filter-name>AuraAnalyticsFilter</filter-name>
-        <filter-class>org.auraframework.http.AuraAnalyticsFilter</filter-class>
-    </filter>
-
-    <filter>
         <filter-name>AuraContextFilter</filter-name>
         <filter-class>org.auraframework.http.AuraContextFilter</filter-class>
     </filter>
     
-    <!-- Begin Aura Servlet -->
-    <filter-mapping>
-        <filter-name>AuraAnalyticsFilter</filter-name>
-        <url-pattern>/analytics</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-    </filter-mapping>
-
     <filter-mapping>
         <filter-name>AuraContextFilter</filter-name>
         <url-pattern>/aura</url-pattern>
-        <url-pattern>/analytics</url-pattern>
+        <url-pattern>/auraAnalytics</url-pattern>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
     </filter-mapping>
@@ -92,7 +79,7 @@
     <servlet-mapping>
         <servlet-name>AuraServlet</servlet-name>
         <url-pattern>/aura</url-pattern>
-        <url-pattern>/analytics</url-pattern>
+        <url-pattern>/auraAnalytics</url-pattern>
     </servlet-mapping>
 
     <!-- Begin rewrite for docs.app mountpoint.  Force loading to prod mode.  After context -->

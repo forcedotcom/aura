@@ -2230,15 +2230,17 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
  * @export
  */
 AuraClientService.prototype.sendBeacon = function(action) {
-    if (window.navigator && window.navigator["sendBeacon"]) {
+    if (window.navigator && window.navigator["sendBeacon"] && window.Blob) {
         try {
             var params = {
                 "message"      : $A.util.json.encode({ "actions" : [action] }),
                 "aura.context" : $A.getContext().encodeForServer(true),
                 "aura.token"   : this._token
             };
-
-            window.navigator["sendBeacon"](this._host + "/analytics", this.buildParams(params));
+            var blobObj = new Blob ([this.buildParams(params)], {
+                "type" : "application/x-www-form-urlencoded; charset=ISO-8859-13"
+            });
+            window.navigator["sendBeacon"](this._host + "/auraAnalytics", blobObj);
 
         } catch (e) {
             $A.warning('Unable to parse action payload');

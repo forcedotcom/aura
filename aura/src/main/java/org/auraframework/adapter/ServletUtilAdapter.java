@@ -110,49 +110,50 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * Get the manifest url.
      */
     String getManifestUrl(AuraContext context, Map<String,Object> attributes);
-    
+
     /**
      * Get bootstrap url.
      */
-    
+
     String getBootstrapUrl(AuraContext context, Map<String,Object> attributes);
-    
+    String getBootstrapFallbackUrl(AuraContext context, Map<String,Object> attributes);
+
     /**
      * Get html5Shiv url.
      */
     String getHTML5ShivUrl();
-    
+
     /**
      * Aura libraries
      */
     String getFrameworkLibUrl();
-    
+
     /**
      * Get inline.js url.
      */
-    
+
     String getInlineJsUrl(AuraContext context, Map<String,Object> attributes);
-    
+
     /**
      * Get app.js url.
      */
     String getAppJsUrl(AuraContext context, Map<String, Object> attributes);
-    
+
     /**
      * Get app.css url.
      */
     String getAppCssUrl(AuraContext context);
-    
+
     /**
      * Get JS client libraries urls
      */
     Set<String> getJsClientLibraryUrls (AuraContext context) throws QuickFixException;
-    
+
     /**
      * Get CSS client libraries urls
      */
     Set<String> getCssClientLibraryUrls (AuraContext context) throws QuickFixException;
-    
+
     /**
      * Get aura framework
      */
@@ -164,7 +165,7 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * @param context the aura context to use.
      * @return the list of css includes
      */
-    	
+
     List<String> getStyles(AuraContext context) throws QuickFixException;
 
     /**
@@ -184,6 +185,9 @@ public interface ServletUtilAdapter extends AuraAdapter {
      */
     List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, boolean ignoreBootstrap, Map<String,Object> attributes)
         throws QuickFixException;
+
+    List<String> getFrameworkFallbackScripts(AuraContext context, boolean safeInlineJs, Map<String,Object> attributes)
+            throws QuickFixException;
 
     /**
      * Force a page to not be cached.
@@ -230,5 +234,5 @@ public interface ServletUtilAdapter extends AuraAdapter {
     Set<DefDescriptor<?>> verifyTopLevel(HttpServletRequest request, HttpServletResponse response,
             AuraContext context) throws IOException;
 
-	
+
 }

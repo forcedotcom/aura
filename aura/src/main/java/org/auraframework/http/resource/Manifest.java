@@ -40,9 +40,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.Maps;
 
 public class Manifest extends AuraResourceImpl {
+    // ui:manifest attribute names
     private static final String LAST_MOD = "lastMod";
     private static final String UID = "uid";
     private static final String RESOURCE_URLS = "resourceURLs";
+    private static final String FALLBACK_URLS = "fallbackURLs";
 
     // FIXME: this is horrendous we actually render the manifest as a component.
     private RenderingService renderingService = Aura.getRenderingService();
@@ -137,6 +139,7 @@ public class Manifest extends AuraResourceImpl {
             context.setFrameworkUID(nonce);
             attribs.put(LAST_MOD, String.format("app=%s, FW=%s", appUid, nonce));
             attribs.put(UID, appUid);
+
             StringWriter sw = new StringWriter();
 
             String resetCssUrl = configAdapter.getResetCssURL();
@@ -183,6 +186,13 @@ public class Manifest extends AuraResourceImpl {
             }
 
             attribs.put(RESOURCE_URLS, sw.toString());
+
+            sw = new StringWriter();
+            for (String s : servletUtilAdapter.getFrameworkFallbackScripts(context, true, attributes)) {
+                sw.write(s);
+                sw.write('\n');
+            }
+            attribs.put(FALLBACK_URLS, sw.toString());
 
             DefDescriptor<ComponentDef> tmplDesc = definitionService
                     .getDefDescriptor("ui:manifest", ComponentDef.class);

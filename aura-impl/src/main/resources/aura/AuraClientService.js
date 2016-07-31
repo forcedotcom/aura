@@ -136,11 +136,10 @@ function AuraClientService () {
     this._host = "";
     this._token = null;
     this._isDisconnected = false;
-    this._useBootstrapCache = true;
+    this._parallelBootstrapLoad = true;
     this.auraStack = [];
     this.appcacheDownloadingEventFired = false;
     this.isOutdated = false;
-    this.initDefsObservers = [];
     this.finishedInitDefs = false;
     this.protocols={"layout":true};
     this.namespaces={internal:{},privileged:{}};
@@ -153,7 +152,11 @@ function AuraClientService () {
     // XHR timeout (milliseconds)
     this.xhrTimeout = undefined;
 
-    // cookie name to force getApplication to the server (to skip cache). done as a cookie so the server
+    // bootstrap.js value used to boot the app. populated after a bootstrap version
+    // is successfully loaded, processed, and merged.
+    this.appBootstrap;
+
+    // cookie name to force boostrap.js to the server (aka skip cache). done as a cookie so the server
     // can set this flag if ever required.
     this._disableBootstrapCacheCookie = "auraDisableBootstrapCache";
 
@@ -375,7 +378,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             var appCache = window.applicationCache;
             if (appCache && (appCache.status === appCache.IDLE || appCache.status > appCache.DOWNLOADING)) {
                 try {
-                appCache.update();
+                    appCache.update();
                 } catch (ignore) {
                     //
                     // not sure what we should do here. but since this seems to only happen in corner cases
@@ -853,6 +856,18 @@ AuraClientService.prototype.handleAppCache = function() {
 
     function handleAppcacheCached() {
         showProgress(100);
+        // workaround appcache wonkiness: when a user logs in that already has a populated appcache,
+        // the browser's appcache update cycle finds a 404 on the manifest until the new sid is
+        // established via various redirects. upon return to the app's url the old appcache is
+        // still active (despite being marked obsolete) so fallback directives take effect. when the
+        // new appcache is ready the page is refreshed so the non-fallback values are used.
+        //
+        // if the boot sequence is beyond bootstrap.js and fallback directives have been used then
+        // reload the page to get the non-fallback values. must do only location.reload();
+        // appcache.swapCache() nor hardRefresh() create the desired behavior.
+        if (Aura["appBootstrapStatus"] === "failed" && Aura["appBootstrapCacheStatus"] === "failed" ) {
+            location.reload();
+        }
     }
 
     function handleAppcacheObsolete() {
@@ -889,14 +904,14 @@ AuraClientService.prototype.setOutdated = function() {
         // an appcache, but appcache.update() will fail (The only known way to reproduce is to use chrome dev
         // tools and disable caching.
         try {
-        appCache.update();
+            appCache.update();
         } catch (e) {
             //
             // whoops. something is inconsistent, but we don't really want to hard fail.
             // so, instead, try a different route.
             //
             this.dumpCachesAndReload();
-    }
+        }
     }
 };
 
@@ -1209,92 +1224,150 @@ AuraClientService.prototype.initDefs = function(config, resolved) {
     Aura["afterAppDefsReady"] = [];
     $A.log("initDefs complete");
 
-    // Use the non-existence of initDefs() as the sentinel indicating that defs are good to go
     this.finishedInitDefs = true;
+};
+
+AuraClientService.prototype.getAppBootstrap = function() {
+    //  network &&  cache -> network
+    //  network && !cache -> network
+    // ?network && cache ->
+    //   parallel -> cache
+    //   serial   -> wait for network
+    // ?network && !cache -> wait for network
+    // !network &&  cache -> cache
+    // !network && !cache -> perm failure
+
+    if (Aura["appBootstrapStatus"] === "loaded") {
+        // loaded bootstrap and CSRF from server so next load can use cached version if enabled
+        this.clearDisableParallelBootstrapLoadOnNextLoad();
+        return {source:"network", value:Aura["appBootstrap"]};
+    }
+    else if (Aura["appBootstrapCacheStatus"] === "loaded" && this.getParallelBootstrapLoad()) {
+        return {source:"cache", value:Aura["appBootstrapCache"]};
+    }
+    else if (Aura["appBootstrapStatus"] === "failed" && Aura["appBootstrapCacheStatus"] === "loaded") {
+        return {source:"cache", value:Aura["appBootstrapCache"]};
+    }
+    else if (Aura["appBootstrapStatus"] === "failed" && Aura["appBootstrapCacheStatus"] === "failed") {
+        // if appcache is disabled or idle then there's no recovery in place. other appcache states have
+        // event handlers that recover automatically (typically by reload the page).
+        if (!window.applicationCache || window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.IDLE) {
+            throw new $A.auraError("AuraClientService.getAppBootstrap: bootstrap.js failed to load from network or cache");
+        }
+    }
+
+    return undefined;
 };
 
 AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
     Aura["afterBootstrapReady"] = Aura["afterBootstrapReady"] || [];
 
-    // If bootstrap has finished already (either js or from cache)
-    if (Aura["appBootstrapReady"]) {
-        var context = $A.getContext();
-        var boot = Aura["appBootstrap"];
+    // if bootstrap is already processed
+    if (this.appBootstrap) {
+        callback.call(this, this.appBootstrap["data"]["app"]);
+        return;
+    }
 
-        if (boot["error"]) {
-            if (boot["error"]["exceptionEvent"]) {
-                $A.util.json.resolveRefsObject(boot);
-                this.throwExceptionEvent(boot["error"]);
-                return;
-            } else {
-                throw new $A.auraError("Aura.loadComponent(): Failed to initialize application.\n" + boot["error"].message);
-            }
-        }
+    // if bootstrap isn't available then enqueue
+    var bootstrap = this.getAppBootstrap();
+    if (!bootstrap) {
+        Aura["afterBootstrapReady"].push(this.runAfterBootstrapReady.bind(this, callback));
+        return;
+    }
 
-        this._token = boot["token"];
-        this.saveTokenToStorage(); // async fire-and-forget
+    // bootstrap is available but unprocessed. process it!
+    var context = $A.getContext();
+    var boot = bootstrap.value;
 
-        // If is not coming from cache we need to clean the payload
-        if (Aura["appBootstrapReady"] !== "cache") {
-
-            $A.util.json.resolveRefsObject(boot["data"]);
-
-            $A.componentService.saveDefsToStorage(boot["context"], context);
-
-            if (this._useBootstrapCache) {
-                var actionStorage = Action.getStorage();
-                if (actionStorage) {
-                    actionStorage.set(AuraClientService.BOOTSTRAP_KEY, boot);
-                }
-            }
+    if (boot["error"]) {
+        if (boot["error"]["exceptionEvent"]) {
+            $A.util.json.resolveRefsObject(boot);
+            this.throwExceptionEvent(boot["error"]);
+            return;
         } else {
-            Aura["afterBootstrapReady"].push(function () {
-                $A.log('Checking bootstrap signature');
-                Aura["bootstrapUpgrade"] = boot["md5"] !== Aura["appBootstrap"]["md5"];
-
-                if (this._token !== boot["token"]) {
-                    this._token = boot["token"];
-                    this.saveTokenToStorage(); // async fire-and-forget
-                }
-
-                this.checkBootstrapUpgrade();
-
-            }.bind(this));
+            throw new $A.auraError("Aura.loadComponent(): Failed to initialize application.\n" + boot["error"]["message"]);
         }
+    }
 
-        // We just have bootstrap data processed either from js or from cache
+    this._token = boot["token"];
+    this.saveTokenToStorage(); // async fire-and-forget
 
-        try {
-            // We can have a mismatch if we are upgrading framework or mode
+    if (bootstrap.source === "network") {
+        // must "clean" the network payload
+        $A.util.json.resolveRefsObject(boot["data"]);
+        $A.componentService.saveDefsToStorage(boot["context"], context);
 
-            if (boot["data"]["components"]) {
-                // we need to use the resolvedRefs for AuraContext components (componentConfigs aka partialConfigs)
-                boot["context"]["components"] = boot["data"]["components"];
-            }
-            context['merge'](boot["context"]);
-        } catch(e) {
-            // Abort caching and wait for bootstrap.js to arrive
-            $A.warning('Bootstrap cache mismatch, waiting for bootstrap.js');
+        // persist bootstrap.js to storage
+        var actionStorage = Action.getStorage();
+        if (actionStorage) {
+            actionStorage.set(AuraClientService.BOOTSTRAP_KEY, boot)
+                .then(
+                    undefined, // noop
+                    function(err) {
+                        $A.warning("AuraClientService.runAfterBootstrapReady(): failed to persist bootstrap.js: " + err);
+                    }
+                );
+        }
+    }
+
+    try {
+        // can have a mismatch if we are upgrading framework or mode
+        if (boot["data"]["components"]) {
+            // need to use the resolvedRefs for AuraContext components (componentConfigs aka partialConfigs)
+            boot["context"]["components"] = boot["data"]["components"];
+        }
+        context["merge"](boot["context"]);
+    } catch(e) {
+        if (bootstrap.source === "cache" && this.getParallelBootstrapLoad() && Aura["appBootstrapStatus"] !== "failed") {
+            $A.warning("Bootstrap cache merge failed, waiting for bootstrap.js from network");
             Aura["afterBootstrapReady"].push(this.runAfterBootstrapReady.bind(this, callback));
             return;
+        } else {
+            throw new $A.auraError("AuraClientService.runAfterBootstrapReady: bootstrap from " + bootstrap.source + " failed to merge");
         }
-
-        callback.call(this, boot["data"]["app"]);
-
-
-    // Wait for bootstrap.js to arrive
-    } else {
-        Aura["afterBootstrapReady"].push(this.runAfterBootstrapReady.bind(this, callback));
     }
+
+    $A.log("Bootstrap loaded and processed from " + bootstrap.source);
+    this.appBootstrap = boot;
+
+    if (bootstrap.source === "cache" && this.getParallelBootstrapLoad() && Aura["appBootstrapStatus"] !== "failed") {
+        // in the future when network bootstrap arrives, if the load was successful
+        // then perform the freshness check
+        Aura["afterBootstrapReady"].push(function () {
+            if (Aura["appBootstrapStatus"] === "loaded") {
+                if (Aura["appBootstrap"]["error"]) {
+                    $A.warning("AuraClientService.runAfterBootstrapReady(): bootstrap from network contained error: " + Aura["appBootstrap"]["error"]["message"]);
+                } else {
+                    Aura["bootstrapUpgrade"] = this.appBootstrap["md5"] !== Aura["appBootstrap"]["md5"];
+                    this.checkBootstrapUpgrade();
+                }
+            }
+            // release memory of network bootstrap
+            delete Aura["appBootstrap"];
+        }.bind(this));
+    }
+
+    // release memory
+    delete Aura["appBootstrap"];
+    delete Aura["appBootstrapCache"];
+
+    callback.call(this, boot["data"]["app"]);
 };
 
 /**
- * Fire an aura:applicationRefreshed application level event if bootstrap returned from server differs from what is
- * currently loaded from cache. 
- *
+ * Fire an aura:applicationRefreshed application level event if bootstrap returned from network differs from bootstrap
+ * loaded from cache.
  * @private
  */
 AuraClientService.prototype.checkBootstrapUpgrade = function() {
+    // finishedInit and bootstrapUpgrade are set in async processes: former waits on libs_*.js
+    // to arrive, latter waits on network bootstrap.js to arrive. thus global meeting point
+    // pattern is required.
+    if (Aura["bootstrapUpgrade"] === undefined) {
+        // network version hasn't arrived yet
+        return;
+    }
+    $A.log("Checking bootstrap signature: network returned " + (Aura["bootstrapUpgrade"] ? "new" : "same") + " version");
     if ($A["finishedInit"] && Aura["bootstrapUpgrade"]) {
         $A.eventService.getNewEvent("markup://aura:applicationRefreshed").fire();
     }
@@ -1328,6 +1401,44 @@ AuraClientService.prototype.runAfterInitDefs = function(callback) {
 };
 
 /**
+ * Loads bootstrap.js from storage, if it exists, and populates several
+ * global variables consumed by runAfterBootstrapReady().
+ * @return {Promise} a promise that always resolves. Errors are logged
+ *  and the promise resolves.
+ */
+AuraClientService.prototype.loadBootstrapFromStorage = function() {
+    var storage = Action.getStorage();
+    // if bootstrap.js from network has loaded then skip loading from cache
+    if (Aura["appBootstrap"]) {
+        return Promise["resolve"]();
+    }
+
+    // if no storage then no cache hit
+    if (!storage || !storage.isPersistent()) {
+        Aura["appBootstrapCacheStatus"] = "failed";
+        return Promise["resolve"]();
+    }
+
+    // else load from storage
+    return storage.get(AuraClientService.BOOTSTRAP_KEY, true)
+        .then(
+            function(value) {
+                if (value) {
+                    Aura["appBootstrapCacheStatus"] = "loaded";
+                    Aura["appBootstrapCache"] = value;
+                } else {
+                    Aura["appBootstrapCacheStatus"] = "failed";
+                }
+            },
+            function(err) {
+                Aura["appBootstrapCacheStatus"] = "failed";
+                $A.warning("AuraClientService.loadBootstrapFromStorage(): failed to load bootstrap from storage: " + err);
+                // do not rethrow
+            }
+        );
+};
+
+/**
  * Load a component.
  *
  * This function does a very complex dance to try to bring up the app as fast as possible. This is really
@@ -1351,14 +1462,16 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                 $A.log("AuraClientService.loadComponent(): token found in storage");
             } else {
                 $A.log("AuraClientService.loadComponent(): no token found in storage");
-                // on next reload force server trip to get new token
-                acs.disableBootstrapCacheOnNextLoad();
+                // on next reload fetch bootstrap from network to get a new token. if
+                // network load fails (eg due to offline) then fallback to cached version,
+                // allowing the app to still boot.
+                acs.disableParallelBootstrapLoadOnNextLoad();
             }
         },
         function(err) {
             $A.log("AuraClientService.loadComponent(): failed to load token from storage: " + err);
             // on next reload force server trip to get new token
-            acs.disableBootstrapCacheOnNextLoad();
+            acs.disableParallelBootstrapLoadOnNextLoad();
         }
     );
 
@@ -3097,55 +3210,54 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
 };
 
 /**
- * Handles invalidSession exception from the server when the csrf token is invalid.
- * Saves new token to storage then refreshes page.
- *
+ * Handles invalidSession exception from the server when the CSRF token is invalid.
+ * Saves the new token to storage then refreshes page.
  * @export
  */
 AuraClientService.prototype.invalidSession = function(token) {
     var acs = this;
 
-    var refresh = function(disableBootstrapCache) {
-        if (disableBootstrapCache) {
-            acs.disableBootstrapCacheOnNextLoad();
+    function refresh(disableParallelBootstrapLoad) {
+        if (disableParallelBootstrapLoad) {
+            acs.disableParallelBootstrapLoadOnNextLoad();
         }
         $A.clientService.hardRefresh();
-    };
+    }
 
     // if new token provided then persist to storage and reload. if persisting
-    // fails then we must go to the server for getApplication to get a new token.
+    // fails then we must go to the server for bootstrap.js to get a new token.
     if (token && token["newToken"]) {
         this._token = token["newToken"];
         this.saveTokenToStorage().then(refresh.bind(null, false), refresh.bind(null, true));
     } else {
-        // refresh (to get a new session id) and force getApplication to the server
+        // refresh (to get a new session id) and force bootstrap.js to the server
         // (to get a new csrf token).
         refresh(true);
     }
 };
 
 /**
- * Sets whether Aura should attempt to load the getApplication action from cache first.
- * This must be called from a template's auraPreInitBlock. By default this is enabled.
- * @param {Boolean} useBootstrapCache if true load getApplication action from cache first.
- *  If false go to the server first (ignoring any existing cache).
+ * Sets how Aura loads bootstrap.js: in parallel from network and cache,
+ * or serially from network then cache. This must be called from a template's
+ * auraPreInitBlock. By default this is enabled.
+ * @param {Boolean} parallel if true parallelly load bootstrap.js from
+ *  network and cache. If false load from network first (if it fails then
+ *  load from cache).
  * @export
  */
-AuraClientService.prototype.setUseBootstrapCache = function(useBootstrapCache) {
-    this._useBootstrapCache = useBootstrapCache;
+AuraClientService.prototype.setParallelBootstrapLoad = function(parallel) {
+    this._parallelBootstrapLoad = !!parallel;
 };
 
 /**
- * Forces getApplication action to the server, skipping the cache, when the app
- * is next loaded.
+ * On next load, serially load bootstrap.js from network then cache.
  *
- * Bootstrap cache is disabled when a valid csrf token is not available because the
- * getApplication action is the only mechanism to get a new token.
- *
+ * If a valid CSRF token is not available then on next load bootstrap.js must
+ * go to the server to fetch a new and valid CSRF token.
  * @private
  */
-AuraClientService.prototype.disableBootstrapCacheOnNextLoad = function() {
-    // can only get a cache hit on getApplication with persistent storage
+AuraClientService.prototype.disableParallelBootstrapLoadOnNextLoad = function() {
+    // can only get a cache hit on bootstrap.js with persistent storage
     var storage = Action.getStorage();
     if (storage && storage.isPersistent()) {
         var expire = new Date(new Date().getTime() + 1000*60*60*24*7); // + 1 week
@@ -3154,19 +3266,19 @@ AuraClientService.prototype.disableBootstrapCacheOnNextLoad = function() {
 };
 
 /**
- * Clears disabling of the bootstrap cache. See disableBootstrapCacheOnNextLoad.
+ * Clears disabling parallel load of bootstrap.js. See disableParallelBootstrapLoadOnNextLoad.
  * @private
  */
-AuraClientService.prototype.clearDisableBootstrapCacheOnNextLoad = function() {
+AuraClientService.prototype.clearDisableParallelBootstrapLoadOnNextLoad = function() {
     document.cookie = this._disableBootstrapCacheCookie + '=true; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 };
 
 /**
- * Gets whether to check action cache for getApplication.
+ * Gets whether to check action cache for bootstrap.js.
  * @return {Boolean} true if the cache should be checked; false to skip the cache.
  */
-AuraClientService.prototype.getUseBootstrapCache = function() {
-    if (!this._useBootstrapCache) {
+AuraClientService.prototype.getParallelBootstrapLoad = function() {
+    if (!this._parallelBootstrapLoad) {
         return false;
     }
 
@@ -3179,11 +3291,9 @@ AuraClientService.prototype.getUseBootstrapCache = function() {
     }
     var end = cookies.indexOf(';', begin + key.length);
     var value = cookies.substring(begin + key.length, end);
-    // stored value is string true; see disableBootstrapCacheOnNextLoad()
+    // stored value is string true; see disableParallelBootstrapLoadOnNextLoad()
     return value !== 'true';
 };
-
-
 
 /**
  * This is a temporary API to workaround a broken network stack found on Samsung
@@ -3234,11 +3344,6 @@ AuraClientService.prototype.populatePersistedActionsFilter = function() {
         .then(function(items) {
             for (var key in items) {
                 acs.persistedActionFilter[key] = true;
-                // Get it from storage if bootstrap.js hasnt arrived yet
-                if (key === AuraClientService.BOOTSTRAP_KEY && !Aura["appBootstrap"]) {
-                    Aura["appBootstrapReady"] = "cache";
-                    Aura["appBootstrap"] = items[key];
-                }
             }
             $A.log("AuraClientService: restored " + Object.keys(items).length + " actions");
         });

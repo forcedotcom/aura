@@ -683,6 +683,9 @@ AuraInstance.prototype.initAsync = function(config) {
             Aura.bootstrapMark("runAfterContextCreated");
             $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
         }
+        function reportError(e) {
+            $A.reportError("getApplication threw error", e);
+        }
 
         // actions depend on defs depend on GVP (labels). so load them in dependency order and skip
         // loading depending items if anything fails to load.
@@ -693,9 +696,14 @@ AuraInstance.prototype.initAsync = function(config) {
 
         if (!context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE) {
             $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");
-            getApplication();
+            $A.clientService.loadBootstrapFromStorage()
+                .then(getApplication, getApplication)
+                .then(undefined, reportError);
         } else {
-            $A.componentService.restoreDefsFromStorage(context)
+            $A.clientService.loadBootstrapFromStorage()
+                .then(function() {
+                    return $A.componentService.restoreDefsFromStorage(context);
+                })
                 .then(function() {
                     return $A.clientService.populatePersistedActionsFilter();
                 })
@@ -706,7 +714,8 @@ AuraInstance.prototype.initAsync = function(config) {
                         // do not rethrow
                     }
                 )
-                .then(getApplication, getApplication);
+                .then(getApplication, getApplication)
+                .then(undefined, reportError);
         }
     });
 };
@@ -995,7 +1004,7 @@ AuraInstance.prototype.getCallback = function(callback) {
     if (context && context.getDef) {
         var contextComponentDef = context.getDef();
         if (contextComponentDef) {
-            contextComponent = contextComponentDef.getDescriptor().toString();    
+            contextComponent = contextComponentDef.getDescriptor().toString();
         }
     }
     return function(){
@@ -1026,7 +1035,7 @@ AuraInstance.prototype.getCallback = function(callback) {
 /**
  * Returns the application configuration token referenced by name.
  * A tokens file is configured with the tokens attribute in the aura:application tag.
- * 
+ *
  * @function
  * @param {String} token - The name of the application configuration token to retrieve, for example, <code>$A.getToken("section.configuration")</code>.
  * @public

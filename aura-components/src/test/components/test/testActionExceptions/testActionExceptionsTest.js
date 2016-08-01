@@ -153,7 +153,7 @@
                         // instance in AuraClientService.prototype.processErrors, so there is no stack for IE.
                         var stack = action.error[0].stack;
                         var browser = $A.get("$Browser");
-                        if(!browser.isIE10 || !browser.isIE11) {
+                        if(!browser.isIE10 && !browser.isIE11) {
                             $A.test.assertTrue(stack.length > 0, "Unexpected stack: " + stack);
                         }
                     }

@@ -34,16 +34,19 @@ function lib() { //eslint-disable-line no-unused-vars
             }
 
             // since v.value is in UTC format like "2015-08-10T04:00:00.000Z", we want to make sure the date portion is valid
-            var dateValue = value.split("T", 1)[0] || value;
+            var splitValue = value.split("T");
+            var dateValue = splitValue[0] || value;
+            var timeValue = splitValue[1];
             var useStrictParsing = config.validateString === true;
-            var date = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", config.langLocale, useStrictParsing);
+            var hasTime = timeValue && timeValue !== '00:00:00.000Z';
+
+            // if dateValue doesn't have time we consider not UTC
+            var date = $A.localizationService.parseDateTime(dateValue, "YYYY-MM-DD", config.langLocale, useStrictParsing);
 
             if ($A.util.isEmpty(date)) {
                 callback(value);
                 return;
             }
-
-            var hasTime = dateValue !== value;
 
             var displayValue = function (convertedDate) {
                 var translatedDate = $A.localizationService.translateToOtherCalendar(convertedDate);

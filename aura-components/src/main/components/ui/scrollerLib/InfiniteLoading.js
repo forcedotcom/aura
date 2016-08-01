@@ -179,14 +179,14 @@ function lib(w) { //eslint-disable-line no-unused-vars
             x || (x = this.x);
             y || (y = this.y);
 
-            if (this.scrollHorizontal) {
-                pos     = x;
-                size    = this.scrollerWidth;
-                wrapper = this.wrapperWidth;
-            } else {
+            if (this.scrollVertical) {
                 pos     = y;
                 size    = this.scrollerHeight;
                 wrapper = this.wrapperHeight;
+            } else {
+                pos     = x;
+                size    = this.scrollerWidth;
+                wrapper = this.wrapperWidth;
             }
 
             var scrollable = size - wrapper; // Total scrollable pixels

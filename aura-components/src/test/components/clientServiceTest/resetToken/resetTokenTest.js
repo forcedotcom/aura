@@ -23,12 +23,13 @@
 
                 var storage = $A.storageService.getStorage("actions");
                 $A.test.assertNotUndefinedOrNull(storage);
+                // Key from AuraClientService.TOKEN_KEY
                 // Verify the token in storage gets updated
                 var key = "$AuraClientService.token$";
                 storage.adapter.getItems([key]).then(
                     function(items) {
                         if(items[key]) {
-                            actual = items[key].value.token
+                            actual = items[key].value.token;
                         }
                     }, function() {
                         $A.test.fail("Failed to get value from storage.");

@@ -5,7 +5,8 @@
     // Test modifies/deletes the persistent database
     labels: ["threadHostile"],
 
-    BOOTSTRAP_KEY: "appBootstrap",
+    // must match AuraClientService.BOOTSTRAP_KEY
+    BOOTSTRAP_KEY: "$AuraClientService.bootstrap$",
 
     testBootstrapMd5ConsistentAcrossReloads: {
         test: [

@@ -1,7 +1,7 @@
 ({
     init: function(cmp) {
         var storage = $A.storageService.getStorage("actions");
-        // TODO - straight against adapter so must use value.value
+        // key from AuraClientService.TOKEN_KEY
         var key = "$AuraClientService.token$";
         storage.adapter.getItems([key]).then(
             function(items) {

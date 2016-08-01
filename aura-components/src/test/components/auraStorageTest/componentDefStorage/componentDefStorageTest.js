@@ -76,7 +76,7 @@
 
             // def storage may not exist until the XHR is back and the def is stored
             if (!storage) {
-                window.setTimeout(function() { checkDefStorage(desc); }, 250);
+                window.setTimeout(function() { checkDefStorage(desc); }, 100);
                 return;
             }
 

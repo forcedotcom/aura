@@ -682,9 +682,9 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
     // blacklist in every adapter.
     //
     // blacklist copied from AuraComponentService.js
-    var actionsBlackList = ["globalValueProviders",                                 /* GlobalValueProviders.js */
-                            "aura://ComponentController/ACTION$getApplication",     /* AuraClientService.js */
-                            "$AuraContext$"];                                       /* AuraContext.js */
+    var actionsBlackList = ["globalValueProviders",           /* GlobalValueProviders.js */
+                            "$AuraClientService.token$",      /* AuraClientService.js */
+                            "$AuraClientService.bootstrap$"]; /* AuraClientService.js */
 
     this.lastSweep = now;
     try {

@@ -24,11 +24,20 @@ import javax.servlet.http.HttpServletResponse;
 import org.auraframework.system.AuraContext;
 
 /**
- * Handles /l/{}/app.encryptionkey requests to retrieve encryption key.
+ * Handles /l/{}/app.encryptionkey.js requests to retrieve encryption key.
  */
 public class EncryptionKeyJs extends AuraResourceImpl {
-    private final String PREPEND_JS = "window.Aura || (window.Aura = {});\nwindow.Aura.bootstrap || (window.Aura.bootstrap = {});\nwindow.Aura.Crypto = {};\nwindow.Aura.Crypto.key =";
-    private final String APPEND_JS = ";\n(function () {\n\twindow.Aura.bootstrap.execEncryptionKey = window.performance && window.performance.now ? window.performance.now() : Date.now();\n\twindow.Aura.encryptionKeyReady = true;\n\tif (window.Aura.afterEncryptionKeyReady){\n\t\twindow.Aura.afterEncryptionKeyReady();\n\t}\n}());";
+    private final String PREPEND_JS = "window.Aura || (window.Aura = {});\n" +
+            "window.Aura.bootstrap || (window.Aura.bootstrap = {});\n" +
+            "window.Aura.Crypto = {};\n" +
+            "window.Aura.Crypto.key =";
+    private final String APPEND_JS = ";(function() {\n" +
+            "    window.Aura.bootstrap.execEncryptionKey = window.performance && window.performance.now ? window.performance.now() : Date.now();\n" +
+            "    window.Aura.encryptionKeyReady = true;\n" +
+            "    if (window.Aura.afterEncryptionKeyReady) {\n" +
+            "        window.Aura.afterEncryptionKeyReady();\n" +
+            "    }\n" +
+            "}())";
 
     public EncryptionKeyJs() {
         super("app.encryptionkey.js", AuraContext.Format.JS);

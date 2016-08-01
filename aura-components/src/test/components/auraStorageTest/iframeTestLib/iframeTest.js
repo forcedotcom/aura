@@ -130,18 +130,13 @@ function iframeTest() {
                 iframe.$A.storageService.getStorage("ComponentDefStorage").getAll([], true)
                     .then(
                         function(items) {
-                            // wait for transaction key to disappear
-                            if (items[that.TRANSACTION_SENTINEL_KEY]) {
-                                checkDefStorage(desc);
+                            // if transaction key present or def not present, recurse
+                            if (items[that.TRANSACTION_SENTINEL_KEY] || !items["markup://" + desc]) {
+                                setTimeout(function() { checkDefStorage(desc); }, 100);
                                 return;
                             }
 
-                            if (items["markup://" + desc]) {
-                                found = true;
-                                return;
-                            }
-
-                            checkDefStorage(desc);
+                            found = true;
                         },
                         function(e) {
                             $A.test.fail("ComponentDefStorage.getAll() failed: " + e);
@@ -176,7 +171,8 @@ function iframeTest() {
                         function(items) {
                             // if transaction key or def is present, recurse
                             if (items[that.TRANSACTION_SENTINEL_KEY] || items["markup://" + desc]) {
-                                checkDefStorage(desc);
+                                // pause before rechecking
+                                setTimeout(function() { checkDefStorage(desc); }, 100);
                                 return;
                             }
 
@@ -245,7 +241,9 @@ function iframeTest() {
                             found = true;
                             return;
                         }
-                        checkGvpsInStorage();
+
+                        // not found so pause a brief moment then recheck
+                        setTimeout(function() { checkGvpsInStorage(); }, 100);
                 });
             }
 
@@ -261,7 +259,6 @@ function iframeTest() {
         waitForActionInStorage : function(key, msg) {
             var iframe = this.getIframe();
             var found = false;
-            var that = this;
 
             function checkActionStorage(key) {
                 // short-circuit once the test times out
@@ -277,7 +274,8 @@ function iframeTest() {
                                 return;
                             }
 
-                            checkActionStorage(key);
+                            // not found so pause a brief moment then recheck
+                            setTimeout(function() { checkActionStorage(key); }, 100);
                         },
                         function(e) {
                             $A.test.fail("action store getAll() failed: " + e);
@@ -293,5 +291,5 @@ function iframeTest() {
                 msg
             );
         }
-    }
+    };
 }

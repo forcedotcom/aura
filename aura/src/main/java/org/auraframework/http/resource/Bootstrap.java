@@ -40,7 +40,7 @@ import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
 /**
- * Handles /l/{}/app.encryptionkey requests to retrieve encryption key.
+ * Handles /l/{}/bootstrap.js requests to retrieve bootstrap.js.
  */
 public class Bootstrap extends AuraResourceImpl {
 
@@ -50,8 +50,19 @@ public class Bootstrap extends AuraResourceImpl {
         super("bootstrap.js", Format.JS);
     }
 
-    private final static String PREPEND_JS = "window.Aura || (window.Aura = {});\nwindow.Aura.bootstrap || (window.Aura.bootstrap = {});\nwindow.Aura.appBootstrap = ";
-    private final static String APPEND_JS = ";\n(function () {\n\twindow.Aura.bootstrap.execBootstrapJs = window.performance && window.performance.now ? window.performance.now() : Date.now();\n\twindow.Aura.appBootstrapReady = \"new\";\n\tif (window.Aura.afterBootstrapReady && window.Aura.afterBootstrapReady.length){\n\t\t for (var i = 0; i < window.Aura.afterBootstrapReady.length; i++) {\n\t\t\twindow.Aura.afterBootstrapReady[i]();\n\t\t}\n\t}\n}());";
+    private final static String PREPEND_JS = "window.Aura || (window.Aura = {});\n" +
+            "window.Aura.bootstrap || (window.Aura.bootstrap = {});\n" +
+            "window.Aura.appBootstrap = ";
+    private final static String APPEND_JS = ";\n" +
+            ";(function() {\n" +
+            "    window.Aura.bootstrap.execBootstrapJs = window.performance && window.performance.now ? window.performance.now() : Date.now();\n" +
+            "    window.Aura.appBootstrapReady = \"new\";\n" +
+            "    if (window.Aura.afterBootstrapReady && window.Aura.afterBootstrapReady.length) {\n" +
+            "        for (var i = 0; i < window.Aura.afterBootstrapReady.length; i++) {\n" +
+            "            window.Aura.afterBootstrapReady[i]();\n" +
+            "        }\n" +
+            "    }\n" +
+            "}());";
 
     public Boolean loadLabels() throws QuickFixException {
         AuraContext ctx = contextService.getCurrentContext();
@@ -130,14 +141,14 @@ public class Bootstrap extends AuraResourceImpl {
     private static class WrappedPrintWriter implements Appendable {
     	private final PrintWriter inner;
     	private final MessageDigest m;
-    	
+
     	WrappedPrintWriter(PrintWriter inner) {
 			try {
 				m = MessageDigest.getInstance("MD5");
 			} catch (NoSuchAlgorithmException e) {
 				throw new RuntimeException(e);
 			}
-			
+
     		this.inner = inner;
     	}
 
@@ -158,18 +169,18 @@ public class Bootstrap extends AuraResourceImpl {
 			updateMD5(String.valueOf(c), 0, 1);
 			return inner.append(c);
 		}
-		
+
 		public void updateMD5(CharSequence csq, int start, int end) {
 			byte[] data = csq.toString().getBytes();
 			m.update(data, 0, data.length);
 		}
-		
+
 		public String getMD5() {
 			BigInteger i = new BigInteger(1, m.digest());
 			return String.format("%1$032X", i);
 		}
     }
-    
+
     private void writeError(Throwable t, HttpServletResponse response, AuraContext context) throws IOException {
         response.resetBuffer();
         PrintWriter out = response.getWriter();

@@ -152,13 +152,6 @@ function AuraClientService () {
     // XHR timeout (milliseconds)
     this.xhrTimeout = undefined;
 
-    // storage key for csrf token. it is queried / updated by non-aura clients before aura boots so
-    // key must not change and must avoid the keyprefix being applied so directly interact with adapter
-    // (not AuraStorage).
-    // TODO W-2531907 - handle CSRF/invalid session issue so this key can be keyprefix'ed and standard
-    // AuraStorage APIs used, and no need for non-aura clients to change with the value preboot.
-    this._tokenStorageKey = "$AuraClientService.token$";
-
     // cookie name to force getApplication to the server (to skip cache). done as a cookie so the server
     // can set this flag if ever required.
     this._disableBootstrapCacheCookie = "auraDisableBootstrapCache";
@@ -227,7 +220,22 @@ function AuraClientService () {
 
 }
 
-AuraClientService.BOOTSTRAP_KEY = "appBootstrap";
+/**
+ * Storage key for CSRF token.
+ * TODO W-2531907 - Get/set done directly against the adapter because pre-200 non-Aura clients modified this value
+ * direclty in SSA prior to Aura booting. Instead Aura should handle CSRF/invalid session issues, then this key/value
+ * can operate against AuraStorage.
+ * TODO W-2481519 - use a dedicated storage (not actions) for this framework-internal data to avoid eviction blacklists
+ * in every adapter.
+ */
+AuraClientService.TOKEN_KEY = "$AuraClientService.token$";
+
+/**
+ * Storage key for bootstrap.js
+ * TODO W-2481519 - use a dedicated storage (not actions) for this framework-internal data to avoid eviction blacklists
+ * in every adapter.
+ */
+AuraClientService.BOOTSTRAP_KEY = "$AuraClientService.bootstrap$";
 
 /**
  * set the queue size.
@@ -932,13 +940,13 @@ AuraClientService.prototype.saveTokenToStorage = function() {
         // satisfy the adapter API shape requirements; see AuraStorage.setItems().
         var now = new Date().getTime();
         var tuple = [
-             this._tokenStorageKey,
+             AuraClientService.TOKEN_KEY,
              {
                  "value": { "token": this._token },
                  "expires": now + 15768000000, // 1/2 year
                  "created": now
              },
-             $A.util.estimateSize(this._tokenStorageKey) + $A.util.estimateSize(this._token)
+             $A.util.estimateSize(AuraClientService.TOKEN_KEY) + $A.util.estimateSize(this._token)
          ];
 
         return storage.adapter.setItems([tuple]).then(
@@ -960,11 +968,10 @@ AuraClientService.prototype.saveTokenToStorage = function() {
 AuraClientService.prototype.loadTokenFromStorage = function() {
     var storage = Action.getStorage();
     if (storage) {
-        var that = this;
-        return storage.adapter.getItems([this._tokenStorageKey])
+        return storage.adapter.getItems([AuraClientService.TOKEN_KEY])
             .then(function(items) {
-                if (items[that._tokenStorageKey]) {
-                    return items[that._tokenStorageKey]["value"];
+                if (items[AuraClientService.TOKEN_KEY]) {
+                    return items[AuraClientService.TOKEN_KEY]["value"];
                 }
                 return undefined;
             });

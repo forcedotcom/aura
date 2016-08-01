@@ -195,6 +195,7 @@ public class InputDateTimeUITest extends WebDriverTestCase {
      * @throws Exception
      */
     @Test
+    // TODO: Flapping on Jenkins autobuilds
     public void _testTPLeftArrow() throws Exception {
         open(URL);
 

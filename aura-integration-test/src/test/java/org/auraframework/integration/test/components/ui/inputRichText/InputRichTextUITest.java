@@ -86,6 +86,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
             BrowserType.IPHONE })
     @ThreadHostileTest("testHtmlContentEscaped is not thread-safe")
     @Test
+    // TODO: Flapping on Jenkins autobuilds
     public void _testHtmlContentEscaped() throws Exception {
         open(URL);
         WebElement ckEditor = getAuraUITestingUtil().waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
@@ -105,6 +106,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
     // Excluding test as switchTo not supported with android drivers
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     @Test
+    // TODO: Flapping on Jenkins autobuilds
     public void _testRenderInitialValueOfRichText() throws Exception {
         String defaultText = "testing text";
         WebDriver driver = this.getDriver();

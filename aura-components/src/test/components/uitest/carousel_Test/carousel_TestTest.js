@@ -124,6 +124,7 @@
     /**
      * Carousel with one tab renders correctly.
      */
+    // TODO: Flapping on Jenkins autobuilds
  	_testCarouselWithOneTab : {
  		browsers: ["-IE7","-IE8"],
  		test : function(cmp){

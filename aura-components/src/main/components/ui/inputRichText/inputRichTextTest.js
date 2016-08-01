@@ -141,6 +141,7 @@
     /**
      * Test basic tool bar is loaded.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testToolbarTypeBasic:{
     	attributes : {toolbar: "basic"},
     	test : [function() {
@@ -153,6 +154,7 @@
     /**
      * Test full tool bar is loaded.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testToolbarTypeFull:{
     	attributes : {toolbar: "full"},
     	test : [function() {
@@ -165,6 +167,7 @@
     /**
      * Test standard tool bar is loaded.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testToolbarTypeStandard:{
     	attributes : {toolbar: "standard"},
     	test : [function() {
@@ -177,6 +180,7 @@
     /**
      * Test email tool bar is loaded.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testToolbarTypeEmail:{
     	attributes : {toolbar: "email"},
     	test : [function() {
@@ -204,6 +208,7 @@
     /**
      * Test custom tool bar is loaded.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testToolbarTypeCustom : {
         attributes : {
             toolbar : "custom",
@@ -219,6 +224,7 @@
     /**
      * Test default tool bar is loaded for an empty custom tool bar configuration.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testToolbarTypeCustomWithEmptyConfig : {
         attributes : {
             toolbar : "custom",
@@ -234,6 +240,7 @@
     /**
      * Test default tool bar is loaded for no custom tool bar configuration.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testToolbarTypeCustomWithNoConfig : {
         attributes : {
             toolbar : "custom"
@@ -248,6 +255,7 @@
     /**
      * Test default tool bar is loaded for a bad custom tool bar configuration.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testToolbarTypeCustomWithBadConfig : {
         attributes : {
             toolbar : "custom",
@@ -263,6 +271,7 @@
     /**
      * Valid toolbar location value. ckeditor is loaded with toolbar in proper place bottom.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testToolbarLocationBottom:{
     	attributes : {toolbarLocation: "outerspace"},
     	test : [function() {
@@ -275,6 +284,7 @@
     /**
      * Invalid toolbar location value. ckeditor is loaded but no toolbar present.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testToolbarLocationInvalid:{
     	attributes : {toolbarLocation: "outerspace"},
     	test : [function() {
@@ -287,6 +297,7 @@
     /**
      * Disable richText.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testDisableRichText:{
     	attributes : {isRichText: false},
     	test : function() {
@@ -298,6 +309,7 @@
      * Test invalid dimensions.
      * Exclude IE 7, 8 since they don't support negative dimensions
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testRichTextInvalidDimensions:{
         browsers: ["-IE7", "-IE8"],
         attributes : {width: -100, height:-10},
@@ -310,6 +322,7 @@
     /**
      * Test rich text editor content.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testRichTextContent:{
     	attributes : {value: "<h3 style='color:red;'><span style='font-family:courier new,courier,monospace;'><span style='font-size:8px;'>test content</span></span></h3>"},
     	test : [function() {
@@ -326,6 +339,7 @@
      * Verify setting value.
      * Disabled due to W-2996437
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testValue: {
         attributes : {isRichText: false, value: "Initial value"},
         test: [function(component){
@@ -339,6 +353,7 @@
     /**
      * Verify setting disabled attribute to true, then switching to false.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testDisabled: {
         attributes : {isRichText: false, disabled: true},
         test: [function(component){
@@ -352,6 +367,7 @@
     /**
      * Verify not setting disabled attribute to false, then switching to true.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testNotDisabled: {
         attributes : {isRichText: false, disabled: false},
         test: [function(component){
@@ -365,6 +381,7 @@
     /**
      * Verify setting readonly attribute to true, then switching to false.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testReadonly: {
         attributes : {isRichText: false, readonly: 'true'},
         test: [function(component){
@@ -378,6 +395,7 @@
     /**
      * Verify setting readonly attribute to false, then switching to true.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testNotReadonly: {
         attributes : {isRichText: false, readonly: 'false'},
         test: [function(component){
@@ -391,6 +409,7 @@
     /**
      * Verify setting rows attribute.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testRows: {
         attributes : {isRichText: false, rows: "15"},
         test: function(component){
@@ -401,6 +420,7 @@
     /**
      * Verify setting columns attribute.
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testCols: {
         attributes : {isRichText: false, cols: "15"},
         test: function(component){
@@ -412,6 +432,7 @@
      * Verify setting resizable attribute to true, then switching to false.
      * Do not run in IE7 because hasAttribute() support is IE8+
      */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
     _testResizable: {
     	browsers : ["-IE7"],
         attributes : {isRichText: false, resizable: true},

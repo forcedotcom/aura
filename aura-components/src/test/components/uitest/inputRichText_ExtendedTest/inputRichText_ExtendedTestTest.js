@@ -17,6 +17,7 @@
 	/**
 	 * Able to extend rich text editor.
 	 */
+    // TODO(W-3259241): Flapping on Jenkins autobuilds
 	_testRichTextExtended: {
 		test : function(component) {
 			this.assertRichTextInitalized();

@@ -157,15 +157,17 @@ public abstract class TemplateResource extends AuraResourceImpl {
             writeHtmlScripts(servletUtilAdapter.getFrameworkScripts(context, true, false, componentAttributes), true, sb);
             attributes.put("auraNamespacesScriptTags", sb.toString());
 
-            if(mode != Mode.PROD && mode != Mode.PRODDEBUG && context.getIsDebugToolEnabled()) {
-                attributes.put("auraInitBlock", "<script>var debugWindow=window.open('/aura/debug.cmp','Aura Debug Tool','width=900,height=305,scrollbars=0,location=0,toolbar=0,menubar=0');$A.util.setDebugToolWindow(debugWindow);</script>");
-            }
+            // init namespaces.
 
             Map<String, Object> auraInit = Maps.newHashMap();
             if (componentAttributes != null && !componentAttributes.isEmpty()) {
                 auraInit.put("attributes", componentAttributes);
             }
 
+            Map<String, Object> namespaces = Maps.newHashMap();
+            namespaces.put("internal", configAdapter.getInternalNamespaces());
+            namespaces.put("privileged", configAdapter.getPrivilegedNamespaces());
+            auraInit.put("ns", namespaces);
             auraInit.put("descriptor", value.getDescriptor());
             auraInit.put("deftype", value.getDescriptor().getDefType());
             auraInit.put("host", contextPath);

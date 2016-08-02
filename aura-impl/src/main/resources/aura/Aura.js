@@ -653,6 +653,7 @@ AuraInstance.prototype.afterInitHooks = function () {
 AuraInstance.prototype.initAsync = function(config) {
     Aura.bootstrapMark("runInitAsync");
     this.beforeInitHooks();
+    this.clientService.setNamespacePrivileges(config["ns"]);
 
     // Context is created async because of the GVPs go though async storage checks
     $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
@@ -744,6 +745,7 @@ AuraInstance.prototype.setLanguage = function() {
  */
 AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
     config = $A.util.json.resolveRefsObject(config);
+    this.clientService.setNamespacePrivileges(config["ns"]);
 
     if (!useExisting || $A.util.isUndefined($A.getContext())) {
         $A.clientService.initHost(config["host"], config["sid"]);

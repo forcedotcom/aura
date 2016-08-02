@@ -11,4 +11,5 @@ if test -n "$name"; then
     NAME_ARG="-DtestNameContains=$name";
 fi
 
+find . -name .registries -exec rm -f {} \;
 mvn verify -DskipUnitTests -DskipJsDoc -DskipComponentCompile -DrunIntTests ${MVN_ARGS} ${NAME_ARG}

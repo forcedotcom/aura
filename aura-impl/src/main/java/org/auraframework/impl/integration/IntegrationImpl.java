@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
@@ -279,6 +280,7 @@ public class IntegrationImpl implements Integration {
             InstanceService instanceService = Aura.getInstanceService();
             RenderingService renderingService = Aura.getRenderingService();
             ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
+            ConfigAdapter configAdapter = Aura.getConfigAdapter();
             ComponentDef templateDef = appDef.getTemplateDef();
 
             Map<String, Object> attributes = Maps.newHashMap();
@@ -303,6 +305,10 @@ public class IntegrationImpl implements Integration {
             auraInit.put("instance", instance);
             auraInit.put("token", AuraBaseServlet.getToken());
             auraInit.put("host", context.getContextPath());
+            Map<String, Object> namespaces = Maps.newHashMap();
+            namespaces.put("internal", configAdapter.getInternalNamespaces());
+            namespaces.put("privileged", configAdapter.getPrivilegedNamespaces());
+            auraInit.put("ns", namespaces);
 
             StringBuilder contextWriter = new StringBuilder();
 

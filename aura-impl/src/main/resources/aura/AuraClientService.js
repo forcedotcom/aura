@@ -1129,6 +1129,26 @@ AuraClientService.prototype.areActionsWaiting = function() {
 };
 
 /**
+ * Add privileged namespaces.
+ *
+ * @param {Array} a list of namespaces to mark privileged
+ * @private
+ */
+AuraClientService.prototype.setNamespacePrivileges = function(sentNs) {
+    var namespaces = { "internal" : this.namespaces.internal, "privileged" : this.namespaces.privileged };
+
+    if (sentNs) {
+        for (var x in namespaces) {
+            if (sentNs[x]) {
+                for (var i = 0; i < sentNs[x].length; i++) {
+                    namespaces[x][sentNs[x][i]] = true;
+                }
+            }
+        }
+    }
+};
+
+/**
  * Initialize definitions.
  *
  * FIXME: why is this exported
@@ -1176,19 +1196,6 @@ AuraClientService.prototype.initDefs = function(config, resolved) {
     var comConfigs = config["componentDefs"];
     for (i = 0; i < comConfigs.length; i++) {
         $A.componentService.saveComponentConfig(comConfigs[i]);
-    }
-
-    var namespaces = { "internal" : this.namespaces.internal, "privileged" : this.namespaces.privileged };
-    var sentNs=config["ns"];
-
-    if (sentNs) {
-        for (var x in namespaces) {
-            if (sentNs[x]) {
-                for (i = 0; i < sentNs[x].length; i++) {
-                    namespaces[x][sentNs[x][i]] = true;
-                }
-            }
-        }
     }
 
     var defObservers = Aura["afterAppDefsReady"] || [];

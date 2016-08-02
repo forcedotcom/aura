@@ -351,15 +351,6 @@ public class ServerServiceImpl implements ServerService {
 
         sb.append("$A.clientService.initDefs({");
 
-        // append namespaces.
-        sb.append("ns:{");
-        sb.append(" internal:");
-        JsonEncoder.serialize(Aura.getConfigAdapter().getInternalNamespaces(), sb, context.getJsonSerializationContext());
-        sb.append(" ,");
-        sb.append(" privileged:");
-        JsonEncoder.serialize(Aura.getConfigAdapter().getPrivilegedNamespaces(), sb, context.getJsonSerializationContext());
-        sb.append("},");
-
         // append event definitions
         sb.append("eventDefs:");
         Collection<EventDef> events = filterAndLoad(EventDef.class, dependencies, null);

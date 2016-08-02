@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -56,18 +57,19 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             InstanceService instanceService = Aura.getInstanceService();
             RenderingService renderingService = Aura.getRenderingService();
             BaseComponentDef def = value.getDescriptor().getDef();
+            ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
+            ConfigAdapter configAdapter = Aura.getConfigAdapter();
 
             ComponentDef templateDef = def.getTemplateDef();
             Map<String, Object> attributes = Maps.newHashMap();
 
             StringBuilder sb = new StringBuilder();
-            writeHtmlStyle(Aura.getConfigAdapter().getResetCssURL(), sb);
+            writeHtmlStyle(configAdapter.getResetCssURL(), sb);
             attributes.put("auraResetTags", sb.toString());
 
-            ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
 
             sb.setLength(0);
-            writeHtmlStyles(Aura.getServletUtilAdapter().getStyles(context), sb);
+            writeHtmlStyles(servletUtilAdapter.getStyles(context), sb);
             attributes.put("auraStyleTags", sb.toString());
 
             sb.setLength(0);
@@ -93,17 +95,24 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             } else {
 
                 attributes.put("auraScriptTags", sb.toString());
+
                 Map<String, Object> auraInit = Maps.newHashMap();
                 if (componentAttributes != null && !componentAttributes.isEmpty()) {
                     auraInit.put("attributes", componentAttributes);
                 }
+
+                Map<String, Object> namespaces = Maps.newHashMap();
+                namespaces.put("internal", configAdapter.getInternalNamespaces());
+                namespaces.put("privileged", configAdapter.getPrivilegedNamespaces());
+                auraInit.put("ns", namespaces);
+
                 auraInit.put("descriptor", def.getDescriptor());
                 auraInit.put("deftype", def.getDescriptor().getDefType());
                 auraInit.put("host", contextPath);
                 
-                String lockerWorkerURL = Aura.getConfigAdapter().getLockerWorkerURL();
+                String lockerWorkerURL = configAdapter.getLockerWorkerURL();
                 if (lockerWorkerURL != null) {
-                	auraInit.put("safeEvalWorker", lockerWorkerURL);
+                    auraInit.put("safeEvalWorker", lockerWorkerURL);
                 }
 
                 attributes.put("autoInitialize", "false");

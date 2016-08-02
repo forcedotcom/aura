@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -51,12 +52,13 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
         try {
             InstanceService instanceService = Aura.getInstanceService();
             RenderingService renderingService = Aura.getRenderingService();
+            ConfigAdapter configAdapter = Aura.getConfigAdapter();
 
             ComponentDef templateDef = value.getTemplateDef();
             Map<String, Object> attributes = Maps.newHashMap();
 
             StringBuilder sb = new StringBuilder();
-            writeHtmlStyle(Aura.getConfigAdapter().getResetCssURL(), sb);
+            writeHtmlStyle(configAdapter.getResetCssURL(), sb);
             attributes.put("auraResetTags", sb.toString());
 
             AuraContext context = Aura.getContextService().getCurrentContext();
@@ -98,12 +100,16 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 if (componentAttributes != null && !componentAttributes.isEmpty()) {
                     auraInit.put("attributes", componentAttributes);
                 }
+                Map<String, Object> namespaces = Maps.newHashMap();
+                namespaces.put("internal", configAdapter.getInternalNamespaces());
+                namespaces.put("privileged", configAdapter.getPrivilegedNamespaces());
+                auraInit.put("ns", namespaces);
 
                 auraInit.put("descriptor", value.getDescriptor());
                 auraInit.put("deftype", value.getDescriptor().getDefType());
                 auraInit.put("host", contextPath);
                 
-                String lockerWorkerURL = Aura.getConfigAdapter().getLockerWorkerURL();
+                String lockerWorkerURL = configAdapter.getLockerWorkerURL();
                 if (lockerWorkerURL != null) {
                 	auraInit.put("safeEvalWorker", lockerWorkerURL);
                 }

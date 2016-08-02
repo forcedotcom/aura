@@ -124,7 +124,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                             focusables.last.focus();
                         }
                     } else if (focusables && config.closeOnTabOut) {
-                        if (current === focusables.last && !shiftPressed) {
+                        if ((current === focusables.last && !shiftPressed) || (current === focusables.first && shiftPressed)) {
                             $A.util.squash(event, true);
                             if ($A.util.isFunction(closeAction)) {
                             	closeAction(cmp, "closeOnTabOut");

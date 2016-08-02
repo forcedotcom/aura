@@ -33,24 +33,5 @@
                 $A.test.assertDefined(columns[i].querySelector('.handle'), "Column " + i + " doesn't have a handle.");
             }
         }
-    },
-    
-    /** Resize events don't fire anymore if the resize is manually triggered by the user.
-     *  // TODO: refacor the test
-     *  Sshould check if the event fires when the resize is done through the UI,
-     *  orr if the DOM matches the data passed in.
-     */
-    _testResizeEvent : {
-        test : [function(cmp) {
-            cmp.find("grid").resizeColumns(this.WIDTHS.smallerWidths);
-        }, function(cmp) {
-            var prevResize = cmp.get("v.prevResize");
-            var lastIndex = this.COLUMNS.length - 1;
-            var columns = cmp.find("grid").getElement().querySelectorAll('th');
-            
-            $A.test.assertEquals(prevResize.src.label, this.COLUMNS[lastIndex], "Name of last resized column does not match");
-            $A.test.assertEquals(prevResize.src.index, lastIndex, "Index of last resized column does not match");
-            $A.test.assertEquals(prevResize.width, columns[lastIndex].clientWidth);
-        }]
     }
 })

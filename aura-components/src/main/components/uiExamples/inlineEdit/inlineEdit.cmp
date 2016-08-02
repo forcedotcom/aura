@@ -34,6 +34,7 @@
 		<ui:inlineEditGrid aura:id="grid" class="inline-edit-example" items="{!v.items}" onEdit="{!c.onEdit}" editable="{!v.editable}" dataVar="record"
 			enableResizableColumns="true" onKeyboardModeEnter="{!c.onKeyboardModeEnter}"  onKeyboardModeExit="{!c.onKeyboardModeExit}">
 			<aura:set attribute="headerColumns">
+				<ui:dataTableHeader name="number"	 label="number" sortable="true"/>
 				<ui:dataTableHeader name="id"	     label="Id" sortable="true"/>
 				<ui:dataTableHeader name="name"	     label="Name" resizable="true"/>
 				<ui:dataTableHeader name="bloodtype"  label="Blood Type" resizable="true"/>
@@ -41,6 +42,9 @@
 			</aura:set>
 			
 			<aura:set attribute="columns">
+				<ui:inlineEditKeyNavCell>
+					<ui:outputText label="Row Number" value="Row Number" />
+				</ui:inlineEditKeyNavCell>
 				<uiExamples:gridActionCell />
 				<ui:inlineEditCell name="id" isPsuedoInput="true" class="pseudoInput" triggerLabel="Edit Id">
 					<ui:outputText class="truncate" value="{!item.record.id}"/>

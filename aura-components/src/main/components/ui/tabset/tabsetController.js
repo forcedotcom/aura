@@ -27,7 +27,7 @@
     },
     
     addTab: function(cmp, evt, helper) {
-    	helper.addTab(cmp, evt.getParam("index"), evt.getParam("tab"), evt.getParam("callback"), evt.getParam("name"));
+       	helper.addTab(cmp, evt.getParam("index"), evt.getParam("tab"), evt.getParam("callback"), evt.getParam("name"));
     },
 
     updateTab: function(cmp, evt, helper) {
@@ -63,5 +63,13 @@
     
     onTabClosed: function(cmp, evt, helper) {
     	helper.removeTabBody(cmp, evt.getParam("index"));
+    },
+
+    clearTabs: function(cmp, evt, helper) {
+        var size = cmp._tabCollection.getSize();
+        for(var c=size-1;c>=0;c--) {
+            helper.removeTab(cmp, c);
+        }
+
     }
 })// eslint-disable-line semi

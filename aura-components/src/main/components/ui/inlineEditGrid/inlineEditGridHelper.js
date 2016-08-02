@@ -85,8 +85,8 @@
 	},
 	
 	createEditPanel : function(cmp, newPanelBody, referenceElement) {
-		var _keyNav = this.lib.keyNav;
-		var config = this.getPanelConfig(referenceElement);
+		var _keyNav = this.getKeyboardManager(cmp);
+		var config = this.getPanelConfig(cmp, referenceElement);
 		
 		newPanelBody.addHandler('submit', cmp, 'c.handlePanelSubmit');
 		config.body = newPanelBody;
@@ -145,7 +145,7 @@
 	    return panelBodyConfig;
 	},
 	
-	getPanelConfig: function(referenceElement) {
+	getPanelConfig: function(cmp, referenceElement) {
         return {
             referenceElement: referenceElement,
             closeOnClickOut: true,
@@ -155,17 +155,17 @@
 				}
 				else {
 					panel.hide();
-					this.lib.keyNav.resumeKeyboardMode();
+					this.getKeyboardManager(cmp).resumeKeyboardMode();
 				}
 			}.bind(this))
         };
     },
 
 	initKeyboardEntry: function(cmp){
-		this.lib.keyNav.initKeyboardEntry(cmp);
+		this.getKeyboardManager(cmp).initKeyboardEntry(cmp);
 	},
 	destroyKeyboard: function(cmp){
-		this.lib.keyNav.destroyKeyboard(cmp);
+		this.getKeyboardManager(cmp).destroyKeyboard(cmp);
 	},
 	handleEnableKeyboardMode: function(cmp){
 		if (cmp.get("v.enableKeyboardMode")) {
@@ -198,10 +198,21 @@
         }).fire();
 	},
 	fireKeyboardModeEnterEvent: function(cmp) {
- 		cmp.getEvent("onKeyboardModeEnter").fire();
+ 		cmp.getEvent("onKeyboardModeEnter").setParams({
+			action : "keyboardModeEnter",
+			payload : {}
+		}).fire();
  	},
- 	fireKeyboardModeExitEvent: function(cmp) {
- 		cmp.getEvent("onKeyboardModeExit").fire();
+	/**
+	 * @param exitAction - the exitAction such as exitOnEsc or exitOnBlur
+	 */
+ 	fireKeyboardModeExitEvent: function(cmp, exitAction) {
+ 		cmp.getEvent("onKeyboardModeExit").setParams({
+			action : "keyboardModeExit",
+			payload : {
+				"exitAction": exitAction
+			}
+		}).fire();
  	},
 	fireShortcutSaveEvent: function(cmp) {
 		cmp.getEvent("onKeyboardShortcut").setParams({
@@ -214,5 +225,11 @@
 			action : "shortcut",
 			payload : "cancel"
 		}).fire();
+	},
+	getKeyboardManager: function(cmp) {
+		if (!cmp._keyboardManager) {
+			cmp._keyboardManager = this.lib.keyNav.createKeyboardManager();
+		}
+		return cmp._keyboardManager;
 	}
 })// eslint-disable-line semi

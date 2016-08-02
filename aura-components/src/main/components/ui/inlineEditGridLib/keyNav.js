@@ -59,16 +59,9 @@ function lib(w) { //eslint-disable-line no-unused-vars
             if (!this.initialized) {
                 this.cmp = cmp;
                 this.table = this.grid = cmp.find('grid').getElement();
-                this.handlersAdded = false;
                 this.tableBody = this.grid.querySelector('tbody');
                 this.tableHead = this.grid.querySelector('thead');
-
-                this._onClickHandler = this._onClick.bind(this);
-                this.grid.addEventListener("click", this._onClickHandler, true);
-
-                this._onDoubleClickHandler = this._onDoubleClick.bind(this);
-                this.grid.addEventListener("dblclick", this._onDoubleClickHandler, true);
-
+                this._addEventHandlers();
                 this.initialized = true;
             }
         },
@@ -80,20 +73,12 @@ function lib(w) { //eslint-disable-line no-unused-vars
         destroyKeyboard: function () {
             if (this.initialized) {
                 this.initialized = false;
-                if (this.handlersAdded) {
-                    this._removeEventHandlers();
-                }
-                this.grid.removeEventListener("dblclick", this._onDoubleClickHandler, true);
-                this._onDoubleClickHandler = null;
-                this.grid.removeEventListener("click", this._onClickHandler, true);
-                this._onClickHandler = null;
+                this._removeEventHandlers();
                 this.tableHead = null;
                 this.tableBody = null;
                 this.table = null;
-                this.handlersAdded = false;
                 this.grid = null;
                 this.cmp = null;
-
                 this._resetActiveCell();
             }
         },
@@ -138,18 +123,25 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * Add Event Handlers (click/keydown) for interacting with the grid
          */
         _addEventHandlers: function(){
-            this._onKeydownHandler = this._onKeydown.bind(this);
-            this.grid.addEventListener("keydown", this._onKeydownHandler, true);
-            this.handlersAdded = true;
+            this._registeredEventsMap = {};
+            for (var eventName in this.EVENT_HANDLERS) {
+                var methodName = this.EVENT_HANDLERS[eventName],
+                    handler = this[methodName].bind(this);
+                this.grid.addEventListener(eventName, handler, true);
+                this._registeredEventsMap[eventName] = handler;
+            }
         },
 
         /**
          * Unbind keyboard and click Nav events
          */
         _removeEventHandlers: function () {
-            this.grid.removeEventListener("keydown", this._onKeydownHandler, true);
-            this._onKeydownHandler = null;
-            this.handlersAdded = false;
+            if (this._registeredEventsMap) {
+                for (var eventName in this._registeredEventsMap) {
+                    this.grid.removeEventListener(eventName, this._registeredEventsMap[eventName], true);
+                }
+                this._registeredEventsMap = null;
+            }
         },
 
         /**
@@ -161,11 +153,9 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 // if the keyboard navigation feature has not been initialized, it was deactivated
                 return;
             }
-            if (!this.handlersAdded){
-                this._addEventHandlers();
-            }
 
             this.inKeyboardMode = true;
+            this.keyboardModePaused = false;
 
             cmp.set('v.inKeyboardMode', true);
 
@@ -189,25 +179,54 @@ function lib(w) { //eslint-disable-line no-unused-vars
                     this._triggerEditOnActiveCell();
                 }
                 else {
-                    this._focusActiveCellInput();
+                    this._focusActiveCell();
                 }
+
             }
+            // adapt UI by changing classes
+            this._applyKeyboardModeCellMarker(false);
 
         },
 
         /**
          * Exits the keyboard mode status of the specified cmp
          * @param cmp
+         * @param exitAction - the exitAction such as exitOnEsc or exitOnBlur
          */
-        exitKeyboardMode: function(cmp) {
+        exitKeyboardMode: function(cmp, exitAction) {
             if (!this.initialized) {
                 // if the keyboard navigation feature has not been initialized, it was deactivated
                 return;
             }
+
+            // adapt UI by changing classes
+            this._applyKeyboardModeCellMarker(true);
+
             this.inKeyboardMode = false;
-            this._removeEventHandlers();
             cmp.set('v.inKeyboardMode', false);
-            cmp.helper.fireKeyboardModeExitEvent(cmp);
+            cmp.helper.fireKeyboardModeExitEvent(cmp, exitAction);
+        },
+
+        /**
+         * Applies the cell markers to make the table looks according to spec when leaving or entering keyboard mode
+         */
+        _applyKeyboardModeCellMarker: function(addMarker) {
+            if (addMarker) {
+                var activeCell = this.table.querySelector("." + this.ACTIVE_CELL_CLASS);
+                if (activeCell) {
+                    $A.util.addClass(activeCell, "slds-cell-marker");
+                    $A.util.addClass(this.table, "slds-no-cell-focus");
+                }
+            }
+            else {
+                // clearing out previous cell markers
+                var activeCellMarker = this.table.querySelector(".slds-cell-marker");
+                if (activeCellMarker) {
+                    $A.util.removeClass(activeCellMarker, "slds-cell-marker");
+                    $A.util.removeClass(this.table, "slds-no-cell-focus");
+                }
+
+            }
         },
 
         /**
@@ -395,7 +414,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * Returns true if the trigger of this element is set to disabled or hidden (which happens if v.editable is set to false)
          */
         _isTriggerDisabledByElement: function(element) {
-            return element.classList.contains("disabled");// || this.isElementHidden(element);
+            return element.classList.contains("disabled");
         },
 
         _isTrigger: function(element) {
@@ -591,11 +610,11 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
             // we have to set the style on the cellContainer because slds requires this to be on the same element as slds-cell-edit and not on the TD
             var cellContainer = this.activeCell.querySelector(".cellContainer");
-            $A.util.addClass((cellContainer)?cellContainer:this.activeCell, "slds-has-focus");
+            $A.util.addClass((cellContainer)?cellContainer:this.activeCell, this.ACTIVE_CELL_CLASS);
 
             var result = this._focusActiveCellInput();
             if (!result) {
-                $A.util.removeClass((cellContainer)?cellContainer:this.activeCell, "slds-has-focus");
+                $A.util.removeClass((cellContainer)?cellContainer:this.activeCell, this.ACTIVE_CELL_CLASS);
             }
             return result;
         },
@@ -606,8 +625,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * @param columnIndex
          */
         _blurActiveCell: function(){
-            // TODO: Find a concrete solution to set a cell as active
-            $A.util.removeClass(this.table.querySelector(".slds-has-focus"), "slds-has-focus");
+            $A.util.removeClass(this.table.querySelector("." + this.ACTIVE_CELL_CLASS), this.ACTIVE_CELL_CLASS);
             this._blurActiveCellInput();
         },
 
@@ -814,7 +832,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                  */
                 case _KEY_CODES.esc:
                     stopEvent();
-                    _context.exitKeyboardMode(cmp);
+                    _context.exitKeyboardMode(cmp, "exitOnEsc");
                     break;
 
                 /**
@@ -845,6 +863,10 @@ function lib(w) { //eslint-disable-line no-unused-vars
                     break;
 
                 case _KEY_CODES.upArrow:
+                    // if we encounter a popup menu we don't use the arrow key so that the menu itself is opened
+                    if (this.activeCellInput && this.activeCellInput.getAttribute("aria-haspopup") === "true") {
+                        return;
+                    }
                     stopEvent();
                     _context._gotoPreviousRow();
                     break;
@@ -979,6 +1001,46 @@ function lib(w) { //eslint-disable-line no-unused-vars
         _ignoreEventTarget: function(e) {
             return this.IGNORE_CLICK_EVENT_TARGETS.indexOf(e.target.tagName.toLowerCase())>-1;
         },
+        
+        /**
+         * Main event handler to validate when keyboard mode is left.
+         * Note: This is called for every sub element too so we have to make sure we only continue if clicked outside
+         * @param e
+         */
+        _onTableBlur: function() {
+            if (this.keyboardModePaused) {
+                return;
+            }
+            // this RAF is required because all the browsers at the time of blur-ing do not set the target of the blur
+            // the target is the old element. However we need to know if one clicked/tabbed out of the grid and therefore
+            // need to wait a bit
+            // http://stackoverflow.com/questions/121499/when-onblur-occurs-how-can-i-find-out-which-element-focus-went-to
+            window.requestAnimationFrame($A.getCallback(function() {
+                // relatedTarget is used for blur event, target is used for click event
+                var targetElement = document.activeElement,
+                    partOfTable = this.table.contains(targetElement);
+
+                if (!partOfTable && this.inKeyboardMode) {
+                    this.exitKeyboardMode(this.cmp, "exitOnBlur");
+                }
+            }.bind(this)));
+        },
+
+        _onTableFocus: function(e) {
+            if (this.keyboardModePaused) {
+                return;
+            }
+            // BLUR and FOCUS need to be in sync and therefore we need to give the focus also time,
+            // otherwise the FOCUS event happens before the BLUR event
+            window.requestAnimationFrame($A.getCallback(function() {
+
+                var partOfTable = this.table.contains(e.target);
+
+                if (partOfTable && !this.inKeyboardMode) {
+                    this.enterKeyboardMode(this.cmp, null, null, true);
+                }
+            }.bind(this)));
+        },
 
         /**
          * Get the location of the clicked cell (row, column)
@@ -1052,8 +1114,18 @@ function lib(w) { //eslint-disable-line no-unused-vars
          */
         ACTIVE_CELL_CLASS: 'slds-has-focus',
         IGNORE_CLICK_EVENT_TARGETS: ['table','tr']
+        EVENT_HANDLERS : {
+            "click"   : "_onClick",
+            "dblclick": "_onDoubleClick",
+            "keydown" : "_onKeydown",
+            "blur"    : "_onTableBlur",
+            "focus"   : "_onTableFocus"
+        }
     };
 
-    // TODO: Library needs to return a new instance of the object for each grid, rather than one single lib object
-    return new KeyboardNavManager();
+    return {
+        createKeyboardManager: function() {
+            return new KeyboardNavManager();
+        }
+    };
 }

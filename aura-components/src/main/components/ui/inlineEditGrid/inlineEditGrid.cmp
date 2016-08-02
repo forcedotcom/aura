@@ -50,8 +50,8 @@
 	<aura:handler name="change" value="{!v.enableKeyboardMode}" action="{!c.handleEnableKeyboardMode}"/>
 
     <aura:registerEvent name="onEdit"   type="ui:collectionValueChanged"    description="Event fired when a cell of the grid has been edited" />
-	<aura:registerEvent name="onKeyboardModeEnter"  type="ui:focus"         description="Event fired when user enters keyboard mode" />
-	<aura:registerEvent name="onKeyboardModeExit"   type="ui:blur"          description="Event fired when user exits keyboard mode" />
+	<aura:registerEvent name="onKeyboardModeEnter"  type="ui:gridAction"    description="Event fired when user enters keyboard mode" />
+	<aura:registerEvent name="onKeyboardModeExit"   type="ui:gridAction"    description="Event fired when user exits keyboard mode with a payload of 'exitAction'. Valid values are: exitOnEsc and exitOnBlur" />
 	<aura:registerEvent name="onKeyboardShortcut"   type="ui:gridAction"    description="Event fired when user presses Ctrl+S or Ctrl+. whilst in keyboard mode" />
 
 	<!-- Events passed from the virtualDataGrid -->

@@ -40,7 +40,7 @@
                 return;
             }
 		    helper.handleEditAction(cmp, evt);
-		    helper.lib.keyNav.pauseKeyboardMode();
+			helper.getKeyboardManager(cmp).pauseKeyboardMode();
 		}
 	},
 	
@@ -71,19 +71,19 @@
 		cmp._panelCmp.hide();
 		
 		helper.fireEditEvent(cmp, payload);
-		helper.lib.keyNav.resumeKeyboardMode();
+		helper.getKeyboardManager(cmp).resumeKeyboardMode();
 	},
 	
 	enterKeyboardMode: function(cmp, evt, helper){
 		var args = evt.getParam('arguments'),
 			editActiveCell = args.editActiveCell,
 			clearActiveCell = args.clearActiveCell;
-		helper.lib.keyNav.enterKeyboardMode(cmp, editActiveCell, clearActiveCell);
+		helper.getKeyboardManager(cmp).enterKeyboardMode(cmp, editActiveCell, clearActiveCell);
 		helper.fireKeyboardModeEnterEvent(cmp);
 	},
 	
 	exitKeyboardMode: function(cmp, evt, helper){
-		helper.lib.keyNav.exitKeyboardMode(cmp);
+		helper.getKeyboardManager(cmp).exitKeyboardMode(cmp);
 		helper.fireKeyboardModeExitEvent(cmp);
 	},
 

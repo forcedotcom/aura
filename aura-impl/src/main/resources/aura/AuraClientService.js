@@ -3037,17 +3037,19 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
 
                 var allowProtocol=this.protocols.hasOwnProperty(accessDescriptor&&accessDescriptor.getPrefix()) || this.protocols.hasOwnProperty(accessFacetDescriptor&&accessFacetDescriptor.getPrefix());
                 var isInternal=allowProtocol || this.namespaces.internal.hasOwnProperty(accessNamespace) || this.namespaces.internal.hasOwnProperty(accessFacetNamespace);
+                var isPrivileged=this.namespaces.privileged.hasOwnProperty(accessNamespace) || this.namespaces.privileged.hasOwnProperty(accessFacetNamespace);
 
                 if(definition.access==='PP') {
                     // PRIVILEGED means accessible to namespaces marked PRIVILEGED, as well as to INTERNAL
-                    var isPrivileged=this.namespaces.privileged.hasOwnProperty(accessNamespace) || this.namespaces.privileged.hasOwnProperty(accessFacetNamespace);
                     if(isPrivileged || isInternal){
                         // Privileged Namespace
                         return true;
                     }
                 }
 
-                var effectiveAccess=definition.access||(isInternal?'I':'P');
+                // JBUCH: TEMPORARY REPRIEVE FOR PRIVILEGED ORGS. RESET TO:
+                //var effectiveAccess=definition.access||(isInternal?'I':'P');
+                var effectiveAccess=definition.access||(isInternal||isPrivileged?'I':'P');
                 if(effectiveAccess==='P') {
                     // PUBLIC means "same namespace only"
                     var targetNamespace = definition.getDescriptor().getNamespace();
@@ -3056,10 +3058,16 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                     }
                 }
 
+                // JBUCH: TEMPORARY REPRIEVE FOR PRIVILEGED ORGS. RESET TO:
+                //if(effectiveAccess==="I"){
+                //    // Internal Namespace
+                //    return isInternal;
+                //}
+
                 // INTERNAL / DEFAULT means namespaces marked INTERNAL by the host
-                if(effectiveAccess==="I"){
+                if(effectiveAccess==="I"||effectiveAccess==="PP"){
                     // Internal Namespace
-                    return isInternal;
+                    return isInternal || isPrivileged;
                 }
 
             }

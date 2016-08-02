@@ -234,6 +234,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
+    @Flapper
     @Test
     public void testManifestRequestLimitExceeded() throws Exception {
         AppDescription app = new AppDescription();

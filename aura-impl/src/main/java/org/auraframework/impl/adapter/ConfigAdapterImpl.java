@@ -472,6 +472,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return String.format("%s/l/%s/app.encryptionkey" + (jsFormat ? ".js" : ""), contextPath, encodedContext);
     }
 
+    @Override
+    public String getEncryptionKeyFallbackURL(Boolean jsFormat) {
+        AuraContext context = contextService.getCurrentContext();
+        String contextPath = context.getContextPath();
+        String nonce = context.getFrameworkUID();
+        return String.format("%s/auraFW/resources/%s/aura/fallback/fallback.app.encryptionkey.js", contextPath, nonce);
+    }
+
     /**
      * Returns default aura encryption key. Key needs to be either 16 or 32 characters in length for AES
      * @return default aura key

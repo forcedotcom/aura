@@ -680,8 +680,6 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
 
     // TODO W-2481519 - ensure aura framework-required data is never evicted without having a
     // blacklist in every adapter.
-    //
-    // blacklist copied from AuraComponentService.js
     var actionsBlackList = ["globalValueProviders",           /* GlobalValueProviders.js */
                             "$AuraClientService.token$",      /* AuraClientService.js */
                             "$AuraClientService.bootstrap$"]; /* AuraClientService.js */

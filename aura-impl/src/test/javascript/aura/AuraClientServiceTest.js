@@ -20,9 +20,9 @@ Test.Aura.AuraClientServiceTest = function() {
     var $A = {};
     var Aura = {Services: {}, Controller: {}, Utils: {Util:{prototype:{on:function(){}}}}};
     var document = {
-    	getElementById : function(id) {
+        getElementById : function(id) {
             return id === "safeEvalWorker" ? {} : undefined;
-    	}
+        }
     };
 
     var Importer = Mocks.GetMocks(Object.Global(), {
@@ -38,11 +38,6 @@ Test.Aura.AuraClientServiceTest = function() {
     });
 
     var mockGlobal = Mocks.GetMocks(Object.Global(), {
-        "Date": {
-            now : function() {
-                return 70000;
-            }
-        },
         "$A": {
             log : function() {},
             assert : function(condition, message) {
@@ -51,6 +46,9 @@ Test.Aura.AuraClientServiceTest = function() {
                 }
             },
             util : {
+                estimateSize: function() {
+                    return 0;
+                },
                 on: function() {},
                 isUndefinedOrNull : function(obj){
                     return obj === undefined || obj === null;
@@ -79,15 +77,61 @@ Test.Aura.AuraClientServiceTest = function() {
         },
         window:{},
         document:document,
-        Aura: Aura
+        Aura: Aura,
+        AuraClientService: Aura.Services.AuraClientService
     });
+
+    // promise mocks
+    var ResolvePromise = function ResolvePromise(value) {
+        return {
+            then: function(resolve, reject) {
+                if(!resolve) {
+                    return ResolvePromise(value);
+                }
+
+                try {
+                    var newValue = resolve(value);
+                    while (newValue && newValue["then"]) {
+                        newValue.then(function(v) {
+                            newValue = v;
+                        });
+                    }
+                    return ResolvePromise(newValue);
+                } catch (e) {
+                    return RejectPromise(e);
+                }
+            }
+        };
+    };
+
+    var RejectPromise = function RejectPromise(error) {
+        return {
+            then: function(resolve, reject) {
+                if(!reject) {
+                    return RejectPromise(error);
+                }
+
+                try {
+                    var value = reject(error);
+                    while (value && value["then"]) {
+                        value.then(function(v) {
+                            value = v;
+                        });
+                    }
+                    return ResolvePromise(value);
+                } catch (newError) {
+                    return RejectPromise(newError);
+                }
+            }
+        };
+    };
 
     [Fixture]
     function testSendOutForegroundActions() {
         [Fact]
         function returnsTrueWhen60sPass() {
             // Arrange
-             var target;
+            var target;
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
                 target.lastSendTime = 0;
@@ -95,7 +139,7 @@ Test.Aura.AuraClientServiceTest = function() {
             // Act
             var actual;
             mockGlobal(function() {
-        		actual = target.shouldSendOutForegroundActions([], 1);
+                    actual = target.shouldSendOutForegroundActions([], 1);
             });
 
             // Assert : we send out caboose action if it has been longer then 60s since last send
@@ -105,23 +149,31 @@ Test.Aura.AuraClientServiceTest = function() {
         [Fact]
         function returnsTrueMoreForegroundThanCaboose() {
             // Arrange
-            var target;
-            mockGlobal(function() {
-                target = new Aura.Services.AuraClientService();
-                target.lastSendTime = Date.now();//make sure we won't send it out because of 60s has passed
+            var mockDate = Mocks.GetMocks(Object.Global(), {
+                "Date": {
+                    now : function() {
+                        return 70000;
+                    }
+                }
             });
-            // Act
+
             var actual;
             var action1 = new MockAction("server", true);
             var action2 = new MockAction("server", true);
+
+            // Act
             mockGlobal(function() {
-                actual = target.shouldSendOutForegroundActions([action1, action2], 1);
+                mockDate(function() {
+                    var target = new Aura.Services.AuraClientService();
+                    target.lastSendTime = Date.now();//make sure we won't send it out because of 60s has passed
+                    actual = target.shouldSendOutForegroundActions([action1, action2], 1);
+                });
             });
+
             // Assert : we send out caboose action if there are more foreground actions than caboose ones
             Assert.Equal(true, actual);
         }
     }
-
 
     [Fixture]
     function testDupes() {
@@ -799,21 +851,89 @@ Test.Aura.AuraClientServiceTest = function() {
 
             Assert.False(actual);
         }
+    }
+
+    [Fixture]
+    function resetToken() {
 
         [Fact]
-        function testResetToken() {
-            mockActionService(function(service, storage) {
-                service.saveTokenToStorage = function() {};
+        function RepectsTokenParam() {
+            var expected = "myToken";
+            var targetService;
+            mockGlobal(function() {
+                targetService = new Aura.Services.AuraClientService();
+                targetService.saveTokenToStorage = function(){};
 
-                // Act
-                service.resetToken("myToken");
-
-                // Assert
-                var expected = "myToken";
-                var actual = service._token;
-                Assert.Equal(expected, actual);
+                targetService.resetToken(expected);
             });
+
+            var actual = targetService._token;
+            Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        function SavesTokenToStorage() {
+            var expected = "myToken";
+            var tuple;
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            adapter:{
+                                setItems: function(tuples) {
+                                    tuple = tuples[0];
+                                    return ResolvePromise();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function() {
+                    var targetService = new Aura.Services.AuraClientService();
+                    targetService.resetToken(expected);
+                });
+            });
+
+            // tuple format: [key, item, size]
+            var actual = tuple[1]["value"]["token"];
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function SavesTokenToStorageWithTokenKey() {
+            var expected = Aura.Services.AuraClientService.TOKEN_KEY;
+            var tuple;
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            adapter:{
+                                setItems: function(tuples) {
+                                    tuple = tuples[0];
+                                    return ResolvePromise();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function() {
+                    var targetService = new Aura.Services.AuraClientService();
+                    targetService.resetToken(expected);
+                });
+            });
+
+            var actual = tuple[0];
+            Assert.Equal(expected, actual);
+        }
+
     }
 
     [Fixture]

@@ -579,120 +579,80 @@
     /**
      * Verify that sweeping never evicts blacklisted keys.
      *
-     * Verifies by creating a store with a minimal size and sweep timing. Stores a sentinel item (the prefix),
-     * items for the blacklist, and more sentinel items (the suffix), then triggers sweeping. Verifies that
-     * the prefix and suffix items are evicted -- and thus sweeping has run -- and the blacklisted items remain.
-     *
      * TODO W-2481519 - when aura framework-required data moved to its own storage this test needs to be
      * moved and refactored. it will no longer be indexeddb adapter specific.
      */
     testSweepNeverEvictsBlacklist: {
         test: [
-           function setup(cmp) {
-               // store max size
-               var maxSize = 400;
+           function createStorage(cmp) {
+                var storageName = "actions";
+                cmp._storage = $A.storageService.initStorage({
+                    name: storageName,
+                    maxSize: 400,
+                    // make stored item expired quickly
+                    expiration: 0.0001,
+                    debugLogging: true
+                });
+                $A.test.addCleanup(function(){ this.deleteStorage(storageName); }.bind(this));
 
-               cmp._storage = $A.storageService.initStorage({
-                   name: "actions",
-                   maxSize: maxSize,
-                   expiration: 2000,
-                   expiration: 0.1,
-                   autoRefreshInterval: 1,
-                   debugLogging: true
-               });
-
-               // blacklisted keys to never expire. copied from AuraComponentService.js
-               cmp._actionsBlacklist = ["globalValueProviders",                                /* GlobalValueProviders.js */
-                                       "aura://ComponentController/ACTION$getApplication",     /* AuraClientService.js */
-                                       "$AuraContext$"];                                       /* AuraContext.js */
-
-               // stored value for blacklisted keys. must be sufficiently small so JSON.stringify() comparison below works.
-               cmp._expected = {"foo": "bar"};
-
-               cmp._prefix = cmp._storageLib.buildEntry("prefix", maxSize/3);
-               cmp._suffix1 = cmp._storageLib.buildEntry("suffix1", maxSize/3);
-               cmp._suffix2 = cmp._storageLib.buildEntry("suffix2", maxSize/3);
+                // blacklisted keys that never gets evicted. copied from AuraClientService.js
+                cmp._actionsBlacklist = ["globalValueProviders",             /* GlobalValueProviders.js */
+                                         "$AuraClientService.token$",        /* AuraClientService.js */
+                                         "$AuraClientService.bootstrap$"];   /* AuraClientService.js */
            },
-           function insertEntries(cmp) {
-               var completed = false;
-               cmp._storage.set(cmp._prefix.key, cmp._prefix.value)
-                   .then(function() {
-                       var values = {};
-                       for (var i = 0; i < cmp._actionsBlacklist.length; i++) {
-                           values[cmp._actionsBlacklist[i]] = cmp._expected;
-                       }
-                       return cmp._storage.setAll(values);
-                   })
-                   .then(function() {
-                       var values = {};
-                       values[cmp._suffix1.key] = cmp._prefix.value;
-                       values[cmp._suffix2.key] = cmp._prefix.value;
-                       return cmp._storage.setAll(values);
-                   })
-                   .then(function() {
-                       completed = true;
-                   })
-                   ["catch"](function(e) {
-                       $A.test.fail("Storage operation failed: " + e.message);
-                   });
+           function storeBlacklistedItems(cmp) {
+                var completed = false;
+                cmp._expected = "blacklistedItem";
 
-               $A.test.addWaitForWithFailureMessage(
-                   true,
-                   function(){ return completed; },
-                   "Inserting storage entries never completed");
-           },
-           function sweepAndVerify(cmp) {
-               /**
-                * Recursive function that runs until prefix + suffix entries are evicted,
-                * and blacklist entries are not. Uses promise chaining for recursion.
-                */
-               function checkStorage() {
-                   // can't call sweep() directly so rely on get() to trigger sweep().
-                   return $A.test.storageSweep(cmp._storage)
-                       .then(function() {
-                           // expiration is set very low to force sweeping so must request expired items
-                           return cmp._storage.getAll([], true);
-                       })
-                       .then(function(items) {
-                           // if sweep() hasn't cleared the items then delay (to not starve other "threads")
-                           // and recurse.
-                           if (items[cmp._prefix.key] || items[cmp._suffix1.key]) {
-                               setTimeout(function() {
-                                   checkStorage();
-                               }, 100);
-                               return;
-                           }
+                var values = {};
+                cmp._actionsBlacklist.forEach(function(key) {
+                    values[key] = cmp._expected;
+                });
 
-                           // verify the blacklisted items remain
-                           for (var i = 0; i < cmp._actionsBlacklist.length; i++) {
-                               var item = items[cmp._actionsBlacklist[i]];
-                               if (!item) {
-                                   return Promise["reject"](new Error("Blacklisted entry '" + cmp._actionsBlacklist[i] + "' was incorrectly evicted"));
-                               }
-                               if (JSON.stringify(cmp._expected) !== JSON.stringify(item)) {
-                                   return Promise["reject"](new Error("Blacklisted entry '" + cmp._actionsBlacklist[i] + "' has wrong value"));
-                               }
-                           }
-                           // success so do not recurse
-                       });
-               }
+                cmp._storage.setAll(values)
+                    .then(function() {
+                        var evictedItem = [
+                            "evictedItemKey",
+                            {
+                                expires : new Date().getTime() + 0.0001,
+                                value: "value"
+                            },
+                            50
+                        ];
+                        // Store a normal item to guarantee expired item gets evicted so that we
+                        // don't have false positive result.
+                        // Setting item through adapter to avoid calling sweep() when setting items.
+                        $A.test.storageAdapterSetItems(cmp._storage.adapter, [evictedItem]);
+                    })
+                    .then(function() { completed = true; })
+                    .catch(function(e) { $A.test.fail(e.toString()); });
 
-               var completed = false;
-               Promise["resolve"]()
-                   .then(function() {
-                       return checkStorage();
-                   })
-                   .then(function() {
-                       completed = true;
-                   })
-                   ["catch"](function(e) {
-                       $A.test.fail("Failure while waiting for sweep to evict items: " + e.message);
-                   });
+                $A.test.addWaitFor(true, function(){ return completed; });
+            },
+            function sweepAndVerify(cmp) {
+                var completed = false;
 
-               $A.test.addWaitForWithFailureMessage(
-                       true,
-                       function(){ return completed; },
-                       "Sweeping items never completed");
+                // sweep() gets run asyncly in API, so explicitly call it.
+                $A.test.storageSweep(cmp._storage)
+                    .then(function() {
+                        return cmp._storage.getAll([], true);
+                    })
+                    .then(function(items) {
+                        $A.test.assertUndefined(items["evictedItemKey"]);
+
+                        // verify the blacklisted items remain
+                        cmp._actionsBlacklist.forEach(function(key) {
+                            var value = items[key];
+
+                            $A.test.assertDefined(value, "Blacklisted entry '" + key + "' was incorrectly evicted");
+                            $A.test.assertEquals(cmp._expected, value,
+                                    "Blacklisted entry '" + key + "' has wrong value");
+                        });
+                    })
+                    .then(function() { completed = true; })
+                    .catch(function(e) { $A.test.fail(e.toString()); });
+
+                $A.test.addWaitFor(true, function(){ return completed; });
            }
        ]
     },

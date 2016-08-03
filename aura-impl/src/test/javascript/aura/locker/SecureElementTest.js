@@ -51,7 +51,7 @@ Test.Aura.Locker.SecureElementTest = function() {
         function DoesNotAddIfPropertyExists() {
             addedProperties = [];
             var se = {
-                // href is <a>'s porperty in elementSpecificAttributeWhitelists
+                // href is <a>'s property in elementSpecificAttributeWhitelists
                 "href": {}
             };
             var el = {

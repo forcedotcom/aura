@@ -50,6 +50,7 @@ public class Bootstrap extends AuraResourceImpl {
         super("bootstrap.js", Format.JS);
     }
 
+    // note: these code blocks must stay in sync with fallback.bootstrap.js
     private final static String PREPEND_JS = "window.Aura || (window.Aura = {});\n" +
             "window.Aura.bootstrap || (window.Aura.bootstrap = {});\n" +
             "window.Aura.appBootstrap = ";

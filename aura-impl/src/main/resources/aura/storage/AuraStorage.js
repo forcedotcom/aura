@@ -483,11 +483,13 @@ AuraStorage.prototype.log = function() {
  * @private
  */
 AuraStorage.prototype.logError = function(payload) {
-    $A.metricsService.transaction("aura", "errorStorage", { "context": {
-        "name"      : this.name,
-        "adapter"   : this.getName(),
-        "operation" : payload["operation"],
-        "error"     : payload["error"] && payload["error"].toString()
+    $A.metricsService.transaction("aura", "error:storage", { "context": {
+        "attributes" : {
+            "name"      : this.name,
+            "adapter"   : this.getName(),
+            "operation" : payload["operation"],
+            "error"     : payload["error"] && payload["error"].toString()
+        }
     }});
 };
 

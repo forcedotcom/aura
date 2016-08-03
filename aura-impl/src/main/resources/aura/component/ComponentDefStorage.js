@@ -435,7 +435,7 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
         // log that we're starting the clear
         metricsPayload = $A.util.apply({}, metricsPayload);
         metricsPayload["evicted"] = "all";
-        $A.metricsService.transactionStart("aura", "evictedDefs", { "context": metricsPayload });
+         $A.metricsService.transactionStart("aura", "performance:evictedDefs", { "context": { "attributes" : metricsPayload } });
 
         $A.clientService.runWhenXHRIdle(function() {
             $A.warning("ComponentDefStorage.clear: clearing all defs and actions");
@@ -470,7 +470,7 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
             var promise = Promise.all([actionClear, defClear]).then(
                 function() {
                     // done the clearing. metricsPayload is updated with any errors
-                    $A.metricsService.transactionEnd("aura", "evictedDefs", { "context": metricsPayload });
+                    $A.metricsService.transactionEnd("aura", "performance:evictedDefs");
                 }
             );
             resolve(promise);

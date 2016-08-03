@@ -1880,12 +1880,6 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                    .then(
                         function(evicted) {
                             $A.log("AuraComponentService.pruneDefsFromStorage: evicted " + evicted.length + " component defs and actions");
-                            $A.metricsService.transaction('aura', 'defsEvicted', { "context": {
-                                "defsRequiredSize" : requiredSpaceKb,
-                                "storageCurrentSize" : currentSize,
-                                "storageRequiredSize" : newSize,
-                                "evicted" : evicted
-                            }});
                         }
                     );
                 */

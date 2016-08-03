@@ -739,7 +739,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
                 target.getAll();
             });
 
-            var actual = metricConfig["context"]["error"];
+            var actual = metricConfig["context"]["attributes"]["error"];
             Assert.Equal(expected, actual);
         }
 

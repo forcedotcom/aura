@@ -217,7 +217,7 @@ CryptoAdapter.prototype.getName = function() {
 
 CryptoAdapter.prototype.fallbackToMemoryAdapter = function(e) {
     this.log(CryptoAdapter.LOG_LEVEL.WARNING, "initialize(): falling back to memory storage", e);
-    $A.metricsService.transaction("aura", "memoryCryptoStorage");
+    $A.metricsService.transaction("aura", "performance:cryptoStorage-fallbackmemory");
     this.mode = Aura.Storage.MemoryAdapter.NAME; // "memory";
 
     // TODO - this indirection is used by auraStorageTest:cryptoFailedAdapter. this needs to be improved.
@@ -264,7 +264,7 @@ CryptoAdapter.prototype.initialize = function() {
                 function handleInvalidSentinel() {
                     // decryption failed so clear the store. do not re-throw to remain using crypto with new key.
                     that.log(CryptoAdapter.LOG_LEVEL.INFO, "initialize(): encryption key is different so clearing storage");
-                    $A.metricsService.transaction("aura", "initializeCryptoStorage");
+                    $A.metricsService.transaction("aura", "performance:cryptoStorage-keymissmatch");
                     return that.adapter.clear();
                 }
 

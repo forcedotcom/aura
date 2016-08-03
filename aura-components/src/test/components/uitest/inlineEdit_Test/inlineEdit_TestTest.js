@@ -263,21 +263,6 @@
              this.verifyHeaderColumnNames(expectedColNames, headers);
          }
      },
-     
-     /**
-      * Test edit cell content and click out to save value change.
-      */
-     _testEditPanelThenClickOut : {
-         test : [function(cmp) {
-             this.triggerEditOnCell(cmp, 0, 2);
-         }, function(cmp) {
-             this.waitForPanelOpen(cmp);
-         }, function(cmp) {
-             this.editPanel(cmp, 99, 0, true);
-         }, function(cmp) {
-             this.waitForCellContent(cmp, 0, 2, '99');
-         }]
-     },
           
      triggerEditOnCell : function(cmp, rowIndex, colIndex) {
          var tbody = document.getElementsByTagName("tbody")[0];

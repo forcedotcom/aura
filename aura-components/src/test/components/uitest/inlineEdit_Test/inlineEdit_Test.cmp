@@ -25,7 +25,6 @@
 
 	<div>
         <div class="toolbar">
-            <ui:inputText aura:id="inputTxt" class="inputTxt"/>
             <ui:button aura:id="appendButton" label="Append Item" press="{!c.appendItem}" />
             <ui:button aura:id="updateButton" label="Update Item" press="{!c.updateItem}" />
             <ui:button label="{! (v.inKeyboardMode ? 'Disable Keyboard Mode' : 'Enable Keyboard Mode')}" press="{!c.handleKeyboardModeChange}" />
@@ -99,6 +98,7 @@
             Keys: <span>{!v.lastEdited.keys[0]}</span><br/>
             Values: <span>{!v.lastEdited.values[0]}</span><br/>
         </div>
+        <ui:inputText aura:id="inputTxt" class="inputTxt"/>
 		
 		<div class="manager">
 	        <ui:panelManager2 aura:id="pm">

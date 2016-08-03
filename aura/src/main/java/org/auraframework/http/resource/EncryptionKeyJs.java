@@ -27,8 +27,6 @@ import org.auraframework.system.AuraContext;
  * Handles /l/{}/app.encryptionkey.js requests to retrieve encryption key.
  */
 public class EncryptionKeyJs extends AuraResourceImpl {
-
-    // note: these code blocks must stay in sync with fallback.app.encryptionkey.js
     private final String PREPEND_JS = "window.Aura || (window.Aura = {});\n" +
             "window.Aura.bootstrap || (window.Aura.bootstrap = {});\n" +
             "window.Aura.Crypto = {};\n" +
@@ -39,8 +37,7 @@ public class EncryptionKeyJs extends AuraResourceImpl {
             "    if (window.Aura.afterEncryptionKeyReady) {\n" +
             "        window.Aura.afterEncryptionKeyReady();\n" +
             "    }\n" +
-            "}());";
-    private final String INVALID_KEY = "'invalid'";
+            "}())";
 
     public EncryptionKeyJs() {
         super("app.encryptionkey.js", AuraContext.Format.JS);
@@ -48,16 +45,16 @@ public class EncryptionKeyJs extends AuraResourceImpl {
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
-        servletUtilAdapter.setNoCache(response);
-
-        String key = INVALID_KEY;
         if (configAdapter.validateGetEncryptionKey(request.getParameter("ssid"))) {
-            key = configAdapter.getEncryptionKey();
-        }
+            servletUtilAdapter.setNoCache(response);
 
-        PrintWriter out = response.getWriter();
-        out.append(PREPEND_JS);
-        out.append(key);
-        out.append(APPEND_JS);
+            String key = configAdapter.getEncryptionKey();
+            PrintWriter out = response.getWriter();
+            out.append(PREPEND_JS);
+            out.append(key);
+            out.append(APPEND_JS);
+        } else {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        }
     }
 }

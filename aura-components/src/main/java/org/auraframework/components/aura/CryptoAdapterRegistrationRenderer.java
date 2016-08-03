@@ -75,11 +75,16 @@ public class CryptoAdapterRegistrationRenderer implements Renderer {
         "    window.Aura || (window.Aura = {});\n" +
         "    if (window.Aura.Crypto && window.Aura.Crypto.key) {\n" +
         "        setCryptoKey(window.Aura.Crypto.key);\n" +
-        "        delete window.Aura.Crypto.key\n" +
         "    } else {\n" +
+        "        var t = setTimeout(function() {\n" + // TODO W-3258797 replace setTimeout with proper error detection
+        "            if (!window.Aura.Crypto) {\n" +
+        "                delete window.Aura.afterEncryptionKeyReady;\n" +
+        "                CryptoAdapter.setKey();\n" +
+        "            }\n" +
+        "        }, 3000);\n" +
         "        Aura.afterEncryptionKeyReady = function() {\n" +
+        "            window.clearTimeout(t);\n" +
         "            setCryptoKey(window.Aura.Crypto.key);\n" +
-        "            delete window.Aura.Crypto.key\n" +
         "        };\n" +
         "    }\n" +
         "}"

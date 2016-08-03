@@ -39,7 +39,6 @@ public class EncryptionKey extends AuraResourceImpl {
             servletUtilAdapter.setNoCache(response);
             response.getOutputStream().write(key.getBytes(StandardCharsets.UTF_8));
         } else {
-            // 403 code is ok for XHR responses; triggers the load handler
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
         }
     }

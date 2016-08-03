@@ -15,21 +15,17 @@
  */
 package org.auraframework.http.resource;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class EncryptionKeyJsTest extends UnitTestCase {
+public class EncryptionKeyJsTest extends UnitTestCase { 
     @Test
     public void testName() {
         assertEquals("app.encryptionkey.js", new EncryptionKeyJs().getName());
@@ -45,31 +41,27 @@ public class EncryptionKeyJsTest extends UnitTestCase {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 
         class DummyResponse extends DummyHttpServletResponse {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            PrintWriter pw = new PrintWriter(baos);
+            private int error;
 
             @Override
-            public PrintWriter getWriter() throws IOException {
-                return pw;
+            public void sendError(int sc) {
+                error = sc;
             }
 
-            String getContent() throws IOException {
-                return baos.toString();
+            public int getError() {
+                return error;
             }
         };
 
         DummyResponse response = new DummyResponse();
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         Mockito.when(configAdapter.validateGetEncryptionKey(Mockito.anyString())).thenReturn(false);
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
-
         EncryptionKeyJs encryptionKey = new EncryptionKeyJs();
         encryptionKey.setConfigAdapter(configAdapter);
-        encryptionKey.setServletUtilAdapter(servletUtilAdapter);
 
         encryptionKey.write(request, response, null);
 
-        response.getWriter().flush();
-        assertTrue("Expected 'invalid' in response", response.getContent().indexOf("'invalid'") > -1);
+        assertEquals("Expected 403 error code to be sent when encryption key validation fails",
+                HttpServletResponse.SC_FORBIDDEN, response.getError());
     }
 }

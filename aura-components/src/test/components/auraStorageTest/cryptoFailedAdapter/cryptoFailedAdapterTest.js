@@ -186,7 +186,7 @@
     verifyLogs: function(operation) {
         var found = false;
         this.transactions.forEach(function(transaction) {
-            if (transaction["name"] === "errorStorage" && transaction["config"]["context"]["operation"] === operation) {
+            if (transaction["name"] === "error:storage" && transaction["config"]["context"]["attributes"]["operation"] === operation) {
                 found = true;
             }
         });

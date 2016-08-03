@@ -811,7 +811,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
          */
         _onKeydown: function (e) {
 
-            if (this.keyboardModePaused) {
+            if (this.keyboardModePaused || !this.activeCell) {
                 return;
             }
 
@@ -1113,7 +1113,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * Helper constants to keep track of class names
          */
         ACTIVE_CELL_CLASS: 'slds-has-focus',
-        IGNORE_CLICK_EVENT_TARGETS: ['table','tr']
+        IGNORE_CLICK_EVENT_TARGETS: ['table','tr'],
         EVENT_HANDLERS : {
             "click"   : "_onClick",
             "dblclick": "_onDoubleClick",

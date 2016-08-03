@@ -47,10 +47,6 @@
 	opacity: 1;
 }
 
-.THIS td, .THIS th {
-    position: relative;
-}
-
 .THIS.indicator {
 	position: absolute;
 	display: none;

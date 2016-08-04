@@ -89,7 +89,7 @@
 
         <ui:virtualDataTable
             aura:id="grid"
-            class="{! v.class + ' slds-table--edit slds-table--bordered'}"
+            class="{! v.class + (v.editable ? ' slds-table--edit' : '') + ' slds-table--bordered'}"
             items="{!v.items}"
 			headerColumns="{!v.headerColumns}"
 			itemVar="{!v.itemVar}"

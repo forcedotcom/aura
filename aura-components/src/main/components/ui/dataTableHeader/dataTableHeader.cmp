@@ -79,7 +79,7 @@
                 </a>
                 
                 <aura:set attribute="else">
-                    <div class="slds-truncate">{! (v.hideLabel ? '' : v.label) }</div>
+                    <div class="slds-truncate slds-th__action">{! (v.hideLabel ? '' : v.label) }</div>
                     <span class="assistiveText">{! (v.hideLabel ? v.label : '') }</span>
                 </aura:set>
             </aura:if>

@@ -25,7 +25,7 @@
                           secure="false"
                           persistent="true" />
        <script>
-            $A.clientService.setParallelBootstrapLoad(false);
+            $A.clientService.setUseBootstrapCache(false);
 
             window._storageGets = [];
             var origGet = $A.storageService.getStorage('actions').get;

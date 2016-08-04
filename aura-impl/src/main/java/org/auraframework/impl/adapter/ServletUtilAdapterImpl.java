@@ -329,24 +329,24 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     public List<String> getBaseScripts(AuraContext context, Map<String,Object> attributes) throws QuickFixException {
         Set<String> ret = Sets.newLinkedHashSet();
-
+        
         String shiv = getHTML5ShivUrl();
         if (shiv != null) {
             ret.add(shiv);
         }
-
+        
         // Dependent libraries for framework (moment, promises,...)
         ret.add(getFrameworkLibUrl());
-
+        
         // Client libraries
         ret.addAll(getJsClientLibraryUrls(context));
-
+        
         // Aura framework
-        ret.add(getFrameworkUrl());
+        ret.add(getFrameworkUrl()); 
 
         return new ArrayList<>(ret);
     }
-
+    
     @Override
     public List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, boolean ignoreNonCacheableScripts, Map<String,Object> attributes)
         throws QuickFixException {
@@ -357,7 +357,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         }
 
         ret.add(getAppJsUrl(context, null));
-
+        
         if (!ignoreNonCacheableScripts) {
             ret.add(getBootstrapUrl(context, attributes));
         }
@@ -365,31 +365,22 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
 
         return ret;
     }
-
-    @Override
-    public List<String> getFrameworkFallbackScripts(AuraContext context, boolean safeInlineJs, Map<String,Object> attributes)
-        throws QuickFixException {
-        List<String> ret = Lists.newArrayList();
-        // TODO W-3269340 use fallback url for all required files to boot aura: inline.js, app.js, aura_*.js, libs_*.js
-        ret.add(getBootstrapUrl(context, attributes) + " " + getBootstrapFallbackUrl(context, attributes));
-        return ret;
-    }
-
+    
     @Override
     public  Set<String> getJsClientLibraryUrls (AuraContext context) throws QuickFixException {
         return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
     }
-
+    
     @Override
     public  Set<String> getCssClientLibraryUrls (AuraContext context) throws QuickFixException {
         return getClientLibraryUrls(context, ClientLibraryDef.Type.CSS);
     }
-
+    
     @Override
     public String getFrameworkLibUrl() {
         return configAdapter.getJSLibsURL();
     }
-
+    
     @Override
     public String getFrameworkUrl() {
         return configAdapter.getAuraJSURL();
@@ -416,24 +407,17 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public String getBootstrapUrl(AuraContext context, Map<String,Object> attributes) {
         return commonJsUrl("/bootstrap.js", context, attributes);
     }
-
-    @Override
-    public String getBootstrapFallbackUrl(AuraContext context, Map<String,Object> attributes) {
-        String contextPath = context.getContextPath();
-        String nonce = context.getFrameworkUID();
-        return String.format("%s/auraFW/resources/%s/aura/fallback/fallback.bootstrap.js", contextPath, nonce);
-    }
-
+    
     @Override
     public String getInlineJsUrl(AuraContext context, Map<String,Object> attributes) {
         return commonJsUrl("/inline.js", context, attributes);
     }
-
+    
     @Override
     public String getAppJsUrl(AuraContext context, Map<String,Object> attributes) {
         return commonJsUrl("/app.js", context, attributes);
     }
-
+    
     @Override
     public String getAppCssUrl(AuraContext context) {
         String contextPath = context.getContextPath();
@@ -442,7 +426,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         defs.append("/app.css");
         return defs.toString();
     }
-
+    
     private String commonJsUrl (String filepath, AuraContext context, Map<String,Object> attributes) {
         StringBuilder url = new StringBuilder(context.getContextPath()).append("/l/");
         url.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));

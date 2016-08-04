@@ -56,12 +56,10 @@ public class Bootstrap extends AuraResourceImpl {
     private final static String APPEND_JS = ";\n" +
             ";(function() {\n" +
             "    window.Aura.bootstrap.execBootstrapJs = window.performance && window.performance.now ? window.performance.now() : Date.now();\n" +
-            "    window.Aura.appBootstrapStatus = \"loaded\";\n" +
+            "    window.Aura.appBootstrapReady = \"new\";\n" +
             "    if (window.Aura.afterBootstrapReady && window.Aura.afterBootstrapReady.length) {\n" +
-            "        var queue = window.Aura.afterBootstrapReady;\n" +
-            "        window.Aura.afterBootstrapReady = [];\n" +
-            "        for (var i = 0; i < queue.length; i++) {\n" +
-        "                queue[i]();\n" +
+            "        for (var i = 0; i < window.Aura.afterBootstrapReady.length; i++) {\n" +
+            "            window.Aura.afterBootstrapReady[i]();\n" +
             "        }\n" +
             "    }\n" +
             "}());";

@@ -15,10 +15,10 @@
  */
 package org.auraframework.integration.test.http;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,7 +40,6 @@ import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.io.LineReader;
 
 public class AppCacheManifestHttpTest extends AuraHttpTestCase {
@@ -77,9 +76,16 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         }
     }
 
-    private List<String> getManifestCacheLinks(String manifestContents) throws Exception {
-        Manifest m = new Manifest(manifestContents);
-        return m.getCacheUrls();
+    private List<String> getManifestLinks(String manifestContents) throws IOException {
+        List<String> links = Lists.newArrayList();
+
+        LineReader reader = new LineReader(new StringReader(manifestContents));
+        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+            if (line.startsWith("/")) {
+                links.add(line);
+            }
+        }
+        return links;
     }
 
     private List<String> getRequiredLinks() throws Exception {
@@ -91,25 +97,25 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     private void assertManifest(String manifestContent, List<String> requiredLinks) throws Exception {
     	assertManifest(manifestContent, requiredLinks, null);
     }
-
+    
     /**
      * check if requried links are in manifest content, also make sure excludeLinks are NOT in manifest content.
      * @param manifestContent
      * @param requiredLinks
      * @param excludeLinks could be null
-     * @throws Exception
+     * @throws Exception 
      */
     private void assertManifest(String manifestContent, List<String> requiredLinks, List<String> excludedLinks) throws Exception {
     	assertManifestFormat(manifestContent);
         assertTrue("Could not find the LAST MOD: line in manifest", manifestContent.contains("\n# LAST MOD: app="));
 
-        List<String> links = getManifestCacheLinks(manifestContent);
+        List<String> links = getManifestLinks(manifestContent);
         List<String> required = getRequiredLinks();
         required.addAll(requiredLinks);
         assertRequiredLinks(required, excludedLinks, links);
         assertLinksReachable(links);
     }
-
+    
     private void assertManifestFormat(String manifestContent) {
         if (!manifestContent.startsWith("CACHE MANIFEST\n")) {
             fail("Manifest should starts with: " + "CACHE MANIFEST");
@@ -142,7 +148,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         	}
         }
     }
-
+    
     private void assertLinksReachable(List<String> links) throws Exception {
         for (String link : links) {
             HttpGet get = obtainGetMethod(link);
@@ -350,72 +356,24 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
             assertManifest(response, Lists.newArrayList(".*/app\\.css", ".*/app\\.js"));
         }
     }
-
+    
     /**
-     *
+     * 
      * UIPerf, UIPerfUi, UIPerfCSS, walltimelocale are uncombinable in PTEST mode.
      */
     @Test
-    public void testUncombinableResourceUrlsAreAddedToAppCacheManifest() throws Exception{
+    public void testUncombinableResourceUrlsAreAddedToAppCacheManifest()throws Exception{
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
         String manifest = getManifestURL("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST, false);
-
+        
         HttpGet get  = obtainGetMethod(manifest);
         HttpResponse response = perform(get);
         assertEquals("Failed to fetch manifest", HttpStatus.SC_OK,getStatusCode(response));
         String responseString = getResponseBody(response);
         get.releaseConnection();
         assertNotNull(responseString);
-
+        
         //Verify the urls of uncombinable resources
         assertTrue("Missing combined libs", responseString.contains("/libs"));
-    }
-
-    /**
-     * A basic appcache manifest parser and representation.
-     */
-    class Manifest {
-        /** URLs in the CACHE directive section */
-        List<String> cache;
-        /** Map of source to target URL in the FALLBACK directive section */
-        Map<String,String> fallback;
-
-        Manifest(String manifestContents) throws Exception {
-            cache = Lists.newArrayList();
-            fallback = Maps.newHashMap();
-            parse(manifestContents);
-        }
-
-        List<String> getCacheUrls() {
-            return cache;
-        }
-
-        Map<String,String> getFallbackUrls() {
-            return fallback;
-        }
-
-        void parse(String manifestContents) throws Exception {
-            List<String> fallbackUnprocessed = Lists.newArrayList();
-            List<String> target = null;
-
-            LineReader reader = new LineReader(new StringReader(manifestContents));
-            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                if ("CACHE:".equals(line)) {
-                    target = cache;
-                } else if ("FALLBACK:".equals(line)) {
-                    target = fallbackUnprocessed;
-                } else if (target != null && line.startsWith("/")) {
-                    target.add(line);
-                }
-            }
-
-            for (String line : fallbackUnprocessed) {
-                String[] split = line.split(" ");
-                if (split.length != 2) {
-                    throw new Exception("Unrecognized FALLBACK directive: " + line);
-                }
-                fallback.put(split[0], split[1]);
-            }
-        }
     }
 }

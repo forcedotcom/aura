@@ -21,7 +21,7 @@ if (typeof Aura === "undefined" || !Aura.frameworkJsReady) {
     window.$A = window.$A || {};
 
 
-    // -- Framework is not ready yet, so implement the minimum set of functions to run!
+    // -- Framework is not ready yet, so implement the minimum set of functiosn to run!
     window.Aura.ApplicationDefs = {
         classExporter : {},
         resolvedDefs  : {},

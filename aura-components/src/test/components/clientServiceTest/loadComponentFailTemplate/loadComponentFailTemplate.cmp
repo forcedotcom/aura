@@ -28,7 +28,7 @@
 
         <script>
             <!-- Do not use bootstrap cache so we drop into the promise of the INCOMPLETE callback for loadComponent -->
-            $A.clientService.setParallelBootstrapLoad(false);
+            $A.clientService.setUseBootstrapCache(false);
         </script>
     </aura:set>
 

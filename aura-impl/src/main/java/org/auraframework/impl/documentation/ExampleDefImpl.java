@@ -15,19 +15,19 @@
  */
 package org.auraframework.impl.documentation;
 
-import java.io.IOException;
-import java.util.Set;
-
+import org.auraframework.Aura;
 import org.auraframework.builder.ExampleDefBuilder;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ExampleDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.Set;
 
 public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements ExampleDef {
 
@@ -107,7 +107,7 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
 
         @Override
         public ExampleDefBuilder setRef(String qualifiedName) {
-            this.ref = DefDescriptorImpl.getInstance(qualifiedName, ComponentDef.class);
+            this.ref = Aura.getDefinitionService().getDefDescriptor(qualifiedName, ComponentDef.class);
             return this;
         }
 

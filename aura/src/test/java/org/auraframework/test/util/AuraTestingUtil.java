@@ -18,8 +18,6 @@ package org.auraframework.test.util;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -36,6 +34,7 @@ import org.auraframework.system.SourceListener;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.FileMonitor;
 import org.auraframework.util.json.JsonEncoder;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -53,10 +52,20 @@ public class AuraTestingUtil {
     private static AtomicLong nonce = new AtomicLong(System.currentTimeMillis());
 
     private Set<DefDescriptor<?>> cleanUpDds;
-    private StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
-    private DefinitionService definitionService = Aura.getDefinitionService();
-    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
-    private ContextService contextService = Aura.getContextService();
+    private FileMonitor fileMonitor;
+    private StringSourceLoader stringSourceLoader;
+    private DefinitionService definitionService;
+    private ConfigAdapter configAdapter;
+    private ContextService contextService;
+
+    public AuraTestingUtil(FileMonitor fileMonitor, StringSourceLoader stringSourceLoader,
+                           DefinitionService definitionService, ConfigAdapter configAdapter, ContextService contextService) {
+        this.fileMonitor = fileMonitor;
+        this.stringSourceLoader = stringSourceLoader;
+        this.definitionService = definitionService;
+        this.configAdapter = configAdapter;
+        this.contextService = contextService;
+    }
 
     public AuraTestingUtil() {
     }
@@ -123,14 +132,14 @@ public class AuraTestingUtil {
                 }
             }
         };
-        definitionService.subscribeToChangeNotification(changeListener);
+        fileMonitor.subscribeToChangeNotification(changeListener);
         try {
             src.addOrUpdate(content);
             updated.acquire();
         } catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while waiting for updated source event", e);
         } finally {
-            definitionService.unsubscribeToChangeNotification(changeListener);
+            fileMonitor.unsubscribeToChangeNotification(changeListener);
         }
     }
 

@@ -15,18 +15,18 @@
  */
 package org.auraframework.util.type.converter;
 
-import java.util.ArrayList;
-
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.util.type.Converter;
+import org.springframework.context.annotation.Lazy;
 
-import aQute.bnd.annotation.component.Component;
+import java.util.ArrayList;
 
 /**
  * Used by aura.util.type.TypeUtil
  */
+@Lazy
 @SuppressWarnings("rawtypes")
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ArrayListToStringArrayConverter implements Converter<ArrayList, String[]> {
 
     @SuppressWarnings("unchecked")

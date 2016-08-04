@@ -16,29 +16,16 @@
 package org.auraframework.impl.test.mock;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
-import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.ModelDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.ValueDef;
 import org.auraframework.impl.parser.ParserFactory;
-import org.auraframework.instance.Action.State;
-import org.auraframework.instance.ComponentConfig;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
-import org.auraframework.test.mock.MockAction;
-import org.auraframework.test.mock.MockModel;
-import org.auraframework.test.mock.MockModelDef;
-import org.auraframework.test.mock.MockProviderDef;
 import org.auraframework.test.source.StringSource;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.mockito.Mockito;
 
 /**
  * Provides access to mocks for internal framework objects that would be difficult to mock traditionally in the context
@@ -47,6 +34,17 @@ import org.mockito.Mockito;
  * (in-process), a default TestContext is used.
  */
 public class MockingUtil {
+
+    private final TestContextAdapter testContextAdapter;
+    private final DefinitionService definitionService;
+    private final ParserFactory parserFactory;
+
+    public MockingUtil(TestContextAdapter testContextAdapter, DefinitionService definitionService, ParserFactory parserFactory) {
+        this.testContextAdapter = testContextAdapter;
+        this.definitionService = definitionService;
+        this.parserFactory = parserFactory;
+    }
+    
     /**
      * Mock a Definition in the MasterDefRegistry. This takes effect on the next AuraContext establishment from this
      * test.
@@ -56,8 +54,6 @@ public class MockingUtil {
      */
     public <D extends Definition> void mockDef(@SuppressWarnings("unchecked") D... mockDefs) throws Exception {
         if (mockDefs != null && mockDefs.length > 0) {
-            TestContextAdapter testContextAdapter = Aura
-                    .get(TestContextAdapter.class);
             TestContext testContext = testContextAdapter.getTestContext();
             if (testContext == null) {
                 throw new IllegalStateException(
@@ -81,7 +77,7 @@ public class MockingUtil {
      */
     public <D extends Definition> D mockDefMarkup(Class<D> defClass, String descriptor, String markup)
             throws Exception {
-        DefDescriptor<D> desc = Aura.getDefinitionService().getDefDescriptor(descriptor, defClass);
+        DefDescriptor<D> desc = definitionService.getDefDescriptor(descriptor, defClass);
         return mockDefMarkup(desc, markup);
     }
 
@@ -95,80 +91,10 @@ public class MockingUtil {
      */
     @SuppressWarnings("unchecked")
     public <D extends Definition> D mockDefMarkup(DefDescriptor<D> descriptor, String markup) throws Exception {
-        Parser<D> parser = ParserFactory.getParser(Parser.Format.XML, descriptor);
+        Parser<D> parser = parserFactory.getParser(Parser.Format.XML, descriptor);
         D def = parser.parse(descriptor,
-                new StringSource<>(descriptor, markup, descriptor.getQualifiedName(),
-                        org.auraframework.system.Parser.Format.XML));
+                new StringSource<>(descriptor, markup, descriptor.getQualifiedName(), org.auraframework.system.Parser.Format.XML));
         mockDef(def);
         return def;
-    }
-
-    /**
-     * Mock a Model. This will still rely on the current ModelDef to be valid.
-     * 
-     * @param modelDefDescriptor
-     * @param properties the complete set of properties to be mocked
-     * @return the MockModel that will be provided when instantiating the requested ModelDef
-     * @throws Exception
-     */
-    public MockModel mockModel(DefDescriptor<ModelDef> modelDefDescriptor, Map<String, Object> properties)
-            throws Exception {
-        final ModelDef modelDef = Mockito.spy(Aura.getDefinitionService().getDefinition(modelDefDescriptor));
-        final MockModel model = Mockito.spy(new MockModel(modelDefDescriptor, properties));
-        Mockito.doReturn(model).when(modelDef).newInstance();
-        mockDef(modelDef);
-        return model;
-    }
-
-    /**
-     * Mock a ModelDef.
-     * 
-     * @param modelDefDescriptor
-     * @param members the ValueDef members of the ModelDef
-     * @return the MockModelDef that will be provided by the registry
-     * @throws Exception
-     */
-    public MockModelDef mockModelDef(DefDescriptor<ModelDef> modelDefDescriptor, Set<ValueDef> members)
-            throws Exception {
-        final MockModelDef modelDef = Mockito.spy(new MockModelDef(modelDefDescriptor, members, null));
-        mockDef(modelDef);
-        return modelDef;
-    }
-
-    /**
-     * Mock a server ProviderDef.
-     * 
-     * @param providerDefDescriptor
-     * @param componentConfig the ComponentConfig that the mock should provide
-     * @return the MockProviderDef that will be provided by the registry
-     * @throws Exception
-     */
-    public MockProviderDef mockServerProviderDef(DefDescriptor<ProviderDef> providerDefDescriptor,
-            ComponentConfig componentConfig) throws Exception {
-        final MockProviderDef providerDef = Mockito.spy(new MockProviderDef(providerDefDescriptor, componentConfig));
-        mockDef(providerDef);
-        return providerDef;
-    }
-
-    /**
-     * Mock a server Action.
-     * 
-     * @param controllerDefDescriptor
-     * @param actionName
-     * @param returnValue
-     * @return the MockAction that will be provided when instantiating the requested Action
-     * @throws DefinitionNotFoundException
-     * @throws Exception
-     */
-    public MockAction mockServerAction(DefDescriptor<ControllerDef> controllerDefDescriptor, String actionName,
-            Object returnValue) throws Exception {
-        final ControllerDef originalControllerDef = Aura.getDefinitionService().getDefinition(controllerDefDescriptor);
-        final ControllerDef controllerDef = Mockito.spy(originalControllerDef);
-        final MockAction mockAction = Mockito.spy(new MockAction(originalControllerDef.getSubDefinition(actionName)
-                .getDescriptor(), State.SUCCESS, returnValue));
-        Mockito.doReturn(mockAction).when(controllerDef)
-                .createAction(Mockito.eq(actionName), Mockito.anyMapOf(String.class, Object.class));
-        mockDef(controllerDef);
-        return mockAction;
     }
 }

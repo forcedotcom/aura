@@ -15,17 +15,19 @@
  */
 package org.auraframework.integration.test.def;
 
-import java.util.regex.Pattern;
-
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.RenderingService;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
+
+import javax.inject.Inject;
+import java.util.regex.Pattern;
 
 /**
  * Unit tests for templates. Components can be marked as template using the "isTemplate" attribute. Applications cannot
@@ -33,6 +35,12 @@ import org.junit.Test;
  * for all applications and components.
  */
 public class TemplateDefTest extends AuraImplTestCase {
+    @Inject
+    RenderingService renderingService;
+
+    @Inject
+    DefinitionService definitionService;
+
     @Test
     public void testDefaultTemplate() throws Exception {
         assertTemplate(ComponentDef.class, String.format(baseComponentTag, "", ""), null,
@@ -113,7 +121,7 @@ public class TemplateDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "isTemplate='true'", ""));
         try {
-            Aura.getInstanceService().getInstance(template);
+            instanceService.getInstance(template);
         } catch (Exception unexpected) {
             fail("A template component can also be instantiated as a stand alone component.");
         }
@@ -266,8 +274,8 @@ public class TemplateDefTest extends AuraImplTestCase {
                         extraScriptTags + extraStyleTags + extraMetaTags));
 
         StringBuffer sb = new StringBuffer();
-        Component template = Aura.getInstanceService().getInstance(scriptTagInBodyOfTemplate);
-        Aura.getRenderingService().render(template, sb, null);
+        Component template = instanceService.getInstance(scriptTagInBodyOfTemplate);
+        renderingService.render(template, sb);
         String result = sb.toString();
 
         // Using pattens here because in java 1.7 we get attributes rendered one way, in 1.8 we get a different way.
@@ -310,8 +318,8 @@ public class TemplateDefTest extends AuraImplTestCase {
                         ""));
         
         StringBuffer sb = new StringBuffer();
-        Component template = Aura.getInstanceService().getInstance(errorTitleIntemplate);
-        Aura.getRenderingService().render(template, sb);
+        Component template = instanceService.getInstance(errorTitleIntemplate);
+        renderingService.render(template, sb);
         String result = sb.toString();
         assertTrue("errorTitle attribute on aura:template has wrong text: "+result,
                 result.contains("Looks like there's a problem:"));
@@ -332,8 +340,8 @@ public class TemplateDefTest extends AuraImplTestCase {
                         errorTitle));
         
         StringBuffer sb = new StringBuffer();
-        Component template = Aura.getInstanceService().getInstance(errorTitleIntemplate);
-        Aura.getRenderingService().render(template, sb);
+        Component template = instanceService.getInstance(errorTitleIntemplate);
+        renderingService.render(template, sb);
         String result = sb.toString();
         assertTrue("errorTitle attribute on aura:template has wrong text",
                 result.contains("Looks like theres a problem."));              

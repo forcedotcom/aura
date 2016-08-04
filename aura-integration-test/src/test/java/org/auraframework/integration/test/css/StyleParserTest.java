@@ -15,13 +15,12 @@
  */
 package org.auraframework.integration.test.css;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.parser.StyleParser;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.test.client.UserAgent;
@@ -30,6 +29,8 @@ import org.auraframework.throwable.quickfix.StyleParserException;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import javax.inject.Inject;
+
 /**
  * This class tests the CSS validation in place for Aura Components. Aura components can have a .css file specified in
  * the same directory. The first part of every selector has to be the name of the component, including the namespace.
@@ -37,6 +38,10 @@ import org.junit.Test;
  * .auraTest
  */
 public class StyleParserTest extends AuraImplTestCase {
+
+    @Inject
+    DefinitionService definitionService;
+
     private void serializeAndGoldFile(StyleDef styleDef, String suffix) throws Exception {
         String styleStr = toJson(styleDef);
         // strip any cachebusters from URLs (simplistically), we have other
@@ -56,7 +61,7 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testTwoCssFilesForAComponent() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testTwoCSSFiles", StyleDef.class);
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testTwoCSSFiles", StyleDef.class);
         StyleDef style = definitionService.getDefinition(descriptor);
         assertTrue(style.getName().equals("testTwoCSSFiles"));
         serializeAndGoldFile(style, "_styleDef");
@@ -72,7 +77,7 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testCaseSensitivity() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleSelectorCaseSensitivity",
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleSelectorCaseSensitivity",
                 StyleDef.class);
         try {
         	definitionService.getDefinition(descriptor);
@@ -92,7 +97,7 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testValidCss() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testValidCSS", StyleDef.class);
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testValidCSS", StyleDef.class);
         StyleDef style = definitionService.getDefinition(descriptor);
         assertTrue(style.getName().equals("testValidCSS"));
         serializeAndGoldFile(style, "_styleDef");
@@ -108,7 +113,7 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testInvalidCss() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testInValidCSS", StyleDef.class);
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testInValidCSS", StyleDef.class);
         try {
         	definitionService.getDefinition(descriptor);
             fail("Should have caught the bad css");
@@ -128,7 +133,7 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testValidNestedComponents() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleValidParent", StyleDef.class);
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleValidParent", StyleDef.class);
         StyleDef style = definitionService.getDefinition(descriptor);
         assertTrue(style.getName().equals("testStyleValidParent"));
         serializeAndGoldFile(style, "_styleDef");
@@ -141,7 +146,7 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testStyleNamespaceToken() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceToken",
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleNamespaceToken",
                 StyleDef.class);
         StyleDef style = definitionService.getDefinition(descriptor);
         assertTrue(style.getName().equals("testStyleNamespaceToken"));
@@ -156,7 +161,7 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testStyleNamespaceTokenValidCss() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceTokenValidCSS",
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleNamespaceTokenValidCSS",
                 StyleDef.class);
         StyleDef style = definitionService.getDefinition(descriptor);
         assertTrue(style.getName().equals("testStyleNamespaceTokenValidCSS"));
@@ -171,7 +176,7 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testStyleNamespaceTokenInvalidCSS() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceTokenInvalidCSS",
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleNamespaceTokenInvalidCSS",
                 StyleDef.class);
         try {
         	definitionService.getDefinition(descriptor);
@@ -188,9 +193,9 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testStyleNamespaceTrueConditions() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceTrueConditions",
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleNamespaceTrueConditions",
                 StyleDef.class);
-        Aura.getContextService()
+        contextService
                 .getCurrentContext()
                 .setClient(new Client(UserAgent.GOOGLE_CHROME.getUserAgentString()));
         StyleDef style = definitionService.getDefinition(descriptor);
@@ -203,9 +208,9 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testStyleNamespaceMediaAndConditions() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceMediaAndConditions",
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleNamespaceMediaAndConditions",
                 StyleDef.class);
-        Aura.getContextService()
+        contextService
                 .getCurrentContext()
                 .setClient(new Client(UserAgent.GOOGLE_CHROME.getUserAgentString()));
         StyleDef style = definitionService.getDefinition(descriptor);
@@ -218,7 +223,7 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testKeyframes() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceKeyframes",
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleNamespaceKeyframes",
                 StyleDef.class);
         StyleDef style = definitionService.getDefinition(descriptor);
         goldFileText(style.getCode());
@@ -229,7 +234,7 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testFontface() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceFontface",
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleNamespaceFontface",
                 StyleDef.class);
         StyleDef style = definitionService.getDefinition(descriptor);
         goldFileText(style.getCode());
@@ -237,7 +242,7 @@ public class StyleParserTest extends AuraImplTestCase {
 
     @Test
     public void testAutoPrefixing() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespacePrefixing",
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleNamespacePrefixing",
                 StyleDef.class);
         StyleDef style = definitionService.getDefinition(descriptor);
         goldFileText(style.getCode());
@@ -248,7 +253,7 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testSvgUrl() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceSvgUrl",
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleNamespaceSvgUrl",
                 StyleDef.class);
         StyleDef style = definitionService.getDefinition(descriptor);
         goldFileText(style.getCode());
@@ -259,7 +264,7 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testStyleNamespaceExceptions() throws Exception {
-        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceInvalidConditions",
+        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleNamespaceInvalidConditions",
                 StyleDef.class);
         try {
         	definitionService.getDefinition(descriptor);
@@ -277,9 +282,9 @@ public class StyleParserTest extends AuraImplTestCase {
      */
     @Test
     public void testTemplateCssValid() throws Exception {
-        DefDescriptor<StyleDef> templateCssDesc = DefDescriptorImpl.getInstance("templateCss://test.testTemplateCss",
+        DefDescriptor<StyleDef> templateCssDesc = definitionService.getDefDescriptor("templateCss://test.testTemplateCss",
                 StyleDef.class);
-        DefDescriptor<StyleDef> cssDesc = DefDescriptorImpl.getInstance("css://test.testTemplateCss", StyleDef.class);
+        DefDescriptor<StyleDef> cssDesc = definitionService.getDefDescriptor("css://test.testTemplateCss", StyleDef.class);
 
         // templateCss should work here since not validated
         try {
@@ -293,21 +298,19 @@ public class StyleParserTest extends AuraImplTestCase {
         	definitionService.getDefinition(cssDesc);
             fail("Parser should have thrown StyleParserException trying to parse invalid CSS.");
         } catch (StyleParserException e) {
-            assertTrue("Incorrect message in StyleParserException", e
-                    .getMessage()
-                    .toString()
-                    .contains(
-                            "CSS selector must begin with '.testTestTemplateCss' or '.THIS'"));
+            assertTrue("Incorrect message in StyleParserException",
+                    e.getMessage().contains("CSS selector must begin with '.testTestTemplateCss' or '.THIS'"));
         }
     }
 
+    @Ignore
     @Test
     public void _testPerformance() throws Exception {
         /*
          * List<Long> oldTimes = Lists.newArrayList(); List<Long> newTimes = Lists.newArrayList(); List<Integer>
          * lineCount = Lists.newArrayList(); DefDescriptor<StyleDef> desc =
          * definitionService.getDefDescriptor("ui.button", StyleDef.class); Source<StyleDef> source =
-         * Aura.getContextService().getCurrentContext().getDefRegistry().getSource(desc); String code =
+         * contextService.getCurrentContext().getDefRegistry().getSource(desc); String code =
          * source.getContents(); StyleParserResultHolder holder = null; for(int k=0;k<1;k++){ if(k>0){ code = code +
          * code; } int count = 2; long old = 0l; long newer = 0l; for(int i=0;i<count;i++){ long start =
          * System.currentTimeMillis(); holder = new CSSParser2("ui", true, ".uiButton", code,
@@ -340,11 +343,11 @@ public class StyleParserTest extends AuraImplTestCase {
     @Ignore("flapper")
     @Test
     public void testUrlFunctionContextPath() throws Exception {
-        if (Aura.getContextService().isEstablished()) {
-            Aura.getContextService().endContext();
+        if (contextService.isEstablished()) {
+            contextService.endContext();
         }
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor("auratest:testApplication1", ApplicationDef.class);
-        AuraContext context = Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.HTML,
+        AuraContext context = contextService.startContext(AuraContext.Mode.DEV, AuraContext.Format.HTML,
                 AuraContext.Authentication.AUTHENTICATED, desc);
         String coolContext = "/cool";
         context.setContextPath(coolContext);

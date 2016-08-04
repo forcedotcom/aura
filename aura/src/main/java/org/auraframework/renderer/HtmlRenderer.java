@@ -19,14 +19,17 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
+import javax.inject.Inject;
+
 import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Renderer;
 import org.auraframework.expression.Expression;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.service.RenderingService;
 import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -34,7 +37,9 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 @ServiceComponentRenderer
 public class HtmlRenderer implements Renderer {
-    private static final ComponentRenderer componentRenderer = new ComponentRenderer();
+
+    @Inject
+    RenderingService renderingService;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -46,7 +51,9 @@ public class HtmlRenderer implements Renderer {
 
         if (script) {
             rc.pushScript();
-            componentRenderer.render(component, rc);
+            for (Component nested: body) {
+                renderingService.render(nested, rc);
+            }
             rc.popScript();
             return;
         }
@@ -100,7 +107,9 @@ public class HtmlRenderer implements Renderer {
 
         if (body != null && body.size() > 0) {
             out.append('>');
-            componentRenderer.render(component, rc);
+            for (Component nested : body) {
+                renderingService.render(nested, rc);
+            }
             out.append("</");
             out.append(tag);
             out.append('>');

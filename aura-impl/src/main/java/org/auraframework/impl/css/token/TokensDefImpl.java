@@ -15,12 +15,14 @@
  */
 package org.auraframework.impl.css.token;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.auraframework.Aura;
 import org.auraframework.builder.TokensDefBuilder;
 import org.auraframework.def.AttributeDef;
@@ -35,6 +37,7 @@ import org.auraframework.def.TokenMapProviderDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.util.Tokens;
+import org.auraframework.impl.java.provider.TokenDescriptorProviderInstance;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.MasterDefRegistry;
@@ -44,14 +47,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation for {@link TokensDef}.
@@ -102,7 +102,9 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
             return descriptor;
         }
 
-        DefDescriptor<TokensDef> provided = descriptorProvider.getDef().provide();
+        TokenDescriptorProviderDef tokenDescriptorProviderDef = descriptorProvider.getDef();
+        TokenDescriptorProviderInstance instance = Aura.getInstanceService().getInstance(tokenDescriptorProviderDef);
+        DefDescriptor<TokensDef> provided = instance.provide();
         while (provided.getDef().getDescriptorProvider() != null) {
             provided = provided.getDef().getConcreteDescriptor();
         }

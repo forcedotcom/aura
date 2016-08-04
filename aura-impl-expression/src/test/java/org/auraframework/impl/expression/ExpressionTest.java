@@ -15,14 +15,7 @@
  */
 package org.auraframework.impl.expression;
 
-import static org.auraframework.impl.expression.functions.BooleanFunctions.AND;
-import static org.auraframework.impl.expression.functions.BooleanFunctions.NOT;
-import static org.auraframework.impl.expression.functions.BooleanFunctions.OR;
-import static org.auraframework.impl.expression.functions.MathFunctions.SUBTRACT;
-import static org.auraframework.impl.expression.functions.MultiFunctions.ADD;
-
-import java.math.BigDecimal;
-
+import com.google.common.collect.ImmutableList;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.ExpressionType;
 import org.auraframework.expression.PropertyReference;
@@ -30,7 +23,13 @@ import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.Location;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
+import java.math.BigDecimal;
+
+import static org.auraframework.impl.expression.functions.BooleanFunctions.AND;
+import static org.auraframework.impl.expression.functions.BooleanFunctions.NOT;
+import static org.auraframework.impl.expression.functions.BooleanFunctions.OR;
+import static org.auraframework.impl.expression.functions.MathFunctions.SUBTRACT;
+import static org.auraframework.impl.expression.functions.MultiFunctions.ADD;
 
 /**
  * Tests of expression evaluation

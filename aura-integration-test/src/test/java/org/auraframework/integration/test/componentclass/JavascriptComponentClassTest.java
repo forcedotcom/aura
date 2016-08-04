@@ -30,6 +30,8 @@ import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.system.AuraContext;
 import org.auraframework.impl.javascript.BaseJavascriptClass;
 import org.auraframework.impl.root.component.ComponentDefImpl.Builder;
 import org.auraframework.impl.root.component.JavascriptComponentClass;
@@ -55,6 +57,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
 
         builder = new Builder();
         builder.setDescriptor(descriptor);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.GLOBAL));
     }
 
     @Test

@@ -15,17 +15,17 @@
  */
 package org.auraframework.impl.java.type.converter;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateOnly;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.type.converter.DateOnlyToStringConverter;
+import org.springframework.context.annotation.Lazy;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component (provide=AuraServiceProvider.class)
+@Lazy
+@ServiceComponent
 public class LocalizedDateOnlyToStringConverter extends DateOnlyToStringConverter implements
         LocalizedConverter<DateOnly, String> {
 

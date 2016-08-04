@@ -15,20 +15,19 @@
  */
 package org.auraframework.impl.adapter.format.js;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.service.SerializationService;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.auraframework.Aura;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-import aQute.bnd.annotation.component.Component;
-
-/**
- */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ComponentDefJSFormatAdapter extends JSFormatAdapter<BaseComponentDef> {
+    @Inject
+    private SerializationService serializationService;
 
     @Override
     public Class<BaseComponentDef> getType() {
@@ -39,7 +38,7 @@ public class ComponentDefJSFormatAdapter extends JSFormatAdapter<BaseComponentDe
     public void writeCollection(Collection<? extends BaseComponentDef> values, Appendable out) throws IOException,
             QuickFixException {
         out.append("$A.clientService.initDefs(");
-        Aura.getSerializationService().writeCollection(values, getType(), out, "JSON");
+        serializationService.writeCollection(values, getType(), out, "JSON");
         out.append(");");
     }
 }

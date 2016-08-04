@@ -15,22 +15,11 @@
  */
 package org.auraframework.def;
 
-import java.util.Map;
-
-import org.auraframework.throwable.quickfix.QuickFixException;
-
 /**
  * Similar to {@link TokenDescriptorProvider}, except this is for providing dynamic token values via a map instead a
  * descriptor.
  */
-public interface TokenMapProviderDef extends Definition {
+public interface TokenMapProviderDef extends Definition, TokenProviderDef {
     @Override
     DefDescriptor<TokenMapProviderDef> getDescriptor();
-
-    /**
-     * Invokes the provide method on the associated map provider class.
-     *
-     * @return The result from the associated class's provide method.
-     */
-    Map<String, String> provide() throws QuickFixException;
 }

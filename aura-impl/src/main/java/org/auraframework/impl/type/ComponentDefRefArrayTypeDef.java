@@ -17,19 +17,21 @@
  */
 package org.auraframework.impl.type;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.component.ComponentDefRefArrayImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 /**
  * typedef that allows for defrefs to be passed around without being automatically instantiated
@@ -48,8 +50,9 @@ public class ComponentDefRefArrayTypeDef extends DefinitionImpl<TypeDef> impleme
 
         public Builder() {
             super(TypeDef.class);
-            setDescriptor(DefDescriptorImpl.getInstance("aura://Aura.ComponentDefRef[]", TypeDef.class));
+            setDescriptor(new DefDescriptorImpl<>("aura://Aura.ComponentDefRef[]", TypeDef.class, null));
             setLocation(getDescriptor().getQualifiedName(), -1);
+            setAccess(new DefinitionAccessImpl(AuraContext.Access.GLOBAL));
         };
 
         @Override
@@ -95,5 +98,4 @@ public class ComponentDefRefArrayTypeDef extends DefinitionImpl<TypeDef> impleme
             componentDefRef.appendDependencies(deps);
         }
     }
-
 }

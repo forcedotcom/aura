@@ -15,19 +15,17 @@
  */
 package org.auraframework.impl.adapter.format.json;
 
-import java.io.IOException;
-import java.util.Collection;
-
-import javax.annotation.concurrent.ThreadSafe;
-
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ControllerDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 
-import aQute.bnd.annotation.component.Component;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Controller JSON format adapter.
@@ -35,8 +33,10 @@ import aQute.bnd.annotation.component.Component;
  * @since 0.0.116
  */
 @ThreadSafe
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ControllerDefJSONFormatAdapter extends JSONFormatAdapter<ControllerDef> {
+    @Inject
+    private ContextService contextService;
 
     @Override
     public Class<ControllerDef> getType() {
@@ -46,7 +46,7 @@ public class ControllerDefJSONFormatAdapter extends JSONFormatAdapter<Controller
     @Override
     public void writeCollection(Collection<? extends ControllerDef> values, Appendable out) throws IOException,
             QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         JsonEncoder.serialize(values, out, context.getJsonSerializationContext());
     }
 

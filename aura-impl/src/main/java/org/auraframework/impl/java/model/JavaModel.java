@@ -22,11 +22,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.type.JavaValueProvider;
 import org.auraframework.impl.javascript.testsuite.JavascriptMockHandler;
-import org.auraframework.instance.*;
+import org.auraframework.instance.InstanceStack;
+import org.auraframework.instance.Model;
+import org.auraframework.instance.ValueProvider;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -44,25 +49,22 @@ public class JavaModel implements Model {
     private final Object bean;
     private final JavaModelDefImpl modelDef;
     private final String path;
+    private final LoggingService loggingService;
 
     /**
      * The constructor.
      *
      * @param modelDef the definition for the model.
      */
-    public JavaModel(JavaModelDefImpl modelDef) {
+    public JavaModel(JavaModelDefImpl modelDef, Object bean, ContextService contextService,
+            LoggingService loggingService) {
         this.modelDef = modelDef;
-        InstanceStack iStack = Aura.getContextService().getCurrentContext().getInstanceStack();
+        this.loggingService = loggingService;
+        InstanceStack iStack = contextService.getCurrentContext().getInstanceStack();
         iStack.pushInstance(this, modelDef.getDescriptor());
         iStack.setAttributeName("m");
         this.path = iStack.getPath();
-        try {
-            this.bean = modelDef.getJavaType().newInstance();
-        } catch (AuraRuntimeException are) {
-            throw are;
-        } catch(Exception e){
-            throw makeException(e.getMessage(),e,this.modelDef);
-        }
+        this.bean = bean;
         iStack.clearAttributeName("m");
         iStack.popInstance(this);
     }
@@ -75,7 +77,6 @@ public class JavaModel implements Model {
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
-        LoggingService loggingService = Aura.getLoggingService();
         loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);
         loggingService.stopTimer(LoggingService.TIMER_AURA);
         loggingService.startTimer("java");

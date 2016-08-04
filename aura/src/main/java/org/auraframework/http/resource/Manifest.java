@@ -20,10 +20,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
+import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -31,6 +34,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.Component;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
@@ -39,6 +43,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Maps;
 
+@ServiceComponent
 public class Manifest extends AuraResourceImpl {
     // ui:manifest attribute names
     private static final String LAST_MOD = "lastMod";
@@ -47,11 +52,18 @@ public class Manifest extends AuraResourceImpl {
     private static final String FALLBACK_URLS = "fallbackURLs";
 
     // FIXME: this is horrendous we actually render the manifest as a component.
-    private RenderingService renderingService = Aura.getRenderingService();
-    private ManifestUtil manifestUtil = new ManifestUtil();
+    private RenderingService renderingService;
+    private ExceptionAdapter exceptionAdapter;
+    private ContextService contextService;
+    private ManifestUtil manifestUtil;
 
     public Manifest() {
         super("app.manifest", Format.MANIFEST);
+    }
+
+    @PostConstruct
+    public void createManifestUtil() {
+        this.manifestUtil = new ManifestUtil(contextService, configAdapter);
     }
 
     /**
@@ -99,16 +111,16 @@ public class Manifest extends AuraResourceImpl {
                     definitionService.updateLoaded(descr);
                     appOk = true;
                 }
-            } catch (QuickFixException qfe) {
-                //
+            } catch (QuickFixException | ClientOutOfSyncException ex) {
+                // QuickFixException
                 // ignore qfe, since we really don't care... the manifest will be 404ed.
                 // This will eventually cause the browser to give up. Note that this case
                 // should almost never occur, as it requires the qfe to be introduced between
                 // the initial request (which will not set a manifest if it gets a qfe) and
                 // the manifest request.
                 //
-            } catch (ClientOutOfSyncException coose) {
-                //
+
+                // ClientOutOfSyncException
                 // In this case, we want to force a reload... A 404 on the manifest is
                 // supposed to handle this. we hope that the client will do the right
                 // thing, and reload everything. Note that this case really should only
@@ -199,7 +211,7 @@ public class Manifest extends AuraResourceImpl {
             Component tmpl = instanceService.getInstance(tmplDesc, attribs);
             renderingService.render(tmpl, response.getWriter());
         } catch (Exception e) {
-            Aura.getExceptionAdapter().handleException(e);
+            exceptionAdapter.handleException(e);
             // Can't throw exception here: to set manifest OBSOLETE
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -227,13 +239,21 @@ public class Manifest extends AuraResourceImpl {
     /**
      * @param renderingService the renderingService to set
      */
+    @Inject
     public void setRenderingService(RenderingService renderingService) {
         this.renderingService = renderingService;
     }
-
-    /**
-     * @param manifestUtil the manifestUtil to set
-     */
+    
+    @Inject
+    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
+        this.exceptionAdapter = exceptionAdapter;
+    }
+    
+    @Inject
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
+    }
+    
     public void setManifestUtil(ManifestUtil manifestUtil) {
         this.manifestUtil = manifestUtil;
     }

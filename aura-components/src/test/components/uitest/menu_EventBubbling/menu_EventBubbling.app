@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application model="java://org.auraframework.components.ui.MenuTestModel">
+<aura:application model="java://org.auraframework.components.ui.MenuItemsTestModel">
 <aura:attribute name="eventBubbled" type="boolean"/>
 <aura:attribute name="stopClickPropagation" type="Boolean"/>
 <div style="display:inline-block;width:50%;vertical-align:top;" onclick="{!c.clickPress}">

@@ -15,17 +15,16 @@
  */
 package org.auraframework.def;
 
+import java.util.List;
 import java.util.Map;
 
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Interface for component definition references.
  */
 public interface ComponentDefRef extends Definition {
-    public static enum Load {
+    enum Load {
         DEFAULT, LAZY, EXCLUSIVE
     }
 
@@ -42,9 +41,9 @@ public interface ComponentDefRef extends Definition {
 
     Map<DefDescriptor<AttributeDef>, AttributeDefRef> getAttributeValues();
 
-    AttributeDefRef getAttributeDefRef(String name);
+    List<AttributeDefRef> getAttributeValueList() throws QuickFixException;
 
-    Component newInstance(BaseComponent<?, ?> valueProvider) throws QuickFixException;
+    AttributeDefRef getAttributeDefRef(String name);
 
     String getLocalId();
 

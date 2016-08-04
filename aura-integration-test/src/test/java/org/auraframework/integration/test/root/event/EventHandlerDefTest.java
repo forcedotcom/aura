@@ -20,7 +20,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.event.EventHandlerDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
@@ -37,7 +36,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
 
     @Test
     public void testHandlerWithoutNameOrEventAttribute() throws Exception {
-        DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
+        DefDescriptor<ComponentDef> componentDefDescriptor = definitionService.getDefDescriptor(
                 "handleEventTest:handlerWithoutNameOrEvent", ComponentDef.class);
         try {
             componentDefDescriptor.getDef();
@@ -54,7 +53,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
      */
     @Test
     public void testHandlerWithEventAttributeForComponentEvent() throws Exception {
-        DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
+        DefDescriptor<ComponentDef> componentDefDescriptor = definitionService.getDefDescriptor(
                 "handleEventTest:handlerWithEventForComponentEvent", ComponentDef.class);
         try {
             componentDefDescriptor.getDef();
@@ -73,7 +72,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
      */
     @Test
     public void testHandlerWithNameAttributeForApplicationEvent() throws Exception {
-        DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
+        DefDescriptor<ComponentDef> componentDefDescriptor = definitionService.getDefDescriptor(
                 "handleEventTest:handlerWithNameForApplicationEvent", ComponentDef.class);
         try {
             componentDefDescriptor.getDef();
@@ -88,7 +87,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
 
     @Test
     public void testHandlerWithInvalidNameAttributeForComponentEvent() throws Exception {
-        DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
+        DefDescriptor<ComponentDef> componentDefDescriptor = definitionService.getDefDescriptor(
                 "handleEventTest:handlerWithUnregisteredName", ComponentDef.class);
         try {
             componentDefDescriptor.getDef();
@@ -101,7 +100,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
 
     @Test
     public void testHandlerWithInvalidEventAttributeForApplicationEvent() throws Exception {
-        DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
+        DefDescriptor<ComponentDef> componentDefDescriptor = definitionService.getDefDescriptor(
                 "handleEventTest:handlerWithInvalidEvent", ComponentDef.class);
         try {
             componentDefDescriptor.getDef();

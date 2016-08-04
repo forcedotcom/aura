@@ -15,10 +15,7 @@
  */
 package org.auraframework.impl.util;
 
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
@@ -28,9 +25,15 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.impl.util.TextTokenizer.Token;
+import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.junit.Test;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class TextTokenizerTest extends AuraImplTestCase {
     private static final String[] testText = new String[] { "this is text", "{!this.is.an.expression}",
@@ -39,6 +42,9 @@ public class TextTokenizerTest extends AuraImplTestCase {
     private static final String wholeText = String.format("%s%s%s", testText[0], testText[1], testText[2]);
 
     private static final String testWhitespace = "     {!true}     {!false}     five spaces";
+
+    @Inject
+    private DefinitionParserAdapter definitionParserAdapter;
 
     @Test
     public void testUnwrap() {
@@ -49,7 +55,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
     }
 
     /**
-     * Test method for {@link TextTokenizer#TextTokenizer(String, Location)}.
+     * Test method for {@link TextTokenizer#tokenize(String, Location)}.
      */
     @Test
     public void testTextTokenizer() throws AuraValidationException {
@@ -69,7 +75,8 @@ public class TextTokenizerTest extends AuraImplTestCase {
     @Test
     public void testAsValues() throws Exception {
         TextTokenizer tokenizer = TextTokenizer.tokenize(wholeText, null);
-        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null);
+        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null, true, definitionService, contextService,
+                configAdapter, definitionParserAdapter);
         try {
             tokenizer.asValue(cdh);
             fail("Should have failed because of mixed expression and text");
@@ -82,7 +89,8 @@ public class TextTokenizerTest extends AuraImplTestCase {
     @Test
     public void testSingleAsValue() throws Exception {
         TextTokenizer tokenizer = TextTokenizer.tokenize(testText[0], null);
-        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null);
+        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null, true, definitionService, contextService,
+                configAdapter, definitionParserAdapter);
         Object o = tokenizer.asValue(cdh);
         assertTrue("Token value is of wrong type", o instanceof String);
         assertEquals("Incorrect value returned from asValue()", testText[0], o.toString());
@@ -97,7 +105,8 @@ public class TextTokenizerTest extends AuraImplTestCase {
     @Test
     public void testAsComponentDefRefs() throws Exception {
         TextTokenizer tokenizer = TextTokenizer.tokenize(wholeText, null);
-        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null);
+        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null, true, definitionService, contextService,
+                configAdapter, definitionParserAdapter);
         List<ComponentDefRef> l = tokenizer.asComponentDefRefs(cdh);
         assertEquals("Wrong number of ComponentDefRefs returned", 3, l.size());
         ComponentDefRef c = l.get(0);
@@ -130,7 +139,8 @@ public class TextTokenizerTest extends AuraImplTestCase {
                 "[value=org.auraframework.impl.expression.LiteralImpl", //
                 "[value=     five spaces]" };
 
-        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null);
+        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null, true, definitionService, contextService,
+                configAdapter, definitionParserAdapter);
         List<ComponentDefRef> compList = TextTokenizer.tokenize(testWhitespace, null, WhitespaceBehavior.PRESERVE)
                 .asComponentDefRefs(cdh);
         assertEquals("Wrong number of ComponentDefRefs returned", descNames.length, compList.size());
@@ -151,7 +161,8 @@ public class TextTokenizerTest extends AuraImplTestCase {
         String[] testResults = new String[] { "[value=org.auraframework.impl.expression.LiteralImpl",
                 "[value=org.auraframework.impl.expression.LiteralImpl", "[value=     five spaces]" };
 
-        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null);
+        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null, true, definitionService, contextService,
+                configAdapter, definitionParserAdapter);
         List<ComponentDefRef> compList = TextTokenizer.tokenize(testWhitespace, null, WhitespaceBehavior.OPTIMIZE)
                 .asComponentDefRefs(cdh);
         assertEquals("Wrong number of ComponentDefRefs returned", descNames.length, compList.size());

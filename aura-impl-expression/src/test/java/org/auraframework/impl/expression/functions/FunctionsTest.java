@@ -15,6 +15,15 @@
  */
 package org.auraframework.impl.expression.functions;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.auraframework.impl.expression.AuraImplExpressionTestCase;
+import org.junit.Test;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import static org.auraframework.impl.expression.functions.BooleanFunctions.AND;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.NOT;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.OR;
@@ -27,23 +36,13 @@ import static org.auraframework.impl.expression.functions.MathFunctions.NEGATE;
 import static org.auraframework.impl.expression.functions.MathFunctions.SUBTRACT;
 import static org.auraframework.impl.expression.functions.MultiFunctions.ADD;
 import static org.auraframework.impl.expression.functions.MultiFunctions.EQUALS;
-import static org.auraframework.impl.expression.functions.MultiFunctions.NOTEQUALS;
 import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER_THAN;
 import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER_THAN_OR_EQUAL;
 import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN;
 import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN_OR_EQUAL;
+import static org.auraframework.impl.expression.functions.MultiFunctions.NOTEQUALS;
 import static org.auraframework.impl.expression.functions.UtilFunctions.EMPTY;
 import static org.auraframework.impl.expression.functions.UtilFunctions.FORMAT;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.auraframework.impl.expression.AuraImplExpressionTestCase;
-import org.junit.Test;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * Basic tests of functions
@@ -161,7 +160,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     }
 
    //<expressionTest:test expression="{!v.Infinity + v.NegativeInfinity}" exprText="v.Infinity + v.NegativeInfinity" expected="NaN"/>
-    @Test
+   @Test
     public void testAddInfinityAndNegativeInfinity() throws Exception {
         assertEquals(Double.NaN, evaluate(ADD, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY));
         assertEquals(Double.NaN, evaluate(ADD, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY));
@@ -1888,7 +1887,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
 
     //<expressionTest:test expression="{!format(v.label2, null, undefined)}" exprText="format(v.label2, null, undefined" expected="'Hello  and '"/>
     @Test
-    public void testFormatArgNull() throws Exception {
+	public void testFormatArgNull() throws Exception {
 	    assertEquals("X", evaluate(FORMAT, "X{0}", (Object) null));
 	}
 

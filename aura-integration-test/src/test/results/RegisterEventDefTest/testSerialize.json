@@ -6,6 +6,7 @@
       "v":{
         "descriptor":"markup://auratest:testEvent",
         "type":"COMPONENT",
+        "xs":"I",
         "superDef":{
           "s":3,
           "v":{
@@ -17,7 +18,8 @@
             "s":4,
             "v":{
               "name":"att1",
-              "type":"aura://String"
+              "type":"aura://String",
+              "xs":"I"
             }
           },
           "att2":{
@@ -25,6 +27,7 @@
             "v":{
               "name":"att2",
               "type":"aura://Boolean",
+              "xs":"I",
               "required":true
             }
           }

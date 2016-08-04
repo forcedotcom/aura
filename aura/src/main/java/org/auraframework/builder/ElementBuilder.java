@@ -16,6 +16,7 @@
 
 package org.auraframework.builder;
 
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
@@ -39,6 +40,8 @@ public interface ElementBuilder {
     ElementBuilder setAPIVersion(String apiVersion);
 
     ElementBuilder setDescription(String description);
+
+    ElementBuilder setAccess(DefinitionAccess access);
 
     /**
      * Set the Hash object from which the definition should extract the string.

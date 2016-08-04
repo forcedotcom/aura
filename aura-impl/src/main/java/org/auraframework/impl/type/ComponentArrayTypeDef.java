@@ -15,26 +15,28 @@
  */
 package org.auraframework.impl.type;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.java.type.JavaValueProvider;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  */
@@ -58,8 +60,9 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
 
         public Builder() {
             super(TypeDef.class);
-            setDescriptor(DefDescriptorImpl.getInstance("aura://Aura.Component[]", TypeDef.class));
+            setDescriptor(new DefDescriptorImpl<>("aura://Aura.Component[]", TypeDef.class, null));
             setLocation(getDescriptor().getQualifiedName(), -1);
+            setAccess(new DefinitionAccessImpl(AuraContext.Access.GLOBAL));
         };
 
         @Override
@@ -95,7 +98,8 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
         List<BaseComponent<?, ?>> components = new ArrayList<>();
         List<?> list = (List<?>) config;
         AuraContext context = Aura.getContextService().getCurrentContext();
-
+        InstanceService instanceService = Aura.getInstanceService();
+        
         if (list != null) {
             int idx = 0;
             for (Object defRef : list) {
@@ -103,7 +107,8 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
                     components.add((BaseComponent<?, ?>) defRef);
                 } else if (defRef instanceof ComponentDefRef) {
                     context.getInstanceStack().setAttributeIndex(idx);
-                    components.add(((ComponentDefRef) defRef).newInstance(valueProvider));
+                    //components.add(((ComponentDefRef) defRef).newInstance(valueProvider));
+                    components.add((BaseComponent<?, ?>) instanceService.getInstance((ComponentDefRef) defRef, valueProvider));
                     context.getInstanceStack().clearAttributeIndex(idx);
                     idx += 1;
                 } else {

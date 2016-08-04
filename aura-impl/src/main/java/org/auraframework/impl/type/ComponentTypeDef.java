@@ -15,20 +15,24 @@
  */
 package org.auraframework.impl.type;
 
-import java.io.IOException;
-import java.util.Set;
-
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.service.InstanceService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  */
@@ -66,8 +70,9 @@ public class ComponentTypeDef extends DefinitionImpl<TypeDef> implements TypeDef
 
         public Builder() {
             super(TypeDef.class);
-            setDescriptor(DefDescriptorImpl.getInstance("aura://Aura.Component", TypeDef.class));
+            setDescriptor(new DefDescriptorImpl<>("aura://Aura.Component", TypeDef.class, null));
             setLocation(getDescriptor().getQualifiedName(), -1);
+            setAccess(new DefinitionAccessImpl(AuraContext.Access.GLOBAL));
         };
 
         @Override
@@ -79,8 +84,9 @@ public class ComponentTypeDef extends DefinitionImpl<TypeDef> implements TypeDef
     @Override
     public Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException {
         ComponentDefRef defRef = (ComponentDefRef) config;
+        InstanceService instanceService = Aura.getInstanceService();
         try {
-            return defRef.newInstance(valueProvider);
+            return instanceService.getInstance(defRef, valueProvider);
         } catch (DefinitionNotFoundException e) {
             throw new AuraRuntimeException(e);
         }

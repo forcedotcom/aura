@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -61,7 +60,7 @@ public class AuraTypeTest extends AuraImplTestCase {
         attributes.put("listName", "listlist");
         attributes.put("setName", "setset");
 
-        cmp = Aura.getInstanceService().getInstance("test:testAuraTypes", ComponentDef.class, attributes);
+        cmp = instanceService.getInstance("test:testAuraTypes", ComponentDef.class, attributes);
         DefDescriptor<ComponentDef> desc = cmp.getDescriptor();
         ComponentDef def = desc.getDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> attrMap = def.getAttributeDefs();

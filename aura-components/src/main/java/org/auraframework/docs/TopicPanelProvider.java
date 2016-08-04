@@ -15,29 +15,40 @@
  */
 package org.auraframework.docs;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @Provider
+@ServiceComponentProvider
 public class TopicPanelProvider implements ComponentDescriptorProvider {
+
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private DefinitionService definitionService;
 
     @Override
     public DefDescriptor<ComponentDef> provide() throws QuickFixException {
-        BaseComponent<?, ?> c = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        BaseComponent<?, ?> c = contextService.getCurrentContext().getCurrentComponent();
         String topic = (String) c.getAttributes().getValue("topic");
         if (topic != null) {
             if (topic.startsWith("api:")) {
-                return Aura.getDefinitionService().getDefDescriptor("auradocs:apiTopic", ComponentDef.class);
+                return definitionService.getDefDescriptor("auradocs:apiTopic", ComponentDef.class);
             } else {
                 if (!topic.endsWith("Topic")) {
                     topic = topic + "Topic";
                 }
-                DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("auradocs:" + topic,
+                DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("auradocs:" + topic,
                         ComponentDef.class);
                 if (desc.exists()) {
                     return desc;
@@ -45,6 +56,6 @@ public class TopicPanelProvider implements ComponentDescriptorProvider {
             }
         }
 
-        return Aura.getDefinitionService().getDefDescriptor("auradocs:welcomeTopic", ComponentDef.class);
+        return definitionService.getDefDescriptor("auradocs:welcomeTopic", ComponentDef.class);
     }
 }

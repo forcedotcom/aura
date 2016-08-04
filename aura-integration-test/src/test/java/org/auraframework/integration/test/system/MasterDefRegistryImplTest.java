@@ -33,8 +33,8 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.cache.Cache;
@@ -51,13 +51,13 @@ import org.auraframework.def.HelperDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TypeDef;
-import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.CachingService;
-import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -68,6 +68,7 @@ import org.auraframework.system.Location;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
@@ -94,13 +95,20 @@ import com.google.common.collect.Sets;
 
 @ThreadHostileTest("Don't you go clearing my caches.")
 public class MasterDefRegistryImplTest extends AuraImplTestCase {
-    private CachingService cachingService = Aura.getCachingService();
+    @Inject
+    private CachingService cachingService;
 
-    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
+    @Inject
+    private ConfigAdapter configAdapter;
 
-    private InstanceService instanceService = Aura.getInstanceService();
+    @Inject
+    private LoggingService loggingService;
 
-    private ContextService contextService = Aura.getContextService();
+    @Inject
+    private InstanceService instanceService;
+
+    @Inject
+    private Collection<RegistryAdapter> providers;
 
     @Mock
     Definition globalDef;
@@ -111,25 +119,29 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     @Mock
     Cache<String, String> mockAccessCheckCache;
 
-    private MasterDefRegistryImplOverride getDefRegistry(boolean asMocks) {
-        Collection<RegistryAdapter> providers = AuraImpl.getRegistryAdapters();
-        List<DefRegistry<?>> mdrregs = Lists.newArrayList();
-
-        AuraContext context = Aura.getContextService().getCurrentContext();
+    private DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> loaders,
+                                           boolean asMocks) {
+        List<DefRegistry<?>> ret = Lists.newArrayList();
         for (RegistryAdapter provider : providers) {
-            DefRegistry<?>[] registries = provider.getRegistries(context.getMode(), context.getAccess(), null);
+            DefRegistry<?>[] registries = provider.getRegistries(mode, access, loaders);
             if (registries != null) {
                 for (DefRegistry<?> reg : registries) {
                     Set<String> ns = reg.getNamespaces();
 
                     if (ns != null) {
-                        mdrregs.add(asMocks ? Mockito.spy(reg) : reg);
+                        ret.add(asMocks ? Mockito.spy(reg) : reg);
                     }
                 }
             }
         }
-        MasterDefRegistryImplOverride registry = new MasterDefRegistryImplOverride(
-                mdrregs.toArray(new DefRegistry<?>[mdrregs.size()]));
+        return ret.toArray(new DefRegistry[ret.size()]);
+    }
+
+    private MasterDefRegistryImplOverride getDefRegistry(boolean asMocks) {
+        AuraContext context = contextService.getCurrentContext();
+        MasterDefRegistryImplOverride registry = new MasterDefRegistryImplOverride(getRegistries(context.getMode(),
+                context.getAccess(), null, asMocks));
+        registry.setContext(context);
         return asMocks ? Mockito.spy(registry) : registry;
     }
 
@@ -1241,7 +1253,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.when(mockedRegistry.find((DescriptorFilter) Mockito.any())).thenReturn(findable);
         Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
         Mockito.when(mockedRegistry.exists(dd)).thenReturn(true);
-        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(mockedRegistry);
+        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(configAdapter, definitionService, loggingService,
+                cachingService, mockedRegistry);
 
         DescriptorFilter df = new DescriptorFilter("aura:mocked", DefType.COMPONENT);
         Set<DefDescriptor<?>> result = mdr.find(df);
@@ -1273,7 +1286,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
         Mockito.when(mockedRegistry.isCacheable()).thenReturn(true);
 
-        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(mockedRegistry);
+        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(configAdapter, definitionService, loggingService,
+                cachingService, mockedRegistry);
 
         DescriptorFilter df = new DescriptorFilter("aura:*", DefType.COMPONENT);
         Set<DefDescriptor<?>> result = mdr.find(df);
@@ -1305,7 +1319,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
         Mockito.when(mockedRegistry.isCacheable()).thenReturn(false);
 
-        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(mockedRegistry);
+        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(configAdapter, definitionService, loggingService,
+                cachingService, mockedRegistry);
 
         DescriptorFilter df = new DescriptorFilter("aura:*", DefType.COMPONENT);
         Set<DefDescriptor<?>> result = mdr.find(df);
@@ -1337,7 +1352,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
         Mockito.when(mockedRegistry.isCacheable()).thenReturn(true);
 
-        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(mockedRegistry);
+        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(configAdapter, definitionService, loggingService,
+                cachingService, mockedRegistry);
 
         DescriptorFilter df = new DescriptorFilter("*:mocked", DefType.COMPONENT);
         Set<DefDescriptor<?>> result = mdr.find(df);
@@ -1694,8 +1710,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         public TypeDef def;
         private final Lock rLock;
 
-        public FakeRegistry(Lock rLock, Lock wLock) {
-            this.desc = Aura.getDefinitionService().getDefDescriptor("java://fake.type", TypeDef.class);
+        public FakeRegistry(Lock rLock, Lock wLock, DefinitionService definitionService) {
+            this.desc = definitionService.getDefDescriptor("java://fake.type", TypeDef.class);
             this.def = new FakeTypeDef(desc);
             this.rLock = rLock;
         }
@@ -1784,7 +1800,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         public final Lock rLock;
         public final Lock wLock;
 
-        public LockTestInfo() {
+        public LockTestInfo(ConfigAdapter configAdapter, DefinitionService definitionService, LoggingService loggingService,
+                            CachingService cachingService) {
             //ServiceLoader sl = ServiceLocatorMocker.spyOnServiceLocator();
             this.rLock = Mockito.mock(Lock.class, "rLock");
             this.wLock = Mockito.mock(Lock.class, "wLock");
@@ -1792,8 +1809,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             //Mockito.stub(sl.get(CachingService.class)).toReturn(acs);
             //Mockito.stub(acs.getReadLock()).toReturn(rLock);
             //Mockito.stub(acs.getWriteLock()).toReturn(wLock);
-            this.reg = new FakeRegistry(rLock, wLock);
-            this.mdr = new MasterDefRegistryImpl(reg);
+            this.reg = new FakeRegistry(rLock, wLock, definitionService);
+            this.mdr = new MasterDefRegistryImpl(configAdapter, definitionService, loggingService,
+                    cachingService, reg);
         }
 
         public void clear() {
@@ -1811,7 +1829,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void _testGetDefLocking() throws Exception {
         LockTestInfo lti = null;
 
-        lti = new LockTestInfo();
+        lti = new LockTestInfo(configAdapter, definitionService, loggingService, cachingService);
         try {
             Definition d = lti.mdr.getDef(lti.reg.desc);
             Mockito.verify(lti.rLock, Mockito.times(1)).lock();
@@ -1834,7 +1852,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void _testFindMatcherLocking() throws Exception {
         LockTestInfo lti = null;
 
-        lti = new LockTestInfo();
+        lti = new LockTestInfo(configAdapter, definitionService, loggingService, cachingService);
         try {
             lti.mdr.find(new DescriptorFilter("bah:hum*"));
             Mockito.verify(lti.rLock, Mockito.times(1)).lock();
@@ -1858,7 +1876,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void _testExistsLocking() throws Exception {
         LockTestInfo lti = null;
 
-        lti = new LockTestInfo();
+        lti = new LockTestInfo(configAdapter, definitionService, loggingService, cachingService);
         try {
             lti.mdr.exists(lti.reg.desc);
             Mockito.verify(lti.rLock, Mockito.times(1)).lock();
@@ -1881,7 +1899,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void _testGetUidLocking() throws Exception {
         LockTestInfo lti = null;
 
-        lti = new LockTestInfo();
+        lti = new LockTestInfo(configAdapter, definitionService, loggingService, cachingService);
         try {
             lti.mdr.getUid(null, lti.reg.desc);
             Mockito.verify(lti.rLock, Mockito.times(1)).lock();
@@ -1899,7 +1917,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     private class MasterDefRegistryImplOverride extends MasterDefRegistryImpl {
         public MasterDefRegistryImplOverride(@Nonnull DefRegistry<?>... registries) {
-            super(registries);
+            super(configAdapter, definitionService, loggingService, cachingService, registries);
         }
 
         @Override

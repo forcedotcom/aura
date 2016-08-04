@@ -15,28 +15,30 @@
  */
 package org.auraframework.docs;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 
 /**
  */
-@Model
-public class EditorPanelModel {
+@ServiceComponentModelInstance
+public class EditorPanelModel implements ModelInstance {
 
     private final String code;
     private final String format;
 
-    public EditorPanelModel() throws QuickFixException {
+    public EditorPanelModel(ContextService contextService, DefinitionService defintionService) throws QuickFixException {
 
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
 
         String desc = (String) component.getAttributes().getValue("descriptor");
@@ -48,7 +50,7 @@ public class EditorPanelModel {
             format = null;
         } else {
             // Nominal case:
-            DefDescriptor<? extends Definition> descriptor = Aura.getDefinitionService().getDefDescriptor(desc, defType.getPrimaryInterface());
+            DefDescriptor<? extends Definition> descriptor = defintionService.getDefDescriptor(desc, defType.getPrimaryInterface());
             Source<?> source = context.getDefRegistry().getSource(descriptor);
             if (source != null && source.exists()) {
                 code = source.getContents();

@@ -15,13 +15,8 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Collections;
-import java.util.List;
-
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
@@ -29,9 +24,16 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.HtmlTag;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.util.TextTokenizer;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Tag handler has a parent
@@ -44,12 +46,16 @@ public abstract class ParentedTagHandler<T extends Definition, P extends RootDef
         super();
     }
 
-    public ParentedTagHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        this(null,parentHandler,xmlReader, source);
+    public ParentedTagHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                              boolean isInInternalNamespace, DefinitionService definitionService,
+                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        this(null, parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
     }
 
-    public ParentedTagHandler(DefDescriptor<T> defDescriptor,ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(defDescriptor,xmlReader, source);
+    public ParentedTagHandler(DefDescriptor<T> defDescriptor, ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                              boolean isInInternalNamespace, DefinitionService definitionService,
+                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(defDescriptor, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         this.parentHandler = parentHandler;
         this.setWhitespaceBehavior(parentHandler == null ? WhitespaceBehavior.OPTIMIZE : parentHandler
                 .getWhitespaceBehavior());

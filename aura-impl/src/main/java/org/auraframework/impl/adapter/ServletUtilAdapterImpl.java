@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,11 +31,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
@@ -61,13 +62,14 @@ import org.auraframework.util.json.JsonEncoder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+@ServiceComponent
 public class ServletUtilAdapterImpl implements ServletUtilAdapter {
-    private ContextService contextSerivce = Aura.getContextService();
-    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
-    private ExceptionAdapter exceptionAdapter = Aura.getExceptionAdapter();
-    private SerializationService serializationService = Aura.getSerializationService();
-    private ClientLibraryService clientLibraryService = Aura.getClientLibraryService();
-    protected DefinitionService definitionService = Aura.getDefinitionService();
+    private ContextService contextService;
+    private ConfigAdapter configAdapter;
+    private ExceptionAdapter exceptionAdapter;
+    private SerializationService serializationService;
+    private ClientLibraryService clientLibraryService;
+    protected DefinitionService definitionService;
 
     /**
      * "Short" pages (such as manifest cookies and AuraFrameworkServlet pages) expire in 1 day.
@@ -235,7 +237,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 //
                 // Clear the InstanceStack before trying to serialize the exception since the Throwable has likely
                 // rendered the stack inaccurate, and may falsely trigger NoAccessExceptions.
-                InstanceStack stack = this.contextSerivce.getCurrentContext().getInstanceStack();
+                InstanceStack stack = this.contextService.getCurrentContext().getInstanceStack();
                 List<String> list = stack.getStackInfo();
                 for (int count = list.size(); count > 0; count--) {
                     stack.popInstance(stack.peek());
@@ -269,7 +271,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 }
             }
         } finally {
-            this.contextSerivce.endContext();
+            this.contextService.endContext();
         }
     }
 
@@ -286,7 +288,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 + "<!--                                                   -->"
                 + "<!--                                                   -->"
                 + "<!--                                                   -->");
-        this.contextSerivce.endContext();
+        this.contextService.endContext();
     }
 
     @Override
@@ -704,6 +706,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     /**
      * @param definitionService the definitionService to set
      */
+    @Inject
     public void setDefinitionService(DefinitionService definitionService) {
         this.definitionService = definitionService;
     }
@@ -711,13 +714,15 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     /**
      * Injection override.
      */
+    @Inject
     public void setContextService(ContextService contextService) {
-        this.contextSerivce = contextService;
+        this.contextService = contextService;
     }
 
     /**
      * Injection override.
      */
+    @Inject
     public void setConfigAdapter(ConfigAdapter configAdapter) {
         this.configAdapter = configAdapter;
     }
@@ -725,6 +730,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     /**
      * Injection override.
      */
+    @Inject
     public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
         this.exceptionAdapter = exceptionAdapter;
     }
@@ -732,6 +738,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     /**
      * Injection override.
      */
+    @Inject
     public void setSerializationService(SerializationService serializationService) {
         this.serializationService = serializationService;
     }
@@ -739,6 +746,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     /**
      * Injection override.
      */
+    @Inject
     public void setClientLibraryService(ClientLibraryService clientLibraryService) {
         this.clientLibraryService = clientLibraryService;
     }

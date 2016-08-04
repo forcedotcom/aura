@@ -18,8 +18,10 @@ package org.auraframework.impl.source;
 import java.util.*;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -178,9 +180,7 @@ public class DescriptorFileMapper {
                 descList = Lists.newArrayList();
                 for (ExtensionInfo ei : eiList) {
                     if (ei.bundleDefType == null) {
-                        String format = DefDescriptor.MARKUP_PREFIX.equals(ei.prefix) ? "%s://%s:%s" : "%s://%s.%s";
-                        descList.add(Aura.getDefinitionService().getDefDescriptor(
-                                String.format(format, ei.prefix, ns, name), ei.defType.getPrimaryInterface()));
+                        descList.add(new DefDescriptorImpl<>(ei.prefix, ns, name, ei.defType.getPrimaryInterface()));
                     }
                 }
                 if (descList.size() > 0) {
@@ -199,11 +199,9 @@ public class DescriptorFileMapper {
                 descList = Lists.newArrayList();
                 for (ExtensionInfo ei : eiList) {
                     if (ei.bundleDefType != null) {
-                        DefDescriptor<? extends Definition> bundle = Aura.getDefinitionService().getDefDescriptor(
-                                String.format("%s://%s:%s", DefDescriptor.MARKUP_PREFIX, ns, name), ei.bundleDefType.getPrimaryInterface());
-                        String format = DefDescriptor.MARKUP_PREFIX.equals(ei.prefix) ? "%s://%s:%s" : "%s://%s.%s";
-                        descList.add(Aura.getDefinitionService().getDefDescriptor(
-                            String.format(format, ei.prefix, ns, ext.get(0)), ei.defType.getPrimaryInterface(), bundle));
+                        DefDescriptor<? extends Definition> bundle = new DefDescriptorImpl<>(
+                        DefDescriptor.MARKUP_PREFIX, ns, name, ei.bundleDefType.getPrimaryInterface());
+                        descList.add(new DefDescriptorImpl<>(ei.prefix, ns, ext.get(0), ei.defType.getPrimaryInterface(), bundle));
                     }
                 }
                 if (descList.size() > 0) {

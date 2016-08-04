@@ -15,10 +15,9 @@
  */
 package org.auraframework.impl.renderer.sampleJavaRenderers;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.Renderer;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
@@ -26,9 +25,11 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
+@ServiceComponentRenderer
 public class RendererToInjectComponentAsAttributes extends AbstractRendererForTestingIntegrationService implements
         Renderer {
 

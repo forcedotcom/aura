@@ -15,20 +15,20 @@
  */
 package org.auraframework.impl.design;
 
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
+import org.auraframework.Aura;
 import org.auraframework.builder.design.DesignTemplateDefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignTemplateDef;
 import org.auraframework.def.design.DesignTemplateRegionDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class DesignTemplateDefImpl extends DefinitionImpl<DesignTemplateDef> implements DesignTemplateDef {
     private static final long serialVersionUID = 765275252198138618L;
@@ -63,7 +63,7 @@ public class DesignTemplateDefImpl extends DefinitionImpl<DesignTemplateDef> imp
 
     @Override
     public DesignTemplateRegionDef getDesignTemplateRegionDef(String name) {
-        return getDesignTemplateRegionDefs().get(DefDescriptorImpl.getInstance(name, DesignTemplateRegionDef.class));
+        return getDesignTemplateRegionDefs().get(Aura.getDefinitionService().getDefDescriptor(name, DesignTemplateRegionDef.class));
     }
 
     @Override

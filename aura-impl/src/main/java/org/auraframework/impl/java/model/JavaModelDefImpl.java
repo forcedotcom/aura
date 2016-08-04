@@ -23,12 +23,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.JavaModelDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Model;
@@ -89,7 +89,7 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
 
     @Override
     public Model newInstance() {
-        return new JavaModel(this);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -120,9 +120,9 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
                 throw new InvalidDefinitionException(String.format("@AuraEnabled annotation found on void method %s",
                         method.getName()), new Location("java://" + method.getDeclaringClass().getCanonicalName(), 0));
             }
-            return DefDescriptorImpl.getInstance("java://" + method.getReturnType().getName(), TypeDef.class);
+            return Aura.getDefinitionService().getDefDescriptor("java://" + method.getReturnType().getName(), TypeDef.class);
         } else {
-            return DefDescriptorImpl.getInstance(type.value(), TypeDef.class);
+            return Aura.getDefinitionService().getDefDescriptor(type.value(), TypeDef.class);
         }
     }
 

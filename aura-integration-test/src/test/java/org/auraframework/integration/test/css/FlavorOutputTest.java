@@ -15,6 +15,8 @@
  */
 package org.auraframework.integration.test.css;
 
+import com.salesforce.omakase.broadcast.emitter.SubscriptionException;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
@@ -23,8 +25,6 @@ import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.css.util.Styles;
 import org.auraframework.throwable.quickfix.StyleParserException;
 import org.junit.Test;
-
-import com.salesforce.omakase.broadcast.emitter.SubscriptionException;
 
 /**
  * General unit tests for expected flavor parsed output.

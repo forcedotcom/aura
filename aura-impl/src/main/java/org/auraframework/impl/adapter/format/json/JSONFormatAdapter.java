@@ -17,8 +17,6 @@ package org.auraframework.impl.adapter.format.json;
 
 import org.auraframework.impl.adapter.format.BaseFormatAdapter;
 
-/**
- */
 public abstract class JSONFormatAdapter<T> extends BaseFormatAdapter<T> {
 
     protected static final String name = "JSON";
@@ -27,5 +25,4 @@ public abstract class JSONFormatAdapter<T> extends BaseFormatAdapter<T> {
     public String getFormatName() {
         return name;
     }
-
 }

@@ -15,10 +15,8 @@
  */
 package org.auraframework.integration.test.css;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
@@ -26,8 +24,9 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.token.StyleContextImpl;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Unit tests for StyleContextImpl.

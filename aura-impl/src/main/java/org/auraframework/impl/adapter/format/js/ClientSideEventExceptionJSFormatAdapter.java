@@ -15,21 +15,21 @@
  */
 package org.auraframework.impl.adapter.format.js;
 
-import java.io.IOException;
-import java.util.Map;
-
-import javax.annotation.concurrent.ThreadSafe;
-
-import org.auraframework.Aura;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.service.SerializationService;
 import org.auraframework.throwable.ClientSideEventException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import aQute.bnd.annotation.component.Component;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Map;
 
 @ThreadSafe
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ClientSideEventExceptionJSFormatAdapter extends JSFormatAdapter<ClientSideEventException> {
+    @Inject
+    private SerializationService serializationService;
 
     @Override
     public Class<ClientSideEventException> getType() {
@@ -40,7 +40,7 @@ public class ClientSideEventExceptionJSFormatAdapter extends JSFormatAdapter<Cli
     public void write(ClientSideEventException value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
         out.append("$A.service.client.throwExceptionEvent(");
-        Aura.getSerializationService().write(value, attributes, getType(), out, "JSON");
+        serializationService.write(value, attributes, getType(), out, "JSON");
         out.append(");");
     }
 }

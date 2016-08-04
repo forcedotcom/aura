@@ -15,36 +15,24 @@
  */
 package org.auraframework.impl.util.json;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import org.auraframework.adapter.JsonSerializerAdapter;
-import org.auraframework.impl.AuraImpl;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.json.ClassMapJsonSerializationContext;
 import org.auraframework.util.json.JsonSerializable;
 import org.auraframework.util.json.JsonSerializer;
+import org.auraframework.util.json.JsonSerializerFactory;
 import org.auraframework.util.json.JsonSerializers;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 
 /**
  * json serialization context for aura
  */
 public class AuraJsonContext extends ClassMapJsonSerializationContext {
-    private static Map<String, JsonSerializer<?>> SERIALIZERS_LOOKUP_MAP;
-    private static final ConcurrentMap<String, JsonSerializer<?>> cache = new ConcurrentHashMap<>();
-    private static Map<Class<?>, JsonSerializer<?>> SERIALIZERS_INSTANCE_MAP;   
 
-    public static AuraJsonContext createContext(Mode mode, boolean refSupport) {
-        return new AuraJsonContext(mode.prettyPrint(), refSupport);
+    public static AuraJsonContext createContext(Mode mode, boolean refSupport, JsonSerializerFactory factory) {
+        return new AuraJsonContext(mode.prettyPrint(), refSupport, factory);
     }
 
-    private AuraJsonContext(boolean format, boolean refSupport) {
-        super(getLookupMap(), getInstanceMap(), cache, format, refSupport, -1, -1);
+    private AuraJsonContext(boolean format, boolean refSupport, JsonSerializerFactory factory) {
+        super(factory, format, refSupport, -1, -1);
     }
 
     @Override
@@ -57,30 +45,5 @@ public class AuraJsonContext extends ClassMapJsonSerializationContext {
             s = (JsonSerializer<T>) JsonSerializers.OLD;
         }
         return s;
-    }
-
-    private static Map<String, JsonSerializer<?>> getLookupMap()  {
-        buildSerializerMaps();
-        return SERIALIZERS_LOOKUP_MAP;
-    }
-
-    private static Map<Class<?>, JsonSerializer<?>> getInstanceMap()  {
-        buildSerializerMaps();
-        return SERIALIZERS_INSTANCE_MAP;
-    }
-
-    private static synchronized void buildSerializerMaps() {
-        if (SERIALIZERS_LOOKUP_MAP != null) {
-            return;
-        }
-        Collection<JsonSerializerAdapter> adapters = AuraImpl.getJsonSerializerAdapters();
-        Builder<String, JsonSerializer<?>> b = ImmutableMap.builder();
-        Builder<Class<?>, JsonSerializer<?>> b2 = ImmutableMap.builder();
-        for (JsonSerializerAdapter a : adapters) {
-            b.putAll(a.lookupSerializers());
-            b2.putAll(a.instanceofSerializers());
-        }
-        SERIALIZERS_LOOKUP_MAP = b.build();
-        SERIALIZERS_INSTANCE_MAP = b2.build();
     }
 }

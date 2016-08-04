@@ -24,9 +24,9 @@ import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
+import javax.inject.Inject;
 
 public class SVGParserTest extends AuraImplTestCase {
-
     private static final String INVALID_ATTR = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"+
             "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n"+
             "  \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n"+
@@ -156,12 +156,12 @@ public class SVGParserTest extends AuraImplTestCase {
             "     id=\"rect3146\" />\n" +
             "</svg>";
 
+    @Inject
     private SVGParser parser;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        parser = SVGParser.getInstance();
     }
 
     @Test

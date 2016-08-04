@@ -15,9 +15,7 @@
  */
 package org.auraframework.integration.test.preload;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Maps;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -30,7 +28,9 @@ import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.junit.Test;
 
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Basic HTTP retrieve test for checking preloaded namespaces and componentDefs.

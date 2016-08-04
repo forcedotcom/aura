@@ -23,23 +23,29 @@ import org.auraframework.impl.javascript.parser.JavascriptControllerParser;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
-public class ParserFactoryTest extends UnitTestCase {
+import javax.inject.Inject;
 
+public class ParserFactoryTest extends AuraTestCase {
+    @Inject
+    private ParserFactory parserFactory;
+
+    @Inject
+    private StringSourceLoader stringSourceLoader;
+    
     private Parser<?> getParser(Format format, Class<? extends Definition> defClass) {
-        return ParserFactory.getParser(format,
-                StringSourceLoader.getInstance().createStringSourceDescriptor(null, defClass, null));
+        return parserFactory.getParser(format, stringSourceLoader.createStringSourceDescriptor(null, defClass, null));
     }
 
     @Test
     public void testGetParserNotFound() {
-        DefDescriptor<?> desc = StringSourceLoader.getInstance().createStringSourceDescriptor(null,
+        DefDescriptor<?> desc = stringSourceLoader.createStringSourceDescriptor(null,
                 StyleDef.class, null);
         try {
-            Parser<?> parser = ParserFactory.getParser(Format.JS, desc);
+            Parser<?> parser = parserFactory.getParser(Format.JS, desc);
             fail(String.format("Not expecting to find a parser for %s, but got %s", desc, parser));
         } catch (Throwable t) {
             assertExceptionMessage(

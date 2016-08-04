@@ -18,8 +18,9 @@ package org.auraframework.integration.test;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 
 @UnAdaptableTest("We don't run access check test across browsers")
@@ -29,12 +30,14 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-
+        
         // TODO: remove when $A.createComponent is exposed in the locker
         getMockConfigAdapter().setLockerServiceEnabled(false);
     }
 
-    public void _testGetEventDefinitionWithoutAccess() throws Exception {
+    @Ignore("TODO: (W-2799335): Disabled this test since $A.getDeifinition() doesn't do access check for Event")
+    @Test
+    public void testGetEventDefinitionWithoutAccess() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("clientApiTest");
         open("/clientApiTest/getDefinition.cmp");
         findDomElement(By.cssSelector(".getEventDefinitionWithoutAccessButton")).click();
@@ -55,7 +58,9 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
         assertEquals("null", actual);
     }
 
-    public void _testGetMutipleDefinitionsWithoutAccess() throws Exception {
+    @Ignore("TODO: (W-2799335): Disabled this test since $A.getDeifinitions() doesn't do access check for Event")
+    @Test
+    public void testGetMultipleDefinitionsWithoutAccess() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("clientApiTest");
         open("/clientApiTest/getDefinition.cmp");
         findDomElement(By.cssSelector(".getDefinitionsWithoutAccessButton")).click();

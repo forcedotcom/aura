@@ -21,6 +21,7 @@ package org.auraframework.test.perf.core;
 //@PerfFrameworkTest
 public abstract class FrameworkPerfAbstractTestCase extends AbstractPerfTestCase {
     public FrameworkPerfAbstractTestCase(String name) {
-        super(name);
+        super();
+        setName(name);
     }
 }

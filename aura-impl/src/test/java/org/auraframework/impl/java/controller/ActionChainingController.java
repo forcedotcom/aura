@@ -15,28 +15,36 @@
  */
 package org.auraframework.impl.java.controller;
 
+import com.google.common.collect.Lists;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.instance.Action;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.SerializationService;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Key;
+
+import javax.inject.Inject;
 import java.io.StringReader;
 import java.util.Collection;
 
-import org.auraframework.Aura;
-import org.auraframework.def.ActionDef;
-import org.auraframework.instance.Action;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
-import org.auraframework.system.Annotations.Key;
+@ServiceComponent
+public class ActionChainingController implements Controller {
 
-import com.google.common.collect.Lists;
+    @Inject
+    private ContextService contextService;
 
-@Controller
-public class ActionChainingController {
-    public static int i = 0;
+    @Inject
+    private SerializationService serializationService;
+
+    private int i = 0;
 
     @AuraEnabled
-    public static int add(@Key("a") Integer a, @Key("b") Integer b, @Key("actions") String chainedActions)
+    public int add(@Key("a") Integer a, @Key("b") Integer b, @Key("actions") String chainedActions)
             throws Exception {
-        Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
+        Action currentAction = contextService.getCurrentContext().getCurrentAction();
         if (chainedActions != null && chainedActions.length() > 0) {
-            Collection<Action> actions = Aura.getSerializationService().readCollection(new StringReader(chainedActions),
+            Collection<Action> actions = serializationService.readCollection(new StringReader(chainedActions),
                     Action.class);
             currentAction.add(Lists.newArrayList(actions));
         }
@@ -45,27 +53,27 @@ public class ActionChainingController {
     }
 
     @AuraEnabled
-    public static int multiply(@Key("a") Integer a) throws Exception {
+    public int multiply(@Key("a") Integer a) throws Exception {
         i = i * a;
         return i;
     }
 
     @AuraEnabled
-    public static int subtract(@Key("a") Integer a) throws Exception {
+    public int subtract(@Key("a") Integer a) throws Exception {
         i = i - a;
         return i;
     }
 
     @AuraEnabled
-    public static int divide(@Key("a") Integer a) throws Exception {
+    public int divide(@Key("a") Integer a) throws Exception {
         i = i / a;
         return i;
     }
 
     @AuraEnabled
-    public static void doNothing(@Key("actions") String chainedActions) throws Exception {
-        Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
-        Collection<Action> actions = Aura.getSerializationService().readCollection(new StringReader(chainedActions),
+    public void doNothing(@Key("actions") String chainedActions) throws Exception {
+        Action currentAction = contextService.getCurrentContext().getCurrentAction();
+        Collection<Action> actions = serializationService.readCollection(new StringReader(chainedActions),
                 Action.class);
         currentAction.add(Lists.newArrayList(actions));
     }

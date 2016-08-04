@@ -15,9 +15,8 @@
  */
 package org.auraframework.impl.type;
 
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.java.type.JavaTypeDefFactory;
@@ -26,8 +25,8 @@ import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.Map;
+import java.util.Set;
 
 public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl<TypeDef> {
 
@@ -47,7 +46,7 @@ public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl<TypeDef> {
 
     private static void putAuraType(JavaTypeDefFactory factory, String name) throws QuickFixException {
         TypeDef def;
-        def = factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", name), TypeDef.class));
+        def = factory.getDef(new DefDescriptorImpl<>(String.format("aura://%s", name), TypeDef.class, null));
         putAuraType(name, def);
     }
 

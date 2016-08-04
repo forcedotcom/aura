@@ -35,10 +35,6 @@ import org.junit.Test;
 @Ignore("W-2565715")
 public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
 
-    public MiscPerfFrameworkTest(String name) {
-        super(name);
-    }
-
     @Override
     protected int numPerfTimelineRuns() {
         return 0; // run only the first warmup run

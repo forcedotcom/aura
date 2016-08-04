@@ -17,19 +17,20 @@ package org.auraframework.components.test.java.model;
 
 import java.util.ArrayList;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-@Model
-public class TestReinitializeModel {
+@ServiceComponentModelInstance
+public class TestReinitializeModel implements ModelInstance {
     @SuppressWarnings("unchecked")
-    public TestReinitializeModel() throws QuickFixException {
+    public TestReinitializeModel(ContextService contextService) throws QuickFixException {
         BaseComponent<?,?> c;
 
-        c = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        c = contextService.getCurrentContext().getCurrentComponent();
 
         if (c != null) {
             this.value = (String) c.getAttributes().getValue("attr");

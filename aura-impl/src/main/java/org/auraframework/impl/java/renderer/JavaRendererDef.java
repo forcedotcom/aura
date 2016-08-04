@@ -15,21 +15,16 @@
  */
 package org.auraframework.impl.java.renderer;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.auraframework.Aura;
 import org.auraframework.def.Renderer;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.service.LoggingService;
-import org.auraframework.system.RenderContext;
-import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.List;
 
 public class JavaRendererDef extends DefinitionImpl<RendererDef> implements RendererDef {
     private static final long serialVersionUID = 5720687422250668587L;
@@ -64,27 +59,6 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
     @Override
     public boolean isLocal() {
         return true;
-    }
-
-    @Override
-    public String getCode() {
-        return null;
-    }
-
-    @Override
-    public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
-        LoggingService loggingService = Aura.getLoggingService();
-        loggingService.stopTimer(LoggingService.TIMER_AURA);
-        loggingService.startTimer("java");
-        try {
-            renderer.render(component, rc);
-            loggingService.incrementNum("JavaCallCount");
-        } catch (Exception e) {
-            throw AuraExceptionUtil.wrapExecutionException(e, this.location);
-        } finally {
-            loggingService.stopTimer("java");
-            loggingService.startTimer(LoggingService.TIMER_AURA);
-        }
     }
 
     @Override
@@ -142,5 +116,14 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
             this.buildRenderer();
             return new JavaRendererDef(this);
         }
+    }
+
+    public Class<?> getJavaType() {
+        return this.renderer.getClass();
+    }
+
+    @Override
+    public String getCode() {
+        return null;
     }
 }

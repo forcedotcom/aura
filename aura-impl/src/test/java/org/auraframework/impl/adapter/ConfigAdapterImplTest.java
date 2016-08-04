@@ -15,11 +15,24 @@
  */
 package org.auraframework.impl.adapter;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.impl.context.AuraContextServiceImpl;
+import org.auraframework.impl.javascript.AuraJavascriptGroup;
+import org.auraframework.impl.source.AuraResourcesHashingGroup;
+import org.auraframework.impl.util.AuraImplFiles;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.FileMonitor;
+import org.auraframework.util.IOUtil;
+import org.auraframework.util.resource.FileGroup;
+import org.auraframework.util.test.util.UnitTestCase;
+import org.auraframework.util.text.Hash;
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import javax.inject.Inject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,15 +43,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.auraframework.impl.javascript.AuraJavascriptGroup;
-import org.auraframework.impl.source.AuraResourcesHashingGroup;
-import org.auraframework.impl.util.AuraImplFiles;
-import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.util.resource.FileGroup;
-import org.auraframework.util.test.util.UnitTestCase;
-import org.auraframework.util.text.Hash;
-import org.junit.Test;
-import org.mockito.Mockito;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for ConfigAdapterImpl.
@@ -47,7 +56,21 @@ import org.mockito.Mockito;
  * @since 0.0.245
  */
 public class ConfigAdapterImplTest extends UnitTestCase {
+    @Inject
+    ConfigAdapter configAdapter;
 
+    @Inject
+    FileMonitor fileMonitor;
+
+    @Inject
+    ContextService contextService;
+    
+    @Inject
+    InstanceService instanceService;
+    
+    @Inject
+    LocalizationAdapter localizationAdapter;
+    
     // An exception thrown to test error handling.
     public static class MockException extends RuntimeException {
         private static final long serialVersionUID = -8065118313848222864L;
@@ -79,13 +102,12 @@ public class ConfigAdapterImplTest extends UnitTestCase {
      */
     @Test
     public void testConfigAdapterCtor() {
-        ConfigAdapterImpl impl = new ConfigAdapterImpl();
-        String version = impl.getAuraVersion();
+        String version = configAdapter.getAuraVersion();
         if (!version.equals("development")) {
             assertTrue("Unexpected version format: " + version,
                     version.matches("^\\d+\\.\\d+(\\.\\d+(\\.\\d+)?)?(-.*)?$"));
         }
-        assertTrue(impl.getBuildTimestamp() > 0);
+        assertTrue(configAdapter.getBuildTimestamp() > 0);
     }
 
     /**
@@ -95,14 +117,13 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     @Test
     public void testRegenerateHandlesErrors() throws Exception {
         // The real case should work, of course:
-        ConfigAdapterImpl impl = new ConfigAdapterImpl();
-        impl.regenerateAuraJS();
-        assertTrue("Framework nonce should not be empty", impl.getAuraFrameworkNonce().length() > 0);
+        configAdapter.regenerateAuraJS();
+        assertTrue("Framework nonce should not be empty", configAdapter.getAuraFrameworkNonce().length() > 0);
 
         // But an error case should fail, and not be swallowed.
         final AuraJavascriptGroup mockJsGroup = mock(AuraJavascriptGroup.class);
 
-        impl = new ConfigAdapterImpl() {
+        ConfigAdapterImpl mockAdapter = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor) {
             @Override
             public AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
                 return mockJsGroup;
@@ -113,11 +134,16 @@ public class ConfigAdapterImplTest extends UnitTestCase {
                 return false;
             }
         };
+
+        ContextService contextService = mock(AuraContextServiceImpl.class);
+        mockAdapter.setContextService(contextService);
+        mockAdapter.setFileMonitor(fileMonitor);
+        mockAdapter.initialize();
         try {
             when(mockJsGroup.isStale()).thenReturn(true);
             Mockito.doThrow(new MockException("Pretend we had a compile error in regeneration")).when(mockJsGroup)
                     .regenerate(AuraImplFiles.AuraResourceJavascriptDirectory.asFile());
-            impl.regenerateAuraJS();
+            mockAdapter.regenerateAuraJS();
             fail("Compilation failure should have been caught!");
         } catch (AuraRuntimeException e) {
             assertTrue("expected ARTE caused by MockException, not " + e.getCause().toString(),
@@ -127,7 +153,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         // Try again, without changes; it should still fail.
         try {
             when(mockJsGroup.isStale()).thenReturn(false);
-            impl.regenerateAuraJS();
+            mockAdapter.regenerateAuraJS();
             fail("Second compilation failure should have been caught!");
         } catch (AuraRuntimeException e2) {
             assertTrue("expected ARTE caused by MockException, not " + e2.getCause().toString(),
@@ -143,7 +169,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         if (!AuraImplFiles.AuraResourceJavascriptDirectory.asFile().exists()) {
             reset(mockJsGroup);
             when(mockJsGroup.isStale()).thenReturn(true);
-            impl.regenerateAuraJS();
+            mockAdapter.regenerateAuraJS();
         }
     }
 
@@ -166,7 +192,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         when(resourcesGroup.isStale()).thenReturn(false);
         when(resourcesGroup.getGroupHash()).thenReturn(resourcesHash);
 
-        ConfigAdapterImpl configAdapter = new ConfigAdapterImpl() {
+        ConfigAdapterImpl configAdapter = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor) {
             @Override
             protected AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
                 return jsGroup;
@@ -178,7 +204,10 @@ public class ConfigAdapterImplTest extends UnitTestCase {
             }
         };
 
+        ContextService contextService = mock(AuraContextServiceImpl.class);
         ConfigAdapterImpl spy = Mockito.spy(configAdapter);
+        spy.setContextService(contextService);
+        spy.initialize();
 
         when(jsHash.toString()).thenReturn("jsGroup");
         when(resourcesHash.toString()).thenReturn("resourcesGroup");
@@ -216,7 +245,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
 
     @Test
     public void testIsInternalNamespaceWithBadArguments() {
-        ConfigAdapterImpl impl = new ConfigAdapterImpl();
+        ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
         assertFalse("null should not be an internal namespace", impl.isInternalNamespace(null));
         assertFalse("Empty string should not be an internal namespace", impl.isInternalNamespace(""));
         assertFalse("Wild characters should not be an internal namespace", impl.isInternalNamespace("*"));
@@ -226,7 +255,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     @Test
     public void testIsInternalNamespaceAfterRegistering() {
         String namespace = this.getName() + System.currentTimeMillis();
-        ConfigAdapterImpl impl = new ConfigAdapterImpl();
+        ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
         impl.addInternalNamespace(namespace);
         assertTrue("Failed to register an internal namespace.", impl.isInternalNamespace(namespace));
         assertTrue("Internal namespace checks are case sensitive.",
@@ -235,7 +264,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
 
     @Test
     public void testAddInternalNamespacesWithBadArguments() {
-        ConfigAdapterImpl impl = new ConfigAdapterImpl();
+        ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
         impl.addInternalNamespace(null);
         assertFalse(impl.isInternalNamespace(null));
 
@@ -245,7 +274,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
 
     @Test
     public void testGetInternalNamespacesReturnsSortedNamespaces() {
-        ConfigAdapterImpl impl = new ConfigAdapterImpl();
+        ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
         impl.getInternalNamespaces().clear();
         String[] namespaces = new String[] {"c", "a", "d", "b","e"};
         for(String namespace : namespaces) {

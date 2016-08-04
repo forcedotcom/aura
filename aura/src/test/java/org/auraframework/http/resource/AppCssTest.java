@@ -16,6 +16,11 @@
 
 package org.auraframework.http.resource;
 
+import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.service.ServerService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
@@ -27,12 +32,6 @@ import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.auraframework.adapter.ServletUtilAdapter;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.service.ServerService;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Format;
 
 /**
  * Simple (non-integration) test case for {@link AppCss}, most useful for exercising hard-to-reach error
@@ -46,7 +45,6 @@ public class AppCssTest extends UnitTestCase {
      */
     @Test
     public void testName() {
-    	
         assertEquals("app.css", new AppCss().getName());
     }
 
@@ -142,13 +140,13 @@ public class AppCssTest extends UnitTestCase {
      */
     @Test
     public void testSetContentType() {
-    	AppCss appCss = new AppCss();
-    	ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
-    	appCss.setServletUtilAdapter(servletUtilAdapter);
-    	Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.CSS))
-        .thenReturn("text/css");
-    	
-    	DummyHttpServletResponse response = new DummyHttpServletResponse() {
+        AppCss appCss = new AppCss();
+        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
+        appCss.setServletUtilAdapter(servletUtilAdapter);
+        Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.CSS))
+                .thenReturn("text/css");
+
+        DummyHttpServletResponse response = new DummyHttpServletResponse() {
             String contentType = "defaultType";
 
             @Override
@@ -161,9 +159,9 @@ public class AppCssTest extends UnitTestCase {
                 this.contentType = contentType;
             }
         };
-    	
-    	appCss.setContentType(response);
-    	
-    	assertEquals("text/css", response.getContentType());
+
+        appCss.setContentType(response);
+
+        assertEquals("text/css", response.getContentType());
     }
 }

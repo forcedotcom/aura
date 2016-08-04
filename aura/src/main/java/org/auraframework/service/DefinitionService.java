@@ -23,7 +23,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -36,7 +35,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * Instances of all AuraServices should be retrieved from {@link Aura}
  * </p>
  */
-public interface DefinitionService extends AuraService, SourceListener {
+public interface DefinitionService extends AuraService {
 
     /**
      * <p>
@@ -84,6 +83,8 @@ public interface DefinitionService extends AuraService, SourceListener {
      * @return a descriptor. Never returns null.
      */
     <T extends Definition> DefDescriptor<T> getDefDescriptor(DefDescriptor<?> desc, String prefix, Class<T> defClass);
+
+    DefDescriptor<?> getDefDescriptor(String prefix, String namespace, String name, DefType defType);
 
     /**
      * Get the Definition associated with the descriptor passed in, compiling if
@@ -148,18 +149,4 @@ public interface DefinitionService extends AuraService, SourceListener {
      * @throws QuickFixException if a definition can't be compiled.
      */
     void updateLoaded(DefDescriptor<?> loading) throws QuickFixException, ClientOutOfSyncException;
-
-    /**
-     * Register interest in real-time changes to source, if available
-     *
-     * @param listener - which listener to register
-     */
-    void subscribeToChangeNotification(SourceListener listener);
-
-    /**
-     * Unregister interest in real-time changes to source
-     *
-     * @param listener - which listener to unregister
-     */
-    void unsubscribeToChangeNotification(SourceListener listener);
 }

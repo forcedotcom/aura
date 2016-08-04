@@ -15,11 +15,6 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
@@ -28,9 +23,14 @@ import org.auraframework.def.RegisterEventDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Abstract component validation
@@ -44,7 +44,7 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
     @Test
     public void testExtendsComponent() throws Exception {
         ComponentDefImpl.Builder builder = createAbstractBuilder();
-        DefDescriptor<ComponentDef> desc = DefDescriptorImpl.getInstance("test:fakeComponent", ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("test:fakeComponent", ComponentDef.class);
         builder.extendsDescriptor = desc;
         ComponentDef cmp = builder.build();
 
@@ -63,8 +63,8 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
     @Test
     public void testExtendsAbstract() throws Exception {
         ComponentDefImpl.Builder builder = createAbstractBuilder();
-        builder.setDescriptor(DefDescriptorImpl.getInstance("test:fakeAbstractChild", ComponentDef.class));
-        DefDescriptor<ComponentDef> desc = DefDescriptorImpl.getInstance("test:fakeAbstractParent", ComponentDef.class);
+        builder.setDescriptor(definitionService.getDefDescriptor("test:fakeAbstractChild", ComponentDef.class));
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("test:fakeAbstractParent", ComponentDef.class);
         builder.extendsDescriptor = desc;
         ComponentDef cmp = builder.build();
 
@@ -83,7 +83,7 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
     @Test
     public void testImplementsIntf() throws Exception {
         Set<DefDescriptor<InterfaceDef>> interfaces = new HashSet<>();
-        interfaces.add(DefDescriptorImpl.getInstance("test:fakeInterface", InterfaceDef.class));
+        interfaces.add(definitionService.getDefDescriptor("test:fakeInterface", InterfaceDef.class));
 
         ComponentDefImpl.Builder builder = createAbstractBuilder();
         builder.interfaces = interfaces;
@@ -107,9 +107,9 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
         Map<String, RegisterEventDef> eventDefs = new HashMap<>();
 
         RegisterEventDefImpl.Builder regBuilder = new RegisterEventDefImpl.Builder();
-        regBuilder.setDescriptor(DefDescriptorImpl.getInstance("test:anevent", EventDef.class));
+        regBuilder.setDescriptor(definitionService.getDefDescriptor("test:anevent", EventDef.class));
         regBuilder.setAttName("fakey");
-        regBuilder.setAccess(new DefinitionAccessImpl(null, "public"));
+        regBuilder.setAccess(new DefinitionAccessImpl(null, "public", false));
 
         eventDefs.put("fakey", regBuilder.build());
         ComponentDefImpl.Builder builder = createAbstractBuilder();
@@ -131,7 +131,7 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
     @Test
     public void testTextComponent() throws Exception {
         ComponentDefImpl.Builder builder = createAbstractBuilder();
-        DefDescriptor<ComponentDef> desc = DefDescriptorImpl.getInstance("test:text", ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("test:text", ComponentDef.class);
         builder.extendsDescriptor = desc;
         ComponentDef cmp = builder.build();
 
@@ -151,7 +151,8 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
         ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
         builder.isAbstract = true;
         builder.isExtensible = true;
-        builder.setDescriptor(DefDescriptorImpl.getInstance("test:fakeAbstract", ComponentDef.class));
+        builder.setDescriptor(definitionService.getDefDescriptor("test:fakeAbstract", ComponentDef.class));
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         return builder;
     }
 }

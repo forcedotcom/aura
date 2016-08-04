@@ -15,23 +15,18 @@
  */
 package org.auraframework.impl.adapter.format.html;
 
-import java.io.IOException;
-import java.util.Map;
-
-import javax.annotation.concurrent.ThreadSafe;
-
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.JsonEncoder;
 
-import aQute.bnd.annotation.component.Component;
+import javax.annotation.concurrent.ThreadSafe;
+import java.io.IOException;
+import java.util.Map;
 
-/**
- */
 @ThreadSafe
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class AuraContextHTMLFormatAdapter extends HTMLFormatAdapter<AuraContext> {
 
     @Override
@@ -47,5 +42,4 @@ public class AuraContextHTMLFormatAdapter extends HTMLFormatAdapter<AuraContext>
             AuraExceptionUtil.passQuickFix(e);
         }
     }
-
 }

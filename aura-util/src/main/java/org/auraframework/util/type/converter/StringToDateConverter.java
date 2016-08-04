@@ -15,16 +15,17 @@
  */
 package org.auraframework.util.type.converter;
 
-import java.util.Date;
-
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.type.Converter;
+import org.springframework.context.annotation.Lazy;
 
-import aQute.bnd.annotation.component.Component;
+import java.util.Date;
 
-@Component (provide=AuraServiceProvider.class)
+
+@Lazy
+@ServiceComponent
 public class StringToDateConverter implements Converter<String, Date> {
 
     @Override

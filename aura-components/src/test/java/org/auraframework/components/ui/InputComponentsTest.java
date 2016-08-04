@@ -15,18 +15,20 @@
  */
 package org.auraframework.components.ui;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.EventType;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraTestCase;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
 
 /**
  * Automation for ui:input component.
@@ -43,8 +45,11 @@ public class InputComponentsTest extends AuraTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+        contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
     }
+    
+    @Inject
+    private DefinitionService definitionService;
 
     /**
      * Verify that ui:input is registered to throw all the expected events. Also

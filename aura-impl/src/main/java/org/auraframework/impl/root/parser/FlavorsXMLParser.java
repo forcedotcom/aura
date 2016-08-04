@@ -15,18 +15,38 @@
  */
 package org.auraframework.impl.root.parser;
 
-import javax.xml.stream.XMLStreamReader;
-
-import org.auraframework.def.FlavorsDef;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.root.parser.handler.FlavorsDefHandler;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import javax.xml.stream.XMLStreamReader;
+
+@ServiceComponent
 public class FlavorsXMLParser extends XMLParser<FlavorsDef> {
+
+    @Override
+    public Format getFormat() {
+        return Format.XML;
+    }
+
+    @Override
+    public DefType getDefType() {
+        return DefType.FLAVORS;
+    }
+
     @Override
     protected FlavorsDefHandler getHandler(DefDescriptor<FlavorsDef> descriptor,
-            Source<FlavorsDef> source, XMLStreamReader xmlReader) throws QuickFixException {
-        return new FlavorsDefHandler(descriptor, source, xmlReader);
+                                           Source<FlavorsDef> source, XMLStreamReader xmlReader,
+                                           boolean isInInternalNamespace, DefinitionService definitionService,
+                                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws QuickFixException {
+        return new FlavorsDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
+                configAdapter, definitionParserAdapter);
     }
 }

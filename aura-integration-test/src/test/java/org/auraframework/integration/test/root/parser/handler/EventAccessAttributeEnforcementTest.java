@@ -400,20 +400,6 @@ public class EventAccessAttributeEnforcementTest extends AuraImplTestCase {
         	descriptor.getDef();
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    /**
-     * Default Access Tests for event is registered by aura:registerEvent
-     */
     /**
      * Verify Default Access Enforcement
      * verifyAccess for Component,System,System

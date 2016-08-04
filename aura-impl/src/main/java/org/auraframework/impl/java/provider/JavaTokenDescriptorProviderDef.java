@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl.java.provider;
 
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.TokensDef;
 import org.auraframework.def.TokenDescriptorProvider;
 import org.auraframework.def.TokenDescriptorProviderDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -27,18 +25,23 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * 
  * @see TokenDescriptorProvider
  */
-final class JavaTokenDescriptorProviderDef extends
+public final class JavaTokenDescriptorProviderDef extends
         AbstractJavaProviderDef<TokenDescriptorProvider, TokenDescriptorProviderDef>
         implements TokenDescriptorProviderDef {
     private static final long serialVersionUID = -124253037254852866L;
 
     public JavaTokenDescriptorProviderDef(Builder builder) throws QuickFixException {
-        super(TokenDescriptorProvider.class, builder);
+        super(builder);
     }
 
     @Override
-    public DefDescriptor<TokensDef> provide() throws QuickFixException {
-        return provider.provide();
+    public Class<?> getProviderType() {
+        return TokenDescriptorProvider.class;
+    }
+
+    @Override
+    public Class<?> getProviderClass() {
+        return this.providerClass;
     }
 
     public static final class Builder extends AbstractJavaProviderDef.Builder<TokenDescriptorProviderDef> {

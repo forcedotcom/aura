@@ -15,8 +15,13 @@
  */
 package org.auraframework.util.type;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.springframework.context.annotation.Lazy;
+
 import java.util.ArrayList;
 
+@Lazy
+@ServiceComponent
 public class StringToCustomPairArrayConverter implements Converter<String, CustomPairType[]> {
 
     @Override
@@ -26,8 +31,9 @@ public class StringToCustomPairArrayConverter implements Converter<String, Custo
         }
         value = value.substring(1, value.length() - 1);
         ArrayList<CustomPairType> ret = new ArrayList<>();
+        Converter<String, CustomPairType> customPairTypeConverter = new CustomPairTypeParameterizedConverter();
         for (String parts : value.split(",")) {
-            ret.add(TypeUtil.convert(parts, CustomPairType.class));
+            ret.add(customPairTypeConverter.convert(parts));
         }
         return ret.toArray(new CustomPairType[ret.size()]);
     }

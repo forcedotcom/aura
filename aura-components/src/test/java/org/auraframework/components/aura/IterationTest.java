@@ -15,11 +15,8 @@
  */
 package org.auraframework.components.aura;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import org.auraframework.Aura;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
@@ -31,8 +28,9 @@ import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Server-side aura:iteration tests
@@ -46,7 +44,7 @@ public class IterationTest extends AuraImplTestCase {
     private Component getIterationComponent(String innerSource, Map<String, Object> attributes) throws Exception {
         DefDescriptor<ComponentDef> def = addSourceAutoCleanup(ComponentDef.class, String.format(
                 "<aura:component><aura:attribute name='items' type='List'/>%s</aura:component>", innerSource));
-        Component cmp = Aura.getInstanceService().getInstance(def, attributes);
+        Component cmp = instanceService.getInstance(def, attributes);
         return (Component) ((List<?>) cmp.getSuper().getAttributes().getValue("body")).get(0);
     }
 
@@ -356,7 +354,7 @@ public class IterationTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<aura:iteration aura:load='LAZY'><aura:text/></aura:iteration>"));
         try {
-            Aura.getInstanceService().getInstance(desc);
+            instanceService.getInstance(desc);
             fail("Should not be able to pass non simple attribute values to lazy loading facets.");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidReferenceException.class,

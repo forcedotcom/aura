@@ -15,14 +15,16 @@
  */
 package org.auraframework.service;
 
-import java.util.Map;
-
+import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Instance;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import java.util.Map;
 
 /**
  * <p>
@@ -122,4 +124,13 @@ public interface InstanceService extends AuraService {
      */
     Instance<?> getInstance(String qualifiedName, Map<String, Object> attributes, DefType... defTypes)
             throws DefinitionNotFoundException, QuickFixException;
+
+    /**
+     * Create a new instance of a component using a passed in Component Definition Reference.
+     *
+     * @param defRef
+     * @return
+     */
+    Instance<?> getInstance(ComponentDefRef defRef, BaseComponent<?, ?> valueProvider) throws QuickFixException;
+    
 }

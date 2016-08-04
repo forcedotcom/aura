@@ -21,23 +21,34 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
 import org.auraframework.adapter.LocalizationAdapter;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.util.AuraLocaleImpl;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.test.TestableLocalizationAdapter;
 import org.auraframework.util.AuraLocale;
+import org.springframework.context.annotation.Lazy;
 
-import aQute.bnd.annotation.component.Component;
+@Lazy
+@ServiceComponent
+public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLocalizationAdapter {
 
-@Component (provide=AuraServiceProvider.class)
-public class LocalizationAdapterImpl implements LocalizationAdapter {
 	private List<Locale> requestedLocales;
+
+    @Inject
+    private ContextService contextService;
 
 	/**
      * Temporary workaround for localized labels
      */
     private static Map<String, Map<String, String>> labels = new HashMap<>();
+    
+    private final static Map<String, String> testLabels = new HashMap<>();
+
+    // THIS SHOULD DIE.
     static {
         Map<String, String> todayLabels = new HashMap<>();
         todayLabels.put("ar", "اليوم");
@@ -71,7 +82,7 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
         tomorrowLabels.put("en_US", "Tomorrow");
         labels.put("task_mode_tomorrow", tomorrowLabels);
     }
-
+    
     public LocalizationAdapterImpl() {
     }
 
@@ -79,6 +90,9 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
     public String getLabel(String section, String name, Object... params) {
         Map<String, String> label = labels.get(name);
         if (label == null) {
+        	if(testLabels.containsKey(getLabelKey(section, name))) {
+        		return testLabels.get(getLabelKey(section, name));
+        	}
             return "FIXME - LocalizationAdapter.getLabel() needs implementation!";
         }
         return label.get(this.getAuraLocale().getLanguageLocale().toString());
@@ -95,12 +109,12 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
      * default is used.
      */
     @Override
-	public AuraLocale getAuraLocale() {
+    public AuraLocale getAuraLocale() {
 		//
 		// use requested locales from context
 		// check for nulls - this happens when AuraContextFilter has not been
 		// run
-		AuraContext context = Aura.getContextService().getCurrentContext();
+		AuraContext context = contextService.getCurrentContext();
 		if (context != null) {
 			List<Locale> locales = context.getRequestedLocales();
 			if (locales != null && locales.size() > 0) {
@@ -116,6 +130,7 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
 		// none available create a default locale
 		return new AuraLocaleImpl();
 	}
+
 
     @Override
     public AuraLocale getAuraLocale(Locale defaultLocale) {
@@ -134,9 +149,28 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
                 systemLocale, timeZone);
     }
 
-	@Override
+    @Override
 	public void setRequestedLocales(List<Locale> requestedLocales) {
 		this.requestedLocales = requestedLocales;
 	}
+    
+   @Override
+	public void setTestLabel(String section, String name, String value) {
+    	testLabels.put(getLabelKey(section, name), value);
+    }
+
+    @Override
+    public String getTestLabel(String section, String name) {
+        return testLabels.get(getLabelKey(section, name));
+    }
+    
+    @Override
+    public String removeTestLabel(String section, String name) {
+    	return testLabels.remove(getLabelKey(section, name));
+    }
+
+    private String getLabelKey(String section, String name) {
+        return section + "." + name;
+    }
 
 }

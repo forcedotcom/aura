@@ -15,12 +15,8 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Collections;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DescriptionDef;
@@ -29,9 +25,15 @@ import org.auraframework.def.ExampleDef;
 import org.auraframework.def.MetaDef;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.impl.root.MetaDefImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Collections;
+import java.util.Set;
 
 public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
 
@@ -49,13 +51,15 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
     }
 
     public DocumentationDefHandler(DefDescriptor<DocumentationDef> defDescriptor, Source<DocumentationDef> source,
-            XMLStreamReader xmlReader) {
-        super(defDescriptor, source, xmlReader);
+                                   XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
+                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(defDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(getLocation());
         if (source != null) {
             builder.setOwnHash(source.getHash());
         }
+        builder.setAccess(getAccess(isInInternalNamespace));
     }
 
     @Override
@@ -78,19 +82,22 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
         String tag = getTagName();
 
         if (DescriptionDefHandler.TAG.equalsIgnoreCase(tag)) {
-            DescriptionDef desc = new DescriptionDefHandler<DocumentationDef>(this, xmlReader, source).getElement();
+            DescriptionDef desc = new DescriptionDefHandler<DocumentationDef>(this, xmlReader, source,
+                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter).getElement();
             String name = desc.getName();
             builder.addDescription(name, desc);
 
         } else if (ExampleDefHandler.TAG.equalsIgnoreCase(tag)) {
-            ExampleDef ex = new ExampleDefHandler<>(this, xmlReader, source).getElement();
+            ExampleDef ex = new ExampleDefHandler<>(this, xmlReader, source, isInInternalNamespace, definitionService,
+                    configAdapter, definitionParserAdapter).getElement();
             String name = ex.getName();
             builder.addExample(name, ex);
 
         } else if (MetaDefHandler.TAG.equalsIgnoreCase(tag)) {
             // The appropriate handler must call getElement()
             // MetaDef is not currently used
-            new MetaDefHandler<>(this, xmlReader, source).getElement();
+            new MetaDefHandler<>(this, xmlReader, source, isInInternalNamespace, definitionService,
+                    configAdapter, definitionParserAdapter).getElement();
         } else {
             throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));
         }

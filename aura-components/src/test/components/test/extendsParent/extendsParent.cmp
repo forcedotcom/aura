@@ -15,6 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.impl.java.controller.TestController2" model="java://org.auraframework.components.test.java.model.TestModel2" extensible="true">
+<aura:component controller="java://org.auraframework.components.test.java.controller.TestController"
+                model="java://org.auraframework.components.test.java.model.TestModel2" extensible="true">
     <test:child1 attr="an attribute value"/>
 </aura:component>

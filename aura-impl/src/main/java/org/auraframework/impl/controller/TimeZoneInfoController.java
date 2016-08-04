@@ -15,103 +15,108 @@
  */
 package org.auraframework.impl.controller;
 
-import java.io.*;
-import java.util.*;
-
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 import org.auraframework.util.resource.ResourceLoader;
 
+import javax.inject.Inject;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Provide time zone information based on IANA (Olson) database (http://www.iana.org/time-zones).
- * 
  */
-@Controller
-public class TimeZoneInfoController {
-    private static Map<String, String> cache = Collections.synchronizedMap(new HashMap<String, String>(1));
-    private static ConfigAdapter configAdapter = Aura.getConfigAdapter();
+@ServiceComponent
+public class TimeZoneInfoController implements Controller {
+    private Map<String, String> cache = Collections.synchronizedMap(new HashMap<String, String>(1));
+
+    private ConfigAdapter configAdapter;
 
     @AuraEnabled
-    public static TimeZoneInfo getTimeZoneInfo(@Key("timezoneId") String timezoneId) throws Exception {
-    	return getTimeZoneInfo(timezoneId, new Helpers());
+    public TimeZoneInfo getTimeZoneInfo(@Key("timezoneId") String timezoneId) throws Exception {
+        return getTimeZoneInfo(timezoneId, new Helpers());
     }
-        
-    public static TimeZoneInfo getTimeZoneInfo(String timezoneId, Helpers helper) throws Exception {
+
+    public TimeZoneInfo getTimeZoneInfo(String timezoneId, Helpers helper) throws Exception {
         if (timezoneId == null) {
-            return null; 
+            return null;
         }
         String info = cache.get(timezoneId);
         if (info == null) {
             String availableTimezoneId = configAdapter.getAvailableTimezone(timezoneId);
             if (availableTimezoneId == null || "GMT".equalsIgnoreCase(availableTimezoneId)) {
-            	return null;
+                return null;
             }
             info = helper.readTZInfoFromFile(availableTimezoneId);
             if (info != null) {
-            	info = timezoneId.equalsIgnoreCase(availableTimezoneId) ? info : 
-            		info.replaceAll(availableTimezoneId, timezoneId);
+                info = timezoneId.equalsIgnoreCase(availableTimezoneId) ? info :
+                        info.replaceAll(availableTimezoneId, timezoneId);
                 cache.put(timezoneId, info);
             }
         }
         return new TimeZoneInfo(info);
     }
-    
-    static class Helpers{
-    
-	    String readTZInfoFromFile(String timezoneId) {
-	        ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
-	        String suffix = timezoneId.replace("/", "-");
-	        String resStr = "/aura/resources/walltime-js/olson/walltime-data_" + suffix + ".js";
-	        InputStream in = resourceLoader.getResourceAsStream(resStr);
-	        try {
-	            return in == null ? null : formatTZInfo(IOUtil.readText(new InputStreamReader(in)));
-	        } catch (IOException ioE) {
-	            return null;
-	        }
-	    }
-	    
-	    private String formatTZInfo(String info) {
-	        StringBuffer result = new StringBuffer(info);
-	        int dataIndex = result.indexOf("window.WallTime.data");
-	        if (dataIndex < 0) {
-	            return info;
-	        }
-	        result = result.delete(0, dataIndex);
-	        int start = result.indexOf("{");
-	        if (start < 0) {
-	            start = 0;
-	        }
-	        int autoinitIndex = result.indexOf("window.WallTime.autoinit");
-	        if (autoinitIndex < 0) {
-	            autoinitIndex = result.length();
-	        }
-	        result = result.delete(autoinitIndex, result.length());
-	        int end = result.lastIndexOf("}");
-	        if (end < 0) {
-	            end = result.length();
-	        }
-	        return result.substring(start, end + 1);
-	    }
+
+    class Helpers {
+
+        String readTZInfoFromFile(String timezoneId) {
+            ResourceLoader resourceLoader = configAdapter.getResourceLoader();
+            String suffix = timezoneId.replace("/", "-");
+            String resStr = "/aura/resources/walltime-js/olson/walltime-data_" + suffix + ".js";
+            InputStream in = resourceLoader.getResourceAsStream(resStr);
+            try {
+                return in == null ? null : formatTZInfo(IOUtil.readText(new InputStreamReader(in)));
+            } catch (IOException ioE) {
+                return null;
+            }
+        }
+
+        private String formatTZInfo(String info) {
+            StringBuffer result = new StringBuffer(info);
+            int dataIndex = result.indexOf("window.WallTime.data");
+            if (dataIndex < 0) {
+                return info;
+            }
+            result = result.delete(0, dataIndex);
+            int start = result.indexOf("{");
+            if (start < 0) {
+                start = 0;
+            }
+            int autoinitIndex = result.indexOf("window.WallTime.autoinit");
+            if (autoinitIndex < 0) {
+                autoinitIndex = result.length();
+            }
+            result = result.delete(autoinitIndex, result.length());
+            int end = result.lastIndexOf("}");
+            if (end < 0) {
+                end = result.length();
+            }
+            return result.substring(start, end + 1);
+        }
     }
-    
+
     public static class TimeZoneInfo implements JsonSerializable {
-        
+
         private String info = null;
-        
+
         public TimeZoneInfo(String info) {
             this.info = info;
         }
-        
-        public String getInfo(){
-        	return this.info;
+
+        public String getInfo() {
+            return this.info;
         }
-        
+
         @Override
         public void serialize(Json json) throws IOException {
             if (this.info == null) {
@@ -122,10 +127,8 @@ public class TimeZoneInfoController {
         }
     }
 
-    /**
-     * Injection override.
-     */
-    public static void setConfigAdapter(ConfigAdapter adapter) {
-        configAdapter = adapter;
+    @Inject
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
     }
 }

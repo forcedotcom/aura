@@ -15,19 +15,19 @@
  */
 package org.auraframework.impl.source;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.source.file.AuraFileMonitor;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.FileMonitor;
 import org.auraframework.util.resource.HashingGroup;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
 
 /**
  * Aura resources wrapper containing constants for the resources group
@@ -47,15 +47,15 @@ public class AuraResourcesHashingGroup extends HashingGroup implements SourceLis
         }
     };
 
-    public AuraResourcesHashingGroup() throws IOException {
-        this(false);
+    public AuraResourcesHashingGroup(FileMonitor fileMonitor) throws IOException {
+        this(fileMonitor, false);
     }
 
-    public AuraResourcesHashingGroup(boolean monitor) throws IOException {
+    public AuraResourcesHashingGroup(FileMonitor fileMonitor, boolean monitor) throws IOException {
         super(GROUP_NAME, ROOT_DIR, FILE_FILTER);
         if (monitor) {
-            Aura.getDefinitionService().subscribeToChangeNotification(this);
-            AuraFileMonitor.addDirectory(ROOT_DIR.getPath());
+            fileMonitor.subscribeToChangeNotification(this);
+            fileMonitor.addDirectory(ROOT_DIR.getPath());
         }
     }
 

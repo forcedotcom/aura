@@ -15,8 +15,6 @@
  */
 package configuration;
 
-import org.auraframework.adapter.ComponentLocationAdapter;
-import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.test.util.TestInventory;
@@ -29,10 +27,5 @@ public class AuraTestConfig {
     @Impl(name = "auraTestInventory")
     public static TestInventory auraTestInventory() throws Exception {
         return new TestInventory(AuraTestConfig.class);
-    }
-
-    @Impl
-    public static ComponentLocationAdapter auraTestStringSourceAdapterImpl() {
-        return new ComponentLocationAdapter.Impl(StringSourceLoader.getInstance());
     }
 }

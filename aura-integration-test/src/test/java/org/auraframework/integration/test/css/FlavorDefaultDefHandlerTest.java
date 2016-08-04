@@ -15,22 +15,30 @@
  */
 package org.auraframework.integration.test.css;
 
-import javax.xml.stream.XMLStreamReader;
-
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.FlavorDefaultDef;
 import org.auraframework.def.FlavorIncludeDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
-import org.auraframework.impl.root.parser.handler.FlavorsDefHandler;
 import org.auraframework.impl.root.parser.handler.FlavorDefaultDefHandler;
+import org.auraframework.impl.root.parser.handler.FlavorsDefHandler;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
 
+import javax.inject.Inject;
+import javax.xml.stream.XMLStreamReader;
+
 public class FlavorDefaultDefHandlerTest extends StyleTestCase {
+    @Inject
+    DefinitionService definitionService;
+
+    @Inject
+    private DefinitionParserAdapter definitionParserAdapter;
 
     @Test
     public void testDescription() throws Exception {
@@ -65,13 +73,15 @@ public class FlavorDefaultDefHandlerTest extends StyleTestCase {
         StringSource<FlavorsDef> parentSource = new StringSource<>(parentDesc, "<aura:flavors/>", "myID", Format.XML);
         XMLStreamReader parentReader = XMLParser.createXMLStreamReader(parentSource.getHashingReader());
         parentReader.next();
-        FlavorsDefHandler parent = new FlavorsDefHandler(parentDesc, parentSource, parentReader);
+        FlavorsDefHandler parent = new FlavorsDefHandler(parentDesc, parentSource, parentReader, true, definitionService,
+                configAdapter, definitionParserAdapter);
 
         DefDescriptor<FlavorIncludeDef> desc = definitionService.getDefDescriptor("test", FlavorIncludeDef.class);
         StringSource<FlavorIncludeDef> ss = new StringSource<>(desc, src, "myID", Format.XML);
         XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(ss.getHashingReader());
         xmlReader.next();
-        FlavorDefaultDefHandler<FlavorsDef> handler = new FlavorDefaultDefHandler<>(parent, xmlReader, ss);
+        FlavorDefaultDefHandler<FlavorsDef> handler = new FlavorDefaultDefHandler<>(parent, xmlReader, ss, true,
+                definitionService, configAdapter, definitionParserAdapter);
         return handler.getElement();
     }
 }

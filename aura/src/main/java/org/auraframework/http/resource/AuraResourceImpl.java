@@ -20,12 +20,13 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
@@ -38,15 +39,16 @@ import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.Maps;
 
+@ServiceComponent
 public abstract class AuraResourceImpl implements AuraResource {
     private final String name;
     private final Format format;
 
-    protected DefinitionService definitionService = Aura.getDefinitionService();
-    protected ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
-    protected ConfigAdapter configAdapter = Aura.getConfigAdapter();
-    protected ServerService serverService = Aura.getServerService();
-    protected InstanceService instanceService = Aura.getInstanceService();
+    protected DefinitionService definitionService;
+    protected ServletUtilAdapter servletUtilAdapter;
+    protected ConfigAdapter configAdapter;
+    protected ServerService serverService;
+    protected InstanceService instanceService;
 
     public AuraResourceImpl(String name, Format format) {
         this(name, format, false);
@@ -60,7 +62,7 @@ public abstract class AuraResourceImpl implements AuraResource {
 
     @Override
     public void setContentType(HttpServletResponse response) {
-    	response.setContentType( this.servletUtilAdapter.getContentType(this.format) );
+        response.setContentType(this.servletUtilAdapter.getContentType(this.format));
     }
     
     @Override
@@ -87,6 +89,7 @@ public abstract class AuraResourceImpl implements AuraResource {
      *
      * @param definitionService the definitionService to set
      */
+    @Inject
     public void setDefinitionService(DefinitionService definitionService) {
         this.definitionService = definitionService;
     }
@@ -96,6 +99,7 @@ public abstract class AuraResourceImpl implements AuraResource {
      *
      * @param servletUtilAdapter the servletUtilAdapter to set
      */
+    @Inject
     public void setServletUtilAdapter(ServletUtilAdapter servletUtilAdapter) {
         this.servletUtilAdapter = servletUtilAdapter;
     }
@@ -105,6 +109,7 @@ public abstract class AuraResourceImpl implements AuraResource {
      *
      * @param configAdapter the ConfigAdapter to set
      */
+    @Inject
     public void setConfigAdapter(ConfigAdapter configAdapter) {
         this.configAdapter = configAdapter;
     }
@@ -114,6 +119,7 @@ public abstract class AuraResourceImpl implements AuraResource {
      *
      * @param serverService the serverService to set
      */
+    @Inject
     public void setServerService(ServerService serverService) {
         this.serverService = serverService;
     }
@@ -123,6 +129,7 @@ public abstract class AuraResourceImpl implements AuraResource {
      * 
      * @param instanceService the instanceService to set
      */
+    @Inject
     public void setInstanceService(InstanceService instanceService) {
         this.instanceService = instanceService;
     }

@@ -35,7 +35,6 @@ import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
@@ -44,8 +43,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements LibraryDef {
-
-    private ContextService contextService = Aura.getContextService();
 
     private static final long serialVersionUID = 610875326950592992L;
     private final int hashCode;
@@ -85,7 +82,7 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
 
 	        // Process Libraries with a lower granularity level, to prevent duplication of external includes.
 	        StringBuilder sb = new StringBuilder();
-	        AuraContext context = contextService.getCurrentContext();
+	        AuraContext context = Aura.getContextService().getCurrentContext();
 	        MasterDefRegistry masterDefRegistry = context.getDefRegistry();
 	        boolean minify = context.getMode().minify();
 	        for (IncludeDefRef defRef : includes) {

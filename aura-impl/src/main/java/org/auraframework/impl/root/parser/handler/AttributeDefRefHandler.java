@@ -15,24 +15,24 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * <aura:set> tags
@@ -54,9 +54,12 @@ public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTa
         super();
     }
 
-    public AttributeDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(parentHandler, xmlReader, source);
+    public AttributeDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                                  boolean isInInternalNamespace, DefinitionService definitionService,
+                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         builder.setLocation(getLocation());
+        builder.setAccess(getAccess(isInInternalNamespace));
     }
 
     @Override
@@ -66,7 +69,7 @@ public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTa
 
     @Override
     protected void readAttributes() {
-        builder.setDescriptor(DefDescriptorImpl.getInstance(getAttributeValue(ATTRIBUTE_ATTRIBUTE), AttributeDef.class));
+        builder.setDescriptor(definitionService.getDefDescriptor(getAttributeValue(ATTRIBUTE_ATTRIBUTE), AttributeDef.class));
         stringValue = getAttributeValue(ATTRIBUTE_VALUE);
     }
 

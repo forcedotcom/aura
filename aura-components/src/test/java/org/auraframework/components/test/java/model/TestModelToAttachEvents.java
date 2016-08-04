@@ -18,25 +18,28 @@ package org.auraframework.components.test.java.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.def.EventDef;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.instance.Event;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.InstanceService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 
-@Model
-public class TestModelToAttachEvents {
-    public TestModelToAttachEvents() throws Exception {
+@ServiceComponentModelInstance
+public class TestModelToAttachEvents implements ModelInstance {
+	
+    public TestModelToAttachEvents(ContextService contextService, InstanceService instanceService) throws Exception {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("strParam", "Go 49ers!");
         // Adding an event whose definition is in the client because of the
         // handler.
-        Event evt = Aura.getInstanceService().getInstance("test:applicationEvent", EventDef.class, attributes);
-        Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);
+        Event evt = instanceService.getInstance("test:applicationEvent", EventDef.class, attributes);
+        contextService.getCurrentContext().addClientApplicationEvent(evt);
         // Adding an event that was not preloaded and without a handler. So the
         // definition is not in the client.
-        evt = Aura.getInstanceService().getInstance("handleEventTest:unHandledEvent", EventDef.class, null);
-        Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);
+        evt = instanceService.getInstance("handleEventTest:unHandledEvent", EventDef.class, null);
+        contextService.getCurrentContext().addClientApplicationEvent(evt);
     }
 
     @AuraEnabled

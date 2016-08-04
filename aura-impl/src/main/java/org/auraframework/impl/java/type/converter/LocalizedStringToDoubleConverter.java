@@ -15,22 +15,30 @@
  */
 package org.auraframework.impl.java.type.converter;
 
-import java.util.Locale;
-
-import org.auraframework.Aura;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.java.type.LocalizedConverter;
+import org.auraframework.service.LocalizationService;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.type.converter.StringToDoubleConverter;
+import org.springframework.context.annotation.Lazy;
 
-import aQute.bnd.annotation.component.Component;
+import javax.inject.Inject;
+import java.util.Locale;
 
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
-@Component (provide=AuraServiceProvider.class)
+@Lazy
+@ServiceComponent
 public class LocalizedStringToDoubleConverter extends StringToDoubleConverter implements
         LocalizedConverter<String, Double> {
+
+    @Inject
+    LocalizationAdapter localizationAdapter;
+
+    @Inject
+    LocalizationService localizationService;
 
     @Override
     public Double convert(String value, AuraLocale locale) {
@@ -40,12 +48,12 @@ public class LocalizedStringToDoubleConverter extends StringToDoubleConverter im
         }
 
         if (locale == null) {
-            locale = Aura.getLocalizationAdapter().getAuraLocale();
+            locale = localizationAdapter.getAuraLocale();
         }
 
         try {
             Locale loc = locale.getNumberLocale();
-            return new Double(Aura.getLocalizationService().parseDouble(value, loc));
+            return new Double(localizationService.parseDouble(value, loc));
         } catch (Exception e) {
             return super.convert(value);
         }

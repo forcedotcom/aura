@@ -205,7 +205,7 @@
                 function(){
                     var refreshTime = new Date().getTime();
                     //Verify that the refresh begin event kicked off
-                    $A.test.assertEquals(refreshState, "none");
+                    $A.test.assertEquals("none", refreshState);
                     refreshState = "start";
                     $A.test.assertTrue((refreshTime-requestTime)< 6000,
                         "Expected refresh within 5 seconds, got "+((refreshTime-requestTime)/1000) );
@@ -217,7 +217,7 @@
             //Verify that refreshEnd was fired
             $A.test.addWaitFor("refreshEnd", function(){ return that.textForName(cmp, "refreshEnd"); },
                 function(){
-                    $A.test.assertEquals(refreshState, "start");
+                    $A.test.assertEquals("start", refreshState);
                     refreshState = "end";
                 });
         }, function(cmp) {
@@ -1026,7 +1026,7 @@
             a.setStorable();
             a.setCallback(cmp, function(action){
             	//sanity check
-            	$A.test.assertEquals(action.getReturnValue(),"anything really","we are not using the correct stub");
+            	$A.test.assertEquals("anything really", action.getReturnValue(), "we are not using the correct stub");
                 that.findAndSetText(cmp, "callbackCounter",
                     parseInt(cmp.find("callbackCounter").getElement().innerHTML,10)+1);
             });

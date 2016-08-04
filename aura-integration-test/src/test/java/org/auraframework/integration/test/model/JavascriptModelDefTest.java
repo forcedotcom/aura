@@ -15,9 +15,7 @@
  */
 package org.auraframework.integration.test.model;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-
+import com.google.common.collect.Maps;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;
@@ -30,7 +28,8 @@ import org.auraframework.instance.Model;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
-import com.google.common.collect.Maps;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 
 public class JavascriptModelDefTest extends AuraImplTestCase {
     /**

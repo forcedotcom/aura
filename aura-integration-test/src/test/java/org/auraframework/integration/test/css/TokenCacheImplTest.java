@@ -15,11 +15,10 @@
  */
 package org.auraframework.integration.test.css;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.auraframework.css.TokenCache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokenMapProvider;
@@ -28,15 +27,16 @@ import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.token.TokenCacheImpl;
 import org.auraframework.impl.java.provider.TestTokenDescriptorProvider;
 import org.auraframework.impl.java.provider.TestTokenMapProvider;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Unit tests for {@link TokenCacheImpl}.
@@ -46,6 +46,9 @@ public class TokenCacheImplTest extends StyleTestCase {
     private DefDescriptor<TokensDef> desc1;
     private DefDescriptor<TokensDef> desc2;
     private DefDescriptor<TokensDef> desc3;
+
+    @Inject
+    DefinitionService definitionService;
 
     @Override
     public void setUp() throws Exception {
@@ -246,7 +249,7 @@ public class TokenCacheImplTest extends StyleTestCase {
     public void testMultipleDescriptorProvidersResolveToSame() throws QuickFixException {
         // multiple providers resolve to the same, and since there's no reason to have them duplicated in this list only
         // the latter ones should be included.
-        DefDescriptor<TokensDef> resolved = DefDescriptorImpl.getInstance(TestTokenDescriptorProvider.DESC, TokensDef.class);
+        DefDescriptor<TokensDef> resolved = definitionService.getDefDescriptor(TestTokenDescriptorProvider.DESC, TokensDef.class);
 
         DefDescriptor<TokensDef> a = addSeparateTokens(tokens().descriptorProvider(TestTokenDescriptorProvider.REF));
         DefDescriptor<TokensDef> b = addSeparateTokens(tokens().token("bbb", "b"));

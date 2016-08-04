@@ -15,192 +15,272 @@
  */
 package org.auraframework;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.adapter.JsonSerializerAdapter;
 import org.auraframework.adapter.LocalizationAdapter;
-import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.Definition;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.instance.Application;
-import org.auraframework.instance.Component;
 import org.auraframework.instance.Instance;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.ConverterService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.IntegrationService;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.service.LoggingService;
-import org.auraframework.service.MetricsService;
-import org.auraframework.service.RenderingService;
-import org.auraframework.service.SerializationService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.adapter.SourceControlAdapter;
+import org.auraframework.util.json.JsonSerializerFactory;
 
 /**
  * Entry point for accessing Aura services
  */
 @ServiceComponent
 public class Aura implements AuraDeprecated {
-    private static ClientLibraryService clientLibraryService;
+    private static IntegrationService integrationService;
+    private static StyleAdapter styleAdapter;
+    private static ConfigAdapter configAdapter;
+    private static LoggingService loggingService;
+    private static DefinitionService definitionService;
+    private static ContextService contextService;
+    private static InstanceService instanceService;
+    private static SourceControlAdapter sourceControlAdapter;
+    private static ConverterService converterService;
+    private static BuilderService builderService;
+    private static LocalizationService localizationService;
+    private static JsonSerializerFactory jsonSerializerFactory;
+    private static List<JsonSerializerAdapter> jsonSerializerAdapters;
+    private static CachingService cachingService;
+    private static ExceptionAdapter exceptionAdapter;
+    private static LocalizationAdapter localizationAdapter;
+    private static ServerService serverService;
 
     @Inject
-    public void setClientLibraryService(ClientLibraryService cls) {
-        clientLibraryService = cls;
+    public void setLocalizationAdapter(LocalizationAdapter adapter) {
+        localizationAdapter = adapter;
     }
 
-    /**
-     * Get the Builder Service: for constructing your own {@link Definition}
-     */
-    public static BuilderService getBuilderService() {
-        return Aura.get(BuilderService.class);
+    @Inject
+    public void setExceptionAdapter(ExceptionAdapter adapter) {
+        exceptionAdapter = adapter;
+    }
+
+    @Inject
+    public void setCachingService(CachingService service) {
+        cachingService = service;
+    }
+    
+    @Inject
+    public void setJsonSerializerFactory(JsonSerializerFactory factory) {
+        jsonSerializerFactory = factory;
+    }
+    
+    @Inject
+    public void setJsonSerializerAdapter(List<JsonSerializerAdapter> adapters) {
+        jsonSerializerAdapters = adapters;
+    }
+    
+    @Inject
+    public void setContextService(ContextService service) {
+        contextService = service;
+    }
+
+    @Inject
+    public void setConfigAdapter(ConfigAdapter adapter) {
+        configAdapter = adapter;
+    }
+
+    @Inject
+    public void setLoggingService(LoggingService service) {
+        loggingService = service;
+    }
+
+    @Inject
+    public void setDefinitionService(DefinitionService service) {
+        definitionService = service;
+    }
+
+    @Inject
+    public void setInstanceService(InstanceService service) {
+        instanceService = service;
+    }
+
+    @Inject
+    public void setStyleAdapter(StyleAdapter adapter) {
+        styleAdapter = adapter;
+    }
+
+    @Inject
+    public void setSourceControlAdapter(SourceControlAdapter adapter) {
+        sourceControlAdapter = adapter;
+    }
+
+    @Inject
+    public void setIntegrationService(IntegrationService service) {
+        integrationService = service;
+    }
+
+    @Inject
+    public void setConverterService(ConverterService service) {
+        converterService = service;
+    }
+
+    @Inject
+    public void setBuilderService(BuilderService service) {
+        builderService = service;
+    }
+
+    @Inject
+    public void setLocalizationService(LocalizationService service) {
+        localizationService = service;
+    }
+
+    @Inject
+    public void setServerService(ServerService service) {
+        serverService = service;
     }
 
     /**
      * Get the Context Service: for creating or interacting with a {@link AuraContext} A AuraContext must be started
      * before working using any other service.
      */
+    // Used by: Lots
     public static ContextService getContextService() {
-        return Aura.get(ContextService.class);
+        return contextService;
     }
 
     /**
      * Get the Definition Service: for loading, finding or interacting with a {@link Definition}
      */
+    // Used by: Lots
     public static DefinitionService getDefinitionService() {
-        return Aura.get(DefinitionService.class);
+        return definitionService;
     }
 
     /**
      * Get the Logging Service: Provides Aura with a top-level Logging handler from the host environments
      */
+    // Used by: ApexAuraComponent, BaseComponentImpl, SFDCAuraContextFilter, CoreLightningComponentFacadeImpl, JavaModel, ServiceComponentModel, RecordValueProvider, and more...
     public static LoggingService getLoggingService() {
-        return Aura.get(LoggingService.class);
-    }
-
-    /**
-     * Get the Logging Service: Provides Aura with a top-level Logging handler from the host environments
-     */
-    public static MetricsService getMetricsService() {
-        return Aura.get(MetricsService.class);
+        return loggingService;
     }
 
     /**
      * Get the Instance Service: for constructing an {@link Instance} of a {@link Definition}
      */
+    // Used by: Everybody
     public static InstanceService getInstanceService() {
-        return Aura.get(InstanceService.class);
-    }
-
-    /**
-     * Get the Rendering Service: for rendering a {@link Component} or {@link Application}
-     */
-    public static RenderingService getRenderingService() {
-        return Aura.get(RenderingService.class);
-    }
-
-    /**
-     * Get the Serialization Service: for serializing things into format specified in the current {@link AuraContext}
-     */
-    public static SerializationService getSerializationService() {
-        return Aura.get(SerializationService.class);
-    }
-
-    /**
-     * Get the Server Service: for responding to requests from a Aura Client
-     */
-    public static ServerService getServerService() {
-        return Aura.get(ServerService.class);
+        return instanceService;
     }
 
     /**
      * Get the Config Adapter: Provides Aura with configuration from the host environment
      */
+    // Used by: Everybody
     public static ConfigAdapter getConfigAdapter() {
-        return Aura.get(ConfigAdapter.class);
-    }
-
-    /**
-     * Get the Localization Adapter: Provides Aura with Localization configuration from the host environments
-     */
-    public static LocalizationAdapter getLocalizationAdapter() {
-        return Aura.get(LocalizationAdapter.class);
-    }
-
-    /**
-     * Gets the Localization Service: Gets the localization configuration
-     */
-    public static LocalizationService getLocalizationService() {
-        return Aura.get(LocalizationService.class);
-    }
-
-    /**
-     * Get the Exception Adapter: Provides Aura with a top-level Exception handler from the host environments
-     */
-    public static ExceptionAdapter getExceptionAdapter() {
-        return Aura.get(ExceptionAdapter.class);
+        return configAdapter;
     }
 
     /**
      * Get the Source Control Adapter : Allows interaction with the source control system.
      */
+    // Used by FileSource
     public static SourceControlAdapter getSourceControlAdapter() {
-        return Aura.get(SourceControlAdapter.class);
+        return sourceControlAdapter;
     }
 
     /**
      * Get the Style Adapter: Used to provide CSS/Style specific functionality.
      */
+    // Used by StyleContextImpl, Tokens, FlavoredStyleParser, StyleParser, ParserConfiguration, AbstractStyleDef
     public static StyleAdapter getStyleAdapter() {
-        return Aura.get(StyleAdapter.class);
-    }
-
-    /**
-     * Get the Servlet Util Adapter: Used to provide overrides for servlet functionality.
-     */
-    public static ServletUtilAdapter getServletUtilAdapter() {
-        return Aura.get(ServletUtilAdapter.class);
-    }
-
-    /**
-     * Get the Definition Parser Adapter: hooks for host environment to interact with definition parsing
-     */
-    public static DefinitionParserAdapter getDefinitionParserAdapter() {
-        return Aura.get(DefinitionParserAdapter.class);
+        return styleAdapter;
     }
 
     /**
      * Gets the Integration Service: Service that makes integrating into other containers easy.
      */
+    // Used in AuraElement, AuraServicesImpl (not used after that), ImportWizardAuraIntegrationServlet, and AuraIntegrationHolder
     public static IntegrationService getIntegrationService() {
-        return Aura.get(IntegrationService.class);
+        return integrationService;
+    }
+
+    // Used in BaseComponentImpl and JavaTypeDef
+    public static ConverterService getConverterService() {
+        return converterService;
+    }
+
+    // Used in many places in sfdc
+    @Deprecated
+    public static BuilderService getBuilderService() {
+        return builderService;
+    }
+
+    // Used in many places in sfdc
+    @Deprecated
+    public static LocalizationService getLocalizationService() {
+        return localizationService;
     }
 
     /**
-     * Gets {@link ClientLibraryService}: service for including external client libraries (CSS or JS)
+     * USE INJECTION INSTEAD
+     * @return
      */
-    public static ClientLibraryService getClientLibraryService() {
-        return clientLibraryService;
+    @Deprecated
+    public static JsonSerializerFactory getJsonSerializerFactory() {
+        return jsonSerializerFactory;
     }
 
     /**
-     * Gets the caching service: a general service for setting and getting arbitrary blobs based on a key
-     * Encapsulates the access to aura's known caches.
+     * USE INJECTION INSTEAD
+     * @return
      */
+    @Deprecated
+    public static List<JsonSerializerAdapter> getJsonSerializerAdapters() {
+        return jsonSerializerAdapters;
+    }
+    /**
+     * USE INJECTION INSTEAD
+     * @return
+     */
+    @Deprecated
     public static CachingService getCachingService() {
-        return Aura.get(CachingService.class);
+        return cachingService;
     }
 
-    public static <T extends AuraServiceProvider> T get(Class<T> type) {
-        return ServiceLocator.get().get(type);
+    /**
+     * USE INJECTION INSTEAD
+     * @return
+     */
+    @Deprecated
+    public static ExceptionAdapter getExceptionAdapter() {
+        return exceptionAdapter;
+    }
+
+    /**
+     * USE INJECTION INSTEAD
+     * @return
+     */
+    @Deprecated
+    public static LocalizationAdapter getLocalizationAdapter() {
+        return localizationAdapter;
+    }
+
+    /**
+     * USE INJECTION INSTEAD
+     * @return
+     */
+    @Deprecated
+    public static ServerService getServerService() {
+        return serverService;
     }
 }

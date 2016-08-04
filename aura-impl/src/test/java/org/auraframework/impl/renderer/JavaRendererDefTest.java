@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import javax.inject.Inject;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -27,10 +28,13 @@ import java.io.StringWriter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.java.renderer.JavaRendererDef;
 import org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.RenderContextImpl;
+import org.auraframework.instance.RendererInstance;
+import org.auraframework.service.InstanceService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraExecutionException;
@@ -43,12 +47,17 @@ import org.junit.Test;
  */
 public class JavaRendererDefTest extends AuraImplTestCase {
 
+    @Inject
+    InstanceService instanceService;
+
     /**
      * Verify that JavaRendererDef is defined as local.
      */
     @Test
-    public void testIsLocal() {
-        JavaRendererDef def = (new JavaRendererDef.Builder()).build();
+    public void testIsLocal() throws Exception {
+        JavaRendererDef.Builder builder = new JavaRendererDef.Builder().setRendererClass(TestSimpleRenderer.class);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
+        JavaRendererDef def = builder.build();
         assertTrue("Server side renderers should be defined as Local", def.isLocal());
     }
 
@@ -69,7 +78,7 @@ public class JavaRendererDefTest extends AuraImplTestCase {
      */
     @Test
     public void testRender() throws Exception {
-        RendererDef def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
+        RendererInstance def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
         StringWriter sw = new StringWriter();
         RenderContext renderContext = new RenderContextImpl(sw, null);
         def.render(null, renderContext);
@@ -81,7 +90,7 @@ public class JavaRendererDefTest extends AuraImplTestCase {
 
     @Test
     public void testWrappingExceptionFromComponentRenderer() throws Exception {
-        RendererDef def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
+        RendererInstance def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
         Appendable mockAppendable = mock(Appendable.class);
         Exception expectedCause = new IOException();
         when(mockAppendable.append(any())).thenThrow(expectedCause);
@@ -98,7 +107,7 @@ public class JavaRendererDefTest extends AuraImplTestCase {
 
     @Test
     public void testOriginalAuraErrorIsThrownOutFromRender() throws Exception {
-        RendererDef def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
+        RendererInstance def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
         Appendable mockAppendable = mock(Appendable.class);
         AuraError expectedAuraError = new AuraError("expected aura error");
         when(mockAppendable.append(any())).thenThrow(expectedAuraError);
@@ -114,7 +123,7 @@ public class JavaRendererDefTest extends AuraImplTestCase {
 
     @Test
     public void testWrappingRuntimeExceptionFromComponentRenderer() throws Exception {
-        RendererDef def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
+        RendererInstance def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
         Appendable mockAppendable = mock(Appendable.class);
         Exception expectedCause = new RuntimeException();
         when(mockAppendable.append(any())).thenThrow(expectedCause);
@@ -131,7 +140,7 @@ public class JavaRendererDefTest extends AuraImplTestCase {
 
     @Test
     public void testOriginalQuickfixExceptionIsThrownOutFromRender() throws Exception {
-        RendererDef def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowsQFEDuringRender");
+        RendererInstance def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowsQFEDuringRender");
         RenderContext renderContext = new RenderContextImpl(null, null);
         try {
             def.render(null, renderContext);
@@ -148,13 +157,16 @@ public class JavaRendererDefTest extends AuraImplTestCase {
      * @return the new RendererDef
      * @throws Exception
      */
-    private RendererDef createRenderer(String qualifiedName) throws Exception {
+    private RendererInstance createRenderer(String qualifiedName) throws Exception {
         JavaRendererDef.Builder builder = new JavaRendererDef.Builder();
-        DefDescriptor<RendererDef> descriptor = DefDescriptorImpl.getInstance(qualifiedName, RendererDef.class);
+        DefDescriptor<RendererDef> descriptor = definitionService.getDefDescriptor(qualifiedName, RendererDef.class);
         Class<?> rendererClass = Class.forName(String.format("%s.%s", descriptor.getNamespace(), descriptor.getName()));
 
         builder.setLocation(rendererClass.getCanonicalName(), -1);
         builder.setRendererClass(rendererClass);
-        return builder.build();
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
+        RendererDef definition = builder.build();
+
+        return instanceService.getInstance(definition);
     }
 }

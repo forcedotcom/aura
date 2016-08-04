@@ -15,9 +15,6 @@
  */
 package org.auraframework.integration.test.css;
 
-import java.util.List;
-import java.util.Map;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokensDef;
@@ -27,6 +24,9 @@ import org.auraframework.impl.java.provider.TestTokenMapProvider;
 import org.auraframework.impl.root.parser.handler.TokensDefHandler;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Unit tests for {@link TokensDefHandler}.

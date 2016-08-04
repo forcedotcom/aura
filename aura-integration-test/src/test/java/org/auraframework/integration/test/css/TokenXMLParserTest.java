@@ -15,6 +15,7 @@
  */
 package org.auraframework.integration.test.css;
 
+import com.google.common.collect.Iterables;
 import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.expression.PropertyReference;
@@ -23,8 +24,6 @@ import org.auraframework.impl.root.parser.handler.TokenDefHandler;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
-
-import com.google.common.collect.Iterables;
 
 /**
  * Unit tests for {@link TokenDefHandler}.

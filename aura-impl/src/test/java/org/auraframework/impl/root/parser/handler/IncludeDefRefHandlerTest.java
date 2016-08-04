@@ -68,7 +68,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(expectedParentNamespace).when(parentDescriptor).getNamespace();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         IncludeDefRef actualDef = handler.getElement();
         assertEquals(expectedName, actualDef.getName());
@@ -92,7 +92,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         for (DefType containerType : unsupportedContainerTypes) {
             Mockito.doReturn(containerType).when(parentDescriptor).getDefType();
             Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-            IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+            IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
             try {
                 handler.getElement();
@@ -110,7 +110,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
                 "<%s/>", IncludeDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         try {
             handler.getElement();
@@ -127,7 +127,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
                 "<%s name='this is invalid'/>", IncludeDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         try {
             handler.getElement();
@@ -140,12 +140,11 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
 
     @Test
     public void testGetElementWithInvalidImportFormat() throws Exception {
-    	
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
                 "<%s name='name' imports='invalid:library'/>", IncludeDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         try {
             handler.getElement();
@@ -162,7 +161,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
                 "<%s name='name' imports='not a descriptor name'/>", IncludeDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         try {
             handler.getElement();
@@ -176,13 +175,12 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
     @Test
     public void testGetElementWithEmptyTag() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
-        
-        StringSource<IncludeDefRef> includeSource = new StringSource<>(descriptor, String.format(
-                "<%s name='%s'></%s>", IncludeDefRefHandler.TAG, expectedName, IncludeDefRefHandler.TAG), "myID",
-                Format.XML);
+        StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
+                "<%s name='%s'></%s>", IncludeDefRefHandler.TAG, expectedName, IncludeDefRefHandler.TAG),
+                "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(includeSource), includeSource);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         IncludeDefRef actualDef = handler.getElement();
         assertEquals(expectedName, actualDef.getName());
@@ -190,17 +188,16 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
 
     @Test
     public void testGetElementWithNonEmptyTag() throws Exception {
-        String expectedName = getAuraTestingUtil().getNonce("irrelevant");        
-        
+        String expectedName = getAuraTestingUtil().getNonce("irrelevant");
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
-                "<%s name='%s'>text</%s>", IncludeDefRefHandler.TAG, expectedName, IncludeDefRefHandler.TAG), "myID",
-                Format.XML);
+                "<%s name='%s'>text</%s>", IncludeDefRefHandler.TAG, expectedName, IncludeDefRefHandler.TAG),
+                "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         try {
-        	handler.getElement();
+            handler.getElement();
             fail("Include tag may not contain any children");
         } catch (AuraRuntimeException t) {
             assertExceptionMessageEndsWith(t, AuraRuntimeException.class,
@@ -212,13 +209,13 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
     public void testGetElementWithDescription() throws Exception {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
         String expectedDescription = "needs to be included";
-        StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
+        StringSource<IncludeDefRef> source = new StringSource<>(descriptor,
+                String.format(
                 "<%s name='%s' description='%s'/>", IncludeDefRefHandler.TAG, expectedName, expectedDescription),
-                "myID",
-                Format.XML);
+                "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         IncludeDefRef actualDef = handler.getElement();
         assertEquals(expectedDescription, actualDef.getDescription());
@@ -229,11 +226,11 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
         String expectedImports = "importable";
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
-                "<%s name='%s' imports='%s'/>", IncludeDefRefHandler.TAG, expectedName, expectedImports), "myID",
-                Format.XML);
+                "<%s name='%s' imports='%s'/>", IncludeDefRefHandler.TAG, expectedName, expectedImports),
+                "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         IncludeDefRef actualDef = handler.getElement();
         List<DefDescriptor<IncludeDef>> actualImports = actualDef.getImports();
@@ -253,7 +250,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
                 expectedBundleName, expectedImports), "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         IncludeDefRef actualDef = handler.getElement();
         List<DefDescriptor<IncludeDef>> actualImports = actualDef.getImports();
@@ -272,7 +269,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
                 " \t\r\n" + String.join(" \t\r\n, \t\r\n", expectedImports)) + " \t\r\n", "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         IncludeDefRef actualDef = handler.getElement();
         List<DefDescriptor<IncludeDef>> actualImports = actualDef.getImports();
@@ -293,11 +290,11 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         String expectedName = getAuraTestingUtil().getNonce("somethingIncluded");
         String expectedExports = "exportable";
         StringSource<IncludeDefRef> source = new StringSource<>(descriptor, String.format(
-                "<%s name='%s' export='%s'/>", IncludeDefRefHandler.TAG, expectedName, expectedExports), "myID",
-                Format.XML);
+                "<%s name='%s' export='%s'/>", IncludeDefRefHandler.TAG, expectedName, expectedExports),
+                "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         IncludeDefRef actualDef = handler.getElement();
         String actualExports = actualDef.getExport();
@@ -311,7 +308,7 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
                 "<%s name='%s' unexpected='me'/>", IncludeDefRefHandler.TAG, expectedName), "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(parentDescriptor).getDefType();
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
-        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source);
+        IncludeDefRefHandler handler = new IncludeDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         try {
             handler.getElement();

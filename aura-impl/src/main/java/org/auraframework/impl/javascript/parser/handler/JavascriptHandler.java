@@ -22,6 +22,8 @@ import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -38,7 +40,7 @@ import org.auraframework.util.json.JsonStreamReader.JsonParseException;
  */
 public abstract class JavascriptHandler<D extends Definition, T extends Definition> {
 
-	protected final Source<?> source;
+    protected final Source<?> source;
     protected final DefDescriptor<D> descriptor;
 
     protected JavascriptHandler(DefDescriptor<D> descriptor, Source<?> source) {
@@ -73,6 +75,7 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
         builder.setDescriptor(descriptor);
         builder.setOwnHash(source.getHash());
         builder.setLocation(getLocation());
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
     }
 
 

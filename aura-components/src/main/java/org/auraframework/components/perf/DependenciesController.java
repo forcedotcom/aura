@@ -24,13 +24,14 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
@@ -42,11 +43,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 
-@Controller
-public class DependenciesController {
+@ServiceComponent
+public class DependenciesController implements Controller {
 
     @AuraEnabled
-    public static Set<String> getAllDescriptors() {
+    public Set<String> getAllDescriptors() {
     	try {
     		DefinitionService definitionService = Aura.getDefinitionService();
     		
@@ -72,7 +73,7 @@ public class DependenciesController {
     }
     
     @AuraEnabled
-    public static Map<String, Object> getDependencies(@Key("component")String component) {
+    public Map<String, Object> getDependencies(@Key("component")String component) {
     	AuraContext context = Aura.getContextService().getCurrentContext();
 		DefDescriptor<?> descriptor;
 		SortedSet<DefDescriptor<?>> sorted;
@@ -105,7 +106,7 @@ public class DependenciesController {
 				    (def.getDescriptor().getNamespace().equals("aura") || def.getDescriptor().getNamespace().equals("auradev"))) {
 					continue;
 				}
-
+				
 				list.add(dep.toString() + "@" + dep.getDefType());
 			}
 			
@@ -119,7 +120,7 @@ public class DependenciesController {
 		}
     }
     @AuraEnabled
-    public static Boolean writeAllDependencies(@Key("file")String file) {
+    public Boolean writeAllDependencies(@Key("file")String file) {
     	Set<String> descriptors = getAllDescriptors();
     	Map<String, Object> dependencies = Maps.newHashMap();
    

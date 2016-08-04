@@ -15,15 +15,9 @@
  */
 package org.auraframework.impl.validation;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auraframework.Aura;
@@ -39,9 +33,14 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.validation.ValidationError;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Misc utility methods used in validation
@@ -97,7 +96,7 @@ public final class ValidationUtil {
         File componentSourceDir = componentSourceDirs.get(0);
 
         // get list of descriptors for all definitions found
-        ValidationFileSourceLoader sourceLoader = new ValidationFileSourceLoader(componentSourceDir);
+        ValidationFileSourceLoader sourceLoader = new ValidationFileSourceLoader(componentSourceDir, null);
         Set<DefDescriptor<?>> descriptors = sourceLoader.findIn(root);
         LOG.info("# descriptors to validate: " + descriptors.size());
 

@@ -15,21 +15,21 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ExampleDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.documentation.ExampleDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHandler<ExampleDefImpl, P> {
 
@@ -46,11 +46,13 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
 
     private final ExampleDefImpl.Builder builder = new ExampleDefImpl.Builder();
 
-    public ExampleDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(parentHandler, xmlReader, source);
+    public ExampleDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                             boolean isInInternalNamespace, DefinitionService definitionService,
+                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
 
         builder.setLocation(getLocation());
-
+        builder.setAccess(getAccess(isInInternalNamespace));
         if (source != null) {
             builder.setOwnHash(source.getHash());
         }
@@ -83,7 +85,7 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
 
         DefDescriptor<P> parentDesc = getParentHandler().getDefDescriptor();
         String exampleName = String.format("%s_%s", parentDesc.getDescriptorName(), name);
-        builder.setDescriptor(DefDescriptorImpl.getInstance(exampleName, ExampleDef.class));
+        builder.setDescriptor(definitionService.getDefDescriptor(exampleName, ExampleDef.class));
     }
 
     @Override

@@ -19,10 +19,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ClientLibraryDef.Type;
 import org.auraframework.def.ComponentDef;
@@ -43,6 +45,14 @@ import org.junit.Test;
  * Unit tests for {@link ClientLibraryDefImpl}
  */
 public class ClientLibraryDefImplTest extends AuraImplTestCase {
+    @Inject
+    private DefinitionParserAdapter definitionParserAdapter;
+    
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     @Test
     public void testValidationNullName() throws Exception {
         String name = null;
@@ -180,13 +190,14 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
     private ClientLibraryDefHandler<ComponentDef> getHandler(String clMarkup) throws Exception {
         StringSource<ClientLibraryDef> componentSource = new StringSource<>(null, "<aura:component/>", "myID", Format.XML);
         XMLStreamReader componentXmlReader = getXmlReader(componentSource);
-        ComponentDefHandler cdh = new ComponentDefHandler(null, componentSource, componentXmlReader);
+        ComponentDefHandler cdh = new ComponentDefHandler(null, componentSource, componentXmlReader, true,
+                definitionService, contextService, configAdapter, definitionParserAdapter);
 
-        StringSource<ClientLibraryDef> clientLibrarySource = new StringSource<>(null, clMarkup, "myID",
-                Format.XML);
+        StringSource<ClientLibraryDef> clientLibrarySource = new StringSource<>(null, clMarkup,
+                "myID", Format.XML);
         XMLStreamReader xmlReader = getXmlReader(clientLibrarySource);
         return new ClientLibraryDefHandler<>(cdh, xmlReader,
-                clientLibrarySource);
+                clientLibrarySource, false, definitionService, configAdapter, definitionParserAdapter);
     }
 
     private XMLStreamReader getXmlReader(StringSource<ClientLibraryDef> clSource) throws FactoryConfigurationError,

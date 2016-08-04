@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.root.event;
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
@@ -26,15 +23,20 @@ import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.service.ContextService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class EventImpl implements Event {
 
     private final DefDescriptor<EventDef> eventDefDescriptor;
     private final AttributeSet attributeSet;
     private final String path;
+    private final ContextService contextService;
 
     public EventImpl(DefDescriptor<EventDef> eventDefDescriptor, Map<String, Object> attributes,
             BaseComponent<?, ?> valueProvider) throws QuickFixException {
@@ -42,6 +44,7 @@ public class EventImpl implements Event {
     	iStack.pushInstance(this, eventDefDescriptor);
         this.path = iStack.getPath();
         this.eventDefDescriptor = eventDefDescriptor;
+        this.contextService = Aura.getContextService();
         this.attributeSet = new AttributeSetImpl(eventDefDescriptor, valueProvider, this);
         this.attributeSet.set(attributes);
         iStack.popInstance(this);
@@ -53,7 +56,7 @@ public class EventImpl implements Event {
     }
 
     public EventImpl(DefDescriptor<EventDef> eventDefDescriptor) throws QuickFixException {
-        this(eventDefDescriptor, null);
+        this(eventDefDescriptor, null, null);
     }
 
     @Override
@@ -67,7 +70,7 @@ public class EventImpl implements Event {
 
     @Override
     public void serialize(Json json) throws IOException {
-        boolean preloaded = Aura.getContextService().getCurrentContext().isPreloaded(getDescriptor());
+        boolean preloaded = contextService.getCurrentContext().isPreloaded(getDescriptor());
 
         try {
             json.writeMapBegin();

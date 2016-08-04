@@ -15,17 +15,19 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.io.IOException;
-import java.io.Reader;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.SVGDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.svg.SVGDefImpl;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.SVGParserException;
 import org.auraframework.util.IOUtil;
+
+import java.io.IOException;
+import java.io.Reader;
 
 public class SVGDefHandler<D extends Definition> {
     private static final int MAX_SVG_LENGTH = 150 * 1024;
@@ -41,6 +43,7 @@ public class SVGDefHandler<D extends Definition> {
         builder.setDescriptor((DefDescriptor<SVGDef>) defDescriptor);
         builder.setLocation(source.getSystemId(), source.getLastModified());
         builder.setOwnHash(source.getHash());
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
 
         Reader stream = source.getHashingReader();
         try {

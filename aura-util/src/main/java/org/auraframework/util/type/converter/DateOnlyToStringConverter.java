@@ -15,15 +15,15 @@
  */
 package org.auraframework.util.type.converter;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.util.date.DateOnly;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.type.Converter;
+import org.springframework.context.annotation.Lazy;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component (provide=AuraServiceProvider.class)
+@Lazy
+@ServiceComponent
 public class DateOnlyToStringConverter implements Converter<DateOnly, String> {
     @Override
     public String convert(DateOnly value) {

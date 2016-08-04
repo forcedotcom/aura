@@ -17,13 +17,15 @@
 package org.auraframework.impl.root.parser.handler.design;
 
 import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignTemplateDef;
 import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.impl.design.DesignTemplateDefImpl;
 import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -45,8 +47,10 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
     }
 
     public DesignTemplateDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
-                                    Source<?> source) {
-        super(parentHandler, xmlReader, source);
+                                    Source<?> source, boolean isInInternalNamespace, DefinitionService definitionService,
+                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+        builder.setAccess(getAccess(isInInternalNamespace));
     }
 
     @Override
@@ -55,7 +59,7 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
         if (name == null) {
             name = ((DesignDefHandler) getParentHandler()).getNextId();
         }
-        builder.setDescriptor(DefDescriptorImpl.getInstance(name, DesignTemplateDef.class));
+        builder.setDescriptor(definitionService.getDefDescriptor(name, DesignTemplateDef.class));
         builder.setName(name);
         builder.setLocation(getLocation());
     }
@@ -65,9 +69,9 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
         String tag = getTagName();
         if (DesignTemplateRegionDefHandler.TAG.equalsIgnoreCase(tag)) {
             DesignTemplateRegionDef templateRegion = new DesignTemplateRegionDefHandler(getParentHandler(), xmlReader,
-                    source).getElement();
+                    source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter).getElement();
             builder.addDesignTemplateRegion(
-                    DefDescriptorImpl.getInstance(templateRegion.getName(), DesignTemplateRegionDef.class),
+                    definitionService.getDefDescriptor(templateRegion.getName(), DesignTemplateRegionDef.class),
                     templateRegion);
         } else {
             throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));

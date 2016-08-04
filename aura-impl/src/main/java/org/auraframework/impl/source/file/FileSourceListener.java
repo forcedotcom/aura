@@ -15,10 +15,7 @@
  */
 package org.auraframework.impl.source.file;
 
-import java.nio.file.Path;
-
 import org.apache.log4j.Logger;
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.source.DescriptorFileMapper;
 import org.auraframework.system.SourceListener;
@@ -26,12 +23,19 @@ import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.util.FileChangeEvent;
 import org.auraframework.util.FileListener;
 
+import java.nio.file.Path;
+
 /**
  * Used by {@link FileSourceLoader} to monitor and notify when file has changed. When a file does change, it notifies
  * its listener to clear cache of specific descriptor.
  */
 public class FileSourceListener extends DescriptorFileMapper implements FileListener {
+    private SourceListener sourceListener;
 
+    public FileSourceListener(SourceListener sourceListener) {
+        this.sourceListener = sourceListener;
+    }
+    
     private static final Logger LOG = Logger.getLogger(FileSourceListener.class);
 
     @Override
@@ -51,7 +55,9 @@ public class FileSourceListener extends DescriptorFileMapper implements FileList
 
     public void onSourceChanged(DefDescriptor<?> defDescriptor, SourceListener.SourceMonitorEvent smEvent,
             String filePath) {
-        Aura.getDefinitionService().onSourceChanged(defDescriptor, smEvent, filePath);
+        if (sourceListener != null) {
+            sourceListener.onSourceChanged(defDescriptor, smEvent, filePath);
+        }
     }
 
     private void notifySourceChanges(FileChangeEvent event, SourceListener.SourceMonitorEvent smEvent) {

@@ -16,11 +16,6 @@
 
 package org.auraframework.integration.test.javascript.parser;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
-
-import java.util.Map;
-
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -32,7 +27,17 @@ import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
+import javax.inject.Inject;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+
 public class JavascriptControllerParserTest extends AuraImplTestCase {
+
+    @Inject
+    StringSourceLoader loader;
+
     /**
      * Verify JavascriptControllerParser parsing client controller
      */
@@ -48,7 +53,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
             "    }\n" +
             "})";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
-        Source<ControllerDef> source = StringSourceLoader.getInstance().getSource(controllerDesc);
+        Source<ControllerDef> source = loader.getSource(controllerDesc);
 
         ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
 
@@ -74,7 +79,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
             "    }\n" +
             "})";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
-        Source<ControllerDef> source = StringSourceLoader.getInstance().getSource(controllerDesc);
+        Source<ControllerDef> source = loader.getSource(controllerDesc);
 
         ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
 
@@ -93,7 +98,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
                 "    function1: function(cmp) {var v = 2;}\n" +
                 "})";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
-        Source<ControllerDef> source = StringSourceLoader.getInstance().getSource(controllerDesc);
+        Source<ControllerDef> source = loader.getSource(controllerDesc);
 
         ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
 
@@ -119,7 +124,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
                 "    var global = 'Do everything';\n"+
                 "})";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
-        Source<ControllerDef> source = StringSourceLoader.getInstance().getSource(controllerDesc);
+        Source<ControllerDef> source = loader.getSource(controllerDesc);
 
         ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
         try {
@@ -141,7 +146,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
                 "    foo: 'do NOthing'\n"+
                 "})";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
-        Source<ControllerDef> source = StringSourceLoader.getInstance().getSource(controllerDesc);
+        Source<ControllerDef> source = loader.getSource(controllerDesc);
 
         ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
         try {

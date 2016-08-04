@@ -16,11 +16,11 @@
 package org.auraframework.impl.system;
 
 import com.google.common.collect.Maps;
+import org.auraframework.Aura;
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
-import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -43,8 +43,8 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
     protected final DefDescriptor<T> descriptor;
     protected final Map<SubDefDescriptor<?, T>, Definition> subDefs;
 
-    protected DefinitionImpl(DefDescriptor<T> descriptor, Location location) {
-        this(descriptor, location, null, null, null, null, null, null);
+    protected DefinitionImpl(DefDescriptor<T> descriptor, Location location, DefinitionAccess access) {
+        this(descriptor, location, null, null, null, access, null, null);
     }
 
     protected DefinitionImpl(RefBuilderImpl<T, ?> builder) {
@@ -59,7 +59,7 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
                 location,
                 apiVersion,
                 description,
-                (access == null ? DefinitionAccessImpl.defaultAccess(descriptor != null ? descriptor.getNamespace() : null) : access),
+                access,
                 ownHash,
                 parseError);
         this.descriptor = descriptor;
@@ -96,6 +96,26 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
         }
     }
 
+    /**
+     * @throws QuickFixException
+     * @see Definition#validateReferences()
+     */
+    @Override
+    public void validateReferences() throws QuickFixException {
+    }
+
+    @Override
+    public String toString() {
+        // getDescriptor is not always non-null (though is should be). Avoid
+        // throwing a null pointer
+        // exception when someone asks for a string representation.
+        if (getDescriptor() != null) {
+            return getDescriptor().toString();
+        } else {
+            return "INVALID[" + this.location + "]: " + this.description;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> sddesc) {
@@ -113,8 +133,9 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
 
     public abstract static class RefBuilderImpl<T extends Definition, A extends Definition> extends BaseXmlElementImpl.BaseBuilderImpl
             implements DefBuilder<T, A> {
-public DefDescriptor<T> descriptor;
-                public Map<SubDefDescriptor<?, T>, Definition> subDefs;;
+
+        public DefDescriptor<T> descriptor;
+        public Map<SubDefDescriptor<?, T>, Definition> subDefs;;
         private boolean descriptorLocked;
 
         protected RefBuilderImpl(Class<T> defClass) {
@@ -125,7 +146,7 @@ public DefDescriptor<T> descriptor;
         @Override
         public RefBuilderImpl<T, A> setDescriptor(String qualifiedName) {
             try {
-                return this.setDescriptor(DefDescriptorImpl.getInstance(qualifiedName, defClass));
+                return this.setDescriptor(Aura.getDefinitionService().getDefDescriptor(qualifiedName, (Class<T>)defClass));
             } catch (Exception e) {
                 setParseError(e);
                 return this;

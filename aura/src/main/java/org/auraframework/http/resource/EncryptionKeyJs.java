@@ -21,11 +21,13 @@ import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.system.AuraContext;
 
 /**
  * Handles /l/{}/app.encryptionkey.js requests to retrieve encryption key.
  */
+@ServiceComponent
 public class EncryptionKeyJs extends AuraResourceImpl {
 
     // note: these code blocks must stay in sync with fallback.app.encryptionkey.js

@@ -15,26 +15,12 @@
  */
 package org.auraframework.def;
 
-import java.io.IOException;
-
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.system.RenderContext;
-import org.auraframework.throwable.quickfix.QuickFixException;
-
 /**
+ * Renderer Definition.
+ *
+ * {@link org.auraframework.instance.RendererInstance} has render method
  */
 public interface RendererDef extends RemotableDefinition {
     @Override
     DefDescriptor<RendererDef> getDescriptor();
-
-    /**
-     * Render the component.
-     *
-     * @param component the component to render.
-     * @param out the output stream.
-     * @throws IOException if the output stream does.
-     * @throws QuickFixException if there is an exception retrieving a
-     *             component.
-     */
-    void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException;
 }

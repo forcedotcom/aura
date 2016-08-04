@@ -22,11 +22,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -42,9 +44,11 @@ import org.auraframework.util.json.JsonSerializationContext;
 /**
  * Handles /l/{}/bootstrap.js requests to retrieve bootstrap.js.
  */
+@ServiceComponent
 public class Bootstrap extends AuraResourceImpl {
 
-    private ContextService contextService = Aura.getContextService();
+    private ContextService contextService;
+
     public Bootstrap() {
         super("bootstrap.js", Format.JS);
     }
@@ -203,6 +207,7 @@ public class Bootstrap extends AuraResourceImpl {
      *
      * @param contextService the ContextService to set
      */
+    @Inject
     public void setContextService(ContextService contextService) {
         this.contextService = contextService;
     }

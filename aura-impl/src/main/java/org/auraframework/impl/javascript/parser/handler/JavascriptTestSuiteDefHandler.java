@@ -29,13 +29,15 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TestSuiteDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestCaseDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef.Builder;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
 
 import com.google.common.base.Strings;
@@ -45,8 +47,8 @@ import com.google.common.collect.Sets;
 
 /**
  * Javascript handler for test suite defs
- *
- *
+ * 
+ * 
  * @since 0.0.194
  */
 public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDef, TestSuiteDef> {
@@ -74,6 +76,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
     protected JavascriptTestSuiteDef createDefinition(String code) throws QuickFixException, IOException {
         builder.setDescriptor(descriptor);
         builder.setLocation(getLocation());
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         builder.caseDefs = new ArrayList<>();
 
         DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl
@@ -90,6 +93,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
         // Verify that we can parse.
         List<Object> suiteMocks = (List<Object>) map.get("mocks");
         Map<String, Object> suiteMocksMap = null;
+        DefinitionAccessImpl caseAccess = new DefinitionAccessImpl(AuraContext.Access.PRIVATE);
 
         for (Entry<String, Object> entry : map.entrySet()) {
             String key = entry.getKey();
@@ -195,7 +199,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 }
 
                 builder.caseDefs.add(new JavascriptTestCaseDef(descriptor, key, null, attributes, defType, labels,
-                        browsers, mocks, auraErrorsExpectedDuringInit, scrumTeam, owner));
+                        browsers, mocks, auraErrorsExpectedDuringInit, scrumTeam, owner, caseAccess));
             }
         }
 

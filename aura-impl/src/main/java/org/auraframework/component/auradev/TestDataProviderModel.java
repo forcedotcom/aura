@@ -15,27 +15,27 @@
  */
 package org.auraframework.component.auradev;
 
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.ds.servicecomponent.ModelInstance;
+import org.auraframework.system.Annotations.AuraEnabled;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.auraframework.component.auradev.TestDataProviderController.Item;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
-
-@Model
-public class TestDataProviderModel {
-    private final List<Item> items;
+@ServiceComponentModelInstance
+public class TestDataProviderModel implements ModelInstance {
+    private final List<TestDataItem> items;
     
     public TestDataProviderModel() throws Exception {
         this.items = new ArrayList<>(10);
         for (int i = 0; i < 10; i++) {
-            items.add(new Item("label" + i, "value" + i));
+            items.add(new TestDataItem("label" + i, "value" + i));
         } 
     }
     
     @AuraEnabled
-    public List<Item> getItems() throws SQLException {
+    public List<TestDataItem> getItems() throws SQLException {
         return items;
     }
 }

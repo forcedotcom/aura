@@ -15,20 +15,21 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.HtmlTag;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.HTMLDefRefBuilderImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamReader;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Handles free HTML in component markup.
@@ -38,12 +39,14 @@ public class HTMLComponentDefRefHandler<P extends RootDefinition> extends Compon
     protected HTMLDefRefBuilderImpl htmlBuilder = new HTMLDefRefBuilderImpl();
 
     protected HTMLComponentDefRefHandler(RootTagHandler<P> parentHandler, String tag, XMLStreamReader xmlReader,
-            Source<?> source) {
-        super(parentHandler, xmlReader, source);
+                                         Source<?> source, boolean isInInternalNamespace, DefinitionService definitionService,
+                                         ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         builder = htmlBuilder;
         builder.setLocation(getLocation());
         builder.setOwnHash(source.getHash());
         htmlBuilder.setTag(tag.trim());
+        builder.setAccess(getAccess(isInInternalNamespace));
     }
 
     @Override

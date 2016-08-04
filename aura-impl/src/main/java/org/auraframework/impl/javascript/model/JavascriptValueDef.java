@@ -15,15 +15,17 @@
  */
 package org.auraframework.impl.javascript.model;
 
-import java.io.IOException;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
 
 public class JavascriptValueDef extends DefinitionImpl<ValueDef> implements ValueDef {
 
@@ -34,7 +36,7 @@ public class JavascriptValueDef extends DefinitionImpl<ValueDef> implements Valu
 
     protected JavascriptValueDef(String name, DefDescriptor<TypeDef> typeDescriptor, Object defaultValue,
             Location location) {
-        super(null, location);
+        super(null, location, new DefinitionAccessImpl(Access.INTERNAL));
         this.name = name;
         this.typeDescriptor = typeDescriptor;
         this.defaultValue = defaultValue;

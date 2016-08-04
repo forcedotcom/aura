@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.root.component;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -42,7 +41,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application><aura:attribute name='strAtt' type='String'>{!who.cares}</aura:attribute></aura:application>");
         try {
-            Aura.getInstanceService().getInstance(appDesc);
+            instanceService.getInstance(appDesc);
             fail("Expressions cannot be used as attribute values in top-level components.");
         } catch (AuraRuntimeException e) {
             assertEquals("Expressions cannot be used as attribute values in top-level components.", e.getMessage());
@@ -248,7 +247,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, String.format(
                 "<aura:application>" + "<%s/>" + "</aura:application>", cmpName));
         try {
-            Aura.getInstanceService().getInstance(appDesc);
+            instanceService.getInstance(appDesc);
             fail("Expression validation did not result in a runtime exception for strAtt=\"" + strExpr + "\" dblAtt=\""
                     + dblExpr + "\"");
         } catch (Exception e) {
@@ -265,7 +264,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
         appDesc = addSourceAutoCleanup(ApplicationDef.class, String.format("<aura:application>"
                 + "<%s strAtt=\"%s\" dblAtt=\"%s\"/>" + "</aura:application>", cmpName, strExpr, dblExpr));
         try {
-            Aura.getInstanceService().getInstance(appDesc);
+            instanceService.getInstance(appDesc);
             fail("Expression validation did not result in a runtime exception for strAtt=\"" + strExpr + "\" dblAtt=\""
                     + dblExpr + "\"");
         } catch (Exception e) {

@@ -210,7 +210,7 @@ public class TabsetUITest extends WebDriverTestCase {
                 .getEval("return $A.test.getActiveElement().getAttribute('class')");
         assertTrue("Focus is not on ther correct element", activeElementClass.contains(itemToVerifyAgainst));
     }
-    
+
     /**
      * Function to open an overflow menu
      * 

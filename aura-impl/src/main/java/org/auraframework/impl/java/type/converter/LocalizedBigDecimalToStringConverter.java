@@ -15,23 +15,31 @@
  */
 package org.auraframework.impl.java.type.converter;
 
-import java.math.BigDecimal;
-import java.util.Locale;
-
-import org.auraframework.Aura;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.java.type.LocalizedConverter;
+import org.auraframework.service.LocalizationService;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.type.converter.BigDecimalToStringConverter;
+import org.springframework.context.annotation.Lazy;
 
-import aQute.bnd.annotation.component.Component;
+import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.util.Locale;
 
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
-@Component (provide=AuraServiceProvider.class)
+@Lazy
+@ServiceComponent
 public class LocalizedBigDecimalToStringConverter extends BigDecimalToStringConverter implements
         LocalizedConverter<BigDecimal, String> {
+
+    @Inject
+    LocalizationAdapter localizationAdapter;
+
+    @Inject
+    LocalizationService localizationService;
 
     @Override
     public String convert(BigDecimal value, AuraLocale locale) {
@@ -41,12 +49,12 @@ public class LocalizedBigDecimalToStringConverter extends BigDecimalToStringConv
         }
 
         if (locale == null) {
-            locale = Aura.getLocalizationAdapter().getAuraLocale();
+            locale = localizationAdapter.getAuraLocale();
         }
 
         try {
             Locale loc = locale.getNumberLocale();
-            return Aura.getLocalizationService().formatNumber(value, loc);
+            return localizationService.formatNumber(value, loc);
         } catch (Exception e) {
             return super.convert(value);
         }

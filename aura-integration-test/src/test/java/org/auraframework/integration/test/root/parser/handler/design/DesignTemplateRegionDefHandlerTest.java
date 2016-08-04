@@ -17,9 +17,9 @@ package org.auraframework.integration.test.root.parser.handler.design;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignTemplateRegionDef;
-import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;

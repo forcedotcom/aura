@@ -17,12 +17,14 @@ package org.auraframework.components.aura;
 
 import java.io.IOException;
 
-import org.auraframework.Aura;
 import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import javax.inject.Inject;
 
 /**
  * Renders client side registration and key retrieval of CryptoAdapter for auraStorage:crypto
@@ -95,13 +97,15 @@ public class CryptoAdapterRegistrationRenderer implements Renderer {
         "}"
     ;
 
+    private ConfigAdapter configAdapter;
+
     @Override
     public void render(BaseComponent<?, ?> component, RenderContext renderContext) throws IOException, QuickFixException {
 
         Boolean debug = (Boolean) component.getAttributes().getValue("debugLoggingEnabled");
         Boolean fetchRemoteKey = (Boolean) component.getAttributes().getValue("fetchRemoteKey");
 
-        String encryptionKeyUrl = Aura.getConfigAdapter().getEncryptionKeyURL(false);
+        String encryptionKeyUrl = configAdapter.getEncryptionKeyURL(false);
         renderContext.pushScript();
         renderContext.getCurrent()
                 .append("(function(debug, fetchRemoteKey, url){\n")
@@ -109,5 +113,10 @@ public class CryptoAdapterRegistrationRenderer implements Renderer {
                 .append("\n}(").append(String.valueOf(debug)).append(",").append(String.valueOf(fetchRemoteKey))
                     .append(", \"").append(encryptionKeyUrl).append("\"));");
         renderContext.popScript();
+    }
+
+    @Inject
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
     }
 }

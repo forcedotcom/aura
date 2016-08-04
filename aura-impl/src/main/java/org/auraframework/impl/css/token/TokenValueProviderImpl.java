@@ -15,13 +15,7 @@
  */
 package org.auraframework.impl.css.token;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.google.common.base.Optional;
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.TokenCache;
 import org.auraframework.css.TokenValueProvider;
@@ -31,15 +25,20 @@ import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.css.util.Tokens;
+import org.auraframework.impl.expression.AuraExpressionBuilder;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
 
-import com.google.common.base.Optional;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Responsible for taking a String reference to a token name and finding the applicable value.
@@ -80,7 +79,7 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
      * @throws AuraValidationException
      */
     private static Expression getExpression(String expression, Location location) throws AuraValidationException {
-        return AuraImpl.getExpressionAdapter().buildExpression(expression, location);
+        return AuraExpressionBuilder.INSTANCE.buildExpression(expression, location);
     }
 
     /**

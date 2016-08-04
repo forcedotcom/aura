@@ -21,20 +21,23 @@ import java.util.Map;
 
 import javax.annotation.concurrent.ThreadSafe;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 
-import aQute.bnd.annotation.component.Component;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Collection;
 
-/**
- */
 @ThreadSafe
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ComponentDefJSONFormatAdapter extends JSONFormatAdapter<BaseComponentDef> {
+    @Inject
+    private ContextService contextService;
 
     @Override
     public Class<BaseComponentDef> getType() {
@@ -44,14 +47,14 @@ public class ComponentDefJSONFormatAdapter extends JSONFormatAdapter<BaseCompone
     @Override
     public void writeCollection(Collection<? extends BaseComponentDef> values, Appendable out) throws IOException,
             QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         JsonEncoder.serialize(values, out, context.getJsonSerializationContext());
     }
     
     @Override
     public void write(BaseComponentDef value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         JsonEncoder.serialize(value, out, context.getJsonSerializationContext());
     }
 }

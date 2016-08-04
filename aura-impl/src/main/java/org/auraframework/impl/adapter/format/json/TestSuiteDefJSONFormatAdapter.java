@@ -15,21 +15,20 @@
  */
 package org.auraframework.impl.adapter.format.json;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.TestSuiteDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.json.JsonEncoder;
 
-import aQute.bnd.annotation.component.Component;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Map;
 
-/**
- */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class TestSuiteDefJSONFormatAdapter extends JSONFormatAdapter<TestSuiteDef> {
+    @Inject
+    private ContextService contextService;
 
     @Override
     public Class<TestSuiteDef> getType() {
@@ -38,8 +37,7 @@ public class TestSuiteDefJSONFormatAdapter extends JSONFormatAdapter<TestSuiteDe
 
     @Override
     public void write(TestSuiteDef value, Map<String, Object> attributes, Appendable out) throws IOException {
-        AuraContext c = Aura.getContextService().getCurrentContext();
+        AuraContext c = contextService.getCurrentContext();
         JsonEncoder.serialize(value, out, c.getJsonSerializationContext());
     }
-
 }

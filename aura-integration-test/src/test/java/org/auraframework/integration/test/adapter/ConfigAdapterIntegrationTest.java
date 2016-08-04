@@ -19,8 +19,9 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
 
-import org.auraframework.Aura;
+import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -28,6 +29,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.adapter.ConfigAdapterImpl;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.AuraContext;
+import org.auraframework.util.IOUtil;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
@@ -39,10 +41,13 @@ import com.google.common.collect.Sets;
  * Tests for ConfigAdapterImpl requiring Aura services to be available
  */
 public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
+    @Inject
+    LocalizationAdapter localizationAdapter;
+
 
     @Test
     public void testGetEquivalentTimezoneSamples() throws Exception {
-        ConfigAdapterImpl impl = new ConfigAdapterImpl();
+        ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
         String tz = impl.getAvailableTimezone("US/Pacific");
         assertEquals("US/Pacific should return America/Los_Angeles as available equivalent",
                 "America/Los_Angeles", tz);
@@ -76,7 +81,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
     @Test
     public void testAllWalltimeMapped() throws Exception {
         Set<String> timezones = Sets.newHashSet();
-        Map<String, String> timezonesMap = AuraPrivateAccessor.<Map<String, String>>invoke(new ConfigAdapterImpl(), "readEquivalentTimezones");
+        Map<String, String> timezonesMap = AuraPrivateAccessor.<Map<String, String>>invoke(new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor), "readEquivalentTimezones");
         for (String equivalent : timezonesMap.values()) {
             timezones.add(equivalent.replace("/", "-"));
         }
@@ -101,7 +106,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         String expected="resetCSS.css";
 
         startAppContext("<aura:application></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS should default to resetCSS.css. Found: "+resetCssUrl, actual);
@@ -112,7 +117,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         String expected="#FAKEUID#";
 
         startAppContext("<aura:application></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS url should contain fake fwUid for long cache headers. Found: "+resetCssUrl, actual);
@@ -125,7 +130,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
 
         startAppContext("<aura:application template='"+template.getDescriptorName()+"'></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS url should default to resetCSS.css for extended template. Found: "+resetCssUrl, actual);
@@ -138,7 +143,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
 
         startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS url should be overridden to resetCss.css for extended template. Found: "+resetCssUrl,actual);
@@ -153,7 +158,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
 
         startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
-        String actual=Aura.getConfigAdapter().getResetCssURL();
+        String actual = configAdapter.getResetCssURL();
 
         assertEquals("Reset CSS url should be null for extended template.", expected, actual);
     }
@@ -167,7 +172,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
 
         startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS url should be overridden to normalize.css for extended template. Found: " + resetCssUrl, actual);
@@ -184,7 +189,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
 
         startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS url should be overridden to normalize.css for last extended template. Found: " + resetCssUrl, actual);
@@ -201,7 +206,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
 
         startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS url should be overridden to resetCSS.css for last extended template. Found: "+resetCssUrl,actual);
@@ -218,7 +223,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
 
         startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
-        String actual=Aura.getConfigAdapter().getResetCssURL();
+        String actual = configAdapter.getResetCssURL();
 
         assertEquals("Reset CSS url should be null for last extended template.", expected, actual);
     }
@@ -234,7 +239,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
 
         startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS url should remain resetCSS.css for last extended template. Found: " + resetCssUrl, actual);
@@ -252,7 +257,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
 
         startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS url should remain normalize.css for last extended template. Found: " + resetCssUrl, actual);
@@ -270,7 +275,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
 
         startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
-        String actual=Aura.getConfigAdapter().getResetCssURL();
+        String actual = configAdapter.getResetCssURL();
 
         assertEquals("Reset CSS url should remain null for last extended template.", expected, actual);
     }
@@ -284,7 +289,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> parentApp = addSourceAutoCleanup(ApplicationDef.class, parentAppSrc);
 
         startAppContext("<aura:application access='unauthenticated' extends='"+parentApp.getDescriptorName()+"'></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS url should default to normalize.css for extended application. Found: " + resetCssUrl, actual);
@@ -299,7 +304,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> parentApp = addSourceAutoCleanup(ApplicationDef.class, parentAppSrc);
 
         startAppContext("<aura:application access='unauthenticated' extends='"+parentApp.getDescriptorName()+"'></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS url should default to resetCSS.css for extended application. Found: " + resetCssUrl, actual);
@@ -314,7 +319,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> parentApp = addSourceAutoCleanup(ApplicationDef.class, parentAppSrc);
 
         startAppContext("<aura:application access='unauthenticated' extends='"+parentApp.getDescriptorName()+"'></aura:application>");
-        String actual=Aura.getConfigAdapter().getResetCssURL();
+        String actual = configAdapter.getResetCssURL();
 
         assertEquals("Reset CSS url should default to normalize.css for extended application.", expected, actual);
     }
@@ -328,7 +333,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> parentApp = addSourceAutoCleanup(ApplicationDef.class, parentAppSrc);
 
         startAppContext("<aura:application access='unauthenticated' extends='"+parentApp.getDescriptorName()+"' template='"+template.getDescriptorName()+"'></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS url should default to normalize.css for extended application. Found: " + resetCssUrl, actual);
@@ -343,7 +348,7 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> parentApp = addSourceAutoCleanup(ApplicationDef.class, parentAppSrc);
 
         startAppContext("<aura:application access='unauthenticated' extends='"+parentApp.getDescriptorName()+"' template='"+template.getDescriptorName()+"'></aura:application>");
-        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        String resetCssUrl = configAdapter.getResetCssURL();
         boolean actual=resetCssUrl.contains(expected);
 
         assertTrue("Reset CSS url should default to resetCSS.css for extended application. Found: " + resetCssUrl, actual);
@@ -358,17 +363,17 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> parentApp = addSourceAutoCleanup(ApplicationDef.class, parentAppSrc);
 
         startAppContext("<aura:application access='unauthenticated' extends='"+parentApp.getDescriptorName()+"' template='"+template.getDescriptorName()+"'></aura:application>");
-        String actual=Aura.getConfigAdapter().getResetCssURL();
+        String actual = configAdapter.getResetCssURL();
 
         assertEquals("Reset CSS url should default to normalize.css for extended application.", expected, actual);
     }
 
     private DefDescriptor<ApplicationDef> startAppContext(String markup){
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, markup);
-        if (Aura.getContextService().isEstablished()) {
-            Aura.getContextService().endContext();
+        if (contextService.isEstablished()) {
+            contextService.endContext();
         }
-        AuraContext ctx = Aura.getContextService().startContext(
+        AuraContext ctx = contextService.startContext(
                 AuraContext.Mode.UTEST,
                 AuraContext.Format.JSON,
                 AuraContext.Authentication.UNAUTHENTICATED,

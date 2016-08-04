@@ -15,22 +15,24 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.FlavorDefaultDef;
 import org.auraframework.def.FlavorIncludeDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.flavor.FlavorsDefImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 public class FlavorsDefHandler extends RootTagHandler<FlavorsDef> {
     protected static final String TAG = "aura:flavors";
@@ -42,8 +44,10 @@ public class FlavorsDefHandler extends RootTagHandler<FlavorsDef> {
     }
 
     public FlavorsDefHandler(DefDescriptor<FlavorsDef> defDescriptor, Source<FlavorsDef> source,
-            XMLStreamReader xmlReader) throws QuickFixException {
-        super(defDescriptor, source, xmlReader);
+                             XMLStreamReader xmlReader, boolean isInInternalNamespace,
+                             DefinitionService definitionService,
+                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws QuickFixException {
+        super(defDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
 
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(getLocation());
@@ -54,6 +58,8 @@ public class FlavorsDefHandler extends RootTagHandler<FlavorsDef> {
         if (!isInInternalNamespace()) {
             throw new DefinitionNotFoundException(defDescriptor);
         }
+
+        builder.setAccess(getAccess(isInInternalNamespace));
     }
 
     @Override
@@ -76,11 +82,13 @@ public class FlavorsDefHandler extends RootTagHandler<FlavorsDef> {
         String tag = getTagName();
 
         if (FlavorIncludeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            FlavorIncludeDef def = new FlavorIncludeDefHandler<>(this, xmlReader, source).getElement();
+            FlavorIncludeDef def = new FlavorIncludeDefHandler<>(this, xmlReader, source, isInInternalNamespace,
+                    definitionService, configAdapter, definitionParserAdapter).getElement();
             builder.addFlavorIncludeDef(def);
         }
         else if (FlavorDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
-            FlavorDefaultDef def = new FlavorDefaultDefHandler<>(this, xmlReader, source).getElement();
+            FlavorDefaultDef def = new FlavorDefaultDefHandler<>(this, xmlReader, source, isInInternalNamespace,
+                    definitionService, configAdapter, definitionParserAdapter).getElement();
             builder.addFlavorDefaultDef(def);
         } else {
             error("Found unexpected tag %s", tag);

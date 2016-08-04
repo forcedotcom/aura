@@ -17,12 +17,22 @@ package org.auraframework.test.http;
 
 import java.util.List;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.http.ManifestUtil;
+import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 public class ManifestUtilTest extends UnitTestCase {
+    @Mock
+    ConfigAdapter configAdapter;
+
+    @Mock
+    ContextService contextService;
 
     private long checkManifestCookieValue(String cookie, int count, long time) {
         List<String> parts = AuraTextUtil.splitSimple(":", cookie, 2);
@@ -45,7 +55,10 @@ public class ManifestUtilTest extends UnitTestCase {
      */
     @Test
     public void testUpdateManifestCookieNull() {
-        String value = new ManifestUtil().updateManifestCookieValue(null);
+        AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
+
+        String value = new ManifestUtil(contextService, configAdapter).updateManifestCookieValue(null);
         checkManifestCookieValue(value, 1, 0);
     }
 
@@ -54,7 +67,9 @@ public class ManifestUtilTest extends UnitTestCase {
      */
     @Test
     public void testUpdateManifestCookieEmpty() {
-        String value = new ManifestUtil().updateManifestCookieValue("");
+        AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
+        String value = new ManifestUtil(contextService, configAdapter).updateManifestCookieValue("");
         checkManifestCookieValue(value, 1, 0);
     }
 
@@ -63,7 +78,9 @@ public class ManifestUtilTest extends UnitTestCase {
      */
     @Test
     public void testUpdateManifestCookieInvalidFormat() {
-        ManifestUtil manifestUtil = new ManifestUtil();
+        AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
+        ManifestUtil manifestUtil = new ManifestUtil(contextService, configAdapter);
         String value = manifestUtil.updateManifestCookieValue("12345678");
         checkManifestCookieValue(value, 1, 0);
 
@@ -76,7 +93,9 @@ public class ManifestUtilTest extends UnitTestCase {
      */
     @Test
     public void testUpdateManifestCookieError() {
-        assertNull(new ManifestUtil().updateManifestCookieValue("error"));
+        AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
+        assertNull(new ManifestUtil(contextService, configAdapter).updateManifestCookieValue("error"));
     }
 
     /**
@@ -84,7 +103,9 @@ public class ManifestUtilTest extends UnitTestCase {
      */
     @Test
     public void testUpdateManifestCookieBadCount() {
-        assertNull(new ManifestUtil().updateManifestCookieValue("one:123456789"));
+        AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
+        assertNull(new ManifestUtil(contextService, configAdapter).updateManifestCookieValue("one:123456789"));
     }
 
     /**
@@ -92,7 +113,9 @@ public class ManifestUtilTest extends UnitTestCase {
      */
     @Test
     public void testUpdateManifestCookieBadTime() {
-        assertNull(new ManifestUtil().updateManifestCookieValue("1:jan 6 2013"));
+        AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
+        assertNull(new ManifestUtil(contextService, configAdapter).updateManifestCookieValue("1:jan 6 2013"));
     }
 
     /**
@@ -100,7 +123,9 @@ public class ManifestUtilTest extends UnitTestCase {
      */
     @Test
     public void testUpdateManifestCookieExpired() {
-        String value = new ManifestUtil().updateManifestCookieValue("99:0");
+        AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
+        String value = new ManifestUtil(contextService, configAdapter).updateManifestCookieValue("99:0");
         checkManifestCookieValue(value, 1, 0);
     }
 
@@ -109,7 +134,9 @@ public class ManifestUtilTest extends UnitTestCase {
      */
     @Test
     public void testUpdateManifestCookieOverCount() {
-        ManifestUtil manifestUtil = new ManifestUtil();
+        AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
+        ManifestUtil manifestUtil = new ManifestUtil(contextService, configAdapter);
         String value = "";
         long time = 0;
         int i;

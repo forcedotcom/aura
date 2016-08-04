@@ -15,15 +15,9 @@
  */
 package org.auraframework.integration.test.util;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.http.Header;
@@ -43,7 +37,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -63,15 +57,26 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import javax.inject.Inject;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Base class with some helper methods specific to Aura.
  */
 @SuppressWarnings("deprecation")
 public abstract class AuraHttpTestCase extends IntegrationTestCase {
+    @Inject
+    private ConfigAdapter configAdapter;
+
     /**
      * Given a URL to post a GET request, this method compares the actual status code of the response with an expected
      * status code.
@@ -104,7 +109,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @param allowInline Allows inline script-src and style-src
      */
     protected void assertDefaultAntiClickjacking(HttpResponse response, boolean guarded, boolean allowInline) {
-        String adapterClassName = Aura.getConfigAdapter().getClass().getName();
+        String adapterClassName = configAdapter.getClass().getName();
         if (adapterClassName.equals("org.auraframework.impl.adapter.ConfigAdapterImpl")
                 || adapterClassName.equals("org.auraframework.impl.adapter.MockConfigAdapterImpl")) {
             Header[] headers = response.getHeaders("X-FRAME-OPTIONS");
@@ -112,7 +117,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             if (guarded) {
                 assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
                 Map<String, String> csp = getCSP(response);
-                AuraContext context = Aura.getContextService().getCurrentContext();
+                AuraContext context = contextService.getCurrentContext();
                 boolean testMode = context != null && context.isTestMode();
                 if (testMode || allowInline) {
                     assertEquals("frame-ancestors is wrong", "*", csp.get("frame-ancestors"));
@@ -374,7 +379,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
         if (!postParams.containsKey("aura.context")) {
             postParams.put("aura.context",
-                    Aura.getContextService().getCurrentContext().serialize(EncodingStyle.Normal));
+                    contextService.getCurrentContext().serialize(EncodingStyle.Normal));
         }
         HttpPost post = obtainPostMethod("/aura", postParams);
         perform(post);
@@ -737,7 +742,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
 
         @Override
-        public void setCallingDescriptor(String caller) {
+        public void setCallingDescriptor(DefDescriptor<ComponentDef> descriptor) {
         }
 
 		@Override

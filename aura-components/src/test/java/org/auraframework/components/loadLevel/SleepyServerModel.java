@@ -18,11 +18,12 @@ package org.auraframework.components.loadLevel;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 
-@Model
-public class SleepyServerModel {
+@ServiceComponentModelInstance
+public class SleepyServerModel implements ModelInstance {
     public SleepyServerModel() throws InterruptedException {
         Thread.sleep(10000);
     }

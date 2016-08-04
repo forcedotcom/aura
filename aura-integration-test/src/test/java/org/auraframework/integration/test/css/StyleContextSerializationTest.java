@@ -15,18 +15,15 @@
  */
 package org.auraframework.integration.test.css;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.auraframework.Aura;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.adapter.StyleAdapterImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -37,13 +34,19 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Sets;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Comprehensive functional tests for serialization of app.css urls.
  */
 public class StyleContextSerializationTest extends AuraImplTestCase {
+
+    @Inject
+    private ServletUtilAdapter servletUtilAdapter;
+
     @UnAdaptableTest("core add info about if we are on desktop, we don't")
     /** test that the css url includes the client/browser, no extra true conditions */
     @Test
@@ -82,7 +85,7 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
     @Test
     public void testCssUrlWithProvidedTokens() throws Exception {
         String name = "test:fakeTokensWithDescriptorProvider";
-        DefDescriptor<TokensDef> desc = DefDescriptorImpl.getInstance(name, TokensDef.class);
+        DefDescriptor<TokensDef> desc = definitionService.getDefDescriptor(name, TokensDef.class);
         setupContext(desc.getDescriptorName());
         goldFileAppCssUrl();
     }
@@ -96,12 +99,12 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
     }
 
     private AuraContext setupContext(DefDescriptor<ApplicationDef> defdesc) {
-        if (Aura.getContextService().isEstablished()) {
-            Aura.getContextService().endContext();
+        if (contextService.isEstablished()) {
+            contextService.endContext();
         }
 
         AuraContext ctx;
-        ctx = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, defdesc);
+        ctx = contextService.startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, defdesc);
         ctx.setFrameworkUID("#FAKEUID#");
         return ctx;
     }
@@ -110,7 +113,7 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
         List<DefDescriptor<TokensDef>> tokens = new ArrayList<>();
 
         for (int i = 0; i < descriptors.length; i++) {
-            tokens.add(DefDescriptorImpl.getInstance(descriptors[i], TokensDef.class));
+            tokens.add(definitionService.getDefDescriptor(descriptors[i], TokensDef.class));
         }
 
         String markup = "<aura:application access='unauthenticated' tokens='%s'/>";
@@ -120,10 +123,10 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
     }
 
     private void goldFileAppCssUrl() throws Exception {
-        AuraContext ctx = Aura.getContextService().getCurrentContext();
+        AuraContext ctx = contextService.getCurrentContext();
         String url = null;
 
-        for (String style : Aura.getServletUtilAdapter().getStyles(ctx)) {
+        for (String style : servletUtilAdapter.getStyles(ctx)) {
             if (style.endsWith("app.css")) {
                 url = style;
                 break;

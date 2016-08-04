@@ -15,13 +15,12 @@
  */
 package org.auraframework.test.perf.core;
 
+import com.google.common.base.Function;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.google.common.base.Function;
 
 /**
  * Base class for Aura WebDriver tests.
@@ -35,11 +34,13 @@ public abstract class CustomPerfAbstractTestCase extends AbstractPerfTestCase {
     protected DefDescriptor<ComponentDef> descriptor;
 
     public CustomPerfAbstractTestCase(String name) {
-        super(name);
+        super();
+        setName(name);
     }
 
     public CustomPerfAbstractTestCase(String name, DefDescriptor<ComponentDef> desc) {
-        super(name);
+        super();
+        setName(name);
         descriptor = desc;
     }
 

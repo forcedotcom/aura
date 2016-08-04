@@ -18,6 +18,7 @@ package org.auraframework.integration.test.http;
 import org.apache.http.HttpStatus;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.test.annotation.AuraTestLabels;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -36,8 +37,9 @@ public class AuraRewriteFilterHttpTest extends AuraHttpTestCase {
                 "/aura/text.cmp?value=DUTCH&aura.mode=DEV", HttpStatus.SC_OK);
     }
 
-    // TODO: W-1088932
-    public void _testDoFilterOfMalformedURLs() throws Exception {
+    @Ignore("TODO: W-1088932")
+    @Test
+    public void testDoFilterOfMalformedURLs() throws Exception {
         assertUrlResponse("Shouldn't forward url without namespace.", "//text.cmp", HttpStatus.SC_NOT_FOUND);
         assertUrlResponse("Shouldn't forward url without component name.", "/aura/.cmp?aura.mode=PROD",
                 HttpStatus.SC_NOT_FOUND);

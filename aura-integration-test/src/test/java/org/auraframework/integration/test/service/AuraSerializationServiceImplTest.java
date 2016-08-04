@@ -15,30 +15,29 @@
  */
 package org.auraframework.integration.test.service;
 
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.SerializationServiceImpl;
 import org.auraframework.instance.Component;
-import org.auraframework.service.InstanceService;
 import org.auraframework.service.SerializationService;
 import org.junit.Test;
 
+import javax.inject.Inject;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+
 public class AuraSerializationServiceImplTest extends AuraImplTestCase {
+    @Inject
+    private SerializationService serializationService;
+
     @Test
     public void testAuraSerializationService() {
-        SerializationService serializationService = Aura.getSerializationService();
         assertTrue(serializationService instanceof SerializationServiceImpl);
     }
 
     @Test
     public void testWriteJson() throws Exception {
-        InstanceService instanceService = Aura.getInstanceService();
-        SerializationService serializationService = Aura.getSerializationService();
 
         StringWriter out = new StringWriter();
         Map<String, Object> attributes = new HashMap<>();

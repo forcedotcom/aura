@@ -29,6 +29,7 @@ import org.auraframework.impl.root.parser.handler.design.DesignDefHandler;
 import org.auraframework.impl.root.parser.handler.design.DesignTemplateDefHandler;
 import org.auraframework.impl.root.parser.handler.design.DesignTemplateRegionDefHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -51,12 +52,15 @@ public abstract class XMLHandler<T extends Definition> extends BaseXMLElementHan
             LibraryDefHandler.TAG, IncludeDefRefHandler.TAG);
     private static final String SYSTEM_TAG_PREFIX = "aura";
 
-    protected XMLHandler(XMLStreamReader xmlReader, Source<?> source) {
+    protected final DefinitionService definitionService;
+
+    protected XMLHandler(XMLStreamReader xmlReader, Source<?> source, DefinitionService definitionService) {
         super(xmlReader, source);
+        this.definitionService = definitionService;
     }
 
     protected XMLHandler() {
-        this(null, null);
+        this(null, null, null);
     }
 
     /**
@@ -173,12 +177,12 @@ public abstract class XMLHandler<T extends Definition> extends BaseXMLElementHan
      * @return An instance of a AuraDescriptor for the provided tag with updated ns for sources with default namespace support
      */
     protected <E extends Definition> DefDescriptor<E> getDefDescriptor(String name, Class<E> clazz) {
-        DefDescriptor<E> defDesc = DefDescriptorImpl.getInstance(name, clazz);
+        DefDescriptor<E> defDesc = definitionService.getDefDescriptor(name, clazz);
 
         if (("apex".equals(defDesc.getPrefix()) || "markup".equals(defDesc.getPrefix())) // only needed for apex && markup def descriptors
             && isDefaultNamespaceUsed(defDesc.getNamespace())) {  // and default ns is used
             String qualifiedName =  DefDescriptorImpl.buildQualifiedName(defDesc.getPrefix(), source.getDescriptor().getNamespace(), defDesc.getName());
-            defDesc = DefDescriptorImpl.getInstance(qualifiedName, clazz);
+            defDesc = definitionService.getDefDescriptor(qualifiedName, clazz);
         }
 
         return defDesc;

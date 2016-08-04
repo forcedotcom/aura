@@ -15,9 +15,14 @@
  */
 package org.auraframework.util.type;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.springframework.context.annotation.Lazy;
+
 import java.util.HashSet;
 import java.util.Set;
 
+@Lazy
+@ServiceComponent
 public class CustomAbstractTypeConverter implements MultiConverter<CustomAbstractType> {
 
 	private static Set<Class<?>> toSet;

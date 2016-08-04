@@ -20,10 +20,13 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.LocatorContextDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.locator.LocatorContextDefImpl;
 import org.auraframework.impl.util.TextTokenizer;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -40,8 +43,11 @@ public class LocatorContextDefHandler<P extends RootDefinition> extends Parented
 
     private final LocatorContextDefImpl.Builder builder = new LocatorContextDefImpl.Builder();
 
-    public LocatorContextDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(parentHandler, xmlReader, source);
+    public LocatorContextDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                                    boolean isInInternalNamespace, DefinitionService definitionService,
+                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter,
+                definitionParserAdapter);
     }
 
     public LocatorContextDefHandler() {

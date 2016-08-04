@@ -15,6 +15,8 @@
  */
 package org.auraframework.integration.test.css;
 
+import javax.inject.Inject;
+
 import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -24,10 +26,15 @@ import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
 public class FlavorsDefImplTest extends StyleTestCase {
+
+    @Inject
+    DefinitionService definitionService;
+
     @Test
     public void testLoadsIndependently() throws QuickFixException {
         // flavor assortments can be placed independently in their own bundles
@@ -78,7 +85,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
                 + "<aura:include source='flavorTestAlt:flavorsAlt'/>"
                 + "</aura:flavors>";
 
-        DefDescriptor<ComponentDef> cmp1 = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
+        DefDescriptor<ComponentDef> cmp1 = definitionService.getDefDescriptor("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> style = Flavors.customFlavorDescriptor(cmp1, "flavorTestAlt", "flavorsAlt");
 
         DefDescriptor<FlavorsDef> fa = addFlavorAssortment(fmt);
@@ -89,8 +96,8 @@ public class FlavorsDefImplTest extends StyleTestCase {
 
     @Test
     public void testSerialization() throws Exception {
-        DefDescriptor<ComponentDef> cmp1 = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
-        DefDescriptor<ComponentDef> cmp2 = DefDescriptorImpl.getInstance("flavorTest:x_landmark", ComponentDef.class);
+        DefDescriptor<ComponentDef> cmp1 = definitionService.getDefDescriptor("flavorTest:x_sample", ComponentDef.class);
+        DefDescriptor<ComponentDef> cmp2 = definitionService.getDefDescriptor("flavorTest:x_landmark", ComponentDef.class);
 
         String fmt = "<aura:flavors>"
                 + "<aura:include source='flavorTestAlt:flavors'/>"

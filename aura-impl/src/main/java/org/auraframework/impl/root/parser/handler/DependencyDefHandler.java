@@ -15,22 +15,23 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.util.TypeParser;
 import org.auraframework.impl.util.TypeParser.Type;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 /**
  * aura:dependency tags.
@@ -50,12 +51,15 @@ public class DependencyDefHandler<P extends RootDefinition> extends ParentedTagH
         super();
     }
 
-    public DependencyDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) throws DefinitionNotFoundException {
-        super(parentHandler, xmlReader, source);
+    public DependencyDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                                boolean isInInternalNamespace, DefinitionService definitionService,
+                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws DefinitionNotFoundException {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
 
         this.builder = new DependencyDefImpl.Builder();
         this.builder.setLocation(getLocation());
         this.builder.setParentDescriptor(parentHandler.getDefDescriptor());
+        this.builder.setAccess(getAccess(isInInternalNamespace));
     }
 
     @Override

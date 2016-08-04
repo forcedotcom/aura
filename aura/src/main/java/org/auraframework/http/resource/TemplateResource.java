@@ -22,10 +22,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -34,6 +36,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
@@ -46,13 +49,22 @@ import org.auraframework.util.json.JsonEncoder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+@ServiceComponent
 public abstract class TemplateResource extends AuraResourceImpl {
-    protected LoggingService loggingService = Aura.getLoggingService();
-    protected RenderingService renderingService = Aura.getRenderingService();
-    protected ManifestUtil manifestUtil = new ManifestUtil();
+
+    protected LoggingService loggingService;
+    protected RenderingService renderingService;
+    protected ContextService contextService;
+
+    protected ManifestUtil manifestUtil;
 
     public TemplateResource(String name, Format format) {
         super(name, format);
+    }
+
+    @PostConstruct
+    public void initManifest() {
+        this.manifestUtil = new ManifestUtil(contextService, configAdapter);
     }
 
     @Override
@@ -209,5 +221,20 @@ public abstract class TemplateResource extends AuraResourceImpl {
                 out.append(String.format(lazy ? HTML_LAZY_SCRIPT : HTML_SCRIPT, script));
             }
         }
+    }
+
+    @Inject
+    public void setLoggingService(LoggingService loggingService) {
+        this.loggingService = loggingService;
+    }
+
+    @Inject
+    public void setRenderingService(RenderingService renderingService) {
+        this.renderingService = renderingService;
+    }
+
+    @Inject
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
     }
 }

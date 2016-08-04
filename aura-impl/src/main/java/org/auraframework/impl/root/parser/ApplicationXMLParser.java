@@ -15,17 +15,42 @@
  */
 package org.auraframework.impl.root.parser;
 
-import javax.xml.stream.XMLStreamReader;
-
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 
+import javax.inject.Inject;
+import javax.xml.stream.XMLStreamReader;
+
+@ServiceComponent
 public class ApplicationXMLParser extends XMLParser<ApplicationDef> {
+
+    @Inject
+    private ContextService contextService;
+    
+    @Override
+    public Format getFormat() {
+        return Format.XML;
+    }
+
+    @Override
+    public DefType getDefType() {
+        return DefType.APPLICATION;
+    }
+
     @Override
     protected ApplicationDefHandler getHandler(DefDescriptor<ApplicationDef> descriptor,
-            Source<ApplicationDef> source, XMLStreamReader xmlReader) {
-        return new ApplicationDefHandler(descriptor, source, xmlReader);
+                                               Source<ApplicationDef> source, XMLStreamReader xmlReader,
+                                               boolean isInInternalNamespace, DefinitionService definitionService,
+                                               ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        return new ApplicationDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
+                contextService, configAdapter, definitionParserAdapter);
     }
 }

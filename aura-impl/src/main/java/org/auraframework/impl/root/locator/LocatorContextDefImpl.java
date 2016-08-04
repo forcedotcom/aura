@@ -18,6 +18,7 @@ package org.auraframework.impl.root.locator;
 import java.io.IOException;
 
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.LocatorContextDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -31,8 +32,8 @@ public class LocatorContextDefImpl extends DefinitionImpl<LocatorContextDef> imp
     private String key;
     private Object value;
 
-    public LocatorContextDefImpl(DefDescriptor<LocatorContextDef> descriptor, Location location) {
-        super(descriptor, location);
+    public LocatorContextDefImpl(DefDescriptor<LocatorContextDef> descriptor, Location location, DefinitionAccess access) {
+        super(descriptor, location, access);
     }
 
     public LocatorContextDefImpl(Builder builder) {

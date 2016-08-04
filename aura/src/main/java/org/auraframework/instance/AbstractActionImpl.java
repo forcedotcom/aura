@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
@@ -105,7 +104,7 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
 
     /**
      * Log any params that are useful and safe to log.
-     * @param paramLogger
+     * @param logger logger
      */
     @Override
     public void logParams(KeyValueLogger logger) {
@@ -136,8 +135,8 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     }
 
     @Override
-    public void setCallingDescriptor(String desc) { 
-        this.callingDescriptor = Aura.getDefinitionService().getDefDescriptor(desc, ComponentDef.class);
+    public void setCallingDescriptor(DefDescriptor<ComponentDef> descriptor) {
+        this.callingDescriptor = descriptor;
     }
 
     @Override

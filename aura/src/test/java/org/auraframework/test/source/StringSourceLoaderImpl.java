@@ -15,28 +15,55 @@
  */
 package org.auraframework.test.source;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
-//import javax.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.FlavorsDef;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.IncludeDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LibraryDef;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.SVGDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.TestSuiteDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.*;
+import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
+import org.auraframework.util.FileMonitor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * This source loader allows tests to load and unload source from strings.
@@ -49,11 +76,30 @@ import com.google.common.collect.*;
  * or provide descriptors via find that aura will not be able to find because it has a fixed idea of the namespaces
  * represented. This could be fixed by providing a fixed view into the namespaces provided.
  */
-@ServiceComponent
-public class StringSourceLoaderImpl implements StringSourceLoader {
-    private DefinitionService definitionService = Aura.getDefinitionService();
+public final class StringSourceLoaderImpl implements StringSourceLoader {
+    
+    public StringSourceLoaderImpl() {
+    }
+    
+    @Configuration
+    public static class BeanConfiguration {
+        private static final StringSourceLoaderImpl INSTANCE = new StringSourceLoaderImpl();
 
-    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
+        @Lazy
+        @Bean
+        public StringSourceLoader stringSourceLoaderImpl() {
+            return INSTANCE;
+        }
+    }
+    
+    @Inject
+    private DefinitionService definitionService;
+
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @Inject
+    private FileMonitor fileMonitor;
 
     private static final String DEFAULT_NAME_PREFIX = "thing";
     private static final Set<String> PREFIXES = ImmutableSet.of(
@@ -95,12 +141,12 @@ public class StringSourceLoaderImpl implements StringSourceLoader {
             return (StringSource<D>)defs.get(descriptor);
         }
 
-        /**
+    /**
          * Put a definition in the namespace.
          *
          * @param def the definition.
          * @param overwrite should we overwrite whatever is there?
-         */
+     */
         public <D extends Definition> boolean put(StringSource<D> def, boolean overwrite) {
             StringSource<? extends Definition> oldDef;
             if (overwrite) {
@@ -118,7 +164,7 @@ public class StringSourceLoaderImpl implements StringSourceLoader {
                         + " current access = " + access
                         + " requested access = " + requestedAccess);
             }
-        }
+    }
 
         public boolean remove(DefDescriptor<? extends Definition> descriptor) {
             Preconditions.checkState(defs.remove(descriptor) != null);
@@ -131,22 +177,6 @@ public class StringSourceLoaderImpl implements StringSourceLoader {
      */
     private final Map<String, NamespaceInfo> namespaces = new ConcurrentHashMap<>();
 
-    private static StringSourceLoader INSTANCE;
-
-    static public synchronized StringSourceLoader getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new StringSourceLoaderImpl();
-        }
-        return INSTANCE;
-    }
-
-
-    public StringSourceLoaderImpl() {
-        definitionService = Aura.getDefinitionService();
-        configAdapter = Aura.getConfigAdapter();
-        init();
-    }
-    
     private NamespaceInfo getOrAddNamespace(String namespace, NamespaceAccess access) {
         nsLock.lock();
         try {
@@ -158,6 +188,9 @@ public class StringSourceLoaderImpl implements StringSourceLoader {
                     configAdapter.addPrivilegedNamespace(namespace);
                     result.setPermanent();
                 }
+                if (access == NamespaceAccess.INTERNAL) {
+                    configAdapter.addInternalNamespace(namespace);
+                }
             } else {
                 result.validateAccess(access);
             }
@@ -167,7 +200,7 @@ public class StringSourceLoaderImpl implements StringSourceLoader {
         }
     }
 
-    //@PostConstruct
+    @PostConstruct
     private void init() {
         getOrAddNamespace(DEFAULT_NAMESPACE, NamespaceAccess.INTERNAL).setPermanent();
         getOrAddNamespace(OTHER_NAMESPACE, NamespaceAccess.INTERNAL).setPermanent();
@@ -296,7 +329,7 @@ public class StringSourceLoaderImpl implements StringSourceLoader {
     public final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor, String contents,
                                                                   boolean overwrite, NamespaceAccess access) {
         Format format = DescriptorInfo.get(descriptor.getDefType().getPrimaryInterface()).getFormat();
-        StringSource<D> source = new StringSource<>(descriptor, contents, descriptor.getQualifiedName(), format);
+        StringSource<D> source = new StringSource<>(fileMonitor, descriptor, contents, descriptor.getQualifiedName(), format);
         return putSource(descriptor, source, overwrite, access);
     }
 
@@ -317,7 +350,7 @@ public class StringSourceLoaderImpl implements StringSourceLoader {
             nsLock.unlock();
         }
         // notify source listeners of change
-        definitionService.onSourceChanged(descriptor, event, null);
+        fileMonitor.onSourceChanged(descriptor, event, null);
 
         return source;
     }
@@ -341,7 +374,7 @@ public class StringSourceLoaderImpl implements StringSourceLoader {
             nsLock.unlock();
         }
         // notify source listeners of change
-        definitionService.onSourceChanged(descriptor, SourceMonitorEvent.DELETED, null);
+        fileMonitor.onSourceChanged(descriptor, SourceMonitorEvent.DELETED, null);
     }
 
     /**
@@ -409,7 +442,7 @@ public class StringSourceLoaderImpl implements StringSourceLoader {
             StringSource<D> ret = namespaceInfo.get(descriptor);
             if (ret != null) {
                 // return a copy of the StringSource to emulate other Sources (hash is reset)
-                return new StringSource<>(ret);
+                return new StringSource<>(fileMonitor, ret);
             }
         }
         return null;
@@ -493,7 +526,7 @@ public class StringSourceLoaderImpl implements StringSourceLoader {
      * Expose privileged namespaces added in StringSourceLoader for testing
      *
      * @param namespace namespace
-     * @return true if included in {@link #privilegedNamespaces}
+     * @return true if namespace has privileged access
      */
     @Override
     public boolean isPrivilegedNamespace(String namespace) {

@@ -16,7 +16,6 @@
 package org.auraframework.integration.test;
 
 import junit.framework.TestSuite;
-
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;

@@ -15,19 +15,19 @@
  */
 package org.auraframework.util.type.converter;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.util.type.Converter;
+import org.springframework.context.annotation.Lazy;
+
 import java.util.ArrayList;
 import java.util.Date;
-
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.util.type.Converter;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * Used by aura.util.type.TypeUtil
  */
+@Lazy
 @SuppressWarnings("rawtypes")
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ArrayListToDateArrayConverter implements Converter<ArrayList, Date[]> {
 
     @SuppressWarnings("unchecked")

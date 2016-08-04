@@ -16,13 +16,17 @@
 package org.auraframework.impl.test;
 
 import junit.framework.TestSuite;
-
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
 
 public class AuraImplUnitTestSuite {
     public static TestSuite suite() throws Exception {
+//    	
+//    	AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(AuraConfiguration.class); 
+//    	
+//    	applicationContext.getBean(requiredType)
+
         TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraImplTestInventory");
         TestSuite suite = inventory.getTestSuite(Type.UNIT);
         suite.setName("aura-impl unit tests");

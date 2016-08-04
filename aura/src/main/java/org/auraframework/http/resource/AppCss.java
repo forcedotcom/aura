@@ -22,10 +22,12 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 
+@ServiceComponent
 public class AppCss extends AuraResourceImpl {
 
     public AppCss() {

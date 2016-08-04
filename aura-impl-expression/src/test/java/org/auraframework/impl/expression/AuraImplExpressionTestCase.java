@@ -38,6 +38,6 @@ public abstract class AuraImplExpressionTestCase extends UnitTestCase {
     }
 
     public Expression buildExpression(String s) throws Exception {
-        return new ExpressionAdapterImpl().buildExpression(s, null);
+        return AuraExpressionBuilder.INSTANCE.buildExpression(s, null);
     }
 }

@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import junit.framework.TestCase;
 
 import org.auraframework.util.IOUtil;
+import org.auraframework.util.adapter.SourceControlAdapter;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.util.test.annotation.AuraTestLabels;
@@ -57,11 +58,14 @@ public abstract class UnitTestCase extends TestCase {
     @Inject
     private ApplicationContext applicationContext;
 
+    @Inject
+    protected SourceControlAdapter sourceControlAdapter;
+
     private static final Logger logger = Logger.getLogger("UnitTestCase");
     private static final GoldFileUtils goldFileUtils = new GoldFileUtils();
-    
-    Collection<File> tempFiles = null;
-    Stack<Runnable> tearDownSteps = null;
+
+    private Collection<File> tempFiles = null;
+    private Stack<Runnable> tearDownSteps = null;
     private PerfMetricsComparator perfMetricsComparator = PerfMetricsComparator.DEFAULT_INSTANCE;
 
     @Rule
@@ -150,6 +154,10 @@ public abstract class UnitTestCase extends TestCase {
         tearDownSteps.push(toRun);
     }
 
+    public SourceControlAdapter getSourceControlAdapter() {
+        return this.sourceControlAdapter;
+    }
+
     /**
      * @return to get metric details stored in gold file (i.e. for perf metrics)
      */
@@ -186,7 +194,7 @@ public abstract class UnitTestCase extends TestCase {
      * Overrides the default gold results folder location
      */
     public final void setExplicitPerfResultsFolder(String folder) {
-    	explicitPerfResultsFolder = folder;
+        explicitPerfResultsFolder = folder;
     }
 
     private String explicitPerfResultsFolder;

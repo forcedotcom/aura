@@ -15,11 +15,9 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokenDef;
@@ -29,13 +27,15 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.def.TokensImportDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.token.TokensDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 /**
  * Handler for aura:tokens tags.
@@ -64,10 +64,11 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
         super();
     }
 
-    public TokensDefHandler(DefDescriptor<TokensDef> defDescriptor, Source<TokensDef> source, XMLStreamReader xmlReader)
+    public TokensDefHandler(DefDescriptor<TokensDef> defDescriptor, Source<TokensDef> source, XMLStreamReader xmlReader,
+                            boolean isInInternalNamespace, DefinitionService definitionService,
+                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter)
             throws QuickFixException {
-        super(defDescriptor, source, xmlReader);
-
+        super(defDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         builder.setOwnHash(source.getHash());
     }
 
@@ -92,17 +93,17 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
 
         String parent = getAttributeValue(ATTRIBUTE_EXTENDS);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(parent)) {
-            builder.setExtendsDescriptor(DefDescriptorImpl.getInstance(parent.trim(), TokensDef.class));
+            builder.setExtendsDescriptor(definitionService.getDefDescriptor(parent.trim(), TokensDef.class));
         }
 
         String provider = getAttributeValue(ATTRIBUTE_PROVIDER);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(provider)) {
-            builder.setDescriptorProvider(DefDescriptorImpl.getInstance(provider, TokenDescriptorProviderDef.class));
+            builder.setDescriptorProvider(definitionService.getDefDescriptor(provider, TokenDescriptorProviderDef.class));
         }
 
         String mapProvider = getAttributeValue(ATTRIBUTE_MAP_PROVIDER);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(mapProvider)) {
-            builder.setMapProvider(DefDescriptorImpl.getInstance(mapProvider, TokenMapProviderDef.class));
+            builder.setMapProvider(definitionService.getDefDescriptor(mapProvider, TokenMapProviderDef.class));
         }
 
         String serialize = getAttributeValue(ATTRIBUTE_SERIALIZE);
@@ -127,7 +128,8 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
         String tag = getTagName();
 
         if (TokenDefHandler.TAG.equalsIgnoreCase(tag)) {
-            TokenDef def = new TokenDefHandler<>(this, xmlReader, source).getElement();
+            TokenDef def = new TokenDefHandler<>(this, xmlReader, source, isInInternalNamespace, definitionService,
+                    configAdapter, definitionParserAdapter).getElement();
             if (builder.tokens().containsKey(def.getName())) {
                 error("Duplicate token %s", def.getName());
             }
@@ -140,7 +142,8 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
                 error("tag %s must come before all declared tokens", TokensImportDefHandler.TAG);
             }
 
-            TokensImportDef def = new TokensImportDefHandler<>(this, xmlReader, source).getElement();
+            TokensImportDef def = new TokensImportDefHandler<>(this, xmlReader, source, isInInternalNamespace,
+                    definitionService, configAdapter, definitionParserAdapter).getElement();
             if (builder.imports().contains(def.getImportDescriptor())) {
                 error("Duplicate import %s", def.getName());
             }

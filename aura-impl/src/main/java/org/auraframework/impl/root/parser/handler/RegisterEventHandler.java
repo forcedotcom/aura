@@ -15,23 +15,24 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl.Builder;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 /**
  * handler for aura:registerEvent tag
@@ -53,8 +54,10 @@ public class RegisterEventHandler<P extends RootDefinition> extends ParentedTagH
         super();
     }
 
-    public RegisterEventHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(parentHandler, xmlReader, source);
+    public RegisterEventHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                                boolean isInInternalNamespace, DefinitionService definitionService,
+                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         if (source != null) {
             builder.setOwnHash(source.getHash());
         }

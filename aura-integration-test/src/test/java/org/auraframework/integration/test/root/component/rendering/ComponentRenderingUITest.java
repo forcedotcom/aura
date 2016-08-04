@@ -15,14 +15,14 @@
  */
 package org.auraframework.integration.test.root.component.rendering;
 
+import com.google.common.base.Function;
+
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-
-import com.google.common.base.Function;
 
 /**
  * This class has tests for rendering components on a page.
@@ -106,7 +106,7 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
      * <li>The inner facet is an interface. This has both a client renderer and
      * server renderer. Only the server renderer is used.</li>
      * </ol>
-     *
+     * 
      * <pre>
      *     test_SimpleServerRenderedPage.app   render = 'server'
      *     {

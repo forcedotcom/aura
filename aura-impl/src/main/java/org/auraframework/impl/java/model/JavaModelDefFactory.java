@@ -20,8 +20,10 @@ import java.util.List;
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.java.BaseJavaDefFactory;
 import org.auraframework.system.Annotations.Model;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -49,6 +51,7 @@ public class JavaModelDefFactory extends BaseJavaDefFactory<ModelDef> {
         builder.setDescriptor(descriptor);
         builder.setLocation(descriptor.getName(), 0);
         builder.setModelClass(c);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         Model ann = findAnnotation(c, Model.class);
         if (ann == null) {
             throw new InvalidDefinitionException(String.format(

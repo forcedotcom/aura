@@ -31,6 +31,7 @@ import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
@@ -49,12 +50,12 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
     private final EventType eventType;
     private final DefDescriptor<EventDef> extendsDescriptor;
     private final int hashCode;
-    private static final DefDescriptor<EventDef> PROTO_COMPONENT_EVENT = Aura.getDefinitionService().getDefDescriptor(
-            "aura:componentEvent", EventDef.class);
-    private static final DefDescriptor<EventDef> PROTO_APPLICATION_EVENT = Aura.getDefinitionService()
-            .getDefDescriptor("aura:applicationEvent", EventDef.class);
-    private static final DefDescriptor<EventDef> PROTO_VALUE_EVENT = Aura.getDefinitionService().getDefDescriptor(
-            "aura:valueEvent", EventDef.class);
+    private static final DefDescriptor<EventDef> PROTO_COMPONENT_EVENT = new DefDescriptorImpl<>("markup", "aura",
+            "componentEvent", EventDef.class);
+    private static final DefDescriptor<EventDef> PROTO_APPLICATION_EVENT = new DefDescriptorImpl<>("markup", "aura",
+            "applicationEvent", EventDef.class);
+    private static final DefDescriptor<EventDef> PROTO_VALUE_EVENT = new DefDescriptorImpl<>("markup", "aura",
+            "valueEvent", EventDef.class);
 
     protected EventDefImpl(Builder builder) {
         super(builder);

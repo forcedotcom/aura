@@ -15,14 +15,8 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
@@ -33,12 +27,19 @@ import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Handles all references to other components. Note that while the reference to the other component is created here, it
@@ -53,10 +54,13 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
         super();
     }
 
-    public ComponentDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(parentHandler, xmlReader, source);
-        builder.setDescriptor(DefDescriptorImpl.getInstance(getTagName(), ComponentDef.class));
+    public ComponentDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                                  boolean isInInternalNamespace, DefinitionService definitionService,
+                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+        builder.setDescriptor(definitionService.getDefDescriptor(getTagName(), ComponentDef.class));
         builder.setLocation(getLocation());
+        builder.setAccess(getAccess(isInInternalNamespace));
         body = new ArrayList<>();
     }
 
@@ -65,8 +69,10 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
      * use it cause of java stupidness
      */
     protected ComponentDefRefHandler(RootTagHandler<P> parentHandler, DefDescriptor<ComponentDef> descriptor,
-            XMLStreamReader xmlReader, Source<?> source) {
-        super(parentHandler, xmlReader, source);
+                                     XMLStreamReader xmlReader, Source<?> source, boolean isInInternalNamespace,
+                                     DefinitionService definitionService,
+                                     ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         builder.setDescriptor(descriptor);
         builder.setLocation(getLocation());
         body = new ArrayList<>();
@@ -121,7 +127,7 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
                 if (!AuraTextUtil.isNullEmptyOrWhitespace(prefix) && !attName.contains(":")) {
                     attName = prefix + ":" + attName;
                 }
-                DefDescriptor<AttributeDef> att = DefDescriptorImpl.getInstance(attName, AttributeDef.class);
+                DefDescriptor<AttributeDef> att = definitionService.getDefDescriptor(attName, AttributeDef.class);
 
                 String attValue = xmlReader.getAttributeValue(i);
                 if (attributes.containsKey(att)) {
@@ -134,6 +140,7 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
                 atBuilder.setDescriptor(att);
                 atBuilder.setLocation(getLocation());
                 atBuilder.setValue(value);
+                atBuilder.setAccess(getAccess(isInInternalNamespace));
                 attributes.put(att, atBuilder.build());
             }
         }
@@ -148,7 +155,7 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
         }
 
         // hacky. if there is an interface, grab that descriptor too
-        DefDescriptor<InterfaceDef> id = DefDescriptorImpl.getInstance(builder.getDescriptor().getQualifiedName(),
+        DefDescriptor<InterfaceDef> id = definitionService.getDefDescriptor(builder.getDescriptor().getQualifiedName(),
                 InterfaceDef.class);
         if (id.exists()) {
             builder.setIntfDescriptor(id);
@@ -169,7 +176,8 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
 
         String tag = getTagName();
         if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefRefImpl attributeDefRef = new AttributeDefRefHandler<>(getParentHandler(), xmlReader, source)
+            AttributeDefRefImpl attributeDefRef = new AttributeDefRefHandler<>(getParentHandler(), xmlReader, source,
+                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter)
                     .getElement();
             builder.setAttribute(attributeDefRef.getDescriptor(), attributeDefRef);
         } else {

@@ -18,18 +18,20 @@ package org.auraframework.integration.test.http.resource;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.auraframework.Aura;
+import javax.inject.Inject;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.resource.InlineJs;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.adapter.ServletUtilAdapterImpl;
-import org.auraframework.impl.clientlibrary.ClientLibraryServiceImpl;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.service.LoggingService;
+import org.auraframework.service.RenderingService;
+import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -37,7 +39,42 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 public class InlineJsTest extends AuraImplTestCase {
 
-    ContextService contextService = Aura.getContextService();
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @Inject
+    private DefinitionService definitionService;
+
+    @Inject
+    private LoggingService loggingService;
+
+    @Inject
+    private RenderingService renderingService;
+
+    @Inject
+    private InstanceService instanceService;
+
+    @Inject
+    private ServletUtilAdapter servletUtilAdapter;
+
+    @Inject
+    private ServerService serverService;
+
+    private InlineJs getInlineJs() {
+        InlineJs inlineJs = new InlineJs();
+        inlineJs.setServletUtilAdapter(servletUtilAdapter);
+        inlineJs.setConfigAdapter(configAdapter);
+        inlineJs.setLoggingService(loggingService);
+        inlineJs.setDefinitionService(definitionService);
+        inlineJs.setInstanceService(instanceService);
+        inlineJs.setContextService(contextService);
+        inlineJs.setServerService(serverService);
+        inlineJs.setRenderingService(renderingService);
+        return inlineJs;
+    }
 
     @Test
     public void testInlineScriptIsWritenIntoInlineJs() throws Exception {
@@ -58,15 +95,14 @@ public class InlineJsTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        InlineJs inlineJs = new InlineJs();
-        inlineJs.setServletUtilAdapter(new MockServletUtilAdapterImpl());
+        InlineJs inlineJs = getInlineJs();
 
         // Act
         inlineJs.write(mockRequest, mockResponse, context);
         String content = mockResponse.getContentAsString();
 
         // Assert
-        assertEquals("Didn't find expceted inline scripts in response content.", script, content.trim());
+        assertEquals("Didn't find expected inline scripts in response content.", script, content.trim());
     }
 
     @Test
@@ -88,8 +124,7 @@ public class InlineJsTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        InlineJs inlineJs = new InlineJs();
-        inlineJs.setServletUtilAdapter(new MockServletUtilAdapterImpl());
+        InlineJs inlineJs = getInlineJs();
 
         // Act
         inlineJs.write(mockRequest, mockResponse, context);
@@ -126,8 +161,7 @@ public class InlineJsTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        InlineJs inlineJs = new InlineJs();
-        inlineJs.setServletUtilAdapter(new MockServletUtilAdapterImpl());
+        InlineJs inlineJs = getInlineJs();
 
         // Act
         inlineJs.write(mockRequest, mockResponse, context);
@@ -159,8 +193,7 @@ public class InlineJsTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        InlineJs inlineJs = new InlineJs();
-        inlineJs.setServletUtilAdapter(new MockServletUtilAdapterImpl());
+        InlineJs inlineJs = getInlineJs();
 
         // Act
         inlineJs.write(mockRequest, mockResponse, context);
@@ -190,30 +223,13 @@ public class InlineJsTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        InlineJs inlineJs = new InlineJs();
-        inlineJs.setServletUtilAdapter(new MockServletUtilAdapterImpl());
+        InlineJs inlineJs = getInlineJs();
 
         // Act
         inlineJs.write(mockRequest, mockResponse, context);
         String content = mockResponse.getContentAsString();
 
         // Assert
-        assertThat("Didn't find expceted inline scripts in response content.", content, containsString(script));
-    }
-
-    private static class MockServletUtilAdapterImpl extends ServletUtilAdapterImpl {
-        public MockServletUtilAdapterImpl() {
-            setClientLibraryService(new ClientLibraryServiceImpl());
-        }
-
-        // In ServletUtilAdapterImp, we catch all exceptions and generate gacks, so tests will not fail if
-        // any exception is thrown during the test. Override the method so that we can fail the tests when
-        // exception is thrown.
-        @Override
-        public void handleServletException(Throwable t, boolean quickfix, AuraContext context,
-                HttpServletRequest request, HttpServletResponse response,
-                boolean written) {
-            throw new RuntimeException(t);
-        }
+        assertThat("Didn't find expected inline scripts in response content.", content, containsString(script));
     }
 }

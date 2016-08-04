@@ -15,28 +15,34 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.Map;
-
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefinitionAccess;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 
-import aQute.bnd.annotation.component.Component;
+import javax.inject.Inject;
+import java.util.Map;
 
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class DefinitionParserAdapterImpl implements DefinitionParserAdapter {
+
+    private ConfigAdapter configAdapter;
 
     @Override
     public DefinitionAccess parseAccess(String namespace, String access) throws InvalidAccessValueException {
-        return new DefinitionAccessImpl(namespace, access);
+        return new DefinitionAccessImpl(namespace, access, configAdapter.isInternalNamespace(namespace));
     }
 
-	@Override
-	public Map<String, String> getRequiredVersions(DefDescriptor<?> desc) {
-		return null;
-	}
+    @Override
+    public Map<String, String> getRequiredVersions(DefDescriptor<?> desc) {
+        return null;
+    }
 
+    @Inject
+    public void setConfigAdapter(ConfigAdapter adapter) {
+        this.configAdapter = adapter;
+    }
 }

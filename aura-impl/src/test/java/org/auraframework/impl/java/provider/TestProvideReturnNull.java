@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.java.provider;
 
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
@@ -22,6 +23,7 @@ import org.auraframework.system.Annotations.Provider;
 /**
  * this provider is for JavaProviderDefTest.testInterfaceWithNoProvider
  */
+@ServiceComponentProvider
 @Provider
 public class TestProvideReturnNull implements ComponentDescriptorProvider {
     @Override

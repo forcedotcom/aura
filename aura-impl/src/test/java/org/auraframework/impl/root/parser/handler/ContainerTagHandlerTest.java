@@ -15,8 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import javax.xml.stream.XMLStreamReader;
-
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
@@ -27,12 +26,18 @@ import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
 
+import javax.inject.Inject;
+import javax.xml.stream.XMLStreamReader;
+
 /**
  * Test for {@link ContainerTagHandler}.
  */
 public class ContainerTagHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;
     ComponentDefRefHandler<?> cdrHandler;
+
+    @Inject
+    private DefinitionParserAdapter definitionParserAdapter;
 
     @Test
     public void testGetDefRefHandler() throws Exception {
@@ -58,7 +63,8 @@ public class ContainerTagHandlerTest extends AuraImplTestCase {
         xmlReader.next();
         // Assume we found the markup in a component, create a
         // ComponentDefHandler to represent that
-        ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
+        ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService,
+                contextService, configAdapter, definitionParserAdapter);
         // Try to create a DefRefHandler which will inturn call
         // ContainerTagHandler.getDefRefHandler()
         return cdh.getDefRefHandler(cdh);

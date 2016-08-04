@@ -16,16 +16,14 @@
 package org.auraframework.impl;
 
 import org.auraframework.adapter.LoggingAdapter;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.context.LoggingContextImpl;
 import org.auraframework.system.LoggingContext;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * Aura LoggingAdapter impl.
  */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class LoggingAdapterImpl implements LoggingAdapter {
 
     private static ThreadLocal<LoggingContext> currentContext = new ThreadLocal<>();

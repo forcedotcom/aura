@@ -15,35 +15,6 @@
  */
 package org.auraframework.impl.controller;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.auraframework.Aura;
-import org.auraframework.css.StyleContext;
-import org.auraframework.css.TokenValueProvider;
-import org.auraframework.def.BaseStyleDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.TokensDef;
-import org.auraframework.impl.css.parser.CssPreprocessor;
-import org.auraframework.impl.css.parser.plugin.TokenExpression;
-import org.auraframework.impl.css.parser.plugin.TokenFunction;
-import org.auraframework.impl.css.token.StyleContextImpl;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
-import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.throwable.quickfix.QuickFixException;
-
 import com.google.common.base.Optional;
 import com.salesforce.omakase.ast.CssAnnotation;
 import com.salesforce.omakase.ast.atrule.AtRule;
@@ -52,14 +23,55 @@ import com.salesforce.omakase.broadcast.annotation.Rework;
 import com.salesforce.omakase.plugin.Plugin;
 import com.salesforce.omakase.plugin.conditionals.ConditionalsValidator;
 import com.salesforce.omakase.util.Args;
+import org.auraframework.adapter.StyleAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.css.StyleContext;
+import org.auraframework.css.TokenValueProvider;
+import org.auraframework.def.BaseStyleDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.TokensDef;
+import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.impl.css.parser.CssPreprocessor;
+import org.auraframework.impl.css.parser.plugin.TokenExpression;
+import org.auraframework.impl.css.parser.plugin.TokenFunction;
+import org.auraframework.impl.css.token.StyleContextImpl;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Key;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Applies {@link TokensDef}s to an application's CSS. The CSS is filtered to things that reference an applicable token.
  * This allows for clients to dynamically re-apply tokenized CSS without having to reload the page or reload the entire
  * app.css file. See AuraStyleService.js for more details.
  */
-@Controller
-public final class DynamicStylingController {
+@ServiceComponent
+public final class DynamicStylingController implements Controller {
+
+    @Inject
+    private DefinitionService definitionService;
+
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private StyleAdapter styleAdapter;
+    
     /**
      * Main endpoint. This applies the given token descriptors to the current application's CSS.
      * <p>
@@ -76,14 +88,14 @@ public final class DynamicStylingController {
      *         returned.
      */
     @AuraEnabled
-    public static String applyTokens(@Key("descriptors") List<String> tokenDescriptors,
-            @Key("clientLoaded") List<String> clientLoaded, @Key("extraStyles") List<String> extraStyles)
+    public String applyTokens(@Key("descriptors") List<String> tokenDescriptors,
+                              @Key("clientLoaded") List<String> clientLoaded, @Key("extraStyles") List<String> extraStyles)
             throws QuickFixException {
 
         checkNotNull(tokenDescriptors, "The 'tokenDescriptors' argument cannot be null");
 
-        DefinitionService defService = Aura.getDefinitionService();
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        DefinitionService defService = definitionService;
+        AuraContext context = contextService.getCurrentContext();
 
         // convert the string descriptors to real descriptors
         List<DefDescriptor<TokensDef>> tokens = new ArrayList<>(tokenDescriptors.size());
@@ -149,12 +161,12 @@ public final class DynamicStylingController {
      * @param defDescriptor Find style dependencies of this def.
      * @return The list of style dependencies.
      */
-    protected static Set<DefDescriptor<? extends BaseStyleDef>> getAllStyleDependencies(DefDescriptor<?> defDescriptor)
+    protected Set<DefDescriptor<? extends BaseStyleDef>> getAllStyleDependencies(DefDescriptor<?> defDescriptor)
             throws QuickFixException {
         Set<DefDescriptor<? extends BaseStyleDef>> styles = new LinkedHashSet<>();
 
-        DefinitionService defService = Aura.getDefinitionService();
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        DefinitionService defService = definitionService;
+        AuraContext context = contextService.getCurrentContext();
         MasterDefRegistry mdr = context.getDefRegistry();
 
         String descUid = mdr.getUid(null, defDescriptor);
@@ -176,11 +188,11 @@ public final class DynamicStylingController {
     }
 
     /** utility that actual does the css processing */
-    private static String extractStyles(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> styles)
+    private String extractStyles(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> styles)
             throws QuickFixException {
 
         // custom style context to include our one-off token descriptors
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         StyleContext styleContext = StyleContextImpl.build(context, tokens);
         context.setStyleContext(styleContext);
 
@@ -224,7 +236,7 @@ public final class DynamicStylingController {
                     .content();
 
             // second pass evaluates as normal (applies token function values, conditionals, etc...)
-            List<Plugin> contextual = Aura.getStyleAdapter().getContextualRuntimePlugins();
+            List<Plugin> contextual = styleAdapter.getContextualRuntimePlugins();
             css = CssPreprocessor.runtime()
                     .source(css)
                     .tokens(style.getDescriptor())
@@ -244,15 +256,15 @@ public final class DynamicStylingController {
      * relevant token is removed, except for media queries using a relevant token in the expression. In the case of the
      * latter, the entire block of the media query is then included irrespective of token usage.
      */
-    private static final class MagicEraser implements Plugin {
-        private static final CssAnnotation ANNOTATION = new CssAnnotation("keep");
+    private final class MagicEraser implements Plugin {
+        private final CssAnnotation ANNOTATION = new CssAnnotation("keep");
         private final Set<String> tokens;
         private final TokenValueProvider tvp;
 
         /** creates a new instance scoped to the specified set of token names */
         public MagicEraser(Set<String> tokens, DefDescriptor<? extends BaseStyleDef> style) {
             this.tokens = tokens;
-            this.tvp = Aura.getStyleAdapter().getTokenValueProvider(style);
+            this.tvp = styleAdapter.getTokenValueProvider(style);
         }
 
         /** determines if the given string contains reference to one of the specified tokens */

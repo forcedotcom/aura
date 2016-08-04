@@ -19,6 +19,8 @@ import static org.junit.Assert.assertArrayEquals;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.auraframework.adapter.ExceptionAdapter;
@@ -32,6 +34,13 @@ public class ExceptionAdapterImplTest extends AuraImplTestCase {
 
     private Logger logger = Logger.getLogger(ExceptionAdapterImpl.class);
     private LoggingTestAppender appender;
+
+    @Inject
+    private ExceptionAdapter exceptionAdapter;
+
+    public ExceptionAdapterImplTest() {
+        logger = Logger.getLogger(ExceptionAdapterImpl.class);
+    }
 
     @Override
     public void setUp() throws Exception {
@@ -48,12 +57,11 @@ public class ExceptionAdapterImplTest extends AuraImplTestCase {
 
     @Test
     public void testAllClientErrorPropertiesGetLogged() {
-        ExceptionAdapter exceptionAdapter = new ExceptionAdapterImpl();
         String causeDescriptor = "causeDescriptor";
         String errorId = "12345678-1234-1234-1234-123412341234";
         String errorMsg = "error message";
         String JsStacktrace = "JS stack trace";
-        AuraClientException clientException = new AuraClientException(causeDescriptor, errorId, errorMsg, JsStacktrace);
+        AuraClientException clientException = new AuraClientException(causeDescriptor, errorId, errorMsg, JsStacktrace, instanceService, exceptionAdapter);
 
         exceptionAdapter.handleException(clientException, null);
         List<LoggingEvent> logs = appender.getLog();

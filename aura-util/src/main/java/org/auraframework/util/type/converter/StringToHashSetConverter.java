@@ -18,17 +18,17 @@ package org.auraframework.util.type.converter;
 import java.util.HashSet;
 import java.util.List;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.type.Converter;
-
-import aQute.bnd.annotation.component.Component;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.Sets;
 
+@Lazy
 @SuppressWarnings("rawtypes")
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class StringToHashSetConverter implements Converter<String, HashSet> {
 
     @Override

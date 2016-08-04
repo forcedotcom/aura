@@ -19,7 +19,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.SourceLoader;
-
 import javax.annotation.Nullable;
 
 /**
@@ -42,14 +41,6 @@ public interface StringSourceLoader extends SourceLoader, InternalNamespaceSourc
     String ANOTHER_CUSTOM_NAMESPACE = "cstring2";
     String DEFAULT_PRIVILEGED_NAMESPACE = "privilegedNS";
     String OTHER_PRIVILEGED_NAMESPACE = "privilegedNS1";
-
-
-    //
-    // Horrendous hack until the rest of 3-tier gets in.
-    //
-    static StringSourceLoader getInstance() {
-        return StringSourceLoaderImpl.getInstance();
-    }
 
     enum NamespaceAccess {
         INTERNAL,

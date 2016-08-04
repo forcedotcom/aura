@@ -15,20 +15,21 @@
  */
 package org.auraframework.impl.java.controller;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 
-@Controller
-public class TestControllerWithDuplicateAction {
+@ServiceComponent
+public class TestControllerWithDuplicateAction implements Controller {
 
     @AuraEnabled
-    public static String appendStrings(@Key("a") String a, @Key("b") String b) {
+    public String appendStrings(@Key("a") String a, @Key("b") String b) {
         return a + b;
     }
 
     @AuraEnabled
-    public static Integer appendStrings(@Key("a") Integer a, @Key("b") Integer b) {
+    public Integer appendStrings(@Key("a") Integer a, @Key("b") Integer b) {
         return Integer.valueOf(a.intValue() + b.intValue());
     }
 }

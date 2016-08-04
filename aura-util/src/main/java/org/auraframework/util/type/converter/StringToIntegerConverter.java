@@ -15,15 +15,15 @@
  */
 package org.auraframework.util.type.converter;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.util.type.Converter;
-
-import aQute.bnd.annotation.component.Component;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Used by aura.util.type.TypeUtil
  */
-@Component (provide=AuraServiceProvider.class)
+@Lazy
+@ServiceComponent
 public class StringToIntegerConverter implements Converter<String, Integer> {
 
     @Override
@@ -31,7 +31,13 @@ public class StringToIntegerConverter implements Converter<String, Integer> {
         if (value == null || value.isEmpty()) {
             return null;
         }
-        return Integer.valueOf(value);
+        try {
+            return Integer.valueOf(value);
+        } catch (NumberFormatException ex) {
+            // Value had decimal precision probably. Try parsing it as a float and returning
+            // only the integer portion.
+            return Float.valueOf(value).intValue();
+        }
     }
 
     @Override

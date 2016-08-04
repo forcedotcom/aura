@@ -15,19 +15,13 @@
  */
 package org.auraframework.impl.root.parser;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.URL;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Location;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
@@ -36,28 +30,50 @@ import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import javax.inject.Inject;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.net.URL;
+
 /**
  * Implementation of Parser. Parses XML Formatted Source to produce
  * ComponentDefs. Implemented as a pull-style parser using the StAX cursor API
  * to try to keep the memory footprint low, and reduce creation of extraneous
  * Objects.
  */
+@ServiceComponent
 public abstract class XMLParser<D extends RootDefinition> implements Parser<D> {
+
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @Inject
+    private DefinitionService definitionService;
+
+    @Inject
+    private DefinitionParserAdapter definitionParserAdapter;
+
 
     private static final XMLInputFactory xmlInputFactory;
 
     static {
         xmlInputFactory = XMLInputFactory.newInstance();
 
-        // Setting IS_NAMESPACE_AWARE to true will require all xml to be valid xml and
-        // we would need to enforce namespace definitions ie xmlns in all cmp and app files.
-        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
-        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, true);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, true);
-
         try {
+
+            // Setting IS_NAMESPACE_AWARE to true will require all xml to be valid xml and
+            // we would need to enforce namespace definitions ie xmlns in all cmp and app files.
+            xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
+            xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
+            xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, true);
+            xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+            xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, true);
+
             // sjsxp does not currently have a thread-safe XMLInputFactory, as that implementation
             // tries to cache and reuse theXMLStreamReader. Setting the parser-specific "reuse-instance"
             // property to false prevents this.
@@ -71,7 +87,10 @@ public abstract class XMLParser<D extends RootDefinition> implements Parser<D> {
     }
 
     protected abstract RootTagHandler<D> getHandler(DefDescriptor<D>defDescriptor, Source<D> source,
-            XMLStreamReader xmlReader) throws QuickFixException;
+                                                    XMLStreamReader xmlReader, boolean isInInternalNamespace,
+                                                    DefinitionService definitionService,
+                                                    ConfigAdapter configAdapter,
+                                                    DefinitionParserAdapter definitionParserAdapter) throws QuickFixException;
 
     @Override
     public D parse(DefDescriptor<D> descriptor, Source<D> source) throws QuickFixException {
@@ -87,7 +106,8 @@ public abstract class XMLParser<D extends RootDefinition> implements Parser<D> {
 
                 xmlReader = xmlInputFactory.createXMLStreamReader(reader);
             }
-            handler = getHandler(descriptor, source, xmlReader);
+            handler = getHandler(descriptor, source, xmlReader, isInInternalNamespace(descriptor),
+                    definitionService, configAdapter, definitionParserAdapter);
             if (xmlReader != null) {
                 // need to skip junk above the start that is ok
                 LOOP: while (xmlReader.hasNext()) {
@@ -214,6 +234,10 @@ public abstract class XMLParser<D extends RootDefinition> implements Parser<D> {
      */
     public static XMLStreamReader createXMLStreamReader(Reader reader) throws XMLStreamException {
         return xmlInputFactory.createXMLStreamReader(reader);
+    }
+
+    protected boolean isInInternalNamespace(DefDescriptor<?> descriptor) {
+        return configAdapter.isInternalNamespace(descriptor.getNamespace());
     }
 
 }

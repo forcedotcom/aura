@@ -20,10 +20,10 @@ import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.json.Json;
@@ -32,18 +32,24 @@ import org.auraframework.util.json.JsonSerializable;
 /**
  * A Aura model that backs the ui:datePicker Aura component.
  */
-@Model
-public class DatePickerModel {
+@ServiceComponentModelInstance
+public class DatePickerModel implements ModelInstance {
+
+    private LocalizationAdapter localizationAdapter;
+
+    DatePickerModel(LocalizationAdapter localizationAdapter) {
+        this.localizationAdapter = localizationAdapter;
+    }
 
     @AuraEnabled
     public String getLangLocale() throws QuickFixException {
-        AuraLocale locale = Aura.getLocalizationAdapter().getAuraLocale();
+        AuraLocale locale = localizationAdapter.getAuraLocale();
         return locale.getLanguageLocale().toString();
     }
 
     @AuraEnabled
     public List<LocalizedLabel> getMonthLabels() throws QuickFixException {
-        AuraLocale locale = Aura.getLocalizationAdapter().getAuraLocale();
+        AuraLocale locale = localizationAdapter.getAuraLocale();
         DateFormatSymbols monthSymbols = DateFormatSymbols.getInstance(locale.getLanguageLocale());
         String[] months = monthSymbols.getMonths();
         String[] shortMonths = monthSymbols.getShortMonths();
@@ -56,13 +62,12 @@ public class DatePickerModel {
 
     @AuraEnabled
     public String getLabelForToday() throws QuickFixException {
-        LocalizationAdapter la = Aura.getLocalizationAdapter();
-        return la.getLabel("Related_Lists", "task_mode_today");
+        return localizationAdapter.getLabel("Related_Lists", "task_mode_today");
     }
 
     @AuraEnabled
     public List<LocalizedLabel> getWeekdayLabels() throws QuickFixException {
-        AuraLocale locale = Aura.getLocalizationAdapter().getAuraLocale();
+        AuraLocale locale = localizationAdapter.getAuraLocale();
         DateFormatSymbols weekdaySymbols = DateFormatSymbols.getInstance(locale.getLanguageLocale());
         String[] weekdays = weekdaySymbols.getWeekdays();
         String[] shortWeekdays = weekdaySymbols.getShortWeekdays();

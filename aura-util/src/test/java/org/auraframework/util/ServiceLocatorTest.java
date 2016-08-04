@@ -15,9 +15,6 @@
  */
 package org.auraframework.util;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.ServiceLocator.ServiceLocatorException;
 import org.auraframework.util.sampleServices.AbstractService;
@@ -50,7 +47,11 @@ import org.auraframework.util.sampleServices.SingleImplServiceImplementation;
 import org.auraframework.util.sampleServices.UnimplementedService;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Unit tests for {@link ServiceLocator}.
@@ -149,11 +150,12 @@ public class ServiceLocatorTest extends UnitTestCase {
         } catch (RuntimeException expected) {
             assertNotNull(expected);
         }
-        
     }
-    
-    public void _testCyclicService() {
-    	try {
+
+    @Ignore
+    @Test
+    public void testGetCyclicReference() {
+        try {
             s.get(CyclicServicePartA.class);
             fail("Cyclic service reference wasn't handled.");
         } catch (RuntimeException expected) {

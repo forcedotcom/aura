@@ -26,7 +26,6 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.LibraryDefRef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSource;
@@ -62,11 +61,11 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
         		String.format("<%s library='%s' property='p'/>", LibraryDefRefHandler.TAG, expectedLibrary), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
         Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
-        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         LibraryDefRef def = handler.getElement();
 
-        DefDescriptor<LibraryDef> expectedDescriptor = DefDescriptorImpl.getInstance(expectedLibrary, LibraryDef.class);
+        DefDescriptor<LibraryDef> expectedDescriptor = definitionService.getDefDescriptor(expectedLibrary, LibraryDef.class);
         assertEquals(expectedDescriptor, def.getDescriptor());
         assertEquals(expectedDescriptor, def.getReferenceDescriptor());
     }
@@ -77,7 +76,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
                 "<%s/>", LibraryDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
         Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
-        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         try {
             handler.getElement();
@@ -94,7 +93,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
                 "<%s library=''/>", LibraryDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
         Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
-        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         try {
             handler.getElement();
@@ -111,7 +110,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
                 "<%s library='this is invalid'/>", LibraryDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
         Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
-        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         try {
             handler.getElement();
@@ -128,7 +127,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
                 "<%s library='l' property='p'>text</%1$s>", LibraryDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
         Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
-        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         try {
             handler.getElement();
@@ -146,7 +145,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
                 "<%s library='l' property='p' description='%s'/>", LibraryDefRefHandler.TAG, expectedDescription), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
         Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
-        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         LibraryDefRef actualDef = handler.getElement();
         assertEquals(expectedDescription, actualDef.getDescription());
@@ -158,7 +157,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
                 "<%s library='l' property='p' unexpected='me'/>", LibraryDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
         Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
-        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source);
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, definitionService);
 
         try {
             handler.getElement();

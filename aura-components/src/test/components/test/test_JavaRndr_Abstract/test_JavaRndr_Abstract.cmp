@@ -15,5 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component abstract="true" renderer="java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer" provider="java://org.auraframework.impl.renderer.TestProvider">
+<aura:component abstract="true" renderer="java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer"
+                provider="java://org.auraframework.impl.renderer.TestRenderTestProvider">
 </aura:component>

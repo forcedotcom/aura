@@ -15,8 +15,7 @@
  */
 package org.auraframework.impl.root;
 
-import java.util.Set;
-
+import com.google.common.collect.Sets;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.AttributeDefRef;
@@ -35,7 +34,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import com.google.common.collect.Sets;
+import java.util.Set;
 
 public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDefImpl, AttributeDef, AttributeDef, Builder> {
 

@@ -617,7 +617,6 @@
                    console.log("we have abort the pollAction:"+action.getId()); 
             }
         });
-
         $A.run(function () {
                $A.enqueueAction(pollAction);
         });

@@ -15,23 +15,21 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.system.AuraContext.Access;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 public class RequiredVersionDefHandler<P extends RootDefinition> extends ParentedTagHandler<RequiredVersionDefImpl, P> {
 
@@ -39,58 +37,60 @@ public class RequiredVersionDefHandler<P extends RootDefinition> extends Parente
      * The tag that this Handler handles
      */
     public static final String TAG = "aura:require";
-    
+
     private static final String ATTRIBUTE_NAMESPACE = "namespace";
     private static final String ATTRIBUTE_VERSION = "version";
 
     private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAMESPACE, ATTRIBUTE_VERSION);
-	
+
     private final RequiredVersionDefImpl.Builder builder = new RequiredVersionDefImpl.Builder();
-    
-    public RequiredVersionDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-    	super(parentHandler, xmlReader, source);
+
+    public RequiredVersionDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                                     boolean isInInternalNamespace, DefinitionService definitionService,
+                                     ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+        builder.setAccess(getAccess(isInInternalNamespace));
     }
-    
-	@Override
-	protected void handleChildTag() throws XMLStreamException,
-			QuickFixException {
-		// No child. Do nothing.
-	}
-	
+
+    @Override
+    protected void handleChildTag() throws XMLStreamException,
+            QuickFixException {
+        // No child. Do nothing.
+    }
+
     @Override
     public Set<String> getAllowedAttributes() {
         return ALLOWED_ATTRIBUTES;
     }
 
-	@Override
-	protected void handleChildText() throws XMLStreamException,
-			QuickFixException {
-		// No child. Do nothing.
-	}
+    @Override
+    protected void handleChildText() throws XMLStreamException,
+            QuickFixException {
+        // No child. Do nothing.
+    }
 
-	@Override
-	public String getHandledTag() {
-		return TAG;
-	}
-	
-	@Override
+    @Override
+    public String getHandledTag() {
+        return TAG;
+    }
+
+    @Override
     protected void readAttributes() throws InvalidAccessValueException {
-		String namespace = getAttributeValue(ATTRIBUTE_NAMESPACE);
-		String version = getAttributeValue(ATTRIBUTE_VERSION);
-		if (AuraTextUtil.isNullEmptyOrWhitespace(namespace) 
-				|| AuraTextUtil.isNullEmptyOrWhitespace(version)) {
-			error("Attribute '%s' and '%s' are required on <%s>", ATTRIBUTE_NAMESPACE, ATTRIBUTE_VERSION, TAG);
-		}
-		builder.setDescriptor(DefDescriptorImpl.getInstance(namespace, RequiredVersionDef.class));
-		// We don't want it GLOBAL since we don't want customers adding these themselves.
-		// They will be managed via a UI in the Dev Console.
-		builder.setAccess(new DefinitionAccessImpl(builder.descriptor.getNamespace(), Access.PUBLIC.toString()));
-		builder.setVersion(version);
-	}
+        String namespace = getAttributeValue(ATTRIBUTE_NAMESPACE);
+        String version = getAttributeValue(ATTRIBUTE_VERSION);
+        if (AuraTextUtil.isNullEmptyOrWhitespace(namespace)
+                || AuraTextUtil.isNullEmptyOrWhitespace(version)) {
+            error("Attribute '%s' and '%s' are required on <%s>", ATTRIBUTE_NAMESPACE, ATTRIBUTE_VERSION, TAG);
+        }
+        builder.setDescriptor(definitionService.getDefDescriptor(namespace, RequiredVersionDef.class));
+        // We don't want it GLOBAL since we don't want customers adding these themselves.
+        // They will be managed via a UI in the Dev Console.
+        builder.setVersion(version);
+    }
 
-	@Override
-	protected RequiredVersionDefImpl createDefinition()
-			throws QuickFixException {
-		return builder.build();
-	}
+    @Override
+    protected RequiredVersionDefImpl createDefinition()
+            throws QuickFixException {
+        return builder.build();
+    }
 }

@@ -17,8 +17,6 @@ package org.auraframework.impl.adapter.format.js;
 
 import org.auraframework.impl.adapter.format.BaseFormatAdapter;
 
-/**
- */
 public abstract class JSFormatAdapter<T> extends BaseFormatAdapter<T> {
 
     protected static final String name = "JS";
@@ -27,5 +25,4 @@ public abstract class JSFormatAdapter<T> extends BaseFormatAdapter<T> {
     public String getFormatName() {
         return name;
     }
-
 }

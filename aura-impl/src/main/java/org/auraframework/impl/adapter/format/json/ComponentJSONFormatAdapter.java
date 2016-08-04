@@ -15,24 +15,24 @@
  */
 package org.auraframework.impl.adapter.format.json;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.instance.Component;
+import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.util.json.JsonEncoder;
+
+import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.annotation.concurrent.ThreadSafe;
-
-import org.auraframework.Aura;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.instance.Component;
-import org.auraframework.system.AuraContext;
-import org.auraframework.util.json.JsonEncoder;
-
-/**
- */
 @ThreadSafe
-@aQute.bnd.annotation.component.Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ComponentJSONFormatAdapter extends JSONFormatAdapter<Component> {
+    @Inject
+    private ContextService contextService;
 
     @Override
     public Class<Component> getType() {
@@ -41,13 +41,13 @@ public class ComponentJSONFormatAdapter extends JSONFormatAdapter<Component> {
 
     @Override
     public void write(Component value, Map<String, Object> attributes, Appendable out) throws IOException {
-        AuraContext c = Aura.getContextService().getCurrentContext();
+        AuraContext c = contextService.getCurrentContext();
         JsonEncoder.serialize(value, out, c.getJsonSerializationContext());
     }
 
     @Override
     public void writeCollection(Collection<? extends Component> values, Appendable out) throws IOException {
-        AuraContext c = Aura.getContextService().getCurrentContext();
+        AuraContext c = contextService.getCurrentContext();
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("components", values);
         m.put("context", c);

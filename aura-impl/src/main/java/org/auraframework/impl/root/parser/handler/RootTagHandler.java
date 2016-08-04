@@ -15,25 +15,24 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamReader;
-
-import org.auraframework.Aura;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.RootDefinition.SupportLevel;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Super class for the top level tags, handles some common setup
@@ -51,8 +50,10 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
         super();
     }
 
-    protected RootTagHandler(DefDescriptor<T> defDescriptor, Source<?> source, XMLStreamReader xmlReader) {
-        super(defDescriptor, xmlReader, source);
+    protected RootTagHandler(DefDescriptor<T> defDescriptor, Source<?> source, XMLStreamReader xmlReader,
+                             boolean isInInternalNamespace, DefinitionService definitionService,
+                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(defDescriptor, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
     }
 
     @Override
@@ -99,17 +100,17 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
     }
 
     protected Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> readRequiredVersionDefs(DefDescriptor<?> desc) {
-        Map<String, String> requiredVersions = Aura.getDefinitionParserAdapter().getRequiredVersions(desc);
-        return createRequiredVersionDefs(requiredVersions);
+        Map<String, String> requiredVersions = definitionParserAdapter.getRequiredVersions(desc);
+        return createRequiredVersionDefs(requiredVersions, this.definitionService);
     }
-    
-    public static Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> createRequiredVersionDefs(Map<String, String> requiredVersions) {
-    	Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = null;
+
+    public static Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> createRequiredVersionDefs(Map<String, String> requiredVersions, DefinitionService definitionService) {
+        Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = null;
         if (requiredVersions != null) {
             requiredVersionDefs = Maps.newHashMap();
             for (Map.Entry<String, String> entry : requiredVersions.entrySet()) {
                 RequiredVersionDefImpl.Builder builder = new RequiredVersionDefImpl.Builder();
-                builder.setDescriptor(DefDescriptorImpl.getInstance(entry.getKey(), RequiredVersionDef.class));
+                builder.setDescriptor(definitionService.getDefDescriptor(entry.getKey(), RequiredVersionDef.class));
                 builder.setVersion(entry.getValue());
                 RequiredVersionDefImpl requiredVersionDef = builder.build();
 

@@ -15,28 +15,35 @@
  */
 package org.auraframework.impl.adapter.format.html;
 
-import java.io.IOException;
-import java.util.Map;
-
-import javax.annotation.concurrent.ThreadSafe;
-
-import org.auraframework.Aura;
+import com.google.common.collect.Maps;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Component;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.Maps;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Map;
 
-/**
- */
 @ThreadSafe
-@aQute.bnd.annotation.component.Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ThrowableHTMLFormatAdapter extends HTMLFormatAdapter<Throwable> {
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private InstanceService instanceService;
+
+    @Inject
+    private RenderingService renderingService;
 
     @Override
     public Class<Throwable> getType() {
@@ -53,8 +60,8 @@ public class ThrowableHTMLFormatAdapter extends HTMLFormatAdapter<Throwable> {
         attribs.put("forceError", "true");
 
         boolean writeStack = false;
-        if (Aura.getContextService().isEstablished()) {
-            Mode mode = Aura.getContextService().getCurrentContext().getMode();
+        if (contextService.isEstablished()) {
+            Mode mode = contextService.getCurrentContext().getMode();
             writeStack = mode != Mode.PROD && mode != Mode.PRODDEBUG;
         }            
         if (writeStack) {
@@ -63,11 +70,10 @@ public class ThrowableHTMLFormatAdapter extends HTMLFormatAdapter<Throwable> {
             attribs.put("errorMessage", AuraTextUtil.escapeForHTML(value.getMessage()));
         }
         try {
-            Component c = Aura.getInstanceService().getInstance("aura:template", ComponentDef.class, attribs);
-            Aura.getRenderingService().render(c, out);
+            Component c = instanceService.getInstance("aura:template", ComponentDef.class, attribs);
+            renderingService.render(c, out);
         } catch (QuickFixException e) {
             throw new AuraError(e);
         }
     }
-
 }

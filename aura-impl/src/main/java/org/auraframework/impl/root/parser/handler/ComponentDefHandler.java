@@ -15,18 +15,20 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.root.component.ComponentDefImpl;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 /**
  */
@@ -50,8 +52,10 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
     }
 
     public ComponentDefHandler(DefDescriptor<ComponentDef> componentDefDescriptor, Source<?> source,
-            XMLStreamReader xmlReader) {
-        super(componentDefDescriptor, source, xmlReader);
+                               XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
+                               ContextService contextService,
+                               ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(componentDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, contextService, configAdapter, definitionParserAdapter);
     }
 
     @Override

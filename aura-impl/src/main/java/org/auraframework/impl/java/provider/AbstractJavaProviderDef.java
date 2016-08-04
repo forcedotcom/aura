@@ -15,47 +15,32 @@
  */
 package org.auraframework.impl.java.provider;
 
-import java.io.IOException;
-
 import org.auraframework.def.Definition;
 import org.auraframework.def.Provider;
 import org.auraframework.impl.system.DefinitionImpl;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
 
 /**
  * Base class for java provider defs.
  */
-abstract class AbstractJavaProviderDef<T extends Provider, D extends Definition> extends DefinitionImpl<D> {
+public abstract class AbstractJavaProviderDef<T extends Provider, D extends Definition> extends DefinitionImpl<D> {
     private static final long serialVersionUID = -8713728986587088353L;
 
-    protected final T provider;
+    protected final Class<?> providerClass;
 
-    public AbstractJavaProviderDef(Class<T> providerType, Builder<D> builder) throws QuickFixException {
+    public AbstractJavaProviderDef(Builder<D> builder) throws QuickFixException {
         super(builder);
-
-        Class<?> klass = builder.getProviderClass();
-        if (providerType.isAssignableFrom(klass)) {
-            try {
-                provider = providerType.cast(klass.newInstance());
-            } catch (InstantiationException ie) {
-                throw new InvalidDefinitionException("Cannot instantiate " + klass.getName(), location);
-            } catch (IllegalAccessException iae) {
-                throw new InvalidDefinitionException("Constructor is inaccessible for " + klass.getName(), location);
-            } catch (RuntimeException e) {
-                throw new InvalidDefinitionException("Failed to instantiate " + klass.getName(), location, e);
-            }
-        } else {
-            throw new InvalidDefinitionException("Provider must implement " + providerType, location);
-        }
+        this.providerClass = builder.getProviderClass();
     }
 
     @Override
     public void serialize(Json json) throws IOException {
     }
 
-    static abstract class Builder<T extends Definition> extends DefinitionImpl.BuilderImpl<T> {
+    public static abstract class Builder<T extends Definition> extends DefinitionImpl.BuilderImpl<T> {
         private Class<?> providerClass;
 
         protected Builder(Class<T> defClass) {

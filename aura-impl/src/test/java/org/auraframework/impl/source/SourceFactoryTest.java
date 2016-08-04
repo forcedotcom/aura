@@ -15,10 +15,8 @@
  */
 package org.auraframework.impl.source;
 
-import java.util.List;
-import java.util.Set;
-
-import org.auraframework.Aura;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -27,20 +25,25 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
-import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Set;
 
 public class SourceFactoryTest extends AuraImplTestCase {
+    @Inject
+    SourceLoader loader;
+
+    @Inject
+    ConfigAdapter configAdapter;
+
     @Test
     public void testSourceFactory() {
-        SourceLoader loader = StringSourceLoader.getInstance();
         try {
             List<SourceLoader> loaders = Lists.newArrayList(loader, loader);
-            new SourceFactory(loaders);
+            new SourceFactory(loaders, configAdapter);
             fail("Should have failed with AuraException('Namespace claimed by 2 SourceLoaders')");
         } catch (AuraRuntimeException e) {
         }
@@ -51,16 +54,16 @@ public class SourceFactoryTest extends AuraImplTestCase {
      * SourceLoaders that implement InternalNamespaceSourceLoaders are considered for determining if a namespace is internal.
      * Namespaces served by SourceLoaders that do not implement InternalNamespaceSourceLoaders are not internal.
      */
-    @Test
+	@Test
     public void testInternalNamespaceSourceLoadersAreRegisteredWithConfigAdapter(){
         SourceLoader friendlyLoader = new FriendlySourceLoader();
         SourceLoader selectiveLoader = new SelectiveSourceLoader();
         SourceLoader externalLoader = new ExternalSourceLoader();
         List<SourceLoader> loaders = Lists.newArrayList(friendlyLoader, selectiveLoader, externalLoader);
-        SourceFactory sf = new SourceFactory(loaders);
+        SourceFactory sf = new SourceFactory(loaders, configAdapter);
         assertEquals(Sets.newHashSet("VIP", "Guest", "Friend1", "Friend2", "Custom_1","Custom_2"), sf.getNamespaces());
 
-        ConfigAdapter c = Aura.getConfigAdapter();
+        ConfigAdapter c = getMockConfigAdapter();
         //Assert namespaces of InternalNamespaceSourceLoaders are internal based on isInternalNamespace()
         assertTrue(c.isInternalNamespace("Friend1"));
         assertTrue(c.isInternalNamespace("Friend2"));

@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.def;
 
+import com.google.common.collect.ImmutableList;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
@@ -29,17 +30,15 @@ import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
 
-import com.google.common.collect.ImmutableList;
-
 public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
-
-    Builder builder = new IncludeDefRefImpl.Builder();
-
     @Mock(answer = Answers.RETURNS_MOCKS)
     DefDescriptor<IncludeDefRef> descriptor;
 
+    Builder builder = new IncludeDefRefImpl.Builder();
+
     @Test
     public void testValidateDefintionWithoutDescriptor() throws Exception {
+        Builder builder = new IncludeDefRefImpl.Builder();
         IncludeDefRef def = builder.build();
 
         try {

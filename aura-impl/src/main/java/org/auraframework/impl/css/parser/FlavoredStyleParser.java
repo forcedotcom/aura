@@ -15,23 +15,38 @@
  */
 package org.auraframework.impl.css.parser;
 
-import static org.auraframework.impl.css.parser.StyleParser.ALLOWED_CONDITIONS;
-
+import com.google.common.collect.Iterables;
 import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.css.flavor.FlavoredStyleDefImpl;
 import org.auraframework.impl.css.parser.CssPreprocessor.ParserResult;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.Iterables;
+import static org.auraframework.impl.css.parser.StyleParser.ALLOWED_CONDITIONS;
 
 /**
  * Flavored CSS style parser.
  */
+@ServiceComponent
 public final class FlavoredStyleParser implements Parser<FlavoredStyleDef> {
+
+    @Override
+    public Format getFormat() {
+        return Format.CSS;
+    }
+
+    @Override
+    public DefType getDefType() {
+        return DefType.FLAVORED_STYLE;
+    }
+
     @Override
     public FlavoredStyleDef parse(DefDescriptor<FlavoredStyleDef> descriptor, Source<FlavoredStyleDef> source)
             throws QuickFixException {
@@ -52,6 +67,7 @@ public final class FlavoredStyleParser implements Parser<FlavoredStyleDef> {
         builder.setContent(result.content());
         builder.setTokenExpressions(result.expressions());
         builder.setFlavorAnnotations(result.flavorAnnotations());
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
 
         return builder.build();
     }

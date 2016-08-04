@@ -35,14 +35,13 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.Literal;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.AuraImpl;
+import org.auraframework.impl.expression.AuraExpressionBuilder;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.AuraValueProviderType;
-import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -67,10 +66,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     private final Boolean isOnePageApp;
 
-    private ContextService contextService=Aura.getContextService();
-
-    public static final DefDescriptor<ApplicationDef> PROTOTYPE_APPLICATION = DefDescriptorImpl.getInstance(
-            "markup://aura:application", ApplicationDef.class);
+    public static final DefDescriptor<ApplicationDef> PROTOTYPE_APPLICATION = new DefDescriptorImpl<>(
+            "markup", "aura", "application", ApplicationDef.class);
 
     protected ApplicationDefImpl(Builder builder) {
         super(builder);
@@ -176,7 +173,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         List<String> urls = Collections.emptyList();
 
         if (additionalAppCacheURLs != null) {
-            Expression expression = AuraImpl.getExpressionAdapter().buildExpression(
+            Expression expression = AuraExpressionBuilder.INSTANCE.buildExpression(
                     TextTokenizer.unwrap(additionalAppCacheURLs), null);
             if (!(expression instanceof PropertyReference)) {
                 throw new AuraRuntimeException(
@@ -221,7 +218,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         Integer expiration = null;
         
         if (bootstrapPublicCacheExpiration != null) {
-            Expression expression = AuraImpl.getExpressionAdapter().buildExpression(
+            Expression expression = AuraExpressionBuilder.INSTANCE.buildExpression(
                     TextTokenizer.unwrap(bootstrapPublicCacheExpiration), null);
             
             Object value = null;
@@ -282,7 +279,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     public Map<String, String> getTokens(){
         Map<String,String> tokens=Maps.newHashMap();
         try {
-            List<DefDescriptor<TokensDef>> tokensDefs = contextService.getCurrentContext().getLoadingApplicationDescriptor().getDef().getTokenOverrides();
+            List<DefDescriptor<TokensDef>> tokensDefs = Aura.getContextService().getCurrentContext().getLoadingApplicationDescriptor().getDef().getTokenOverrides();
             for (DefDescriptor<TokensDef> descriptor : tokensDefs) {
                 addTokens(descriptor, tokens);
             }

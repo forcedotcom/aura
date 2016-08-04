@@ -15,16 +15,17 @@
  */
 package org.auraframework.impl.adapter.format.svg;
 
-import java.io.IOException;
-import java.util.Map;
-
-import javax.annotation.concurrent.ThreadSafe;
-
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.SVGDef;
 import org.auraframework.impl.adapter.format.BaseFormatAdapter;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import javax.annotation.concurrent.ThreadSafe;
+import java.io.IOException;
+import java.util.Map;
+
 @ThreadSafe
+@ServiceComponent
 public class SVGFormatAdapter extends BaseFormatAdapter<SVGDef> {
     protected static final String name = "SVG";
 

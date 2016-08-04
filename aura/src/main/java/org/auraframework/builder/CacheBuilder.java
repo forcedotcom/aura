@@ -15,6 +15,7 @@
  */
 package org.auraframework.builder;
 
+import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.cache.Cache;
 
 public interface CacheBuilder<K, T> {
@@ -26,6 +27,14 @@ public interface CacheBuilder<K, T> {
 	 * @return the same CacheBuilder with this property set
 	 */
 	CacheBuilder<K, T> setInitialSize(int initialCapacity);
+
+	/**
+	 * Set the LoggingAdapter to be used by the cache.
+	 *
+	 * @param loggingAdapter
+	 * @return the same CacheBuilder with this property set
+	 */
+	CacheBuilder<K, T> setLoggingAdapter(LoggingAdapter loggingAdapter);
 
 	/**
 	 * Set a hint for maximum cache size, before evictions occur

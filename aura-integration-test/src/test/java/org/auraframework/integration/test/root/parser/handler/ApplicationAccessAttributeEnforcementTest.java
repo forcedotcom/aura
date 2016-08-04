@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.root.parser.handler;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -26,9 +25,12 @@ import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
+import javax.inject.Inject;
+
 public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase {
 
-    DefinitionService definitionService = Aura.getDefinitionService();
+    @Inject
+    DefinitionService definitionService;
 
     /**
      * Default Access Tests start

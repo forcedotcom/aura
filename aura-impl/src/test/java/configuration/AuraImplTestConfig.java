@@ -15,15 +15,12 @@
  */
 package configuration;
 
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.LocalizationAdapter;
-import org.auraframework.impl.adapter.MockConfigAdapterImpl;
-import org.auraframework.impl.adapter.TestLocalizationAdapterImpl;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
-import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
 import org.auraframework.util.test.util.TestInventory;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 @AuraConfiguration
 public class AuraImplTestConfig {
 
@@ -31,17 +28,4 @@ public class AuraImplTestConfig {
     public static TestInventory auraImplTestInventory() throws Exception {
         return new TestInventory(AuraImplTestConfig.class);
     }
-
-    @Impl
-    @PrimaryImpl
-    public static ConfigAdapter auraImplTestConfigAdapter() {
-        return new MockConfigAdapterImpl();
-    }
-    
-    @Impl
-    @PrimaryImpl
-    public static LocalizationAdapter auraImplTestLocalizationAdapter() {
-    	return new TestLocalizationAdapterImpl();
-    }
-
 }

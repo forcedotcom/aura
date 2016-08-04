@@ -23,8 +23,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ComponentLocationAdapter;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.source.DescriptorFileMapper;
 import org.auraframework.system.SourceListener;
 import org.auraframework.util.IOUtil;
@@ -40,15 +41,16 @@ import org.auraframework.util.IOUtil;
 public class AuraComponentTestBuilder extends DescriptorFileMapper implements AutoCloseable {
     private Path componentsPath;
     private final ComponentLocationAdapter cla;
-//    private Set<ComponentLocationAdapter> modified;
+    private final SourceListener sourceListener;
 
     /**
      * Create a new test builder.
      */
-    public AuraComponentTestBuilder() throws IOException {
+    public AuraComponentTestBuilder(SourceListener sourceListener) throws IOException {
         File tmpDir = new File(IOUtil.newTempDir("testComponens"));
         componentsPath = tmpDir.toPath();
         cla = new ComponentLocationAdapter.Impl(tmpDir);
+        this.sourceListener = sourceListener;
     }
 
     @Override
@@ -62,7 +64,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
             }
         }
 
-        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
+        sourceListener.onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
     }
 
     /**

@@ -15,6 +15,10 @@
  */
 package org.auraframework.util.test.diff;
 
+import org.auraframework.util.IOUtil;
+import org.auraframework.util.adapter.SourceControlAdapter;
+import org.auraframework.util.test.util.UnitTestCase;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,11 +28,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.URL;
-
-import org.auraframework.util.AuraUtil;
-import org.auraframework.util.IOUtil;
-import org.auraframework.util.adapter.SourceControlAdapter;
-import org.auraframework.util.test.util.UnitTestCase;
 
 public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
 
@@ -152,7 +151,7 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
 
     protected final void writeGoldFileContent(String content) {
         URL url = getDestUrl();
-        SourceControlAdapter sca = AuraUtil.getSourceControlAdapter();
+        SourceControlAdapter sca = this.test.getSourceControlAdapter();
         try {
             File f = new File(url.getFile());
             boolean existed = f.exists();

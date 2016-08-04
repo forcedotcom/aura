@@ -15,11 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.stream.XMLStreamReader;
-
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
@@ -33,8 +29,15 @@ import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
 
-public class ComponentDefRefHandlerTest extends AuraImplTestCase {
+import javax.inject.Inject;
+import javax.xml.stream.XMLStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
+public class ComponentDefRefHandlerTest extends AuraImplTestCase {
+    @Inject
+    private DefinitionParserAdapter definitionParserAdapter;
+    
     XMLStreamReader xmlReader;
     ComponentDefRefHandler<?> cdrHandler;
 
@@ -45,12 +48,12 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 desc,
-                "<fake:component attr='attr value'>Child Text<aura:foo/><aura:set attribute='header'>Header Value</aura:set></fake:component>",
-                "myID", Format.XML);
+                "<fake:component attr='attr value'>Child Text<aura:foo/><aura:set attribute='header'>Header Value</aura:set></fake:component>", "myID", Format.XML);
         xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
-        ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
-        cdrHandler = new ComponentDefRefHandler<>(cdh, xmlReader, source);
+        ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
+                configAdapter, definitionParserAdapter);
+        cdrHandler = new ComponentDefRefHandler<>(cdh, xmlReader, source, true, definitionService, configAdapter, definitionParserAdapter);
         cdrHandler.readAttributes();
     }
 
@@ -158,7 +161,8 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(desc, markup, "myID", Format.XML);
         xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
-        ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
-        return new ComponentDefRefHandler<>(cdh, xmlReader, source);
+        ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService, contextService,
+                configAdapter, definitionParserAdapter);
+        return new ComponentDefRefHandler<>(cdh, xmlReader, source, true, definitionService, configAdapter, definitionParserAdapter);
     }
 }

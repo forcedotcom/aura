@@ -21,7 +21,7 @@ import java.util.Map;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -37,11 +37,17 @@ import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
 
+import javax.inject.Inject;
+
 /**
  * Test class to verify that clientside cache is invalidated by Aura Servlet.
  */
 @ThreadHostileTest("relies on getLastMod")
 public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
+
+    @Inject
+    ConfigAdapter configAdapter;
+
     /**
      * Verify that AuraServlet returns an error code in the response body when
      * an expired lastmod timestamp is used in a POST request.
@@ -118,14 +124,14 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
             uid = getAuraTestingUtil().modifyUID(uid);
         }
         serContext = getAuraTestingUtil().buildContextForPost(Mode.DEV, desc, uid,
-                Aura.getConfigAdapter().getAuraFrameworkNonce(), null, null);
+                configAdapter.getAuraFrameworkNonce(), null, null);
         params.put("aura.context", serContext);
 
         return obtainPostMethod("/aura", params);
     }
 
     private AuraContext startContext(String qualifiedName, Class<? extends BaseComponentDef> clazz) {
-        return Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+        return contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
                 definitionService.getDefDescriptor(qualifiedName, clazz));
     }
 

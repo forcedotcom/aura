@@ -15,6 +15,11 @@
  */
 package org.auraframework.util.type;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.springframework.context.annotation.Lazy;
+
+@Lazy
+@ServiceComponent
 public class CustomDupConverter2 implements Converter<String, CustomDupType> {
 
     @Override

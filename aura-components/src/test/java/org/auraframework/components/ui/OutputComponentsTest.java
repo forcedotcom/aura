@@ -20,21 +20,66 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
+import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventType;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraTestCase;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * Common tests for ui:output components
  */
 public class OutputComponentsTest extends AuraTestCase {
+	
+	@Inject
+	private DefinitionService definitionService;
+    /**
+     * Verify that all ui:output* components have a required "value" attribute.
+     */
+    @Ignore
+    @Test
+    public void testValueRequired() throws Exception {
+        List<String> failures = Lists.newLinkedList();
+        contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+        for (ComponentDef def : getUiOutputComponents()) {
+            String name = def.getName();
+            AttributeDef value = def.getAttributeDef("value");
+            if (value == null || !value.isRequired()) {
+                failures.add(name);
+            }
+        }
+        if (!failures.isEmpty()) {
+            fail("The following ui:output* components should have a required 'value' attributef: " + failures);
+        }
+    }
+
+    private Set<ComponentDef> getUiOutputComponents() throws Exception {
+        DescriptorFilter matcher = new DescriptorFilter("markup://ui:output*", DefType.COMPONENT);
+        Set<ComponentDef> ret = Sets.newHashSet();
+        for (DefDescriptor<?> def : definitionService.find(matcher)) {
+            if (def.getName().startsWith("output")) {
+                ret.add((ComponentDef) def.getDef());
+            }
+        }
+        return ret;
+    }
+
     private ComponentDef getUiOutputComponent() throws Exception {
         ComponentDef def = definitionService.getDefinition("markup://ui:output", ComponentDef.class);
         return def;
@@ -64,7 +109,7 @@ public class OutputComponentsTest extends AuraTestCase {
         events.put("keyup", "markup://ui:keyup");
         events.put("select", "markup://ui:select");
 
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+        contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         ComponentDef def = getUiOutputComponent();
         Map<String, RegisterEventDef> registeredEvents = def.getRegisterEventDefs();
 
@@ -93,7 +138,7 @@ public class OutputComponentsTest extends AuraTestCase {
         List<String> events = new ArrayList<>();
         events.add("change");
 
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+        contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         ComponentDef def = getUiOutputComponent();
         Map<String, RegisterEventDef> registeredEvents = def.getRegisterEventDefs();
         RegisterEventDef registeredEvent;

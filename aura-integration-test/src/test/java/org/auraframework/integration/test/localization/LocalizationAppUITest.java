@@ -18,6 +18,7 @@ package org.auraframework.integration.test.localization;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.CheckAccessibility;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -126,7 +127,9 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputNumber/outputNumber components
-    public void _testNumberComponents() throws Exception {
+    @Ignore
+    @Test
+    public void testNumberComponents() throws Exception {
         open(URL);
 
         // initial load

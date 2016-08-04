@@ -23,12 +23,16 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -36,6 +40,8 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.EnumParam;
+import org.auraframework.http.RequestParam.InvalidParamException;
+import org.auraframework.http.RequestParam.MissingParamException;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.instance.Action;
 import org.auraframework.service.ContextService;
@@ -94,33 +100,39 @@ import com.google.common.collect.Maps;
 public class AuraServlet extends AuraBaseServlet {
     private static final long serialVersionUID = 2218469644108785216L;
 
+    public final static String AURA_PREFIX = "aura.";
+    private final static String CSRF_PROTECT = "while(1);\n";
+
+    /**
+     * "Long" pages (such as resources and cached HTML templates) expire in 45 days. We also use this to "pre-expire"
+     * no-cache pages, setting their expiration a month and a half into the past for user agents that don't understand
+     * Cache-Control: no-cache.
+     * This is the same as ServletUtilAdapterImpl.java
+     */
+    public final static String UTF_ENCODING = "UTF-8";
+
     public final static StringParam tag = new StringParam(AURA_PREFIX + "tag", 128, true);
     public final static EnumParam<DefType> defTypeParam = new EnumParam<>(AURA_PREFIX + "deftype", false,
             DefType.class);
     
+    private final static StringParam csrfToken = new StringParam(AURA_PREFIX + "token", 0, true);
     private final static StringParam formatAdapterParam = new StringParam(AURA_PREFIX + "formatAdapter", 0, false);
-
     private final static StringParam messageParam = new StringParam("message", 0, false);
-
-    // FIXME: is this really a good idea?
     private final static StringParam nocacheParam = new StringParam("nocache", 0, false);
 
-    private ManifestUtil manifestUtil = new ManifestUtil();
+    private ExceptionAdapter exceptionAdapter;
+    private ContextService contextService;
+    private DefinitionService definitionService;
+    private ConfigAdapter configAdapter;
+    private SerializationService serializationService;
+    private LoggingService loggingService;
+    private ServerService serverService;
+    private ManifestUtil manifestUtil;
 
-    private ServletUtilAdapter servletUtilAdapter;
-
-	public AuraServlet() {
-		this(Aura.getServletUtilAdapter());
-	}
-
-	AuraServlet(ServletUtilAdapter servletUtilAdapter) {
-		super();
-		this.servletUtilAdapter = servletUtilAdapter;
-	}
-    
     @Override
-    public void init() throws ServletException {
-        super.init();
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        manifestUtil = new ManifestUtil(contextService, configAdapter);
     }
 
     /**
@@ -181,12 +193,13 @@ public class AuraServlet extends AuraBaseServlet {
         } catch (Exception e) {
             // This exception should never happen.
             // If happened: log a gack and redirect
-            Aura.getExceptionAdapter().handleException(e);
+            exceptionAdapter.handleException(e);
         }
 
         servletUtilAdapter.setNoCache(response);
         response.setHeader(HttpHeaders.LOCATION, newLocation);
     }
+
 
     /**
      * Handle an HTTP GET operation.
@@ -199,10 +212,10 @@ public class AuraServlet extends AuraBaseServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        DefinitionService definitionService;
         AuraContext context;
         String tagName;
         DefType defType;
+        ServletContext servletContext = getServletContext();
 
         //
         // Pre-hook
@@ -215,17 +228,16 @@ public class AuraServlet extends AuraBaseServlet {
         //
         try {
             response.setCharacterEncoding(UTF_ENCODING);
-            context = Aura.getContextService().getCurrentContext();
+            context = contextService.getCurrentContext();
             response.setContentType(servletUtilAdapter.getContentType(context.getFormat()));
-            definitionService = Aura.getDefinitionService();
         } catch (RuntimeException re) {
             //
             // If we can't get this far, log the exception and bolt.
             // We can't do our normal exception handling because
             // at this point we simply broke.
             //
-            Aura.getExceptionAdapter().handleException(re);
-            servletUtilAdapter.send404(getServletConfig().getServletContext() ,request, response);
+            exceptionAdapter.handleException(re);
+            servletUtilAdapter.send404(servletContext, request, response);
             return;
         }
         String nocache = nocacheParam.get(request);
@@ -251,51 +263,44 @@ public class AuraServlet extends AuraBaseServlet {
             }
 
             Mode mode = context.getMode();
-            if (!isValidDefType(defType, mode)) {
-                servletUtilAdapter.send404(getServletConfig().getServletContext(), request, response);
+            if (!servletUtilAdapter.isValidDefType(defType, mode)) {
+                servletUtilAdapter.send404(servletContext, request, response);
                 return;
             }
 
             Class<? extends BaseComponentDef> defClass = defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class;
             defDescriptor = definitionService.getDefDescriptor(tagName, defClass);
-        } catch (RequestParam.InvalidParamException ipe) {
-            servletUtilAdapter.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
-            return;
-        } catch (RequestParam.MissingParamException mpe) {
-            servletUtilAdapter.handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
-            return;
         } catch (Throwable t) {
             servletUtilAdapter.handleServletException(new SystemErrorException(t), false, context, request, response, false);
             return;
         }
 
-        internalGet(request, response, defDescriptor, context, definitionService);
+        internalGet(request, response, defDescriptor, context);
     }
 
     private boolean shouldCacheHTMLTemplate(HttpServletRequest request) {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         try {
             DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getLoadingApplicationDescriptor();
             if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
                 Boolean isOnePageApp = ((ApplicationDef) appDefDesc.getDef()).isOnePageApp();
                 if (isOnePageApp != null) {
-                    return isOnePageApp.booleanValue();
+                    return isOnePageApp;
                 }
             }
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         }
+
         return !manifestUtil.isManifestEnabled(request);
     }
 
-    protected <T extends BaseComponentDef> void internalGet(HttpServletRequest request,
-            HttpServletResponse response, DefDescriptor<T> defDescriptor, AuraContext context,
-            DefinitionService definitionService)
+    private <T extends BaseComponentDef> void internalGet(HttpServletRequest request,
+                                                          HttpServletResponse response, DefDescriptor<T> defDescriptor, AuraContext context)
             throws ServletException, IOException {
-    	
         T def;
         try {
-            context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+            context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
             context.setApplicationDescriptor(defDescriptor);
             definitionService.updateLoaded(defDescriptor);
@@ -313,11 +318,14 @@ public class AuraServlet extends AuraBaseServlet {
             return;
         }
 
-        SerializationService serializationService = Aura.getSerializationService();
-        LoggingService loggingService = Aura.getLoggingService();
-
         try {
             if (shouldCacheHTMLTemplate(request)) {
+                /*
+                 * Set a long cache timeout.
+                 *
+                 * This sets several headers to try to ensure that the page will be cached for a reasonable length of time. Of note
+                 * is the last-modified header, which is set to a day ago so that browsers consider it to be safe.
+                 */
                 servletUtilAdapter.setLongCache(response);
             } else {
                 servletUtilAdapter.setNoCache(response);
@@ -340,17 +348,14 @@ public class AuraServlet extends AuraBaseServlet {
     }
 
     private void assertAccess(BaseComponentDef def) throws QuickFixException {
-        String defaultNamespace = Aura.getConfigAdapter().getDefaultNamespace();
+        String defaultNamespace = configAdapter.getDefaultNamespace();
         DefDescriptor<?> referencingDescriptor = (defaultNamespace != null && !defaultNamespace.isEmpty())
-                ? Aura.getDefinitionService().getDefDescriptor(String.format("%s:servletAccess", defaultNamespace),
+                ? definitionService.getDefDescriptor(String.format("%s:servletAccess", defaultNamespace),
                         ApplicationDef.class)
                 : null;
-        Aura.getDefinitionService().getDefRegistry().assertAccess(referencingDescriptor, def);
+        definitionService.getDefRegistry().assertAccess(referencingDescriptor, def);
     }
 
-    protected boolean isValidDefType(DefType defType, Mode mode) {
-        return servletUtilAdapter.isValidDefType(defType, mode);
-    }
 
     private Map<String, Object> getComponentAttributes(HttpServletRequest request) {
         Enumeration<String> attributeNames = request.getParameterNames();
@@ -407,13 +412,10 @@ public class AuraServlet extends AuraBaseServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        SerializationService serializationService = Aura.getSerializationService();
-        LoggingService loggingService = Aura.getLoggingService();
-        ContextService contextService = Aura.getContextService();
-        ServerService serverService = Aura.getServerService();
         AuraContext context = contextService.getCurrentContext();
         response.setCharacterEncoding(UTF_ENCODING);
         boolean written = false;
+
         servletUtilAdapter.setNoCache(response);
 
         //
@@ -432,7 +434,7 @@ public class AuraServlet extends AuraBaseServlet {
                 throw new AuraRuntimeException("Invalid request, no message");
             }
 
-            String fwUID = Aura.getConfigAdapter().getAuraFrameworkNonce();
+            String fwUID = configAdapter.getAuraFrameworkNonce();
             if (!fwUID.equals(context.getFrameworkUID())) {
                 throw new ClientOutOfSyncException("Framework has been updated. Expected: " + fwUID +
                         " Actual: " + context.getFrameworkUID());
@@ -452,7 +454,7 @@ public class AuraServlet extends AuraBaseServlet {
             boolean isBootstrapAction = isBootstrapAction(message, servletUtilAdapter.isProductionMode(context.getMode()));
 
             if (!isBootstrapAction) {
-                validateCSRF(csrfToken.get(request));
+                configAdapter.validateCSRFToken(csrfToken.get(request));
             }
 
             DefDescriptor<? extends BaseComponentDef> applicationDescriptor = context.getApplicationDescriptor();
@@ -463,7 +465,7 @@ public class AuraServlet extends AuraBaseServlet {
             if (applicationDescriptor != null) {
                 // ClientOutOfSync will drop down.
                 try {
-                    Aura.getDefinitionService().updateLoaded(applicationDescriptor);
+                    definitionService.updateLoaded(applicationDescriptor);
                 } catch (QuickFixException qfe) {
                     //
                     // ignore quick fix. If we got a 'new' quickfix, it will be thrown as
@@ -479,18 +481,15 @@ public class AuraServlet extends AuraBaseServlet {
             Map<String, Object> attributes = null;
             if (isBootstrapAction) {
                 attributes = Maps.newHashMap();
-                attributes.put("token", getToken());
+                attributes.put("token", configAdapter.getCSRFToken());
             }
 
             PrintWriter out = response.getWriter();
             written = true;
             out.write(CSRF_PROTECT);
             serverService.run(message, context, out, attributes);
-        } catch (RequestParam.InvalidParamException ipe) {
+        } catch (InvalidParamException | MissingParamException ipe) {
             servletUtilAdapter.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
-            return;
-        } catch (RequestParam.MissingParamException mpe) {
-            servletUtilAdapter.handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
             return;
         } catch (JsonParseException jpe) {
             servletUtilAdapter.handleServletException(new SystemErrorException(jpe), false, context, request, response, false);
@@ -507,6 +506,41 @@ public class AuraServlet extends AuraBaseServlet {
      */
     protected String getTagName(HttpServletRequest request) {
         return tag.get(request);
+    }
+
+    @Inject
+    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
+        this.exceptionAdapter = exceptionAdapter;
+    }
+
+    @Inject
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
+    }
+
+    @Inject
+    public void setDefinitionService(DefinitionService definitionService) {
+        this.definitionService = definitionService;
+    }
+
+    @Inject
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
+    }
+
+    @Inject
+    public void setSerializationService(SerializationService serializationService) {
+        this.serializationService = serializationService;
+    }
+
+    @Inject
+    public void setLoggingService(LoggingService loggingService) {
+        this.loggingService = loggingService;
+    }
+
+    @Inject
+    public void setServerService(ServerService serverService) {
+        this.serverService = serverService;
     }
 
     /**

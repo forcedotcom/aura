@@ -15,6 +15,15 @@
  */
 package org.auraframework.impl.java.type;
 
+import org.auraframework.builder.DefBuilder;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TypeDef;
+import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.impl.java.BaseJavaDefFactory;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.SourceLoader;
+import org.auraframework.util.AuraTextUtil;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,13 +31,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-
-import org.auraframework.builder.DefBuilder;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.TypeDef;
-import org.auraframework.impl.java.BaseJavaDefFactory;
-import org.auraframework.system.SourceLoader;
-import org.auraframework.util.AuraTextUtil;
 
 /**
  * Loads Java types for Aura components.
@@ -54,6 +56,7 @@ public class JavaTypeDefFactory extends BaseJavaDefFactory<TypeDef> {
         builder.setDescriptor(descriptor);
         builder.setLocation(clazz.getCanonicalName(), 0);
         builder.setTypeClass(clazz);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.GLOBAL));
         return builder;
     }
 

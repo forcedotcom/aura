@@ -18,12 +18,16 @@ package org.auraframework.impl.java.provider;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.ComponentConfig;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -31,12 +35,19 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * Testing Java Provider used in component provider:settingAttributesComponentConfigProvider
  */
 
+@ServiceComponentProvider
 @Provider
 public class TestSettingAttributesComponentConfigProvider implements ComponentConfigProvider {
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private DefinitionService definitionService;
+
     @Override
     public ComponentConfig provide() throws QuickFixException {
         ComponentConfig config = new ComponentConfig();
-        DefDescriptor<ComponentDef> cmpDefDesc = Aura.getDefinitionService().getDefDescriptor(
+        DefDescriptor<ComponentDef> cmpDefDesc = definitionService.getDefDescriptor(
                 "provider:settingComponentAttributesInComponentConfigProviderImpl", ComponentDef.class);
         config.setDescriptor(cmpDefDesc);
 
@@ -47,7 +58,7 @@ public class TestSettingAttributesComponentConfigProvider implements ComponentCo
         attributes.put("arrayValue", new String[] { "val1", "val2" });
 
         // setting stringValue attribute as the value on abstract component can be used in provide()
-        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        BaseComponent<?, ?> component = contextService.getCurrentContext().getCurrentComponent();
         Object existingValue = component.getAttributes().getValue("existingValue");
         if (existingValue != null && existingValue.toString().equals("existing string value")) {
             attributes.put("stringValue", existingValue);

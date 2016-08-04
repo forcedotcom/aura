@@ -17,32 +17,38 @@ package org.auraframework.impl.java.controller;
 
 import java.util.Map;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.instance.Component;
+import org.auraframework.service.InstanceService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 
 import com.google.common.collect.ImmutableMap;
 
-@Controller
-public class DelayedController {
+import javax.inject.Inject;
+
+@ServiceComponent
+public class DelayedController implements Controller {
+
+    @Inject
+    private InstanceService instanceService;
+
     @AuraEnabled
-    public static Object getComponents(@Key("token") String token) throws Exception {
-        Component cmp = Aura.getInstanceService().getInstance("auratest:text", ComponentDef.class);
-        Object val = token;
-        Map<String, Object> atts = ImmutableMap.of("value", val);
+    public Object getComponents(@Key("token") String token) throws Exception {
+        Component cmp = instanceService.getInstance("auratest:text", ComponentDef.class);
+        Map<String, Object> atts = ImmutableMap.of("value", token);
         cmp.getAttributes().set(atts);
         try {
             Thread.sleep(2000);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return new Component[] { cmp };
     }
 
     @AuraEnabled
-    public static boolean delayAction(@Key("delayMs") long delayMs) {
+    public boolean delayAction(@Key("delayMs") long delayMs) {
         try {
             Thread.sleep(delayMs);
         } catch (Exception e) {

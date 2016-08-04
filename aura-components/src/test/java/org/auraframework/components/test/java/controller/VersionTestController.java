@@ -15,26 +15,33 @@
  */
 package org.auraframework.components.test.java.controller;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.instance.Action;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-@Controller
-public class VersionTestController {
+import javax.inject.Inject;
+
+@ServiceComponent
+public class VersionTestController implements Controller {
+
+    @Inject
+    private ContextService contextService;
+
     @AuraEnabled
-    public static String getContextAccessVersion() throws QuickFixException {
-        AuraContext ac = Aura.getContextService().getCurrentContext();
+    public String getContextAccessVersion() throws QuickFixException {
+        AuraContext ac = contextService.getCurrentContext();
         return ac.getAccessVersion();
     }
 
     @AuraEnabled
-    public static String currentCallingDescriptor() {
-        Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
+    public String currentCallingDescriptor() {
+        Action currentAction = contextService.getCurrentContext().getCurrentAction();
         DefDescriptor<ComponentDef> defDescr = currentAction.getCallingDescriptor();
         String qualifiedName = null;
         if(defDescr != null) {

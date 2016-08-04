@@ -19,7 +19,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
 
@@ -27,33 +26,33 @@ public class ComponentDefDescriptorTest extends AuraImplTestCase {
 
     @Test
     public void testGetDefType() throws Exception {
-        DefDescriptor<ComponentDef> testDescriptor = DefDescriptorImpl.getInstance("aura:text", ComponentDef.class);
+        DefDescriptor<ComponentDef> testDescriptor = definitionService.getDefDescriptor("aura:text", ComponentDef.class);
         assertEquals(testDescriptor.getDefType(), DefType.COMPONENT);
     }
 
     @Test
     public void testGetInstance() throws Exception {
-        DefDescriptor<ComponentDef> testDescriptor = DefDescriptorImpl.getInstance("aura:text", ComponentDef.class);
+        DefDescriptor<ComponentDef> testDescriptor = definitionService.getDefDescriptor("aura:text", ComponentDef.class);
 
         // getInstance should never return null
         assertNotNull(testDescriptor);
 
         // even if the component doesn't exist
-        assertNotNull(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class));
+        assertNotNull(definitionService.getDefDescriptor("fake:component", ComponentDef.class));
 
         // subsequent calls to getInstance should return the same object
-        assertSame(testDescriptor, (DefDescriptorImpl.getInstance("aura:text", ComponentDef.class)));
+        assertSame(testDescriptor, (definitionService.getDefDescriptor("aura:text", ComponentDef.class)));
 
         DefDescriptor<ComponentDef> testDescriptorNullTag = null;
 
         try {
-            testDescriptorNullTag = DefDescriptorImpl.getInstance(null, ComponentDef.class);
+            testDescriptorNullTag = definitionService.getDefDescriptor(null, ComponentDef.class);
             fail("Should have thrown AuraException for null tag in ComponentDefDescriptor");
         } catch (AuraRuntimeException expected) {
         }
 
         try {
-            testDescriptorNullTag = DefDescriptorImpl.getInstance("aura:text", null);
+            testDescriptorNullTag = definitionService.getDefDescriptor("aura:text", null);
             fail("Should have thrown AuraException for null defClass in ComponentDefDescriptor");
         } catch (AuraRuntimeException expected) {
         }
@@ -130,24 +129,24 @@ public class ComponentDefDescriptorTest extends AuraImplTestCase {
 
     @Test
     public void testEquals() throws Exception {
-        assertTrue(DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class).equals(
+        assertTrue(definitionService.getDefDescriptor("aura:fakeComponent", ComponentDef.class).equals(
                 vendor.makeComponentDefDescriptor("aura:fakeComponent")));
-        assertTrue(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class).equals(
+        assertTrue(definitionService.getDefDescriptor("fake:component", ComponentDef.class).equals(
                 vendor.makeComponentDefDescriptor("fake:component")));
-        assertTrue(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class).equals(
+        assertTrue(definitionService.getDefDescriptor("aura:text", ComponentDef.class).equals(
                 vendor.makeComponentDefDescriptor("aura:text")));
 
-        assertFalse(DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class).equals(
+        assertFalse(definitionService.getDefDescriptor("aura:fakeComponent", ComponentDef.class).equals(
                 vendor.makeComponentDefDescriptor("fake:component")));
-        assertFalse(DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class).equals(
+        assertFalse(definitionService.getDefDescriptor("aura:fakeComponent", ComponentDef.class).equals(
                 vendor.makeComponentDefDescriptor("aura:text")));
-        assertFalse(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class).equals(
+        assertFalse(definitionService.getDefDescriptor("fake:component", ComponentDef.class).equals(
                 vendor.makeComponentDefDescriptor("aura:fakeComponent")));
-        assertFalse(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class).equals(
+        assertFalse(definitionService.getDefDescriptor("fake:component", ComponentDef.class).equals(
                 vendor.makeComponentDefDescriptor("aura:text")));
-        assertFalse(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class).equals(
+        assertFalse(definitionService.getDefDescriptor("aura:text", ComponentDef.class).equals(
                 vendor.makeComponentDefDescriptor("fake:component")));
-        assertFalse(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class).equals(
+        assertFalse(definitionService.getDefDescriptor("aura:text", ComponentDef.class).equals(
                 vendor.makeComponentDefDescriptor("aura:fakeComponent")));
     }
 

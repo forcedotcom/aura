@@ -16,13 +16,15 @@
 package org.auraframework.impl.root.parser.handler.design;
 
 import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.design.DesignAttributeDefImpl;
 import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -68,8 +70,10 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
 
     // TODO implement tool specific properties
     public DesignAttributeDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
-                                     Source<?> source) {
-        super(parentHandler, xmlReader, source);
+                                     Source<?> source, boolean isInInternalNamespace, DefinitionService definitionService,
+                                     ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+        builder.setAccess(getAccess(isInInternalNamespace));
     }
 
     @Override
@@ -93,7 +97,7 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
         Boolean translatable = getBooleanAttributeValue(ATTRIBUTE_TRANSLATABLE);
 
         if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
-            builder.setDescriptor(DefDescriptorImpl.getInstance(name, DesignAttributeDef.class));
+            builder.setDescriptor(definitionService.getDefDescriptor(name, DesignAttributeDef.class));
             builder.setName(name);
         } else {
             error("Name attribute is required for attribute design definitions");
@@ -116,14 +120,15 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
         builder.setTranslatable(translatable);
         builder.setParentDescriptor(getParentDefDescriptor());
         builder.setIsInternalNamespace(isInInternalNamespace());
-
+        builder.setAccess(readAccessAttribute());
     }
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (isInInternalNamespace() && DesignAttributeDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
-            DesignAttributeDefaultDef def = new DesignAttributeDefaultDefHandler(getParentHandler(), xmlReader, source).getElement();
+            DesignAttributeDefaultDef def = new DesignAttributeDefaultDefHandler(getParentHandler(), xmlReader, source,
+                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter).getElement();
             builder.setDefault(def);
         } else {
             error("Found unexpected tag %s", getTagName());

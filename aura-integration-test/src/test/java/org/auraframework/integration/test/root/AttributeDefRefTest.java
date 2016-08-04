@@ -15,24 +15,21 @@
  */
 package org.auraframework.integration.test.root;
 
-import java.util.Set;
-
-import org.auraframework.Aura;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.util.type.TypeUtil.ConversionException;
+import org.auraframework.util.type.ConversionException;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
+import java.util.Set;
 
 public class AttributeDefRefTest extends AuraImplTestCase {
 
@@ -70,9 +67,9 @@ public class AttributeDefRefTest extends AuraImplTestCase {
      */
     @Test
     public void testParseValueSimple() throws Exception {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         String typeName = getAuraTestingUtil().getNonce("customType");
-        DefDescriptor<TypeDef> typeDesc = DefDescriptorImpl.getInstance(typeName, TypeDef.class);
+        DefDescriptor<TypeDef> typeDesc = definitionService.getDefDescriptor(typeName, TypeDef.class);
         TypeDef mockType = Mockito.mock(TypeDef.class);
         Mockito.doReturn(typeDesc).when(mockType).getDescriptor();
         Mockito.doReturn("fabulous").when(mockType).valueOf("parseable");

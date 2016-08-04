@@ -15,20 +15,22 @@
  */
 package org.auraframework.impl.compound.controller;
 
-import java.util.Map;
-
+import com.google.common.collect.Maps;
+import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.compound.controller.CompoundControllerDef.Builder;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefFactoryImpl;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.Maps;
+import java.util.Map;
 
 /**
  */
@@ -44,23 +46,23 @@ public class CompoundControllerDefFactory extends DefFactoryImpl<ControllerDef> 
                 DefDescriptor.MARKUP_PREFIX);
         BaseComponentDef componentDef = null;
         if (compDesc.exists()) {
-            componentDef = compDesc.getDef();
+            componentDef = Aura.getDefinitionService().getDefinition(compDesc);
         } else {
             DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getAssociateDescriptor(descriptor,
                     ApplicationDef.class, DefDescriptor.MARKUP_PREFIX);
-            componentDef = appDesc.getDef();
+            componentDef = Aura.getDefinitionService().getDefinition(appDesc);
         }
 
         if (componentDef == null) {
             DefDescriptor<ComponentDef> layoutDesc = DefDescriptorImpl.getAssociateDescriptor(descriptor,
                     ComponentDef.class, "layout");
-            componentDef = layoutDesc.getDef();
+            componentDef = Aura.getDefinitionService().getDefinition(layoutDesc);
         }
 
         Map<String, ActionDef> flattened = Maps.newHashMap();
 
         for (DefDescriptor<ControllerDef> delegate : componentDef.getControllerDefDescriptors()) {
-            ControllerDef c = delegate.getDef();
+            ControllerDef c = Aura.getDefinitionService().getDefinition(delegate);
             for (Map.Entry<String, ? extends ActionDef> e : c.getActionDefs().entrySet()) {
                 ActionDef a = flattened.get(e.getKey());
                 if (a != null) {
@@ -72,6 +74,7 @@ public class CompoundControllerDefFactory extends DefFactoryImpl<ControllerDef> 
             }
         }
         builder.setActionDefs(flattened);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
 
         return builder.build();
     }

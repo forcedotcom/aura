@@ -15,20 +15,21 @@
  */
 package org.auraframework.impl.java.controller;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.throwable.AuraHandledException;
 
-@Controller
-public class DeferredServerActionTestController {
+@ServiceComponent
+public class DeferredServerActionTestController implements Controller {
 
-	@AuraEnabled
-	public static int meaningOfLife() {
-		return 42;
-	}
+    @AuraEnabled
+    public int meaningOfLife() {
+        return 42;
+    }
 
-	@AuraEnabled
-	public static void alwaysThrows() throws AuraHandledException {
-		throw new AuraHandledException("Foo");
-	}
+    @AuraEnabled
+    public void alwaysThrows() throws AuraHandledException {
+        throw new AuraHandledException("Foo");
+    }
 }

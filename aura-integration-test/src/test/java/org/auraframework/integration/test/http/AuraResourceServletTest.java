@@ -16,11 +16,11 @@
 package org.auraframework.integration.test.http;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.servlet.ServletConfig;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.SVGDef;
@@ -28,8 +28,8 @@ import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.http.AuraResourceRewriteFilter;
 import org.auraframework.http.AuraResourceServlet;
 import org.auraframework.http.ManifestUtil;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
@@ -39,12 +39,14 @@ import org.auraframework.test.client.UserAgent;
 import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.test.util.DummyHttpServletRequest;
 import org.auraframework.test.util.DummyHttpServletResponse;
+import org.auraframework.util.FileMonitor;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.context.TestContextManager;
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
  * conditions. I would like this test to be in the "aura" module (vice "aura-impl"), but the configuration there isn't
@@ -52,24 +54,36 @@ import org.springframework.mock.web.MockHttpSession;
  * for now.
  */
 public class AuraResourceServletTest extends AuraTestCase {
+    @Inject
+    private FileMonitor fileMonitor;
 
-    ContextService contextService = Aura.getContextService();
+    @Inject
+    DefinitionService definitionService;
+
+    @Inject
+    ContextService contextService;
 
     public static class SimulatedErrorException extends RuntimeException {
         private static final long serialVersionUID = 411181168049748986L;
     }
 
-    private void doGet(AuraResourceServlet servlet,  HttpServletRequest request, HttpServletResponse response) throws Exception {
-        AuraPrivateAccessor.invoke(servlet, "doGet", request, response);
+    @Mock
+    private ServletConfig servletConfig;
+
+    private AuraResourceServlet getAuraResourceServlet() throws Exception {
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        TestContextManager testContextManager = new TestContextManager(getClass());
+        testContextManager.prepareTestInstance(servlet);
+        return servlet;
     }
 
     public void testAddAppManifestCookie() throws Exception {
-        Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
+        contextService.startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
                 AuraContext.Authentication.UNAUTHENTICATED);
 
-        DefDescriptor<ApplicationDef> nopreload = DefDescriptorImpl.getInstance("appCache:nopreload",
+        DefDescriptor<ApplicationDef> nopreload = definitionService.getDefDescriptor("appCache:nopreload",
                 ApplicationDef.class);
-        Aura.getContextService().getCurrentContext().setApplicationDescriptor(nopreload);
+        contextService.getCurrentContext().setApplicationDescriptor(nopreload);
 
         DummyHttpServletRequest request = new DummyHttpServletRequest("app.manifest");
         DummyHttpServletResponse response = new DummyHttpServletResponse() {
@@ -85,7 +99,7 @@ public class AuraResourceServletTest extends AuraTestCase {
                 return cookie != null && cookie.getName().equals(name) ? cookie : null;
             }
         };
-        new ManifestUtil().checkManifestCookie(request, response);
+        new ManifestUtil(contextService, configAdapter).checkManifestCookie(request, response);
         String expectedName = Mode.UTEST + "_" + nopreload.getNamespace() + "_" + nopreload.getName() + "_lm";
         Cookie cookie = response.getCookie(expectedName);
         assertEquals(expectedName, cookie.getName());
@@ -118,8 +132,8 @@ public class AuraResourceServletTest extends AuraTestCase {
     private void runTestRequestFromDifferentBrowserOnSamePage(String ua, Type uaType, String cssMsgToVerify) throws Exception {
         String cmpname = "appCache:withpreload";
         String cmporapp = "app";
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance(cmpname, ApplicationDef.class);
-        AuraContext context = Aura.getContextService()
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(cmpname, ApplicationDef.class);
+        AuraContext context = contextService
                 .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         Client clientWEBKIT = new Client(ua);
         assertEquals(uaType, clientWEBKIT.getType());
@@ -137,8 +151,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         };
         request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, cmporapp);
         HttpServletResponse response = new DummyHttpServletResponse();
-        AuraResourceServlet servlet = new AuraResourceServlet();
-        doGet(servlet, request, response);
+        AuraResourceServlet servlet = getAuraResourceServlet();
+        servlet.doGet(request, response);
 
         final String key = "CSS:" + context.getClient().getType().name().toLowerCase() + "$" + mKey + uid;
         // Verify something was actually added to cache
@@ -166,8 +180,8 @@ public class AuraResourceServletTest extends AuraTestCase {
     @UnAdaptableTest("W-2931019 enable this once 3Tier change is in")
     @Test
     public void testCssCacheClearedOnSourceChange() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload", ApplicationDef.class);
-        AuraContext context = Aura.getContextService()
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:withpreload", ApplicationDef.class);
+        AuraContext context = contextService
                 .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
@@ -182,8 +196,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         };
         request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "app");
         HttpServletResponse response = new DummyHttpServletResponse();
-        AuraResourceServlet servlet = new AuraResourceServlet();
-        doGet(servlet, request, response);
+        AuraResourceServlet servlet = getAuraResourceServlet();
+        servlet.doGet(request, response);
 
         final String key = "CSS:" + context.getClient().getType().name().toLowerCase() + "$" + mKey + uid;
 
@@ -192,7 +206,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertNotNull("Nothing added to CSS cache", cssCache);
 
         // Now force a source change event and verify cache is emptied
-        definitionService.onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
+        fileMonitor.onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         cssCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
 
@@ -207,8 +221,8 @@ public class AuraResourceServletTest extends AuraTestCase {
     @UnAdaptableTest("W-2929438")
     @Test
     public void testJsCacheClearedOnSourceChange() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload", ApplicationDef.class);
-        AuraContext context = Aura.getContextService()
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:withpreload", ApplicationDef.class);
+        AuraContext context = contextService
                 .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         final String uid = context.getDefRegistry().getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
@@ -223,8 +237,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         };
         request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "app");
         HttpServletResponse response = new DummyHttpServletResponse();
-        AuraResourceServlet servlet = new AuraResourceServlet();
-        doGet(servlet, request, response);
+        AuraResourceServlet servlet = getAuraResourceServlet();
+        servlet.doGet(request, response);
 
         final String key = "JS:" + mKey + uid;
 
@@ -233,7 +247,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertNotNull("Nothing added to JS cache", jsCache);
 
         // Now force a source change event and verify cache is emptied
-        definitionService.onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
+        fileMonitor.onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         jsCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
         assertNull("JS cache not cleared after source change event", jsCache);
@@ -245,8 +259,8 @@ public class AuraResourceServletTest extends AuraTestCase {
     @UnAdaptableTest("W-2929438")
     @Test
     public void testSvgCacheClearedOnSourceChange() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance("appCache:withpreload", ApplicationDef.class);
-        AuraContext context = Aura.getContextService()
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:withpreload", ApplicationDef.class);
+        AuraContext context = contextService
                 .startContext(Mode.DEV, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
         DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
@@ -261,8 +275,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         };
         request.setQueryParam(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
         HttpServletResponse response = new DummyHttpServletResponse();
-        AuraResourceServlet servlet = new AuraResourceServlet();
-        doGet(servlet, request, response);
+        AuraResourceServlet servlet = getAuraResourceServlet();
+        servlet.doGet(request, response);
 
         final String key = "SVG:" + context.getClient().getType() + "$" + uid;
 
@@ -271,7 +285,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertNotNull("Nothing added to SVG cache", svgCache);
 
         // Now force a source change event and verify cache is emptied
-        definitionService.onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
+        fileMonitor.onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
 
         svgCache = context.getDefRegistry().getCachedString(uid, svgDesc, key);
         assertNull("SVG cache not cleared after source change event", svgCache);
@@ -295,13 +309,13 @@ public class AuraResourceServletTest extends AuraTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest(null, "resources.svg");
         mockRequest.setAttribute(AuraResourceServlet.ORIG_REQUEST_URI, "resources.svg");
         mockRequest.addParameter(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
-        //If referer is empty we assume the image is not viewed from within a webpage
+                    //If referer is empty we assume the image is not viewed from within a webpage
         mockRequest.addHeader("referer", "ANotNullString");
         mockRequest.setSession(new MockHttpSession());
 
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
-        AuraResourceServlet servlet = new AuraResourceServlet();
-        doGet(servlet, mockRequest, mockResponse);
+        AuraResourceServlet servlet = getAuraResourceServlet();
+        servlet.doGet(mockRequest, mockResponse);
 
         List<String> headers = mockResponse.getHeaders("etag");
         assertTrue("Failed to find expected value in header: " + headers, headers.contains(etag));
@@ -335,13 +349,13 @@ public class AuraResourceServletTest extends AuraTestCase {
         mockRequest.setSession(new MockHttpSession());
         mockRequest.setAttribute(AuraResourceServlet.ORIG_REQUEST_URI, "resources.svg");
         mockRequest.addHeader("if-none-match", etag);
-        //If referer is empty we assume the image is not viewed from within a webpage
+                    //If referer is empty we assume the image is not viewed from within a webpage
         mockRequest.addHeader("referer", "ANotNullString");
         mockRequest.addParameter(AuraResourceRewriteFilter.TYPE_PARAM, "svg");
 
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
-        AuraResourceServlet servlet = new AuraResourceServlet();
-        doGet(servlet, mockRequest, mockResponse);
+        AuraResourceServlet servlet = getAuraResourceServlet();
+        servlet.doGet(mockRequest, mockResponse);
 
         assertEquals(304, mockResponse.getStatus());
     }
@@ -367,8 +381,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         mockRequest.setSession(new MockHttpSession());
 
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
-        AuraResourceServlet servlet = new AuraResourceServlet();
-        doGet(servlet, mockRequest, mockResponse);
+        AuraResourceServlet servlet = getAuraResourceServlet();
+        servlet.doGet(mockRequest, mockResponse);
 
         List<String> headers = mockResponse.getHeaders("Content-Disposition");
         assertFalse("Failed to find any header for Content-Disposition", headers.isEmpty());

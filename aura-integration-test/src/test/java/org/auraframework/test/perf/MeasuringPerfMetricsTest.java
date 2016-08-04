@@ -36,10 +36,6 @@ import org.openqa.selenium.By;
 @Ignore("W-2565715")
 public final class MeasuringPerfMetricsTest extends AbstractPerfTestCase {
 
-    public MeasuringPerfMetricsTest(String name) {
-        super(name);
-    }
-
     private static final String LABEL_MOCK = "Mock value for 'label' attribute";
 
     @Override

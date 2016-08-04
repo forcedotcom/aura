@@ -19,14 +19,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.instance.InstanceStack;
-import org.auraframework.system.Annotations.Provider;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -35,12 +37,15 @@ import com.google.common.collect.Maps;
 /**
  * server side provider for if.cmp
  */
-@Provider
+@ServiceComponentProvider
 public class IfProvider implements ComponentConfigProvider {
-
+	
+	@Inject
+	ContextService contextService;
+	
     @Override
     public ComponentConfig provide() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
         InstanceStack iStack = context.getInstanceStack();
         ComponentConfig cc = new ComponentConfig();

@@ -15,23 +15,23 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
-
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TokensDef;
 import org.auraframework.def.TokensImportDef;
 import org.auraframework.impl.css.token.TokensImportDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
+
+import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
 
 public class TokensImportDefHandler<P extends RootDefinition> extends ParentedTagHandler<TokensImportDef, P> {
     protected static final String TAG = "aura:import";
@@ -43,9 +43,12 @@ public class TokensImportDefHandler<P extends RootDefinition> extends ParentedTa
         super();
     }
 
-    public TokensImportDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(parentHandler, xmlReader, source);
+    public TokensImportDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                                  boolean isInInternalNamespace, DefinitionService definitionService,
+                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         this.builder.setLocation(getLocation());
+        this.builder.setAccess(getAccess(isInInternalNamespace));
     }
 
     @Override
@@ -64,7 +67,7 @@ public class TokensImportDefHandler<P extends RootDefinition> extends ParentedTa
         if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
             error("Missing required attribute 'name' on ", TAG);
         }
-        builder.setImportDescriptor(DefDescriptorImpl.getInstance(name, TokensDef.class));
+        builder.setImportDescriptor(definitionService.getDefDescriptor(name, TokensDef.class));
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
     }
 

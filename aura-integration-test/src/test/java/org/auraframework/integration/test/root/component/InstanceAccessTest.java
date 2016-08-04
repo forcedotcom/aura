@@ -15,13 +15,11 @@
  */
 package org.auraframework.integration.test.root.component;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.service.InstanceService;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.NoAccessException;
@@ -36,8 +34,6 @@ public class InstanceAccessTest extends AuraImplTestCase {
     private static final String DEFAULT = StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE;//'csstring'
     private static final String OTHER = StringSourceLoader.OTHER_CUSTOM_NAMESPACE;//'csstring1'
     private static final String ANOTHER = StringSourceLoader.ANOTHER_CUSTOM_NAMESPACE;//csstring2
-
-    private InstanceService instanceService = Aura.getInstanceService();
 
     @Test
     public void testAccessToNonGlobalInSameNS() throws Exception {

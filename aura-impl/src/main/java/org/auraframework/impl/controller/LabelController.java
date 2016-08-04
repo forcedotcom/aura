@@ -15,23 +15,29 @@
  */
 package org.auraframework.impl.controller;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import javax.inject.Inject;
+
 import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
-@Controller
-public class LabelController {
+@ServiceComponent
+public class LabelController implements Controller {
+
+    @Inject
+    private ContextService contextService;
 
     @AuraEnabled
-    public static String getLabel(@Key("section") String section, @Key("name") String name) throws QuickFixException {
-        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
+    public String getLabel(@Key("section") String section, @Key("name") String name) throws QuickFixException {
+        GlobalValueProvider labelProvider = contextService.getCurrentContext().getGlobalProviders()
                 .get(LABEL.getPrefix());
         PropertyReference labelRef = new PropertyReferenceImpl(section + "." + name, null);
         return (String) labelProvider.getValue(labelRef);

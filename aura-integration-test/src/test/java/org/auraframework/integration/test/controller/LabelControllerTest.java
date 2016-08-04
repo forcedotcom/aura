@@ -17,14 +17,13 @@ package org.auraframework.integration.test.controller;
 
 import java.util.Map;
 
-import org.auraframework.Aura;
-import org.auraframework.def.ActionDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
+import javax.inject.Inject;
+
+import org.auraframework.def.*;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
+import org.auraframework.service.InstanceService;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
@@ -36,13 +35,19 @@ import com.google.common.collect.Maps;
 @UnAdaptableTest
 // Missing labels behave differently in SFDC stack
 public class LabelControllerTest extends AuraImplTestCase {
-    DefDescriptor<ControllerDef> labelCntrDesc = DefDescriptorImpl.getInstance(
-            "java://org.auraframework.impl.controller.LabelController", ControllerDef.class);
+//    @Inject
+//    private ExceptionAdapter exceptionAdapter;
+
+    @Inject
+    private InstanceService instanceService;
+
     String getLabelDesc = "java://org.auraframework.impl.controller.LabelController/ACTION$getLabel";
     String placeholder = "FIXME - LocalizationAdapter.getLabel() needs implementation!";
 
     @Test
     public void testLabelController() throws Exception {
+        DefDescriptor<ControllerDef> labelCntrDesc = definitionService.getDefDescriptor(
+                "java://org.auraframework.impl.controller.LabelController", ControllerDef.class);
         ControllerDef def = labelCntrDesc.getDef();
         assertNotNull("Failed to fetch the definition of the Label Controller.", def);
         runLabelAction("Related_Lists", "task_mode_today", State.SUCCESS, "Today");
@@ -69,7 +74,7 @@ public class LabelControllerTest extends AuraImplTestCase {
         params.put("section", section);
         params.put("name", name);
 
-        Action instance = (Action) Aura.getInstanceService().getInstance(getLabelDesc,
+        Action instance = instanceService.getInstance(getLabelDesc,
                 ActionDef.class, params);
         instance.run();
         assertEquals(expectedStatus, instance.getState());

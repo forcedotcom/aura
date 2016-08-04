@@ -17,8 +17,7 @@ package org.auraframework.impl;
 
 import com.google.common.base.Optional;
 import org.apache.log4j.Logger;
-import org.auraframework.Aura;
-import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.builder.CacheBuilder;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.ApplicationDef;
@@ -26,10 +25,16 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.cache.CacheImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.CachingService;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.SourceListener;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
@@ -39,9 +44,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-@ServiceComponent
 public class CachingServiceImpl implements CachingService {
-
     private static final long serialVersionUID = -3311707270226573084L;
 
     /** Default size of definition caches, in number of entries */
@@ -60,6 +63,19 @@ public class CachingServiceImpl implements CachingService {
     /** Default size of client lib caches, in number of entries */
     private final static int CLIENT_LIB_CACHE_SIZE = 30;
 
+    @Configuration
+    public static class BeanConfiguration {
+        private static final CachingServiceImpl INSTANCE  = new CachingServiceImpl();
+        
+        @Lazy
+        @Bean
+        public CachingService cachingServiceImpl() {
+            return INSTANCE;
+        }
+    }
+    
+    private LoggingAdapter loggingAdapter;
+    
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final WriteLock wLock = rwLock.writeLock();
 
@@ -68,21 +84,23 @@ public class CachingServiceImpl implements CachingService {
         return new CacheImpl.Builder<>();
     }
 
-    private final Cache<DefDescriptor<?>, Boolean> existsCache;
-    private final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
-    private final Cache<String, String> stringsCache;
-    private final Cache<String, String> altStringsCache;
-    private final Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
-    private final Cache<String, DependencyEntry> depsCache;
-    private final Cache<String, String> clientLibraryOutputCache;
-    private final Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> defDescriptorByNameCache;
+    private Cache<DefDescriptor<?>, Boolean> existsCache;
+    private Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
+    private Cache<String, String> stringsCache;
+    private Cache<String, String> altStringsCache;
+    private Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
+    private Cache<String, DependencyEntry> depsCache;
+    private Cache<String, String> clientLibraryOutputCache;
+    private Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> defDescriptorByNameCache;
 
     private static final Logger logger = Logger.getLogger(CachingServiceImpl.class);
 
-    public CachingServiceImpl() {
+    @PostConstruct
+    void initializeCaches() {
         int size = getCacheSize("aura.cache.existsCacheSize", DEFINITION_CACHE_SIZE);
         existsCache = this.<DefDescriptor<?>, Boolean> getCacheBuilder()
                 .setInitialSize(size)
+                .setLoggingAdapter(loggingAdapter)
                 .setMaximumSize(size)
                 .setRecordStats(true)
                 .setName("existsCache")
@@ -92,6 +110,7 @@ public class CachingServiceImpl implements CachingService {
         defsCache = this
                 .<DefDescriptor<?>, Optional<? extends Definition>> getCacheBuilder()
                 .setInitialSize(size)
+                .setLoggingAdapter(loggingAdapter)
                 .setMaximumSize(size)
                 .setRecordStats(true)
                 .setName("defsCache")
@@ -100,6 +119,7 @@ public class CachingServiceImpl implements CachingService {
         size = getCacheSize("aura.cache.stringsCacheSize", STRING_CACHE_SIZE);
         stringsCache = this.<String, String> getCacheBuilder()
                 .setInitialSize(size)
+                .setLoggingAdapter(loggingAdapter)
                 .setMaximumSize(size)
                 .setRecordStats(true)
                 .setName("stringsCache")
@@ -108,6 +128,7 @@ public class CachingServiceImpl implements CachingService {
         size = getCacheSize("aura.cache.altStringsCacheSize", ALT_STRINGS_CACHE_SIZE);
         altStringsCache = this.<String, String> getCacheBuilder()
                 .setInitialSize(size)
+                .setLoggingAdapter(loggingAdapter)
                 .setMaximumSize(size)
                 .setRecordStats(true)
                 .setName("altStringsCache")
@@ -117,6 +138,7 @@ public class CachingServiceImpl implements CachingService {
         descriptorFilterCache = this
                 .<String, Set<DefDescriptor<?>>> getCacheBuilder()
                 .setInitialSize(size)
+                .setLoggingAdapter(loggingAdapter)
                 .setMaximumSize(size)
                 .setRecordStats(true)
                 .setName("descriptorFilterCache")
@@ -125,6 +147,7 @@ public class CachingServiceImpl implements CachingService {
         size = getCacheSize("aura.cache.depsCacheSize", DEPENDENCY_CACHE_SIZE);
         depsCache = this.<String, DependencyEntry> getCacheBuilder()
                 .setInitialSize(size)
+                .setLoggingAdapter(loggingAdapter)
                 .setMaximumSize(size)
                 .setRecordStats(true)
                 .setName("depsCache")
@@ -133,6 +156,7 @@ public class CachingServiceImpl implements CachingService {
         size = getCacheSize("aura.cache.clientLibraryOutputCacheSize", CLIENT_LIB_CACHE_SIZE);
         clientLibraryOutputCache = this.<String, String> getCacheBuilder()
                 .setInitialSize(size)
+                .setLoggingAdapter(loggingAdapter)
                 .setMaximumSize(size)
                 .setSoftValues(true)
                 .setName("clientLibraryOutputCache")
@@ -142,6 +166,7 @@ public class CachingServiceImpl implements CachingService {
         defDescriptorByNameCache =
                 this.<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getCacheBuilder()
                         .setInitialSize(512)
+                        .setLoggingAdapter(loggingAdapter)
                         .setMaximumSize(size)
                         .setConcurrencyLevel(20)
                         .setName("defDescByNameCache")
@@ -258,11 +283,8 @@ public class CachingServiceImpl implements CachingService {
             defsCache.invalidateAll();
             existsCache.invalidateAll();
         } else {
-            DefinitionService ds = Aura.getDefinitionService();
-            DefDescriptor<ComponentDef> cdesc = ds.getDefDescriptor(descriptor,
-                    "markup", ComponentDef.class);
-            DefDescriptor<ApplicationDef> adesc = ds.getDefDescriptor(
-                    descriptor, "markup", ApplicationDef.class);
+            DefDescriptor<ComponentDef> cdesc = new DefDescriptorImpl<>(descriptor, ComponentDef.class, "markup");
+            DefDescriptor<ApplicationDef> adesc = new DefDescriptorImpl<>(descriptor, ApplicationDef.class, "markup");
 
             defsCache.invalidate(descriptor);
             existsCache.invalidate(descriptor);
@@ -278,6 +300,11 @@ public class CachingServiceImpl implements CachingService {
             default:
             }
         }
+    }
+
+    @Inject
+    void setLoggingAdapter(LoggingAdapter loggingAdapter) {
+        this.loggingAdapter = loggingAdapter;
     }
 
     /**

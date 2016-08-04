@@ -23,6 +23,7 @@ import org.auraframework.builder.ClientLibraryDefBuilder;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -171,6 +172,7 @@ public final class ClientLibraryDefImpl extends DefinitionImpl<ClientLibraryDef>
 
         public Builder() {
             super(ClientLibraryDef.class);
+            setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         }
 
         @Override

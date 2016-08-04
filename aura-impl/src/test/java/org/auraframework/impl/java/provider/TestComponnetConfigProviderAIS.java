@@ -15,14 +15,15 @@
  */
 package org.auraframework.impl.java.provider;
 
-import java.util.Map;
-
+import com.google.common.collect.Maps;
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.system.Annotations.Provider;
 
-import com.google.common.collect.Maps;
+import java.util.Map;
 
+@ServiceComponentProvider
 @Provider
 public class TestComponnetConfigProviderAIS implements ComponentConfigProvider {
     @Override

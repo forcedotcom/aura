@@ -28,11 +28,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.auraframework.Aura;
+import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.components.ui.InputOption;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.impl.service.testdata.LocalizationServiceTestData;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateOnly;
 
@@ -40,11 +41,12 @@ import org.auraframework.util.date.DateOnly;
  * Used by /expressionTest/expressionFunction.cmp which expects the current
  * return values.
  */
-@Model
-public class TestModelLocalization {
+@ServiceComponentModelInstance
+public class TestModelLocalization implements ModelInstance {
     static ArrayList<InputOption> inputOptions = new ArrayList<>();
     static ArrayList<InputOption> moreInputOptions = new ArrayList<>();
     static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<>();
+    private final LocalizationAdapter localizationAdapter;
 
     static {
         inputOptions.add(new InputOption("Option1", "Opt1", false, "option1"));
@@ -58,6 +60,10 @@ public class TestModelLocalization {
         for (InputOption i : inputOptions) {
             optionMap.put(i.getValue(), getSubCategory(i.getValue()));
         }
+    }
+    
+    public TestModelLocalization(LocalizationAdapter localizationAdapter) {
+    	this.localizationAdapter = localizationAdapter;
     }
 
     private static ArrayList<InputOption> getSubCategory(String option) {
@@ -496,7 +502,7 @@ public class TestModelLocalization {
     @AuraEnabled
     public Object getLocaleData() {
         List<String> localeData = new LinkedList<>();
-        AuraLocale ll = Aura.getLocalizationAdapter().getAuraLocale();
+        AuraLocale ll = localizationAdapter.getAuraLocale();
         localeData.add("Currency locale:" + ll.getCurrencyLocale().getDisplayName());
         localeData.add("Date locale:" + ll.getDateLocale().getDisplayName());
         localeData.add("Default locale:" + ll.getDefaultLocale().getDisplayName());

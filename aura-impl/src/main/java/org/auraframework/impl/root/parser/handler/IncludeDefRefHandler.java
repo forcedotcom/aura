@@ -15,28 +15,30 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.library.IncludeDefRefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
+
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
 
@@ -58,9 +60,9 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
     }
 
     public IncludeDefRefHandler(RootTagHandler<? extends RootDefinition> parentHandler, XMLStreamReader xmlReader,
-        Source<?> source) {
-    	super(xmlReader, source);
-    	this.parentHandler = parentHandler;
+                                Source<?> source, DefinitionService definitionService) {
+        super(xmlReader, source, definitionService);
+        this.parentHandler = parentHandler;
     }
 
     @Override
@@ -79,24 +81,21 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
         if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
             throw new InvalidDefinitionException(("aura:include must specify a valid JavaScript file name."), getLocation());
         }
-        DefDescriptor<IncludeDef> descriptor = DefDescriptorImpl.getInstance(
-        		String.format("%s.%s", parentDescriptor.getNamespace(), name), 
-        		IncludeDef.class, parentDescriptor);
-        builder.setDescriptor(descriptor);
-        
+        builder.setDescriptor(definitionService.getDefDescriptor(String.format("%s.%s", parentDescriptor.getNamespace(), name), IncludeDef.class, parentDescriptor));
+
         String importNames = getAttributeValue(ATTRIBUTE_IMPORTS);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(importNames)) {
             List<DefDescriptor<IncludeDef>> imports = new LinkedList<>();
             for (String importName : Arrays.asList(importNames.trim().split("\\s*\\,\\s*"))) {
                 String[] parts = importName.split(":");
                 if (parts.length == 1) { // local import
-                    imports.add(DefDescriptorImpl.getInstance(
+                    imports.add(definitionService.getDefDescriptor(
                             String.format("%s.%s", parentDescriptor.getNamespace(), importName), 
                             IncludeDef.class, parentDescriptor));
                 } else if (parts.length == 3) { // external import
-                    DefDescriptor<LibraryDef> externalLibrary = DefDescriptorImpl.getInstance(
+                    DefDescriptor<LibraryDef> externalLibrary = definitionService.getDefDescriptor(
                             String.format("%s:%s", parts[0], parts[1]), LibraryDef.class);
-                    imports.add(DefDescriptorImpl.getInstance(String.format("%s.%s", parts[0], parts[2]),
+                    imports.add(definitionService.getDefDescriptor(String.format("%s.%s", parts[0], parts[2]),
                             IncludeDef.class, externalLibrary));
                 } else { // invalid import name
                     throw new InvalidDefinitionException(String.format(
@@ -125,8 +124,9 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
         }
 
         builder.setOwnHash(source.getHash());
-	   	return builder.build();
-    }   
+        builder.setAccess(new DefinitionAccessImpl(Access.PRIVATE));
+        return builder.build();
+    }
 
     @Override
     public Set<String> getAllowedAttributes() {

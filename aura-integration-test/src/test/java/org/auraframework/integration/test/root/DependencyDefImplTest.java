@@ -15,14 +15,14 @@
  */
 package org.auraframework.integration.test.root;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class DependencyDefImplTest extends AuraImplTestCase {
     @Test

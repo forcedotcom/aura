@@ -323,26 +323,26 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
         List<String> cspRecords = new ArrayList<>();
         if(expectedLogsSize == 0 ) {
             List<LoggingEvent> logs = appender.getLog();
-            while (!logs.isEmpty()) {
-                LoggingEvent log = logs.remove(0);
-                if (log.getMessage().toString().contains(CSPReporterServlet.JSON_NAME)) {
-                    cspRecords.add(log.getMessage().toString());
+                while (!logs.isEmpty()) {
+                    LoggingEvent log = logs.remove(0);
+                    if (log.getMessage().toString().contains(CSPReporterServlet.JSON_NAME)) {
+                        cspRecords.add(log.getMessage().toString());
+                    }
                 }
-            }
         } else {
             getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
                 @Override
                 public Boolean apply(WebDriver d) {
                     List<LoggingEvent> logs = appender.getLog();
-                    while (!logs.isEmpty()) {
-                        LoggingEvent log = logs.remove(0);
-                        if (log.getMessage().toString().contains(CSPReporterServlet.JSON_NAME)) {
-                            cspRecords.add(log.getMessage().toString());
-                            return cspRecords.size() == expectedLogsSize;
+                            while (!logs.isEmpty()) {
+                                LoggingEvent log = logs.remove(0);
+                                if (log.getMessage().toString().contains(CSPReporterServlet.JSON_NAME)) {
+                                    cspRecords.add(log.getMessage().toString());
+                                    return cspRecords.size() == expectedLogsSize;
+                                }
                         }
+                        return false;
                     }
-                    return false;
-                }
             },
             10,
             "Did not find expected number of log lines (expected " + expectedLogsSize + ", found " + cspRecords.size() + ").");
@@ -350,5 +350,6 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
 
         return cspRecords;
     }
+    
 }
 

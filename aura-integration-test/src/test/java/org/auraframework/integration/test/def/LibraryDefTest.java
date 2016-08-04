@@ -15,20 +15,23 @@
  */
 package org.auraframework.integration.test.def;
 
-import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Charsets;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import javax.inject.Inject;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.def.DefinitionTest;
 import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.impl.root.library.LibraryDefImpl.Builder;
+import org.auraframework.service.ServerService;
+import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -37,13 +40,17 @@ import org.auraframework.util.json.JsonEncoder;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.List;
+import java.util.Set;
 
 public class LibraryDefTest extends DefinitionTest<LibraryDef> {
+
+    @Inject
+    private ServerService serverService;
+
     /**
      * Verify the loading of libraryDefs.
      */
@@ -105,6 +112,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
                 null);
         Builder builder = new LibraryDefImpl.Builder();
         builder.setDescriptor(libDesc);
+        builder.setAccess(new DefinitionAccessImpl(Access.INTERNAL));
 
         LibraryDef libraryDef = builder.build();
 
@@ -132,6 +140,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
 
         List<IncludeDefRef> includes = ImmutableList.of(include, includeDupe);
         builder.setIncludes(includes);
+        builder.setAccess(new DefinitionAccessImpl(Access.INTERNAL));
 
         LibraryDef libraryDef = builder.build();
 
@@ -155,12 +164,12 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         addSourceAutoCleanup(includeDesc,
                 "function X(){\n\tvar renamed = 'truth';\n\tif(window.blah)\n\t\t{renamed+=' hurts'}\n\treturn renamed}");
 
-        Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
+        contextService.endContext();
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
 
         Set<DefDescriptor<?>> descs = ImmutableSet.<DefDescriptor<?>> of(libDesc);
         Writer writer = new StringWriter();
-        Aura.getServerService().writeDefinitions(descs, writer);
+        serverService.writeDefinitions(descs, writer);
         String actual = writer.toString();
         String expected = "function(){var a=\"truth\";window.blah&&(a+=\" hurts\");return a}";
         if (!actual.contains(expected)) {

@@ -15,22 +15,33 @@
  */
 package org.auraframework.impl.java.provider;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+@ServiceComponentProvider
 @Provider
 public class ClientLibraryTestProvider implements ComponentDescriptorProvider {
 
+	@Inject
+	ContextService contextService;
+	
+	@Inject
+	DefinitionService definitionService;
+	
     @Override
     public DefDescriptor<ComponentDef> provide() throws QuickFixException {
-        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        BaseComponent<?, ?> component = contextService.getCurrentContext().getCurrentComponent();
         String num = (String) component.getAttributes().getExpression("implNumber");
-        return DefDescriptorImpl.getInstance("clientLibraryTest:testInterfaceImpl" + num, ComponentDef.class);    }
+        return definitionService.getDefDescriptor("clientLibraryTest:testInterfaceImpl" + num, ComponentDef.class);
+    }
 
 }

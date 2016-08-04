@@ -15,6 +15,21 @@
  */
 package org.auraframework.components.test.java.controller;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.instance.Component;
+import org.auraframework.service.InstanceService;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Key;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+import javax.inject.Inject;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -25,36 +40,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.instance.Component;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
-import org.auraframework.system.Annotations.Key;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.QuickFixException;
+@ServiceComponent
+public class TestControllerLocalization implements Controller {
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+    @Inject
+    private InstanceService instanceService;
 
-@Controller
-public class TestControllerLocalization {
-
-    static Log log = LogFactory.getLog(Aura.class);
+    static Log log = LogFactory.getLog(TestControllerLocalization.class);
 
     @AuraEnabled
-    public static void noArgs() {
+    public void noArgs() {
 
     }
 
     @AuraEnabled
-    public static Object getComponents(@Key("token") String token, @Key("input") String input) throws Exception {
+    public Object getComponents(@Key("token") String token, @Key("input") String input) throws Exception {
         int count = Integer.parseInt(input);
         List<Component> cmps = new LinkedList<>();
         while (count-- > 0) {
-            Component cmp = Aura.getInstanceService().getInstance("auratest:text", ComponentDef.class);
+            Component cmp = instanceService.getInstance("auratest:text", ComponentDef.class);
             Object val = token + ":java:" + count;
             Map<String, Object> atts = ImmutableMap.of("value", val);
             cmp.getAttributes().set(atts);
@@ -64,31 +68,31 @@ public class TestControllerLocalization {
     }
 
     @AuraEnabled
-    public static String getString(@Key("param") String param) throws Exception {
+    public String getString(@Key("param") String param) throws Exception {
         return param;
     }
 
     @AuraEnabled
-    public static int getInt(@Key("param") int param) throws Exception {
+    public int getInt(@Key("param") int param) throws Exception {
         return param;
     }
 
     @AuraEnabled
-    public static void throwsThrowable(@Key("token") String token, @Key("input") String input) {
+    public void throwsThrowable(@Key("token") String token, @Key("input") String input) {
         throw new RuntimeException();
     }
 
     private static Map<String, StringBuffer> buffers = Maps.newLinkedHashMap();
 
     @AuraEnabled
-    public static String getBuffer() throws Exception {
+    public String getBuffer() throws Exception {
         String id = UUID.randomUUID().toString();
         buffers.put(id, new StringBuffer());
         return id;
     }
 
     @AuraEnabled
-    public static void deleteBuffer(@Key("id") String id) throws Exception {
+    public void deleteBuffer(@Key("id") String id) throws Exception {
         buffers.remove(id);
     }
 
@@ -97,8 +101,8 @@ public class TestControllerLocalization {
      * whose value is the current buffer contents plus the current append.
      */
     @AuraEnabled
-    public static Component appendBuffer(@Key("id") String id, @Key("delayMs") BigDecimal delayMs,
-            @Key("append") String append) throws Exception {
+    public Component appendBuffer(@Key("id") String id, @Key("delayMs") BigDecimal delayMs,
+                                  @Key("append") String append) throws Exception {
         StringBuffer buffer = buffers.get(id);
         buffer.append(append);
         long delay = delayMs.longValue();
@@ -106,128 +110,127 @@ public class TestControllerLocalization {
             Thread.sleep(delay);
         }
         Map<String, Object> atts = ImmutableMap.of("value", (Object) (buffer + "."));
-        return Aura.getInstanceService().getInstance("auratest:text", ComponentDef.class, atts);
+        return instanceService.getInstance("auratest:text", ComponentDef.class, atts);
     }
 
     @AuraEnabled
-    public static Boolean echoCheckbox(@Key("inVar") Boolean inVar) {
+    public Boolean echoCheckbox(@Key("inVar") Boolean inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static BigDecimal echoCurrency(@Key("inVar") BigDecimal inVar) {
+    public BigDecimal echoCurrency(@Key("inVar") BigDecimal inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static BigDecimal echoDecimal(@Key("inVar") BigDecimal inVar) {
+    public BigDecimal echoDecimal(@Key("inVar") BigDecimal inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static Date echoDate(@Key("inVar") Date inVar) {
+    public Date echoDate(@Key("inVar") Date inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static Date echoTime(@Key("inVar") Date inVar) {
+    public Date echoTime(@Key("inVar") Date inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static Date echoDateTime(@Key("inVar") Date inVar) {
+    public Date echoDateTime(@Key("inVar") Date inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoEmail(@Key("inVar") String inVar) {
+    public String echoEmail(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static BigDecimal echoNumber(@Key("inVar") BigDecimal inVar) {
+    public BigDecimal echoNumber(@Key("inVar") BigDecimal inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoNumberString(@Key("inVar") String inVar) {
+    public String echoNumberString(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static BigDecimal echoPercentString(@Key("inVar") BigDecimal inVar) {
+    public BigDecimal echoPercentString(@Key("inVar") BigDecimal inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoDateString(@Key("inVar") String inVar) {
+    public String echoDateString(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static Boolean echoOption(@Key("inVar") Boolean inVar) {
+    public Boolean echoOption(@Key("inVar") Boolean inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static BigDecimal echoPercent(@Key("inVar") BigDecimal inVar) {
+    public BigDecimal echoPercent(@Key("inVar") BigDecimal inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoPhone(@Key("inVar") String inVar) {
+    public String echoPhone(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoPicklist(@Key("inVar") String inVar) {
+    public String echoPicklist(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoSearch(@Key("inVar") String inVar) {
+    public String echoSearch(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoSecret(@Key("inVar") String inVar) {
+    public String echoSecret(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoSelect(@Key("inVar") String inVar) {
+    public String echoSelect(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoSelectMulti(@Key("inVar") String inVar) {
+    public String echoSelectMulti(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static Boolean echoSelectOption(@Key("inVar") Boolean inVar) {
+    public Boolean echoSelectOption(@Key("inVar") Boolean inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoText(@Key("inVar") String inVar) {
+    public String echoText(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoTextArea(@Key("inVar") String inVar) {
+    public String echoTextArea(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoUrl(@Key("inVar") String inVar) {
+    public String echoUrl(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static Component getInputNumberCmp(@Key("value") BigDecimal value, @Key("step") BigDecimal step,
-            @Key("max") BigDecimal max, @Key("min") BigDecimal min) throws DefinitionNotFoundException,
-            QuickFixException {
+    public Component getInputNumberCmp(@Key("value") BigDecimal value, @Key("step") BigDecimal step,
+                                       @Key("max") BigDecimal max, @Key("min") BigDecimal min) throws QuickFixException {
         log.info("api:getInputNumberCmp values received on server:" + " value:" + value + " step:" + step + " max:"
                 + max + " min:" + min);
         Map<String, Object> attributes = Maps.newHashMap();
@@ -238,20 +241,67 @@ public class TestControllerLocalization {
         attributes.put("step", step);
         attributes.put("max", max);
         attributes.put("min", min);
-        inputNumCmp = Aura.getInstanceService().getInstance("ui:inputNumber", ComponentDef.class, attributes);
+        inputNumCmp = instanceService.getInstance("ui:inputNumber", ComponentDef.class, attributes);
 
         return inputNumCmp;
     }
 
     @AuraEnabled
-    public static Component getOutputNumberCmp(@Key("inVar") BigDecimal inVar) throws DefinitionNotFoundException,
-            QuickFixException {
+    public Component getOutputNumberCmp(@Key("inVar") BigDecimal inVar) throws QuickFixException {
         log.info("getOutputNumberCmp value received on server:" + inVar);
+        return getOutputComponent(inVar, "ui:outputNumber");
+    }
+
+    @AuraEnabled
+    public Component getOutputPercentStringCmp(@Key("inVar") BigDecimal inVar) throws QuickFixException {
+        log.info("api:getOutputPercentStringCmp value received on server:" + inVar);
+        return getOutputComponent(inVar, "ui:outputPercent");
+    }
+
+    @AuraEnabled
+    public Component getOutputDateCmp(@Key("inVar") Date inVar) throws QuickFixException {
+        log.info("api:getOutputDateCmp value received on server:" + inVar);
+        Map<String, Object> attributes = Maps.newHashMap();
+        Component outputDateCmp = null;
+
+        attributes.put("value", inVar);
+        try {
+            outputDateCmp = instanceService.getInstance("ui:outputDate", ComponentDef.class, attributes);
+        } catch (Exception e) {
+        }
+        return outputDateCmp;
+    }
+
+    @AuraEnabled
+    public Component getOutputTimeCmp(@Key("inVar") Date inVar) throws DefinitionNotFoundException,
+            QuickFixException {
+        return getOutputDateComponent(inVar, "ui:outputDateTime");
+    }
+
+    @AuraEnabled
+    public Component getOutputDateTimeCmp(@Key("inVar") Date inVar) throws DefinitionNotFoundException,
+            QuickFixException {
+        return getOutputDateComponent(inVar, "ui:outputDateTime");
+    }
+
+    @AuraEnabled
+    public Component getOutputCurrencyCmp(@Key("inVar") BigDecimal inVar) throws QuickFixException {
+        log.info("api:getOutputCurrencyCmp value received on server:" + inVar);
+        return getOutputComponent(inVar, "ui:outputCurrency");
+    }
+
+    @AuraEnabled
+    public Component getOutputPercentCmp(@Key("inVar") BigDecimal inVar) throws QuickFixException {
+        log.info("api:getOutputPercentCmp value received on server:" + inVar);
+        return getOutputComponent(inVar, "ui:outputPercent");
+    }
+
+    private Component getOutputComponent(BigDecimal inVar, String component) throws QuickFixException {
         Map<String, Object> attributes = Maps.newHashMap();
         Component outputCmp = null;
         try {
             attributes.put("value", inVar);
-            outputCmp = Aura.getInstanceService().getInstance("ui:outputNumber", ComponentDef.class, attributes);
+            outputCmp = instanceService.getInstance(component, ComponentDef.class, attributes);
         } catch (Exception nfe) {
             StringWriter errors = new StringWriter();
             nfe.printStackTrace(new PrintWriter(errors));
@@ -259,67 +309,12 @@ public class TestControllerLocalization {
             attributes.clear();
             attributes.put("title", errors.toString());
             attributes.put("severity", "error");
-            outputCmp = Aura.getInstanceService().getInstance("ui:message", ComponentDef.class, attributes);
+            outputCmp = instanceService.getInstance("ui:message", ComponentDef.class, attributes);
         }
         return outputCmp;
     }
 
-    @AuraEnabled
-    public static Component getOutputPercentStringCmp(@Key("inVar") BigDecimal inVar)
-            throws DefinitionNotFoundException, QuickFixException {
-        log.info("api:getOutputPercentStringCmp value received on server:" + inVar);
-        Map<String, Object> attributes = Maps.newHashMap();
-        Component outputCmp = null;
-        try {
-            attributes.put("value", inVar);
-            outputCmp = Aura.getInstanceService().getInstance("ui:outputPercent", ComponentDef.class, attributes);
-        } catch (Exception nfe) {
-            StringWriter errors = new StringWriter();
-
-            attributes.clear();
-            attributes.put("title", errors.toString());
-            attributes.put("severity", "error");
-            outputCmp = Aura.getInstanceService().getInstance("ui:message", ComponentDef.class, attributes);
-        }
-        return outputCmp;
-    }
-
-    @AuraEnabled
-    public static Component getOutputDateCmp(@Key("inVar") Date inVar) throws DefinitionNotFoundException,
-            QuickFixException {
-        log.info("api:getOutputDateCmp value received on server:" + inVar);
-        Map<String, Object> attributes = Maps.newHashMap();
-        Component outputDateCmp = null;
-
-        attributes.put("value", inVar);
-        try {
-            outputDateCmp = Aura.getInstanceService().getInstance("ui:outputDate", ComponentDef.class, attributes);
-        } catch (Exception e) {
-        }
-        return outputDateCmp;
-    }
-
-    @AuraEnabled
-    public static Component getOutputTimeCmp(@Key("inVar") Date inVar) throws DefinitionNotFoundException,
-            QuickFixException {
-        log.info("api:getOutputDateTimeCmp value received on server:" + inVar);
-        Map<String, Object> attributes = Maps.newHashMap();
-
-        Component outputDateCmp = null;
-        long time = inVar.getTime();
-        Calendar c = Calendar.getInstance();
-        c.setTime(new Date(time));
-        attributes.put("value", inVar);
-        try {
-            outputDateCmp = Aura.getInstanceService().getInstance("ui:outputDateTime", ComponentDef.class, attributes);
-        } catch (Exception e) {
-        }
-        return outputDateCmp;
-    }
-
-    @AuraEnabled
-    public static Component getOutputDateTimeCmp(@Key("inVar") Date inVar) throws DefinitionNotFoundException,
-            QuickFixException {
+    private Component getOutputDateComponent(Date inVar, String component) {
         log.info("api:getOutputDateTimeCmp value received on server:" + inVar);
         Map<String, Object> attributes = Maps.newHashMap();
         Component outputDateCmp = null;
@@ -329,50 +324,9 @@ public class TestControllerLocalization {
         c.setTime(new Date(time));
         attributes.put("value", c);
         try {
-            outputDateCmp = Aura.getInstanceService().getInstance("ui:outputDateTime", ComponentDef.class, attributes);
+            outputDateCmp = instanceService.getInstance(component, ComponentDef.class, attributes);
         } catch (Exception e) {
         }
         return outputDateCmp;
-    }
-
-    @AuraEnabled
-    public static Component getOutputCurrencyCmp(@Key("inVar") BigDecimal inVar) throws DefinitionNotFoundException,
-            QuickFixException {
-        log.info("api:getOutputCurrencyCmp value received on server:" + inVar);
-        Map<String, Object> attributes = Maps.newHashMap();
-        Component outputCmp = null;
-        try {
-            attributes.put("value", inVar);
-            outputCmp = Aura.getInstanceService().getInstance("ui:outputCurrency", ComponentDef.class, attributes);
-        } catch (Exception nfe) {
-            StringWriter errors = new StringWriter();
-            nfe.printStackTrace(new PrintWriter(errors));
-
-            attributes.clear();
-            attributes.put("title", errors.toString());
-            attributes.put("severity", "error");
-            outputCmp = Aura.getInstanceService().getInstance("ui:message", ComponentDef.class, attributes);
-        }
-        return outputCmp;
-    }
-
-    @AuraEnabled
-    public static Component getOutputPercentCmp(@Key("inVar") BigDecimal inVar) throws DefinitionNotFoundException,
-            QuickFixException {
-        log.info("api:getOutputPercentCmp value received on server:" + inVar);
-        Map<String, Object> attributes = Maps.newHashMap();
-        Component outputCmp = null;
-        try {
-            attributes.put("value", inVar);
-            outputCmp = Aura.getInstanceService().getInstance("ui:outputPercent", ComponentDef.class, attributes);
-        } catch (Exception nfe) {
-            StringWriter errors = new StringWriter();
-
-            attributes.clear();
-            attributes.put("title", errors.toString());
-            attributes.put("severity", "error");
-            outputCmp = Aura.getInstanceService().getInstance("ui:message", ComponentDef.class, attributes);
-        }
-        return outputCmp;
     }
 }

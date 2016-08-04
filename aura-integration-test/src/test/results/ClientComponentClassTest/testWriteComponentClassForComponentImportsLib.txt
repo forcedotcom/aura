@@ -4,8 +4,7 @@ var test$testComponent = {
     "name":"test$testComponent",
     "extends":"markup://aura:component",
     "imports":{
-      "myLib1":"test:testLibrary",
-      "myLib2":"test:testLibrary"
+
     }
   }
 };

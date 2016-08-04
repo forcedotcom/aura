@@ -18,10 +18,12 @@ package org.auraframework.components.loadLevel;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * A model to allow the client to control server speed.
@@ -35,13 +37,16 @@ import org.auraframework.system.Annotations.Model;
  * This is not intended to be overly robust against misuse, and it is particularly prone to issues if multiple tests use
  * the same gate id. This should be avoided.
  */
-@Model
-public class GatedModel {
-    public GatedModel() throws Exception {
-        Aura.getContextService().getCurrentContext().getGlobalProviders();
+@ServiceComponentModelInstance
+public class GatedModel implements ModelInstance {
+	private final ContextService contextService;
+	
+    public GatedModel(ContextService contextService) throws QuickFixException, InterruptedException {
+    	this.contextService = contextService;
+    	contextService.getCurrentContext().getGlobalProviders();
         String id = null;
         try {
-            id = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
+            id = (String) contextService.getCurrentContext().getCurrentComponent().getAttributes()
                     .getValue("waitId");
         } catch (Throwable t) {
             return;
@@ -62,7 +67,7 @@ public class GatedModel {
 
     @AuraEnabled
     public String getString() {
-        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        BaseComponent<?, ?> component = contextService.getCurrentContext().getCurrentComponent();
         String str = (String) component.getAttributes().getExpression("stringAttribute");
         return str;
     }

@@ -15,24 +15,23 @@
  */
 package org.auraframework.integration.test.css;
 
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokenDescriptorProvider;
 import org.auraframework.def.TokenMapProvider;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Unit tests for resolving token function values in CSS files.
@@ -383,7 +382,7 @@ public class TokenResolutionTest extends StyleTestCase {
     public static final class Provider1 implements TokenDescriptorProvider {
         @Override
         public DefDescriptor<TokensDef> provide() throws QuickFixException {
-            return DefDescriptorImpl.getInstance("tokenProviderTest:tokenResolutionProvider", TokensDef.class);
+            return Aura.getDefinitionService().getDefDescriptor("tokenProviderTest:tokenResolutionProvider", TokensDef.class);
         }
     }
 
@@ -426,7 +425,7 @@ public class TokenResolutionTest extends StyleTestCase {
     public static final class TokenComboTestProvider implements TokenDescriptorProvider {
         @Override
         public DefDescriptor<TokensDef> provide() throws QuickFixException {
-            return DefDescriptorImpl.getInstance("tokenProviderTest:tokenComboTest", TokensDef.class);
+            return Aura.getDefinitionService().getDefDescriptor("tokenProviderTest:tokenComboTest", TokensDef.class);
         }
     }
 

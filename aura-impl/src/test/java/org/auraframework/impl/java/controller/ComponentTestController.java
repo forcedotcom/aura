@@ -19,14 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.instance.Component;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 
-@Controller
-public class ComponentTestController {
+@ServiceComponent
+public class ComponentTestController implements Controller {
 
     @AuraEnabled
     public static List<Component> createComponentsOnServer(@Key("descriptors") List<String> descriptors) throws Exception {

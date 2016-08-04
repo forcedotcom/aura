@@ -17,30 +17,22 @@
 package org.auraframework.impl.system;
 
 import org.auraframework.Aura;
-import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.TypeDef;
-import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.TypeParser;
 import org.auraframework.impl.util.TypeParser.Type;
-import org.auraframework.service.CachingService;
-import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import java.io.IOException;
 
 /**
  */
 public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T> {
     private static final long serialVersionUID = 3030118554156737974L;
-    private static CachingService cSrv = Aura.getCachingService();
+    private final DefDescriptor<?> bundle;
     protected final String namespace;
     protected final String name;
     protected final String qualifiedName;
@@ -48,46 +40,55 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     protected final String prefix;
     protected final String nameParameters;
     protected final DefType defType;
-    private final DefDescriptor<?> bundle;
+
     private final int hashCode;
 
-    protected DefDescriptorImpl(DefDescriptor<?> associate, Class<T> defClass, String newPrefix) {
-        LoggingService loggingService = Aura.getLoggingService();
-
-        loggingService.startTimer(LoggingService.TIMER_DEF_DESCRIPTOR_CREATION);
-        try {
-            this.bundle = null;
-            this.defType = DefType.getDefType(defClass);
-            this.prefix = newPrefix;
-            this.name = associate.getName();
-            this.namespace = associate.getNamespace();
-            this.qualifiedName = buildQualifiedName(prefix, namespace, name);
-            this.descriptorName = buildDescriptorName(prefix, namespace, name);
-            int pos = name.indexOf('<');
-            this.nameParameters = pos >= 0 ? name.substring(pos).replaceAll("\\s", "") : null;
-            this.hashCode = createHashCode();
-        } finally {
-            loggingService.stopTimer(LoggingService.TIMER_DEF_DESCRIPTOR_CREATION);
-        }
-        loggingService.incrementNum(LoggingService.DEF_DESCRIPTOR_COUNT);
+    public DefDescriptorImpl(DefDescriptor<?> associate, Class<T> defClass, String newPrefix) {
+        this.bundle = null;
+        this.defType = DefType.getDefType(defClass);
+        this.prefix = newPrefix;
+        this.name = associate.getName();
+        this.namespace = associate.getNamespace();
+        this.qualifiedName = buildQualifiedName(prefix, namespace, name);
+        this.descriptorName = buildDescriptorName(prefix, namespace, name);
+        int pos = name.indexOf('<');
+        this.nameParameters = pos >= 0 ? name.substring(pos).replaceAll("\\s", "") : null;
+        this.hashCode = createHashCode();
     }
 
-    private DefDescriptorImpl(String qualifiedName, Class<T> defClass, DefDescriptor<?> bundle) {
+    public DefDescriptorImpl(String prefix, String namespace, String name, Class<T> defClass) {
+        this(prefix, namespace, name, defClass, null);
+    }
+
+    public DefDescriptorImpl(String prefix, String namespace, String name, Class<T> defClass, DefDescriptor<?> bundle) {
+        this.defType = DefType.getDefType(defClass);
+        int pos = name.indexOf('<');
+        this.nameParameters = pos >= 0 ? name.substring(pos).replaceAll("\\s", "") : null;
+
+        this.prefix = prefix;
+        this.qualifiedName = buildQualifiedName(prefix, namespace, name);
+        this.descriptorName = buildDescriptorName(prefix, namespace, name);
+        this.namespace = namespace;
+        this.name = name;
+        // Needs to be before createHashcode()
         this.bundle = bundle;
-        LoggingService loggingService = Aura.getLoggingService();
-        loggingService.startTimer(LoggingService.TIMER_DEF_DESCRIPTOR_CREATION);
-        try {
-            this.defType = DefType.getDefType(defClass);
-            if (AuraTextUtil.isNullEmptyOrWhitespace(qualifiedName)) {
-                throw new AuraRuntimeException("QualifiedName is required for descriptors");
-            }
+        this.hashCode = createHashCode();
+    }
 
-            String prefix = null;
-            String namespace = null;
-            String name = null;
-            String nameParameters = null;
+    @Deprecated
+    public DefDescriptorImpl(String qualifiedName, Class<T> defClass, DefDescriptor<?> bundle) {
+        this.bundle = bundle;
+        this.defType = DefType.getDefType(defClass);
+        if (AuraTextUtil.isNullEmptyOrWhitespace(qualifiedName)) {
+            throw new AuraRuntimeException("QualifiedName is required for descriptors");
+        }
 
-            switch (defType) {
+        String prefix = null;
+        String namespace = null;
+        String name = null;
+        String nameParameters = null;
+
+        switch (defType) {
             case CONTROLLER:
             case TESTSUITE:
             case MODEL:
@@ -160,25 +161,21 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 }
 
                 break;
-            }
-
-            if (AuraTextUtil.isNullEmptyOrWhitespace(prefix)) {
-                prefix = Aura.getContextService().getCurrentContext().getDefaultPrefix(defType);
-                if (prefix != null) {
-                    qualifiedName = buildQualifiedName(prefix, namespace, name);
-                }
-            }
-            this.qualifiedName = qualifiedName;
-            this.descriptorName = buildDescriptorName(prefix, namespace, name);
-            this.prefix = prefix;
-            this.namespace = namespace;
-            this.name = name;
-            this.hashCode = createHashCode();
-            this.nameParameters = nameParameters;
-        } finally {
-            loggingService.stopTimer(LoggingService.TIMER_DEF_DESCRIPTOR_CREATION);
         }
-        loggingService.incrementNum(LoggingService.DEF_DESCRIPTOR_COUNT);
+
+        if (AuraTextUtil.isNullEmptyOrWhitespace(prefix)) {
+            prefix = Aura.getContextService().getCurrentContext().getDefaultPrefix(defType);
+            if (prefix != null) {
+                qualifiedName = buildQualifiedName(prefix, namespace, name);
+            }
+        }
+        this.qualifiedName = qualifiedName;
+        this.descriptorName = buildDescriptorName(prefix, namespace, name);
+        this.prefix = prefix;
+        this.namespace = namespace;
+        this.name = name;
+        this.hashCode = createHashCode();
+        this.nameParameters = nameParameters;
     }
 
     protected DefDescriptorImpl(String qualifiedName, Class<T> defClass) {
@@ -186,6 +183,9 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     }
 
     public static String buildQualifiedName(String prefix, String namespace, String name) {
+        if (prefix == null && namespace == null) {
+            return name;
+        }
         if (namespace == null) {
             return String.format("%s://%s", prefix, name);
         }
@@ -199,110 +199,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         }
         String format = MARKUP_PREFIX.equals(prefix) ? "%s:%s" : "%s.%s";
         return String.format(format, namespace, name);
-    }
-
-    private static <E extends Definition> DefDescriptor<E> buildInstance(String qualifiedName,
-            Class<E> defClass, DefDescriptor<?> bundle) {
-        if (defClass == TypeDef.class && qualifiedName.indexOf("://") == -1) {
-            TypeDef typeDef = AuraStaticTypeDefRegistry.INSTANCE.getInsensitiveDef(qualifiedName);
-            if (typeDef != null) {
-                @SuppressWarnings("unchecked")
-                DefDescriptor<E> result = (DefDescriptor<E>) typeDef.getDescriptor();
-                return result;
-            }
-        }
-
-        return new DefDescriptorImpl<>(qualifiedName, defClass, bundle);
-    }
-
-    /**
-     * FIXME: this method is ambiguous about wanting a qualified, simple, or descriptor name.
-     *
-     * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
-     * @param defClass The Interface's Class for the DefDescriptor being requested.
-     * @return An instance of a AuraDescriptor for the provided tag
-     */
-    public static <E extends Definition> DefDescriptor<E> getInstance(String name, Class<E> defClass,
-            DefDescriptor<?> bundle) {
-        if (name == null || defClass == null) {
-            throw new AuraRuntimeException("descriptor is null");
-        }
-
-        DescriptorKey dk = new DescriptorKey(name, defClass, bundle);
-
-        Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache =
-                cSrv.getDefDescriptorByNameCache();
-
-        @SuppressWarnings("unchecked")
-        DefDescriptor<E> result = (DefDescriptor<E>) cache.getIfPresent(dk);
-        if (result == null) {
-            result = buildInstance(name, defClass, bundle);
-
-            // Our input names may not be qualified, but we should ensure that
-            // the fully-qualified is properly cached to the same object.
-            // I'd like an unqualified name to either throw or be resolved first,
-            // but that's breaking or non-performant respectively.
-            if (!dk.getName().equals(result.getQualifiedName())) {
-                DescriptorKey fullDK = new DescriptorKey(result.getQualifiedName(), defClass, result.getBundle());
-
-                @SuppressWarnings("unchecked")
-                DefDescriptor<E> fullResult = (DefDescriptor<E>) cache.getIfPresent(fullDK);
-                if (fullResult == null) {
-                    cache.put(fullDK, result);
-                } else {
-                    // We already had one, just under the proper name
-                    result = fullResult;
-                }
-            }
-
-            cache.put(dk, result);
-        }
-
-        return result;
-    }
-
-    /**
-     * FIXME: this method is ambiguous about wanting a qualified, simple, or descriptor name.
-     *
-     * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
-     * @param defClass The Interface's Class for the DefDescriptor being requested.
-     * @return An instance of a AuraDescriptor for the provided tag
-     */
-    public static <E extends Definition> DefDescriptor<E> getInstance(String name, Class<E> defClass) {
-        return getInstance(name, defClass, null);
-    }
-
-    /**
-     * Get an instance from name parts.
-     *
-     * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
-     * @param namespace The Interface's Class for the DefDescriptor being requested.
-     * @return An instance of a AuraDescriptor for the provided tag
-     */
-    public static DefDescriptor<?> getInstance(@CheckForNull String prefix, @Nonnull String namespace,
-            @Nonnull String name, @Nonnull DefType defType) {
-        StringBuilder sb = new StringBuilder();
-        if (AuraTextUtil.isNullEmptyOrWhitespace(prefix)) {
-            prefix = Aura.getContextService().getCurrentContext().getDefaultPrefix(defType);
-        }
-        sb.append(prefix.toLowerCase());
-        sb.append("://");
-        sb.append(namespace);
-        if (prefix.equals("markup")) {
-            sb.append(":");
-        } else {
-            sb.append(".");
-        }
-        sb.append(name);
-        return getInstance(sb.toString(), defType.getPrimaryInterface(), null);
-    }
-
-    public static <E extends Definition> DefDescriptor<E> getAssociateDescriptor(DefDescriptor<?> desc,
-            Class<E> defClass, String newPrefix) {
-        if (desc == null) {
-            throw new AuraRuntimeException("descriptor is null");
-        }
-        return new DefDescriptorImpl<>(desc, defClass, newPrefix);
     }
 
     /**
@@ -337,7 +233,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
 
         return compare(dd1.getBundle(), dd2.getBundle());
     }
-
     private int createHashCode() {
         return (bundle == null ? 0 : bundle.hashCode())
                 + AuraUtil.hashCodeLowerCase(name, namespace, prefix, defType.ordinal());
@@ -423,10 +318,20 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
 
     /**
      * @see DefDescriptor#getDef()
+     * THIS METHOD IS DEPRECATED. USE Use definitionService.getDefinition(descriptor); on the consumption side.
      */
     @Override
+    @Deprecated 
     public T getDef() throws QuickFixException {
         return Aura.getDefinitionService().getDefinition(this);
+    }
+
+    public static <E extends Definition> DefDescriptor<E> getAssociateDescriptor(DefDescriptor<?> desc,
+            Class<E> defClass, String newPrefix) {
+        if (desc == null) {
+            throw new AuraRuntimeException("descriptor is null");
+        }
+        return new DefDescriptorImpl<>(desc, defClass, newPrefix);
     }
 
     /**
@@ -445,4 +350,5 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     public int compareTo(DefDescriptor<?> other) {
         return compare(this, other);
     }
+
 }

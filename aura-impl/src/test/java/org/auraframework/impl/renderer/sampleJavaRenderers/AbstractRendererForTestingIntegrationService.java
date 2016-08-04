@@ -15,27 +15,36 @@
  */
 package org.auraframework.impl.renderer.sampleJavaRenderers;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.def.Renderer;
 import org.auraframework.integration.Integration;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.IntegrationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import java.io.IOException;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+@ServiceComponentRenderer
 public abstract class AbstractRendererForTestingIntegrationService implements Renderer {
 
+	@Inject
+	ContextService contextService;
+	
+	@Inject
+	IntegrationService integrationService;
+	
     protected void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
             Appendable out, boolean useAsync, String applicationTag) throws AuraRuntimeException, QuickFixException, IOException {
-        ContextService contextService = Aura.getContextService();
         AuraContext ctx = contextService.getCurrentContext();
         contextService.endContext();
 
-        Integration integration = Aura.getIntegrationService().createIntegration(
+        Integration integration = integrationService.createIntegration(
                 "", Mode.DEV, true, null, applicationTag, null);
         integration.injectComponentHtml(tag, attributes, localId, locatorDomId, out, useAsync);
 

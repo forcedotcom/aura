@@ -15,10 +15,6 @@
  */
 package org.auraframework.impl.java.controller;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.List;
-
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
@@ -26,6 +22,10 @@ import org.auraframework.def.ValueDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * action in java, aka static method.
@@ -144,8 +144,8 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
 
         /**
          * Sets the loggable param names for this instance.
-         * 
-         * @param params The loggableParams.
+         *
+         * @param loggableParams The loggableParams.
          */
         public void setLoggableParams(List<String> loggableParams) {
             this.loggableParams = loggableParams;
@@ -164,12 +164,12 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
             this.method = method;
         }
 
-	public void setBackground(boolean background) {
-	    this.background = background;
-	}
+        public void setBackground(boolean background) {
+            this.background = background;
+        }
 
-	public void setCaboose(boolean caboose) {
-	    this.caboose = caboose;
-	}
+        public void setCaboose(boolean caboose) {
+            this.caboose = caboose;
+        }
     }
 }

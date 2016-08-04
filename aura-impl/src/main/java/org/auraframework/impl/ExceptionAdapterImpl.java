@@ -15,14 +15,11 @@
  */
 package org.auraframework.impl;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.controller.ComponentController.AuraClientException;
 import org.auraframework.instance.Action;
 import org.auraframework.throwable.AuraExceptionInfo;
@@ -30,13 +27,18 @@ import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.util.json.JsonEncoder;
 
-import aQute.bnd.annotation.component.Component;
+import javax.inject.Inject;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ExceptionAdapterImpl implements ExceptionAdapter {
     private static final Log log = LogFactory.getLog(ExceptionAdapterImpl.class);
+
+    @Inject
+    ConfigAdapter configAdapter;
 
     @Override
     public Throwable getRootCause(Throwable th) {
@@ -66,8 +68,8 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
         } else{
         	String message = "Unable to process your request";
         	//If non-production setup, add more information to exception message
-        	if(!Aura.getConfigAdapter().isProduction()){
-        		StringWriter sw = new StringWriter();
+            if (!configAdapter.isProduction()) {
+                StringWriter sw = new StringWriter();
                 PrintWriter p = new PrintWriter(sw);
                 th.printStackTrace(p);
                 message = message + "\n\n" + sw.toString();

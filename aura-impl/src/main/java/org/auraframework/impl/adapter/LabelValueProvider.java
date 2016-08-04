@@ -15,21 +15,21 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.auraframework.Aura;
+import com.google.common.collect.Maps;
+import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.AuraValueProviderType;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.Maps;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Value provider for $Label
@@ -39,8 +39,13 @@ public class LabelValueProvider implements GlobalValueProvider {
     // MapValueProvider...
     private final Map<String, Map<String, String>> labels;
 
-    public LabelValueProvider() {
-        labels = Maps.newHashMap();
+    private final LocalizationAdapter localizationAdapter;
+    private final DefinitionService definitionService;
+
+    public LabelValueProvider(LocalizationAdapter localizationAdapter, DefinitionService definitionService) {
+        this.labels = Maps.newHashMap();
+        this.localizationAdapter = localizationAdapter;
+        this.definitionService = definitionService;
     }
 
     @Override
@@ -55,7 +60,7 @@ public class LabelValueProvider implements GlobalValueProvider {
         }
         String ret = m.get(param);
         if (ret == null) {
-            String label = Aura.getLocalizationAdapter().getLabel(section, param);
+            String label = localizationAdapter.getLabel(section, param);
             // people escape stuff like &copy; in the labels, aura doesn't need
             // that.
             ret = AuraTextUtil.unescapeOutput(label, false);
@@ -71,7 +76,7 @@ public class LabelValueProvider implements GlobalValueProvider {
 
     @Override
     public DefDescriptor<TypeDef> getReturnTypeDef() {
-        return Aura.getDefinitionService().getDefDescriptor("String", TypeDef.class);
+        return definitionService.getDefDescriptor("String", TypeDef.class);
     }
 
     @Override
@@ -82,7 +87,7 @@ public class LabelValueProvider implements GlobalValueProvider {
         List<String> parts = expr.getList();
         String section = parts.get(0);
         String param = parts.get(1);
-        if (!Aura.getLocalizationAdapter().labelExists(section, param)) {
+        if (!localizationAdapter.labelExists(section, param)) {
             throw new InvalidExpressionException("No label found for " + expr, expr.getLocation());
         }
     }
@@ -94,7 +99,7 @@ public class LabelValueProvider implements GlobalValueProvider {
 
     @Override
     public boolean refSupport() {
-    	// $Label has no serialization references.
+        // $Label has no serialization references.
         return false;
     }
 

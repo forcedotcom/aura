@@ -22,25 +22,25 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
+import org.auraframework.ds.servicecomponent.ModelInstance;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 
-@Model
-public class ExamplesModel {
+@ServiceComponentModelInstance
+public class ExamplesModel implements ModelInstance {
     List<Map<String, String>> examples = new ArrayList<>();
     String message;
 
-    public ExamplesModel() throws Exception {
-        DefinitionService definitionService = Aura.getDefinitionService();
+    public ExamplesModel(ContextService contextService, DefinitionService definitionService) throws Exception {
 
-        String name = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
+        String name = (String) contextService.getCurrentContext().getCurrentComponent().getAttributes()
                 .getValue("name");
 
         if (name != null && !name.isEmpty()) {
@@ -55,7 +55,7 @@ public class ExamplesModel {
                         Map<String, String> m;
 
                         try {
-                            DocumentationDef docDef = (DocumentationDef) descriptor.getDef();
+                            DocumentationDef docDef = (DocumentationDef) definitionService.getDefinition(descriptor);
 
                             Collection<ExampleDef> exampleDefs = docDef.getExampleDefs();
 
@@ -70,7 +70,7 @@ public class ExamplesModel {
                             }
                         } catch (Exception e) {
                             // only display errors in loading DocDefs in dev mode
-                            if (Aura.getContextService().getCurrentContext().isDevMode()) {
+                            if (contextService.getCurrentContext().isDevMode()) {
                                 m = new TreeMap<>();
                                 m.put("error", e.toString());
                                 m.put("descriptor", descriptor.getDescriptorName());

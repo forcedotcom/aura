@@ -15,17 +15,37 @@
  */
 package org.auraframework.impl.root.parser;
 
-import javax.xml.stream.XMLStreamReader;
-
-import org.auraframework.def.design.DesignDef;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.root.parser.handler.design.DesignDefHandler;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 
+import javax.xml.stream.XMLStreamReader;
+
+@ServiceComponent
 public class DesignXMLParser extends XMLParser<DesignDef> {
+
+    @Override
+    public Format getFormat() {
+        return Format.XML;
+    }
+
+    @Override
+    public DefType getDefType() {
+        return DefType.DESIGN;
+    }
+
     @Override
     protected DesignDefHandler getHandler(DefDescriptor<DesignDef> descriptor,
-            Source<DesignDef> source, XMLStreamReader xmlReader) {
-        return new DesignDefHandler(descriptor, source, xmlReader);
+                                          Source<DesignDef> source, XMLStreamReader xmlReader,
+                                          boolean isInInternalNamespace, DefinitionService definitionService,
+                                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        return new DesignDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
+                configAdapter, definitionParserAdapter);
     }
 }

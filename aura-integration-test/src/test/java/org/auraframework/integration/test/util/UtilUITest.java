@@ -22,8 +22,8 @@ import org.openqa.selenium.By;
 
 public class UtilUITest extends WebDriverTestCase {
 
-    @Test
-    public void testRemoveOn() throws Exception {
+	@Test
+	public void testRemoveOn() throws Exception {
 		DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
 				ComponentDef.class, String.format(baseComponentTag,
 						"render='client'",

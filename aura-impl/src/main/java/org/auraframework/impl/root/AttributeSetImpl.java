@@ -15,13 +15,7 @@
  */
 package org.auraframework.impl.root;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
@@ -34,7 +28,6 @@ import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.event.EventHandlerImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.type.ComponentArrayTypeDef;
 import org.auraframework.impl.type.ComponentTypeDef;
 import org.auraframework.impl.util.AuraUtil;
@@ -59,7 +52,12 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceType;
 
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  */
@@ -67,12 +65,14 @@ import com.google.common.collect.Maps;
 public class AttributeSetImpl implements AttributeSet {
     private static final Location SUPER_PASSTHROUGH = AuraUtil.getExternalLocation("super component attribute passthrough");
 
+    // Immutable? I think not.
     private DefDescriptor<? extends RootDefinition> rootDefDescriptor;
+    private boolean trackDirty = false;
+    
     private final Map<DefDescriptor<AttributeDef>, Attribute> attributes = Maps.newHashMap();
     private final Map<DefDescriptor<EventHandlerDef>, EventHandler> events = Maps.newHashMap();
     private final BaseComponent<?, ?> valueProvider;
     private final Instance<?> parent;
-    private boolean trackDirty = false;
 
     public AttributeSetImpl(DefDescriptor<? extends RootDefinition> componentDefDescriptor,
             BaseComponent<?, ?> valueProvider, Instance<?> parent) throws QuickFixException {
@@ -151,7 +151,7 @@ public class AttributeSetImpl implements AttributeSet {
             // Kris:
             // This is going to fail a good handfull of things at the moment, I need to
             // Uncomment and test against the app before trying to check this in.
-            // Mode mode = Aura.getContextService().getCurrentContext().getMode();
+            // Mode mode = contextService.getCurrentContext().getMode();
             // if(mode.isDevMode() || mode.isTestMode()) {
             //  throw new InvalidValueSetTypeException(
             //                  String.format("Error setting the attribute '%s' of type %s to a value of type %s.", attributeDef.getName(), attributeDef.getTypeDef().getName(), attributeDefRef.getValue().getClass().getName()),
@@ -190,7 +190,7 @@ public class AttributeSetImpl implements AttributeSet {
         Map<DefDescriptor<?>, Object> lookup = Maps.newHashMap();
 
         for (Attribute attribute : attributeSet) {
-            lookup.put(DefDescriptorImpl.getInstance(attribute.getName(), AttributeDef.class), attribute);
+            lookup.put(Aura.getDefinitionService().getDefDescriptor(attribute.getName(), AttributeDef.class), attribute);
         }
 
         for (AttributeDefRef attributeDefRef : facetDefRefs) {
@@ -217,7 +217,7 @@ public class AttributeSetImpl implements AttributeSet {
             RootDefinition rootDef = rootDefDescriptor.getDef();
             Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDef.getAttributeDefs();
             for (Map.Entry<String, Object> entry : attributeMap.entrySet()) {
-                DefDescriptor<AttributeDef> desc = DefDescriptorImpl.getInstance(entry.getKey(), AttributeDef.class);
+                DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor(entry.getKey(), AttributeDef.class);
                 if (attrs.containsKey(desc)) {
                     setExpression(desc, entry.getValue());
                 }
@@ -260,7 +260,7 @@ public class AttributeSetImpl implements AttributeSet {
 
     @Override
     public Object getExpression(String name) {
-        DefDescriptor<AttributeDef> desc = DefDescriptorImpl.getInstance(name, AttributeDef.class);
+        DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class);
 
         Attribute at = attributes.get(desc);
         if (at != null) {

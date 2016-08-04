@@ -21,6 +21,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.SVGDef;
 import org.auraframework.http.AuraServlet;
@@ -29,6 +30,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+@ServiceComponent
 public class ResourceSvg extends AuraResourceImpl {
     private static final StringParam lookup = new StringParam(AuraServlet.AURA_PREFIX + "lookup", 0, false);
 

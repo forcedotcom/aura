@@ -15,11 +15,6 @@
  */
 package org.auraframework.impl.java.controller;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
-import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -27,12 +22,13 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.JavaControllerDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
-import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.instance.Action;
 import org.auraframework.system.SubDefDescriptor;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The default implementation for a java controller def.
@@ -89,23 +85,6 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
     @Override
     public Map<String, JavaActionDef> getActionDefs() {
         return actionMap;
-    }
-
-    @Override
-    public Action createAction(String actionName, Map<String, Object> paramValues) throws DefinitionNotFoundException {
-        JavaActionDef actionDef = actionMap.get(actionName);
-        if(actionDef == null){
-            DefDescriptor<ActionDef> desc = SubDefDescriptorImpl.getInstance(actionName, getDescriptor(), ActionDef.class);
-            throw new DefinitionNotFoundException(desc);
-        }
-        Object controller = null;
-        try {
-            controller = this.getJavaType().newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            // ignore since it's okay to pass in a null controller instance
-        }
-
-        return new JavaAction(getDescriptor(), actionDef, controller, paramValues);
     }
 
     @Override

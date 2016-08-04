@@ -15,17 +15,18 @@
  */
 package org.auraframework.util.type.converter;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.util.type.Converter;
+import org.springframework.context.annotation.Lazy;
+
 import java.util.Calendar;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.util.type.Converter;
-
-import aQute.bnd.annotation.component.Component;
 
 /**
  * Used by aura.util.type.TypeUtil
  */
-@Component (provide=AuraServiceProvider.class)
+@Lazy
+@ServiceComponent
 public class StringToCalendarConverter implements Converter<String, Calendar> {
 
     @Override

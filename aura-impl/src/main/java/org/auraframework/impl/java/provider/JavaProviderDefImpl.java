@@ -15,26 +15,19 @@
  */
 package org.auraframework.impl.java.provider;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.auraframework.Aura;
-import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDescriptorProvider;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.JavaProviderDef;
 import org.auraframework.def.Provider;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.def.StaticComponentConfigProvider;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.instance.ComponentConfig;
-import org.auraframework.service.LoggingService;
-import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.List;
 
 public class JavaProviderDefImpl extends DefinitionImpl<JavaProviderDef> implements JavaProviderDef {
     private static final long serialVersionUID = -4972842636058759316L;
@@ -49,6 +42,21 @@ public class JavaProviderDefImpl extends DefinitionImpl<JavaProviderDef> impleme
         this.descriptorProvider = builder.descriptorProvider;
     }
 
+    @Override
+    public Class<?> getJavaType() {
+        if (configProvider != null) {
+            return configProvider;
+        }
+        if (descriptorProvider != null) {
+            return descriptorProvider;
+        }
+        if (staticConfigProvider != null) {
+            return staticConfigProvider;
+        }
+
+        return null;
+    }
+
     /**
      * Validate our definition.
      *
@@ -61,51 +69,6 @@ public class JavaProviderDefImpl extends DefinitionImpl<JavaProviderDef> impleme
         if (configProvider == null && descriptorProvider == null) {
             throw new InvalidDefinitionException("@Provider must have a provider interface.", location);
         }
-    }
-
-    @Override
-    public ComponentConfig provide(DefDescriptor<? extends RootDefinition> intfDescriptor) throws QuickFixException {
-        ComponentConfig config = null;
-        LoggingService loggingService = Aura.getLoggingService();
-        loggingService.stopTimer(LoggingService.TIMER_AURA);
-        loggingService.startTimer("java");
-        try {
-            if (configProvider != null) {
-                config = configProvider.newInstance().provide();
-                loggingService.incrementNum("JavaCallCount");
-            } else if (descriptorProvider != null) {
-                config = new ComponentConfig();
-                config.setDescriptor(descriptorProvider.newInstance().provide());
-                loggingService.incrementNum("JavaCallCount");
-            }
-        } catch (Exception e) {
-            throw AuraExceptionUtil.wrapExecutionException(e, this.location);
-        } finally {
-            loggingService.stopTimer("java");
-            loggingService.startTimer(LoggingService.TIMER_AURA);
-        }
-
-        return config;
-    }
-
-    @Override
-    public ComponentConfig provide(ComponentDefRefBuilder ref) throws QuickFixException {
-        ComponentConfig config = null;
-        LoggingService loggingService = Aura.getLoggingService();
-        loggingService.stopTimer(LoggingService.TIMER_AURA);
-        loggingService.startTimer("java");
-
-        try {
-            config = staticConfigProvider.newInstance().provide(ref);
-            loggingService.incrementNum("JavaCallCount");
-        } catch (Exception e) {
-            throw AuraExceptionUtil.wrapExecutionException(e, this.location);
-        } finally {
-            loggingService.stopTimer("java");
-            loggingService.startTimer(LoggingService.TIMER_AURA);
-        }
-
-        return config;
     }
 
     @Override
@@ -158,4 +121,5 @@ public class JavaProviderDefImpl extends DefinitionImpl<JavaProviderDef> impleme
             return new JavaProviderDefImpl(this);
         }
     }
+
 }

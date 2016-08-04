@@ -16,6 +16,8 @@
 
 package org.auraframework.integration.test.root.parser.handler;
 
+import javax.inject.Inject;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -28,7 +30,12 @@ import org.junit.Test;
 @UnAdaptableTest("namespace start with c means something special in core")
 public class AccessAttributeEnforcementTest extends AuraImplTestCase {
 	
-    protected StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
+	@Inject
+	protected StringSourceLoader stringSourceLoader;
+
+	public AccessAttributeEnforcementTest() throws Exception {
+		super();
+	}
 
     @Test
     public void testComponentWithTextWithSystemNamespace() throws Exception {

@@ -15,6 +15,18 @@
  */
 package org.auraframework.test.perf.util;
 
+import com.google.common.collect.Maps;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import junit.framework.AssertionFailedError;
+import org.auraframework.util.IOUtil;
+import org.auraframework.util.test.perf.metrics.PerfMetrics;
+import org.bson.Document;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,20 +41,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import junit.framework.AssertionFailedError;
-
-import org.auraframework.util.IOUtil;
-import org.auraframework.util.test.perf.metrics.PerfMetrics;
-import org.bson.Document;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.google.common.collect.Maps;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-
 public final class PerfResultsUtil {
 
     private static final Logger LOG = Logger.getLogger(PerfResultsUtil.class.getSimpleName());
@@ -52,7 +50,7 @@ public final class PerfResultsUtil {
     private static MongoClient getMongoClient(String dbURI) {
         if (MONGO_CLIENT == null) {
             try {
-                LOG.info("Trying to connect to DB: " + dbURI);              	
+                LOG.info("Trying to connect to DB: " + dbURI);
                 MongoClientURI uri = new MongoClientURI(dbURI);
                 MONGO_CLIENT = new MongoClient(uri);
             } catch (Exception e) {

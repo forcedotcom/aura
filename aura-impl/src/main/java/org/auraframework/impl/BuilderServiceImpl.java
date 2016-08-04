@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.builder.ApplicationDefBuilder;
 import org.auraframework.builder.CacheBuilder;
 import org.auraframework.builder.ComponentDefBuilder;
@@ -22,7 +23,6 @@ import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.builder.FlavoredStyleDefBuilder;
 import org.auraframework.builder.StyleDefBuilder;
 import org.auraframework.builder.TokensDefBuilder;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.impl.css.flavor.FlavoredStyleDefImpl;
 import org.auraframework.impl.css.style.StyleDefImpl;
@@ -33,15 +33,8 @@ import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.service.BuilderService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import aQute.bnd.annotation.component.Component;
-
-/**
- */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class BuilderServiceImpl implements BuilderService {
-
-    /**
-     */
     private static final long serialVersionUID = 5092951086123399013L;
 
     @Override

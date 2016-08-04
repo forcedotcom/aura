@@ -15,16 +15,8 @@
  */
 package org.auraframework.tools.definition;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auraframework.Aura;
@@ -41,11 +33,17 @@ import org.auraframework.system.DefRegistry;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Compile components into a set of static registries and write them to a file.
@@ -299,7 +297,7 @@ public class RegistrySerializer {
             throw new RegistrySerializerException("Unable to read/write "+componentDirectory);
         }
         // Now, get our namespaces.
-        FileSourceLoader fsl = new FileSourceLoader(componentDirectory);
+        FileSourceLoader fsl = new FileSourceLoader(componentDirectory, null);
         Set<String> namespaces = fsl.getNamespaces();
         if (excluded != null) {
             for (String x : excluded) {

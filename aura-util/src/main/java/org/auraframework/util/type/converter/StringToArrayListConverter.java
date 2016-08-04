@@ -18,12 +18,12 @@ package org.auraframework.util.type.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.type.Converter;
+import org.springframework.context.annotation.Lazy;
 
-import aQute.bnd.annotation.component.Component;
 
 /**
  * Convert strings to array lists.
@@ -32,8 +32,9 @@ import aQute.bnd.annotation.component.Component;
  * parameterized types. it is not possible to properly type things here (syntax
  * errors result).
  */
+@Lazy
 @SuppressWarnings("rawtypes")
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class StringToArrayListConverter implements Converter<String, ArrayList> {
 
     /**

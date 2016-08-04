@@ -15,29 +15,30 @@
  */
 package org.auraframework.impl;
 
-import java.util.Map;
-
 import org.auraframework.adapter.LoggingAdapter;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.util.json.Json;
 
-import aQute.bnd.annotation.component.Component;
+import javax.inject.Inject;
+import java.util.Map;
 
 /**
  */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class LoggingServiceImpl implements LoggingService {
 
     /**
      */
     private static final long serialVersionUID = -6025038810583975257L;
 
+    private LoggingAdapter loggingAdapter;
+
     @Override
     public LoggingService establish() {
-        AuraImpl.getLoggingAdapter().establish();
+        this.loggingAdapter.establish();
         
         setNum(LoggingService.CMP_COUNT, 0L);
         setNum(LoggingService.DEF_COUNT, 0L);
@@ -48,7 +49,7 @@ public class LoggingServiceImpl implements LoggingService {
 
     @Override
     public void release() {
-        AuraImpl.getLoggingAdapter().release();
+        this.loggingAdapter.release();
     }
 
     @Override
@@ -168,11 +169,10 @@ public class LoggingServiceImpl implements LoggingService {
      * Get the logging context
      */
     protected LoggingContext getLoggingContext() {
-        LoggingAdapter la = AuraImpl.getLoggingAdapter();
-        if (la == null || !la.isEstablished()) {
+        if (this.loggingAdapter == null || !this.loggingAdapter.isEstablished()) {
             return null;
         }
-        return la.getLoggingContext();
+        return this.loggingAdapter.getLoggingContext();
     }
 
     @Override
@@ -257,5 +257,10 @@ public class LoggingServiceImpl implements LoggingService {
     @Override
     public void serialize(Json json) {
         getLoggingContext().serialize(json);
+    }
+
+    @Inject
+    public void setLoggingAdapter(LoggingAdapter adapter) {
+        this.loggingAdapter = adapter;
     }
 }

@@ -24,7 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -43,12 +43,22 @@ import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
 import com.google.common.collect.Lists;
 
+/**
+ * AuraContext JSON Serializer
+ */
 public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
-
-    public AuraContextJsonSerializer() {
-    }
-
     public static final String DELETED = "deleted";
+
+    private final TestContextAdapter testContextAdapter;
+    private final ConfigAdapter configAdapter;
+    private final DefinitionService definitionService;
+
+    public AuraContextJsonSerializer(ConfigAdapter configAdapter, TestContextAdapter testContextAdapter,
+            DefinitionService definitionService) {
+        this.configAdapter = configAdapter;
+        this.testContextAdapter = testContextAdapter;
+        this.definitionService = definitionService;
+    }
 
     private void writeDefs(Json json, String name, List<Definition> writable) throws IOException {
         if (writable.size() > 0) {
@@ -88,7 +98,6 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             json.writeMapEntry("requestedLocales", locales);
         }
 
-        TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
         if (testContextAdapter != null) {
             TestContext testContext = testContextAdapter.getTestContext();
             if (testContext != null) {
@@ -99,7 +108,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         if (ctx.getFrameworkUID() != null) {
             json.writeMapEntry("fwuid", ctx.getFrameworkUID());
         } else {
-            json.writeMapEntry("fwuid", Aura.getConfigAdapter().getAuraFrameworkNonce());
+            json.writeMapEntry("fwuid", configAdapter.getAuraFrameworkNonce());
         }
         
         //
@@ -207,8 +216,9 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
 
         // JBUCH: TEMPORARY CRUC FIX FOR 202. REMOVE IN 204
         json.writeMapEntry("enableAccessChecks",((AuraContextImpl)ctx).enableAccessChecks);
-        
-        if (Aura.getConfigAdapter().isLockerServiceEnabled()) {
+
+
+        if (configAdapter.isLockerServiceEnabled()) {
             json.writeMapEntry("lockerEnabled", true);
         }
 
@@ -230,7 +240,6 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             return;
         }
 
-        DefinitionService definitionService = Aura.getDefinitionService();
         for (DefDescriptor<? extends Definition> desc : defMap.keySet()) {
             if (trackedDefs.contains(desc)) {
                 try {
@@ -243,6 +252,4 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             }
         }
     }
-    
 }
-

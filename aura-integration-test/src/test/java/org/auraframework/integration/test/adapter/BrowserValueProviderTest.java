@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.adapter;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.PropertyReference;
@@ -70,7 +69,7 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
 
     @Test
     public void testValidate() throws Exception {
-        BrowserValueProvider bvp = new BrowserValueProvider();
+        BrowserValueProvider bvp = new BrowserValueProvider(contextService);
         bvp.validate(BrowserProperty.isTablet);
         bvp.validate(BrowserProperty.isPhone);
         bvp.validate(BrowserProperty.isAndroid);
@@ -92,7 +91,7 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         try {
             bvp.validate(null);
             fail("Expected NullPointerException for null PropertyReference");
-        } catch (NullPointerException expected) {
+        } catch (NullPointerException ignored) {
         }
     }
 
@@ -105,7 +104,7 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
                     ComponentDef.class,
                     "<aura:component>{!$Browser.badProperty}</aura:component>");
 
-            Aura.getInstanceService().getInstance(desc, null);
+            instanceService.getInstance(desc, null);
             fail("Expected an InvalidExpressionException");
         } catch (InvalidExpressionException e) {
             assertEquals("No property on $Browser for key: badProperty",
@@ -122,10 +121,10 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
     private void assertBrowserProperties(UserAgent userAgent, boolean isTablet,
             boolean isPhone, boolean isAndroid, String formFactor,
             boolean isIPad, boolean isIPhone, boolean isIOS, boolean isWindowsPhone) throws Exception {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         String userAgentString = userAgent == null ? null : userAgent.getUserAgentString();
         context.setClient(new Client(userAgentString));
-        BrowserValueProvider bvp = new BrowserValueProvider();
+        BrowserValueProvider bvp = new BrowserValueProvider(contextService);
         assertBrowserProperty(bvp, BrowserProperty.isTablet, isTablet, userAgentString);
         assertBrowserProperty(bvp, BrowserProperty.isPhone, isPhone, userAgentString);
         assertBrowserProperty(bvp, BrowserProperty.isAndroid, isAndroid, userAgentString);
@@ -191,7 +190,7 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
 
     @Test
     public void testGetValueUndefinedProperty() throws Exception {
-        BrowserValueProvider bvp = new BrowserValueProvider();
+        BrowserValueProvider bvp = new BrowserValueProvider(contextService);
         assertEquals(null,
                 bvp.getValue(new PropertyReferenceImpl("isBlackberry", null))); // undefined property
     }
@@ -245,10 +244,10 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
 
     private void assertBrowserTypes(UserAgent userAgent, boolean isWebKit, boolean isFirefox, boolean isIE6,
             boolean isIE7, boolean isIE8, boolean isIE9, boolean isIE10, boolean isIE11) throws Exception {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         String userAgentString = userAgent == null ? null : userAgent.getUserAgentString();
         context.setClient(new Client(userAgentString));
-        BrowserValueProvider bvp = new BrowserValueProvider();
+        BrowserValueProvider bvp = new BrowserValueProvider(contextService);
         assertBrowserType(bvp, BrowserType.isWebKit, isWebKit, userAgentString);
         assertBrowserType(bvp, BrowserType.isFirefox, isFirefox, userAgentString);
         assertBrowserType(bvp, BrowserType.isIE6, isIE6, userAgentString);

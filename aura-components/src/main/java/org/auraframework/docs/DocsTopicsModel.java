@@ -21,14 +21,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
@@ -38,8 +38,10 @@ import com.google.common.collect.Maps;
 
 /**
  */
-@Model
-public class DocsTopicsModel {
+@ServiceComponentModelInstance
+public class DocsTopicsModel implements ModelInstance {
+
+    private DefinitionService definitionService;
 
     private final List<Node> applications;
     private final List<Node> components;
@@ -48,8 +50,8 @@ public class DocsTopicsModel {
     private final List<Node> librariesList;
     private final List<Node> tests;
 
-    public DocsTopicsModel() throws QuickFixException {
-
+    public DocsTopicsModel(DefinitionService definitionService) throws QuickFixException {
+        this.definitionService = definitionService;
         applications = makeNodes("markup", DefType.APPLICATION);
         components = makeNodes("markup", DefType.COMPONENT);
         interfaces = makeNodes("markup", DefType.INTERFACE);
@@ -60,8 +62,6 @@ public class DocsTopicsModel {
 
     private <E extends Definition> List<Node> makeNodes(String prefix, DefType type) throws QuickFixException {
         // if (!Config.isProduction()) {
-        DefinitionService definitionService = Aura.getDefinitionService();
-
         List<Node> ret = Lists.newArrayList();
 
         Map<String, Node> namespaceNodes = Maps.newHashMap();

@@ -23,6 +23,7 @@ import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+
 public class AbstractErrorUITestCase extends WebDriverTestCase {
 
     protected final By ERROR_MASK_LOCATOR = By.cssSelector("div[id='auraErrorMask']");
@@ -80,6 +81,6 @@ public class AbstractErrorUITestCase extends WebDriverTestCase {
         List<String> lines = Arrays.asList(message.split("\\n"));
         if(lines.size() > numOfMsgLines) {
             fail("Error message contains stacktrace: " + message);
-        }
+    }
     }
 }

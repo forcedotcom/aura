@@ -21,7 +21,8 @@ import static org.junit.Assert.assertThat;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -32,13 +33,14 @@ import org.auraframework.impl.root.component.BaseComponentDefTest;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
-import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
 public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
+    @Inject
+    protected ParserFactory parserFactory;
 
     public ComponentDefTest() {
         super(ComponentDef.class, "aura:component");
@@ -51,7 +53,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
     public void testAbstractNoProvider() throws Exception {
         try {
             ComponentDef cd = define(baseTag, "abstract='true'", "");
-            Aura.getInstanceService().getInstance(cd);
+            instanceService.getInstance(cd);
             fail("Should not be able to instantiate a component with no providers.");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "cannot be instantiated directly");
@@ -309,9 +311,8 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
-        StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
         Source<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
-        Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, cmpDesc);
+        Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, cmpDesc);
         ComponentDef cmpDef = parser.parse(cmpDesc, source);
 
         try {
@@ -333,9 +334,8 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
-        StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
         Source<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
-        Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, cmpDesc);
+        Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, cmpDesc);
         ComponentDef appDef = parser.parse(cmpDesc, source);
 
         try {
@@ -360,9 +360,8 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
-        StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
         Source<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
-        Parser<ComponentDef> parser = ParserFactory.getParser(Format.XML, cmpDesc);
+        Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, cmpDesc);
         ComponentDef appDef = parser.parse(cmpDesc, source);
 
         String actual = appDef.getCode(true);

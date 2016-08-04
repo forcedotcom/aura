@@ -15,13 +15,8 @@
  */
 package org.auraframework.impl.javascript.provider;
 
-import org.auraframework.builder.ComponentDefRefBuilder;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.javascript.BaseJavascriptDef;
-import org.auraframework.instance.ComponentConfig;
-import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class JavascriptProviderDef extends BaseJavascriptDef<ProviderDef> implements ProviderDef {
     private static final long serialVersionUID = -3839367107553671775L;
@@ -43,17 +38,12 @@ public class JavascriptProviderDef extends BaseJavascriptDef<ProviderDef> implem
     }
 
     @Override
-    public ComponentConfig provide(DefDescriptor<? extends RootDefinition> intfDescriptor) throws QuickFixException {
-        return null;
-    }
-
-    @Override
-    public ComponentConfig provide(ComponentDefRefBuilder ref) throws QuickFixException {
-        return null;
-    }
-
-    @Override
     public boolean supportsRefProvide() {
         return false;
+    }
+
+    @Override
+    public Class<?> getJavaType() {
+        return null;
     }
 }

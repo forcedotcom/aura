@@ -15,9 +15,8 @@
  */
 package org.auraframework.integration.test.css;
 
-import java.util.List;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableList;
+import org.auraframework.Aura;
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.DefDescriptor;
@@ -27,7 +26,7 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.token.TokenCacheImpl;
 import org.auraframework.impl.css.token.TokenValueProviderImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -35,13 +34,18 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Unit tests for {@link TokenValueProviderImpl}.
  */
 public class TokenValueProviderImplTest extends StyleTestCase {
     private DefDescriptor<StyleDef> def;
+
+    @Inject
+    DefinitionService definitionService;
 
     @Override
     public void setUp() throws Exception {
@@ -107,7 +111,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     public static final class TmpProvider implements TokenDescriptorProvider {
         @Override
         public DefDescriptor<TokensDef> provide() throws QuickFixException {
-            return DefDescriptorImpl.getInstance("tokenProviderTest:tvp", TokensDef.class);
+            return Aura.getDefinitionService().getDefDescriptor("tokenProviderTest:tvp", TokensDef.class);
         }
     }
 
@@ -151,7 +155,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     @Test
     public void testAppTokensDoesntExist() throws QuickFixException {
         addNsTokens(tokens().token("color", "red"));
-        DefDescriptor<TokensDef> override = DefDescriptorImpl.getInstance("idont:exist", TokensDef.class);
+        DefDescriptor<TokensDef> override = definitionService.getDefDescriptor("idont:exist", TokensDef.class);
 
         try {
             setupOverride(override).getValue("color", null);

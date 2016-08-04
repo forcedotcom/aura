@@ -15,9 +15,7 @@
  */
 package org.auraframework.integration.test.css;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import com.google.common.collect.Table;
 import org.auraframework.css.FlavorOverrideLocation;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -26,14 +24,20 @@ import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.util.Flavors;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
-import com.google.common.collect.Table;
+import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FlavorIncludeDefImplTest extends StyleTestCase {
+
+    @Inject
+    DefinitionService definitionService;
+
     /* util */
     private FlavorIncludeDef source(String flavorIncludeSource) throws QuickFixException {
         String fmt = String.format("<aura:flavors>%s</aura:flavors>", flavorIncludeSource);
@@ -46,8 +50,8 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
         FlavorIncludeDef fi = source("<aura:include source='flavorTestAlt:flavorIncludeDefTestFlavors'/>");
         Table<DefDescriptor<ComponentDef>, String, FlavorOverrideLocation> overrides = fi.computeOverrides();
 
-        DefDescriptor<ComponentDef> sample1 = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
-        DefDescriptor<ComponentDef> sample2 = DefDescriptorImpl.getInstance("flavorTest:x_landmark", ComponentDef.class);
+        DefDescriptor<ComponentDef> sample1 = definitionService.getDefDescriptor("flavorTest:x_sample", ComponentDef.class);
+        DefDescriptor<ComponentDef> sample2 = definitionService.getDefDescriptor("flavorTest:x_landmark", ComponentDef.class);
 
         DefDescriptor<FlavoredStyleDef> sample1Flavor = Flavors.customFlavorDescriptor(sample1, "flavorTestAlt", "flavorIncludeDefTestFlavors");
         DefDescriptor<FlavoredStyleDef> sample2Flavor = Flavors.customFlavorDescriptor(sample2, "flavorTestAlt", "flavorIncludeDefTestFlavors");
@@ -68,8 +72,8 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
         Set<DefDescriptor<?>> dependencies = new HashSet<>();
         fi.appendDependencies(dependencies);
 
-        DefDescriptor<ComponentDef> sample1 = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
-        DefDescriptor<ComponentDef> sample2 = DefDescriptorImpl.getInstance("flavorTest:x_landmark", ComponentDef.class);
+        DefDescriptor<ComponentDef> sample1 = definitionService.getDefDescriptor("flavorTest:x_sample", ComponentDef.class);
+        DefDescriptor<ComponentDef> sample2 = definitionService.getDefDescriptor("flavorTest:x_landmark", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> sample1Flavor = Flavors.customFlavorDescriptor(sample1, "flavorTestAlt", "flavorIncludeDefTestFlavors");
         DefDescriptor<FlavoredStyleDef> sample2Flavor = Flavors.customFlavorDescriptor(sample2, "flavorTestAlt", "flavorIncludeDefTestFlavors");
 

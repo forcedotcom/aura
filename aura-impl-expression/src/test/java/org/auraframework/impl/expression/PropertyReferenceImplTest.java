@@ -15,12 +15,12 @@
  */
 package org.auraframework.impl.expression;
 
-import java.util.List;
-
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.Location;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * expressiony test

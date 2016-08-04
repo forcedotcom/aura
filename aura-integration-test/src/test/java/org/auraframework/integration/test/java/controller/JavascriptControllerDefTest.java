@@ -18,7 +18,6 @@ package org.auraframework.integration.test.java.controller;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.auraframework.def.ActionDef;
@@ -26,12 +25,13 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.javascript.controller.JavascriptActionDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef;
 import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
 import org.auraframework.instance.Action;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
@@ -45,7 +45,9 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
      */
     @Test
     public void testIsLocalReturnsFalse() {
-        ControllerDef controllerDef = (new JavascriptControllerDef.Builder()).build();
+        JavascriptControllerDef.Builder builder = new JavascriptControllerDef.Builder();
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
+        ControllerDef controllerDef = builder.build();
         assertFalse(controllerDef.isLocal());
     }
 
@@ -55,6 +57,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
         PropertyReference propertyReference = new PropertyReferenceImpl("$Label.section", null);
         JavascriptControllerDef.Builder builder = new JavascriptControllerDef.Builder();
         builder.addExpressionRef(propertyReference);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.INTERNAL));
         ControllerDef controllerDef = builder.build();
 
         try {
@@ -137,13 +140,16 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
         String controllerJs = "({ function1: function(arg) {} })";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
         ControllerDef controllerDef = definitionService.getDefinition(controllerDesc);
-
         assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
-        Action action = controllerDef.createAction("function1", null);
+
+        ActionDef actionDef = controllerDef.getSubDefinition("function1");
+        Action action = instanceService.getInstance(actionDef, null);
 
         assertThat(action, instanceOf(JavascriptPseudoAction.class));
     }
 
+    /**
+     *  TODO: Created in master but not yet compilable in UI-tier
     @Test
     public void testCreateActionThrowsExceptionWhenCreatingNonExsitingAction() throws Exception {
         String controllerJs = "({ function1: function(arg) {} })";
@@ -158,4 +164,5 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
             checkExceptionFull(e, DefinitionNotFoundException.class, expectMessage);
         }
     }
+    */
 }

@@ -15,10 +15,9 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.builder.HtmlDefRefBuilder;
 import org.auraframework.def.AttributeDef;
@@ -29,16 +28,18 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HtmlTag;
 import org.auraframework.def.optimizer.DefBuilderOptimizer;
 import org.auraframework.expression.Expression;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.parser.handler.HTMLComponentDefRefHandler;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.system.AuraContext;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class HTMLDefRefBuilderImpl extends ComponentDefRefImpl.Builder implements HtmlDefRefBuilder  {
 
-    public static final DefDescriptor<ComponentDef> HTML_DESC = DefDescriptorImpl.getInstance("aura:html",
+    public static final DefDescriptor<ComponentDef> HTML_DESC = Aura.getDefinitionService().getDefDescriptor("aura:html",
         ComponentDef.class);
 
     private final Map<DefDescriptor<AttributeDef>, Object> htmlAttributes = Maps.newHashMap();
@@ -59,9 +60,9 @@ public class HTMLDefRefBuilderImpl extends ComponentDefRefImpl.Builder implement
     @Override
     public HTMLDefRefBuilderImpl setComponentAttribute(String key, Object value) {
         AttributeDefRefImpl.Builder valueBuilder = new AttributeDefRefImpl.Builder();
-        valueBuilder.setDescriptor(DefDescriptorImpl.getInstance(key, AttributeDef.class));
+        valueBuilder.setDescriptor(Aura.getDefinitionService().getDefDescriptor(key, AttributeDef.class));
         valueBuilder.setValue(value);
-
+        valueBuilder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         AttributeDefRef adr = valueBuilder.build();
         super.setAttribute(adr.getDescriptor(), adr);
         return this;
@@ -102,10 +103,10 @@ public class HTMLDefRefBuilderImpl extends ComponentDefRefImpl.Builder implement
         @Override
         @SuppressWarnings("unchecked")
         public HTMLDefRefBuilderImpl optimize(HTMLDefRefBuilderImpl builder) {
-            DefDescriptor<AttributeDef> bodyDesc = DefDescriptorImpl.getInstance("body", AttributeDef.class);
-            DefDescriptor<AttributeDef> tagDesc = DefDescriptorImpl.getInstance("tag", AttributeDef.class);
-            DefDescriptor<ComponentDef> textDesc = DefDescriptorImpl.getInstance("aura:text", ComponentDef.class);
-            DefDescriptor<ComponentDef> expDesc = DefDescriptorImpl.getInstance("aura:expression", ComponentDef.class);
+            DefDescriptor<AttributeDef> bodyDesc = Aura.getDefinitionService().getDefDescriptor("body", AttributeDef.class);
+            DefDescriptor<AttributeDef> tagDesc = Aura.getDefinitionService().getDefDescriptor("tag", AttributeDef.class);
+            DefDescriptor<ComponentDef> textDesc = Aura.getDefinitionService().getDefDescriptor("aura:text", ComponentDef.class);
+            DefDescriptor<ComponentDef> expDesc = Aura.getDefinitionService().getDefDescriptor("aura:expression", ComponentDef.class);
             AttributeDefRef bodyRef = builder.getAttributeValue(bodyDesc);
             Map<DefDescriptor<AttributeDef>, Object> htmlAttributes = builder.htmlAttributes;
             boolean pureHTML = true;

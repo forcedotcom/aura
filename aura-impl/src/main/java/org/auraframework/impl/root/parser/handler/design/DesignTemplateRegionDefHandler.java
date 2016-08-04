@@ -17,13 +17,15 @@
 package org.auraframework.impl.root.parser.handler.design;
 
 import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.impl.design.DesignTemplateRegionDefImpl;
 import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -48,8 +50,11 @@ public class DesignTemplateRegionDefHandler extends ParentedTagHandler<DesignTem
     }
 
     public DesignTemplateRegionDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
-                                          Source<?> source) {
-        super(parentHandler, xmlReader, source);
+                                          Source<?> source, boolean isInInternalNamespace,
+                                          DefinitionService definitionService,
+                                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+        builder.setAccess(getAccess(isInInternalNamespace));
     }
 
     @Override
@@ -58,7 +63,7 @@ public class DesignTemplateRegionDefHandler extends ParentedTagHandler<DesignTem
 
         String name = getAttributeValue(ATTRIBUTE_NAME);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
-            builder.setDescriptor(DefDescriptorImpl.getInstance(name, DesignTemplateRegionDef.class));
+            builder.setDescriptor(definitionService.getDefDescriptor(name, DesignTemplateRegionDef.class));
             builder.setName(name);
         } else {
             error("Name attribute is required for design template region definitions");
@@ -68,7 +73,7 @@ public class DesignTemplateRegionDefHandler extends ParentedTagHandler<DesignTem
         if (qnames != null) {
             List<String> interfaces = AuraTextUtil.splitSimple(",", qnames);
             for (String qname : interfaces) {
-                builder.addAllowedInterface(DefDescriptorImpl.getInstance(qname, InterfaceDef.class));
+                builder.addAllowedInterface(definitionService.getDefDescriptor(qname, InterfaceDef.class));
             }
         }
 

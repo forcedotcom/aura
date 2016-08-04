@@ -37,9 +37,10 @@ public class PassThroughDefRegistry implements DefRegistry<Definition> {
     private final Set<DefType> defTypes;
     private final Set<String> prefixes;
     private final boolean cacheable;
+    private final ParserFactory parserFactory;
 
     public PassThroughDefRegistry(SourceLoader sourceLoader, Set<DefType> defTypes, Set<String> prefixes,
-            boolean cacheable) {
+            boolean cacheable, ParserFactory parserFactory) {
         this.sourceLoader = sourceLoader;
         this.prefixes = Sets.newHashSet();
         for (String prefix : prefixes) {
@@ -47,6 +48,7 @@ public class PassThroughDefRegistry implements DefRegistry<Definition> {
         }
         this.defTypes = defTypes;
         this.cacheable = cacheable;
+        this.parserFactory = parserFactory;
     }
 
     @Override
@@ -54,7 +56,7 @@ public class PassThroughDefRegistry implements DefRegistry<Definition> {
         Source<Definition> source = sourceLoader.getSource(descriptor);
         if (source != null && source.exists()) {
             descriptor = source.getDescriptor();
-            Parser<Definition> parser = ParserFactory.getParser(source.getFormat(), descriptor);
+            Parser<Definition> parser = parserFactory.getParser(source.getFormat(), descriptor);
             return parser.parse(descriptor, source);
         }
         return null;

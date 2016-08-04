@@ -20,12 +20,12 @@ import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.http.resource.FileStaticResource;
@@ -36,9 +36,6 @@ import org.auraframework.util.resource.ResourceLoader;
 public class AuraFrameworkServlet extends AuraBaseServlet {
 
     private static final long serialVersionUID = 6034969764380397480L;
-    private ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
-    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
-    private ResourceLoader resourceLoader = configAdapter.getResourceLoader();
 
     // RESOURCES_PATTERN format:
     // /required_root/optional_nonce/required_rest_of_path
@@ -46,8 +43,12 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
 
     public static final String RESOURCES_FORMAT = "%s/auraFW/resources/%s/%s";
 
+    private ConfigAdapter configAdapter;
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ResourceLoader resourceLoader = configAdapter.getResourceLoader();
+
         // defend against directory traversal attack
         // getPathInfo() has already resolved all ".." * "%2E%2E" relative
         // references in the path
@@ -60,7 +61,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
         }
         long ifModifiedSince = request.getDateHeader(HttpHeaders.IF_MODIFIED_SINCE);
 
-        servletUtilAdapter.setCSPHeaders(null, request,  response);
+        servletUtilAdapter.setCSPHeaders(null, request, response);
 
         InputStream in = null;
         try {
@@ -69,9 +70,9 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             // Careful with race conditions here, we should only call regenerateAuraJS
             // _before_ we get the nonce.
             //
-            Aura.getConfigAdapter().regenerateAuraJS();
+            configAdapter.regenerateAuraJS();
             // framework uid is combination of aura js and resources uid
-            String currentUid = Aura.getConfigAdapter().getAuraFrameworkNonce();
+            String currentUid = configAdapter.getAuraFrameworkNonce();
             // match entire path once, looking for root, optional nonce, and
             // rest-of-path
             Matcher matcher = RESOURCES_PATTERN.matcher(path);
@@ -130,7 +131,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 matchedUid = false;
             }
 
-            boolean isProduction = Aura.getConfigAdapter().isProduction();
+            boolean isProduction = configAdapter.isProduction();
             StaticResource staticResource = new FileStaticResource(file, format, nonceUid, isProduction, resourceLoader);
 
             //
@@ -207,5 +208,10 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 }
             }
         }
+    }
+
+    @Inject
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
     }
 }

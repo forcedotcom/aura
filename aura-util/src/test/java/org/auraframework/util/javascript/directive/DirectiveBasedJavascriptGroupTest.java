@@ -151,7 +151,6 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     /**
      * Make sure the processor regeneration stops when there are errors in the source file
      */
-    // 202: Disable JS validation since we precompile definitions
     @Ignore
     @Test
     public void testJavascriptReGenerationFails() throws Exception {

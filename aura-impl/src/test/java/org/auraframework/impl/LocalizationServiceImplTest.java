@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl;
 
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -25,7 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.auraframework.Aura;
 import org.auraframework.impl.service.testdata.LocalizationServiceTestData;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.test.util.AuraTestCase;
@@ -40,7 +40,8 @@ import com.ibm.icu.text.NumberFormat;
  */
 public class LocalizationServiceImplTest extends AuraTestCase {
 
-    public LocalizationService localizationService = Aura.getLocalizationService();
+    @Inject
+    public LocalizationService localizationService;
 
     /**
      * Tests to verify Date parser across different Locale

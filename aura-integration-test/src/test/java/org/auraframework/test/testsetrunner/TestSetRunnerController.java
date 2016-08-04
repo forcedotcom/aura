@@ -15,26 +15,27 @@
  */
 package org.auraframework.test.testsetrunner;
 
+import junit.framework.TestFailure;
+import junit.framework.TestResult;
+
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.integration.test.util.TestExecutor;
+import org.auraframework.integration.test.util.TestExecutor.TestRun;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Key;
+import org.auraframework.test.perf.util.PerfExecutorTestCase;
+
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestFailure;
-import junit.framework.TestResult;
-
-import org.auraframework.integration.test.util.TestExecutor;
-import org.auraframework.integration.test.util.TestExecutor.TestRun;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
-import org.auraframework.system.Annotations.Key;
-import org.auraframework.test.perf.util.PerfExecutorTestCase;
-
 /**
  * This controller handles the execution and result collection of test cases on behalf of client-initiated requests.
  */
-@Controller
-public class TestSetRunnerController {
+@ServiceComponent
+public class TestSetRunnerController implements Controller {
     /**
      * Enqueue multiple tests for execution.
      * 
@@ -42,7 +43,7 @@ public class TestSetRunnerController {
      * @throws Exception
      */
     @AuraEnabled
-    public static void runTestSet(@Key("testSet") List<String> tests, @Key("scope") String scope) throws Exception {
+    public void runTestSet(@Key("testSet") List<String> tests, @Key("scope") String scope) throws Exception {
         changeStatus(tests, "ENQUEUED", scope);
         for (String name : tests) {
             StatefulTestRun testRunner = new StatefulTestRun(name, scope);
@@ -56,7 +57,7 @@ public class TestSetRunnerController {
      * @param tests the tests to update
      * @param status the new status to give to the tests
      */
-    private static void changeStatus(List<String> tests, String status, String scope) throws Exception {
+    private void changeStatus(List<String> tests, String status, String scope) throws Exception {
         for (String t : tests) {
             TestSetRunnerState testRunnerState = TestSetRunnerState.getInstanceByScope(scope);
             testRunnerState.setTestProp(t, "status", status);
@@ -68,7 +69,7 @@ public class TestSetRunnerController {
      * Query the current status of test execution.
      */
     @AuraEnabled
-    public static Map<String, Object> pollForTestRunStatus(@Key("scope") String scope) throws Exception {
+    public Map<String, Object> pollForTestRunStatus(@Key("scope") String scope) throws Exception {
         Map<String, Object> r = new HashMap<>();
         Map<String, Map<String, Object>> m = TestSetRunnerState.getInstanceByScope(scope).getTestsWithPropertiesMap();
         r.put("testsRunning", TestExecutor.getInstance().isActive());
@@ -79,7 +80,7 @@ public class TestSetRunnerController {
     /**
      * A {@link Callable} adapter to schedule a test for execution and collect its results.
      */
-    private static class StatefulTestRun extends TestRun {
+    private class StatefulTestRun extends TestRun {
         private final String testName;
 		private String scope;
 

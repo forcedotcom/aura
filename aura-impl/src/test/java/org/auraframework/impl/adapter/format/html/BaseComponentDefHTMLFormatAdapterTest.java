@@ -15,14 +15,15 @@
  */
 package org.auraframework.impl.adapter.format.html;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.FormatAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext.Format;
+
+import javax.inject.Inject;
 
 /**
  * Shared stuff for the child tests.
@@ -30,10 +31,13 @@ import org.auraframework.system.AuraContext.Format;
 public abstract class BaseComponentDefHTMLFormatAdapterTest<T extends Definition> extends AuraImplTestCase {
     public abstract Class<T> getDefClass();
 
+    @Inject
+    private SerializationService serializationService;
+
     @SuppressWarnings("unchecked")
     protected String doWrite(T def) throws Exception {
-        Aura.getContextService().getCurrentContext().setApplicationDescriptor((DefDescriptor<? extends BaseComponentDef>) def.getDescriptor());
-        FormatAdapter<T> adapter = AuraImpl.getFormatAdapter(Format.HTML.name(), getDefClass());
+        contextService.getCurrentContext().setApplicationDescriptor((DefDescriptor<? extends BaseComponentDef>) def.getDescriptor());
+        FormatAdapter<T> adapter = serializationService.getFormatAdapter(Format.HTML.name(), getDefClass());
         adapter.getClass().asSubclass(BaseComponentDefHTMLFormatAdapter.class);
         StringBuffer out = new StringBuffer();
         adapter.write(def, null, out);

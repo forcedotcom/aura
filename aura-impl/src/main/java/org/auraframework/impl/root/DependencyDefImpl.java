@@ -15,20 +15,22 @@
  */
 package org.auraframework.impl.root;
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.auraframework.Aura;
 import org.auraframework.builder.DependencyDefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * The definition of a declared dependency.
@@ -130,6 +132,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
 
         public Builder() {
             super(DependencyDef.class);
+            setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         }
 
         private DefDescriptor<? extends RootDefinition> parentDescriptor;

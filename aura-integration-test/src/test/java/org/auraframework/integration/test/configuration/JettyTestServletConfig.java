@@ -15,12 +15,6 @@
  */
 package org.auraframework.integration.test.configuration;
 
-import java.net.InetAddress;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -28,18 +22,30 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.integration.test.util.AuraJettyServer;
 import org.auraframework.test.util.SauceUtil;
 import org.auraframework.util.test.configuration.TestServletConfig;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 
+import javax.inject.Inject;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * @since 0.0.59
  */
 @SuppressWarnings("deprecation")
+@ServiceComponent
 public class JettyTestServletConfig implements TestServletConfig {
+
+    @Inject
+    ConfigAdapter configAdapter;
 
     private static final Logger LOG = Logger.getLogger(JettyTestServletConfig.class.getSimpleName());
 
@@ -114,7 +120,7 @@ public class JettyTestServletConfig implements TestServletConfig {
 
     @Override
     public String getCsrfToken() throws Exception {
-        String token = Aura.getConfigAdapter().getCSRFToken();
+        String token = configAdapter.getCSRFToken();
         return token == null ? "" : token;
     }
 }

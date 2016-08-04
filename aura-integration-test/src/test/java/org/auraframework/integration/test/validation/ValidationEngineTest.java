@@ -15,17 +15,16 @@
  */
 package org.auraframework.integration.test.validation;
 
-import java.util.List;
-
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.validation.AuraValidationTestCase;
 import org.auraframework.impl.validation.ValidationEngine;
 import org.auraframework.util.validation.ValidationError;
 import org.junit.Test;
+
+import java.util.List;
 
 public final class ValidationEngineTest extends AuraValidationTestCase {
 
@@ -35,7 +34,7 @@ public final class ValidationEngineTest extends AuraValidationTestCase {
             return; // csslint doesn't work with 1.6
         }
 
-        DefDescriptor<?> descriptor = DefDescriptorImpl.getInstance("css://validationTest.basic", StyleDef.class);
+        DefDescriptor<?> descriptor = definitionService.getDefDescriptor("css://validationTest.basic", StyleDef.class);
         List<ValidationError> errors = new ValidationEngine().validate(descriptor);
         assertEquals(2, errors.size());
 
@@ -58,8 +57,8 @@ public final class ValidationEngineTest extends AuraValidationTestCase {
 
     @Test
     public void testValidateCmp() {
-        DefDescriptor<?> descriptor = DefDescriptorImpl
-                .getInstance("markup://validationTest:basic", ComponentDef.class);
+        DefDescriptor<?> descriptor = definitionService
+                .getDefDescriptor("markup://validationTest:basic", ComponentDef.class);
         List<ValidationError> errors = new ValidationEngine().validate(descriptor);
         assertEquals(1, errors.size());
         assertError(

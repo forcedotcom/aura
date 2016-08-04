@@ -90,7 +90,7 @@ public abstract class BaseJavascriptDef<T extends Definition> extends Definition
             this.code = code;
         }
 
-        @Override
+		@Override
         public void addDependency(DependencyDef dependency) {
             if (this.dependencies == null) {
                 this.dependencies = new HashSet<>();

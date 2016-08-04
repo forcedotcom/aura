@@ -16,6 +16,7 @@
 package org.auraframework.system;
 
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -30,9 +31,13 @@ public interface Parser<D extends Definition> {
      * 
      * 
      */
-    public enum Format {
+    enum Format {
         XML, JS, CSS, JAVA, TEMPLATE_CSS, APEX, SVG
     }
 
+    Format getFormat();
+
+    DefType getDefType();
+    
     D parse(DefDescriptor<D> descriptor, Source<D> source) throws QuickFixException;
 }

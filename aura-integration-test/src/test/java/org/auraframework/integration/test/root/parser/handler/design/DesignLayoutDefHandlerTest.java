@@ -61,7 +61,7 @@ public class DesignLayoutDefHandlerTest extends AuraImplTestCase {
         }
     }
 
-	@Test
+    @Test
     public void testLayoutInNonInternalNS() throws Exception {
         try {
             setupDesignLayoutDef(LAYOUT, false);

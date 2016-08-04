@@ -18,15 +18,16 @@ package org.auraframework.docs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.components.ui.InputOption;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 
 /**
  * Used by /expressionTest/expressionFunction.cmp which expects the current return values.
  */
-@Model
-public class SizeModel {
+@ServiceComponentModelInstance
+public class SizeModel implements ModelInstance {
 
     @AuraEnabled
     public List<InputOption> getSizes() {

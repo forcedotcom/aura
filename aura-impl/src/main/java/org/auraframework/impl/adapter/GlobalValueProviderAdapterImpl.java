@@ -15,40 +15,54 @@
  */
 package org.auraframework.impl.adapter;
 
+import com.google.common.collect.Sets;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.GlobalValueProviderAdapter;
+import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.instance.AuraValueProviderType;
+import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.ValueProviderType;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+
+import javax.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.auraframework.adapter.GlobalValueProviderAdapter;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.instance.AuraValueProviderType;
-import org.auraframework.instance.ValueProviderType;
-
-import com.google.common.collect.Sets;
-
-import aQute.bnd.annotation.component.Component;
-
 /**
  */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class GlobalValueProviderAdapterImpl implements GlobalValueProviderAdapter {
 
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @Inject
+    private LocalizationAdapter localizationAdapter;
+
+    @Inject
+    private DefinitionService definitionService;
+
+    @Inject
+    private ContextService contextService;
+    
     @Override
     public List<GlobalValueProvider> createValueProviders() {
         List<GlobalValueProvider> l = new LinkedList<>();
 
         // $Label.Section.Key
-        l.add(new LabelValueProvider());
+        l.add(new LabelValueProvider(localizationAdapter, definitionService));
 
         // $Locale
-        l.add(new LocaleValueProvider());
+        l.add(new LocaleValueProvider(configAdapter, localizationAdapter, definitionService));
 
         // $Browser
-        l.add(new BrowserValueProvider());
+        l.add(new BrowserValueProvider(contextService));
         
         // $Global
-        l.add(new ContextValueProvider());
+        l.add(new ContextValueProvider(contextService));
         
         return l;
     }

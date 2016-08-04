@@ -15,12 +15,8 @@
  */
 package org.auraframework.impl.java.controller;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.Map;
-
-import org.auraframework.Aura;
+import com.google.common.collect.Lists;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ValueDef;
@@ -34,12 +30,23 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A server side java based action.
  */
 public class JavaAction extends AbstractActionImpl<JavaActionDef> {
+
+    private Object returnValue;
+    private final List<Object> errors = Lists.newArrayList();
+    private final Object instance;
+
+    private final ExceptionAdapter exceptionAdapter;
+    private final LoggingService loggingService;
+
     /**
      * The constructor for an action.
      *
@@ -52,12 +59,15 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
      * @param paramValues the parameter values.
      */
     public JavaAction(DefDescriptor<ControllerDef> controllerDescriptor, JavaActionDef actionDef,
-            Object bean, Map<String, Object> paramValues) {
+                      Object bean, Map<String, Object> paramValues, ExceptionAdapter exceptionAdapter,
+                      LoggingService loggingService) {
         super(controllerDescriptor, actionDef, paramValues);
-        this.bean = bean;
+        this.instance = bean;
+        this.exceptionAdapter = exceptionAdapter;
+        this.loggingService = loggingService;
     }
 
-    private Object[] getArgs() {
+    private Object[] getArgs(ExceptionAdapter exceptionAdapter) {
         Class<?>[] javaParams = actionDef.getJavaParams();
         Object[] args = new Object[javaParams.length];
         int i = 0;
@@ -71,18 +81,18 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
                 // This means that we have a broken definition.
                 //
                 addException(new AuraUnhandledException("Invalid parameter " + valueDef, qfe), State.ERROR, true,
-                        false);
+                        false, exceptionAdapter);
                 return null;
             } catch (IllegalArgumentException iae) {
                 addException(new AuraUnhandledException("Invalid value for " + valueDef, iae), State.ERROR, false,
-                        false);
+                        false, exceptionAdapter);
                 return null;
             } catch (AuraHandledException lhe) {
-                addException(lhe, State.ERROR, false, false);
+                addException(lhe, State.ERROR, false, false, exceptionAdapter);
                 return null;
             } catch (Exception e) {
                 addException(new AuraUnhandledException("Error on parameter " + valueDef, e), State.ERROR, false,
-                        false);
+                        false, exceptionAdapter);
                 return null;
             }
             args[i++] = param;
@@ -95,10 +105,10 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
      * 
      * @param t the throwable to add.
      * @param newState the 'State' to set.
-     * @param loggable should this exception be run through the 'exception
-     *            adapter'.
+     * @param loggable should this exception be run through the 'exception adapter'.
+     * @param exceptionAdapter ExceptionAdapter
      */
-    public void addException(Throwable t, State newState, boolean loggable, boolean wrap) {
+    public void addException(Throwable t, State newState, boolean loggable, boolean wrap, ExceptionAdapter exceptionAdapter) {
         this.state = newState;
         if (t instanceof AuraHandledException) {
             this.errors.add(t);
@@ -108,7 +118,7 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
                 ex = new AuraExecutionException(ex, new Location(controllerDescriptor.toString(), 0));
             }
             if (loggable) {
-                ex = Aura.getExceptionAdapter().handleException(ex, this);
+                ex = exceptionAdapter.handleException(ex, this);
             }
             this.errors.add(ex);
         }
@@ -117,37 +127,35 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
     @Override
     public void run() {
         if (this.actionDef == null) {
-            addException(
-                    new InvalidDefinitionException("No action found", new Location(
-                            this.controllerDescriptor.getQualifiedName(), 0)), State.ERROR, true, false);
+            addException(new InvalidDefinitionException("No action found", new Location(this.controllerDescriptor.getQualifiedName(), 0)),
+                    State.ERROR, true, false, exceptionAdapter);
             return;
         }
         this.state = State.RUNNING;
 
-        Object[] args = getArgs();
+        Object[] args = getArgs(exceptionAdapter);
         if (args == null) {
             return;
         }
 
-        LoggingService loggingService = Aura.getLoggingService();
         loggingService.stopTimer(LoggingService.TIMER_AURA);
         loggingService.startTimer("java");
         try {
             loggingService.incrementNum("JavaCallCount");
-            this.returnValue = this.actionDef.getMethod().invoke(bean, args);
+            this.returnValue = this.actionDef.getMethod().invoke(instance, args);
             this.state = State.SUCCESS;
         } catch (InvocationTargetException e) {
             // something bad happened in the body of the action itself
             // getCause() unwraps the InvocationTargetException, gives us the
             // real information.
-            addException(e.getCause(), State.ERROR, true, true);
+            addException(e.getCause(), State.ERROR, true, true, exceptionAdapter);
         } catch (Exception e) {
             //
             // Several cases handled here, including
             // * IllegalArgumentError: the conversion probably didn't work.
             // * IllegalAccessException: should not be possible.
             //
-            addException(e, State.ERROR, true, false);
+            addException(e, State.ERROR, true, false, exceptionAdapter);
         } finally {
             loggingService.stopTimer("java");
             loggingService.startTimer(LoggingService.TIMER_AURA);
@@ -167,8 +175,4 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
     @Override
     public void serialize(Json json) throws IOException {
     }
-
-    private Object returnValue;
-    private final List<Object> errors = Lists.newArrayList();
-    private final Object bean;
 }

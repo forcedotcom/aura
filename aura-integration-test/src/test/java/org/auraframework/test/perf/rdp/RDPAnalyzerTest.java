@@ -15,8 +15,7 @@
  */
 package org.auraframework.test.perf.rdp;
 
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
@@ -31,20 +30,16 @@ import org.auraframework.util.test.perf.rdp.TimelineEventStats;
 import org.auraframework.util.test.perf.rdp.TimelineEventUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.google.common.collect.Lists;
-
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.List;
+import java.util.Map;
 
 //Roman TODO: remove @UnAdaptableTest once we also use SauceLabs for perf tests in autobuild
 @UnAdaptableTest
 @Ignore("W-2565715")
 public final class RDPAnalyzerTest extends AbstractPerfTestCase {
-
-    public RDPAnalyzerTest(String name) {
-        super(name);
-    }
 
     @Override
     protected boolean runPerfWarmupRun() {

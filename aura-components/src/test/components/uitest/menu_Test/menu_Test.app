@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application model="java://org.auraframework.components.ui.MenuTestModel">
+<aura:application model="java://org.auraframework.components.ui.MenuItemsTestModel">
     <aura:attribute name="expandEventFired" type="boolean" default="false"/>
     <aura:attribute name="collapseEventFired" type="boolean" default="false"/>
     <aura:attribute name="menuSelectFireCount" type="Integer" default="0" />

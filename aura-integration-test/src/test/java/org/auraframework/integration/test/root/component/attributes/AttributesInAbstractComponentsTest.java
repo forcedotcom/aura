@@ -15,14 +15,13 @@
  */
 package org.auraframework.integration.test.root.component.attributes;
 
-import java.util.ArrayList;
-
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 /**
  * Automation to verify how attributes behave in abstract components.
@@ -45,7 +44,7 @@ public class AttributesInAbstractComponentsTest extends AuraImplTestCase {
         assertNotNull(
                 "Failed to retrieve definition of extension component which was setting value of inherited attribute",
                 definitionService.getDefinition(extensionCmpDesc));
-        Component component = (Component) Aura.getInstanceService().getInstance(extensionCmpDesc.getQualifiedName(),
+        Component component = (Component) instanceService.getInstance(extensionCmpDesc.getQualifiedName(),
                 ComponentDef.class);
         assertEquals("Attribute value set using value assignment does not match expected value.", "Aura", component
                 .getSuper().getAttributes().getValue("text"));
@@ -66,7 +65,7 @@ public class AttributesInAbstractComponentsTest extends AuraImplTestCase {
         assertNotNull(
                 "Failed to retrieve definition of extension component which was setting value of inherited attribute",
                 definitionService.getDefinition(extensionCmpDesc));
-        Component component = (Component) Aura.getInstanceService().getInstance(extensionCmpDesc.getQualifiedName(),
+        Component component = (Component) instanceService.getInstance(extensionCmpDesc.getQualifiedName(),
                 ComponentDef.class);
         Object value = component.getSuper().getAttributes().getValue("innerBody");
         assertTrue(value instanceof ArrayList);

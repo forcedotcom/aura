@@ -15,14 +15,28 @@
  */
 package org.auraframework.impl.javascript.parser;
 
-import org.auraframework.def.HelperDef;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.HelperDef;
 import org.auraframework.impl.javascript.parser.handler.JavascriptHelperDefHandler;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+@ServiceComponent
 public class JavascriptHelperParser implements Parser<HelperDef> {
+
+    @Override
+    public Format getFormat() {
+        return Format.JS;
+    }
+
+    @Override
+    public DefType getDefType() {
+        return DefType.HELPER;
+    }
+    
     @Override
     public HelperDef parse(DefDescriptor<HelperDef> descriptor, Source<HelperDef> source)
             throws QuickFixException {

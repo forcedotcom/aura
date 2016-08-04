@@ -15,15 +15,14 @@
  */
 package org.auraframework.impl.system;
 
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.Client;
 import org.auraframework.system.Client.Type;
 import org.auraframework.test.client.UserAgent;
 import org.junit.Test;
 
-import com.google.common.collect.Maps;
+import java.util.Map;
 
 public class ClientTest extends AuraImplTestCase {
     /**

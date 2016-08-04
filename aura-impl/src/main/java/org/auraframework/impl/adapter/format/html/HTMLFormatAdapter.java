@@ -15,12 +15,12 @@
  */
 package org.auraframework.impl.adapter.format.html;
 
+import org.auraframework.impl.adapter.format.BaseFormatAdapter;
+
+import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.util.List;
 
-import javax.annotation.concurrent.ThreadSafe;
-
-import org.auraframework.impl.adapter.format.BaseFormatAdapter;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.system.AuraContext;
 

@@ -15,15 +15,13 @@
  */
 package org.auraframework.integration.test.css;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.google.common.collect.ImmutableMap;
 import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.FlavorDefaultDef;
 import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.flavor.FlavorOverrideLocationImpl;
 import org.auraframework.impl.css.flavor.FlavorOverrideLocatorImpl;
@@ -31,7 +29,8 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class FlavorDefaultDefImplTest extends StyleTestCase {
     private static final FlavorOverrideLocator NO_OVERRIDES = new FlavorOverrideLocatorImpl.Builder().build();

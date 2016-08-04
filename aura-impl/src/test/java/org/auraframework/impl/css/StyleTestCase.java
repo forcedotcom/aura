@@ -15,12 +15,8 @@
  */
 package org.auraframework.impl.css;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.auraframework.Aura;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.ComponentDef;
@@ -32,14 +28,18 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
+import javax.inject.Inject;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * for testing stuff that needs StyleDef, TokenDef sources.
@@ -48,6 +48,12 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     private static AtomicLong counter = new AtomicLong();
     private String ns1;
     private String ns2;
+
+    @Inject
+    protected DefinitionService definitionService;
+
+    @Inject
+    protected ContextService contextService;
 
     @Override
     public void setUp() throws Exception {
@@ -65,7 +71,6 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         dummy = definitionService.getDefDescriptor(desc, ComponentDef.class);
         addSourceAutoCleanup(dummy, "<aura:component></aura:component>");
 
-        ContextService contextService = Aura.getContextService();
         if (contextService.isEstablished()) {
             contextService.endContext();
         }
@@ -114,14 +119,14 @@ public abstract class StyleTestCase extends AuraImplTestCase {
 
     /** gets the parsed output of the given style */
     public String getParsedCss(DefDescriptor<? extends BaseStyleDef> styleDesc) throws QuickFixException {
-        return styleDesc.getDef().getCode();
+        return definitionService.getDefinition(styleDesc).getCode();
     }
 
     /** gets the parsed output of the given style. This ensures the application explicit tokens are registered */
     public String getParsedCssUseAppTokens(DefDescriptor<? extends BaseStyleDef> styleDesc) throws QuickFixException {
         // ensures app's tokens are added to the context
         // create style context?
-        return styleDesc.getDef().getCode();
+        return definitionService.getDefinition(styleDesc).getCode();
     }
 
     /** adds the namespace-default {@link TokensDef} to the namespace with the given source */
@@ -166,7 +171,6 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         addSourceAutoCleanup(appDesc, src.toString());
 
         // restart the context with the new app
-        ContextService contextService = Aura.getContextService();
         if (contextService.isEstablished()) {
             contextService.endContext();
         }

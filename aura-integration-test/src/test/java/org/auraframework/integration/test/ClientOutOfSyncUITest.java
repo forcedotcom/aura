@@ -37,6 +37,7 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -52,7 +53,7 @@ import com.google.common.base.Function;
  */
 public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
-	@Override
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         // these tests trigger server recompilation which can take a bit of time
@@ -357,7 +358,9 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
      * cause a failure in very few iterations.
      */
     @ThreadHostileTest("NamespaceDef modification affects namespace")
-    public void _testPostManyAfterStyleChange() throws Exception {
+    @Test
+    @Ignore
+    public void testPostManyAfterStyleChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='out'>hi</div>");
         String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
         DefDescriptor<?> styleDesc = definitionService.getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,

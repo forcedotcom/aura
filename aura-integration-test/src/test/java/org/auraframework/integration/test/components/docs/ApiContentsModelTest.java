@@ -15,12 +15,19 @@
  */
 package org.auraframework.integration.test.components.docs;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.auraframework.components.ui.TreeNode;
 import org.auraframework.docs.ApiContentsModel;
-import org.auraframework.integration.test.util.IntegrationTestCase;
+import org.auraframework.util.resource.ResourceLoader;
 import org.junit.Test;
+import org.mockito.Mockito;
+
+	
+import org.auraframework.integration.test.util.IntegrationTestCase;
 
 public class ApiContentsModelTest extends IntegrationTestCase {
     /**
@@ -29,7 +36,33 @@ public class ApiContentsModelTest extends IntegrationTestCase {
      */
     @Test
     public void testLoadJavaScriptApi() {
-        List<TreeNode> jsDocTreeNodes = new ApiContentsModel().getNodes();
+    	/* 
+    	 * Nodes string is equal to this, which was taken from symbolSet.json
+    	 
+    	[{
+		    'description': 'The Aura Event Service, accessible using $A.eventService. Creates and Manages Events.',
+		    'kind': 'class',
+		    'name': 'AuraEventService',
+		    'tags': [{
+		        'originalTitle': 'export',
+		        'title': 'export',
+		        'text': ''
+		    }],
+		    'longname': 'AuraEventService'
+		}]
+
+    	 */
+    	final String nodes = "[{\"description\":\"The Aura Event Service, accessible using $A.eventService. Creates and Manages Events.\",\"kind\":\"class\",\"name\":\"AuraEventService\",\"tags\":[{\"originalTitle\":\"export\",\"title\":\"export\",\"text\":\"\"}],\"longname\":\"AuraEventService\"}]";
+
+    	
+    	InputStream stream = new ByteArrayInputStream(nodes.getBytes(StandardCharsets.UTF_8));
+    	ResourceLoader loader = Mockito.mock(ResourceLoader.class);
+    	Mockito.when(loader.getResourceAsStream(Mockito.eq("jsdoc/symbolSet.json"))).thenReturn(stream);
+
+    	ApiContentsModel.refreshSymbols(loader);
+    	
+    	ApiContentsModel model = new ApiContentsModel();
+        List<TreeNode> jsDocTreeNodes = model.getNodes();
         assertTrue("No jsdoc nodes loaded from generated JSON file.", jsDocTreeNodes.size() > 0);
     }
 }

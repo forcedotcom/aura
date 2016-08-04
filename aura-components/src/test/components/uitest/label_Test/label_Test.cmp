@@ -16,7 +16,7 @@
 
 -->
 
-<aura:component model="java://org.auraframework.components.ui.MenuTestModel">
+<aura:component model="java://org.auraframework.components.ui.MenuItemsTestModel">
 <!-- Mirror default label position from input.cmp -->
 <aura:attribute default="left" type="String" name="whichPosition"/>
 <aura:attribute type="String" name="labelTitle"/>

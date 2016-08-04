@@ -30,10 +30,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.components.ui.InputOption;
+import org.auraframework.ds.servicecomponent.ModelInstance;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.date.DateOnly;
 import org.auraframework.util.date.DateService;
@@ -47,8 +48,8 @@ import com.google.common.collect.Maps;
 /**
  * Used by /expressionTest/expressionFunction.cmp which expects the current return values.
  */
-@Model
-public class TestJavaModel {
+@ServiceComponentModelInstance
+public class TestJavaModel implements ModelInstance {
     static ArrayList<InputOption> inputOptions = new ArrayList<>();
     static ArrayList<InputOption> moreInputOptions = new ArrayList<>();
     static ArrayList<InputOption> perfInputOptions = new ArrayList<>();
@@ -63,6 +64,7 @@ public class TestJavaModel {
     static List<LoadColumn> noColumns = Collections.emptyList();
     static List<LoadColumn> maxColumns;
     static List<ColumnsSelected> columnsSelected;
+    private final ContextService contextService;
 
     static {
         inputOptions.add(new InputOption("Option1", "Opt1", false, "option1"));
@@ -77,10 +79,8 @@ public class TestJavaModel {
         for (InputOption i : inputOptions) {
             optionMap.put(i.getValue(), getSubCategory(i.getValue()));
         }
-    }
 
-    // Options for perf testing /performanceTest/ui_inputSelect.cmp
-    static {
+        // Options for perf testing /performanceTest/ui_inputSelect.cmp
         InputOption firstOption = new InputOption("Option1", "Opt1", true, "option1");
         perfInputOptions.add(firstOption);
         morePerfInputOptions.add(firstOption);
@@ -96,12 +96,15 @@ public class TestJavaModel {
             }
             evenMorePerfInputOptions.add(iOption);
         }
-
     }
 
+    public TestJavaModel(ContextService contextService) {
+    	this.contextService = contextService;
+    }
+    
     @AuraEnabled
     public ArrayList<InputOption> getPerfOptions() throws QuickFixException {
-        Integer count = (Integer) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
+        Integer count = (Integer) contextService.getCurrentContext().getCurrentComponent().getAttributes()
                 .getValue("count");
         if (count == null || count < 21) {
             return perfInputOptions;
@@ -751,7 +754,7 @@ public class TestJavaModel {
 
     @AuraEnabled
     public List<Item> getItems() throws QuickFixException {
-        String dataType = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
+        String dataType = (String) contextService.getCurrentContext().getCurrentComponent().getAttributes()
                 .getValue("dataType");
         if (dataType == null) {
             return items;
@@ -765,7 +768,7 @@ public class TestJavaModel {
 
     @AuraEnabled
     public List<LoadColumn> getColumns() throws QuickFixException {
-        String dataType = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
+        String dataType = (String) contextService.getCurrentContext().getCurrentComponent().getAttributes()
                 .getValue("dataType");
         if (dataType == null) {
             return columns;

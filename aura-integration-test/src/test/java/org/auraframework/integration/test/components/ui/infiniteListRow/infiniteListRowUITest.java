@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
 @UnAdaptableTest
 @TargetBrowsers({ BrowserType.IPHONE })
 public class infiniteListRowUITest extends WebDriverTestCase{
@@ -55,7 +56,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws InterruptedException
 	 */
     @Test
-    public void testHorizontolSwipeLogs () throws MalformedURLException, URISyntaxException, InterruptedException {
+	public void testHorizontolSwipeLogs () throws MalformedURLException, URISyntaxException, InterruptedException {
 		open(TEST_APP);
 		setViewPortVariable();
 		
@@ -101,7 +102,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws InterruptedException
 	 */
     @Test
-    public void testHorizontalSwipeGesturesDefaultBehavior() throws MalformedURLException, URISyntaxException, InterruptedException{
+	public void testHorizontalSwipeGesturesDefaultBehavior() throws MalformedURLException, URISyntaxException, InterruptedException{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
@@ -125,7 +126,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws InterruptedException
 	 */
     @Test
-    public void testHorizontalLeftSwipeBehavior() throws MalformedURLException, URISyntaxException, InterruptedException{
+	public void testHorizontalLeftSwipeBehavior() throws MalformedURLException, URISyntaxException, InterruptedException{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
@@ -176,12 +177,12 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws InterruptedException
 	 */
     @Test
-    public void testRefreshOnListRowsClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
+	public void testRefreshOnListRowsClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
         verifyListRowAfterRefreshOrShowMoreAction("refresh");
 	}
 	
     @Test
-    public void testScrollingAnyVerifyDefaultSwipeBehavior() throws MalformedURLException, URISyntaxException, InterruptedException {
+	public void testScrollingAnyVerifyDefaultSwipeBehavior() throws MalformedURLException, URISyntaxException, InterruptedException {
 		open(TEST_APP);
         setViewPortVariable();
         clickOnShowMore();
@@ -229,7 +230,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * Bug: W-2257072
 	 */
     @Test
-    public void testVerticalSwipeClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
+	public void testVerticalSwipeClosesOpenSwipeBody() throws MalformedURLException, URISyntaxException, InterruptedException{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);
@@ -250,7 +251,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 * @throws InterruptedException
 	 */
     @Test
-    public void testTapOnNonActiveRowClosesActiveRow() throws MalformedURLException, URISyntaxException, InterruptedException{
+	public void testTapOnNonActiveRowClosesActiveRow() throws MalformedURLException, URISyntaxException, InterruptedException{
 		open(TEST_APP);
 		setViewPortVariable();
 		verifyOnlyOneSwipeBodyIsOpen(null, false);

@@ -193,7 +193,7 @@ public abstract class BaseXmlElementImpl implements BaseXmlElement {
     }
 
     public abstract static class BaseBuilderImpl implements ElementBuilder {
-        final Class defClass;
+        final Class<?> defClass;
         public Location location;
         public String apiVersion;
         public String description;
@@ -203,7 +203,7 @@ public abstract class BaseXmlElementImpl implements BaseXmlElement {
         private DefinitionAccess access;
         private String fullyQualifiedName;
 
-        protected BaseBuilderImpl(Class defClass) {
+        protected BaseBuilderImpl(Class<?> defClass) {
             this.defClass = defClass;
             //this.ownHash = String.valueOf(System.currentTimeMillis());
         }
@@ -212,6 +212,7 @@ public abstract class BaseXmlElementImpl implements BaseXmlElement {
             return access;
         }
 
+        @Override
         public BaseBuilderImpl setAccess(DefinitionAccess access) {
             this.access = access;
             return this;

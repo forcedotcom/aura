@@ -19,9 +19,6 @@ import static org.auraframework.util.json.JsonSerializers.ARRAY;
 import static org.auraframework.util.json.JsonSerializers.LITERAL;
 import static org.auraframework.util.json.JsonSerializers.STRING;
 
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * uses 2 maps to find serializers. first is direct class lookup (fast), second
@@ -29,17 +26,13 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class ClassMapJsonSerializationContext extends BaseJsonSerializationContext {
 
-    private final Map<String, JsonSerializer<?>> serializersLookupMap;
-    private final Map<Class<?>, JsonSerializer<?>> serializersInstanceMap;
-    private final ConcurrentMap<String, JsonSerializer<?>> cache;
+    private final JsonSerializerFactory jsonSerializerFactory;
 
-    public ClassMapJsonSerializationContext(Map<String, JsonSerializer<?>> serializersLookupMap,
-            Map<Class<?>, JsonSerializer<?>> serializersInstanceMap, ConcurrentMap<String, JsonSerializer<?>> cache,
-            boolean format, boolean refSupport, int dataSizeLimit, int collectionSizeLimit) {
+    public ClassMapJsonSerializationContext(JsonSerializerFactory jsonSerializerFactory,
+                                            boolean format, boolean refSupport, int dataSizeLimit,
+                                            int collectionSizeLimit) {
         super(format, refSupport, dataSizeLimit, collectionSizeLimit, false);
-        this.serializersLookupMap = serializersLookupMap;
-        this.serializersInstanceMap = serializersInstanceMap;
-        this.cache = cache;
+        this.jsonSerializerFactory = jsonSerializerFactory;
     }
 
     @Override
@@ -56,25 +49,6 @@ public class ClassMapJsonSerializationContext extends BaseJsonSerializationConte
             return (JsonSerializer<T>) STRING;
         }
 
-        JsonSerializer<T> s = (JsonSerializer<T>) cache.get(c.getName());
-        if (s != null) {
-            return s;
-        }
-
-        String className = c.getName();
-        s = (JsonSerializer<T>) serializersLookupMap.get(className);
-        if (s != null) {
-            cache.putIfAbsent(className, s);
-            return s;
-        }
-
-        for (Entry<Class<?>, JsonSerializer<?>> e : serializersInstanceMap.entrySet()) {
-            if (e.getKey().isAssignableFrom(c)) {
-                s = (JsonSerializer<T>) e.getValue();
-                cache.putIfAbsent(className, s);
-                return s;
-            }
-        }
-        return null;
+        return jsonSerializerFactory.getSerializer(o);
     }
 }

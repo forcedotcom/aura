@@ -46,6 +46,7 @@ import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.root.RootDefinitionTest;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -67,7 +68,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends RootDefinitionTest<T> {
-
     public BaseComponentDefTest(Class<T> defClass, String tag) {
         super(defClass, tag);
     }
@@ -75,7 +75,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     @Test
     public void testHashCode() throws Exception {
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = new HashMap<>();
-        attributeDefs.put(DefDescriptorImpl.getInstance(vendor.getAttributeName(), AttributeDef.class),
+        attributeDefs.put(definitionService.getDefDescriptor(vendor.getAttributeName(), AttributeDef.class),
                 vendor.makeAttributeDef());
 
         Map<String, RegisterEventDef> eventDefs = new HashMap<>();
@@ -90,7 +90,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         @SuppressWarnings("unchecked")
         DefDescriptor<T> extendsDesc = (DefDescriptor<T>) vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                "aura:parent", null, null, null, null, null, null, null, null, null, null, null, false, true)
+                "aura:parent", null, null, null, null, null, null, null, null, null, null, null, false, true, AuraContext.Access.INTERNAL)
                 .getDescriptor();
 
         Set<DefDescriptor<InterfaceDef>> interfaces = new HashSet<>();
@@ -107,63 +107,63 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         BaseComponentDef bcdAll = vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", attributeDefs,
                 eventDefs, children, location, vendor.getControllerDescriptor(), modelDesc, extendsDesc, interfaces,
-                renderers, helpers, eventHandlers, false, false);
+                renderers, helpers, eventHandlers, false, false, AuraContext.Access.INTERNAL);
         int baseCode = bcdAll.hashCode();
 
         // ignore children and eventHandlers
         assertEquals(baseCode, vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", attributeDefs,
                 eventDefs, null, location, vendor.getControllerDescriptor(), modelDesc, extendsDesc, interfaces,
-                renderers, helpers, null, false, false).hashCode());
+                renderers, helpers, null, false, false, AuraContext.Access.INTERNAL).hashCode());
 
         assertFalse("descriptor not included in hashCode",
                 baseCode == vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test2", attributeDefs,
                         eventDefs, null, location, vendor.getControllerDescriptor(), modelDesc, extendsDesc,
-                        interfaces, renderers, helpers, null, false, false).hashCode());
+                        interfaces, renderers, helpers, null, false, false, AuraContext.Access.INTERNAL).hashCode());
 
         assertFalse("attributes not included in hashCode",
                 baseCode == vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", null,
                         eventDefs, null, location, vendor.getControllerDescriptor(), modelDesc, extendsDesc,
-                        interfaces, renderers, helpers, null, false, false).hashCode());
+                        interfaces, renderers, helpers, null, false, false, AuraContext.Access.INTERNAL).hashCode());
 
         assertFalse("events not included in hashCode",
                 baseCode == vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", attributeDefs,
                         null, null, location, vendor.getControllerDescriptor(), modelDesc, extendsDesc, interfaces,
-                        renderers, helpers, null, false, false).hashCode());
+                        renderers, helpers, null, false, false, AuraContext.Access.INTERNAL).hashCode());
 
         assertFalse("location not included in hashCode",
                 baseCode == vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", attributeDefs,
                         eventDefs, null, null, vendor.getControllerDescriptor(), modelDesc, extendsDesc, interfaces,
-                        renderers, helpers, null, false, false).hashCode());
+                        renderers, helpers, null, false, false, AuraContext.Access.INTERNAL).hashCode());
 
         assertFalse("controller not included in hashCode",
                 baseCode == vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", attributeDefs,
                         eventDefs, null, location, null, modelDesc, extendsDesc, interfaces, renderers, helpers, null,
-                        false, false).hashCode());
+                        false, false, AuraContext.Access.INTERNAL).hashCode());
 
         assertFalse("model not included in hashCode",
                 baseCode == vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", attributeDefs,
                         eventDefs, null, location, vendor.getControllerDescriptor(), null, extendsDesc, interfaces,
-                        renderers, helpers, null, false, false).hashCode());
+                        renderers, helpers, null, false, false, AuraContext.Access.INTERNAL).hashCode());
 
         assertFalse("extends not included in hashCode",
                 baseCode == vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", attributeDefs,
                         eventDefs, null, location, vendor.getControllerDescriptor(), modelDesc, null, interfaces,
-                        renderers, helpers, null, false, false).hashCode());
+                        renderers, helpers, null, false, false, AuraContext.Access.INTERNAL).hashCode());
 
         assertFalse("interfaces not included in hashCode",
                 baseCode == vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", attributeDefs,
                         eventDefs, null, location, vendor.getControllerDescriptor(), modelDesc, extendsDesc, null,
-                        renderers, helpers, null, false, false).hashCode());
+                        renderers, helpers, null, false, false, AuraContext.Access.INTERNAL).hashCode());
 
         assertFalse("renderers not included in hashCode",
                 baseCode == vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", attributeDefs,
                         eventDefs, null, location, vendor.getControllerDescriptor(), modelDesc, extendsDesc,
-                        interfaces, null, helpers, null, false, false).hashCode());
+                        interfaces, null, helpers, null, false, false, AuraContext.Access.INTERNAL).hashCode());
 
         assertFalse("helpers not included in hashCode",
                 baseCode == vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", attributeDefs,
                         eventDefs, null, location, vendor.getControllerDescriptor(), modelDesc, extendsDesc,
-                        interfaces, null, null, null, false, false).hashCode());
+                        interfaces, null, null, null, false, false, AuraContext.Access.INTERNAL).hashCode());
     }
 
     @Test
@@ -171,9 +171,9 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         String desc = getAuraTestingUtil().getNonce("test:cmp");
         Location location = vendor.makeLocation("filename1", 5, 5, 0);
         BaseComponentDef bcd1 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                desc, null, null, null, location, null, null, null, null, null, null, null, false, false);
+                desc, null, null, null, location, null, null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
         BaseComponentDef bcd2 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                desc, null, null, null, location, null, null, null, null, null, null, null, false, false);
+                desc, null, null, null, location, null, null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
         assertTrue("The BaseComponentDefs should have been equal", bcd1.equals(bcd2));
     }
 
@@ -181,54 +181,54 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testEqualsWithDifferentObjects() throws Exception {
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null, null, null, null, null, null,
-                null, false, false);
+                null, false, false, AuraContext.Access.INTERNAL);
         assertFalse("A BaseComponentDef shouldn't equal a ComponentDefRef",
                 bcd.equals(vendor.makeComponentDefRef()));
     }
 
     @Test
     public void testEqualsWithDifferentController() throws Exception {
-        DefDescriptor<ControllerDef> controllerDesc = DefDescriptorImpl.getInstance("java://foo.bar2",
+        DefDescriptor<ControllerDef> controllerDesc = definitionService.getDefDescriptor("java://foo.bar2",
                 ControllerDef.class);
         String desc = getAuraTestingUtil().getNonce("test:cmp");
         Location location = vendor.makeLocation("filename1", 5, 5, 0);
         BaseComponentDef bcd1 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                desc, null, null, null, location, null, null, null, null, null, null, null, false, false);
+                desc, null, null, null, location, null, null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
         BaseComponentDef bcd2 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                desc, null, null, null, location, controllerDesc, null, null, null, null, null, null, false, false);
+                desc, null, null, null, location, controllerDesc, null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
         assertFalse("A BaseComponentDef shouldn't be equal with different controllers", bcd1.equals(bcd2));
     }
 
     @Test
     public void testEqualsWithDifferentParents() throws Exception {
-        DefDescriptor<T> parentDesc = DefDescriptorImpl.getInstance("fake:componentParent2", getDefClass());
+        DefDescriptor<T> parentDesc = definitionService.getDefDescriptor("fake:componentParent2", getDefClass());
         String desc = getAuraTestingUtil().getNonce("test:cmp");
         Location location = vendor.makeLocation("filename1", 5, 5, 0);
         BaseComponentDef bcd1 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                desc, null, null, null, location, null, null, null, null, null, null, null, false, false);
+                desc, null, null, null, location, null, null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
         BaseComponentDef bcd2 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                desc, null, null, null, location, null, null, parentDesc, null, null, null, null, false, false);
+                desc, null, null, null, location, null, null, parentDesc, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
         assertFalse("A BaseComponentDef shouldn't be equal with different parents", bcd1.equals(bcd2));
     }
 
     @Test
     public void testEqualsWithDifferentEvents() throws Exception {
-        DefDescriptor<EventDef> eventDefDescriptor = DefDescriptorImpl.getInstance("fake:event2", EventDef.class);
+        DefDescriptor<EventDef> eventDefDescriptor = definitionService.getDefDescriptor("fake:event2", EventDef.class);
         Map<String, RegisterEventDef> eventDefs = ImmutableMap.of("fakey2",
                 (RegisterEventDef) vendor.makeRegisterEventDef(eventDefDescriptor, false, null));
         String desc = getAuraTestingUtil().getNonce("test:cmp");
         Location location = vendor.makeLocation("filename1", 5, 5, 0);
         BaseComponentDef bcd1 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                desc, null, null, null, location, null, null, null, null, null, null, null, false, false);
+                desc, null, null, null, location, null, null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
         BaseComponentDef bcd2 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                desc, null, eventDefs, null, location, null, null, null, null, null, null, null, false, false);
+                desc, null, eventDefs, null, location, null, null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
         assertFalse("A BaseComponentDef shouldn't be equal with different registered events", bcd1.equals(bcd2));
     }
 
     @Test
     public void testSerializeWithAttributes() throws Exception {
         Map<DefDescriptor<AttributeDef>, AttributeDef> testAttributeDefs = ImmutableMap.of(
-                DefDescriptorImpl.getInstance("testAttributeDescriptorName", AttributeDef.class),
+                definitionService.getDefDescriptor("testAttributeDescriptorName", AttributeDef.class),
                 (AttributeDef) vendor.makeAttributeDefWithNulls(
                         "testAttributeDescriptorName",
                         null,
@@ -239,14 +239,14 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                         vendor.makeLocation("filename1", 5, 5, 0)));
         serializeAndGoldFile(vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "aura:test", testAttributeDefs, null, null, vendor.makeLocation("filename1", 5, 5, 0), null,
-                null, null, null, null, null, null, false, false));
+                null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL));
     }
 
     @Test
     public void testSerializeBasic() throws Exception {
         serializeAndGoldFile(vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "aura:test", null, null, null, vendor.makeLocation("filename2", 10, 10, 0), null,
-                null, null, null, null, null, null, false, false));
+                null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL));
     }
 
     @Test
@@ -255,7 +255,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         // Using a non-internal namespace will put the component in the Locker
         serializeAndGoldFile(vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "nonInternal:component", null, null, null, vendor.makeLocation("filename3", 10, 10, 0), null,
-                null, null, null, null, null, null, false, false));
+                null, null, null, null, null, null, false, false, AuraContext.Access.PUBLIC));
     }
 
     /**
@@ -265,12 +265,12 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     @Test
     public void testRendererDefsNotSerialized() throws Exception {
         List<DefDescriptor<RendererDef>> rendererList = new ArrayList<>();
-        DefDescriptor<RendererDef> renderer = DefDescriptorImpl.getInstance(
+        DefDescriptor<RendererDef> renderer = definitionService.getDefDescriptor(
                 "js://aura.html", RendererDef.class);
         rendererList.add(renderer);
         Object cmpDef = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "aura:if", null, null, null, null, null, null, null, null,
-                rendererList, null, null, false, false);
+                rendererList, null, null, false, false, AuraContext.Access.INTERNAL);
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
         Map<?, ?> rendererDef = (Map<?, ?>) json.get("rendererDef");
@@ -286,12 +286,12 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     @Test
     public void testHelperDefNotSerialized() throws Exception {
         List<DefDescriptor<HelperDef>> helperList = new ArrayList<>();
-        DefDescriptor<HelperDef> helper = DefDescriptorImpl.getInstance(
+        DefDescriptor<HelperDef> helper = definitionService.getDefDescriptor(
                 "js://aura.html", HelperDef.class);
         helperList.add(helper);
         Object cmpDef = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "aura:if", null, null, null, null, null, null, null, null,
-                null, helperList, null, false, false);
+                null, helperList, null, false, false, AuraContext.Access.INTERNAL);
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
         Map<?, ?> helperDef = (Map<?, ?>) json.get("helperDef");
@@ -304,7 +304,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testComponentClassSerialized() throws Exception {
         Object cmpDef = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "aura:text", null, null, null, null, null, null, null, null,
-                null, null, null, false, false);
+                null, null, null, false, false, AuraContext.Access.INTERNAL);
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
         String componentClass = (String) ((Map<?, ?>) json
@@ -322,15 +322,15 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 String.format(baseTag, "", "<aura:attribute name='parentAttribute' type='String'/>"));
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "aura:test", null, null, null, null, null, null, extendsDescriptor, interfaces, null, null, null,
-                false, false);
+                false, false, AuraContext.Access.INTERNAL);
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = bcd.getAttributeDefs();
         assertEquals(3, attributes.size());
         assertTrue("mystring should be an attribute",
-                attributes.containsKey(DefDescriptorImpl.getInstance("mystring", AttributeDef.class)));
+                attributes.containsKey(definitionService.getDefDescriptor("mystring", AttributeDef.class)));
         assertTrue("body should be an attribute",
-                attributes.containsKey(DefDescriptorImpl.getInstance("body", AttributeDef.class)));
+                attributes.containsKey(definitionService.getDefDescriptor("body", AttributeDef.class)));
         assertTrue("parentAttribute should be an attribute",
-                attributes.containsKey(DefDescriptorImpl.getInstance("parentAttribute", AttributeDef.class)));
+                attributes.containsKey(definitionService.getDefDescriptor("parentAttribute", AttributeDef.class)));
     }
 
     @Test
@@ -341,7 +341,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 String.format(baseTag, "", "<aura:registerevent name='anotherParentEvent' type='test:parentEvent'/>"));
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "aura:test", null, null, null, null, null, null, extendsDescriptor, interfaces, null, null, null,
-                false, false);
+                false, false, AuraContext.Access.INTERNAL);
         Map<String, RegisterEventDef> registeredED = bcd.getRegisterEventDefs();
         assertEquals(2, registeredED.size());
         assertNotNull(registeredED.containsKey("parentEvent"));
@@ -352,7 +352,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testAppendDependenciesWithNone() throws Exception {
         Set<DefDescriptor<?>> dependencies = new HashSet<>();
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(), "aura:test", null, null, null, null,
-                null, null, null, null, null, null, null, false, false);
+                null, null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
         bcd.appendDependencies(dependencies);
 
         assertFalse(dependencies.isEmpty());
@@ -368,7 +368,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<InterfaceDef> intfDesc = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface/>");
         DefDescriptor<EventDef> eventDesc = addSourceAutoCleanup(EventDef.class,
                 "<aura:event type='component' support='GA'/>");
-        DefDescriptor<ProviderDef> providerDesc = DefDescriptorImpl.getInstance(
+        DefDescriptor<ProviderDef> providerDesc = definitionService.getDefDescriptor(
                 "java://org.auraframework.impl.java.provider.ConcreteProvider", ProviderDef.class);
 
         DefDescriptor<T> cmpDesc = addSourceAutoCleanup(
@@ -773,7 +773,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testGetControllerDefDescriptors() throws QuickFixException {
         @SuppressWarnings("unchecked")
         DefDescriptor<T> ddParent = (DefDescriptor<T>) define(baseTag,
-                "extensible='true' controller='java://org.auraframework.impl.java.controller.TestController2'", "")
+                "extensible='true' controller='java://org.auraframework.components.test.java.controller.JavaTestController'", "")
                         .getDescriptor();
         List<DefDescriptor<ControllerDef>> dds = define(
                 baseTag,
@@ -790,7 +790,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         });
         assertTrue(names.containsAll(ImmutableSet.of(
                 "java://org.auraframework.components.test.java.controller.TestController",
-                "java://org.auraframework.impl.java.controller.TestController2")));
+                "java://org.auraframework.components.test.java.controller.JavaTestController")));
     }
 
     /**
@@ -808,7 +808,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     @Test
     public void testGetControllerDef() throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> ddParent = define(baseTag,
-                "extensible='true' controller='java://org.auraframework.impl.java.controller.TestController2'", "")
+                "extensible='true' controller='java://org.auraframework.components.test.java.controller.TestController'", "")
                         .getDescriptor();
         ControllerDef d = define(
                 baseTag,
@@ -1700,7 +1700,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 getAuraTestingUtil().getNonce("test:cmp"), null, null, null,
                 vendor.makeLocation("filename1", 5, 5, 0), null, null,
-                null, null, null, null, null, false, false);
+                null, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
         assertEquals(
                 vendor.makeLocation("filename1", 5, 5, 0),
                 bcd.getLocation());
@@ -1871,7 +1871,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     @Test
     public void testBuildWithNullDescriptor() throws Exception {
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(), null, null, null, null,
-                null, null, null, null, null, null, null, null, false, false);
+                null, null, null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
         try {
             bcd.validateDefinition();
             fail("Should have thrown AuraRuntimeException for null descriptor");
@@ -1887,7 +1887,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testValidateDefinitionNonExtensibleAbstract() throws Exception {
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,
-                null, null, null, null, null, null, true, false);
+                null, null, null, null, null, null, true, false, AuraContext.Access.INTERNAL);
         try {
             bcd.validateDefinition();
             fail("Should have thrown AuraException because an abstract component isn't extensible.");
@@ -1904,8 +1904,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testValidateReferencesWithNonExistentParent() throws Exception {
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,
-                null, DefDescriptorImpl.getInstance("test:nonExistentComponentParent", getDefClass()), null, null,
-                null, null, false, false);
+                null, definitionService.getDefDescriptor("test:nonExistentComponentParent", getDefClass()), null, null,
+                null, null, false, false, AuraContext.Access.INTERNAL);
         try {
             bcd.validateReferences();
             fail("Should have thrown AuraException because the parent doesn't exist.");
@@ -1926,7 +1926,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<T> parentDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,
-                null, parentDesc, null, null, null, null, false, false);
+                null, parentDesc, null, null, null, null, false, false, AuraContext.Access.INTERNAL);
         try {
             bcd.validateReferences();
             fail("Should have thrown AuraException because the parent isn't extensible.");
@@ -1949,7 +1949,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         interfaces.add(idd);
         BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,
-                null, null, interfaces, null, null, null, false, false);
+                null, null, interfaces, null, null, null, false, false, AuraContext.Access.INTERNAL);
         try {
             bcd.validateReferences();
             fail("Should have thrown AuraException because the parent isn't extensible.");

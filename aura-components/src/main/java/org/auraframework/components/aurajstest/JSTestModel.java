@@ -18,39 +18,42 @@ package org.auraframework.components.aurajstest;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-@Model
-public class JSTestModel {
+@ServiceComponentModelInstance
+public class JSTestModel implements ModelInstance {
 
     private final DefDescriptor<TestSuiteDef> descriptor;
     private final TestSuiteDef def;
     private final String url;
     private final List<TestCaseDef> tcds;
-
-    public JSTestModel() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+    private final DefinitionService definitionService;
+    
+    public JSTestModel(ContextService contextService, DefinitionService definitionService) throws QuickFixException {
+        this.definitionService = definitionService;
+        
+    	AuraContext context = contextService.getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
-        DefinitionService defService = Aura.getDefinitionService();
 
         String desc = (String) component.getAttributes().getValue("descriptor");
         DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
 
         desc = "js://" + desc.replace(':', '.');
-        descriptor = defService.getDefDescriptor(desc, TestSuiteDef.class);
-        def = descriptor.getDef();
+        descriptor = definitionService.getDefDescriptor(desc, TestSuiteDef.class);
+        def = definitionService.getDefinition(descriptor);
         if (def == null) {
             throw new DefinitionNotFoundException(descriptor);
         }
@@ -71,7 +74,7 @@ public class JSTestModel {
 
     private List<TestCaseDef> filterTestCases(String test) throws QuickFixException {
         if (test != null) {
-            List<TestCaseDef> temp = descriptor.getDef().getTestCaseDefs();
+            List<TestCaseDef> temp = definitionService.getDefinition(descriptor).getTestCaseDefs();
             for (TestCaseDef t : temp) {
                 if (t.getName().equals(test)) {
                     List<TestCaseDef> testCases = new ArrayList<>();
@@ -80,7 +83,7 @@ public class JSTestModel {
                 }
             }
         }
-        return descriptor.getDef().getTestCaseDefs();
+        return definitionService.getDefinition(descriptor).getTestCaseDefs();
     }
 
     @AuraEnabled

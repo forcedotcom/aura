@@ -15,8 +15,8 @@
  */
 package org.auraframework.integration.test.error;
 
-import org.auraframework.Aura;
-import org.auraframework.controller.java.ServletConfigController;
+import com.google.common.base.Function;
+
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -24,6 +24,7 @@ import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
@@ -33,7 +34,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.google.common.base.Function;
+import javax.inject.Inject;
 
 /**
  * What should you see when something goes wrong. {@link ThreadHostile} due to setProdConfig and friends.
@@ -45,20 +46,23 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
 
     private static final String errorBoxPath = "//div[@class='auraMsgMask auraForcedErrorBox']//div[@id='auraErrorMessage']";
 
+    @Inject
+    MockConfigAdapter mockConfigAdapter;
+
     private void setProdConfig() throws Exception {
-        ServletConfigController.setProductionConfig(true);
-        Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Authentication.AUTHENTICATED);
+        mockConfigAdapter.setIsProduction(true);
+        contextService.endContext();
+        contextService.startContext(Mode.DEV, Format.HTML, Authentication.AUTHENTICATED);
     }
 
     private void setProdContextWithoutConfig() throws Exception {
-        Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+        contextService.endContext();
+        contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
     }
 
     private void setDevContextWithoutConfig() throws Exception {
-        Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Authentication.AUTHENTICATED);
+        contextService.endContext();
+        contextService.startContext(Mode.DEV, Format.HTML, Authentication.AUTHENTICATED);
     }
 
     private String getAppUrl(String attributeMarkup, String bodyMarkup) throws Exception {

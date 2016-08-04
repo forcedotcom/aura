@@ -15,11 +15,7 @@
  */
 package org.auraframework.impl.system;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Maps;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -27,7 +23,10 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.system.Source;
 
-import com.google.common.collect.Maps;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Immutable DefRegistry implementation, backed by a prepopulated map.

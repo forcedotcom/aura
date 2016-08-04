@@ -17,14 +17,15 @@ package org.auraframework.components.auradocs;
 
 import java.util.List;
 
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.components.ui.TreeNode;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 
 import com.google.common.collect.Lists;
 
-@Model
-public class SearchFilterTreeTestModel {
+@ServiceComponentModelInstance
+public class SearchFilterTreeTestModel implements ModelInstance {
 
     @AuraEnabled
     public List<TreeNode> getTree() {

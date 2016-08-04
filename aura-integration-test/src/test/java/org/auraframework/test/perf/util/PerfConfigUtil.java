@@ -15,18 +15,7 @@
  */
 package org.auraframework.test.perf.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.google.gson.Gson;
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -40,7 +29,17 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraFiles;
 
-import com.google.gson.Gson;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class PerfConfigUtil {
 
@@ -93,7 +92,7 @@ public final class PerfConfigUtil {
         File moduleDir;
         String componentsDir = null;
         try {
-            fileName = def.getDef().getLocation().getFileName();            
+            fileName = Aura.getDefinitionService().getDefinition(def).getLocation().getFileName();            
             moduleDir = new File(fileName).getCanonicalFile().getParentFile().getParentFile().getParentFile();
             if(fileName.contains("/core/")){
                 componentsDir = moduleDir.toString();
@@ -113,8 +112,8 @@ public final class PerfConfigUtil {
     	String componentDirPath = null;   	
     	
     	try {
-	    	String fileName = def.getDef().getLocation().getFileName();
-	    	componentPath = def.getNamespace() + "/" + def.getName();
+            String fileName = Aura.getDefinitionService().getDefinition(def).getLocation().getFileName();
+            componentPath = def.getNamespace() + "/" + def.getName();
 	    	
 	    	// If file is read from a jar, then need to handle it differently.
 	        if(fileName.contains("jar:")){        	

@@ -15,6 +15,10 @@
  */
 package org.auraframework.util.json;
 
+import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
+import org.mockito.Mockito;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -24,10 +28,6 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-
-import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Test;
-import org.mockito.Mockito;
 
 /**
  */

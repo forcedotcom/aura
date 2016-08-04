@@ -18,26 +18,34 @@ package org.auraframework.integration.test.renderer;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
-import java.io.StringWriter;
+import javax.inject.Inject;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
-import org.auraframework.impl.system.RenderContextImpl;
-import org.auraframework.system.RenderContext;
+import org.auraframework.instance.RendererInstance;
+import org.auraframework.service.InstanceService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
 
 /**
  * Test class to verify implementation of JavascriptRendererDef.
  */
 public class JavascriptRendererDefTest extends AuraImplTestCase {
+    @Inject
+    InstanceService instanceService;
+
     /**
      * Verify JavascriptRendererDef is non-local.
      */
     @Test
     public void testIsLocalReturnsFalse() {
-        RendererDef rendererDef =  (new JavascriptRendererDef.Builder()).build();
+        JavascriptRendererDef.Builder builder = new JavascriptRendererDef.Builder();
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
+        RendererDef rendererDef = builder.build();
         assertFalse(rendererDef.isLocal());
     }
 
@@ -51,19 +59,18 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify UnsupportedOperationException is thrown when rendering component locally using client renderer
+     * Verify AuraRuntimeException is thrown when trying to retrieve a renderer instance for a JavascriptRendererDefinition
      */
     @Test
     public void testThrownExceptionWhenUsingJSRendererLocally() throws Exception {
-        RendererDef rendererDef = (new JavascriptRendererDef.Builder()).build();
-        StringWriter sw = new StringWriter();
-        RenderContext rc = new RenderContextImpl(sw, null);
-        
+        JavascriptRendererDef.Builder builder = new JavascriptRendererDef.Builder();
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
+        RendererDef rendererDef = builder.build();
         try {
-            rendererDef.render(null, rc);
-            fail("UnsupportedOperationException should be thrown when calling client render() in local.");
-        } catch (Exception e) {
-            checkExceptionFull(e, UnsupportedOperationException.class, null);
+            RendererInstance renderer = instanceService.getInstance(rendererDef);
+            fail("AuraRuntimeException should be thrown when trying to create a javascript renderer client render() in local. renderer=" + renderer);
+        } catch (Exception ex) {
+            checkExceptionFull(ex, AuraRuntimeException.class, "Instances of class org.auraframework.impl.javascript.renderer.JavascriptRendererDef cannot be created.");
         }
     }
 

@@ -15,18 +15,25 @@
  */
 package org.auraframework.impl.source.file;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-
-import java.nio.file.FileSystems;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.SourceListener;
 import org.auraframework.util.FileChangeEvent;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.nio.file.FileSystems;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link FileSourceListener}
@@ -35,12 +42,10 @@ public class FileSourceListenerTest extends UnitTestCase {
     @Captor
     private ArgumentCaptor<DefDescriptor<?>> defDescriptorCaptor;
 
-    private FileSourceListener listener = new FileSourceListener();
+    private FileSourceListener listener = new FileSourceListener(null);
 
     @Mock
     private FileChangeEvent fileChangeEvent;
-
-
 
     @Override
     public void setUp() throws Exception {

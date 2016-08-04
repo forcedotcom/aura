@@ -15,17 +15,16 @@
  */
 package org.auraframework.test.perf.core;
 
-import java.util.Enumeration;
-import java.util.Set;
-import java.util.logging.Logger;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
+
+import java.util.Enumeration;
+import java.util.Set;
+import java.util.logging.Logger;
 
 @UnAdaptableTest
 //@PerfTestSuite

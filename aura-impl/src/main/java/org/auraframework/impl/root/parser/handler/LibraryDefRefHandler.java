@@ -26,8 +26,10 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.library.LibraryDefRefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -53,8 +55,8 @@ public class LibraryDefRefHandler extends XMLHandler<LibraryDefRef> {
     }
 
     public LibraryDefRefHandler(RootTagHandler<? extends RootDefinition> parentHandler, XMLStreamReader xmlReader,
-            Source<?> source) {
-        super(xmlReader, source);
+                            Source<?> source, DefinitionService definitionService) {
+        super(xmlReader, source, definitionService);
         this.parentHandler = parentHandler;
     }
 
@@ -72,7 +74,8 @@ public class LibraryDefRefHandler extends XMLHandler<LibraryDefRef> {
         if (AuraTextUtil.isNullEmptyOrWhitespace(library)) {
             throw new InvalidDefinitionException(String.format("%s missing library attribute", TAG), getLocation());
         }
-        builder.setDescriptor(DefDescriptorImpl.getInstance(library.trim(), LibraryDef.class));
+        DefDescriptor<LibraryDef> descriptor = definitionService.getDefDescriptor(library.trim(), LibraryDef.class);
+        builder.setDescriptor(descriptor);
 
         String property = getAttributeValue(ATTRIBUTE_PROPERTY);
         if (AuraTextUtil.isNullEmptyOrWhitespace(property)) {
@@ -88,6 +91,7 @@ public class LibraryDefRefHandler extends XMLHandler<LibraryDefRef> {
         }
 
         builder.setOwnHash(source.getHash());
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PRIVATE));
 
         return builder.build();
     }

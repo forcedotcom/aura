@@ -15,10 +15,16 @@
  */
 package org.auraframework.util.type;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.springframework.context.annotation.Lazy;
+
+@Lazy
+@ServiceComponent
 public class BadConverter implements Converter<CustomPairType, String> {
 
     @Override
     public String convert(CustomPairType value) {
+    	
         return null;
     }
 

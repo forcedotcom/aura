@@ -29,5 +29,5 @@ public interface TokenDescriptorProvider extends Provider {
     /**
      * Returns a descriptor.
      */
-    public DefDescriptor<TokensDef> provide() throws QuickFixException;
+    DefDescriptor<TokensDef> provide() throws QuickFixException;
 }

@@ -18,25 +18,36 @@ package org.auraframework.test.java.provider;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.instance.Attribute;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.ComponentConfig;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Maps;
 
+import javax.inject.Inject;
+
+@ServiceComponentProvider
 public class MockConfigProvider implements ComponentConfigProvider {
 
+	@Inject
+	ContextService contextService;
+	
+	@Inject
+	DefinitionService definitionService;
+	
     @Override
     public ComponentConfig provide() throws QuickFixException {
-        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        BaseComponent<?, ?> component = contextService.getCurrentContext().getCurrentComponent();
         
         ComponentConfig config = new ComponentConfig();
-        config.setDescriptor(Aura.getDefinitionService().getDefDescriptor("markup://ui:outputText", ComponentDef.class)); 
+        config.setDescriptor(definitionService.getDefDescriptor("markup://ui:outputText", ComponentDef.class)); 
         String text = (String)component.getAttributes().getValue("providedAttribute");
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("value", text);

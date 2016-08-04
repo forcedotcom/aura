@@ -15,11 +15,9 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
@@ -29,12 +27,14 @@ import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 public class EventDefHandler extends RootTagHandler<EventDef> {
 
@@ -54,8 +54,11 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
         super();
     }
 
-    public EventDefHandler(DefDescriptor<EventDef> eventDefDescriptor, Source<?> source, XMLStreamReader xmlReader) {
-        super(eventDefDescriptor, source, xmlReader);
+    public EventDefHandler(DefDescriptor<EventDef> eventDefDescriptor, Source<?> source, XMLStreamReader xmlReader,
+                           boolean isInInternalNamespace, DefinitionService definitionService,
+                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(eventDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter,
+                definitionParserAdapter);
     }
 
     @Override
@@ -75,12 +78,14 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefImpl attributeDef = new AttributeDefHandler<>(this, xmlReader, source).getElement();
-            builder.getAttributeDefs().put(DefDescriptorImpl.getInstance(attributeDef.getName(), AttributeDef.class),
+            AttributeDefImpl attributeDef = new AttributeDefHandler<>(this, xmlReader, source, isInInternalNamespace,
+                    definitionService, configAdapter, definitionParserAdapter).getElement();
+            builder.getAttributeDefs().put(definitionService.getDefDescriptor(attributeDef.getName(), AttributeDef.class),
                     attributeDef);
         } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
             RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<>(this,
-                    xmlReader, source).getElement();
+                    xmlReader, source, isInInternalNamespace, definitionService, configAdapter,
+                    definitionParserAdapter).getElement();
             DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef
                     .getDescriptor();
             if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {

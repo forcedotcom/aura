@@ -17,26 +17,27 @@ package org.auraframework.impl.java.controller;
 
 import java.io.IOException;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.BackgroundAction;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
-@Controller
-public class ParallelActionTestController {
+@ServiceComponent
+public class ParallelActionTestController implements Controller {
 
-	private static int recordObjCounter = 0;
+    private static int recordObjCounter = 0;
 
 	@AuraEnabled
 	public static void executeInForeground() {
 
-	}
+    }
 
     @AuraEnabled
-    public static Record errorInForeground() {
+    public Record errorInForeground() {
         int foo[] = new int[2];
         // Throw our error:
         foo[42] = 42;
@@ -54,11 +55,11 @@ public class ParallelActionTestController {
 		return new Record(i);
 	}
 
-	@AuraEnabled
-	@BackgroundAction
-	public static Record executeInBackgroundWithReturn(@Key("i")int i) {
-		return new Record(i);
-	}
+    @AuraEnabled
+    @BackgroundAction
+    public Record executeInBackgroundWithReturn(@Key("i") int i) {
+        return new Record(i);
+    }
 
     @AuraEnabled
     public static String executeInForegroundWithStringReturn(@Key("s")String s) {
@@ -77,7 +78,7 @@ public class ParallelActionTestController {
         Integer counterValue;
 
         Record(Integer counter) {
-        	recordObjCounter ++;
+            recordObjCounter++;
             this.counterValue = counter;
         }
 

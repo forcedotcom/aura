@@ -19,8 +19,10 @@ package org.auraframework.impl.root.parser.handler.design;
 import org.auraframework.def.design.DesignItemsDef;
 import org.auraframework.def.design.DesignLayoutAttributeDef;
 import org.auraframework.def.design.DesignLayoutComponentDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.design.DesignItemsDefImpl;
 import org.auraframework.impl.root.parser.handler.BaseXMLElementHandler;
+import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -39,8 +41,9 @@ public class DesignItemsDefHandler extends BaseXMLElementHandler {
 
     public DesignItemsDefHandler(XMLStreamReader xmlReader, Source<?> source, boolean isInInternalNamespace) {
         super(xmlReader, source);
-        builder.setTagName(getTagName());
         this.isInInternalNamespace = isInInternalNamespace;
+        builder.setTagName(getTagName());
+        builder.setAccess(new DefinitionAccessImpl(isInInternalNamespace ? Access.INTERNAL : Access.PUBLIC));
     }
 
     @Override

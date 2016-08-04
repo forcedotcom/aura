@@ -15,13 +15,9 @@
  */
 package org.auraframework.test.perf.core;
 
-import java.lang.reflect.Constructor;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -43,9 +39,13 @@ import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
+import java.lang.reflect.Constructor;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @UnAdaptableTest
 // @PerfTestSuite
@@ -145,7 +145,7 @@ public class ComponentPerfTestSuite extends TestSuite {
 
                     Test test;
                     try {
-                        test = new ComponentTestSuite((DefDescriptor<ComponentDef>)descriptor);
+                        test = new ComponentTestSuite((DefDescriptor<ComponentDef>) descriptor);
                     } catch (Throwable t) {
                         test = new FailTestCase(descriptor, t);
                     }

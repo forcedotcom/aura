@@ -25,24 +25,54 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.HttpStatus;
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.resource.Bootstrap;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 public class BootstrapTest extends AuraImplTestCase {
+    @Inject
+    private DefinitionService definitionService;
 
-    ContextService contextService = Aura.getContextService();
+    @Inject
+    private ServletUtilAdapter servletUtilAdapter;
+
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @Inject
+    private ServerService serverService;
+
+    @Inject
+    private InstanceService instanceService;
+
+    @Inject
+    private ContextService contextService;
+
+    private Bootstrap getBootstrap() {
+        Bootstrap bootstrap = new Bootstrap();
+        bootstrap.setConfigAdapter(configAdapter);
+        bootstrap.setDefinitionService(definitionService);
+        bootstrap.setServletUtilAdapter(servletUtilAdapter);
+        bootstrap.setContextService(contextService);
+        bootstrap.setInstanceService(instanceService);
+        bootstrap.setServerService(serverService);
+        return bootstrap;
+    }
 
     @SuppressWarnings("unchecked")
     @Test
@@ -61,7 +91,7 @@ public class BootstrapTest extends AuraImplTestCase {
 
         ConfigAdapter configAdapter = mock(ConfigAdapter.class);
 
-        Bootstrap bootstrap = new Bootstrap();
+        Bootstrap bootstrap = getBootstrap();
         bootstrap.setConfigAdapter(configAdapter);
 
         // Force token validation to fail

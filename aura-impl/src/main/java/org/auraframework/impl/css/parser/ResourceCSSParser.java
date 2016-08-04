@@ -15,18 +15,31 @@
  */
 package org.auraframework.impl.css.parser;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ResourceDef;
 import org.auraframework.impl.clientlibrary.handler.ResourceDefHandler;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-
 /**
  * Class to handle resource CSS parsing.
  */
+@ServiceComponent
 public final class ResourceCSSParser implements Parser<ResourceDef> {
+
+    @Override
+    public Format getFormat() {
+        return Format.CSS;
+    }
+
+    @Override
+    public DefType getDefType() {
+        return DefType.RESOURCE;
+    }
+    
     @Override
     public ResourceDef parse(DefDescriptor<ResourceDef> descriptor,
             Source<ResourceDef> source) throws QuickFixException {

@@ -20,7 +20,9 @@ import java.util.List;
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.java.BaseJavaDefFactory;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -48,6 +50,7 @@ public class JavaRendererDefFactory extends BaseJavaDefFactory<RendererDef> {
         builder.setDescriptor(descriptor);
         builder.setLocation(rendererClass.getCanonicalName(), -1);
         builder.setRendererClass(rendererClass);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         return builder;
     }
 }

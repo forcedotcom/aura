@@ -15,22 +15,24 @@
  */
 package org.auraframework.impl.cache;
 
+import com.google.common.cache.CacheStats;
+import com.google.common.cache.RemovalCause;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
+import org.auraframework.adapter.LoggingAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.cache.Cache;
+import org.auraframework.system.LoggingContext;
+
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
-import org.auraframework.adapter.LoggingAdapter;
-import org.auraframework.cache.Cache;
-import org.auraframework.impl.AuraImpl;
-import org.auraframework.system.LoggingContext;
-
-import com.google.common.cache.CacheStats;
-import com.google.common.cache.RemovalCause;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
-
+@ServiceComponent
 public class CacheImpl<K, T> implements Cache<K, T> {
+    private LoggingAdapter loggingAdapter;
 
     /** A default name string */
     private static final String UNNAMED = "(unnamed)";
@@ -42,6 +44,8 @@ public class CacheImpl<K, T> implements Cache<K, T> {
 
         /** A name for the cache being listened to, to clarifiy in logs which one evicted */
         private final String name;
+
+        private final LoggingAdapter loggingAdapter;
 
         /** The cache for this listener, to fetch statistics. */
         private com.google.common.cache.Cache<K, T> cache;
@@ -55,8 +59,9 @@ public class CacheImpl<K, T> implements Cache<K, T> {
         /** Log the entire stats once a day, regardless of evictions. */
         private long lastFull = System.currentTimeMillis();
 
-        EvictionListener(String name) {
+        EvictionListener(String name, LoggingAdapter adapter) {
             this.name = name == null ? UNNAMED : name;
+            this.loggingAdapter = adapter;
         }
 
         void setCache(com.google.common.cache.Cache<K, T> cache) {
@@ -65,7 +70,6 @@ public class CacheImpl<K, T> implements Cache<K, T> {
 
         @Override
         public void onRemoval(RemovalNotification<K, T> notification) {
-            LoggingAdapter adapter = AuraImpl.getLoggingAdapter();
             boolean dayHasPassed = (System.currentTimeMillis() >= lastFull + ONE_DAY);
 
             if (notification.getCause() == RemovalCause.SIZE) {
@@ -86,8 +90,8 @@ public class CacheImpl<K, T> implements Cache<K, T> {
                         nextLogThreshold += 1000;
                     }
                 }
-                if (emit && adapter != null && adapter.isEstablished()) {
-                    LoggingContext loggingCtx = adapter.getLoggingContext();
+                if (emit && loggingAdapter != null && loggingAdapter.isEstablished()) {
+                    LoggingContext loggingCtx = loggingAdapter.getLoggingContext();
                     CacheStats stats = cache.stats();
                     loggingCtx.logCacheInfo(name,
                             String.format("evicted %d entries for size pressure, hit rate=%.3f",
@@ -97,7 +101,7 @@ public class CacheImpl<K, T> implements Cache<K, T> {
                 }
             } else if (dayHasPassed) {
                 // Even without size pressure, we want to
-                LoggingContext loggingCtx = adapter.getLoggingContext();
+                LoggingContext loggingCtx = loggingAdapter.getLoggingContext();
                 CacheStats stats = cache.stats();
                 loggingCtx.logCacheInfo(name,
                         String.format("cache has little size pressure, hit rate=%.3f", stats.hitRate()),
@@ -107,8 +111,8 @@ public class CacheImpl<K, T> implements Cache<K, T> {
         }
     };
 
-    private final com.google.common.cache.Cache<K, T> cache;
-    private final String name;
+    private com.google.common.cache.Cache<K, T> cache;
+    private String name;
 
     CacheImpl(com.google.common.cache.Cache<K, T> cache) {
         this.cache = cache;
@@ -117,8 +121,7 @@ public class CacheImpl<K, T> implements Cache<K, T> {
 
     @Override
     public void logCacheStatus(String extraMessage) {
-    	LoggingAdapter adapter = AuraImpl.getLoggingAdapter();
-    	LoggingContext loggingCtx = adapter.getLoggingContext();
+        LoggingContext loggingCtx = this.loggingAdapter.getLoggingContext();
         CacheStats stats = cache.stats();
         loggingCtx.logCacheInfo(name,
                 String.format(extraMessage+"hit rate=%.3f", stats.hitRate()),
@@ -126,6 +129,8 @@ public class CacheImpl<K, T> implements Cache<K, T> {
     }
 
     public CacheImpl(Builder<K, T> builder) {
+        this.loggingAdapter = builder.loggingAdapter;
+        
         // if builder.useSecondaryStorage is true, we should try to use a
         // non-quava secondary-storage cache with streaming ability
 
@@ -142,7 +147,7 @@ public class CacheImpl<K, T> implements Cache<K, T> {
             cb = cb.softValues();
         }
 
-        EvictionListener<K, T> listener = new EvictionListener<>(builder.name);
+        EvictionListener<K, T> listener = new EvictionListener<>(builder.name, this.loggingAdapter);
         cb.removalListener(listener);
         cache = cb.build();
         name = builder.name;
@@ -213,9 +218,14 @@ public class CacheImpl<K, T> implements Cache<K, T> {
         return cache;
     }
 
-    public static class Builder<K, T> implements
-    org.auraframework.builder.CacheBuilder<K, T> {
+    @Inject
+    public void setLoggingAdapter(LoggingAdapter adapter) {
+        this.loggingAdapter = adapter;
+    }
+
+    public static class Builder<K, T> implements org.auraframework.builder.CacheBuilder<K, T> {
         // builder defaults
+        LoggingAdapter loggingAdapter;
         int initialCapacity = 128;
         int concurrencyLevel = 4;
         long maximumSize = 1024;
@@ -225,7 +235,6 @@ public class CacheImpl<K, T> implements Cache<K, T> {
         String name;
 
         public Builder() {
-
         }
 
         @Override
@@ -233,6 +242,14 @@ public class CacheImpl<K, T> implements Cache<K, T> {
             this.initialCapacity = initialCapacity;
             return this;
         };
+
+        @Override
+        public Builder<K, T> setLoggingAdapter(LoggingAdapter loggingAdapter) {
+            this.loggingAdapter = loggingAdapter;
+            return this;
+        }
+
+        ;
 
         @Override
         public Builder<K, T> setMaximumSize(long maximumSize) {
@@ -274,7 +291,5 @@ public class CacheImpl<K, T> implements Cache<K, T> {
         public CacheImpl<K, T> build() {
             return new CacheImpl<>(this);
         }
-
     }
-
 }

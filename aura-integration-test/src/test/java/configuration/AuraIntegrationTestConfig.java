@@ -15,12 +15,7 @@
  */
 package configuration;
 
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.auraframework.adapter.RegistryAdapter;
-import org.auraframework.integration.test.configuration.JettyTestServletConfig;
 import org.auraframework.integration.test.service.DefinitionServiceImplTest.AuraTestRegistryProviderWithNulls;
 import org.auraframework.integration.test.util.SeleniumServerLauncher;
 import org.auraframework.test.util.PooledRemoteWebDriverFactory;
@@ -29,13 +24,15 @@ import org.auraframework.test.util.SauceUtil;
 import org.auraframework.test.util.WebDriverProvider;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
-import org.auraframework.util.test.configuration.TestServletConfig;
 import org.auraframework.util.test.util.TestInventory;
 import org.openqa.selenium.net.PortProber;
 
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @AuraConfiguration
 public class AuraIntegrationTestConfig {
-    private static TestServletConfig testServletConfig = null;
     private static WebDriverProvider webDriverProvider = null;
 
     @Impl(name = "auraIntegrationTestInventory")
@@ -46,14 +43,6 @@ public class AuraIntegrationTestConfig {
     @Impl
     public static RegistryAdapter auraImplTestRegistryAdapterWithNulls() {
         return new AuraTestRegistryProviderWithNulls();
-    }
-
-    @Impl
-    public synchronized static TestServletConfig auraJettyServletTestInfo() throws Exception {
-        if (testServletConfig == null) {
-            testServletConfig = new JettyTestServletConfig();
-        }
-        return testServletConfig;
     }
 
     @Impl

@@ -15,12 +15,7 @@
  */
 package org.auraframework.integration.test.root.parser.handler;
 
-import java.util.List;
-
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.AttributeDefRef;
@@ -40,7 +35,16 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.junit.Test;
 
+import javax.inject.Inject;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.List;
+
 public class AttributeDefHandlerTest extends AuraImplTestCase {
+    @Inject
+    private DefinitionParserAdapter definitionParserAdapter;
+    
     DefDescriptor<AttributeDef> desc = null;
     StringSource<AttributeDef> componentSource = null;
     XMLStreamReader componentXmlReader = null;
@@ -52,7 +56,8 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
         desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         componentSource = new StringSource<>(desc, "<aura:component/>", "myID", Format.XML);
         componentXmlReader = getXmlReader(componentSource);
-        cdh = new ComponentDefHandler(null, componentSource, componentXmlReader);
+        cdh = new ComponentDefHandler(null, componentSource, componentXmlReader, true, definitionService, contextService,
+                configAdapter, definitionParserAdapter);
     }
 
     @Test
@@ -230,11 +235,11 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
     }
 
     private AttributeDefHandler<ComponentDef> getHandler(String attrMarkup) throws Exception {
-        StringSource<AttributeDef> attributeSource = new StringSource<>(desc, attrMarkup, "myID",
-                Format.XML);
+        StringSource<AttributeDef> attributeSource = new StringSource<>(desc, attrMarkup,
+                "myID", Format.XML);
         XMLStreamReader attributeXmlReader = getXmlReader(attributeSource);
-        return new AttributeDefHandler<>(cdh, attributeXmlReader,
-                attributeSource);
+        return new AttributeDefHandler<>(cdh, attributeXmlReader, attributeSource, true, definitionService,
+                configAdapter, definitionParserAdapter);
     }
 
     private AttributeDefImpl getElement(String attrMarkup) throws Exception {

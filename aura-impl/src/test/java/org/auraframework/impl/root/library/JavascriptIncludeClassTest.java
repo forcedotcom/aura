@@ -22,14 +22,20 @@ import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.def.DefinitionTest;
+import org.auraframework.impl.root.library.IncludeDefRefImpl;
 import org.auraframework.impl.javascript.BaseJavascriptClass;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
+import org.mockito.Answers;
+import org.mockito.Mock;
 
 public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
 
     IncludeDefRefImpl.Builder builder = new IncludeDefRefImpl.Builder();
+
+    @Mock(answer = Answers.RETURNS_MOCKS)
+    DefDescriptor<IncludeDef> descriptor;
 
     @Test
     public void testSerializeMinimal() throws Exception {
@@ -149,7 +155,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
                 LibraryDef.class, null);
         DefDescriptor<IncludeDef> extImportDesc = getAuraTestingUtil().createStringSourceDescriptor("thirdimport",
                 IncludeDef.class, extLibDesc);
-
+        
         addSourceAutoCleanup(import1Desc, code);
         addSourceAutoCleanup(import2Desc, code);
         addSourceAutoCleanup(extImportDesc, code);

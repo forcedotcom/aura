@@ -15,14 +15,28 @@
  */
 package org.auraframework.impl.javascript.parser;
 
-import org.auraframework.def.ProviderDef;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.javascript.parser.handler.JavascriptProviderDefHandler;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+@ServiceComponent
 public class JavascriptProviderParser implements Parser<ProviderDef> {
+
+    @Override
+    public Format getFormat() {
+        return Format.JS;
+    }
+
+    @Override
+    public DefType getDefType() {
+        return DefType.PROVIDER;
+    }
+    
     @Override
     public ProviderDef parse(DefDescriptor<ProviderDef> descriptor, Source<ProviderDef> source)
             throws QuickFixException {

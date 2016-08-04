@@ -15,27 +15,54 @@
  */
 package org.auraframework.tools.javascript;
 
+import org.auraframework.AuraConfiguration;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.impl.javascript.AuraJavascriptGroup;
+import org.auraframework.impl.source.AuraResourcesHashingGroup;
+import org.auraframework.impl.util.AuraImplFiles;
+import org.auraframework.util.FileMonitor;
+import org.auraframework.util.resource.CompiledGroup;
+import org.auraframework.util.resource.HashingGroup;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+
+import javax.inject.Inject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.auraframework.impl.javascript.AuraJavascriptGroup;
-import org.auraframework.impl.source.AuraResourcesHashingGroup;
-import org.auraframework.util.resource.CompiledGroup;
-import org.auraframework.util.resource.HashingGroup;
-import org.auraframework.impl.util.AuraImplFiles;
-
 /**
  * main method for generating aura framework javascript files
  */
+@ServiceComponent
 public class GenerateJavascript {
     public static void main(String[] args) throws IOException {
+        AbstractApplicationContext context = new AnnotationConfigApplicationContext(AuraConfiguration.class);
+        try {
+            context.registerShutdownHook();
+
+            System.err.println("Generating javascript classpath:");
+            System.err.println(System.getProperty("java.class.path"));
+            GenerateJavascript bean = context.getBean(GenerateJavascript.class);
+            bean.generate();
+
+            // No waiting for jvm to realize we're done.
+            System.exit(0);
+        } finally {
+            context.close();
+        }
+    }
+
+    @Inject
+    private FileMonitor fileMonitor;
+
+    private void generate() throws IOException {
         Logger logger = Logger.getLogger(GenerateJavascript.class.getName());
         // aura js
         logger.info("Generating framework javascript");
-        AuraJavascriptGroup js = new AuraJavascriptGroup();
+        AuraJavascriptGroup js = new AuraJavascriptGroup(fileMonitor);
         // generate the js into this package, this one right here I say.
         File dest = AuraImplFiles.AuraResourceJavascriptDirectory.asFile();
         if (!dest.exists()) {
@@ -61,7 +88,7 @@ public class GenerateJavascript {
 
         // resources
         // Create hashing group for aura resources. Doesn't need to parse or generate. Just hash it.
-        HashingGroup resourceJs = new AuraResourcesHashingGroup();
+        HashingGroup resourceJs = new AuraResourcesHashingGroup(fileMonitor);
         props = new Properties();
         props.setProperty(CompiledGroup.UUID_PROPERTY, resourceJs.getGroupHash().toString());
         props.setProperty(CompiledGroup.LASTMOD_PROPERTY, Long.toString(resourceJs.getLastMod()));
@@ -70,9 +97,5 @@ public class GenerateJavascript {
         logger.info("Saving resources version to filesystem");
         props.store(writer, "Aura resources version information by GenerateJavascript");
         writer.close();
-
-        // No waiting for jvm to realize we're done.
-        System.exit(0);
     }
-
 }

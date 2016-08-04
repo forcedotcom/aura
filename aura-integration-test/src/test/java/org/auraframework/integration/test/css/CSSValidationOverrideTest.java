@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test.css;
 
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -27,6 +27,8 @@ import org.auraframework.throwable.quickfix.StyleParserException;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
 
+import javax.inject.Inject;
+
 /**
  * Automation to verify that CSS validation override. Aura enforces validation of CSS in component bundles. This css
  * validation can be configured in a aura.conf file. The aura.conf file should be at one of the Java classpath roots of
@@ -34,6 +36,10 @@ import org.junit.Test;
  */
 
 public class CSSValidationOverrideTest extends AuraImplTestCase {
+    @Inject
+    private ConfigAdapter configAdapter;
+
+
     private Source<StyleDef> getInvalidStyleSource() {
         DefDescriptor<StyleDef> styleDefDesc = definitionService.getDefDescriptor("css://fake.name", StyleDef.class);
         return new StringSource<StyleDef>(styleDefDesc, 
@@ -46,11 +52,10 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
      */
     @Test
     public void testDefaultProps() throws Exception {
-        assertTrue("By default all component CSS should be validated",
-                Aura.getConfigAdapter().validateCss());
+        assertTrue("By default all component CSS should be validated", configAdapter.validateCss());
         Source<StyleDef> source = getInvalidStyleSource();
         try {
-            new StyleParser(true).parse(source.getDescriptor(), source).validateDefinition();
+            new StyleParser.WithValidation().parse(source.getDescriptor(), source).validateDefinition();
             fail("Expected CSS validation to be turned on and catch the invalid CSS");
         } catch (StyleParserException expected) {
             assertTrue("Unexpected error message in StyleParserException",
@@ -65,8 +70,8 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
     @Test
     public void testOverrideCSSValidation() throws Exception {
         getMockConfigAdapter().setValidateCss(false);
-        assertFalse("Expected CSS validation to be overriden.", Aura.getConfigAdapter().validateCss());
+        assertFalse("Expected CSS validation to be overriden.", configAdapter.validateCss());
         Source<StyleDef> source = getInvalidStyleSource();
-        new StyleParser(true).parse(source.getDescriptor(), source);
+        new StyleParser.WithValidation().parse(source.getDescriptor(), source);
     }
 }

@@ -16,15 +16,12 @@
 
 package org.auraframework.integration.test.javascript.parser;
 
-import java.util.List;
-import java.util.Map;
-
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.components.AuraComponentsFiles;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.parser.JavascriptTestSuiteParser;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestCaseDef;
@@ -32,21 +29,32 @@ import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.FileMonitor;
 import org.auraframework.util.ServiceLocator;
 import org.junit.Test;
 
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
+
 public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
+    @Inject
+    DefinitionService definitionService;
+
+    @Inject
+    private FileMonitor fileMonitor;
+    
     /**
      * Test method for {@link JavascriptParser#parse(DefDescriptor, Source)}.
      */
     @Test
     public void testParse() throws Exception {
-        DefDescriptor<TestSuiteDef> descriptor = DefDescriptorImpl.getInstance(
+        DefDescriptor<TestSuiteDef> descriptor = definitionService.getDefDescriptor(
                 "js://test.testJSTestSuite", TestSuiteDef.class);
         Source<TestSuiteDef> source = getJavascriptSourceLoader().getSource(descriptor);
         // Step 1: Parse the source which refers to a simple component with a
@@ -67,7 +75,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
      */
     @Test
     public void testNullCases() throws Exception {
-        DefDescriptor<TestSuiteDef> descriptor = DefDescriptorImpl.getInstance(
+        DefDescriptor<TestSuiteDef> descriptor = definitionService.getDefDescriptor(
                 "js://test.testNoJSControllers", TestSuiteDef.class);
         Source<TestSuiteDef> source = getJavascriptSourceLoader().getSource(descriptor);
         boolean failed = false;
@@ -109,7 +117,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
     @Test
     public void testJSTestSuite() throws Exception {
 
-        DefDescriptor<TestSuiteDef> descriptor = DefDescriptorImpl.getInstance(
+        DefDescriptor<TestSuiteDef> descriptor = definitionService.getDefDescriptor(
                 "js://test.testJSTestSuite", TestSuiteDef.class);
         Source<TestSuiteDef> source = getJavascriptSourceLoader().getSource(descriptor);
 
@@ -180,7 +188,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
 
     @Test
     public void testJSTestSuiteWithoutAttributes() throws Exception {
-        DefDescriptor<TestSuiteDef> descriptor = DefDescriptorImpl.getInstance(
+        DefDescriptor<TestSuiteDef> descriptor = definitionService.getDefDescriptor(
                 "js://test.testJSTestSuiteWithoutAttributes",
                 TestSuiteDef.class);
         Source<TestSuiteDef> source = getJavascriptSourceLoader().getSource(descriptor);
@@ -261,7 +269,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
 
     private BaseSourceLoader getJavascriptSourceLoader() {
         if (AuraComponentsFiles.TestComponents.asFile().exists()) {
-            return new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
+            return new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile(), fileMonitor);
         } else {
             String pkg = ServiceLocator.get()
                     .get(ComponentLocationAdapter.class, "auraTestComponentLocationAdapterImpl")

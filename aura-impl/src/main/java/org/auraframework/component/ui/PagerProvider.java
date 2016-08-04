@@ -15,12 +15,15 @@
  */
 package org.auraframework.component.ui;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.system.Annotations.Provider;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -34,8 +37,14 @@ import com.google.common.collect.ImmutableMap;
  * Currently supports 'JumpToPage', 'NextPrevious' (default), 'PageInfo',
  * 'PageSize', or a namespaced component, eg. ns:CustomPager
  */
-@Provider
+@ServiceComponentProvider
 public class PagerProvider implements ComponentDescriptorProvider {
+	@Inject
+	ContextService contextService;
+	
+	@Inject
+	DefinitionService definitionService;
+	
     // attribute name
     private static final String TYPE_ATTRIBUTE = "type";
 
@@ -47,14 +56,14 @@ public class PagerProvider implements ComponentDescriptorProvider {
 
     @Override
     public DefDescriptor<ComponentDef> provide() throws QuickFixException {
-        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        BaseComponent<?, ?> component = contextService.getCurrentContext().getCurrentComponent();
         String type = (String) component.getAttributes().getValue(TYPE_ATTRIBUTE);
         if (type == null) {
             type = "";
         }
         String typeDescriptor = type.contains(":") ? type : typeMap.get(type);
         if (typeDescriptor != null) {
-            return Aura.getDefinitionService().getDefDescriptor(typeDescriptor, ComponentDef.class);
+            return definitionService.getDefDescriptor(typeDescriptor, ComponentDef.class);
         }
         throw new AuraRuntimeException("Unknown type attribute specified for ui:pager '" + type
                 + "'. Remove the type attribute or use one of the following values: '"

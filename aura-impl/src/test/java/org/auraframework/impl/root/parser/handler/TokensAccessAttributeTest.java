@@ -26,15 +26,20 @@ import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
+
+import javax.inject.Inject;
+
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 
 @UnAdaptableTest("when run in core, we throw error with different type.")
 // Tokens not supported in custom, namespaces at this time
 public class TokensAccessAttributeTest extends AuraImplTestCase {
 
-    private StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
+    @Inject
+    private ParserFactory parserFactory;
+
 	    
     /***********************************************************************************
      ******************* Tests for Internal Namespace start ****************************
@@ -50,7 +55,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -65,7 +70,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -86,7 +91,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -107,7 +112,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -130,7 +135,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -152,7 +157,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
             Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
             
-            Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+            Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
             Definition def = parser.parse(descriptor, source);
             try {
                 def.validateDefinition();
@@ -174,7 +179,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
         	def.validateDefinition();
@@ -199,7 +204,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -212,7 +217,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -225,7 +230,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
     }
@@ -238,7 +243,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -251,7 +256,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -270,7 +275,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -283,7 +288,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -297,7 +302,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -310,7 +315,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -323,7 +328,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -342,7 +347,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -365,7 +370,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -383,7 +388,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
         	def.validateDefinition();
@@ -402,7 +407,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
         	def.validateDefinition();
@@ -427,7 +432,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -451,7 +456,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -474,7 +479,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
         	def.validateDefinition();
@@ -499,7 +504,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
         	def.validateDefinition();
@@ -518,7 +523,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -537,7 +542,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
         	def.validateDefinition();
@@ -556,7 +561,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
         	def.validateDefinition();
@@ -575,7 +580,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
         	def.validateDefinition();
@@ -603,7 +608,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -618,7 +623,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -639,7 +644,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -660,7 +665,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -683,7 +688,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -705,7 +710,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
             Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
             
-            Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+            Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
             Definition def = parser.parse(descriptor, source);
             try {
                 def.validateDefinition();
@@ -727,7 +732,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -753,7 +758,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -766,7 +771,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -779,7 +784,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
     }
@@ -792,7 +797,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -812,7 +817,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -830,7 +835,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -849,7 +854,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -868,7 +873,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -887,7 +892,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -906,7 +911,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -931,7 +936,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -954,7 +959,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         def.validateDefinition();
     }
@@ -972,7 +977,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -991,7 +996,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -1016,7 +1021,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -1040,7 +1045,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -1063,7 +1068,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -1087,7 +1092,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try{
             def.validateDefinition();
@@ -1106,7 +1111,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -1125,7 +1130,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -1144,7 +1149,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();
@@ -1163,7 +1168,7 @@ public class TokensAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         Source<TokensDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<TokensDef> parser = ParserFactory.getParser(Format.XML, descriptor);
+        Parser<TokensDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
         try {
             def.validateDefinition();

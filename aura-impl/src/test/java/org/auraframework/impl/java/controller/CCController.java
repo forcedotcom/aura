@@ -15,15 +15,17 @@
  */
 package org.auraframework.impl.java.controller;
 
+
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 
-@Controller
-public class CCController {
+@ServiceComponent
+public class CCController implements Controller {
 
     @AuraEnabled
-    public static String echo(@Key("input") String input) throws Exception {
+    public String echo(@Key("input") String input) throws Exception {
         return "[" + input + "]";
     }
     

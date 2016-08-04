@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl.java.provider;
 
-import java.util.Map;
-
 import org.auraframework.def.TokenMapProvider;
 import org.auraframework.def.TokenMapProviderDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -26,17 +24,22 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * 
  * @see TokenMapProvider
  */
-final class JavaTokenMapProviderDef extends AbstractJavaProviderDef<TokenMapProvider, TokenMapProviderDef>
+public final class JavaTokenMapProviderDef extends AbstractJavaProviderDef<TokenMapProvider, TokenMapProviderDef>
         implements TokenMapProviderDef {
     private static final long serialVersionUID = -6882943436136564021L;
 
     public JavaTokenMapProviderDef(Builder builder) throws QuickFixException {
-        super(TokenMapProvider.class, builder);
+        super(builder);
     }
 
     @Override
-    public Map<String, String> provide() throws QuickFixException {
-        return provider.provide();
+    public Class<?> getProviderType() {
+        return TokenMapProvider.class;
+    }
+
+    @Override
+    public Class<?> getProviderClass() {
+        return this.providerClass;
     }
 
     public static final class Builder extends AbstractJavaProviderDef.Builder<TokenMapProviderDef> {

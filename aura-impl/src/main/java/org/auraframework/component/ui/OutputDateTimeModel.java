@@ -19,11 +19,12 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -33,12 +34,20 @@ import org.auraframework.util.date.DateServiceImpl;
 /**
  * A Aura model that backs the ui:outputDateTime Aura component.
  */
-@Model
-public class OutputDateTimeModel {
+@ServiceComponentModelInstance
+public class OutputDateTimeModel implements ModelInstance {
+
+    private ContextService contextService;
+    private LocalizationService localizationService;
+
+    OutputDateTimeModel(ContextService contextService, LocalizationService localizationService) {
+        this.contextService = contextService;
+        this.localizationService = localizationService;
+    }
 
     @AuraEnabled
     public String getText() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
 
         Calendar cal;
@@ -65,7 +74,6 @@ public class OutputDateTimeModel {
         Locale loc = null;
 
         String format = (String) component.getAttributes().getValue("format");
-        LocalizationService lclService = Aura.getLocalizationService();
 
         if (format == null) {
             String dateStyle = (String) component.getAttributes().getValue("dateStyle");
@@ -73,14 +81,14 @@ public class OutputDateTimeModel {
             DateService dateService = DateServiceImpl.get();
             int intDateStyle = dateService.getStyle(dateStyle);
             int intTimeStyle = dateService.getStyle(timeStyle);
-            return lclService.formatDateTime(cal.getTime(), loc, tz, intDateStyle, intTimeStyle);
+            return localizationService.formatDateTime(cal.getTime(), loc, tz, intDateStyle, intTimeStyle);
         } else {
             // no pattern, no result
             if (AuraTextUtil.isEmptyOrWhitespace(format)) {
                 return "";
             } else {
                 try {
-                    return lclService.formatDateTime(cal.getTime(), loc, tz, format);
+                    return localizationService.formatDateTime(cal.getTime(), loc, tz, format);
                 } catch (IllegalArgumentException e) {
                     return "You must provide a valid format: " + e.getMessage();
                 }

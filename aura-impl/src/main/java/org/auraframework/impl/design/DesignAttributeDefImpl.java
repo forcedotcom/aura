@@ -16,6 +16,7 @@
 package org.auraframework.impl.design;
 
 import com.google.common.collect.Sets;
+import org.auraframework.Aura;
 import org.auraframework.builder.design.DesignAttributeDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
@@ -23,7 +24,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -172,11 +172,11 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
 
-        ComponentDef cmp = DefDescriptorImpl.getInstance(getParentDescriptor().getQualifiedName(),
+        ComponentDef cmp = Aura.getDefinitionService().getDefDescriptor(getParentDescriptor().getQualifiedName(),
                 ComponentDef.class).getDef();
         AttributeDef attr = cmp.getAttributeDef(getName());
         if (attr == null || !attr.getName().equals(getName())) {
-            throw new DefinitionNotFoundException(DefDescriptorImpl.getInstance(getName(),
+            throw new DefinitionNotFoundException(Aura.getDefinitionService().getDefDescriptor(getName(),
                     AttributeDef.class));
         }
         if(!isInInternalNamespace && getDataSource() != null){

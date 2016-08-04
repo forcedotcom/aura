@@ -15,14 +15,16 @@
  */
 package org.auraframework.impl.renderer.sampleJavaRenderers;
 
-import java.io.IOException;
-import java.util.Map;
-
+import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import java.io.IOException;
+import java.util.Map;
+
+@ServiceComponentRenderer
 public class RendererWithExtendedApp extends AbstractRendererForTestingIntegrationService implements
         Renderer {
 

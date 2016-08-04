@@ -25,23 +25,26 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import junit.framework.Test;
 
-import org.auraframework.Aura;
+import org.auraframework.ds.servicecomponent.ModelInstance;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 
 /**
  * This model exposes a view on the {@link TestSetRunnerState} for
  * {@link AuraEnabled} access. Because all the model state is shared, this class
  * itself does not hold any state.
  */
-@Model
+@ServiceComponentModelInstance
 @ThreadSafe
-public class TestSetRunnerModel {
+public class TestSetRunnerModel implements ModelInstance {
 	private String scope;
+
 	
-	public TestSetRunnerModel() throws QuickFixException {
-		Object scope_param = Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("scope");
+	public TestSetRunnerModel(ContextService contextService) throws QuickFixException {
+		Object scope_param;
+		scope_param = contextService.getCurrentContext().getCurrentComponent().getAttributes().getValue("scope");
 		if(scope_param!=null) {
 			scope = scope_param.toString();
 		}

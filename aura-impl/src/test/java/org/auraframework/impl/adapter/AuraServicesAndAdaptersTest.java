@@ -20,7 +20,6 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.util.ServiceLoaderImpl;
 import org.auraframework.util.ServiceLocator;
-import org.auraframework.util.sampleServices.UnimplementedService;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
@@ -39,9 +38,5 @@ public class AuraServicesAndAdaptersTest extends AuraImplTestCase {
         assertNotNull(c);
         assertTrue("Expected MockConfigAdapterImpl to be registered in AuraImplTestConfig",
                 c instanceof MockConfigAdapterImpl);
-        assertTrue("Failed to get expected implementation of service.",
-                Aura.get(ConfigAdapter.class) instanceof MockConfigAdapterImpl);
-        assertNull("Aura.get() returned implementations for an unimplemented service.",
-                Aura.get(UnimplementedService.class));
     }
 }

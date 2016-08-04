@@ -15,26 +15,26 @@
  */
 package org.auraframework.impl.adapter.format.json;
 
-import java.io.IOException;
-import java.util.Collection;
-
-import javax.annotation.concurrent.ThreadSafe;
-
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.EventDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 
-import aQute.bnd.annotation.component.Component;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Event JSON format adapter.
  */
 @ThreadSafe
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class EventDefJSONFormatAdapter extends JSONFormatAdapter<EventDef> {
+    @Inject
+    private ContextService contextService;
 
     @Override
     public Class<EventDef> getType() {
@@ -44,8 +44,7 @@ public class EventDefJSONFormatAdapter extends JSONFormatAdapter<EventDef> {
     @Override
     public void writeCollection(Collection<? extends EventDef> values, Appendable out) throws IOException,
             QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         JsonEncoder.serialize(values, out, context.getJsonSerializationContext());
     }
-
 }

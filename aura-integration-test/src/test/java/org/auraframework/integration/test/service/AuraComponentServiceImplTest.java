@@ -15,19 +15,19 @@
  */
 package org.auraframework.integration.test.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class AuraComponentServiceImplTest extends AuraImplTestCase {
+
     @Test
     public void testGetComponent() throws Exception {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("attr", "yo");
-        assertNotNull(Aura.getInstanceService().getInstance("test:child1", ComponentDef.class, attributes));
+        assertNotNull(instanceService.getInstance("test:child1", ComponentDef.class, attributes));
     }
 }

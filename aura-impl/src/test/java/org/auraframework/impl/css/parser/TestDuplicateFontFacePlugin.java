@@ -15,7 +15,7 @@
  */
 package org.auraframework.impl.css.parser;
 
-import org.auraframework.Aura;
+import com.google.common.collect.Lists;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
@@ -24,8 +24,7 @@ import org.auraframework.impl.adapter.format.css.StyleDefCSSFormatAdapter;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.parser.plugin.DuplicateFontFacePlugin;
 import org.auraframework.throwable.AuraRuntimeException;
-
-import com.google.common.collect.Lists;
+import org.junit.Test;
 
 public class TestDuplicateFontFacePlugin extends StyleTestCase {
     private DuplicateFontFacePlugin fontFamilyPlugin;
@@ -44,6 +43,7 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         return adapter;
     }
 
+    @Test
     public void testNoErrorOnDifferentFonts() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin());
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; src: url(Custom1.woff)}");
@@ -51,10 +51,11 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
-        cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc1), Aura.getDefinitionService().getDefinition(desc2)), out);
+        cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), definitionService.getDefinition(desc2)), out);
         // no error
     }
 
+    @Test
     public void testErrorsOnDupeFontsSameFile() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin());
         String s = "@font-face {font-family: Custom1; src: url(Custom1.woff)}";
@@ -63,13 +64,14 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc)), out);
+            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");
         }
     }
 
+    @Test
     public void testErrorsOnDupeFontsDifferentFiles() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin());
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; src: url(Custom1.woff)}");
@@ -79,15 +81,16 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc1), 
-            		Aura.getDefinitionService().getDefinition(desc2), 
-            		Aura.getDefinitionService().getDefinition(desc3)), out);
+            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+            		definitionService.getDefinition(desc2), 
+            		definitionService.getDefinition(desc3)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");
         }
     }
 
+    @Test
     public void testErrorsOnDupeQuotedAndUnquoted() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin());
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; src: url(Custom1.woff)}");
@@ -96,14 +99,15 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc1),
-            		Aura.getDefinitionService().getDefinition(desc2)), out);
+            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1),
+            		definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");
         }
     }
 
+    @Test
     public void testErrorsOnDupeDifferentQuotes() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin());
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: 'Custom1'; src: url(Custom1.woff)}");
@@ -112,14 +116,15 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc1), 
-            		Aura.getDefinitionService().getDefinition(desc2)), out);
+            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+            		definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");
         }
     }
 
+    @Test
     public void testSamePropsCheckAllOn() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(false, true));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
@@ -128,14 +133,15 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc1), 
-            		Aura.getDefinitionService().getDefinition(desc2)), out);
+            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+            		definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");
         }
     }
 
+    @Test
     public void testSamePropsCheckAllOff() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(false, false));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
@@ -144,14 +150,15 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc1), 
-            		Aura.getDefinitionService().getDefinition(desc2)), out);
+            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+            		definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");
         }
     }
 
+    @Test
     public void testDifferentPropsCheckAllOn() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(false, true));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
@@ -159,11 +166,12 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
-        cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc1), 
-        		Aura.getDefinitionService().getDefinition(desc2)), out);
+        cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+        		definitionService.getDefinition(desc2)), out);
         // no error
     }
 
+    @Test
     public void testDifferentPropsCheckAllOff() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(false, false));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
@@ -172,14 +180,15 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc1), 
-            		Aura.getDefinitionService().getDefinition(desc2)), out);
+            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+            		definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");
         }
     }
 
+    @Test
     public void testSamePropsBothHaveAnnotation() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(true, false));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
@@ -187,11 +196,12 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
-        cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc1), 
-        		Aura.getDefinitionService().getDefinition(desc2)), out);
+        cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+        		definitionService.getDefinition(desc2)), out);
         // no error
     }
 
+    @Test
     public void testSamePropsOnlyFirstHasAnnotation() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(true, false));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
@@ -200,14 +210,15 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc1), 
-            		Aura.getDefinitionService().getDefinition(desc2)), out);
+            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+            		definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");
         }
     }
 
+    @Test
     public void testSamePropsOnlySecondHasAnnotation() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(true, false));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
@@ -216,13 +227,14 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc1), Aura.getDefinitionService().getDefinition(desc2)), out);
+            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");
         }
     }
 
+    @Test
     public void testSamePropsBothHaveAnnotationButNotAllowed() throws Exception {
         StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(false, false));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
@@ -231,7 +243,7 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
         cssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(Aura.getDefinitionService().getDefinition(desc1), Aura.getDefinitionService().getDefinition(desc2)), out);
+            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");

@@ -20,7 +20,11 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
-import org.apache.http.*;
+import javax.inject.Inject;
+
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -30,16 +34,15 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.CSP;
-import org.auraframework.service.ContextService;
-import org.auraframework.system.*;
+import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.IntegrationTest;
 import org.auraframework.util.test.configuration.TestServletConfig;
@@ -57,10 +60,17 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 @RunWith(BlockJUnit4ClassRunner.class)
 @TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class})
 @ContextConfiguration(locations = {"/applicationContext.xml"})
-public abstract class IntegrationTestCase extends AuraTestCase {
-    private TestServletConfig servletConfig = null;
+public abstract class IntegrationTestCase extends AuraImplTestCase {
+
+    @Inject
+    private TestServletConfig testServletConfig;
+    
     private HttpClient httpClient = null;
 
+    protected IntegrationTestCase() {
+        setShouldSetupContext(false);
+    }
+    
     @Override
     public void tearDown() throws Exception {
         if (httpClient != null) {
@@ -81,21 +91,13 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         return getTestServletConfig().getCsrfToken();
     }
 
-    protected TestServletConfig getTestServletConfig() {
-        if (servletConfig == null) {
-            servletConfig = Aura.get(TestServletConfig.class);
-        }
-        return servletConfig;
-    }
-
     /**
      * Start a context and set up default values.
      */
     protected AuraContext setupContext(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc)
             throws QuickFixException {
-        ContextService contextService = Aura.getContextService();
         AuraContext ctxt = contextService.startContext(mode, format, Authentication.AUTHENTICATED, desc);
-        ctxt.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+        ctxt.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
         String uid = ctxt.getDefRegistry().getUid(null, desc);
         ctxt.addLoaded(desc, uid);
         return ctxt;
@@ -235,4 +237,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
                 DefType.APPLICATION.equals(desc.getDefType()) ? "app" : "cmp");
     }
 
+    protected TestServletConfig getTestServletConfig() {
+        return testServletConfig;
+    }
 }

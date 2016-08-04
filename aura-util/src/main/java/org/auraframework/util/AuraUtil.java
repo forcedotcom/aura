@@ -16,20 +16,11 @@
 package org.auraframework.util;
 
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.util.adapter.SourceControlAdapter;
 
 /**
  * Entry point for accessing Aura services
  */
 public class AuraUtil {
-    /**
-     * Get the Source Control Adapter : Allows interaction with the source
-     * control system.
-     */
-    public static SourceControlAdapter getSourceControlAdapter() {
-        return AuraUtil.get(SourceControlAdapter.class);
-    }
-
     public static <T extends AuraServiceProvider> T get(Class<T> type) {
         return ServiceLocator.get().get(type);
     }

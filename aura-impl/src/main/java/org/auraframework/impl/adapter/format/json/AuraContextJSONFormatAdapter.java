@@ -15,19 +15,15 @@
  */
 package org.auraframework.impl.adapter.format.json;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
-import aQute.bnd.annotation.component.Component;
+import java.io.IOException;
+import java.util.Map;
 
-/**
- */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class AuraContextJSONFormatAdapter extends JSONFormatAdapter<AuraContext> {
 
     @Override
@@ -40,5 +36,4 @@ public class AuraContextJSONFormatAdapter extends JSONFormatAdapter<AuraContext>
         JsonSerializationContext s = value.getJsonSerializationContext();
         JsonEncoder.serialize(value, out, s);
     }
-
 }

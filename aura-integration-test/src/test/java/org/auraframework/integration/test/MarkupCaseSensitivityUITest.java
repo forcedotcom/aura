@@ -17,21 +17,20 @@ package org.auraframework.integration.test;
 
 import java.util.List;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.LibraryDefRef;
 import org.auraframework.integration.test.error.AbstractErrorUITestCase;
-import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Source;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Source;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -46,7 +45,7 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
 	private final String testLibButtonClass = "button_tryOutLibs";
 	
     @Test
-    public void testDummy() {
+	public void testDummy() {
 		return;
 	}
 	
@@ -59,20 +58,21 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
      * we modify test_Library.lib, change all basicFirst to BASICFirst (wrong case, BASICFirst.js doesn't exist)
      * then reload the testApp, it still loads fine, and what we changed is updated in lib too (verify through helper).
          fix it and enable plz: W-2984818	
-       */
+	 */
 	@UnAdaptableTest("SFDC chrome autobuild doesn't pick up source change, not sure why.")
 	@ThreadHostileTest("We are messing up with source during the test, if you load other cmp/app at the same time, it might get wrong source")
-	public void _testLibFileChangeAfterCached() throws Exception {
+        @Ignore("W-2984848")
+	@Test
+	public void testLibFileChangeAfterCached() throws Exception {
 		//load the test app, and verify the lib loads fine
 		String url = "/"+testAppNamespace+"/"+testAppName+".app";
         open(url, Mode.DEV);
         waitForElementAppear(By.className(testLibButtonClass));
         findDomElement(By.className(testLibButtonClass)).click();
         //change lib source
-        ContextService service = Aura.getContextService();
-        AuraContext context = service.getCurrentContext();
+		AuraContext context = contextService.getCurrentContext();
         if (context == null) {
-            context = service.startContext(Mode.SELENIUM, Format.HTML,
+			context = contextService.startContext(Mode.SELENIUM, Format.HTML,
                     Authentication.AUTHENTICATED);
         }
         ApplicationDef ad = definitionService.getDefinition(

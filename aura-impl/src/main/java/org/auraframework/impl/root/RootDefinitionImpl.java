@@ -15,12 +15,10 @@
  */
 package org.auraframework.impl.root;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
@@ -28,14 +26,15 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Shared definition code between component and event definition.
@@ -79,7 +78,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
     @Override
     public RequiredVersionDef getRequiredVersion(String namespace) {
-        return requiredVersionDefs.get(DefDescriptorImpl.getInstance(namespace, RequiredVersionDef.class));
+        return requiredVersionDefs.get(Aura.getDefinitionService().getDefDescriptor(namespace, RequiredVersionDef.class));
     }
 
     @Override
@@ -111,7 +110,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
     @Override
     public AttributeDef getAttributeDef(String name) throws QuickFixException {
-        return getAttributeDefs().get(DefDescriptorImpl.getInstance(name, AttributeDef.class));
+        return getAttributeDefs().get(Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class));
     }
 
     public abstract static class Builder<T extends RootDefinition> extends DefinitionImpl.BuilderImpl<T> implements
@@ -133,11 +132,11 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
             if (this.providerDescriptors == null) {
                 this.providerDescriptors = Lists.newArrayList();
             }
-            this.providerDescriptors.add(DefDescriptorImpl.getInstance(name, ProviderDef.class));
+            this.providerDescriptors.add(Aura.getDefinitionService().getDefDescriptor(name, ProviderDef.class));
         }
 
         public Builder<T> setDocumentation(String name) {
-            documentationDescriptor = DefDescriptorImpl.getInstance(name, DocumentationDef.class);
+            documentationDescriptor = Aura.getDefinitionService().getDefDescriptor(name, DocumentationDef.class);
             return this;
         }
 

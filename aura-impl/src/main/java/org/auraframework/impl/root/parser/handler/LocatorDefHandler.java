@@ -20,9 +20,12 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.LocatorDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.locator.LocatorDefImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -40,8 +43,11 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
 
     private final LocatorDefImpl.Builder builder = new LocatorDefImpl.Builder();
 
-    public LocatorDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(parentHandler, xmlReader, source);
+    public LocatorDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                             boolean isInInternalNamespace, DefinitionService definitionService,
+                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter,
+                definitionParserAdapter);
     }
 
     public LocatorDefHandler() {
@@ -58,7 +64,8 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
         String tag = getTagName();
         if (LocatorContextDefHandler.TAG.equals(tag)) {
             // to resolve expressions in locator context definitions, we need to pass in the component as the parent
-            builder.addLocatorContext(new LocatorContextDefHandler<>(this.getParentHandler(), xmlReader, source).getElement());
+            builder.addLocatorContext(new LocatorContextDefHandler<>(this.getParentHandler(), xmlReader, source,
+                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter).getElement());
         } else {
             error("Found unexpected tag inside aura:locator. %s", tag);
         }

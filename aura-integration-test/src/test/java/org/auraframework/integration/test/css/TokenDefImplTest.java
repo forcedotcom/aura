@@ -15,8 +15,7 @@
  */
 package org.auraframework.integration.test.css;
 
-import java.util.List;
-
+import com.google.common.collect.ImmutableList;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokenDef;
@@ -29,7 +28,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 
 /**
  * Unit tests for {@link TokenDefImpl}.

@@ -15,27 +15,21 @@
  */
 package org.auraframework.impl.adapter.format.json;
 
+import com.google.common.collect.Lists;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.impl.root.component.ComponentDefRefImpl;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.util.json.JsonReader;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.def.ComponentDefRef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.impl.root.component.ComponentDefRefImpl;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.util.json.JsonReader;
-
-import com.google.common.collect.Lists;
-
-import aQute.bnd.annotation.component.Component;
-
-/**
- */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ComponentDefRefJSONFormatAdapter extends JSONFormatAdapter<ComponentDefRef> {
-
     @Override
     public Class<ComponentDefRef> getType() {
         return ComponentDefRef.class;
@@ -70,5 +64,4 @@ public class ComponentDefRefJSONFormatAdapter extends JSONFormatAdapter<Componen
         }
         return ret;
     }
-
 }

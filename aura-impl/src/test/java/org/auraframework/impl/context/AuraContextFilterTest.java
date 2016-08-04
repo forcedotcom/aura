@@ -15,21 +15,41 @@
  */
 package org.auraframework.impl.context;
 
-import java.util.Locale;
-import java.util.Vector;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.google.common.collect.ImmutableList;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.http.AuraContextFilter;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
-import com.google.common.collect.ImmutableList;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
+import java.util.Vector;
 
 public class AuraContextFilterTest extends AuraTestCase {
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private LoggingService loggingService;
+
+    @Inject
+    private DefinitionService definitionService;
+
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @Inject
+    private LocalizationAdapter localizationAdapter;
+
     private void assertContextPath(AuraContextFilter filter, HttpServletRequest mock, String input, String expected)
             throws Exception {
         Mockito.when(mock.getContextPath()).thenReturn(input);
@@ -40,7 +60,14 @@ public class AuraContextFilterTest extends AuraTestCase {
 
     @Test
     public void testStartContextContextPath() throws Exception {
+    	System.out.println(definitionService.hashCode());
         AuraContextFilter filter = new AuraContextFilter();
+        filter.setContextService(contextService);
+        filter.setLoggingService(loggingService);
+        filter.setDefinitionService(definitionService);
+        filter.setConfigAdapter(configAdapter);
+        filter.setLocalizationAdapter(localizationAdapter);
+        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(filter);
         HttpServletRequest mock = Mockito.mock(HttpServletRequest.class);
         Mockito.when(mock.getLocales()).thenReturn(new Vector<>(ImmutableList.of(Locale.ENGLISH)).elements());
 

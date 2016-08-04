@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application model="java://org.auraframework.components.ui.MenuTestModel">
+<aura:application model="java://org.auraframework.components.ui.MenuItemsTestModel">
     <div style="display:inline-block;width:50%;vertical-align:top;">
             <h2>Extends menuItem - Focus Test</h2>
             <ui:menu aura:id="uiMenu" class="clubMenu">

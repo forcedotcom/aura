@@ -15,28 +15,26 @@
  */
 package org.auraframework.impl.controller;
 
-import java.util.Map;
-import java.util.Set;
-
-import org.auraframework.Aura;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
-import org.auraframework.impl.java.controller.JavaControllerDefImpl.Builder;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
-import org.auraframework.throwable.AuraUnhandledException;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @since 0.0.116
  */
-public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<ControllerDef> {
+public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Definition> {
 
     /**
      */
@@ -52,60 +50,53 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
     private static final Set<String> prefixes = Sets.newHashSet(PREFIX);
     private static final Set<DefType> defTypes = Sets.immutableEnumSet(DefType.CONTROLLER);
 
-    public static final AuraStaticControllerDefRegistry INSTANCE = new AuraStaticControllerDefRegistry();
-    private final Map<DefDescriptor<?>,Definition> allMap;
+    private static AuraStaticControllerDefRegistry INSTANCE;
+    private static Map<DefDescriptor<? extends Definition>, Definition> allMap;
 
-    protected AuraStaticControllerDefRegistry() {
-        super(defTypes, prefixes, null, getDefs());
+    protected AuraStaticControllerDefRegistry(DefinitionService definitionService) {
+        super(defTypes, prefixes, null, getDefs(definitionService));
+    }
 
-        ImmutableMap.Builder<DefDescriptor<?>, Definition> builder = new ImmutableMap.Builder<>();
-        for (Map.Entry<DefDescriptor<ControllerDef>, ControllerDef> entry : defs.entrySet()) {
-            builder.put(entry.getKey(), entry.getValue());
+    public static synchronized AuraStaticControllerDefRegistry getInstance(DefinitionService definitionService) {
+        if (INSTANCE == null) {
+            INSTANCE = new AuraStaticControllerDefRegistry(definitionService);
         }
-        allMap = builder.build();
+        return INSTANCE;
     }
 
-    private static Map<DefDescriptor<ControllerDef>, ControllerDef> getDefs() {
+    private static synchronized Collection<Definition> getDefs(DefinitionService definitionService) {
+        if (allMap == null) {
+            try {
+                JavaControllerDefFactory jcdf = new JavaControllerDefFactory(null, definitionService);
+                ImmutableMap.Builder<DefDescriptor<? extends Definition>, Definition> builder;
+                ControllerDef cd;
+                DefDescriptor<ControllerDef> descriptor;
 
-        Map<DefDescriptor<ControllerDef>, ControllerDef> ret = Maps.newHashMap();
+                builder = new ImmutableMap.Builder<>();
+                descriptor = new DefDescriptorImpl<>(COMPONENT_CONTROLLER, ControllerDef.class, null);
+                cd = jcdf.getDef_DONOTUSE(descriptor, ComponentController.class);
+                builder.put(cd.getDescriptor(), cd);
 
-        // Add Component Controller
-        Builder builder = getControllerBuilder(ComponentController.class, COMPONENT_CONTROLLER);
-        ret.put(builder.getDescriptor(), builder.build());
+                descriptor = new DefDescriptorImpl<>(LABEL_CONTROLLER, ControllerDef.class, null);
+                cd = jcdf.getDef_DONOTUSE(descriptor, LabelController.class);
+                builder.put(cd.getDescriptor(), cd);
 
-        // Add Label Controller
-        builder = getControllerBuilder(LabelController.class, LABEL_CONTROLLER);
-        // FIXME="need an md5";
-        ret.put(builder.getDescriptor(), builder.build());
+                descriptor = new DefDescriptorImpl<>(TIMEZONEINFO_CONTROLLER, ControllerDef.class, null);
+                cd = jcdf.getDef_DONOTUSE(descriptor, TimeZoneInfoController.class);
+                builder.put(cd.getDescriptor(), cd);
 
-        // Add TimeZoneInfo Controller
-        builder = getControllerBuilder(TimeZoneInfoController.class, TIMEZONEINFO_CONTROLLER);
-        ret.put(builder.getDescriptor(), builder.build());
+                descriptor = new DefDescriptorImpl<>(DYNAMIC_STYLING_CONTROLLER, ControllerDef.class, null);
+                cd = jcdf.getDef_DONOTUSE(descriptor, DynamicStylingController.class);
+                builder.put(cd.getDescriptor(), cd);
 
-        // Add Dynamic Styling Controller
-        builder = getControllerBuilder(DynamicStylingController.class, DYNAMIC_STYLING_CONTROLLER);
-        ret.put(builder.getDescriptor(), builder.build());
-
-        return ret;
+                allMap = builder.build();
+            } catch (QuickFixException qfe) {
+                throw new RuntimeException(qfe);
     }
-
-    private static Builder getControllerBuilder(Class<?> controller, String qualifiedName) {
-
-        DefDescriptor<ControllerDef> controllerDesc = Aura.getDefinitionService()
-                .getDefDescriptor(qualifiedName, ControllerDef.class);
-
-        Builder builder = new Builder();
-        try {
-            builder.setActionMap(JavaControllerDefFactory.createActions(controller, controllerDesc));
-        } catch (QuickFixException qfe) {
-            throw new AuraUnhandledException("Broken Controller: " + qualifiedName, qfe);
         }
-        builder.setControllerClass(controller);
-        builder.setLocation(qualifiedName, -1);
-        builder.setDescriptor(controllerDesc);
 
-        return builder;
-    }
+        return allMap.values();
+        }
 
     public Map<DefDescriptor<? extends Definition>, Definition> getAll() {
         return allMap;

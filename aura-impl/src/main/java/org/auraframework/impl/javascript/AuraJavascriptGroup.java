@@ -15,18 +15,17 @@
  */
 package org.auraframework.impl.javascript;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.EnumSet;
-
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.source.file.AuraFileMonitor;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.SourceListener;
+import org.auraframework.util.FileMonitor;
 import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
 import org.auraframework.util.javascript.directive.DirectiveTypes;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.EnumSet;
 
 /**
  * the aura javascript. starts at Force.js
@@ -39,15 +38,15 @@ public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup implement
     public static final File ROOT_DIR = AuraImplFiles.AuraJavascriptSourceDirectory.asFile();
     private boolean isStale = true;
 
-    public AuraJavascriptGroup() throws IOException {
-        this(false);
+    public AuraJavascriptGroup(FileMonitor fileMonitor) throws IOException {
+        this(fileMonitor, false);
     }
 
-    public AuraJavascriptGroup(boolean monitor) throws IOException {
+    public AuraJavascriptGroup(FileMonitor fileMonitor, boolean monitor) throws IOException {
         this(ROOT_DIR);
         if (monitor) {
-            Aura.getDefinitionService().subscribeToChangeNotification(this);
-            AuraFileMonitor.addDirectory(ROOT_DIR.getPath());
+            fileMonitor.subscribeToChangeNotification(this);
+            fileMonitor.addDirectory(ROOT_DIR.getPath());
         }
     }
 

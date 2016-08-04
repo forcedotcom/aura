@@ -18,11 +18,15 @@ package org.auraframework.integration.test.util;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
+import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JsonSerializationUITest extends WebDriverTestCase {
-    // currently fails to parse on client because !-- gets encoded to \u0021-- which is invalid js
-    public void _testJsOperationBangMinusMinus() throws Exception {
+
+    @Ignore("currently fails to parse on client because !-- gets encoded to \u0021-- which is invalid js")
+    @Test
+    public void testJsOperationBangMinusMinus() throws Exception {
         DefDescriptor<ComponentDef> cmpdd = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "render='client'", ""));
         addSourceAutoCleanup(
@@ -33,7 +37,7 @@ public class JsonSerializationUITest extends WebDriverTestCase {
         assertEquals("continue",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().countDown()"));
         assertEquals("done",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().countDown()"));
     }
-    
+
     @Test
     public void testJsStringBangMinusMinus() throws Exception {
         DefDescriptor<ComponentDef> cmpdd = addSourceAutoCleanup(ComponentDef.class,
@@ -45,8 +49,9 @@ public class JsonSerializationUITest extends WebDriverTestCase {
         assertEquals("<!-- inside -->",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().getComment()"));
     }
 
-    // fails to match because */ gets encoded to \u002A/
-    public void _testJsRegexStarSlash() throws Exception {
+    @Ignore("fails to match because */ gets encoded to \u002A/")
+    @Test
+    public void testJsRegexStarSlash() throws Exception {
         DefDescriptor<ComponentDef> cmpdd = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "render='client'", ""));
         addSourceAutoCleanup(
@@ -67,9 +72,9 @@ public class JsonSerializationUITest extends WebDriverTestCase {
         assertEquals("/* non-comment */",getAuraUITestingUtil().getEval("return $A.getRoot().getDef().getHelper().getComment()"));
     }
 
-    // W-2427098
-    // causes JsonStreamParseException because the embedded quotes are read as part of a string rather than literal
-    public void _testJsLiteralRegexp() throws Exception {
+    @Ignore("W-2427098: causes JsonStreamParseException because the embedded quotes are read as part of a string rather than literal")
+    @Test
+    public void testJsLiteralRegexp() throws Exception {
         DefDescriptor<ComponentDef> cmpdd = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "render='client'", ""));
         addSourceAutoCleanup(

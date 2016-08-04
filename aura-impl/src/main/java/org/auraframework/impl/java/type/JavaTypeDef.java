@@ -23,14 +23,15 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ConverterService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.type.TypeUtil;
 
 /**
  */
@@ -66,7 +67,7 @@ public class JavaTypeDef extends DefinitionImpl<TypeDef> implements TypeDef {
             return false;
         }
 
-        return TypeUtil.hasConverter(ArrayList.class, clazz, simpleParamName);
+        return Aura.getConverterService().hasConverter(ArrayList.class, clazz, simpleParamName);
 
     }
 
@@ -98,10 +99,11 @@ public class JavaTypeDef extends DefinitionImpl<TypeDef> implements TypeDef {
 
     @Override
     public Object valueOf(Object value) {
+        ConverterService converterService = Aura.getConverterService();
         if (hasCollectionConverters()) {
-            return TypeUtil.convertNoTrim(value, clazz, simpleParamName);
+            return converterService.convert(value, clazz, simpleParamName, false);
         }
-        return JavaLocalizedTypeUtil.convertNoTrim(value, clazz);
+        return converterService.convert(value, clazz, null, false, true);
     }
 
     @Override
@@ -112,6 +114,7 @@ public class JavaTypeDef extends DefinitionImpl<TypeDef> implements TypeDef {
     @Override
     public Object initialize(Object config, BaseComponent<?, ?> valueProvider) {
         if (config != null && config instanceof String && !clazz.isInstance(config)) {
+            // TODO: KRIS WE CAN'T PASS NULL HERE. THATS MESSED UP AND WILL FAIL.
             return valueOf(config);
         }
         return config;

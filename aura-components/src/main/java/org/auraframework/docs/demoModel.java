@@ -29,10 +29,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.components.ui.InputOption;
+import org.auraframework.ds.servicecomponent.ModelInstance;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.date.DateOnly;
 import org.auraframework.util.date.DateService;
@@ -46,8 +47,11 @@ import com.google.common.collect.Maps;
 /**
  * Used by demoAutoProvider.cmp
  */
-@Model
-public class demoModel {
+@ServiceComponentModelInstance
+public class demoModel implements ModelInstance {
+
+    private ContextService contextService;
+
     static ArrayList<InputOption> inputOptions = new ArrayList<>();
     static ArrayList<InputOption> moreInputOptions = new ArrayList<>();
     static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<>();
@@ -116,6 +120,10 @@ public class demoModel {
         for (int i = 1; i <= 50; i++) {
             itemsLarge.add(new Item("some one " + i, "id" + i));
         }
+    }
+
+    demoModel(ContextService contextService) {
+        this.contextService = contextService;
     }
 
     public static class Item implements JsonSerializable {
@@ -663,7 +671,8 @@ public class demoModel {
 
     @AuraEnabled
     public List<Item> getItems() throws QuickFixException {
-        String dataType = (String)Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("dataType");
+        String dataType = (String) contextService.getCurrentContext().getCurrentComponent().getAttributes()
+                .getValue("dataType");
         if (dataType == null) {
             return items;
         } else if (dataType.equals("largeList")) {
@@ -676,7 +685,8 @@ public class demoModel {
 
     @AuraEnabled
     public List<LoadColumn> getColumns() throws QuickFixException {
-        String dataType = (String)Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes().getValue("dataType");
+        String dataType = (String) contextService.getCurrentContext().getCurrentComponent().getAttributes()
+                .getValue("dataType");
         if (dataType == null) {
             return columns;
         } else if (dataType.equals("largeList")) {

@@ -41,7 +41,7 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
      * Verify that resource change depending on Mode.
      */
     @Ignore("TODO W-2970512 missing resources to test - need to inject extra client libs")
-    @Test
+	@Test
     public void testModeDependentResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
 

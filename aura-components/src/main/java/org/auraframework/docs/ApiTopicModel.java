@@ -17,21 +17,22 @@ package org.auraframework.docs;
 
 import java.util.Map;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-@Model
-public class ApiTopicModel {
+@ServiceComponentModelInstance
+public class ApiTopicModel implements ModelInstance {
 
     private String title;
     private final Map<String, Object> symbol;
 
-    public ApiTopicModel() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+    public ApiTopicModel(ContextService contextService) throws QuickFixException {
+        AuraContext context = contextService.getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
         title = (String) component.getAttributes().getValue("topic");
         title = title.substring(4);

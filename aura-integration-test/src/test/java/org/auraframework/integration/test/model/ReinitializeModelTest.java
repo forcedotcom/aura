@@ -18,11 +18,11 @@ package org.auraframework.integration.test.model;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -112,7 +112,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
      */
     public void runTestReinitializedModelSuperCmp(Boolean testModelWithCount, String model) throws Exception {
         if (testModelWithCount) {
-            TestReinitializeModelWithCount.clearCount();
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         }
         Map<String, Object> attributes = Maps.newHashMap();
 
@@ -131,7 +131,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
                 (defDesParent.getDescriptorName(), "attributeInChild", "default attribute in Child",
                         attributeFromChildToGrandChild, "{!v.attributeInChild}", cmpGrandChild);
 
-        Component childCmp = Aura.getInstanceService().getInstance(defDesChild, attributes);
+        Component childCmp = instanceService.getInstance(defDesChild, attributes);
 
         String result =
                 "<br/>ParentCMP<br/>m.valueParent=defaultattributeinChild" +
@@ -139,8 +139,8 @@ public class ReinitializeModelTest extends AuraImplTestCase {
                         "<br/>ParentCMP<br/>m.valueParent=defaultattributeFromChildToGrandChild" +
                         "<br/>GrandCHILDCMP<br/>";
         if (testModelWithCount) {
-            assertEquals(2, TestReinitializeModelWithCount.getCount());
-            TestReinitializeModelWithCount.clearCount();
+            assertEquals(2, TestReinitializeModelWithCount.getCount(this.testContextAdapter.getTestContext()));
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         } else {
             assertEquals(result, getRenderedBaseComponent(childCmp).replaceAll("\\s+", ""));
         }
@@ -152,8 +152,8 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         childCmp.reinitializeModel();
 
         if (testModelWithCount) {
-            assertEquals(2, TestReinitializeModelWithCount.getCount());
-            TestReinitializeModelWithCount.clearCount();
+            assertEquals(2, TestReinitializeModelWithCount.getCount(this.testContextAdapter.getTestContext()));
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         } else {
             assertEquals(result.replaceAll("default", "new"), getRenderedBaseComponent(childCmp).replaceAll("\\s+", ""));
         }
@@ -179,7 +179,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
      */
     public void runTestSameCmpSameModel(Boolean testModelWithCount, String model) throws Exception {
         if (testModelWithCount) {
-            TestReinitializeModelWithCount.clearCount();
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         }
         DefDescriptor<ComponentDef> defDes1 = getDefDescriptor(componentTagWithModelAndAttr, model,
                 "'defaultattributeinParent1'", "", "");
@@ -209,7 +209,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
                 "<aura:component render=\"client\">" +
                         attributeInMain1 + attributeInMain2 + attributeInMain3 +
                         "MAIN CMP%s</aura:component>", source));
-        Component mainCMP = Aura.getInstanceService().getInstance(def, attributes);
+        Component mainCMP = instanceService.getInstance(def, attributes);
 
         String result = "MAINCMP" +
                 "<br/>ParentCMP<br/>m.valueParent=defaultattributeInMain1" +
@@ -217,8 +217,8 @@ public class ReinitializeModelTest extends AuraImplTestCase {
                 "<br/>ParentCMP<br/>m.valueParent=defaultattributeInMain3";
 
         if (testModelWithCount) {
-            assertEquals(3, TestReinitializeModelWithCount.getCount());
-            TestReinitializeModelWithCount.clearCount();
+            assertEquals(3, TestReinitializeModelWithCount.getCount(this.testContextAdapter.getTestContext()));
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         } else {
             assertEquals(result, getRenderedBaseComponent(mainCMP).replaceAll("\\s+", ""));
         }
@@ -230,8 +230,8 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         mainCMP.reinitializeModel();
 
         if (testModelWithCount) {
-            assertEquals(3, TestReinitializeModelWithCount.getCount());
-            TestReinitializeModelWithCount.clearCount();
+            assertEquals(3, TestReinitializeModelWithCount.getCount(this.testContextAdapter.getTestContext()));
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         } else {
             assertEquals(result.replaceAll("default", "new"), getRenderedBaseComponent(mainCMP).replaceAll("\\s+", ""));
         }
@@ -254,7 +254,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
      */
     public void runTestDiffCMPSameModel(Boolean testModelWithCount, String model) throws Exception {
         if (testModelWithCount) {
-            TestReinitializeModelWithCount.clearCount();
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         }
         DefDescriptor<ComponentDef> defDes1 = getDefDescriptor(componentTagWithModelAndAttr, model,
                 "'defaultattributeinParent1'", "", "");
@@ -276,12 +276,12 @@ public class ReinitializeModelTest extends AuraImplTestCase {
                 "<aura:component render=\"client\">" +
                         attributeInMain + attributeInMain1 +
                         "MAIN CMP%s</aura:component>", source));
-        Component mainCMP = Aura.getInstanceService().getInstance(def, attributes);
+        Component mainCMP = instanceService.getInstance(def, attributes);
 
         String result = "MAINCMP<br/>ParentCMP<br/>m.valueParent=defaultattributeInMain1<br/>INNERCMP--valueofattr:defaultattributeInMain,valuefrommodule:defaultattributeInMain<br/>";
         if (testModelWithCount) {
-            assertEquals(2, TestReinitializeModelWithCount.getCount());
-            TestReinitializeModelWithCount.clearCount();
+            assertEquals(2, TestReinitializeModelWithCount.getCount(this.testContextAdapter.getTestContext()));
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         } else {
             assertEquals(result, getRenderedBaseComponent(mainCMP).replaceAll("\\s+", ""));
         }
@@ -292,8 +292,8 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         mainCMP.reinitializeModel();
 
         if (testModelWithCount) {
-            assertEquals(2, TestReinitializeModelWithCount.getCount());
-            TestReinitializeModelWithCount.clearCount();
+            assertEquals(2, TestReinitializeModelWithCount.getCount(this.testContextAdapter.getTestContext()));
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         } else {
             assertEquals(result.replaceAll("default", "new"), getRenderedBaseComponent(mainCMP).replaceAll("\\s+", ""));
         }
@@ -317,7 +317,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
      */
     public void runTestNestedCmp(Boolean testModelWithCount, String model) throws Exception {
         if (testModelWithCount) {
-            TestReinitializeModelWithCount.clearCount();
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         }
         Map<String, Object> attributes = Maps.newHashMap();
 
@@ -342,14 +342,14 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> defDes1 = getDefDescriptor(componentTagWithModelAndAttr, model,
                 "'defaultattributeinParent1'", att1to2 + att1to3, cmpString2);
 
-        Component mainCMP = Aura.getInstanceService().getInstance(defDes1, attributes);
+        Component mainCMP = instanceService.getInstance(defDes1, attributes);
 
         String result = "<br/>ParentCMP<br/>m.valueParent=defaultattributeinParent1" +
                 "<br/>ParentCMP<br/>m.valueParent=defaultattribute1to2" +
                 "<br/>ParentCMP<br/>m.valueParent=defaultattribute1to3";
         if (testModelWithCount) {
-            assertEquals(3, TestReinitializeModelWithCount.getCount());
-            TestReinitializeModelWithCount.clearCount();
+            assertEquals(3, TestReinitializeModelWithCount.getCount(this.testContextAdapter.getTestContext()));
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         } else {
             assertEquals(result, getRenderedBaseComponent(mainCMP).replaceAll("\\s+", ""));
         }
@@ -361,8 +361,8 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         mainCMP.getAttributes().set(attributes);
         mainCMP.reinitializeModel();
         if (testModelWithCount) {
-            assertEquals(3, TestReinitializeModelWithCount.getCount());
-            TestReinitializeModelWithCount.clearCount();
+            assertEquals(3, TestReinitializeModelWithCount.getCount(this.testContextAdapter.getTestContext()));
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         } else {
             assertEquals(result.replaceAll("default", "new"), getRenderedBaseComponent(mainCMP).replaceAll("\\s+", ""));
         }
@@ -384,7 +384,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
      */
     public void runTestCmpAsAttribute(Boolean testModelWithCount, String model) throws Exception {
         if (testModelWithCount) {
-            TestReinitializeModelWithCount.clearCount();
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         }
         Map<String, Object> attributesMain = Maps.newHashMap();
         DefDescriptor<ComponentDef> defDes = getDefDescriptor(componentTagWithModelAndAttr, model,
@@ -395,10 +395,10 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> def = addSourceAutoCleanup(ComponentDef.class, String.format(
                 "<aura:component render='client'>" + attributeSource +
                 "%s</aura:component>", "'{!v.componentArray}'"));
-        Component mainCMP = Aura.getInstanceService().getInstance(def, attributesMain);
+        Component mainCMP = instanceService.getInstance(def, attributesMain);
         if (testModelWithCount) {
-            assertEquals(1, TestReinitializeModelWithCount.getCount());
-            TestReinitializeModelWithCount.clearCount();
+            assertEquals(1, TestReinitializeModelWithCount.getCount(this.testContextAdapter.getTestContext()));
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         } else {
             String output = getRenderedBaseComponent(mainCMP);
             String result = "'<br/>ParentCMP<br/>m.valueParent=defaultattributeinParent'";
@@ -410,10 +410,10 @@ public class ReinitializeModelTest extends AuraImplTestCase {
 
         DefDescriptor<ComponentDef> newDefDes = getDefDescriptor(componentTagWithModelAndAttr, model,
                 "'defaultattributeinParent'", "", "");
-        Component newAttrCMP = Aura.getInstanceService().getInstance(newDefDes.getDescriptorName(), ComponentDef.class,
+        Component newAttrCMP = instanceService.getInstance(newDefDes.getDescriptorName(), ComponentDef.class,
                 attributes);
         if (testModelWithCount) {
-            TestReinitializeModelWithCount.clearCount();
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         }
         ArrayList<Component> newCmpList = new ArrayList<>();
         newCmpList.add(newAttrCMP);
@@ -422,8 +422,8 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         mainCMP.getAttributes().set(attributesMain);
         mainCMP.reinitializeModel();
         if (testModelWithCount) {
-            assertEquals(1, TestReinitializeModelWithCount.getCount());
-            TestReinitializeModelWithCount.clearCount();
+            assertEquals(1, TestReinitializeModelWithCount.getCount(this.testContextAdapter.getTestContext()));
+            TestReinitializeModelWithCount.clearCount(this.testContextAdapter.getTestContext());
         } else {
             String newoutput = getRenderedBaseComponent(mainCMP);
             String newresult = "'<br/>ParentCMP<br/>m.valueParent=newValueInParent'";
@@ -450,7 +450,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
     public void testCmpWithJavaProvider() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("whatToDo", "provideTestModelParentCmp");
-        Component mainCMP = Aura.getInstanceService().getInstance("test:test_Provider_Concrete", ComponentDef.class,
+        Component mainCMP = instanceService.getInstance("test:test_Provider_Concrete", ComponentDef.class,
                 attributes);
         String result = "<br/>ParentCMP<br/>m.valueParent=defaultattributeinParent";
         assertEquals(result, getRenderedBaseComponent(mainCMP).replaceAll("\\s+", ""));
@@ -469,10 +469,12 @@ public class ReinitializeModelTest extends AuraImplTestCase {
      * Bug: W-2107628 trying to change what we provide like this won't work also I didn't check in
      * provideTestModelParentCmpWithNewAttr for the provider of test_Provider_Concrete
      */
-    public void _testCmpWithJavaProviderChangeWhatWeProvide() throws Exception {
+    @Ignore
+    @Test
+    public void testCmpWithJavaProviderChangeWhatWeProvide() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("whatToDo", "provideTestModelParentCmp");
-        Component mainCMP = Aura.getInstanceService().getInstance("test:test_Provider_Concrete", ComponentDef.class,
+        Component mainCMP = instanceService.getInstance("test:test_Provider_Concrete", ComponentDef.class,
                 attributes);
         String result = "<br/>ParentCMP<br/>m.valueParent=defaultattributeinParent";
         assertEquals(result, getRenderedBaseComponent(mainCMP).replaceAll("\\s+", ""));
@@ -499,7 +501,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
                 String.format(
                         "<aura:component model=\"java://org.auraframework.components.test.java.model.TestReinitializeModel\"><aura:attribute name=\"attr\" type=\"String\" default=\"defaultValue\"/>%s</aura:component>",
                         source));
-        Component ifcmp = Aura.getInstanceService().getInstance(def, attributes);
+        Component ifcmp = instanceService.getInstance(def, attributes);
         assertEquals("value from attr:defaultValue,value from model:defaultValue", getRenderedBaseComponent(ifcmp));
         Map<String, Object> attributes2 = Maps.newHashMap();
         attributes2.put("attr", "new value from component");
@@ -523,7 +525,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
                 String.format(
                         "<aura:component><aura:attribute name=\"attr_out\" type=\"String\" default=\"defaultValue\"/>%s</aura:component>",
                         sourceInnerCMP));
-        Component ifcmp = Aura.getInstanceService().getInstance(def, attributes);
+        Component ifcmp = instanceService.getInstance(def, attributes);
         assertTrue(getRenderedBaseComponent(ifcmp).contains(
                 "INNER CMP -- value of attr: defaultValue , value from module: defaultValue"));
         Map<String, Object> attributes2 = Maps.newHashMap();
@@ -539,7 +541,9 @@ public class ReinitializeModelTest extends AuraImplTestCase {
      * iteration on m.item this test to check if we change v.listToShow, iteration get updated or not enable this when
      * W-2088677 is resolved
      */
-    public void _testReinitializeModelIteration() throws Exception {
+    @Ignore
+    @Test
+    public void testReinitializeModelIteration() throws Exception {
         String source = "<aura:iteration items='{!m.itemList}' var='x' indexVar='i'>{!x}</aura:iteration>";
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("listToShow", Lists.newArrayList("q", "r", "s"));
@@ -548,7 +552,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
                 String.format(
                         "<aura:component model=\"java://org.auraframework.components.test.java.model.TestReinitializeModel\"><aura:attribute name='listToShow' type='List'/>%s</aura:component>",
                         source));
-        Component iteration = Aura.getInstanceService().getInstance(def, attributes);
+        Component iteration = instanceService.getInstance(def, attributes);
         assertEquals("qrs", getRenderedBaseComponent(iteration));
         // listToShow is qrs
         iteration.reinitializeModel();
@@ -559,5 +563,4 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         // listToShow is abc now
         assertEquals("abc", getRenderedBaseComponent(iteration));
     }
-
 }

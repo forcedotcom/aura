@@ -22,21 +22,24 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.protocol.HttpContext;
-import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -44,6 +47,9 @@ import com.google.common.collect.Maps;
 import com.google.common.io.LineReader;
 
 public class AppCacheManifestHttpTest extends AuraHttpTestCase {
+
+    @Inject
+    MockConfigAdapter mockConfigAdapter;
 
     private static final String APPCACHE_SUPPORTED_USERAGENT = UserAgent.GOOGLE_CHROME.getUserAgentString();
     private static final Pattern HTML_MANIFEST_PATTERN = Pattern.compile("<html[^>]* manifest=\"(.*?)\"[^>]*>");
@@ -95,7 +101,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      * check if requried links are in manifest content, also make sure excludeLinks are NOT in manifest content.
      * @param manifestContent
      * @param requiredLinks
-     * @param excludeLinks could be null
+     * @param excludedLinks could be null
      * @throws Exception
      */
     private void assertManifest(String manifestContent, List<String> requiredLinks, List<String> excludedLinks) throws Exception {
@@ -180,7 +186,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     @Test
     public void testGetManifestWithAppCacheDisabled() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        ServletConfigController.setAppCacheDisabled(Boolean.TRUE);
+        mockConfigAdapter.setIsClientAppcacheEnabled(false);
         String manifest = getManifestURL("/appCache/withpreload.app", true);
         if (manifest != null) {
             fail("no manifest url should be present, but got: " + manifest);
@@ -303,7 +309,9 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      * scenarios, it just continues and ignores the exception thrown by the action, in other cases it returns 404.
      * Should we do something to signal that something went wrong, you might not have resources that you asked for?
      */
-    public void _testGetManifestWhenAdditionalAppCacheUrlsActionBarfs() throws Exception {
+    @Ignore
+    @Test
+    public void testGetManifestWhenAdditionalAppCacheUrlsActionBarfs() throws Exception {
         String values[] = { "{!c.throwException}", // Action throws exception
                 "{!c.getString}", // Action returns literal instead of List<String>
                 "{!v.attr}", // A expression that refers to attribute instead of action

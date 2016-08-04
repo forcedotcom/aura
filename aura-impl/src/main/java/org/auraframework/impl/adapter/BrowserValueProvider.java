@@ -17,7 +17,6 @@ package org.auraframework.impl.adapter;
 
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
@@ -26,6 +25,7 @@ import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.ValueProviderType;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -58,8 +58,15 @@ public class BrowserValueProvider implements GlobalValueProvider {
 
     private Map<String, Object> browserDetails;
 
+    private final ContextService contextService;
+
+    public BrowserValueProvider(ContextService contextService) {
+        this.browserDetails = null;
+        this.contextService = contextService;
+    }
+
     protected Map<String, Object> parse() {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(32);
         String ua = context != null ? context.getClient().getUserAgent() : null;
         BrowserInfo b = new BrowserInfo(ua);
@@ -83,10 +90,6 @@ public class BrowserValueProvider implements GlobalValueProvider {
         m.put(IS_BLACKBERRY, b.isBlackBerry());
 
         return m;
-    }
-
-    public BrowserValueProvider() {
-        browserDetails = null;
     }
 
     @Override
@@ -118,7 +121,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
 
     @Override
     public boolean refSupport() {
-    	// $Browser has no serialization references.
+        // $Browser has no serialization references.
         return false;
     }
 

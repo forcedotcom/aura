@@ -18,15 +18,14 @@ package org.auraframework.integration.test.root;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.junit.Test;
 
 public class RootDefRegistryTest extends AuraImplTestCase {
     @Test
     public void testGetComponentDefWithExtends() throws Exception {
-        DefDescriptor<ComponentDef> childDescriptor = DefDescriptorImpl.getInstance("test:extendsChild",
+        DefDescriptor<ComponentDef> childDescriptor = definitionService.getDefDescriptor("test:extendsChild",
                 ComponentDef.class);
-        DefDescriptor<ComponentDef> parentDescriptor = DefDescriptorImpl.getInstance("test:extendsParent",
+        DefDescriptor<ComponentDef> parentDescriptor = definitionService.getDefDescriptor("test:extendsParent",
                 ComponentDef.class);
         ComponentDef def = childDescriptor.getDef();
         assertEquals(parentDescriptor, def.getExtendsDescriptor());

@@ -15,15 +15,12 @@
  */
 package org.auraframework.integration.test;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.auraframework.Aura;
+import org.auraframework.AuraDeprecated;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
@@ -39,85 +36,108 @@ import org.auraframework.test.util.WebDriverUtil;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.JSTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestContextManager;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
-import com.google.common.collect.Sets;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * TODO(W-1386863): investigate why/fix the thread hostile nature of these tests.
  */
 @UnAdaptableTest
 @JSTest
+@RunWith(AllTests.class)
+@ContextConfiguration(locations = {"/applicationContext.xml"})
+@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class})
 public class ComponentJSUITest extends TestSuite {
 
     public static TestSuite suite() throws Exception {
-        TestSuite suite = new NamespaceTestSuite("*");
-        suite.setName("JS Component Tests");
+        ComponentJSUITest suite = new ComponentJSUITest("*");
+        TestContextManager testContextManager = new TestContextManager(ComponentJSUITest.class);
+        testContextManager.prepareTestInstance(suite);
         return suite;
     }
 
-    private static class FailTestCase extends WebDriverTestCase {
-        private final Throwable cause;
+    @Inject
+    private AuraDeprecated auraDeprecated;
 
-        private FailTestCase(DefDescriptor<TestSuiteDef> descriptor, Throwable cause) {
-            this.setName(descriptor.getQualifiedName());
-            this.cause = cause;
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private DefinitionService definitionService;
+
+    private String[] namespaces;
+
+    public ComponentJSUITest(String... namespaces) {
+        super();
+        this.namespaces = namespaces == null ? new String[0] : namespaces;
+    }
+
+    @PostConstruct
+    private void postConstruct() {
+        boolean contextStarted = false;
+        if (!contextService.isEstablished()) {
+            contextStarted = true;
+            contextService.startContext(Mode.JSTEST, Format.JSON, Authentication.AUTHENTICATED);
         }
 
-        @Override
-        public void runTest() throws Throwable {
-            throw cause;
+        Map<String, TestSuite> subSuites = new HashMap<>();
+        try {
+            for (String namespace : namespaces) {
+                try {
+                    DescriptorFilter filter = new DescriptorFilter("js://" + namespace, DefType.TESTSUITE.toString());
+                    Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
+
+                    for (DefDescriptor<?> qd : descriptors) {
+                        @SuppressWarnings("unchecked")
+                        DefDescriptor<TestSuiteDef> descriptor = (DefDescriptor<TestSuiteDef>) qd;
+                        Test test;
+                        try {
+                            test = new ComponentTestSuite(descriptor.getDef());
+                        } catch (Throwable t) {
+                            test = new FailTestCase(descriptor.getQualifiedName(), t);
+                        }
+                        String testNamespace = descriptor.getNamespace();
+                        if (namespace.equals(testNamespace)) {
+                            addTest(test);
+                        } else {
+                            TestSuite subSuite = subSuites.get(testNamespace);
+                            if (subSuite == null) {
+                                subSuite = new TestSuite(testNamespace);
+                                subSuites.put(testNamespace, subSuite);
+                                addTest(subSuite);
+                    }
+                            subSuite.addTest(test);
+                }
+            }
+                } catch (Throwable t) {
+                    addTest(new FailTestCase("Failed to generate tests for namespace: " + namespace, t));
+        }
+            }
+        } finally {
+            if (contextStarted) {
+                contextService.endContext();
+            }
         }
     }
 
-    @UnAdaptableTest
-    public static class NamespaceTestSuite extends TestSuite {
-        public NamespaceTestSuite(String namespace) throws Exception {
-            super(namespace);
-            ContextService contextService = Aura.getContextService();
-            DefinitionService definitionService = Aura.getDefinitionService();
+    public AuraDeprecated getAuraDeprecated() {
+        return auraDeprecated;
+    }
 
-            boolean contextStarted = false;
-            if (!contextService.isEstablished()) {
-                contextStarted = true;
-                contextService.startContext(Mode.JSTEST, Format.JSON, Authentication.AUTHENTICATED);
-            }
-
-            Map<String, TestSuite> subSuites = new HashMap<>();
-            try {
-                DescriptorFilter filter = new DescriptorFilter("js://" + namespace, DefType.TESTSUITE.toString());
-                Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
-
-                for (DefDescriptor<?> qd : descriptors) {
-                    @SuppressWarnings("unchecked")
-                    DefDescriptor<TestSuiteDef> descriptor = (DefDescriptor<TestSuiteDef>) qd;
-                    Test test;
-                    try {
-                        test = new ComponentTestSuite(descriptor.getDef());
-                    } catch (Throwable t) {
-                        test = new FailTestCase(descriptor, t);
-                    }
-                    String testNamespace = descriptor.getNamespace();
-                    if (namespace.equals(testNamespace)) {
-                        addTest(test);
-                    } else {
-                        TestSuite subSuite = subSuites.get(testNamespace);
-                        if (subSuite == null) {
-                            subSuite = new TestSuite(testNamespace);
-                            subSuites.put(testNamespace, subSuite);
-                            addTest(subSuite);
-                        }
-                        subSuite.addTest(test);
-                    }
-                }
-            } catch (Throwable t) {
-                System.err.println("Failed to load component tests for namespace: " + namespace);
-                t.printStackTrace();
-            } finally {
-                if (contextStarted) {
-                    contextService.endContext();
-                }
-            }
-        }
+    public void setAuraDeprecated(AuraDeprecated auraDeprecated) {
+        this.auraDeprecated = auraDeprecated;
     }
 
     private static class ComponentTestSuite extends TestSuite {
@@ -229,5 +249,20 @@ public class ComponentJSUITest extends TestSuite {
         private final TestCaseDef caseDef;
         private final Set<BrowserType> targetBrowsers = EnumSet.noneOf(BrowserType.class);
         private final Set<BrowserType> excludedBrowsers = EnumSet.noneOf(BrowserType.class);
+    }
+
+    private static class FailTestCase extends WebDriverTestCase {
+        private final Throwable cause;
+
+        private FailTestCase(String msg, Throwable cause) {
+            super();
+            this.setName(msg);
+            this.cause = cause;
+        }
+
+        @Override
+        public void runTest() throws Throwable {
+            throw cause;
+        }
     }
 }

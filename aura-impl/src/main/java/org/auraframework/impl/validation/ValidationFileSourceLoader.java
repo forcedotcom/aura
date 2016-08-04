@@ -15,15 +15,16 @@
  */
 package org.auraframework.impl.validation;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.FileMonitor;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Specialized file source loader used for validation, it loads all types of definitions.
@@ -32,8 +33,8 @@ public final class ValidationFileSourceLoader extends FileSourceLoader {
 
     private static final Logger LOG = Logger.getLogger(ValidationFileSourceLoader.class);
 
-    public ValidationFileSourceLoader(File base) {
-        super(base);
+    public ValidationFileSourceLoader(File base, FileMonitor fileMonitor) {
+        super(base, fileMonitor);
     }
 
     /**

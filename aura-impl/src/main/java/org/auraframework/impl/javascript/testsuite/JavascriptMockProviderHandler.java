@@ -23,9 +23,13 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Provider;
 import org.auraframework.def.ProviderDef;
+import org.auraframework.impl.instance.ProviderInstanceBuilder;
 import org.auraframework.impl.javascript.provider.JavascriptProviderDef.Builder;
 import org.auraframework.instance.ComponentConfig;
+import org.auraframework.instance.InstanceBuilder;
+import org.auraframework.instance.ProviderInstance;
 import org.auraframework.test.Resettable;
 import org.auraframework.test.mock.Answer;
 import org.auraframework.test.mock.DelegatingStubHandler;
@@ -33,11 +37,36 @@ import org.auraframework.test.mock.Invocation;
 import org.auraframework.test.mock.Stub;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.beans.factory.annotation.Autowire;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Parse JSTEST mock Providers.
  */
 public class JavascriptMockProviderHandler extends JavascriptMockHandler<ProviderDef> {
+    @Configuration
+    public static class ConfigureMockProviderInstanceBuilder {
+        @Bean(autowire = Autowire.BY_TYPE)
+        public InstanceBuilder<ProviderInstance, ?> mockProviderInstanceBuilder() {
+            return new MockProviderInstanceBuilder();
+        }
+    }
+
+    private static class MockProviderInstanceBuilder extends ProviderInstanceBuilder {
+        @Override
+        public Class<?> getDefinitionClass() {
+            return Proxy.getProxyClass(JavascriptMockProviderHandler.class.getClassLoader(), new Class<?>[] {
+                    ProviderDef.class, ProviderInstance.class, Provider.class, Resettable.class });
+        }
+
+        @Override
+        public ProviderInstance getInstance(ProviderDef mockDefInstance, Map<String, Object> attributes)
+                throws QuickFixException {
+            return (ProviderInstance) mockDefInstance;
+        }
+    }
+
     public JavascriptMockProviderHandler(DefDescriptor<? extends BaseComponentDef> targetDescriptor,
             Map<String, Object> map) {
         super(targetDescriptor, map);
@@ -47,8 +76,8 @@ public class JavascriptMockProviderHandler extends JavascriptMockHandler<Provide
     protected ProviderDef createDefinition(Map<String, Object> map) throws QuickFixException {
         ProviderDef baseDef = getBaseDefinition((String) map.get("descriptor"), ProviderDef.class);
         List<Stub<?>> stubs = getStubs(map.get("stubs"));
-        return (ProviderDef) Proxy.newProxyInstance(this.getClass()
-                .getClassLoader(), new Class<?>[] { ProviderDef.class, Resettable.class },
+        return (ProviderDef) Proxy.newProxyInstance(JavascriptMockProviderHandler.class.getClassLoader(),
+                new Class<?>[] { ProviderDef.class, ProviderInstance.class, Provider.class, Resettable.class },
                 new DelegatingStubHandler(baseDef, stubs));
     }
 
@@ -57,15 +86,16 @@ public class JavascriptMockProviderHandler extends JavascriptMockHandler<Provide
     protected <T> T getValue(Object object, Class<T> retClass) throws QuickFixException {
         if (object != null && ComponentConfig.class.equals(retClass)) {
             if (!(object instanceof Map)) {
-                throw new InvalidDefinitionException("Mock Provider expects (descriptor and/or attributes) or (configProvider)", getLocation());
+                throw new InvalidDefinitionException(
+                        "Mock Provider expects (descriptor and/or attributes) or (configProvider)", getLocation());
             }
             ComponentConfig config;
-            
-            String configProvider = (String)((Map<?, ?>) object).get("configProvider");
-            //If a config provider is specified, defer provide until later
-            if(configProvider!=null && !configProvider.isEmpty()){
+
+            String configProvider = (String) ((Map<?, ?>) object).get("configProvider");
+            // If a config provider is specified, defer provide until later
+            if (configProvider != null && !configProvider.isEmpty()) {
                 config = null;
-            }else{//Else determine the mock component to provide
+            } else {// Else determine the mock component to provide
                 config = new ComponentConfig();
                 DefDescriptor<ComponentDef> cdd = getDescriptor((String) ((Map<?, ?>) object).get("descriptor"),
                         ComponentDef.class);
@@ -82,46 +112,50 @@ public class JavascriptMockProviderHandler extends JavascriptMockHandler<Provide
             return super.getValue(object, retClass);
         }
     }
-    
+
     @Override
     protected <T> Answer<T> getAnswer(Object object, Class<T> retClass) throws QuickFixException {
         if (object instanceof Map) {
             Map<?, ?> map = (Map<?, ?>) object;
-            final String configProvider = (String)((Map<?, ?>)map.get("value")).get("configProvider");
-            if(configProvider!=null){
-                return new Returns<T>(null){
+            final String configProvider = (String) ((Map<?, ?>) map.get("value")).get("configProvider");
+            if (configProvider != null) {
+                return new Returns<T>(null) {
                     @SuppressWarnings("unchecked")
                     @Override
                     public T answer() throws Throwable {
-                        String mockProvider = configProvider; 
+                        String mockProvider = configProvider;
                         ComponentConfig config;
-                        if(configProvider.startsWith("java://")){
+                        if (configProvider.startsWith("java://")) {
                             mockProvider = configProvider.substring("java://".length());
                         }
-                        try{
+                        try {
                             Class<?> providerClass = Class.forName(mockProvider);
-                            if(!ComponentConfigProvider.class.isAssignableFrom(providerClass)){
-                                throw new InvalidDefinitionException("Class specified as configProvider should implement ComponentConfigProvider", getLocation()); 
+                            if (!ComponentConfigProvider.class.isAssignableFrom(providerClass)) {
+                                throw new InvalidDefinitionException(
+                                        "Class specified as configProvider should implement ComponentConfigProvider",
+                                        getLocation());
                             }
-                            ComponentConfigProvider provider = (ComponentConfigProvider)providerClass.newInstance(); 
+                            ComponentConfigProvider provider = (ComponentConfigProvider) providerClass.newInstance();
                             config = provider.provide();
-                        }catch(ClassNotFoundException e){
-                            throw new InvalidDefinitionException("Could not locate class specified as configProvider:"+configProvider, getLocation());
-                        }catch(IllegalAccessException e){
-                            throw new InvalidDefinitionException("Constructor is inaccessible for "+ configProvider, getLocation());
-                        }catch (InstantiationException ie) {
+                        } catch (ClassNotFoundException e) {
+                            throw new InvalidDefinitionException("Could not locate class specified as configProvider:"
+                                    + configProvider, getLocation());
+                        } catch (IllegalAccessException e) {
+                            throw new InvalidDefinitionException("Constructor is inaccessible for " + configProvider,
+                                    getLocation());
+                        } catch (InstantiationException ie) {
                             throw new InvalidDefinitionException("Cannot instantiate " + configProvider, getLocation());
                         }
-                      return (T)config;
+                        return (T) config;
                     }
                 };
-            }else{
+            } else {
                 return super.getAnswer(object, retClass);
             }
         }
         throw new InvalidDefinitionException("Mock answer must specify either 'value' or 'error'", getLocation());
     }
-    
+
     @Override
     protected ProviderDef getDefaultBaseDefinition() throws QuickFixException {
         return getTargetDescriptor().getDef().getLocalProviderDef();

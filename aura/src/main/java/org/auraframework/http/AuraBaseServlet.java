@@ -18,11 +18,14 @@ package org.auraframework.http;
 import java.io.IOException;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.inject.Inject;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
@@ -71,13 +74,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
     public static final String OUTDATED_MESSAGE = "OUTDATED";
     protected final static StringParam csrfToken = new StringParam(AURA_PREFIX + "token", 0, true);
 
-    public static String getToken() {
-        return Aura.getConfigAdapter().getCSRFToken();
-    }
-
-    public static void validateCSRF(String token) {
-        Aura.getConfigAdapter().validateCSRFToken(token);
-    }
+    protected ServletUtilAdapter servletUtilAdapter;
 
     public AuraBaseServlet() {
         super();
@@ -88,12 +85,12 @@ public abstract class AuraBaseServlet extends HttpServlet {
      */
     @Deprecated
     protected boolean isProductionMode(Mode mode) {
-        return Aura.getServletUtilAdapter().isProductionMode(mode);
+        return servletUtilAdapter.isProductionMode(mode);
     }
 
     @Deprecated
     public String getContentType(AuraContext.Format format) {
-        return Aura.getServletUtilAdapter().getContentType(format);
+        return servletUtilAdapter.getContentType(format);
     }
 
     @Override
@@ -101,13 +98,18 @@ public abstract class AuraBaseServlet extends HttpServlet {
         super.init(config);
         processInjection(config);
     }
-
+    
     public void processInjection(ServletConfig config) {
         SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
     }
 
     @Deprecated
     protected void send404(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        Aura.getServletUtilAdapter().send404(getServletConfig().getServletContext(), request, response);
+        servletUtilAdapter.send404(getServletConfig().getServletContext(), request, response);
+    }
+    
+    @Inject
+    public void setServletUtilAdapter(ServletUtilAdapter servletUtilAdapter) {
+        this.servletUtilAdapter = servletUtilAdapter;
     }
 }

@@ -18,9 +18,9 @@ package org.auraframework.impl.integration;
 import java.io.IOException;
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
@@ -28,7 +28,6 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.impl.system.RenderContextHTMLImpl;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.instance.Action;
@@ -40,6 +39,7 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
+import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -63,13 +63,35 @@ public class IntegrationImpl implements Integration {
 
     private TemplateUtil templateUtil = new TemplateUtil();
 
+    private boolean hasApplicationBeenWritten = false;
+    private int contextDepthCount = 0;
+
+    private InstanceService instanceService;
+    private DefinitionService definitionService;
+    private SerializationService serializationService;
+    private ContextService contextService;
+    private ConfigAdapter configAdapter;
+    private RenderingService renderingService;
+    private ServletUtilAdapter servletUtilAdapter;
+
     public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent,
-                           String application) throws QuickFixException {
+                           String application, InstanceService instanceService,
+                           DefinitionService definitionService, SerializationService serializationService,
+                           ContextService contextService, ConfigAdapter configAdapter,
+                           RenderingService renderingService, ServletUtilAdapter servletUtilAdapter
+                           ) throws QuickFixException {
         this.client = userAgent != null ? new Client(userAgent) : null;
         this.contextPath = contextPath;
         this.mode = mode;
         this.initializeAura = initializeAura;
         this.application = application != null ? application : DEFAULT_APPLICATION;
+        this.instanceService = instanceService;
+        this.definitionService = definitionService;
+        this.serializationService = serializationService;
+        this.contextService = contextService;
+        this.configAdapter = configAdapter;
+        this.renderingService = renderingService;
+        this.servletUtilAdapter = servletUtilAdapter;
     }
 
     @Override
@@ -105,15 +127,14 @@ public class IntegrationImpl implements Integration {
         AuraContext context = getContext("is");
 
         try {
-            DefinitionService definitionService = Aura.getDefinitionService();
             DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor(tag,
                     ComponentDef.class);
 
             Map<String, Object> actionAttributes = Maps.newHashMap();
             Map<String, String> actionEventHandlers = Maps.newHashMap();
 
-            ComponentDef componentDef = descriptor.getDef();
-            if(attributes!=null) {
+            ComponentDef componentDef = this.definitionService.getDefinition(descriptor);
+            if (attributes != null) {
                 for (Map.Entry<String, Object> entry : attributes.entrySet()) {
                     String key = entry.getKey();
 
@@ -165,20 +186,22 @@ public class IntegrationImpl implements Integration {
                     // only when not using async because component defs will be printed onto HTML
                     definitionService.updateLoaded(descriptor);
 
-                    ControllerDef componentControllerDef = definitionService.getDefDescriptor("aura://ComponentController",
-                            ControllerDef.class).getDef();
+                    ControllerDef componentControllerDef = definitionService.getDefinition("aura://ComponentController",
+                            ControllerDef.class);
 
                     Map<String, Object> paramValues = Maps.newHashMap();
                     paramValues.put("name", descriptor.getQualifiedName());
                     paramValues.put("attributes", actionAttributes);
 
-                    Action action = componentControllerDef.createAction("getComponent", paramValues);
+                    ActionDef getComponentActionDef = componentControllerDef.getSubDefinition("getComponent");
+                    Action action = instanceService.getInstance(getComponentActionDef, paramValues);
                     action.setId("ais");
 
                     //
                     // Now build a second action.... to load all of the relevant labels.
                     //
-                    Action labelAction = componentControllerDef.createAction("loadLabels", null);
+                    ActionDef loadLabelsActionDef = componentControllerDef.getSubDefinition("loadLabels");
+                    Action labelAction = instanceService.getInstance(loadLabelsActionDef, null);
                     labelAction.setId("aisLabels");
 
                     Action previous = context.setCurrentAction(action);
@@ -193,7 +216,7 @@ public class IntegrationImpl implements Integration {
                     Message message = new Message(Lists.newArrayList(action));
 
                     init.append("var config = ");
-                    Aura.getSerializationService().write(message, null, Message.class, init);
+                    serializationService.write(message, null, Message.class, init);
                     init.append(";\n");
 
                     if (!actionEventHandlers.isEmpty()) {
@@ -223,15 +246,13 @@ public class IntegrationImpl implements Integration {
 
     private void releaseContext() {
         if (contextDepthCount == 0) {
-            Aura.getContextService().endContext();
+            contextService.endContext();
         } else {
             contextDepthCount -= 1;
         }
     }
 
     private AuraContext getContext(String num) throws ClientOutOfSyncException, QuickFixException {
-        ContextService contextService = Aura.getContextService();
-
         if (contextService.isEstablished()) {
             contextDepthCount += 1;
         }
@@ -252,13 +273,13 @@ public class IntegrationImpl implements Integration {
 
         if (!DEFAULT_APPLICATION.equals(application)) {
             // Check to insure that the app extends aura:integrationServiceApp
-            ApplicationDef def = applicationDescriptor.getDef();
+            ApplicationDef def = definitionService.getDefinition(applicationDescriptor);
             if (!def.isInstanceOf(getApplicationDescriptor(DEFAULT_APPLICATION))) {
                 throw new AuraRuntimeException("Application must extend aura:integrationServiceApp.");
             }
         }
         context.setContextPath(contextPath);
-        context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+        context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
         if (num != null) {
             context.setNum(num);
@@ -277,10 +298,6 @@ public class IntegrationImpl implements Integration {
         try {
             ApplicationDef appDef = getApplicationDescriptor(application).getDef();
 
-            InstanceService instanceService = Aura.getInstanceService();
-            RenderingService renderingService = Aura.getRenderingService();
-            ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
-            ConfigAdapter configAdapter = Aura.getConfigAdapter();
             ComponentDef templateDef = appDef.getTemplateDef();
 
             Map<String, Object> attributes = Maps.newHashMap();
@@ -303,7 +320,7 @@ public class IntegrationImpl implements Integration {
             Application instance = instanceService.getInstance(appDef, null);
 
             auraInit.put("instance", instance);
-            auraInit.put("token", AuraBaseServlet.getToken());
+            auraInit.put("token", configAdapter.getCSRFToken());
             auraInit.put("host", context.getContextPath());
             Map<String, Object> namespaces = Maps.newHashMap();
             namespaces.put("internal", configAdapter.getInternalNamespaces());
@@ -312,7 +329,7 @@ public class IntegrationImpl implements Integration {
 
             StringBuilder contextWriter = new StringBuilder();
 
-            Aura.getSerializationService().write(context, null, AuraContext.class, contextWriter, "JSON");
+            serializationService.write(context, null, AuraContext.class, contextWriter, "JSON");
 
             auraInit.put("context", new Literal(contextWriter.toString()));
 
@@ -327,7 +344,6 @@ public class IntegrationImpl implements Integration {
     }
 
     private DefDescriptor<ApplicationDef> getApplicationDescriptor(String application) {
-        DefinitionService definitionService = Aura.getDefinitionService();
         return definitionService.getDefDescriptor(application, ApplicationDef.class);
     }
 
@@ -338,7 +354,4 @@ public class IntegrationImpl implements Integration {
     private final boolean initializeAura;
     private final Client client;
     private final String application;
-
-    private boolean hasApplicationBeenWritten = false;
-    private int contextDepthCount = 0;
 }

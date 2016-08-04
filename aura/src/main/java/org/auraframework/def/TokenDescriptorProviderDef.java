@@ -15,21 +15,12 @@
  */
 package org.auraframework.def;
 
-import org.auraframework.throwable.quickfix.QuickFixException;
-
 /**
  * Similar to {@link ProviderDef}, except that this is only used to invoke {@link TokensDef} providers. The reason a
  * separate class hierarchy is created for token providers is because, as of this writing, the other Provider classes
  * are too closely tied to the nuances of providing components.
  */
-public interface TokenDescriptorProviderDef extends Definition {
+public interface TokenDescriptorProviderDef extends Definition, TokenProviderDef {
     @Override
     DefDescriptor<TokenDescriptorProviderDef> getDescriptor();
-
-    /**
-     * Invokes the provide method on the associated provider class.
-     *
-     * @return The result from the associated class's provide method.
-     */
-    DefDescriptor<TokensDef> provide() throws QuickFixException;
 }

@@ -16,12 +16,14 @@
 package org.auraframework.impl.root.parser.handler;
 
 import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.MethodDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.MethodDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -63,13 +65,15 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
      * @param xmlReader The XMLStreamReader that the handler should read from. It is expected to be queued up to the
      *            appropriate position before getElement() is invoked.
      */
-    public MethodDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(parentHandler, xmlReader, source);
+    public MethodDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                            boolean isInInternalNamespace, DefinitionService definitionService,
+                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         String name = getAttributeValue(ATTRIBUTE_NAME);
         if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
             error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_NAME, TAG);
         }
-        this.defDescriptor=DefDescriptorImpl.getInstance(name,MethodDef.class);
+        this.defDescriptor = definitionService.getDefDescriptor(name, MethodDef.class);
     }
 
     @Override
@@ -86,7 +90,7 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
         }
 
         builder.setParentDescriptor(getParentHandler().getDefDescriptor());
-        builder.setDescriptor(DefDescriptorImpl.getInstance(name, MethodDef.class));
+        builder.setDescriptor(definitionService.getDefDescriptor(name, MethodDef.class));
         builder.setLocation(getLocation());
         builder.setAction(getAttributeValue(ATTRIBUTE_ACTION));
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
@@ -120,8 +124,9 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefImpl attributeDef = new AttributeDefHandler<>(this, xmlReader, source).getElement();
-            builder.getAttributeDefs().put(DefDescriptorImpl.getInstance(attributeDef.getName(), AttributeDef.class),
+            AttributeDefImpl attributeDef = new AttributeDefHandler<>(this, xmlReader, source, isInInternalNamespace,
+                    definitionService, configAdapter, definitionParserAdapter).getElement();
+            builder.getAttributeDefs().put(definitionService.getDefDescriptor(attributeDef.getName(), AttributeDef.class),
                     attributeDef);
         } else {
             error("'<%s>' does not support the child tag '<%s>'.", TAG, tag);

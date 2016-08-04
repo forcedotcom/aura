@@ -15,24 +15,24 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
-
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TokenDef;
 import org.auraframework.impl.css.token.TokenDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
+
+import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
 
 public final class TokenDefHandler<P extends RootDefinition> extends ParentedTagHandler<TokenDef, P> {
     protected static final String TAG = "aura:token";
@@ -56,8 +56,10 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
         super();
     }
 
-    public TokenDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(parentHandler, xmlReader, source);
+    public TokenDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                           boolean isInInternalNamespace, DefinitionService definitionService,
+                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         this.builder.setLocation(getLocation());
     }
 
@@ -79,7 +81,7 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
             // result in the get def descriptor below throwing a nondescript error message
             error("Missing required attribute 'name' on %s", TAG);
         }
-        builder.setDescriptor(DefDescriptorImpl.getInstance(name, TokenDef.class));
+        builder.setDescriptor(definitionService.getDefDescriptor(name, TokenDef.class));
 
         value = getAttributeValue(ATTRIBUTE_VALUE);// value (to be set on builder later, cuz it might throw a QFE)
 

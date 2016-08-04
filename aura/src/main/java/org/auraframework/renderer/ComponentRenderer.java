@@ -18,10 +18,12 @@ package org.auraframework.renderer;
 import java.io.IOException;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
-import org.auraframework.Aura;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.RenderingService;
 import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -30,6 +32,9 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 @ServiceComponentRenderer
 public class ComponentRenderer implements Renderer {
 
+    @Inject
+    private RenderingService renderingService;
+
     @SuppressWarnings("unchecked")
     @Override
     public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
@@ -37,7 +42,7 @@ public class ComponentRenderer implements Renderer {
         if(bodyAttribute !=null && bodyAttribute instanceof List) {
             List<BaseComponent<?, ?>> body = (List<BaseComponent<?, ?>>) bodyAttribute;
             for (BaseComponent<?, ?> c : body) {
-                Aura.getRenderingService().render(c, rc);
+                renderingService.render(c, rc);
             }
         }
     }

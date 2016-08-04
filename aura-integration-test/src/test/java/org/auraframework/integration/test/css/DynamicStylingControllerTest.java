@@ -15,10 +15,8 @@
  */
 package org.auraframework.integration.test.css;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.auraframework.Aura;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
@@ -27,10 +25,12 @@ import org.auraframework.impl.controller.DynamicStylingController;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
+import org.auraframework.service.InstanceService;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Basic tests for {@link DynamicStylingController}.
@@ -39,6 +39,9 @@ import com.google.common.collect.Lists;
  */
 public class DynamicStylingControllerTest extends StyleTestCase {
     private static final String ACTION = "java://org.auraframework.impl.controller.DynamicStylingController/ACTION$applyTokens";
+
+    @Inject
+    private InstanceService instanceService;
 
     /** test basic usage */
     @Test
@@ -188,7 +191,7 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         Map<String, Object> params = new HashMap<>();
         params.put("descriptors", Lists.newArrayList(descriptor));
         params.put("extraStyles", ImmutableList.<String>of());
-        Action action = (Action) Aura.getInstanceService().getInstance(ACTION, ActionDef.class, params);
+        Action action = instanceService.getInstance(ACTION, ActionDef.class, params);
         action.run();
         return action;
     }

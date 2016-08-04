@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.root.parser.handler;
 
-
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
@@ -126,5 +125,4 @@ public class MethodDefHandlerTest extends AuraImplTestCase {
         addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", markup));
         return cmpDesc;
     }
-
 }

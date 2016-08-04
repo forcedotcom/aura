@@ -15,20 +15,21 @@
  */
 package org.auraframework.impl.adapter.format.json;
 
-import java.io.IOException;
-import java.util.Collection;
-
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.LibraryDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 
-import aQute.bnd.annotation.component.Component;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Collection;
 
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class LibraryDefJSONFormatAdapter extends JSONFormatAdapter<LibraryDef> {
+    @Inject
+    private ContextService contextService;
 
     @Override
     public Class<LibraryDef> getType() {
@@ -38,7 +39,7 @@ public class LibraryDefJSONFormatAdapter extends JSONFormatAdapter<LibraryDef> {
     @Override
     public void writeCollection(Collection<? extends LibraryDef> values, Appendable out) throws IOException,
             QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         JsonEncoder.serialize(values, out, context.getJsonSerializationContext());
     }
 }

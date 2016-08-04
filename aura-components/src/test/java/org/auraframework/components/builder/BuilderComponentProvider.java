@@ -18,26 +18,30 @@ package org.auraframework.components.builder;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
 
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.builder.ComponentDefBuilder;
 import org.auraframework.builder.ComponentDefRefBuilder;
-
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.ComponentConfig;
-
+import org.auraframework.service.BuilderService;
 import org.auraframework.service.DefinitionService;
-
-import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
 
-@Provider
+@ServiceComponentProvider
 public class BuilderComponentProvider implements ComponentConfigProvider {
+    @Inject
+    private DefinitionService definitionService;
+
+    @Inject
+    private BuilderService builderService;
+
     public static AtomicInteger counter = new AtomicInteger(1);
 
     private String getUniqueName() {
@@ -47,17 +51,17 @@ public class BuilderComponentProvider implements ComponentConfigProvider {
     @Override
     public ComponentConfig provide() throws QuickFixException {
         String name = getUniqueName();
-        DefinitionService ds = Aura.getDefinitionService();
-        DefDescriptor<ComponentDef> newDesc = ds.getDefDescriptor("builderComponent:"+name, ComponentDef.class);
-        ComponentDefRefBuilder contents = Aura.getBuilderService().getComponentDefRefBuilder();
-        contents.setDescriptor(ds.getDefDescriptor("componentTest:builderInjected", ComponentDef.class));
-        ComponentDefBuilder builder = Aura.getBuilderService().getComponentDefBuilder();
+        DefDescriptor<ComponentDef> newDesc = definitionService.getDefDescriptor("builderComponent:" + name,
+                ComponentDef.class);
+        ComponentDefRefBuilder contents = builderService.getComponentDefRefBuilder();
+        contents.setDescriptor(definitionService.getDefDescriptor("componentTest:builderInjected", ComponentDef.class));
+        ComponentDefBuilder builder = builderService.getComponentDefBuilder();
         builder.setDescriptor(newDesc);
         builder.setDescription("A custom built component");
         List<ComponentDefRef> body = Lists.newArrayList();
         body.add(contents.build());
         builder.setFacet("body", body);
-        ds.getDefRegistry().addLocalDef(builder.build());
+        definitionService.getDefRegistry().addLocalDef(builder.build());
         ComponentConfig cc = new ComponentConfig();
         cc.setDescriptor(newDesc);
         return cc;

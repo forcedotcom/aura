@@ -15,11 +15,12 @@
  */
 package org.auraframework.impl.java.controller;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 
-@Controller
-public class TestControllerWithNonPublicMethods {
+@ServiceComponent
+public class TestControllerWithNonPublicMethods implements Controller {
     @AuraEnabled
     protected void protectedMethod() {
     }

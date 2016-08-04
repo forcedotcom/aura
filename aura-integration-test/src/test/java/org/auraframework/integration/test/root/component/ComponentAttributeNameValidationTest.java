@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.root.component;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
@@ -30,7 +29,7 @@ import org.junit.Test;
 public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
     private Component getComponentInstance(String markup) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
-        return Aura.getInstanceService().getInstance(cmpDesc);
+        return instanceService.getInstance(cmpDesc);
     }
 
     private void assertAttributeNotFoundException(String markup, String missingAttr) throws Exception {

@@ -15,29 +15,29 @@
  */
 package org.auraframework.impl.java.controller;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 
-@Controller
-public class TestControllerWithParameters {
+@ServiceComponent
+public class TestControllerWithParameters implements Controller {
 
     @AuraEnabled
-    public static String appendStrings(@Key("a") String a, @Key("b") String b) {
+    public String appendStrings(@Key("a") String a, @Key("b") String b) {
         return a + b;
     }
 
     @AuraEnabled
-    public static Integer sumValues(@Key("a") Integer a, @Key("b") Integer b) {
+    public Integer sumValues(@Key("a") Integer a, @Key("b") Integer b) {
         return Integer.valueOf(a.intValue() + b.intValue());
     }
 
     @AuraEnabled
- 	public static String customParam(@Key("a") CustomParam a) {
- 	     return "Anything";
+    public String customParam(@Key("a") CustomParam a) {
+        return "Anything";
     }
 
     public class CustomParam {
     }
 }
-

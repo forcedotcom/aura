@@ -15,33 +15,33 @@
  */
 package org.auraframework.impl.util;
 
+import com.google.common.collect.Sets;
+import org.auraframework.Aura;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.expression.Expression;
+import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.impl.expression.AuraExpressionBuilder;
+import org.auraframework.impl.expression.PropertyReferenceImpl;
+import org.auraframework.impl.root.AttributeDefRefImpl;
+import org.auraframework.impl.root.component.ComponentDefRefImpl;
+import org.auraframework.impl.root.parser.handler.ExpressionContainerHandler;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.Location;
+import org.auraframework.throwable.quickfix.AuraValidationException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.auraframework.util.AuraTextUtil;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.expression.Expression;
-import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.AuraImpl;
-import org.auraframework.impl.expression.PropertyReferenceImpl;
-import org.auraframework.impl.root.AttributeDefRefImpl;
-import org.auraframework.impl.root.component.ComponentDefRefImpl;
-import org.auraframework.impl.root.parser.handler.ExpressionContainerHandler;
-import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.system.Location;
-import org.auraframework.throwable.quickfix.AuraValidationException;
-import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.util.AuraTextUtil;
-
-import com.google.common.collect.Sets;
 
 /**
  * Parses expressions and literal text. Those tokens can then be converted into
@@ -67,12 +67,12 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
             Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
     public static enum TokenType {
-        PLAINTEXT(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class)),
-        EXPRESSION(DefDescriptorImpl.getInstance("aura:expression", ComponentDef.class));
+        PLAINTEXT("aura:text"),
+        EXPRESSION("aura:expression");
 
-        private final DefDescriptor<ComponentDef> componentDefDescriptor;
+        private final String componentDefDescriptor;
 
-        private TokenType(DefDescriptor<ComponentDef> componentDefDescriptor) {
+        private TokenType(String componentDefDescriptor) {
             this.componentDefDescriptor = componentDefDescriptor;
         }
     }
@@ -252,7 +252,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
             Set<PropertyReference> propRefs = null;
             if (type == TokenType.EXPRESSION) {
                 propRefs = Sets.newHashSetWithExpectedSize(2);
-                Expression e = AuraImpl.getExpressionAdapter().buildExpression(unwrap(raw), location);
+                Expression e = AuraExpressionBuilder.INSTANCE.buildExpression(unwrap(raw), location);
                 e.gatherPropertyReferences(propRefs);
                 e.setByValue(raw.charAt(1)=='#');
                 result = e;
@@ -298,10 +298,11 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
             }
 
             AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();
-            DefDescriptor<AttributeDef> attdesc = DefDescriptorImpl.getInstance("value", AttributeDef.class);
+            DefDescriptor<AttributeDef> attdesc = Aura.getDefinitionService().getDefDescriptor("value", AttributeDef.class);
             atBuilder.setDescriptor(attdesc);
             atBuilder.setLocation(location);
             atBuilder.setValue(value);
+            atBuilder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
 
             ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
             builder.setDescriptor(type.componentDefDescriptor);

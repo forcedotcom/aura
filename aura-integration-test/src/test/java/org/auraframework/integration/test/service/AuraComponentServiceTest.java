@@ -15,11 +15,6 @@
  */
 package org.auraframework.integration.test.service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
@@ -35,6 +30,10 @@ import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 public class AuraComponentServiceTest extends AuraImplTestCase {
     /**
      * Testing the getComponent method. Get a component and call each getting
@@ -42,7 +41,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
      */
     @Test
     public void testGetComponent() throws Exception {
-        Component component = Aura.getInstanceService()
+        Component component = instanceService
                 .getInstance("auratest:testComponent1", ComponentDef.class, null);
         assertEquals("Default String", component.getAttributes().getExpression("myString")); // from
                                                                                              // the
@@ -103,7 +102,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
      */
     @Test
     public void testGetApplication() throws QuickFixException {
-        Application application = Aura.getInstanceService().getInstance("auratest:testApplication1",
+        Application application = instanceService.getInstance("auratest:testApplication1",
                 ApplicationDef.class, null);
         assertEquals("Default String", application.getAttributes().getExpression("myString")); // from
                                                                                                // the

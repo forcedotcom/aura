@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -98,7 +99,9 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
     /**
      * For Future: When Application can be included as FACETS
      */
-    public void _testBrowserHistoryInteractionInComplexComponent2() throws MalformedURLException, URISyntaxException {
+    @Test
+    @Ignore
+    public void testBrowserHistoryInteractionInComplexComponent2() throws MalformedURLException, URISyntaxException {
         /*
          * This verifies that even though the Inner component has its own location change event, in the context of
          * another bigger component, only the root component's location change event is fired. In this case

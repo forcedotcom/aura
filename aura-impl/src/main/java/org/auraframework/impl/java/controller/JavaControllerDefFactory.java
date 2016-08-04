@@ -15,6 +15,33 @@
  */
 package org.auraframework.impl.java.controller;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.auraframework.builder.DefBuilder;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TypeDef;
+import org.auraframework.def.ValueDef;
+import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.impl.java.BaseJavaDefFactory;
+import org.auraframework.impl.java.model.JavaValueDef;
+import org.auraframework.impl.java.type.JavaTypeDef;
+import org.auraframework.impl.system.SubDefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.BackgroundAction;
+import org.auraframework.system.Annotations.CabooseAction;
+import org.auraframework.system.Annotations.Key;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.DefFactory;
+import org.auraframework.system.Location;
+import org.auraframework.system.SourceLoader;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -23,65 +50,47 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.builder.DefBuilder;
-import org.auraframework.def.ActionDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.TypeDef;
-import org.auraframework.def.ValueDef;
-import org.auraframework.impl.java.BaseJavaDefFactory;
-import org.auraframework.impl.java.model.JavaValueDef;
-import org.auraframework.impl.java.type.JavaTypeDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.system.SubDefDescriptorImpl;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.BackgroundAction;
-import org.auraframework.system.Annotations.CabooseAction;
-import org.auraframework.system.Annotations.Controller;
-import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.DefFactory;
-import org.auraframework.system.Location;
-import org.auraframework.system.SourceLoader;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 /**
  * A {@link DefFactory} for Java controllers.
  */
 public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> {
 
-    public JavaControllerDefFactory() {
-        this(null);
+    private DefinitionService definitionService;
+
+    public JavaControllerDefFactory(List<SourceLoader> sourceLoaders, DefinitionService definitionService) {
+        super(sourceLoaders);
+        this.definitionService = definitionService;
     }
 
-    public JavaControllerDefFactory(List<SourceLoader> sourceLoaders) {
-        super(sourceLoaders);
+    public ControllerDef getDef_DONOTUSE(DefDescriptor<ControllerDef> descriptor, Class<?> clazz)
+            throws QuickFixException {
+        return getBuilder(descriptor, clazz).build();
     }
 
     @Override
     protected DefBuilder<?, ? extends ControllerDef> getBuilder(DefDescriptor<ControllerDef> descriptor)
             throws QuickFixException {
-        JavaControllerDefImpl.Builder builder = new JavaControllerDefImpl.Builder();
-        builder.setDescriptor(descriptor);
-
-        Class<?> c = getClazz(descriptor);
-        if (c == null) {
+        Class<?> clazz = getClazz(descriptor);
+        if (clazz == null) {
             return null;
         }
-        builder.setControllerClass(c);
-        // FIXME = "we need an md5";
-        builder.setLocation(c.getCanonicalName(), -1);
-        Controller ann = findAnnotation(c, Controller.class);
-        if (ann == null) {
+        return getBuilder(descriptor, clazz);
+    }
+
+    private DefBuilder<?, ? extends ControllerDef> getBuilder(DefDescriptor<ControllerDef> descriptor, Class<?> clazz)
+            throws QuickFixException {
+        JavaControllerDefImpl.Builder builder = new JavaControllerDefImpl.Builder();
+        builder.setDescriptor(descriptor);
+        builder.setControllerClass(clazz);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
+        builder.setLocation(clazz.getCanonicalName(), -1);
+        if (!Controller.class.isAssignableFrom(clazz)) {
             throw new InvalidDefinitionException(String.format(
-                    "@Controller annotation is required on all Controllers.  Not found on %s", descriptor),
+                    "%s must implement org.auraframework.ds.servicecomponent.Controller", clazz.toString()),
                     builder.getLocation());
         }
         try {
-            builder.setActionMap(createActions(c, builder.getDescriptor()));
+            builder.setActionMap(createActions(clazz, builder.getDescriptor()));
         } catch (QuickFixException qfe) {
             builder.setParseError(qfe);
         }
@@ -126,8 +135,8 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
      * @param method the method for which we want to create an action.
      * @throws QuickFixException if the method is invalid for some reason.
      */
-    private static JavaActionDef makeActionDef(Method method, Class<?> controllerClass,
-            DefDescriptor<ControllerDef> controllerDesc) throws QuickFixException {
+    private JavaActionDef makeActionDef(Method method, Class<?> controllerClass,
+                                        DefDescriptor<ControllerDef> controllerDesc) throws QuickFixException {
 
         JavaActionDef.Builder actionBuilder = new JavaActionDef.Builder();
         String name = method.getName();
@@ -138,7 +147,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
 
         actionBuilder.setDescriptor(SubDefDescriptorImpl.getInstance(name, controllerDesc, ActionDef.class));
         actionBuilder.setMethod(method);
-        actionBuilder.setReturnTypeDescriptor(DefDescriptorImpl.getInstance("java://"
+        actionBuilder.setReturnTypeDescriptor(definitionService.getDefDescriptor("java://"
                 + method.getReturnType().getName(), TypeDef.class));
         actionBuilder.setJavaParams(method.getParameterTypes());
         Type[] genParams = method.getGenericParameterTypes();
@@ -149,9 +158,8 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
                 if (annotation instanceof Key) {
                     found = true;
                     String qn = "java://" + formatType(genParams[i]);
-                    DefDescriptor<TypeDef> typeDefDesc = DefDescriptorImpl.getInstance(qn, TypeDef.class);
+                    DefDescriptor<TypeDef> typeDefDesc = definitionService.getDefDescriptor(qn, TypeDef.class);
 
-                    // FIXME = "we need an md5";
                     String paramName = ((Key) annotation).value();
                     ValueDef valueDef = new JavaValueDef(paramName, typeDefDesc, new Location(
                             controllerClass.getName() + "." + name, 0));
@@ -172,7 +180,9 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
         
     	actionBuilder.setBackground(method.isAnnotationPresent(BackgroundAction.class));
     	actionBuilder.setCaboose(method.isAnnotationPresent(CabooseAction.class));
-        
+
+        actionBuilder.setAccess(new DefinitionAccessImpl(Access.INTERNAL));
+
         return actionBuilder.build();
     }
 
@@ -192,8 +202,8 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
      * @param controllerClass the class that contains our action functions.
      * @param controllerDesc a descriptor for the class.
      */
-    public static Map<String, JavaActionDef> createActions(Class<?> controllerClass,
-            DefDescriptor<ControllerDef> controllerDesc) throws QuickFixException {
+    public Map<String, JavaActionDef> createActions(Class<?> controllerClass,
+                                                    DefDescriptor<ControllerDef> controllerDesc) throws QuickFixException {
         Map<String, JavaActionDef> actions = Maps.newTreeMap();
         for (Method method : controllerClass.getMethods()) {
             if (method.isAnnotationPresent(AuraEnabled.class)) {

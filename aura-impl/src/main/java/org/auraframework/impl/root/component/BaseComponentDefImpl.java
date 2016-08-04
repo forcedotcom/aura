@@ -67,6 +67,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.javascript.BaseJavascriptClass;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -96,8 +97,8 @@ import com.google.common.collect.Sets;
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
-    public static final DefDescriptor<InterfaceDef> ROOT_MARKER = DefDescriptorImpl.getInstance(
-            "markup://aura:rootComponent", InterfaceDef.class);
+    public static final DefDescriptor<InterfaceDef> ROOT_MARKER = new DefDescriptorImpl<>(
+            "markup", "aura", "rootComponent", InterfaceDef.class);
 
     private static final long serialVersionUID = -2485193714215681494L;
     private final boolean isAbstract;
@@ -1136,13 +1137,13 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         return js;
     }
-
+    
     private void initializeJavascriptClass(boolean minify) throws QuickFixException {
         if (javascriptClass == null) {
             javascriptClass = new JavascriptComponentClass.Builder().setDefinition(this).setMinify(minify).build();
         }
     }
-
+    
     /**
      * Return true if the definition is a component that needs to be locked.
      */
@@ -1444,6 +1445,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             atBuilder.setDescriptor(key);
             atBuilder.setLocation(getLocation());
             atBuilder.setValue(value);
+            atBuilder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
             facets.add(atBuilder.build());
             return this;
         }
@@ -1452,21 +1454,21 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             if (this.rendererDescriptors == null) {
                 this.rendererDescriptors = Lists.newArrayList();
             }
-            this.rendererDescriptors.add(DefDescriptorImpl.getInstance(name, RendererDef.class));
+            this.rendererDescriptors.add(Aura.getDefinitionService().getDefDescriptor(name, RendererDef.class));
         }
 
         public void addHelper(String name) {
             if (this.helperDescriptors == null) {
                 this.helperDescriptors = Lists.newArrayList();
             }
-            this.helperDescriptors.add(DefDescriptorImpl.getInstance(name, HelperDef.class));
+            this.helperDescriptors.add(Aura.getDefinitionService().getDefDescriptor(name, HelperDef.class));
         }
 
         public void addResource(String name) {
             if (this.resourceDescriptors == null) {
                 this.resourceDescriptors = Lists.newArrayList();
             }
-            this.resourceDescriptors.add(DefDescriptorImpl.getInstance(name, ResourceDef.class));
+            this.resourceDescriptors.add(Aura.getDefinitionService().getDefDescriptor(name, ResourceDef.class));
         }
 
         @Override
@@ -1604,7 +1606,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 this.tokenOverrides = new ArrayList<>();
             }
             for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(tokenOverrides)) {
-                this.tokenOverrides.add(DefDescriptorImpl.getInstance(name, TokensDef.class));
+                this.tokenOverrides.add(Aura.getDefinitionService().getDefDescriptor(name, TokensDef.class));
             }
             return this;
         }

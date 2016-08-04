@@ -15,17 +15,36 @@
  */
 package org.auraframework.impl.root.parser;
 
-import javax.xml.stream.XMLStreamReader;
-
-import org.auraframework.def.LibraryDef;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.root.parser.handler.LibraryDefHandler;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 
+import javax.xml.stream.XMLStreamReader;
+
+@ServiceComponent
 public class LibraryXMLParser extends XMLParser<LibraryDef> {
+
     @Override
-    protected LibraryDefHandler getHandler(DefDescriptor<LibraryDef> descriptor,
-            Source<LibraryDef> source, XMLStreamReader xmlReader) {
-        return new LibraryDefHandler(descriptor, source, xmlReader);
+    public Format getFormat() {
+        return Format.XML;
+    }
+
+    @Override
+    public DefType getDefType() {
+        return DefType.LIBRARY;
+    }
+
+    @Override
+    protected LibraryDefHandler getHandler(DefDescriptor<LibraryDef> descriptor, Source<LibraryDef> source,
+                                           XMLStreamReader xmlReader, boolean isInInternalNamespace,
+                                           DefinitionService definitionService,
+                                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        return new LibraryDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
     }
 }

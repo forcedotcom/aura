@@ -15,23 +15,23 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
-
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.css.flavor.FlavorIncludeDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
+
+import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
 
 public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedTagHandler<FlavorIncludeDef, P> {
     protected static final String TAG = "aura:include";
@@ -41,9 +41,12 @@ public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedT
 
     private final FlavorIncludeDefImpl.Builder builder = new FlavorIncludeDefImpl.Builder();
 
-    public FlavorIncludeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        super(parentHandler, xmlReader, source);
+    public FlavorIncludeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                                   boolean isInInternalNamespace, DefinitionService definitionService,
+                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         builder.setLocation(getLocation());
+        builder.setAccess(getAccess(isInInternalNamespace));
     }
 
     @Override
@@ -67,7 +70,7 @@ public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedT
 
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
         builder.setParentDescriptor(getParentDefDescriptor());
-        builder.setDescriptor(DefDescriptorImpl.getInstance(source, FlavorIncludeDef.class));
+        builder.setDescriptor(definitionService.getDefDescriptor(source, FlavorIncludeDef.class));
     }
 
     @Override

@@ -15,11 +15,7 @@
  */
 package org.auraframework.integration.test.validation;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraFiles;
@@ -28,7 +24,11 @@ import org.auraframework.util.validation.ValidationClient;
 import org.auraframework.util.validation.ValidationTestUtil;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.List;
 
 /**
  * Testing validation tool functionality. UnAdaptableTest because requires source to check present in file system.

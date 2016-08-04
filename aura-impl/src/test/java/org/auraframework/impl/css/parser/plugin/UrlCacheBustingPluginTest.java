@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.css.parser.plugin;
 
-import org.auraframework.Aura;
 import org.auraframework.impl.AuraImplTestCase;
 import org.junit.Test;
 
@@ -26,7 +25,7 @@ public class UrlCacheBustingPluginTest extends AuraImplTestCase {
     private void assertBustedUrl(String expectedFormat, String initialValue) throws Exception {
         UrlCacheBustingPlugin acb = new UrlCacheBustingPlugin(true);
         UrlFunctionValue ufv = new UrlFunctionValue(initialValue);
-        String buster = "" + Aura.getConfigAdapter().getBuildTimestamp();
+        String buster = "" + getMockConfigAdapter().getBuildTimestamp();
         String expected = String.format(expectedFormat, buster);
 
         acb.rework(ufv);

@@ -122,8 +122,8 @@ public abstract class ActionDelegate implements Action {
     }
 
     @Override
-    public void setCallingDescriptor(String caller) {
-        original.setCallingDescriptor(caller);
+    public void setCallingDescriptor(DefDescriptor<ComponentDef> descriptor) {
+        original.setCallingDescriptor(descriptor);
     }
     
 	@Override

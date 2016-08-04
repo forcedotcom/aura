@@ -15,10 +15,9 @@
  */
 package org.auraframework.integration.test;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
@@ -38,14 +37,13 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
 
 /**
- *
  * UI test for usage of Integration Service.
- *
  */
 @ThreadHostileTest("Tests modify if locker service is enabled")
 public class IntegrationServiceImplUITest extends WebDriverTestCase {
@@ -827,5 +825,4 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
             throws MalformedURLException, URISyntaxException {
         openIntegrationStub(defaultStubCmp, toInject, attributeMap, null);
     }
-
 }

@@ -15,6 +15,10 @@
  */
 package org.auraframework.util.resource;
 
+import org.auraframework.util.IOUtil;
+import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -24,12 +28,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Scanner;
-
-import org.auraframework.util.IOUtil;
-import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Test;
-
-import com.google.common.io.Files;
 
 /**
  * Tests for aura.util.resource.ResourceLoader
@@ -86,7 +84,7 @@ public class ResourceLoaderTest extends UnitTestCase {
          *  /TestName.jar: the jar file that packs up the source found in /TestName-ORIG for the jar-based loader.
          * </pre>
          */
-        testFolder = Files.createTempDir();
+        testFolder = new File(IOUtil.newTempDir("ResourceTest"));
         origFolder = new File(testFolder, getName() + "-ORIG");
         origFolder.mkdir();
         tempFolder = new File(testFolder, getName() + "-TEMP");

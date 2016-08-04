@@ -27,7 +27,7 @@ public class PillContainerAutoCompleteWithUsePanelUITest extends BasePillContain
 	
 	@Override
     @Test
-    public void testLossOfFocusVerification(){
+	public void testLossOfFocusVerification(){
 		//TODO:Remove this override test once W-2707857 is fixed
 	}
 }

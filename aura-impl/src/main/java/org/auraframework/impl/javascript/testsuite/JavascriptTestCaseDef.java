@@ -15,17 +15,13 @@
  */
 package org.auraframework.impl.javascript.testsuite;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -35,14 +31,20 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implements TestCaseDef {
     public JavascriptTestCaseDef(DefDescriptor<TestSuiteDef> suiteDescriptor, String name, Location location,
-            Map<String, Object> attributes, DefType defType, Set<String> testLabels, Set<String> browsers,
-            List<Object> mocks, Set<String> auraErrorsExpectedDuringInit, String scrumTeam, String owner) {
-        super(DefDescriptorImpl.getInstance(suiteDescriptor.getQualifiedName() + "/" + DefType.TESTCASE + "$" + name,
-                TestCaseDef.class), location);
+                                 Map<String, Object> attributes, DefType defType, Set<String> testLabels, Set<String> browsers,
+                                 List<Object> mocks, Set<String> auraErrorsExpectedDuringInit, String scrumTeam, String owner,
+                                 DefinitionAccess access) {
+        // FIXME: 3Tier 
+        super(new DefDescriptorImpl<>(suiteDescriptor.getQualifiedName() + "/" + DefType.TESTCASE + "$" + name,
+                TestCaseDef.class, null), location, access);
         this.suiteDescriptor = suiteDescriptor;
         this.attributes = attributes == null ? null : AuraUtil.immutableMap(attributes);
         this.defType = defType;

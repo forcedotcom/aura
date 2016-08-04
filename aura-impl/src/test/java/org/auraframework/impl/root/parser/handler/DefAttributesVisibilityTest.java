@@ -16,7 +16,7 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.util.Set;
-
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -25,7 +25,10 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
+import org.junit.Before;
 import org.junit.Test;
+
+import javax.inject.Inject;
 
 import com.google.common.collect.Sets;
 
@@ -33,6 +36,12 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     protected Set<String> publicAttrs;
     protected Set<String> internalAttrs;
     protected Set<String> publicAndInternalAttrs;
+
+    @Inject
+    StringSourceLoader loader;
+
+    @Inject
+    DefinitionParserAdapter definitionParserAdapter;
 
     @Override
     public void setUp() throws Exception {
@@ -42,7 +51,6 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     }
 
     protected <D extends Definition> DefDescriptor<D> getDescriptor(boolean internal, Class<D> clazz) {
-        StringSourceLoader loader = StringSourceLoader.getInstance();
         String prefix;
 
         if (internal) {
@@ -61,18 +69,19 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         assertTrue("Internal and private sets must not intersect" + intersect, intersect.size() == 0);
     }
 
-    @Test
+	@Test
     public void testInternalAttributeSet() throws Exception {
         compareExpectedWithActual(publicAndInternalAttrs, getHandler(true));
     }
-
-    @Test
+	
+	@Test
     public void testNonInternalAttributeSet() throws Exception {
         compareExpectedWithActual(publicAttrs, getHandler(false));
     }
 
     public static class ApplicationDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
         @Override
+        @Before
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "implements", "useAppcache",
                         "additionalAppCacheURLs", "controller", "model", "apiVersion", "abstract", "extensible",
@@ -85,12 +94,14 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
 
         @Override
         protected XMLHandler<?> getHandler(boolean internal) {
-            return new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null);
+            return new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null, internal,
+                    definitionService, contextService, configAdapter, definitionParserAdapter);
         }
     }
 
     public static class ComponentDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
         @Override
+        @Before
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "implements", "controller",
                     "model", "apiVersion", "abstract", "extensible", "extends", "isTemplate");
@@ -102,12 +113,14 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
 
         @Override
         protected XMLHandler<?> getHandler(boolean internal) {
-            return new ComponentDefHandler(getDescriptor(internal, ComponentDef.class), null, null);
+            return new ComponentDefHandler(getDescriptor(internal, ComponentDef.class), null, null, internal,
+                    definitionService, contextService, configAdapter, definitionParserAdapter);
         }
     }
 
     public static class EventDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
         @Override
+        @Before
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "extends", "type", "apiVersion");
             internalAttrs = Sets.newHashSet("support");
@@ -116,12 +129,14 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
 
         @Override
         protected XMLHandler<?> getHandler(boolean internal) {
-            return new EventDefHandler(getDescriptor(internal, EventDef.class), null, null);
+            return new EventDefHandler(getDescriptor(internal, EventDef.class), null, null, internal,
+                    definitionService, configAdapter, definitionParserAdapter);
         }
     }
 
     public static class InterfaceDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
         @Override
+        @Before
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "extends", "apiVersion");
             internalAttrs = Sets.newHashSet("support");
@@ -130,12 +145,14 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
 
         @Override
         protected XMLHandler<?> getHandler(boolean internal) {
-            return new InterfaceDefHandler(getDescriptor(internal, InterfaceDef.class), null, null);
+            return new InterfaceDefHandler(getDescriptor(internal, InterfaceDef.class), null, null, internal,
+                    definitionService, contextService, configAdapter, definitionParserAdapter);
         }
     }
 
     public static class AttributeDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
         @Override
+        @Before
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "default", "description", "name", "required", "type");
             internalAttrs = Sets.newHashSet("serializeTo");
@@ -145,13 +162,16 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         protected XMLHandler<?> getHandler(boolean internal) {
             ApplicationDefHandler parentHandler;
-            parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null);
-            return new AttributeDefHandler<>(parentHandler, null, null);
+            parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null,
+                    internal, definitionService, contextService, configAdapter, definitionParserAdapter);
+            return new AttributeDefHandler<>(parentHandler, null, null, internal, definitionService, configAdapter,
+                    definitionParserAdapter);
         }
     }
 
     public static class RegisterEventAttributesVisibilityTest extends DefAttributesVisibilityTest {
         @Override
+        @Before
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "name", "type");
             internalAttrs = Sets.newHashSet();
@@ -161,13 +181,16 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         protected XMLHandler<?> getHandler(boolean internal) {
             ApplicationDefHandler parentHandler;
-            parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null);
-            return new RegisterEventHandler<>(parentHandler, null, null);
+            parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null,
+                    internal, definitionService, contextService, configAdapter, definitionParserAdapter);
+            return new RegisterEventHandler<>(parentHandler, null, null, internal, definitionService, configAdapter,
+                    definitionParserAdapter);
         }
     }
 
     public static class AttributeDefRefAttributesVisibilityTest extends DefAttributesVisibilityTest {
         @Override
+        @Before
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("attribute", "value");
             internalAttrs = Sets.newHashSet();
@@ -177,13 +200,16 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         protected XMLHandler<?> getHandler(boolean internal) {
             ApplicationDefHandler parentHandler;
-            parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null);
-            return new AttributeDefRefHandler<>(parentHandler, null, null);
+            parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null,
+                    internal, definitionService, contextService, configAdapter, definitionParserAdapter);
+            return new AttributeDefRefHandler<>(parentHandler, null, null, internal, definitionService,
+                    configAdapter, definitionParserAdapter);
         }
     }
 
     public static class EventHandlerDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
         @Override
+        @Before
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("action", "description", "event", "name", "value", "phase", "includeFacets");
             internalAttrs = Sets.newHashSet();
@@ -193,8 +219,9 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         protected XMLHandler<?> getHandler(boolean internal) {
             ApplicationDefHandler parentHandler;
-            parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null);
-            return new EventHandlerDefHandler(parentHandler, null, null);
+            parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null,
+                    internal, definitionService, contextService, configAdapter, definitionParserAdapter);
+            return new EventHandlerDefHandler(parentHandler, null, null, definitionService);
         }
     }
 

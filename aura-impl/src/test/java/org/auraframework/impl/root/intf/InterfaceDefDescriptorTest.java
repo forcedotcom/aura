@@ -18,19 +18,22 @@ package org.auraframework.impl.root.intf;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.InterfaceDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
+
+import javax.inject.Inject;
 
 /**
  */
 public class InterfaceDefDescriptorTest extends UnitTestCase {
+    @Inject
+    protected DefinitionService definitionService;
 
     @Test
     public void testGetDefType() {
-        DefDescriptor<InterfaceDef> testDescriptor = DefDescriptorImpl.getInstance("aura:testinterfacechild",
+        DefDescriptor<InterfaceDef> testDescriptor = definitionService.getDefDescriptor("aura:testinterfacechild",
                 InterfaceDef.class);
         assertEquals(DefType.INTERFACE, testDescriptor.getDefType());
     }
-
 }

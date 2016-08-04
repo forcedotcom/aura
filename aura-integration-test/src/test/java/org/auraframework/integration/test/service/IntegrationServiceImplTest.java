@@ -15,17 +15,15 @@
  */
 package org.auraframework.integration.test.service;
 
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.auraframework.Aura;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.integration.Integration;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.IntegrationService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -37,8 +35,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import javax.inject.Inject;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Unit tests for IntegrationService. IntegrationService is used to inject aura
@@ -47,21 +47,25 @@ import com.google.common.collect.Maps;
  * preload definitions etc.
  */
 public class IntegrationServiceImplTest extends AuraImplTestCase {
-    public IntegrationServiceImplTest() {
-        // Do not setup a context, integration service manages its own context.
-        this.setShouldSetupContext(false);
-    }
-
     AuraTestingMarkupUtil tmu;
     
-    private IntegrationService service;
     private final String simpleComponentTag = "ui:button";
     private final String arraysComponentTag = "expressionTest:arrays";
 
+    @Inject
+    private IntegrationService integrationService;
+
+    @Inject
+    private ContextService contextService;
+
+    public IntegrationServiceImplTest() {
+        super();
+        setShouldSetupContext(false);
+    }
+    
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        service = Aura.getIntegrationService();
         tmu = getAuraTestingMarkupUtil();
     }
 
@@ -75,15 +79,15 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     @Test
     public void testNullsForIntegrationService() throws Exception {
         Integration integration = null;
-        assertNotNull("Failed to locate integration service implementation.", service);
+        assertNotNull("Failed to locate integration service implementation.", integrationService);
         // All Nulls
-        integration = service.createIntegration(null, null, true, null, null, null);
+        integration = integrationService.createIntegration(null, null, true, null, null, null);
         assertException(integration);
         // No Context Path
-        integration = service.createIntegration(null, Mode.UTEST, true, null, null, null);
+        integration = integrationService.createIntegration(null, Mode.UTEST, true, null, null, null);
         assertException(integration);
         // No mode specified
-        integration = service.createIntegration("", null, true, null, null, null);
+        integration = integrationService.createIntegration("", null, true, null, null, null);
         assertException(integration);
     }
 
@@ -123,21 +127,18 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      */
     @Test
     public void testSanityCheck() throws Exception {
-        assertNotNull("Failed to locate implementation of IntegrationService.", service);
+        assertNotNull("Failed to locate implementation of IntegrationService.", integrationService);
 
         Mode[] testModes = new Mode[] { Mode.UTEST, Mode.PROD, Mode.FTEST, Mode.JSTEST, Mode.JSTESTDEBUG, Mode.PRODDEBUG, Mode.PTEST, Mode.SELENIUM, Mode.STATS };
         for (Mode m : testModes) {
-            Integration integration = service.createIntegration("", m, true, null, getNoDefaultPreloadsApp().getQualifiedName(), null);
+            Integration integration = integrationService.createIntegration("", m, true, null, getNoDefaultPreloadsApp().getQualifiedName(), null);
             assertNotNull(String.format(
                     "Failed to create an integration object using IntegrationService in %s mode. Returned null.", m),
                     integration);
             try {
                 injectSimpleComponent(integration);
             } catch (Exception unexpected) {
-                fail(String
-                        .format("Failed to use IntegrationService to inject a component in %s mode with the following exception:",
-                                m)
-                        + unexpected.getMessage());
+                throw new RuntimeException(String.format("Failed to inject a component in %s mode", m), unexpected);
             }
         }
     }
@@ -155,12 +156,9 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
-        try {
             integration.injectComponentHtml(cmp1.getDescriptorName(), attributes, "", "", out);
             integration.injectComponentHtml(cmp2.getDescriptorName(), attributes, "", "", out);
-        } catch (Exception unexpected) {
-            fail("Failed to inject multiple component. Exception:" + unexpected.getMessage());
-        }
+
         // Verify that the boot strap was written only once
         assertNotNull(out);
         Pattern frameworkJS = Pattern.compile("<script src=\"/auraFW/javascript/[^/]+/aura_.{4}.js\"[^>]*></script>");
@@ -226,11 +224,10 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     /**
      * Verify initializing attributes and event handlers during component
      * injection.
-     * @throws QuickFixException 
      * W-2370679: this test pass, but adding handler function like this doesn't work.
      */
     @Test
-    public void testAttributesAndEvents() throws QuickFixException {
+    public void testAttributesAndEvents() throws Exception {
         String attributeMarkup = "<aura:attribute name='strAttr' type='String'/>"
                 + "<aura:attribute name='booleanAttr' type='Boolean'/>";
         String eventsMarkup = "<aura:registerevent name='press' type='ui:press'/>"
@@ -247,12 +244,8 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
 
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
-        try {
-            integration.injectComponentHtml(cmp.getDescriptorName(), attributes, "", "", out);
-        } catch (Exception unexpected) {
-            fail("Exception occured when injecting component with attribute and event handlers. Exception:"
-                    + unexpected.getMessage());
-        }
+
+        integration.injectComponentHtml(cmp.getDescriptorName(), attributes, "", "", out);
     }
 
     /**
@@ -296,7 +289,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     }
     
 	private Integration createIntegration() throws QuickFixException {
-		return service.createIntegration("", Mode.UTEST, true, null, getNoDefaultPreloadsApp().getQualifiedName(), null);
+        return integrationService.createIntegration("", Mode.UTEST, true, null, getNoDefaultPreloadsApp().getQualifiedName(), null);
 	}
 
     @Ignore("W-1505382")
@@ -370,11 +363,9 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
-        try {
-            integration.injectComponentHtml(cmp.getDescriptorName(), attributes, "", "", out);
-        } catch (Exception unexpected) {
-            fail("Exceptions during component instantiation should be funneled to the client.");
-        }
+
+        // Exceptions during component instantiation should be funneled to the client.
+        integration.injectComponentHtml(cmp.getDescriptorName(), attributes, "", "", out);
     }
 
     /**
@@ -384,7 +375,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      */
     @Test
     public void testNoDefaultsPreloadInterfaceIsInGoodState(){
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+        contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         DefDescriptor<InterfaceDef> noDefaultPreloadsInterfaceDef = definitionService.getDefDescriptor(IntegrationService.NO_DEFAULT_PRELOADS_INTERFACE, 
                 InterfaceDef.class);
         try{
@@ -404,7 +395,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
                 ApplicationDef.class, appMarkup);
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST, true, null, appDesc.getQualifiedName(), null);
+        Integration integration = integrationService.createIntegration("", Mode.UTEST, true, null, appDesc.getQualifiedName(), null);
         try {
             integration.injectComponentHtml(simpleComponentTag, attributes, "", "", out);
             fail("App used for integration should extend aura:integrationServiceApp");

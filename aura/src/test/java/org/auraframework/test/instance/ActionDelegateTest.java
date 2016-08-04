@@ -15,6 +15,8 @@
  */
 package org.auraframework.test.instance;
 
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ActionDelegate;
 import org.auraframework.util.test.util.UnitTestCase;
@@ -27,16 +29,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import static org.mockito.Mockito.mock;
+
 public class ActionDelegateTest extends UnitTestCase {
     //
     // A class to remove the 'abstract'
     //
-    private static class MyDelegateAction extends ActionDelegate {
+    private class MyDelegateAction extends ActionDelegate {
         public MyDelegateAction(Action delegate) {
             super(delegate);
         }
-    };
-
+    }
 
     private void oneCall(Map<String, Method> methodMap, Map<String,Boolean> calledMap, String name,
             Object... args) throws Throwable {
@@ -57,6 +60,9 @@ public class ActionDelegateTest extends UnitTestCase {
     public void testCallsFunctions() throws Throwable {
         Map<String,Method> methodMap = Maps.newHashMap();
         Map<String,Boolean> calledMap = Maps.newHashMap();
+
+        @SuppressWarnings("unchecked")
+        DefDescriptor<ComponentDef> componentDescriptor = mock(DefDescriptor.class);
 
         for (Method m : Action.class.getMethods()) {
             assertFalse("Duplicate method name "+m.getName(), methodMap.containsKey(m.getName()));
@@ -83,7 +89,7 @@ public class ActionDelegateTest extends UnitTestCase {
         oneCall(methodMap, calledMap, "getInstanceStack");
 
         oneCall(methodMap, calledMap, "getCallingDescriptor");
-        oneCall(methodMap, calledMap, "setCallingDescriptor", new String("descriptor"));
+        oneCall(methodMap, calledMap, "setCallingDescriptor", componentDescriptor);
         
         oneCall(methodMap, calledMap, "getCallerVersion");
         oneCall(methodMap, calledMap, "setCallerVersion", new String("version"));

@@ -15,31 +15,31 @@
  */
 package org.auraframework.impl.system;
 
-import java.util.Map;
-
-import org.auraframework.Aura;
+import com.google.common.collect.ImmutableMap;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.system.DefinitionImpl.RefBuilderImpl;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
+import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.text.Hash;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import com.google.common.collect.ImmutableMap;
+import javax.inject.Inject;
+import java.util.Map;
 
 public abstract class DefinitionImplUnitTest<I extends DefinitionImpl<D>, D extends Definition, R extends Definition, B extends RefBuilderImpl<D, R>>
-extends UnitTestCase {
+extends AuraTestCase {
 
     protected String descriptorName;
     protected String qualifiedDescriptorName;
@@ -55,6 +55,9 @@ extends UnitTestCase {
     protected String ownHash;
 
     protected AuraContext testAuraContext;
+
+    @Inject
+    private ContextService contextService;
 
     @Test
     public void testGetDescription() throws Exception {
@@ -141,21 +144,21 @@ extends UnitTestCase {
 
     @Test
     public void testAccessGlobal() throws Exception {
-        this.access = new DefinitionAccessImpl(null, "global");
+        this.access = new DefinitionAccessImpl(null, "global", false);
         DefinitionAccess actual = buildDefinition().getAccess();
         assertTrue(actual.isGlobal());
     }
 
     @Test
     public void testAccessGlobalDynamic() throws Exception {
-        this.access = new DefinitionAccessImpl(null, "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal");
+        this.access = new DefinitionAccessImpl(null, "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal", false);
         DefinitionAccess actual = buildDefinition().getAccess();
         assertTrue(actual.isGlobal());
     }
 
     @Test
-    public void testAccessDefault() throws Exception {
-        this.access = DefinitionAccessImpl.defaultAccess(null);
+    public void testAccessPublic() throws Exception {
+        this.access = new DefinitionAccessImpl(null, "public", false);
         DefinitionAccess actual = buildDefinition().getAccess();
         assertTrue(actual.isPublic());
     }
@@ -178,10 +181,10 @@ extends UnitTestCase {
     @Test
     public void testValidateDefinition() throws Exception {
         if (testAuraContext != null) {
-            Aura.getContextService().endContext();
+            contextService.endContext();
         }
 
-        testAuraContext = Aura.getContextService().startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED);
+        testAuraContext = contextService.startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED);
 
         buildDefinition().validateDefinition();
     }
@@ -201,10 +204,10 @@ extends UnitTestCase {
     @Test
     public void testValidateReferences() throws Exception {
         if (testAuraContext != null) {
-            Aura.getContextService().endContext();
+            contextService.endContext();
         }
 
-        testAuraContext = Aura.getContextService().startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED);
+        testAuraContext = contextService.startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED);
 
         setupValidateReferences();
         buildDefinition().validateReferences();
@@ -213,7 +216,7 @@ extends UnitTestCase {
     @Override
     public void tearDown() throws Exception {
         if (testAuraContext != null) {
-            Aura.getContextService().endContext();
+            contextService.endContext();
         }
     }
 
@@ -243,6 +246,9 @@ extends UnitTestCase {
         builder.setDescription(this.description);
         builder.hash = this.sourceHash;
         builder.ownHash = this.ownHash;
+        if (this.access == null) {
+            this.access = new DefinitionAccessImpl(AuraContext.Access.INTERNAL);
+        }
         builder.setAccess(this.access);
         return builder.build();
     }

@@ -15,13 +15,6 @@
  */
 package org.auraframework.impl.source;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -31,6 +24,12 @@ import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Locates source code and produces Source objects that can be used to read that
@@ -48,11 +47,10 @@ public final class SourceFactory {
 
     private final Set<String> namespaces;
 
-    public SourceFactory(Collection<SourceLoader> loaders) {
+    public SourceFactory(Collection<SourceLoader> loaders, ConfigAdapter configAdapter) {
         Map<LoaderKey, SourceLoader> mutableLoaderMap = new HashMap<>();
         Set<String> mutableNamespaces = new HashSet<>();
 
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
         for (SourceLoader loader : loaders) {
             for (String namespace : loader.getNamespaces()) {
                 mutableNamespaces.add(namespace);

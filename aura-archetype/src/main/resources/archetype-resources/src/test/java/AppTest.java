@@ -11,6 +11,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 
+import org.junit.Test;
+
 /**
  * Test to verify HTTP response of generated simple aura application
  */
@@ -24,6 +26,7 @@ public class AppTest extends TestCase {
         super(name);
     }
 
+    @Test
     public void testApp() throws Exception {
         DefaultHttpClient http = new DefaultHttpClient();
         HttpGet get = new HttpGet("http://localhost:8080/${artifactId}/${artifactId}.app");

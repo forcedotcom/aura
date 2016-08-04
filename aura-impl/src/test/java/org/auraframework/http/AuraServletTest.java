@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
-import org.auraframework.Aura;
 import org.auraframework.AuraConfiguration;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.service.ContextService;
@@ -37,11 +36,15 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.context.TestContextManager;
 import org.springframework.web.context.support.GenericWebApplicationContext;
+
+import javax.inject.Inject;
 
 public class AuraServletTest extends UnitTestCase {
 
-    private ContextService contextService = Aura.getContextService();
+    @Inject
+    private ContextService contextService;
 
     private AuraServlet servlet;
 
@@ -66,8 +69,9 @@ public class AuraServletTest extends UnitTestCase {
         gwac.setServletContext(servletContext);
         gwac.refresh();
 
-        servlet = new AuraServlet(servletUtilAdapter);
+        servlet = new AuraServlet();
         servlet.init(servletConfig);
+        servlet.setServletUtilAdapter(servletUtilAdapter);
     }
 
     @Override
@@ -281,6 +285,7 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 
+    @Test
     @Ignore("W-3041937: of most concern when switching to https, if request or redirect are on non-standard ports")
     public void _testDoGet_NoCacheRetainsRequestAuthority() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);

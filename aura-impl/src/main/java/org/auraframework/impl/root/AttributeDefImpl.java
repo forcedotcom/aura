@@ -15,12 +15,10 @@
  */
 package org.auraframework.impl.root;
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -31,6 +29,9 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * The definition of an attribute. Holds all information about a given component's AttributeDefRef, aside from the
@@ -48,11 +49,13 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
      * @param required true if is required that this attribute Value be set (not defaulted) on Attribute instances that
      *            refer to this AttributeDef
      * @param location The location where this AttributeDef was defined in the markup.
+     * @param access the access value for the attribute
      */
     public AttributeDefImpl(DefDescriptor<AttributeDef> descriptor,
-            DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
-            AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location) {
-        super(descriptor, location);
+                            DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
+                            AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location,
+                            DefinitionAccess access) {
+        super(descriptor, location, access);
         this.parentDescriptor = parentDescriptor;
         this.typeDefDescriptor = typeDefDescriptor;
         this.defaultValue = defaultValue;

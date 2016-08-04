@@ -15,20 +15,32 @@
  */
 package org.auraframework.impl.java.provider;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Provider;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 
 /**
  */
+
+@ServiceComponentProvider
 @org.auraframework.system.Annotations.Provider
 public class TestProvider implements Provider {
+
+    @Inject
+    private ContextService contextService;
+    
+    @Inject
+    private DefinitionService definitionService;
+    
     public DefDescriptor<ComponentDef> provide() {
-        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        BaseComponent<?, ?> component = contextService.getCurrentContext().getCurrentComponent();
         String num = (String) component.getAttributes().getExpression("implNumber");
-        return DefDescriptorImpl.getInstance("test:test_Provider_providerImpl" + num, ComponentDef.class);
+        return definitionService.getDefDescriptor("test:test_Provider_providerImpl" + num, ComponentDef.class);
     }
 }

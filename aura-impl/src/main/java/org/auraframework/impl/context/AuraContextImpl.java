@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -44,6 +44,7 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
@@ -126,16 +127,18 @@ public class AuraContextImpl implements AuraContext {
     private static final int MAX_COMPONENT_COUNT = 10000;
     private int componentCount;
 
-    private static final Map<String, GlobalValue> allowedGlobalValues;
+    private static final Map<String, GlobalValue> allowedGlobalValues = new HashMap<>();
     private Map<String, AuraContext.GlobalValue> globalValues;
 
-    static {
-        allowedGlobalValues = new HashMap<>();
-    }
+    private final DefinitionService definitionService;
+    private final ConfigAdapter configAdapter;
+    private final TestContextAdapter testContextAdapter;
 
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
-            Map<String, GlobalValueProvider> globalProviders, boolean isDebugToolEnabled) {
+            Map<String, GlobalValueProvider> globalProviders, boolean isDebugToolEnabled,
+                           ConfigAdapter configAdapter, DefinitionService definitionService,
+                           TestContextAdapter testContextAdapter) {
         this.mode = mode;
         this.masterRegistry = masterRegistry;
         this.defaultPrefixes = defaultPrefixes;
@@ -144,7 +147,10 @@ public class AuraContextImpl implements AuraContext {
         this.jsonContext = jsonContext;
         this.globalProviders = globalProviders;
         this.isDebugToolEnabled = isDebugToolEnabled;
-        globalValues = new HashMap<>();
+        this.configAdapter = configAdapter;
+        this.definitionService = definitionService;
+        this.testContextAdapter = testContextAdapter;
+        this.globalValues = new HashMap<>();
     }
 
     @Override
@@ -368,7 +374,7 @@ public class AuraContextImpl implements AuraContext {
     public void addClientApplicationEvent(Event event) throws QuickFixException {
         if (event != null) {
             DefDescriptor<EventDef> desc = event.getDescriptor();
-            EventDef def = Aura.getDefinitionService().getDefinition(desc);
+            EventDef def = definitionService.getDefinition(desc);
             if (def == null || def.getEventType() != EventType.APPLICATION) {
                 throw new InvalidEventTypeException(
                         String.format("%s is not an Application event. "
@@ -561,7 +567,7 @@ public class AuraContextImpl implements AuraContext {
             throw new AuraRuntimeException("Attempt to retrieve unknown $Global variable: " + approvedName);
         }
         if (globalValues.containsKey(approvedName)) {
-            return globalValues.get(approvedName).getValue();
+        	return globalValues.get(approvedName).getValue();
         }
         return allowedGlobalValues.get(approvedName).getValue();
     }
@@ -651,7 +657,7 @@ public class AuraContextImpl implements AuraContext {
                 if (getFrameworkUID() != null) {
                     json.writeMapEntry("fwuid", getFrameworkUID());
                 } else {
-                    json.writeMapEntry("fwuid", Aura.getConfigAdapter().getAuraFrameworkNonce());
+                    json.writeMapEntry("fwuid", configAdapter.getAuraFrameworkNonce());
                 }
 
                 Map<String, String> loadedStrings = Maps.newHashMap();
@@ -695,7 +701,7 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
             
-            TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
+
             if (testContextAdapter != null) {
                 TestContext testContext = testContextAdapter.getTestContext();
                 if (testContext != null) {
@@ -703,7 +709,7 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
             
-            json.writeMapEntry("ls", Aura.getConfigAdapter().getLockerServiceCacheBuster());
+            json.writeMapEntry("ls", configAdapter.getLockerServiceCacheBuster());
             
             json.writeMapEnd();
         } catch (IOException ioe) {

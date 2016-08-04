@@ -15,10 +15,6 @@
  */
 package org.auraframework.integration.test.components.ui.modalOverlay;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.util.List;
-
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
@@ -29,6 +25,10 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.util.List;
 
 @ExcludeBrowsers({BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD,
         BrowserType.IE7, BrowserType.IE8})

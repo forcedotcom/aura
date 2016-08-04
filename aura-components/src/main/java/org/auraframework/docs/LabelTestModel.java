@@ -20,14 +20,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 
 /**
  * Model for auradocs:demoLabel to demo ui:label
  */
-@Model
-public class LabelTestModel {
+
+@ServiceComponentModelInstance
+public class LabelTestModel implements ModelInstance {
     @AuraEnabled
     public List<Object> getIterationItems() {
         List<Object> menuItem = new LinkedList<>();

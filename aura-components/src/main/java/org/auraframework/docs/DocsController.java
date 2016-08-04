@@ -15,40 +15,44 @@
  */
 package org.auraframework.docs;
 
-import java.util.Map;
-
-import org.auraframework.Aura;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.instance.Component;
+import org.auraframework.service.InstanceService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
+import javax.inject.Inject;
+import java.util.Map;
 
-@Controller
-public class DocsController {
+@ServiceComponent
+public class DocsController implements Controller {
+
+    @Inject
+    private InstanceService instanceService;
 
     @AuraEnabled
-    public static Component getTopic(@Key("topic") String topic) throws QuickFixException {
+    public Component getTopic(@Key("topic") String topic) throws QuickFixException {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("topic", topic);
-        return Aura.getInstanceService().getInstance("auradocs:topicPanel", ComponentDef.class, attributes);
+        return instanceService.getInstance("auradocs:topicPanel", ComponentDef.class, attributes);
     }
 
     @AuraEnabled
-    public static Component getDemo(@Key("demo") String demo) throws QuickFixException {
+    public Component getDemo(@Key("demo") String demo) throws QuickFixException {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("demo", demo);
-        return Aura.getInstanceService().getInstance("auradocs:demoPanel", ComponentDef.class, attributes);
+        return instanceService.getInstance("auradocs:demoPanel", ComponentDef.class, attributes);
     }
 
     @AuraEnabled
-    public static Component getReference(@Key("topic") String topic, @Key("descriptor") String descriptor,
-        @Key("defType") String defType) throws QuickFixException {
+    public Component getReference(@Key("topic") String topic, @Key("descriptor") String descriptor,
+                                  @Key("defType") String defType) throws QuickFixException {
 
         Map<String, Object> attributes = Maps.newHashMap();
         String defaultTopic = "referenceTabTopic";
@@ -72,7 +76,7 @@ public class DocsController {
             DefType dt = DefType.valueOf(defType.toUpperCase());
             attributes.put("descriptor", descriptor);
             attributes.put("defType", dt.name());
-            return Aura.getInstanceService().getInstance("auradocs:def", ComponentDef.class, attributes);
+            return instanceService.getInstance("auradocs:def", ComponentDef.class, attributes);
         }
     }
 }

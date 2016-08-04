@@ -27,11 +27,13 @@ public abstract class ComponentPerfAbstractTestCase extends AbstractPerfTestCase
     protected DefDescriptor<ComponentDef> descriptor;
 
     public ComponentPerfAbstractTestCase(String name) {
-        super(name);
+        super();
+        setName(name);
     }
 
     public ComponentPerfAbstractTestCase(String name, DefDescriptor<ComponentDef> desc) {
-        super(name);
+        super();
+        setName(name);
         descriptor = desc;
     }
 

@@ -19,11 +19,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
 import org.auraframework.service.LoggingService;
 import org.auraframework.util.json.JsonReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -55,7 +57,9 @@ public class CSPReporterServlet extends HttpServlet {
     public static final String STATUS_CODE = "status-code";
     public static final String VIOLATED_DIRECTIVE = "violated-directive";
     public static final String EFFECTIVE_DIRECTIVE = "effective-directive";
-    
+
+    private LoggingService loggingService;
+
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -82,14 +86,18 @@ public class CSPReporterServlet extends HttpServlet {
         // make sure we actually received a csp-report
         if (report.containsKey(JSON_NAME)) {
             report.put(HttpHeaders.USER_AGENT, req.getHeader(HttpHeaders.USER_AGENT));
-            
-            LoggingService ls = Aura.getLoggingService();
-            ls.establish();
+
+            loggingService.establish();
             try {
-                ls.logCSPReport(report);
+                loggingService.logCSPReport(report);
             } finally {
-                ls.release();
+                loggingService.release();
             }
         }
+    }
+
+    @Inject
+    public void setLoggingService(LoggingService loggingService) {
+        this.loggingService = loggingService;
     }
 }

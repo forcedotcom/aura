@@ -15,33 +15,46 @@
  */
 package org.auraframework.impl;
 
-import java.io.IOException;
-
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.RendererDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.system.RenderContextImpl;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.RendererInstance;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Primary;
 
-import aQute.bnd.annotation.component.Component;
+import javax.inject.Inject;
+
+import java.io.IOException;
 
 /**
  */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
+@Primary
 public class RenderingServiceImpl implements RenderingService {
+    @Inject
+    ContextService contextService;
 
+    @Inject
+    InstanceService instanceService;
+    
+    @Inject
+    DefinitionService definitionService;
+    
     /**
      */
     private static final long serialVersionUID = 1663840391180454913L;
 
     @Override
     public void render(BaseComponent<?, ?> component, RenderContext rc) throws QuickFixException, IOException {
-        Aura.getContextService().assertEstablished();
+        contextService.assertEstablished();
 
         BaseComponent<?, ?> renderable = null;
         BaseComponent<?, ?> tmpRenderable = component;
@@ -49,7 +62,7 @@ public class RenderingServiceImpl implements RenderingService {
         RendererDef rendererDef = null;
 
         while (tmpRenderable != null) {
-            componentDef = tmpRenderable.getDescriptor().getDef();
+            componentDef = definitionService.getDefinition(tmpRenderable.getDescriptor());
             if (rendererDef == null) {
                 rendererDef = componentDef.getLocalRendererDef();
                 if (rendererDef == null && componentDef.getRendererDescriptor() != null) {
@@ -65,7 +78,9 @@ public class RenderingServiceImpl implements RenderingService {
             throw new AuraRuntimeException(String.format("No local RendererDef found for %s", component));
         }
 
-        rendererDef.render(renderable, rc);
+        RendererInstance renderer = (RendererInstance) instanceService.getInstance(rendererDef);
+
+        renderer.render(renderable, rc);
     }
 
     /**

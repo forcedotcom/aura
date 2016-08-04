@@ -15,24 +15,23 @@
  */
 package org.auraframework.impl.adapter.format.json;
 
-import java.io.IOException;
-import java.util.Map;
-
-import javax.annotation.concurrent.ThreadSafe;
-
-import org.auraframework.Aura;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import com.google.common.collect.Maps;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.service.ContextService;
 import org.auraframework.throwable.ClientSideEventException;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
-import com.google.common.collect.Maps;
-
-import aQute.bnd.annotation.component.Component;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Map;
 
 @ThreadSafe
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ClientSideEventExceptionJSONFormatAdapter extends JSONFormatAdapter<ClientSideEventException> {
+    @Inject
+    private ContextService contextService;
 
     @Override
     public Class<ClientSideEventException> getType() {
@@ -41,7 +40,7 @@ public class ClientSideEventExceptionJSONFormatAdapter extends JSONFormatAdapter
 
     @Override
     public void write(ClientSideEventException value, Map<String, Object> attributes, Appendable out) throws IOException {
-        JsonSerializationContext jsonCxt = Aura.getContextService().getCurrentContext().getJsonSerializationContext();
+        JsonSerializationContext jsonCxt = contextService.getCurrentContext().getJsonSerializationContext();
         Map<String, Object> serialized = Maps.newHashMap();
         serialized.put("exceptionEvent", Boolean.TRUE);
         serialized.put("event", value.getEvent());
@@ -52,5 +51,4 @@ public class ClientSideEventExceptionJSONFormatAdapter extends JSONFormatAdapter
         }
         JsonEncoder.serialize(serialized, out, jsonCxt);
     }
-
 }

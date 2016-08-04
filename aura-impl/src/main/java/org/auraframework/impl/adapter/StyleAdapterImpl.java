@@ -15,30 +15,40 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.auraframework.Aura;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.salesforce.omakase.plugin.Plugin;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.StyleAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.TokenCache;
 import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.css.parser.plugin.DuplicateFontFacePlugin;
 import org.auraframework.impl.css.token.TokenValueProviderImpl;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.salesforce.omakase.plugin.Plugin;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
-import aQute.bnd.annotation.component.Component;
-
-@Component(provide = AuraServiceProvider.class)
+@ServiceComponent
 public class StyleAdapterImpl implements StyleAdapter {
+
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @Inject
+    private DefinitionService definitionService;
+
     @Override
     public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style) {
         return getTokenValueProvider(style, ResolveStrategy.RESOLVE_NORMAL);
@@ -48,7 +58,7 @@ public class StyleAdapterImpl implements StyleAdapter {
     public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy) {
         switch (strategy) {
         case RESOLVE_NORMAL:
-            TokenCache overrides = Aura.getContextService().getCurrentContext().getStyleContext().getTokens();
+            TokenCache overrides = contextService.getCurrentContext().getStyleContext().getTokens();
             return getTokenValueProvider(style, strategy, overrides);
         case RESOLVE_DEFAULTS:
         case PASSTHROUGH:
@@ -67,13 +77,13 @@ public class StyleAdapterImpl implements StyleAdapter {
     @Override
     public boolean tokenPropertyValidation(DefDescriptor<? extends BaseStyleDef> style) {
         // validate all non-internal namespaces.
-        return !Aura.getConfigAdapter().isInternalNamespace(style.getNamespace());
+        return !configAdapter.isInternalNamespace(style.getNamespace());
     }
 
     @Override
     public DefDescriptor<TokensDef> getNamespaceDefaultDescriptor(DefDescriptor<?> descriptor) {
         String fmt = String.format("%s:%sNamespace", descriptor.getNamespace(), descriptor.getNamespace());
-        return Aura.getDefinitionService().getDefDescriptor(fmt, TokensDef.class);
+        return definitionService.getDefDescriptor(fmt, TokensDef.class);
     }
 
     @Override

@@ -62,8 +62,8 @@ public class PerfMetricsUtil {
 
         // Diff the results file against an existing goldfile per component
         if(config.getOptions().get("skipDiff") == null || config.getOptions().get("skipDiff") == "false"){
-        	PerfResultsUtil.assertPerfDiff(test, "goldfile.json", metrics);
-        }
+        PerfResultsUtil.assertPerfDiff(test, "goldfile.json", metrics);
+    }
     }
 
     /**
@@ -182,10 +182,10 @@ public class PerfMetricsUtil {
 	public PerfMetrics prepareResults() {
         PerfMetrics metrics = new PerfMetrics();
         String timeline = config.getOptions().get("timeline");
-        if(timeline!=null && !timeline.equals("disable")) {           
-    		rdpAnalyzer = new RDPAnalyzer(notifications, test.getPerfStartMarker(), test.getPerfEndMarker());
-    		prepareNetworkMetrics(metrics);
-        	prepareTimelineMetrics(metrics);
+        if (timeline != null && !timeline.equals("disable")) {
+            rdpAnalyzer = new RDPAnalyzer(notifications, test.getPerfStartMarker(), test.getPerfEndMarker());
+            prepareNetworkMetrics(metrics);
+            prepareTimelineMetrics(metrics);
         }
         prepareAuraMetrics(metrics);
         return metrics;
@@ -201,7 +201,7 @@ public class PerfMetricsUtil {
         WebDriver driver = test.getWebDriver();
         String timeline = config.getOptions().get("timeline");
         if(timeline!=null && !timeline.equals("disable")) {
-        	notifications = test.getRDPNotifications();
+            notifications = test.getRDPNotifications();
         }
         // TODO auraUITestingUtil unable to execute the js correctly
         Object obj = ((JavascriptExecutor) driver).executeScript("return $A.PerfRunner.getResults()");

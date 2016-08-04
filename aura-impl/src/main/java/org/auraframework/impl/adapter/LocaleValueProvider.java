@@ -15,6 +15,27 @@
  */
 package org.auraframework.impl.adapter;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+import com.ibm.icu.text.DecimalFormat;
+import com.ibm.icu.text.DecimalFormatSymbols;
+import com.ibm.icu.util.Currency;
+
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TypeDef;
+import org.auraframework.expression.PropertyReference;
+import org.auraframework.instance.AuraValueProviderType;
+import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.ValueProviderType;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraLocale;
+import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonSerializable;
+
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -25,24 +46,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.auraframework.Aura;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.TypeDef;
-import org.auraframework.expression.PropertyReference;
-import org.auraframework.instance.AuraValueProviderType;
-import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.instance.ValueProviderType;
-import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraLocale;
-import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializable;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
-import com.ibm.icu.text.DecimalFormat;
-import com.ibm.icu.text.DecimalFormatSymbols;
-import com.ibm.icu.util.Currency;
 
 public class LocaleValueProvider implements GlobalValueProvider {
     public static String USER_LOCALE_LANGUAGE = "userLocaleLang";
@@ -82,11 +85,14 @@ public class LocaleValueProvider implements GlobalValueProvider {
     public static String IS_EASTERN_NAME_STYLE = "isEasternNameStyle";
 
     private final Map<String, Object> data;
+    private final DefinitionService definitionService;
 
-    public LocaleValueProvider() {
+    public LocaleValueProvider(ConfigAdapter configAdapter, LocalizationAdapter localizationAdapter, DefinitionService definitionService) {
+    	this.definitionService = definitionService;
+    	
         Builder<String, Object> builder = ImmutableMap.builder();
 
-        AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
+        AuraLocale al = localizationAdapter.getAuraLocale();
 
         Locale userLocale = al.getLocale();
         Locale lang = al.getLanguageLocale();
@@ -102,7 +108,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
         try {
             builder.put(MONTH_NAME, this.getNameOfMonths(al));
             builder.put(WEEKDAY_NAME, this.getNameOfWeekdays(al));
-            builder.put(TODAY_LABEL, this.getLabelForToday());
+            builder.put(TODAY_LABEL, this.getLabelForToday(localizationAdapter));
         } catch (QuickFixException qfe) {
             // Ignore
         }
@@ -129,7 +135,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
         }
 
         String timezoneId = al.getTimeZone().getID();
-        String availableTimezoneId = Aura.getConfigAdapter().getAvailableTimezone(timezoneId);
+        String availableTimezoneId = configAdapter.getAvailableTimezone(timezoneId);
         builder.put(TIME_ZONE, availableTimezoneId);
         builder.put(TIME_ZONE_FILE_NAME, availableTimezoneId.replace("/", "-"));
 
@@ -174,7 +180,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
 
     @Override
     public DefDescriptor<TypeDef> getReturnTypeDef() {
-        return Aura.getDefinitionService().getDefDescriptor("String", TypeDef.class);
+        return definitionService.getDefDescriptor("String", TypeDef.class);
     }
 
     @Override
@@ -211,8 +217,8 @@ public class LocaleValueProvider implements GlobalValueProvider {
         return monthList;
     }
 
-    private String getLabelForToday() throws QuickFixException {
-        String today = Aura.getLocalizationAdapter().getLabel("Related_Lists", "task_mode_today");
+    private String getLabelForToday(LocalizationAdapter localizationAdapter) throws QuickFixException {
+        String today = localizationAdapter.getLabel("Related_Lists", "task_mode_today");
         if (today == null) {
             return "Today";
         }

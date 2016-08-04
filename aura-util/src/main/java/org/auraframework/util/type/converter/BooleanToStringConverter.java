@@ -15,15 +15,15 @@
  */
 package org.auraframework.util.type.converter;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.util.type.Converter;
-
-import aQute.bnd.annotation.component.Component;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Used by aura.util.type.TypeUtil
  */
-@Component (provide=AuraServiceProvider.class)
+@Lazy
+@ServiceComponent
 public class BooleanToStringConverter implements Converter<Boolean, String> {
 
     @Override

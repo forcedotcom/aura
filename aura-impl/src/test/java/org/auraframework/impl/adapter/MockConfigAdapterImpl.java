@@ -22,20 +22,30 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
+import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.http.CSP;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.InvalidSessionException;
+import org.auraframework.util.FileMonitor;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Scope;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Sets;
@@ -44,6 +54,28 @@ import com.google.common.collect.Sets;
  * ConfigAdapter for Aura tests.
  */
 public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConfigAdapter {
+    @Configuration
+    public static class TestConfiguration {
+        private final static MockConfigAdapter mockConfigAdapter = new MockConfigAdapterImpl();
+
+    /**
+         * Use a true singleton MockConfigAdapter for tests, because integration tests may execute outside the server's
+         * ApplicationContext.
+         */
+        @Primary
+        @Bean
+        @Scope(BeanDefinition.SCOPE_SINGLETON)
+        public static MockConfigAdapter mockConfigAdapter() {
+            return mockConfigAdapter;
+        }
+    }
+    
+    @Inject
+    StringSourceLoader stringLoader;
+
+    @Inject
+    TestContextAdapter testContextAdapter;
+
     /**
      * An extension of a ContentSecurityPolicy that adds "odd" test requirements.
      */
@@ -149,7 +181,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private static final Set<String> SYSTEM_TEST_CUSTOM_NAMESPACES = new ImmutableSortedSet.Builder<>(
     		String.CASE_INSENSITIVE_ORDER)
     		.add("testCustomNS1", "testCustomNS2")
-    		.build();
+                    .build();
 
     private Boolean isClientAppcacheEnabled = null;
     private Boolean isProduction = null;
@@ -165,8 +197,8 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         super();
     }
 
-    public MockConfigAdapterImpl(String resourceCacheDir) {
-        super(resourceCacheDir);
+    public MockConfigAdapterImpl(String resourceCacheDir, LocalizationAdapter localizationAdapter, InstanceService instanceService, ContextService contextService, FileMonitor fileMonitor) {
+        super(resourceCacheDir, localizationAdapter, instanceService, contextService, fileMonitor);
     }
 
     @Override
@@ -254,8 +286,8 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
             return false;
         }
 
-        if(StringSourceLoader.getInstance().isPrivilegedNamespace(namespace) || SYSTEM_TEST_PRIVILEGED_NAMESPACES.contains(namespace)) {
-        	return true;
+        if(stringLoader.isPrivilegedNamespace(namespace) || SYSTEM_TEST_PRIVILEGED_NAMESPACES.contains(namespace)) {
+            return true;
         }
 
         if (super.isPrivilegedNamespace(namespace)) {
@@ -288,7 +320,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         	return false;
         }
 
-        if (StringSourceLoader.getInstance().isInternalNamespace(namespace)
+        if (stringLoader.isInternalNamespace(namespace)
                 || SYSTEM_TEST_NAMESPACES.contains(namespace) || super.isInternalNamespace(namespace)) {
             return true;
         }
@@ -296,7 +328,6 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         // Check for any local defs with this namespace and consider that as an indicator that we have an internal
         // namespace
         if (namespace != null) {
-            TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
             if (testContextAdapter != null) {
                 TestContext testContext = testContextAdapter.getTestContext();
                 if (testContext != null) {

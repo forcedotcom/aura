@@ -15,16 +15,7 @@
  */
 package org.auraframework.impl.test.util;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.auraframework.Aura;
+import com.google.common.collect.ImmutableList;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
@@ -71,18 +62,27 @@ import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.root.event.EventHandlerDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.ImmutableList;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Utility to easily get aura objects.
@@ -96,13 +96,20 @@ public class AuraImplUnitTestingUtil {
     private static final String defaultFileName = "filename1";
     private static final EventType defaultEventType = EventType.COMPONENT;
 
+    private final DefinitionService definitionService;
+    private final InstanceService instanceService;
+
+    public AuraImplUnitTestingUtil(DefinitionService definitionService, InstanceService instanceService) {
+        this.definitionService = definitionService;
+        this.instanceService = instanceService;
+    }
+
     public String getAttributeName() {
         return defaultAttributeName;
     }
 
     public DefDescriptor<AttributeDef> getAttributeDescriptor() {
-        return DefDescriptorImpl.getInstance(defaultAttributeName,
-                AttributeDef.class);
+        return definitionService.getDefDescriptor(defaultAttributeName, AttributeDef.class);
     }
 
     public String getAttributeValue() {
@@ -110,46 +117,39 @@ public class AuraImplUnitTestingUtil {
     }
 
     public DefDescriptor<RendererDef> getRendererDescriptor() {
-        return DefDescriptorImpl.getInstance("js://test.renderer",
-                RendererDef.class);
+        return definitionService.getDefDescriptor("js://test.renderer", RendererDef.class);
     }
 
     public DefDescriptor<StyleDef> getStyleDescriptor() {
-        return DefDescriptorImpl.getInstance("css://test.fakeComponent",
-                StyleDef.class);
+        return definitionService.getDefDescriptor("css://test.fakeComponent", StyleDef.class);
     }
 
     public DefDescriptor<ApplicationDef> getApplicationDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeApplication",
-                ApplicationDef.class);
+        return definitionService.getDefDescriptor("test:fakeApplication", ApplicationDef.class);
     }
 
     public DefDescriptor<ComponentDef> getComponentDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeComponent",
-                ComponentDef.class);
+        return definitionService.getDefDescriptor("test:fakeComponent", ComponentDef.class);
     }
 
     public DefDescriptor<DocumentationDef> getDocumentationDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeDoc",
-                DocumentationDef.class);
+        return definitionService.getDefDescriptor("test:fakeDoc", DocumentationDef.class);
     }
 
     public DefDescriptor<ComponentDef> getParentComponentDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeComponentParent",
-                ComponentDef.class);
+        return definitionService.getDefDescriptor("test:fakeComponentParent", ComponentDef.class);
     }
 
     public DefDescriptor<ComponentDef> getChildComponentDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakecomponentChild",
-                ComponentDef.class);
+        return definitionService.getDefDescriptor("test:fakecomponentChild", ComponentDef.class);
     }
 
     public DefDescriptor<TokensDef> getTokensDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeTokens", TokensDef.class);
+        return definitionService.getDefDescriptor("test:fakeTokens", TokensDef.class);
     }
 
     public DefDescriptor<ComponentDef> getFlavorableComponentDescriptor() {
-        return DefDescriptorImpl.getInstance("test:flavorableFakeComponent", ComponentDef.class);
+        return definitionService.getDefDescriptor("test:flavorableFakeComponent", ComponentDef.class);
     }
 
     public DefDescriptor<FlavoredStyleDef> getFlavoredStyleDescriptor() {
@@ -161,13 +161,12 @@ public class AuraImplUnitTestingUtil {
     }
 
     public DefDescriptor<InterfaceDef> getInterfaceDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeInterface",
+        return definitionService.getDefDescriptor("test:fakeInterface",
                 InterfaceDef.class);
     }
 
     public DefDescriptor<InterfaceDef> getParentInterfaceDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeParentInterface",
-                InterfaceDef.class);
+        return definitionService.getDefDescriptor("test:fakeParentInterface", InterfaceDef.class);
     }
 
     public Location getLocation() {
@@ -175,7 +174,11 @@ public class AuraImplUnitTestingUtil {
     }
 
     public DefDescriptor<TypeDef> getTypeDefDescriptor() {
-        return DefDescriptorImpl.getInstance("String", TypeDef.class);
+        return definitionService.getDefDescriptor("String", TypeDef.class);
+    }
+
+    public DefDescriptor<TypeDef> getSimpleTypeDefDescriptor(String simpleType) {
+        return definitionService.getDefDescriptor(simpleType, TypeDef.class);
     }
 
     public TypeDef getTypeDef() {
@@ -189,7 +192,7 @@ public class AuraImplUnitTestingUtil {
 
             @Override
             public DefDescriptor<TypeDef> getDescriptor() {
-                return DefDescriptorImpl.getInstance("String", TypeDef.class);
+                return definitionService.getDefDescriptor("String", TypeDef.class);
             }
 
             @Override
@@ -300,11 +303,10 @@ public class AuraImplUnitTestingUtil {
     }
 
     public DefDescriptor<EventDef> getEventDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:anevent", EventDef.class);
+        return definitionService.getDefDescriptor("test:anevent", EventDef.class);
     }
     public DefDescriptor<EventDef> getParentEventDefDescriptor() {
-        return DefDescriptorImpl
-                .getInstance("test:parentEvent", EventDef.class);
+        return definitionService.getDefDescriptor("test:parentEvent", EventDef.class);
     }
 
     public EventType getEventType() {
@@ -312,19 +314,17 @@ public class AuraImplUnitTestingUtil {
     }
 
     public DefDescriptor<ControllerDef> getControllerDescriptor() {
-        return DefDescriptorImpl.getInstance(
+        return definitionService.getDefDescriptor(
                 "java://org.auraframework.components.test.java.controller.TestController",
                 ControllerDef.class);
     }
 
     public DefDescriptor<ModelDef> getModelDescriptor() {
-        return DefDescriptorImpl.getInstance(
-                "java://org.auraframework.impl.model.java.TestModel",
-                ModelDef.class);
+        return definitionService.getDefDescriptor("java://org.auraframework.impl.model.java.TestModel", ModelDef.class);
     }
 
     public AttributeImpl makeAttribute(String name) {
-        return new AttributeImpl(DefDescriptorImpl.getInstance(
+        return new AttributeImpl(definitionService.getDefDescriptor(
                 name == null ? defaultAttributeName : name, AttributeDef.class));
     }
 
@@ -332,11 +332,8 @@ public class AuraImplUnitTestingUtil {
         return makeAttributeDef(null, null, null, false, null, null);
     }
 
-    public ClientLibraryDef makeClientLibraryDef(String name,
-            ClientLibraryDef.Type type,
-            Set<AuraContext.Mode> modes,
-            DefDescriptor<? extends RootDefinition> parentDescriptor,
-            Location location) {
+    public ClientLibraryDef makeClientLibraryDef(String name, ClientLibraryDef.Type type, Set<AuraContext.Mode> modes,
+            DefDescriptor<? extends RootDefinition> parentDescriptor, Location location) {
         ClientLibraryDefImpl.Builder builder = new ClientLibraryDefImpl.Builder();
 
         builder.setName(name);
@@ -350,39 +347,48 @@ public class AuraImplUnitTestingUtil {
     }
 
     /**
+     * Create and insert an attribute def in a map.
+     */
+    public void insertAttributeDef(Map<DefDescriptor<AttributeDef>, AttributeDef> map,
+                                   DefDescriptor<? extends RootDefinition> parent, String name, String simpleType, boolean required,
+                                   SerializeToType serializeTo, Location location, AuraContext.Access access) {
+        AttributeDef attr = makeAttributeDefWithNulls(name, parent, getSimpleTypeDefDescriptor(name), null,
+                required, serializeTo, location, new DefinitionAccessImpl(access));
+        map.put(attr.getDescriptor(), attr);
+    }
+
+    /**
      * A null parameter indicates you don't care what the value is, and thus it
      * replaces the parameter with a default object. If you want null values for
      * the parameter, you have to call the objects constructor directly.
      */
-    public AttributeDefImpl makeAttributeDef(String name,
-            DefDescriptor<TypeDef> typeDefDescriptor,
-            AttributeDefRefImpl defaultValue, boolean required,
-            SerializeToType serializeTo, Location location) {
-        return new AttributeDefImpl(
-                DefDescriptorImpl.getInstance(
-                        name == null ? defaultAttributeName : name,
-                                AttributeDef.class), null,
-                                typeDefDescriptor == null ? getTypeDef().getDescriptor()
-                                        : typeDefDescriptor,
-                                        defaultValue == null ? makeAttributeDefRef(null, null, null)
-                                                : defaultValue, required,
-                                                serializeTo == null ? AttributeDef.SerializeToType.BOTH
-                                                        : serializeTo, location == null ? getLocation()
-                                                                : location);
+    public AttributeDefImpl makeAttributeDef(String name, DefDescriptor<TypeDef> typeDefDescriptor,
+                                             AttributeDefRefImpl defaultValue, boolean required, SerializeToType serializeTo, Location location) {
+        return makeAttributeDefWithNulls(
+                name == null ? defaultAttributeName : name, null,
+                typeDefDescriptor == null ? getTypeDef().getDescriptor() : typeDefDescriptor,
+                defaultValue == null ? makeAttributeDefRef(null, null, null) : defaultValue, required,
+                serializeTo == null ? AttributeDef.SerializeToType.BOTH : serializeTo,
+                location == null ? getLocation() : location,
+                new DefinitionAccessImpl(AuraContext.Access.PRIVATE));
     }
 
     public AttributeDefImpl makeAttributeDefWithNulls(String name,
-            DefDescriptor<? extends RootDefinition> parentDescriptor,
-            DefDescriptor<TypeDef> typeDefDescriptor,
-            AttributeDefRefImpl defaultValue, boolean required,
-            SerializeToType serializeTo, Location location) {
-        return new AttributeDefImpl(DefDescriptorImpl.getInstance(name,
-                AttributeDef.class), parentDescriptor, typeDefDescriptor,
-                defaultValue, required, serializeTo, location);
+                                                      DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
+                                                      AttributeDefRefImpl defaultValue, boolean required, SerializeToType serializeTo, Location location) {
+        return makeAttributeDefWithNulls(name, parentDescriptor, typeDefDescriptor, defaultValue, required, serializeTo,
+                location, new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
     }
 
-    public DependencyDef makeDependencyDef(
-            DefDescriptor<? extends RootDefinition> parentDescriptor,
+    public AttributeDefImpl makeAttributeDefWithNulls(String name,
+                                                      DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
+            AttributeDefRefImpl defaultValue, boolean required,
+                                                      SerializeToType serializeTo, Location location, DefinitionAccess access) {
+        return new AttributeDefImpl(definitionService.getDefDescriptor(name, AttributeDef.class),
+                parentDescriptor, typeDefDescriptor, defaultValue, required, serializeTo, location, access);
+    }
+
+    public DependencyDef makeDependencyDef(DefDescriptor<? extends RootDefinition> parentDescriptor,
             String resource, String type, Location location) {
         DependencyDefImpl.Builder builder;
 
@@ -404,9 +410,8 @@ public class AuraImplUnitTestingUtil {
      * the parameter, you have to call the objects constructor directly.
      */
     public AttributeDefRefImpl makeAttributeDefRef(String name, Object value, Location location) {
-
         AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();
-        atBuilder.setDescriptor(DefDescriptorImpl.getInstance(name == null ? defaultAttributeName : name,
+        atBuilder.setDescriptor(definitionService.getDefDescriptor(name == null ? defaultAttributeName : name,
                 AttributeDef.class));
         atBuilder.setLocation((location == null) ? getLocation() : location);
         atBuilder.setValue((value == null) ? defaultAttributeValue : value);
@@ -414,18 +419,16 @@ public class AuraImplUnitTestingUtil {
         return atBuilder.build();
     }
 
-    public AttributeDefRefImpl makeAttributeDefRefWithNulls(String name,
-            Object value, Location location) {
+    public AttributeDefRefImpl makeAttributeDefRefWithNulls(String name, Object value, Location location) {
         AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();
-        atBuilder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDef.class));
+        atBuilder.setDescriptor(definitionService.getDefDescriptor(name, AttributeDef.class));
         atBuilder.setLocation(location);
         atBuilder.setValue(value);
         return atBuilder.build();
     }
 
-    public Component makeComponent(String name, String globalId)
-            throws QuickFixException {
-        return Aura.getInstanceService().getInstance(DefDescriptorImpl.getInstance(name == null ? defaultComponentName : name,
+    public Component makeComponent(String name, String globalId) throws QuickFixException {
+        return instanceService.getInstance(definitionService.getDefDescriptor(name == null ? defaultComponentName : name,
                 ComponentDef.class), null);
     }
 
@@ -434,8 +437,7 @@ public class AuraImplUnitTestingUtil {
                 null, null, null, null, false, false);
     }
 
-    public ComponentDef makeComponentDef(
-            DefDescriptor<ComponentDef> descriptor,
+    public ComponentDef makeComponentDef(DefDescriptor<ComponentDef> descriptor,
             DefDescriptor<ComponentDef> extendsDescriptor) throws QuickFixException {
         return makeComponentDef(descriptor, null, null, null, null, null, null,
                 extendsDescriptor, null, null, false, false);
@@ -484,8 +486,7 @@ public class AuraImplUnitTestingUtil {
         if (attributeDefs == null) {
             return;
         }
-        for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> entry : attributeDefs
-                .entrySet()) {
+        for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> entry : attributeDefs.entrySet()) {
             builder.addAttributeDef(entry.getKey(), entry.getValue());
         }
     }
@@ -495,8 +496,7 @@ public class AuraImplUnitTestingUtil {
         if (attributeDefs == null) {
             return;
         }
-        for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : attributeDefs
-                .entrySet()) {
+        for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : attributeDefs.entrySet()) {
             builder.setAttribute(entry.getKey(), entry.getValue());
         }
     }
@@ -565,7 +565,7 @@ public class AuraImplUnitTestingUtil {
             List<DefDescriptor<RendererDef>> renderers,
             List<DefDescriptor<HelperDef>> helpers,
             List<EventHandlerDef> eventHandlers, boolean isAbstract,
-            boolean isExtensible) throws QuickFixException {
+            boolean isExtensible, Access access) throws QuickFixException {
 
         @SuppressWarnings("unchecked")
         BaseComponentDefImpl.Builder<T> builder = (Builder<T>) (defClass
@@ -594,6 +594,7 @@ public class AuraImplUnitTestingUtil {
         builder.interfaces = interfaces;
         builder.rendererDescriptors = renderers;
         builder.helperDescriptors = helpers;
+        builder.setAccess(access != null ? new DefinitionAccessImpl(access) : null);
         return builder.build();
     }
 
@@ -639,8 +640,7 @@ public class AuraImplUnitTestingUtil {
         }
 
         List<DefDescriptor<ControllerDef>> cd = new ArrayList<>();
-        cd.add(controllerDescriptor == null ? getControllerDescriptor()
-                : controllerDescriptor);
+        cd.add(controllerDescriptor == null ? getControllerDescriptor() : controllerDescriptor);
 
         builder.setDescriptor((descriptor == null) ? getComponentDefDescriptor()
                 : descriptor);
@@ -664,7 +664,7 @@ public class AuraImplUnitTestingUtil {
     }
 
     public DefDescriptor<ComponentDef> makeComponentDefDescriptor(String tag) {
-        return DefDescriptorImpl.getInstance(tag, ComponentDef.class);
+        return definitionService.getDefDescriptor(tag, ComponentDef.class);
     }
 
     public ComponentDef makeComponentDefWithNulls(
@@ -734,22 +734,23 @@ public class AuraImplUnitTestingUtil {
     }
 
     public EventDefImpl makeEventDef() {
-        return makeEventDef(null, null, null, null, null);
+        return makeEventDef(null, null, null, null, null, Access.INTERNAL);
     }
 
     public EventDefImpl makeEventDef(DefDescriptor<EventDef> descriptor, DefDescriptor<EventDef> extendsDescriptor) {
-        return makeEventDef(descriptor, null, null, null, extendsDescriptor);
+        return makeEventDef(descriptor, null, null, null, extendsDescriptor, Access.INTERNAL);
     }
 
     /**
      * A null parameter indicates you don't care what the value is, and thus it
      * replaces the parameter with a default object. If you want null values for
      * the parameter, you have to call the objects constructor directly.
+     * @param access TODO
      */
     public EventDefImpl makeEventDef(DefDescriptor<EventDef> descriptor,
             EventType eventType,
             Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
-            Location location, DefDescriptor<EventDef> extendsDescriptor) {
+                                     Location location, DefDescriptor<EventDef> extendsDescriptor, Access access) {
 
         if (attributeDefs == null) {
             attributeDefs = new HashMap<>();
@@ -762,6 +763,7 @@ public class AuraImplUnitTestingUtil {
         addAttributes(builder, attributeDefs);
         builder.setLocation((location == null) ? getLocation() : location);
         builder.extendsDescriptor = extendsDescriptor == null ? getParentEventDefDescriptor() : extendsDescriptor;
+        builder.setAccess(new DefinitionAccessImpl(access));
         return builder.build();
     }
 
@@ -775,11 +777,12 @@ public class AuraImplUnitTestingUtil {
         addAttributes(builder, attributeDefs);
         builder.setLocation(location);
         builder.extendsDescriptor = extendsDescriptor;
+        builder.setAccess(new DefinitionAccessImpl(Access.PUBLIC));
         return builder.build();
     }
 
     public DefDescriptor<EventDef> makeEventDefDescriptor(String tag) {
-        return DefDescriptorImpl.getInstance(tag, EventDef.class);
+        return definitionService.getDefDescriptor(tag, EventDef.class);
     }
 
     public EventHandlerDef makeEventHandlerDef() {
@@ -812,31 +815,33 @@ public class AuraImplUnitTestingUtil {
         builder.setLocation(location);
         builder.setDescriptor(handledEvent);
         builder.setAction(action);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         return builder.build();
     }
 
     public InterfaceDefImpl makeInterfaceDef() {
-        return makeInterfaceDef(null, null, null, null, null);
+        return makeInterfaceDef(null, null, null, null, null, AuraContext.Access.INTERNAL);
     }
 
     public InterfaceDefImpl makeInterfaceDef(DefDescriptor<InterfaceDef> descriptor) {
-        return makeInterfaceDef(descriptor, null, null, null, null);
+        return makeInterfaceDef(descriptor, null, null, null, null, AuraContext.Access.INTERNAL);
     }
 
     public InterfaceDefImpl makeInterfaceDef(Set<DefDescriptor<InterfaceDef>> extendsDescriptors) {
-        return makeInterfaceDef(null, null, null, null, extendsDescriptors);
+        return makeInterfaceDef(null, null, null, null, extendsDescriptors, AuraContext.Access.INTERNAL);
     }
 
     /**
      * A null parameter indicates you don't care what the value is, and thus it
      * replaces the parameter with a default object. If you want null values for
      * the parameter, you have to call the objects constructor directly.
+     * @param access TODO
      */
     public InterfaceDefImpl makeInterfaceDef(
             DefDescriptor<InterfaceDef> descriptor,
             Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs,
             Map<String, RegisterEventDef> eventDefs, Location location,
-            Set<DefDescriptor<InterfaceDef>> extendsDescriptors) {
+            Set<DefDescriptor<InterfaceDef>> extendsDescriptors, Access access) {
         InterfaceDefImpl.Builder builder = new InterfaceDefImpl.Builder();
 
         if (attributeDefs == null) {
@@ -859,6 +864,7 @@ public class AuraImplUnitTestingUtil {
 
         builder.setDescriptor((descriptor == null) ? getInterfaceDefDescriptor() : descriptor);
         builder.setLocation((location == null) ? getLocation() : location);
+        builder.setAccess(new DefinitionAccessImpl(access));
         return builder.build();
     }
 
@@ -873,6 +879,7 @@ public class AuraImplUnitTestingUtil {
         builder.events = eventDefs;
         builder.setLocation(location);
         builder.extendsDescriptors = extendsDescriptors;
+        builder.setAccess(new DefinitionAccessImpl(Access.INTERNAL));
         if (provider != null) {
             builder.addProvider(provider);
         }
@@ -880,7 +887,7 @@ public class AuraImplUnitTestingUtil {
     }
 
     public DefDescriptor<InterfaceDef> makeInterfaceDefDescriptor(String tag) {
-        return DefDescriptorImpl.getInstance(tag, InterfaceDef.class);
+        return definitionService.getDefDescriptor(tag, InterfaceDef.class);
     }
 
     public Location makeLocation() {
@@ -908,7 +915,7 @@ public class AuraImplUnitTestingUtil {
         builder.setAttName("fakey");
         DefinitionAccessImpl access;
         try {
-            access = new DefinitionAccessImpl(null, isGlobal ? "global" : "public");
+            access = new DefinitionAccessImpl(null, isGlobal ? "global" : "public", false);
         } catch (InvalidAccessValueException e) {
             access = null;
         }
@@ -925,7 +932,7 @@ public class AuraImplUnitTestingUtil {
         builder.setAttName("fakey");
         DefinitionAccessImpl access;
         try {
-            access = new DefinitionAccessImpl(null, isGlobal ? "global" : "public");
+            access = new DefinitionAccessImpl(null, isGlobal ? "global" : "public", false);
         } catch (InvalidAccessValueException e) {
             access = null;
         }
@@ -939,7 +946,7 @@ public class AuraImplUnitTestingUtil {
         for (Entry<String, String> entry : variables.entrySet()) {
             AttributeDefRefImpl value = makeAttributeDefRef(entry.getKey(), entry.getValue(), null);
             AttributeDefImpl attr = makeAttributeDef(entry.getKey(),
-                    DefDescriptorImpl.getInstance("String", TypeDef.class), value, false, null, null);
+                    definitionService.getDefDescriptor("String", TypeDef.class), value, false, null, null);
             builder.addAttributeDef(attr.getDescriptor(), attr);
         }
 
@@ -958,6 +965,6 @@ public class AuraImplUnitTestingUtil {
     }
 
     public DefDescriptor<HelperDef> getHelperDescriptor() {
-        return DefDescriptorImpl.getInstance("js://aura.html", HelperDef.class);
+        return definitionService.getDefDescriptor("js://aura.html", HelperDef.class);
     }
 }

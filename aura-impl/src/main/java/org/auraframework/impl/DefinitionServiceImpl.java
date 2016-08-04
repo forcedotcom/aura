@@ -15,25 +15,29 @@
  */
 package org.auraframework.impl;
 
-import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.auraframework.Aura;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.cache.Cache;
 import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DefDescriptor.DescriptorKey;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
-import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
+import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
+import org.auraframework.service.*;
 import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.Sets;
 
@@ -46,20 +50,72 @@ import com.google.common.collect.Sets;
 @ServiceComponent
 public class DefinitionServiceImpl implements DefinitionService {
     private static final long serialVersionUID = -2488984746420077688L;
-    private static final ConcurrentLinkedQueue<WeakReference<SourceListener>> listeners = new ConcurrentLinkedQueue<>();
 
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private CachingService cachingService;
+    
     @Override
     public <T extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass) {
         return getDefDescriptor(qualifiedName, defClass, null);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends Definition, B extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName,
             Class<T> defClass, DefDescriptor<B> bundle) {
         if (defClass == ActionDef.class) {
             return SubDefDescriptorImpl.getInstance(qualifiedName, defClass, ControllerDef.class);
         }
-        return DefDescriptorImpl.getInstance(qualifiedName, defClass, bundle);
+        if (qualifiedName == null || defClass == null) {
+            throw new AuraRuntimeException("descriptor is null");
+        }
+
+        DescriptorKey dk = new DescriptorKey(qualifiedName, defClass, bundle);
+
+        Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache = null;
+        if (cachingService != null) {
+            cache = cachingService.getDefDescriptorByNameCache();
+        }
+
+        DefDescriptor<T> result = null;
+        if (cache != null) {
+            DefDescriptor<T> cachedResult = (DefDescriptor<T>) cache.getIfPresent(dk);
+            result = cachedResult;
+        }
+        if (result == null) {
+            if (defClass == TypeDef.class && qualifiedName.indexOf("://") == -1) {
+                TypeDef typeDef = AuraStaticTypeDefRegistry.INSTANCE.getInsensitiveDef(qualifiedName);
+                if (typeDef != null) {
+                    return (DefDescriptor<T>) typeDef.getDescriptor();
+                }
+            }
+            result = new DefDescriptorImpl<>(qualifiedName, defClass, bundle);
+
+            // Our input names may not be qualified, but we should ensure that
+            // the fully-qualified is properly cached to the same object.
+            // I'd like an unqualified name to either throw or be resolved first,
+            // but that's breaking or non-performant respectively.
+            if (!dk.getName().equals(result.getQualifiedName())) {
+                DescriptorKey fullDK = new DescriptorKey(result.getQualifiedName(), defClass, result.getBundle());
+
+                DefDescriptor<T> fullResult = (DefDescriptor<T>) cache.getIfPresent(fullDK);
+                if (fullResult == null) {
+                    cache.put(fullDK, result);
+                } else {
+                    // We already had one, just under the proper name
+                    result = fullResult;
+                }
+            }
+
+            if (cache != null) {
+                cache.put(dk, result);
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -69,14 +125,21 @@ public class DefinitionServiceImpl implements DefinitionService {
         return DefDescriptorImpl.getAssociateDescriptor(desc, defClass, prefix);
     }
 
+    @SuppressWarnings({"unchecked", "cast"})
     @Override
     public <T extends Definition> T getDefinition(DefDescriptor<T> descriptor) throws QuickFixException {
-        ContextService contextService = Aura.getContextService();
         contextService.assertEstablished();
 
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        T def = context.getDefRegistry().getDef(descriptor);
+        AuraContext context = contextService.getCurrentContext();
+        T def;
 
+        // TODO: Remove SubDefDescriptor and with it this block of code.
+        if (descriptor instanceof SubDefDescriptor) {
+            SubDefDescriptor<T, ?> subDefDescriptor = (SubDefDescriptor<T, ?>) descriptor;
+            def = getDefinition(subDefDescriptor.getParentDescriptor()).getSubDefinition(subDefDescriptor);
+        } else {
+            def = context.getDefRegistry().getDef(descriptor);
+        }
         if (def != null && descriptor.getDefType() == DefType.APPLICATION && def.getAccess().requiresAuthentication() &&
                 context.getAccess() != Authentication.AUTHENTICATED) {
             def = null;
@@ -91,12 +154,11 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     @Override
     public <T extends Definition> T getDefinition(String qualifiedName, Class<T> defClass) throws QuickFixException {
-        return getDefinition(DefDescriptorImpl.getInstance(qualifiedName, defClass));
+        return getDefinition(getDefDescriptor(qualifiedName, defClass));
     }
 
     @Override
     public Definition getDefinition(String qualifiedName, DefType... defTypes) throws QuickFixException {
-        ContextService contextService = Aura.getContextService();
         contextService.assertEstablished();
 
         if (defTypes == null || defTypes.length == 0) {
@@ -108,7 +170,7 @@ public class DefinitionServiceImpl implements DefinitionService {
             desc = getDefDescriptor(qualifiedName, defType.getPrimaryInterface());
             Definition ret = null;
             try {
-                ret = desc.getDef();
+                ret = getDefinition(desc);
             } catch (DefinitionNotFoundException e) {
                 // ignore
             }
@@ -127,17 +189,15 @@ public class DefinitionServiceImpl implements DefinitionService {
      */
     @Override
     public MasterDefRegistry getDefRegistry() {
-        ContextService cs = Aura.getContextService();
-
-        cs.assertEstablished();
-        return cs.getCurrentContext().getDefRegistry();
+        contextService.assertEstablished();
+        return contextService.getCurrentContext().getDefRegistry();
     }
 
     @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
-        Aura.getContextService().assertEstablished();
+        contextService.assertEstablished();
 
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         return context.getDefRegistry().find(matcher);
     }
 
@@ -167,7 +227,6 @@ public class DefinitionServiceImpl implements DefinitionService {
      */
     @Override
     public void updateLoaded(DefDescriptor<?> loading) throws QuickFixException, ClientOutOfSyncException {
-        ContextService contextService = Aura.getContextService();
         AuraContext context;
         MasterDefRegistry mdr;
         Set<DefDescriptor<?>> loaded = Sets.newHashSet();
@@ -249,27 +308,29 @@ public class DefinitionServiceImpl implements DefinitionService {
         }
     }
 
+    /**
+     * Get an instance from name parts.
+     *
+     * @param name      The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
+     * @param namespace The Interface's Class for the DefDescriptor being requested.
+     * @return An instance of a AuraDescriptor for the provided tag
+     */
     @Override
-    public void onSourceChanged(DefDescriptor<?> source, SourceListener.SourceMonitorEvent event, String filePath) {
-        for (WeakReference<SourceListener> i : listeners) {
-            if (i.get() == null) {
-                listeners.remove(i);
-            }
+    public DefDescriptor<?> getDefDescriptor(@CheckForNull String prefix, @Nonnull String namespace,
+                                             @Nonnull String name, @Nonnull DefType defType) {
+        StringBuilder sb = new StringBuilder();
+        if (AuraTextUtil.isNullEmptyOrWhitespace(prefix)) {
+            prefix = contextService.getCurrentContext().getDefaultPrefix(defType);
         }
-        Aura.getCachingService().notifyDependentSourceChange(listeners, source, event, filePath);
-    }
-
-    @Override
-    public void subscribeToChangeNotification(SourceListener listener) {
-        listeners.add(new WeakReference<>(listener));
-    }
-
-    @Override
-    public void unsubscribeToChangeNotification(SourceListener listener) {
-        for (WeakReference<SourceListener> i : listeners) {
-            if (i.get() == null || i.get() == listener) {
-                listeners.remove(i);
-            }
+        sb.append(prefix.toLowerCase());
+        sb.append("://");
+        sb.append(namespace);
+        if (prefix.equals("markup")) {
+            sb.append(":");
+        } else {
+            sb.append(".");
         }
+        sb.append(name);
+        return getDefDescriptor(sb.toString(), defType.getPrimaryInterface(), null);
     }
 }

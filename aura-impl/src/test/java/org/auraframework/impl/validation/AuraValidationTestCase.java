@@ -15,13 +15,13 @@
  */
 package org.auraframework.impl.validation;
 
-import java.io.File;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.util.validation.ValidationError;
 import org.auraframework.util.validation.ValidationTestUtil;
+
+import java.io.File;
 
 public abstract class AuraValidationTestCase extends AuraImplTestCase {
 

@@ -15,12 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.List;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.IncludeDef;
@@ -37,7 +32,16 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import javax.inject.Inject;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.List;
+
 public class LibraryDefHandlerTest extends AuraImplTestCase {
+    @Inject
+    private DefinitionParserAdapter definitionParserAdapter;
+
     @Mock(answer = Answers.RETURNS_MOCKS)
     DefDescriptor<LibraryDef> descriptor;
 
@@ -51,9 +55,10 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
                 "<%s><%s name=\"%s\"/></%1$s>",
                 LibraryDefHandler.TAG, IncludeDefRefHandler.TAG, filename), "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(descriptor).getDefType();
-        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source));
-        
-    	LibraryDef actualDef = handler.getElement();
+        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source), true, definitionService,
+                configAdapter, definitionParserAdapter);
+
+        LibraryDef actualDef = handler.getElement();
         assertSame(descriptor, actualDef.getDescriptor());
         List<IncludeDefRef> includes = actualDef.getIncludes();
         assertEquals(1, includes.size());
@@ -62,9 +67,10 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
 
     @Test
     public void testGetElementWithEmptyTag() throws Exception {
-        StringSource<LibraryDef> source = new StringSource<>(descriptor, 
-        		String.format("<%s></%1$s>", LibraryDefHandler.TAG), "myID", Format.XML);
-        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source));
+        StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s></%1$s>",
+                LibraryDefHandler.TAG), "myID", Format.XML);
+        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source), true, definitionService,
+                configAdapter, definitionParserAdapter);
 
         LibraryDef actualDef = handler.getElement();
         assertSame(descriptor, actualDef.getDescriptor());
@@ -73,9 +79,10 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
 
     @Test
     public void testGetElementWithBodyText() throws Exception {
-        StringSource<LibraryDef> source = new StringSource<>(descriptor, 
-        		String.format("<%s>text</%1$s>", LibraryDefHandler.TAG), "myID", Format.XML);
-        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source));
+        StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s>text</%1$s>",
+                LibraryDefHandler.TAG), "myID", Format.XML);
+        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source), true, definitionService,
+                configAdapter, definitionParserAdapter);
 
         try {
             handler.getElement();
@@ -88,9 +95,10 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
 
     @Test
     public void testGetElementWithUnsupportedBodyTag() throws Exception {
-        StringSource<LibraryDef> source = new StringSource<>(descriptor, 
-        		String.format("<%s><br/></%1$s>", LibraryDefHandler.TAG), "myID", Format.XML);
-        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source));
+        StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s><br/></%1$s>",
+                LibraryDefHandler.TAG), "myID", Format.XML);
+        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source), true, definitionService,
+                configAdapter, definitionParserAdapter);
 
         try {
             handler.getElement();
@@ -103,9 +111,10 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
     @Test
     public void testGetElementWithDescription() throws Exception {
         String expectedDescription = "needs to be included";
-        StringSource<LibraryDef> source = new StringSource<>(descriptor, 
-        		String.format("<%s description='%s'></%1$s>", LibraryDefHandler.TAG, expectedDescription), "myID", Format.XML);
-        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source));
+        StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s description='%s'></%1$s>",
+                LibraryDefHandler.TAG, expectedDescription), "myID", Format.XML);
+        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source), true, definitionService,
+                configAdapter, definitionParserAdapter);
 
         LibraryDef actualDef = handler.getElement();
         assertEquals(expectedDescription, actualDef.getDescription());
@@ -113,9 +122,10 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
 
     @Test
     public void testGetElementWithUnexpectedAttribute() throws Exception {
-        StringSource<LibraryDef> source = new StringSource<>(descriptor, 
-        		String.format("<%s unexpected='me'></%1$s>", LibraryDefHandler.TAG), "myID", Format.XML);
-        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source));
+        StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s unexpected='me'></%1$s>",
+                LibraryDefHandler.TAG), "myID", Format.XML);
+        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source), true, definitionService,
+                configAdapter, definitionParserAdapter);
 
         try {
             handler.getElement();

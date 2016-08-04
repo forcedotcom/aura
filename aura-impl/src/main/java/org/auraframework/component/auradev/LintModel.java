@@ -21,28 +21,27 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.impl.validation.ValidationEngine;
 import org.auraframework.impl.validation.ValidationUtil;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.util.validation.ValidationError;
 
-@Model
-public class LintModel {
+@ServiceComponentModelInstance
+public class LintModel implements ModelInstance {
     List<Map<String, String>> errors = new ArrayList<>();
     String message;
 
-    public LintModel() throws Exception {
-        DefinitionService definitionService = Aura.getDefinitionService();
-
-        String name = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
+    public LintModel(ContextService contextService, DefinitionService definitionService) throws Exception {
+        String name = (String) contextService.getCurrentContext().getCurrentComponent().getAttributes()
                 .getValue("name");
 
         if (name != null && !name.isEmpty()) {
@@ -57,7 +56,7 @@ public class LintModel {
                     case INTERFACE:
 
                         try {
-                            Definition definition = descriptor.getDef();
+                            Definition definition = definitionService.getDefinition(descriptor);
 
                             if (definition instanceof RootDefinition) {
                                 List<DefDescriptor<?>> deps = ((RootDefinition) definition).getBundle();

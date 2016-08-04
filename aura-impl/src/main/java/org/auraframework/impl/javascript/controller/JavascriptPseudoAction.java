@@ -15,11 +15,6 @@
  */
 package org.auraframework.impl.javascript.controller;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -29,6 +24,11 @@ import org.auraframework.instance.InstanceStack;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This represents the Java bookkeeping idea of a Javascript action.  It is not
@@ -141,7 +141,7 @@ public class JavascriptPseudoAction implements Action {
     }
 
     @Override
-    public void setCallingDescriptor(String caller) {
+    public void setCallingDescriptor(DefDescriptor<ComponentDef> descriptor) {
         throw new UnsupportedOperationException("client-side Javascript actions do not have set calling descriptor");
     }
 

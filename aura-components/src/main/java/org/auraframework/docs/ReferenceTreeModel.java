@@ -15,58 +15,58 @@
  */
 package org.auraframework.docs;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.components.ui.TreeNode;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.ds.servicecomponent.ModelInstance;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-@Model
-public class ReferenceTreeModel {
-    public static boolean hasAccess(Definition def) throws QuickFixException {
-        DefinitionService definitionService = Aura.getDefinitionService();
-        MasterDefRegistry registry = definitionService.getDefRegistry();
-        return registry.hasAccess(getReferencingDescriptor(), def) == null;
+@ServiceComponentModelInstance
+public class ReferenceTreeModel implements ModelInstance{
+    
+    private final DefinitionService definitionService;
+    private final ContextService contextService;
+    private final ConfigAdapter configAdapter;
+    private List<TreeNode> tree;
+    
+    public ReferenceTreeModel(ContextService contextService, DefinitionService definitionService, ConfigAdapter configAdapter) {
+        this.contextService = contextService;
+        this.definitionService = definitionService;
+        this.configAdapter = configAdapter;
     }
 
-    public static void assertAccess(Definition def) throws QuickFixException {
-        DefinitionService definitionService = Aura.getDefinitionService();
-        MasterDefRegistry registry = definitionService.getDefRegistry();
-        registry.assertAccess(getReferencingDescriptor(), def);
+
+    public boolean isRunningInInternalNamespace() {
+        String ns = configAdapter.getDefaultNamespace();
+        return ns == null || configAdapter.isInternalNamespace(ns);
     }
 
-    public static boolean isRunningInInternalNamespace() {
-        String ns = Aura.getConfigAdapter().getDefaultNamespace();
-        return ns != null ? Aura.getConfigAdapter().isInternalNamespace(ns) : true;
-    }
-
-    private static final <E extends Definition> List<TreeNode> makeTreeNodes(String prefix, DefType type)
+    private final <E extends Definition> List<TreeNode> makeTreeNodes(String prefix, DefType type)
             throws QuickFixException {
-        Aura.getContextService().pushSystemContext();
+        contextService.pushSystemContext();
         try {
-            DefinitionService definitionService = Aura.getDefinitionService();
             List<TreeNode> ret = Lists.newArrayList();
 
             Map<String, TreeNode> namespaceTreeNodes = Maps.newHashMap();
             DescriptorFilter matcher = new DescriptorFilter(String.format("%s://*:*", prefix), type);
             Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
-            ConfigAdapter configAdapter = Aura.getConfigAdapter();
             for (DefDescriptor<?> desc : descriptors) {
                 if (desc == null) {
                     // Getting null here after commit 2037c31ddc81eae3edaf6ddd5bcfd0009fefe1bd. This causes a NPE and
@@ -77,7 +77,7 @@ public class ReferenceTreeModel {
                 String namespace = desc.getNamespace();
                 if (configAdapter.isDocumentedNamespace(namespace)) {
                     try {
-                        Definition def = desc.getDef();
+                        Definition def = definitionService.getDefinition(desc);
                         if (hasAccess(def)) {
                             TreeNode namespaceTreeNode = namespaceTreeNodes.get(desc.getNamespace());
                             if (namespaceTreeNode == null) {
@@ -98,7 +98,7 @@ public class ReferenceTreeModel {
 
                             // Preload the def
                             try {
-                                desc.getDef();
+                                definitionService.getDefinition(desc);
                             } catch (Throwable t) {
                                 // ignore problems, we were only trying to preload
                             }
@@ -118,7 +118,7 @@ public class ReferenceTreeModel {
 
             return ret;
         } finally {
-            Aura.getContextService().popSystemContext();
+            contextService.popSystemContext();
         }
     }
 
@@ -138,6 +138,8 @@ public class ReferenceTreeModel {
                 tree.add(new TreeNode(null, "Tests", makeTreeNodes("js", DefType.TESTSUITE), false));
             }
 
+            ApiContentsModel.refreshSymbols(configAdapter.getResourceLoader());
+            
             tree.add(new TreeNode(null, "JavaScript API", new ApiContentsModel().getNodes(), false));
 
             /*
@@ -148,16 +150,28 @@ public class ReferenceTreeModel {
         return tree;
     }
 
-    static DefDescriptor<ApplicationDef> getReferencingDescriptor() {
-        String defaultNamespace = Aura.getConfigAdapter().getDefaultNamespace();
+    private DefDescriptor<ApplicationDef> getReferencingDescriptor() {
+        String defaultNamespace = configAdapter.getDefaultNamespace();
         if (defaultNamespace == null) {
             defaultNamespace = "aura";
         }
 
-        DefinitionService definitionService = Aura.getDefinitionService();
         return definitionService.getDefDescriptor(String.format("%s:application", defaultNamespace),
                 ApplicationDef.class);
     }
+    
+    public boolean hasAccess(Definition def) throws QuickFixException {
+        MasterDefRegistry registry = definitionService.getDefRegistry();
+        return registry.hasAccess(getReferencingDescriptor(), def) == null;
+    }
 
-    private List<TreeNode> tree;
+    public void assertAccess(Definition def) throws QuickFixException {
+        MasterDefRegistry registry = definitionService.getDefRegistry();
+        registry.assertAccess(getReferencingDescriptor(), def);
+    }
+
+    public boolean isRunningInPrivilegedNamespace() {
+        String ns = configAdapter.getDefaultNamespace();
+        return ns != null ? configAdapter.isPrivilegedNamespace(ns) : true;
+    }
 }

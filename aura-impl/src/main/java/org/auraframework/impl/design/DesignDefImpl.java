@@ -168,7 +168,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
-        DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(this.descriptor.getQualifiedName(),
+        DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService().getDefDescriptor(this.descriptor.getQualifiedName(),
                 ComponentDef.class);
         dependencies.add(cmpDesc);
 
@@ -202,7 +202,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
 
     @Override
     public DesignAttributeDef getAttributeDesignDef(String name) {
-        return getAttributeDesignDefs().get(DefDescriptorImpl.getInstance(name, DesignAttributeDef.class));
+        return getAttributeDesignDefs().get(Aura.getDefinitionService().getDefDescriptor(name, DesignAttributeDef.class));
     }
 
     @Override

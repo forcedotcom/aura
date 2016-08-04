@@ -15,10 +15,6 @@
  */
 package org.auraframework.integration.test.validation;
 
-import java.io.File;
-import java.util.List;
-import java.util.Set;
-
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -29,7 +25,12 @@ import org.auraframework.impl.validation.AuraValidationTestCase;
 import org.auraframework.impl.validation.ValidationUtil;
 import org.junit.Test;
 
+import java.io.File;
+import java.util.List;
+import java.util.Set;
+
 public final class ValidationUtilTest extends AuraValidationTestCase {
+
     @Test
     public void testGetAllDescriptorsIn() throws Exception {
         if (skipTestIfNotRunningWithAuraSource()) {

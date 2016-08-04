@@ -134,7 +134,7 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
 
     private long doAPI(Mode mode) throws Exception {
         long start = System.currentTimeMillis();
-        open("/auradocs#reference?topic=api:Aura");
+        open("/auradocs#reference?topic=api:$A", mode, true);
         // TODO: this should test more.
         WebElement content = getAuraUITestingUtil().findDomElement(
                 By.cssSelector(".content"));

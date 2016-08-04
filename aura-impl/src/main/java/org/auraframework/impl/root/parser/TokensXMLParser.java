@@ -15,18 +15,38 @@
  */
 package org.auraframework.impl.root.parser;
 
-import javax.xml.stream.XMLStreamReader;
-
-import org.auraframework.def.TokensDef;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.root.parser.handler.TokensDefHandler;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import javax.xml.stream.XMLStreamReader;
+
+@ServiceComponent
 public class TokensXMLParser extends XMLParser<TokensDef> {
+
+    @Override
+    public Format getFormat() {
+        return Format.XML;
+    }
+
+    @Override
+    public DefType getDefType() {
+        return DefType.TOKENS;
+    }
+
     @Override
     protected TokensDefHandler getHandler(DefDescriptor<TokensDef> descriptor,
-            Source<TokensDef> source, XMLStreamReader xmlReader) throws QuickFixException {
-        return new TokensDefHandler(descriptor, source, xmlReader);
+                                          Source<TokensDef> source, XMLStreamReader xmlReader, boolean isInInternalNamespace,
+                                          DefinitionService definitionService,
+                                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws QuickFixException {
+        return new TokensDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
+                configAdapter, definitionParserAdapter);
     }
 }

@@ -15,20 +15,21 @@
  */
 package org.auraframework.integration.test.adapter.format.html;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.auraframework.Aura;
-import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.adapter.format.html.BaseComponentDefHTMLFormatAdapterTest;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
+
+import javax.inject.Inject;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Tests for BaseComponentDefHTMLFormatAdapter, as it relates to ApplicationDef
@@ -36,6 +37,11 @@ import org.junit.Test;
  * @since 0.0.224
  */
 public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFormatAdapterTest<ApplicationDef> {
+    @Inject
+    MockConfigAdapter mockConfigAdapter;
+
+    @Inject
+    DefinitionService definitionService;
 
     @Override
     public Class<ApplicationDef> getDefClass() {
@@ -48,8 +54,8 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
     @ThreadHostileTest("disables AppCache")
     @Test
     public void testWriteManifestWithConfigDisabled() throws Exception {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        ServletConfigController.setAppCacheDisabled(Boolean.TRUE);
+        AuraContext context = contextService.getCurrentContext();
+        mockConfigAdapter.setIsClientAppcacheEnabled(false);
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application useAppcache='true' render='client'></aura:application>");
         context.setApplicationDescriptor(desc);
@@ -67,13 +73,12 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
      */
     @Test
     public void testWriteManifestWithUseAppCacheFalse() throws Exception {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application render='client' useAppcache='false'></aura:application>");
         context.setApplicationDescriptor(desc);
         context.addLoaded(desc, context.getDefRegistry().getUid(null, desc));
-        String body = doWrite(definitionService.getDefinition(desc)
-        		);
+        String body = doWrite(definitionService.getDefinition(desc));
         int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
         if (tag.contains(" manifest=")) {
@@ -86,7 +91,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
      */
     @Test
     public void testWriteManifestWithUseAppCacheInherited() throws Exception {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application render='client'></aura:application>");
         context.setApplicationDescriptor(desc);
@@ -104,7 +109,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
      */
     @Test
     public void testWriteManifest() throws Exception {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application render='client' useAppcache='true'></aura:application>");
         context.setApplicationDescriptor(desc);
@@ -113,7 +118,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         String body = doWrite(definitionService.getDefinition(desc));
         int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
-        String cacheBuster = Aura.getConfigAdapter().getLockerServiceCacheBuster();
+        String cacheBuster = configAdapter.getLockerServiceCacheBuster();
         String lockerServiceEnabled = cacheBuster != null ? ",\"ls\":\"" + cacheBuster + "\"" : "";
         String expectedSubPath = AuraTextUtil.urlencode(String.format(
                 "{\"mode\":\"UTEST\",\"app\":\"%s\",\"test\":\"org.auraframework.integration.test.adapter.format.html.ApplicationDefHTMLFormatAdapterTest.testWriteManifest\"%s}",
@@ -129,7 +134,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
      */
     @Test
     public void testUrlContextPath() throws Exception {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         String coolContext = "/cool";
         context.setContextPath(coolContext);
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,

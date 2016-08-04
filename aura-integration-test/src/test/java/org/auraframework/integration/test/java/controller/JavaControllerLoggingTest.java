@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.spi.LoggingEvent;
-import org.auraframework.Aura;
 import org.auraframework.components.test.java.controller.JavaTestController.CustomParamType;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
@@ -40,16 +39,25 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import javax.inject.Inject;
+
 /**
  * Integration tests for java Controllers loggings.
  */
 @UnAdaptableTest("AbstractLoggingUITest has tag @ThreadHostileTest which is not supported in SFDC.")
 public class JavaControllerLoggingTest extends AbstractLoggingTest {
 
-    private ServerService serverService = Aura.getServerService();
-    private InstanceService instanceService = Aura.getInstanceService();
-    private ContextService contextService = Aura.getContextService();
-    private LoggingService loggingService = Aura.getLoggingService();
+    @Inject
+    private ServerService serverService;
+    
+    @Inject
+    private InstanceService instanceService;
+
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private LoggingService loggingService;
 
     @Test
     public void testParamLogging_NoParams() throws Exception {

@@ -17,7 +17,6 @@ package org.auraframework.impl.system;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +43,7 @@ import org.auraframework.def.ParentedDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.service.CachingService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.DefRegistry;
@@ -123,6 +123,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     private final Lock rLock;
 
+    private final ConfigAdapter configAdapter;
+    private final DefinitionService definitionService;
+    private final LoggingService loggingService;
     private final Cache<DefDescriptor<?>, Boolean> existsCache;
     private final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
     private final Cache<String, DependencyEntry> depsCache;
@@ -160,19 +163,24 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     private final MasterDefRegistryImpl original;
 
-    private MasterDefRegistryImpl(RegistryTrie delegate, MasterDefRegistryImpl original) {
-        CachingService acs = Aura.getCachingService();
+    private AuraContext context;
 
+    private MasterDefRegistryImpl(ConfigAdapter configAdapter, DefinitionService definitionService,
+                                  LoggingService loggingService, CachingService cachingService,
+                                  RegistryTrie delegate, MasterDefRegistryImpl original) {
+        this.configAdapter = configAdapter;
+        this.definitionService = definitionService;
+        this.loggingService = loggingService;
         this.delegateRegistries = delegate;
         this.original = original;
-        this.rLock = acs.getReadLock();
-        this.existsCache = acs.getExistsCache();
-        this.defsCache = acs.getDefsCache();
-        this.depsCache = acs.getDepsCache();
-        this.stringsCache = acs.getStringsCache();
-        this.altStringsCache = acs.getAltStringsCache();
-        this.descriptorFilterCache = acs.getDescriptorFilterCache();
-        this.accessCheckCache = acs.<String, String> getCacheBuilder()
+        this.rLock = cachingService.getReadLock();
+        this.existsCache = cachingService.getExistsCache();
+        this.defsCache = cachingService.getDefsCache();
+        this.depsCache = cachingService.getDepsCache();
+        this.stringsCache = cachingService.getStringsCache();
+        this.altStringsCache = cachingService.getAltStringsCache();
+        this.descriptorFilterCache = cachingService.getDescriptorFilterCache();
+        this.accessCheckCache = cachingService.<String, String>getCacheBuilder()
                 .setInitialSize(ACCESS_CHECK_CACHE_SIZE)
                 .setMaximumSize(ACCESS_CHECK_CACHE_SIZE)
                 .setRecordStats(true)
@@ -194,8 +202,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      *
      * @param original the registry that is the 'public' registry.
      */
-    public MasterDefRegistryImpl(@Nonnull MasterDefRegistryImpl original) {
-        this(original.delegateRegistries, original);
+    public MasterDefRegistryImpl(ConfigAdapter configAdapter, DefinitionService definitionService,
+                                 LoggingService loggingService, CachingService cachingService,
+                                 @Nonnull MasterDefRegistryImpl original) {
+        this(configAdapter, definitionService, loggingService, cachingService, original.delegateRegistries, original);
     }
 
     /**
@@ -205,8 +215,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      *
      * @param registries the registries to use in the mdr.
      */
-    public MasterDefRegistryImpl(@Nonnull DefRegistry<?>... registries) {
-        this(new RegistryTrie(registries), null);
+    public MasterDefRegistryImpl(ConfigAdapter configAdapter, DefinitionService definitionService,
+                                 LoggingService loggingService, CachingService cachingService,
+                                 @Nonnull DefRegistry<?>... registries) {
+        this(configAdapter, definitionService, loggingService, cachingService, new RegistryTrie(registries), null);
     }
 
     private boolean isOkForDependencyCaching(DefDescriptor<?> descriptor) {
@@ -250,7 +262,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
 
             // just one match
-            DefDescriptor<?> singleMatch = DefDescriptorImpl.getInstance(
+            DefDescriptor<?> singleMatch = definitionService.getDefDescriptor(
                     prefix, matcher.getNamespaceMatch().toString(), matcher.getNameMatch().toString(),
                     matcher.getDefTypes().get(0));
             if (exists(singleMatch)) {
@@ -418,8 +430,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * This class holds the local information necessary for compilation.
      */
     private static class CompileContext {
-        public final AuraContext context = Aura.getContextService().getCurrentContext();
-        public final LoggingService loggingService = Aura.getLoggingService();
+        public final AuraContext context;
+        public final LoggingService loggingService;
         public final Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiled = Maps.newHashMap();
         public final List<ClientLibraryDef> clientLibs;
         public final DefDescriptor<? extends Definition> topLevel;
@@ -429,7 +441,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         /** Is this def's dependencies cacheable? */
         public boolean shouldCacheDependencies;
 
-        public CompileContext(DefDescriptor<? extends Definition> topLevel, List<ClientLibraryDef> clientLibs) {
+        public CompileContext(LoggingService loggingService, AuraContext context, DefDescriptor<? extends Definition> topLevel, List<ClientLibraryDef> clientLibs) {
+            this.loggingService = loggingService;
+            this.context = context != null ? context : Aura.getContextService().getCurrentContext();
             this.clientLibs = clientLibs;
             this.topLevel = topLevel;
             this.level = 0;
@@ -437,7 +451,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             this.compiling = true;
         }
 
-        public CompileContext(DefDescriptor<? extends Definition> topLevel) {
+        public CompileContext(LoggingService loggingService, AuraContext context, DefDescriptor<? extends Definition> topLevel) {
+            this.loggingService = loggingService;
+            this.context = context != null ? context : Aura.getContextService().getCurrentContext();
             this.clientLibs = null;
             this.topLevel = topLevel;
             this.shouldCacheDependencies = true;
@@ -831,8 +847,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         try {
             List<ClientLibraryDef> clientLibs = Lists.newArrayList();
-            CompileContext cc = new CompileContext(descriptor, clientLibs);
-            cc.addMap(AuraStaticControllerDefRegistry.INSTANCE.getAll());
+            CompileContext cc = new CompileContext(loggingService, context, descriptor, clientLibs);
+            cc.addMap(AuraStaticControllerDefRegistry.getInstance(definitionService).getAll());
             Definition def = compileDef(descriptor, cc);
             DependencyEntry de;
             String uid;
@@ -848,12 +864,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // levels where affected the ordering of dependencies creating different uid.
             //
             // Using descriptor only produces a more consistent UID
-            Collections.sort(compiled, new Comparator<CompilingDef<?>>() {
-                @Override
-                public int compare(CompilingDef<?> cd1, CompilingDef<?> cd2) {
-                    return cd1.descriptor.compareTo(cd2.descriptor);
-                }
-            });
+            Collections.sort(compiled, (cd1, cd2) -> cd1.descriptor.compareTo(cd2.descriptor));
 
             //
             // Now walk the sorted list, building up our dependencies, and uid
@@ -1017,7 +1028,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             throw new AuraRuntimeException("Ugh, nested compileDE/buildDE on " + currentCC.topLevel
                     + " trying to build " + descriptor);
         }
-        currentCC = new CompileContext(descriptor);
+        currentCC = new CompileContext(loggingService, context, descriptor);
         try {
             validateHelper(descriptor);
             for (DefDescriptor<?> dd : de.dependencies) {
@@ -1266,12 +1277,18 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         assertAccess(referencingDescriptor, def, accessCheckCache);
     }
 
+    @Override
+    public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, DefDescriptor<?> assertionDefinition)
+            throws QuickFixException {
+        assertAccess(referencingDescriptor, definitionService.getDefinition(assertionDefinition), accessCheckCache);
+    }
+
     public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def,
             Cache<String, String> accessCheckCache) {
         String status = hasAccess(referencingDescriptor, def, accessCheckCache);
         if (status != null) {
             DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
-            String message = Aura.getConfigAdapter().isProduction() ? DefinitionNotFoundException.getMessage(
+            String message = configAdapter.isProduction() ? DefinitionNotFoundException.getMessage(
                     descriptor.getDefType(), descriptor.getName()) : status;
                     throw new NoAccessException(message);
         }
@@ -1291,11 +1308,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         // If the def is access="global" or does not require authentication then anyone can see it
         DefinitionAccess access = def.getAccess();
+        if (access == null) {
+            throw new RuntimeException("Missing access declaration for " + def.getDescriptor());
+        }
         if (access.isGlobal() || !access.requiresAuthentication()) {
             return null;
         }
 
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
         String referencingNamespace = null;
         if (referencingDescriptor != null) {
             String prefix = referencingDescriptor.getPrefix();
@@ -1379,6 +1398,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         return status.isEmpty() ? null : status;
     }
 
+    public void setContext(AuraContext context) {
+        this.context = context;
+    }
+    
     /**
      * only used by admin tools to view all registries
      */
@@ -1593,14 +1616,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (prefix == null) {
                 cacheable = false;
             } else {
-                ConfigAdapter configAdapter = Aura.getConfigAdapter();
                 cacheable = configAdapter.isCacheablePrefix(prefix);
             }
         } else if (prefix == null) {
-            ConfigAdapter configAdapter = Aura.getConfigAdapter();
             cacheable = configAdapter.isInternalNamespace(namespace);
         } else {
-            ConfigAdapter configAdapter = Aura.getConfigAdapter();
             cacheable = configAdapter.isCacheablePrefix(prefix) || configAdapter.isInternalNamespace(namespace);
         }
         return cacheable;

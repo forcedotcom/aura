@@ -35,9 +35,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
-import org.auraframework.Aura;
 import org.auraframework.AuraDeprecated;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -47,8 +47,10 @@ import org.auraframework.http.RequestParam.BooleanParam;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.InvalidParamException;
 import org.auraframework.http.RequestParam.StringParam;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
+import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -61,7 +63,6 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import com.google.common.collect.Maps;
 
 public class AuraContextFilter implements Filter {
-
     public static final EnumParam<AuraContext.Mode> mode = new EnumParam<>(AuraServlet.AURA_PREFIX
             + "mode", false, AuraContext.Mode.class);
 
@@ -87,9 +88,46 @@ public class AuraContextFilter implements Filter {
 
     private AuraDeprecated auraDeprecated; // force initialization of Aura
 
+    private ContextService contextService;
+    private LoggingService loggingService;
+    private DefinitionService definitionService;
+    private ConfigAdapter configAdapter;
+    protected SerializationService serializationService;
+    private LocalizationAdapter localizationAdapter;
+
+    @Inject
+    public void setContextService(ContextService service) {
+        contextService = service;
+    }
+
+    @Inject
+    public void setLoggingService(LoggingService service) {
+        loggingService = service;
+    }
+
+    @Inject
+    public void setDefinitionService(DefinitionService service) {
+        definitionService = service;
+    }
+
+    @Inject
+    public void setConfigAdapter(ConfigAdapter adapter) {
+        configAdapter = adapter;
+    }
+
+    @Inject
+    public void setSerializationService(SerializationService service) {
+        serializationService = service;
+    }
+
     @Inject
     public void setAuraTestFilter(AuraTestFilter testFilter) {
         this.testFilter = testFilter;
+    }
+
+    @Inject
+    public void setLocalizationAdapter(LocalizationAdapter localizationAdapter) {
+        this.localizationAdapter = localizationAdapter;
     }
 
     public AuraTestFilter getAuraTestFilter() {
@@ -99,13 +137,12 @@ public class AuraContextFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
 
-        if (Aura.getContextService().isEstablished()) {
+        if (contextService.isEstablished()) {
             LOG.error("Aura context was not released correctly! New context will NOT be created.");
             chain.doFilter(req, res);
             return;
         }
 
-        LoggingService loggingService = Aura.getLoggingService();
         try {
             startContext(req, res, chain);
             HttpServletRequest request = (HttpServletRequest) req;
@@ -171,14 +208,14 @@ public class AuraContextFilter implements Filter {
 		// AuraLocale.
 		// So, we pass the locales to LocalizationAdapter
 		//
-        Aura.getLocalizationAdapter().setRequestedLocales(requestedLocales);
+        localizationAdapter.setRequestedLocales(requestedLocales);
         
-        AuraContext context = Aura.getContextService().startContext(m, f, a, appDesc, d);
+        AuraContext context = contextService.startContext(m, f, a, appDesc, d);
         
         //
         // Reset it after the context is started (created)
         //
-        Aura.getLocalizationAdapter().setRequestedLocales(null);
+        localizationAdapter.setRequestedLocales(null);
  
         String contextPath = request.getContextPath();
         // some appservers (like tomcat) use "/" as the root path, others ""
@@ -230,7 +267,6 @@ public class AuraContextFilter implements Filter {
         }
         @SuppressWarnings("unchecked")
         Map<String, String> loaded = (Map<String, String>) loadedEntry;
-        DefinitionService definitionService = Aura.getDefinitionService();
         Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
 
         for (Map.Entry<String, String> entry : loaded.entrySet()) {
@@ -294,7 +330,6 @@ public class AuraContextFilter implements Filter {
 
     protected Mode getMode(HttpServletRequest request, Map<String, Object> configMap) {
         Mode m = getModeParam(request, configMap);
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
 
         if (m == null) {
             m = configAdapter.getDefaultMode();
@@ -320,9 +355,9 @@ public class AuraContextFilter implements Filter {
             }
         }
         if (appName != null) {
-            return Aura.getDefinitionService().getDefDescriptor(appName, ApplicationDef.class);
+            return definitionService.getDefDescriptor(appName, ApplicationDef.class);
         } else if (cmpName != null) {
-            return Aura.getDefinitionService().getDefDescriptor(cmpName, ComponentDef.class);
+            return definitionService.getDefDescriptor(cmpName, ComponentDef.class);
         }
         return null;
     }
@@ -333,7 +368,7 @@ public class AuraContextFilter implements Filter {
     }
 
     protected void endContext() {
-        Aura.getContextService().endContext();
+        contextService.endContext();
     }
 
     protected Boolean getDebugToolParam(HttpServletRequest request) {
@@ -354,7 +389,7 @@ public class AuraContextFilter implements Filter {
         }
         testFilter.init(filterConfig);
     }
-
+    
     public void processInjection(FilterConfig filterConfig) {
         SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, filterConfig.getServletContext());
     }

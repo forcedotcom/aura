@@ -15,14 +15,7 @@
  */
 package org.auraframework.integration.test.root.component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.auraframework.Aura;
+import com.google.common.collect.ImmutableMap;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
@@ -32,12 +25,16 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ComponentDefRefImplTest extends AuraImplTestCase {
     private ComponentDefRef testComponentDefRef;
@@ -52,7 +49,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
                 vendor.makeLocation("fakefilename", 10, 10, 0)));
 
         Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new HashMap<>();
-        attributes.put(DefDescriptorImpl.getInstance(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, AttributeDef.class),
+        attributes.put(definitionService.getDefDescriptor(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, AttributeDef.class),
                 vendor.makeAttributeDefRefWithNulls(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, children, null));
 
         testComponentDefRef = vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("test:text"), attributes,
@@ -88,7 +85,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         // children.add(vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("aura:text"),
         // null, vendor.makeLocation("fakefilename2", 20, 20, 0)));
         Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new HashMap<>();
-        attributes.put(DefDescriptorImpl.getInstance(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, AttributeDef.class),
+        attributes.put(definitionService.getDefDescriptor(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, AttributeDef.class),
                 vendor.makeAttributeDefRef(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, children, null));
 
         testComponentDefRef = vendor.makeComponentDefRefWithNulls(vendor.makeComponentDefDescriptor("test:text"), null,
@@ -96,12 +93,12 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
 
         children.add(testComponentDefRef);
         testComponentDefRef = vendor.makeComponentDefRef(
-                DefDescriptorImpl.getInstance("test:text", ComponentDef.class), attributes,
+                definitionService.getDefDescriptor("test:text", ComponentDef.class), attributes,
                 vendor.makeLocation("filename", 5, 5, 0));
         dependencies = new HashSet<>();
         testComponentDefRef.appendDependencies(dependencies);
         assertEquals(1, dependencies.size());
-        assertTrue(dependencies.contains(DefDescriptorImpl.getInstance("test:text", ComponentDef.class)));
+        assertTrue(dependencies.contains(definitionService.getDefDescriptor("test:text", ComponentDef.class)));
         // assertTrue(dependencies.contains(vendor.makeComponentDefDescriptor("aura:text")));
     }
 
@@ -148,10 +145,10 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
 
         Map<String, Object> atts = ImmutableMap.of("req", (Object) "hi");
 
-        assertNotNull(Aura.getInstanceService().getInstance(cmpDesc.getDescriptorName(), ComponentDef.class, atts));
-        assertNotNull(Aura.getInstanceService().getInstance(cmpDesc.getDescriptorName(), atts, DefType.COMPONENT));
-        assertNotNull(Aura.getInstanceService().getInstance(cmpDesc, atts));
-        assertNotNull(Aura.getInstanceService().getInstance(definitionService.getDefinition(cmpDesc), atts));
+        assertNotNull(instanceService.getInstance(cmpDesc.getDescriptorName(), ComponentDef.class, atts));
+        assertNotNull(instanceService.getInstance(cmpDesc.getDescriptorName(), atts, DefType.COMPONENT));
+        assertNotNull(instanceService.getInstance(cmpDesc, atts));
+        assertNotNull(instanceService.getInstance(definitionService.getDefinition(cmpDesc), atts));
     }
 
     @Test
@@ -160,7 +157,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
                 "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
 
         try {
-            Aura.getInstanceService().getInstance(cmpDesc.getDescriptorName(), ComponentDef.class);
+            instanceService.getInstance(cmpDesc.getDescriptorName(), ComponentDef.class);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, MissingRequiredAttributeException.class, "COMPONENT " + cmpDesc.getQualifiedName()
@@ -174,7 +171,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
                 "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
 
         try {
-            Aura.getInstanceService().getInstance(cmpDesc.getDescriptorName(), DefType.COMPONENT);
+            instanceService.getInstance(cmpDesc.getDescriptorName(), DefType.COMPONENT);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, MissingRequiredAttributeException.class, "COMPONENT " + cmpDesc.getQualifiedName()
@@ -188,7 +185,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
         try {
-            Aura.getInstanceService().getInstance(cmpDesc);
+            instanceService.getInstance(cmpDesc);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, MissingRequiredAttributeException.class, "COMPONENT " + cmpDesc.getQualifiedName()
@@ -201,7 +198,7 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
         try {
-            Aura.getInstanceService().getInstance(definitionService.getDefinition(cmpDesc));
+            instanceService.getInstance(definitionService.getDefinition(cmpDesc));
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, MissingRequiredAttributeException.class, "COMPONENT " + cmpDesc.getQualifiedName()
@@ -218,33 +215,33 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
 
         Map<String, Object> atts = ImmutableMap.of("req", (Object) "hi");
 
-        Aura.getInstanceService().getInstance(cmpDesc.getDescriptorName(), ComponentDef.class, atts);
-        Aura.getInstanceService().getInstance(cmpDesc.getDescriptorName(), atts, DefType.COMPONENT);
-        Aura.getInstanceService().getInstance(cmpDesc, atts);
-        Aura.getInstanceService().getInstance(definitionService.getDefinition(cmpDesc), atts);
+        instanceService.getInstance(cmpDesc.getDescriptorName(), ComponentDef.class, atts);
+        instanceService.getInstance(cmpDesc.getDescriptorName(), atts, DefType.COMPONENT);
+        instanceService.getInstance(cmpDesc, atts);
+        instanceService.getInstance(definitionService.getDefinition(cmpDesc), atts);
         try {
-            Aura.getInstanceService().getInstance(cmpDesc.getDescriptorName(), ComponentDef.class);
+            instanceService.getInstance(cmpDesc.getDescriptorName(), ComponentDef.class);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, MissingRequiredAttributeException.class, "COMPONENT " + cmpDesc.getQualifiedName()
                     + " is missing required attribute 'req'", parent.getQualifiedName());
         }
         try {
-            Aura.getInstanceService().getInstance(cmpDesc.getDescriptorName(), DefType.COMPONENT);
+            instanceService.getInstance(cmpDesc.getDescriptorName(), DefType.COMPONENT);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, MissingRequiredAttributeException.class, "COMPONENT " + cmpDesc.getQualifiedName()
                     + " is missing required attribute 'req'", parent.getQualifiedName());
         }
         try {
-            Aura.getInstanceService().getInstance(cmpDesc);
+            instanceService.getInstance(cmpDesc);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, MissingRequiredAttributeException.class, "COMPONENT " + cmpDesc.getQualifiedName()
                     + " is missing required attribute 'req'", parent.getQualifiedName());
         }
         try {
-            Aura.getInstanceService().getInstance(definitionService.getDefinition(cmpDesc));
+            instanceService.getInstance(definitionService.getDefinition(cmpDesc));
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, MissingRequiredAttributeException.class, "COMPONENT " + cmpDesc.getQualifiedName()
@@ -259,28 +256,28 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format("<aura:component><%s/></aura:component>", inner.getDescriptorName()));
         try {
-            Aura.getInstanceService().getInstance(cmpDesc.getDescriptorName(), ComponentDef.class);
+            instanceService.getInstance(cmpDesc.getDescriptorName(), ComponentDef.class);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, MissingRequiredAttributeException.class, "COMPONENT " + cmpDesc.getQualifiedName()
                     + " is missing required attribute 'req'", inner.getQualifiedName());
         }
         try {
-            Aura.getInstanceService().getInstance(cmpDesc.getDescriptorName(), DefType.COMPONENT);
+            instanceService.getInstance(cmpDesc.getDescriptorName(), DefType.COMPONENT);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, MissingRequiredAttributeException.class, "COMPONENT " + cmpDesc.getQualifiedName()
                     + " is missing required attribute 'req'", inner.getQualifiedName());
         }
         try {
-            Aura.getInstanceService().getInstance(cmpDesc);
+            instanceService.getInstance(cmpDesc);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, MissingRequiredAttributeException.class, "COMPONENT " + cmpDesc.getQualifiedName()
                     + " is missing required attribute 'req'", inner.getQualifiedName());
         }
         try {
-            Aura.getInstanceService().getInstance(definitionService.getDefinition(cmpDesc));
+            instanceService.getInstance(definitionService.getDefinition(cmpDesc));
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (Exception e) {
             checkExceptionFull(e, MissingRequiredAttributeException.class, "COMPONENT " + cmpDesc.getQualifiedName()

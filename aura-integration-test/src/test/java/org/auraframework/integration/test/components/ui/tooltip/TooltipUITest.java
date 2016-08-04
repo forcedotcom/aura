@@ -18,6 +18,7 @@ package org.auraframework.integration.test.components.ui.tooltip;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -31,7 +32,8 @@ public class TooltipUITest extends WebDriverTestCase {
 	 * pressing enter on keyboard
 	 */
     @Test
-    public void testToolTipOpenAndCloseWithEnterKey() throws Exception {
+    @Ignore
+	public void testToolTipOpenAndCloseWithEnterKey() throws Exception {
 		open(URL_FULL_CMP);
 
 		WebElement trigger = findDomElement(By.cssSelector(".triggerClick"));
@@ -64,3 +66,4 @@ public class TooltipUITest extends WebDriverTestCase {
 		waitForElementDisappear("Tooltip should not be present but is", By.cssSelector(".uiTooltipAdvanced.visible"));
 	}
 }
+

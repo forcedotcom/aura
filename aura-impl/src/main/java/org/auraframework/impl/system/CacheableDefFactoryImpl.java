@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl.system;
 
-import java.util.Set;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
@@ -27,11 +25,15 @@ import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import java.util.Set;
+
 public class CacheableDefFactoryImpl<D extends Definition> extends DefFactoryImpl<D> implements CacheableDefFactory<D> {
     private final SourceFactory sourceFactory;
+    private final ParserFactory parserFactory;
 
-    public CacheableDefFactoryImpl(SourceFactory sourceFactory) {
+    public CacheableDefFactoryImpl(SourceFactory sourceFactory, ParserFactory parserFactory) {
         this.sourceFactory = sourceFactory;
+        this.parserFactory = parserFactory;
     }
 
     @Override
@@ -42,7 +44,7 @@ public class CacheableDefFactoryImpl<D extends Definition> extends DefFactoryImp
             // Update the descriptor to respect the canonical case from the source.
             descriptor = source.getDescriptor();
 
-            Parser<D> parser = ParserFactory.getParser(source.getFormat(), descriptor);
+            Parser<D> parser = parserFactory.getParser(source.getFormat(), descriptor);
             D def = parser.parse(descriptor, source);
             return def;
         }

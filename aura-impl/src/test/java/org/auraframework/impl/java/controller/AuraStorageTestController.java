@@ -15,6 +15,24 @@
  */
 package org.auraframework.impl.java.controller;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.instance.Component;
+import org.auraframework.service.InstanceService;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.BackgroundAction;
+import org.auraframework.system.Annotations.CabooseAction;
+import org.auraframework.system.Annotations.Key;
+import org.auraframework.test.TestContextAdapter;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonSerializable;
+
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
@@ -25,37 +43,27 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.instance.Component;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.BackgroundAction;
-import org.auraframework.system.Annotations.CabooseAction;
-import org.auraframework.system.Annotations.Controller;
-import org.auraframework.system.Annotations.Key;
-import org.auraframework.test.TestContextAdapter;
-import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializable;
+@ServiceComponent
+public class AuraStorageTestController implements Controller {
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+    @Inject
+    private TestContextAdapter testContextAdapter;
 
-@Controller
-public class AuraStorageTestController {
-    public static ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<>();
-    private static Map<String, Map<String, Semaphore>> pending = new ConcurrentHashMap<>();
-    private static Map<String, List<Object>> buffer = Maps.newHashMap();
-    private static Map<String, Semaphore> executorLocks = new ConcurrentHashMap<>();
+    @Inject
+    private InstanceService instanceService;
+
+    public ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<>();
+    private Map<String, Map<String, Semaphore>> pending = new ConcurrentHashMap<>();
+    private Map<String, List<Object>> buffer = Maps.newHashMap();
+    private Map<String, Semaphore> executorLocks = new ConcurrentHashMap<>();
 
     private enum Command {
         RESET, WAIT, RESUME, APPEND, READ, STAMP, SLEEP, COPY;
     }
 
     @AuraEnabled
-    public static List<Object> execute(@Key("commands") String commands) throws Exception {
-        String testName = Aura.get(TestContextAdapter.class).getTestContext().getName();
+    public List<Object> execute(@Key("commands") String commands) throws Exception {
+        String testName = testContextAdapter.getTestContext().getName();
         List<Object> result = Lists.newLinkedList();
         getExecutorLock(testName);
         try {
@@ -146,29 +154,29 @@ public class AuraStorageTestController {
 
     @AuraEnabled
     @BackgroundAction
-    public static List<Object> executeBackground(@Key("commands") String commands) throws Exception {
+    public List<Object> executeBackground(@Key("commands") String commands) throws Exception {
         return execute(commands);
     }
 
     @AuraEnabled
     @CabooseAction
-    public static List<Object> executeCaboose(@Key("commands") String commands) throws Exception {
+    public List<Object> executeCaboose(@Key("commands") String commands) throws Exception {
         return execute(commands);
     }
 
     @AuraEnabled
-    public static void block(@Key("testName") String testName) {
+    public void block(@Key("testName") String testName) {
         getSemaphore(testName, null, true);
     }
 
     @AuraEnabled
-    public static void resume(@Key("testName") String testName) {
+    public void resume(@Key("testName") String testName) {
         getSemaphore(testName, null, false).release();
         removeSemaphore(testName, null);
     }
 
     @AuraEnabled
-    public static Record fetchDataRecord(@Key("testName") String testName) throws Exception {
+    public Record fetchDataRecord(@Key("testName") String testName) throws Exception {
         staticCounter.putIfAbsent(testName, 0);
         AuraStorageTestController.Record r = new AuraStorageTestController.Record(staticCounter.get(testName),
                 "StorageController");
@@ -187,8 +195,8 @@ public class AuraStorageTestController {
      * cause Action refresh to trigger a callback in the client
      */
     @AuraEnabled
-    public static RecordWithComponents fetchDataRecordWithComponents(@Key("testName") String testName,
-            @Key("extraComponentsCreated") Boolean extraComponentsCreated) throws Exception {
+    public RecordWithComponents fetchDataRecordWithComponents(@Key("testName") String testName,
+                                                              @Key("extraComponentsCreated") Boolean extraComponentsCreated) throws Exception {
         staticCounter.putIfAbsent(testName, 0);
         // Create extra components the second time this server action is called.
         if (extraComponentsCreated != null && extraComponentsCreated && staticCounter.get(testName).intValue() == 1) {
@@ -197,7 +205,7 @@ public class AuraStorageTestController {
             Map<String, Object> attr = Maps.newHashMap();
             // W-1859020 - W-1859020 - Revert to auraStorageTest:playerFacet
             // attr.put("value", ""+System.currentTimeMillis());
-            Aura.getInstanceService().getInstance("uitest:hasModel", ComponentDef.class, attr);
+            instanceService.getInstance("uitest:hasModel", ComponentDef.class, attr);
         }
         AuraStorageTestController.RecordWithComponents r = new AuraStorageTestController.RecordWithComponents(
                 staticCounter.get(testName),
@@ -213,12 +221,12 @@ public class AuraStorageTestController {
     }
 
     @AuraEnabled
-    public static int getInt(@Key("param") int param) throws Exception {
+    public int getInt(@Key("param") int param) throws Exception {
         return param;
     }
 
     @AuraEnabled
-    public static void resetCounter(@Key("testName") String testName) {
+    public void resetCounter(@Key("testName") String testName) {
         if (testName != null) {
             staticCounter.remove(testName);
             removeSemaphore(testName, null);
@@ -232,12 +240,12 @@ public class AuraStorageTestController {
     }
 
     @AuraEnabled
-    public static void setCounter(@Key("testName") String testName, @Key("value") Integer value) {
+    public void setCounter(@Key("testName") String testName, @Key("value") Integer value) {
         staticCounter.put(testName, value);
     }
 
     @AuraEnabled
-    public static List<Integer> string(@Key("testName") String testName, @Key("param1") Integer param1) {
+    public List<Integer> string(@Key("testName") String testName, @Key("param1") Integer param1) {
         staticCounter.putIfAbsent(testName, 0);
         List<Integer> ret = Lists.newArrayList();
         ret.add(staticCounter.get(testName));
@@ -248,7 +256,7 @@ public class AuraStorageTestController {
     }
 
     @AuraEnabled
-    public static List<Integer> substring(@Key("testName") String testName, @Key("param1") Integer param1) {
+    public List<Integer> substring(@Key("testName") String testName, @Key("param1") Integer param1) {
         staticCounter.putIfAbsent(testName, 0);
         List<Integer> ret = Lists.newArrayList();
         ret.add(staticCounter.get(testName));
@@ -289,7 +297,7 @@ public class AuraStorageTestController {
     /**
      * Object to represent return value for controller.
      */
-    static class RecordWithComponents implements JsonSerializable {
+    class RecordWithComponents implements JsonSerializable {
         Integer counterValue;
         Object obj;
         Component cmp;
@@ -304,7 +312,7 @@ public class AuraStorageTestController {
             try {
                 // W-1859020 - Revert to auraStorageTest:playerFacet
                 // cmp = Aura.getInstanceService().getInstance("auraStorageTest:playerFacet", ComponentDef.class, attr);
-                cmp = Aura.getInstanceService().getInstance("uitest:hasModel", ComponentDef.class, attr);
+                cmp = instanceService.getInstance("uitest:hasModel", ComponentDef.class, attr);
             } catch (QuickFixException e) {
                 // Do nothing
             }
@@ -334,7 +342,7 @@ public class AuraStorageTestController {
         }
     }
 
-    private static void getExecutorLock(String key) {
+    private void getExecutorLock(String key) {
         Semaphore sem;
         synchronized (executorLocks) {
             sem = executorLocks.get(key);
@@ -346,7 +354,7 @@ public class AuraStorageTestController {
         sem.acquireUninterruptibly();
     }
 
-    private static void releaseExecutorLock(String key) {
+    private void releaseExecutorLock(String key) {
         synchronized (executorLocks) {
             Semaphore sem = executorLocks.get(key);
             if (sem == null) {
@@ -359,9 +367,9 @@ public class AuraStorageTestController {
         }
     }
 
-    private static Semaphore getSemaphore(String key, String subKey, boolean create) {
+    private Semaphore getSemaphore(String key, String subKey, boolean create) {
         if (key == null) {
-            key = Aura.get(TestContextAdapter.class).getTestContext().getName();
+            key = testContextAdapter.getTestContext().getName();
         }
         synchronized (pending) {
             Map<String, Semaphore> subSet = pending.get(key);
@@ -388,9 +396,9 @@ public class AuraStorageTestController {
         }
     }
 
-    private static void removeSemaphore(String key, String subKey) {
+    private void removeSemaphore(String key, String subKey) {
         if (key == null) {
-            key = Aura.get(TestContextAdapter.class).getTestContext().getName();
+            key = testContextAdapter.getTestContext().getName();
         }
         synchronized (pending) {
             Map<String, Semaphore> subSet = pending.get(key);
@@ -407,7 +415,7 @@ public class AuraStorageTestController {
         }
     }
 
-    private synchronized static List<Object> getBuffer(String key) {
+    private synchronized List<Object> getBuffer(String key) {
         List<Object> list = buffer.get(key);
         if (list == null) {
             list = Lists.newLinkedList();

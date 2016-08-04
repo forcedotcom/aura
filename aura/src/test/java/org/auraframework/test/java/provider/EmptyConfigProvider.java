@@ -15,6 +15,7 @@
  */
 package org.auraframework.test.java.provider;
 
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.system.Annotations.Provider;
@@ -23,6 +24,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * A provider that doesn't provide anything - used for tests.
  */
+@ServiceComponentProvider
 @Provider
 public class EmptyConfigProvider implements ComponentConfigProvider {
 	@Override

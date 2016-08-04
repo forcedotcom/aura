@@ -15,11 +15,8 @@
  */
 package org.auraframework.integration.test.root.component;
 
-import java.util.Collections;
-import java.util.Map;
-
-import org.auraframework.def.AttributeDefRef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.def.AttributeDefRef;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.Component;
@@ -28,6 +25,9 @@ import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Test;
+
+import java.util.Collections;
+import java.util.Map;
 
 public class ComponentImplTest extends AuraImplTestCase {
 

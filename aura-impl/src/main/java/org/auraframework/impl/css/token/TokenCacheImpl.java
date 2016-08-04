@@ -15,23 +15,6 @@
  */
 package org.auraframework.impl.css.token;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.auraframework.css.TokenCache;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.TokenDef;
-import org.auraframework.def.TokensDef;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.text.Hash;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -42,6 +25,25 @@ import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import org.auraframework.Aura;
+import org.auraframework.css.TokenCache;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TokenDef;
+import org.auraframework.def.TokenMapProviderDef;
+import org.auraframework.def.TokensDef;
+import org.auraframework.impl.java.provider.TokenMapProviderInstance;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.text.Hash;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class TokenCacheImpl implements TokenCache {
     private final Multimap<DefDescriptor<TokensDef>, DefDescriptor<TokensDef>> originals;
@@ -77,7 +79,9 @@ public final class TokenCacheImpl implements TokenCache {
         for (DefDescriptor<TokensDef> descriptor : this.descriptors) { // iterate through the unique list
             TokensDef def = descriptor.getDef();
             if (def.getMapProvider() != null) {
-                Map<String, String> map = def.getMapProvider().getDef().provide();
+                TokenMapProviderDef tokenMapProviderDef = def.getMapProvider().getDef();
+                TokenMapProviderInstance instance = Aura.getInstanceService().getInstance(tokenMapProviderDef);
+                Map<String, String> map = instance.provide();
                 for (Entry<String, String> entry : map.entrySet()) {
                     table.put(entry.getKey(), descriptor, entry.getValue());
                 }

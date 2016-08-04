@@ -15,11 +15,9 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -28,11 +26,15 @@ import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamReader;
+import java.util.List;
+import java.util.Set;
 
 public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDef, ApplicationDefImpl.Builder> {
 
@@ -43,8 +45,10 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     }
 
     public ApplicationDefHandler(DefDescriptor<ApplicationDef> applicationDefDescriptor, Source<ApplicationDef> source,
-            XMLStreamReader xmlReader) {
-        super(applicationDefDescriptor, source, xmlReader);
+                                 XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
+                                 ContextService contextService,
+                                 ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(applicationDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, contextService, configAdapter, definitionParserAdapter);
     }
 
     @Override
@@ -78,7 +82,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
         String locationChangeEvent = getAttributeValue(ATTRIBUTE_LOCATION_CHANGE_EVENT);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(locationChangeEvent)) {
-            builder.locationChangeEventDescriptor = DefDescriptorImpl.getInstance(locationChangeEvent,
+            builder.locationChangeEventDescriptor = definitionService.getDefDescriptor(locationChangeEvent,
                     EventDef.class);
         }
 
@@ -99,7 +103,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         if (!AuraTextUtil.isNullEmptyOrWhitespace(trackedDependecies)) {
             List<String> trackedList = AuraTextUtil.splitSimple(",", trackedDependecies);
             for (String tracked : trackedList) {
-            	DefDescriptor<ComponentDef> trackedDef = DefDescriptorImpl.getInstance(tracked, ComponentDef.class);
+            	DefDescriptor<ComponentDef> trackedDef = definitionService.getDefDescriptor(tracked, ComponentDef.class);
             	builder.addTrackedDependency(trackedDef);
             }
         }
@@ -126,7 +130,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         // the cmp is top-level. need to figure out something better.
         String flavorOverrides = getAttributeValue(ATTRIBUTE_FLAVOR_OVERRIDES);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(flavorOverrides)) {
-            builder.setFlavorOverrides(DefDescriptorImpl.getInstance(flavorOverrides, FlavorsDef.class));
+            builder.setFlavorOverrides(definitionService.getDefDescriptor(flavorOverrides, FlavorsDef.class));
         } else {
             // see if there is a flavors file in the bundle
             DefDescriptor<FlavorsDef> flavors = DefDescriptorImpl.getAssociateDescriptor(

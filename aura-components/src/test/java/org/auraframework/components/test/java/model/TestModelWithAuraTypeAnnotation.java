@@ -18,16 +18,23 @@ package org.auraframework.components.test.java.model;
 import java.math.BigDecimal;
 import java.util.*;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.instance.Component;
+import org.auraframework.service.InstanceService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.Annotations.Type;
 
-@Model
-public class TestModelWithAuraTypeAnnotation {
+@ServiceComponentModelInstance
+public class TestModelWithAuraTypeAnnotation implements ModelInstance{
 
+	private final InstanceService instanceService;
+	
+	public TestModelWithAuraTypeAnnotation(InstanceService instanceService) {
+		this.instanceService = instanceService;
+	}
+	
     /**
      * Basic data type.
      */
@@ -163,15 +170,15 @@ public class TestModelWithAuraTypeAnnotation {
     @AuraEnabled
     @Type("Aura.Component")
     public Component getAuraComponent() throws Exception {
-        return (Component) Aura.getInstanceService().getInstance("test:text", ComponentDef.class, null);
+        return (Component) instanceService.getInstance("test:text", ComponentDef.class, null);
     }
 
     @AuraEnabled
     @Type("Aura.Component[]")
     public Component[] getAuraComponentArray() throws Exception {
         Component[] ret = new Component[2];
-        ret[0] = (Component) Aura.getInstanceService().getInstance("test:text", ComponentDef.class, null);
-        ret[1] = (Component) Aura.getInstanceService().getInstance("test:test_button", ComponentDef.class, null);
+        ret[0] = (Component) instanceService.getInstance("test:text", ComponentDef.class, null);
+        ret[1] = (Component) instanceService.getInstance("test:test_button", ComponentDef.class, null);
         return ret;
     }
 }

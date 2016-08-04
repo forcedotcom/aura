@@ -23,11 +23,13 @@ import java.util.TreeMap;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.javascript.controller.JavascriptActionDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef.Builder;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.JavascriptTokenizer;
+import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
@@ -80,6 +82,7 @@ public class JavascriptControllerDefHandler extends JavascriptHandler<Controller
     private JavascriptActionDef createActionDef(String name) {
         JavascriptActionDef.Builder builder = new JavascriptActionDef.Builder();
         builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, getDescriptor(), ActionDef.class));
+        builder.setAccess(new DefinitionAccessImpl(Access.INTERNAL));
         return builder.build();
     }
 

@@ -15,20 +15,26 @@
  */
 package org.auraframework.integration.test.clientlibrary;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Set;
-
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ResourceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.clientlibrary.ResourceDefImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.util.json.JsonEncoder;
 import org.junit.Test;
+
+import javax.inject.Inject;
+import java.io.ByteArrayOutputStream;
+import java.util.Set;
 
 import com.google.common.base.Charsets;
 
 public class ResourceDefImplTest extends AuraImplTestCase {
+
+    @Inject
+    DefinitionService definitionService;
+
     @Test
     public void testGetResourceDefWithDefaultPrefix(){
         DefDescriptor<ResourceDef> resourceDef = definitionService.getDefDescriptor("clientLibraryTest.clientLibraryTest", ResourceDef.class);

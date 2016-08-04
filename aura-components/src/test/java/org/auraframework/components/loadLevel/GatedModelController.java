@@ -15,15 +15,16 @@
  */
 package org.auraframework.components.loadLevel;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 
-@Controller
-public class GatedModelController {
+@ServiceComponent
+public class GatedModelController implements Controller {
 
     @AuraEnabled
-    public static void resumeGateId(@Key("waitId") String waitId) {
+    public void resumeGateId(@Key("waitId") String waitId) {
         if (waitId == null) {
             return;
         }
@@ -31,7 +32,7 @@ public class GatedModelController {
     }
 
     @AuraEnabled
-    public static void clearGateId(@Key("waitId") String waitId) {
+    public void clearGateId(@Key("waitId") String waitId) {
         if (waitId == null) {
             return;
         }

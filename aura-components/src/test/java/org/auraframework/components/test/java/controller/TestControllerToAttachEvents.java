@@ -15,74 +15,83 @@
  */
 package org.auraframework.components.test.java.controller;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.EventDef;
+import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.instance.Component;
+import org.auraframework.instance.Event;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.system.Annotations.AuraEnabled;
+
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.EventDef;
-import org.auraframework.instance.Component;
-import org.auraframework.instance.Event;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
+@ServiceComponent
+public class TestControllerToAttachEvents implements Controller {
 
-@Controller
-public class TestControllerToAttachEvents {
+    @Inject
+    private InstanceService instanceService;
+
+    @Inject
+    private ContextService contextService;
 
     @AuraEnabled
-    public static String getDataAndOneEvent() throws Exception {
+    public String getDataAndOneEvent() throws Exception {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("strAttr", "Go Giants!");
-        Event evt = Aura.getInstanceService().getInstance("handleEventTest:applicationEvent", EventDef.class,
+        Event evt = instanceService.getInstance("handleEventTest:applicationEvent", EventDef.class,
                 attributes);
-        Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);
+        contextService.getCurrentContext().addClientApplicationEvent(evt);
         return "Attached handleEventsTest:applicationEvent to response";
     }
 
     @AuraEnabled
-    public static Component getDataAndThreeEvents() throws Exception {
+    public Component getDataAndThreeEvents() throws Exception {
         // Another event whose definition was preloaded
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("strAttr", "Go Raiders!");
-        Event evt = Aura.getInstanceService().getInstance("preloadTest:applicationEvent", EventDef.class, attributes);
-        Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);
+        Event evt = instanceService.getInstance("preloadTest:applicationEvent", EventDef.class, attributes);
+        contextService.getCurrentContext().addClientApplicationEvent(evt);
         // Attach one event whose's definition was loaded because of the handler
         // specification
         // Another event whose definition is not known to the client
-        return Aura.getInstanceService().getInstance("handleEventTest:attachEventsInModel", ComponentDef.class);
+        return instanceService.getInstance("handleEventTest:attachEventsInModel", ComponentDef.class);
     }
 
     @AuraEnabled
-    public static String getCyclicEvent() throws Exception {
-        Event evt = Aura.getInstanceService().getInstance("handleEventTest:cyclicEvent", EventDef.class, null);
-        Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);
+    public String getCyclicEvent() throws Exception {
+        Event evt = instanceService.getInstance("handleEventTest:cyclicEvent", EventDef.class, null);
+        contextService.getCurrentContext().addClientApplicationEvent(evt);
         return "Doesn't really matter";
     }
 
     @AuraEnabled
-    public static String getDupEvents() throws Exception {
+    public String getDupEvents() throws Exception {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("strAttr", "Posey");
-        Event evt = Aura.getInstanceService().getInstance("handleEventTest:dupEvent", EventDef.class, attributes);
-        Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);
+        Event evt = instanceService.getInstance("handleEventTest:dupEvent", EventDef.class, attributes);
+        contextService.getCurrentContext().addClientApplicationEvent(evt);
 
         attributes.put("strAttr", "Sandavol");
-        evt = Aura.getInstanceService().getInstance("handleEventTest:dupEvent", EventDef.class, attributes);
-        Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);
+        evt = instanceService.getInstance("handleEventTest:dupEvent", EventDef.class, attributes);
+        contextService.getCurrentContext().addClientApplicationEvent(evt);
         return "Attached handleEventsTest:dupEvent";
     }
 
     @AuraEnabled
-    public static String getEventChain() throws Exception {
+    public String getEventChain() throws Exception {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("pandaAttr", "Pablo");
-        Event evt = Aura.getInstanceService().getInstance("handleEventTest:chainEvent", EventDef.class, attributes);
-        Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);
+        Event evt = instanceService.getInstance("handleEventTest:chainEvent", EventDef.class, attributes);
+        contextService.getCurrentContext().addClientApplicationEvent(evt);
         return "Attached handleEventsTest:chainEvent to response";
     }
 
     @AuraEnabled
-    public static String getChainLink() throws Exception {
+    public String getChainLink() throws Exception {
         return "Chain Link";
     }
 }

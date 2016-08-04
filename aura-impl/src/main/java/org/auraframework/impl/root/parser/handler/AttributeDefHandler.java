@@ -15,28 +15,28 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.List;
+import java.util.Set;
 
 /**
  */
@@ -76,13 +76,16 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
      * @param xmlReader The XMLStreamReader that the handler should read from. It is expected to be queued up to the
      *            appropriate position before getElement() is invoked.
      */
-    public AttributeDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
-        this(parentHandler, xmlReader, source, null);
+    public AttributeDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+                               boolean isInInternalNamespace, DefinitionService definitionService,
+                               ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        this(parentHandler, xmlReader, source, null, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
     }
 
     public AttributeDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
-            String defaultType) {
-        super(parentHandler, xmlReader, source);
+                               String defaultType, boolean isInInternalNamespace, DefinitionService definitionService,
+                               ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         this.defaultType = Optional.fromNullable(defaultType);
     }
 
@@ -100,7 +103,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         }
 
         builder.setParentDescriptor(getParentDefDescriptor());
-        builder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDef.class));
+        builder.setDescriptor(definitionService.getDefDescriptor(name, AttributeDef.class));
         builder.setLocation(getLocation());
         builder.setRequired(getBooleanAttributeValue(ATTRIBUTE_REQUIRED));
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
@@ -149,6 +152,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
             atBuilder.setDescriptor(builder.getDescriptor());
             atBuilder.setLocation(builder.getLocation());
             atBuilder.setValue(defaultObj);
+            atBuilder.setAccess(getAccess(isInInternalNamespace));
             builder.setDefaultValue(atBuilder.build());
         }
 

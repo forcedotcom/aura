@@ -15,8 +15,8 @@
  */
 package org.auraframework.integration.test.root.parser.handler;
 
-import javax.xml.stream.XMLStreamReader;
-
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorsDef;
@@ -27,6 +27,8 @@ import org.auraframework.impl.root.parser.ApplicationXMLParser;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSource;
@@ -34,14 +36,29 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
+import javax.inject.Inject;
+import javax.xml.stream.XMLStreamReader;
+
 public class ApplicationDefHandlerTest extends AuraImplTestCase {
+    @Inject
+    private DefinitionParserAdapter definitionParserAdapter;
+    
     XMLStreamReader xmlReader;
     ApplicationDefHandlerOverride cdHandler;
 
-    private static class ApplicationDefHandlerOverride extends ApplicationDefHandler {
+    @Inject
+    private ApplicationXMLParser applicationXMLParser;
+
+    @Inject
+    DefinitionService definitionService;
+
+    private class ApplicationDefHandlerOverride extends ApplicationDefHandler {
         public ApplicationDefHandlerOverride(DefDescriptor<ApplicationDef> applicationDefDescriptor,
-                Source<ApplicationDef> source, XMLStreamReader xmlReader) {
-            super(applicationDefDescriptor, source, xmlReader);
+                                             Source<ApplicationDef> source, XMLStreamReader xmlReader,
+                                             boolean isInInternalNamespace, DefinitionService definitionService,
+                                             ContextService contextService,
+                                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+            super(applicationDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, contextService, configAdapter, definitionParserAdapter);
         }
 
         @Override
@@ -58,14 +75,15 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        StringSource<ApplicationDef> source = new StringSource<>(vendor.getApplicationDefDescriptor(),
-                "<aura:application controller='" + vendor.getControllerDescriptor().getQualifiedName() + "' extends='"
-                        + vendor.getParentComponentDefDescriptor() + "' implements='"
-                        + vendor.getInterfaceDefDescriptor()
-                        + "' abstract='true'>Child Text<aura:foo/></aura:application>", "myID", Format.XML);
+        StringSource<ApplicationDef> source = new StringSource<>(
+                vendor.getApplicationDefDescriptor(), "<aura:application controller='" + vendor.getControllerDescriptor().getQualifiedName() + "' extends='"
+                + vendor.getParentComponentDefDescriptor() + "' implements='"
+                + vendor.getInterfaceDefDescriptor()
+                + "' abstract='true'>Child Text<aura:foo/></aura:application>", "myID", Format.XML);
         xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
-        cdHandler = new ApplicationDefHandlerOverride(vendor.getApplicationDefDescriptor(), source, xmlReader);
+        cdHandler = new ApplicationDefHandlerOverride(vendor.getApplicationDefDescriptor(), source, xmlReader, true,
+                definitionService, contextService, configAdapter, definitionParserAdapter);
     }
 
     @Test
@@ -86,13 +104,13 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
 
     @Test
     public void testDuplicateAttributeNames() throws Exception {
-        DefDescriptor<ApplicationDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser",
+        DefDescriptor<ApplicationDef> descriptor = definitionService.getDefDescriptor("test:fakeparser",
                 ApplicationDef.class);
-        StringSource<ApplicationDef> source = new StringSource<>(descriptor,
-                "<aura:application><aura:attribute name=\"implNumber\" type=\"String\"/>"
-                        + "<aura:attribute name=\"implNumber\" type=\"String\"/></aura:application>", "myID",
-                Format.XML);
-        ApplicationDef ad = new ApplicationXMLParser().parse(descriptor, source);
+        StringSource<ApplicationDef> source = new StringSource<>(
+                descriptor, "<aura:application><aura:attribute name=\"implNumber\" type=\"String\"/>"
+                + "<aura:attribute name=\"implNumber\" type=\"String\"/></aura:application>",
+                "myID", Format.XML);
+        ApplicationDef ad = applicationXMLParser.parse(descriptor, source);
         try {
             ad.validateDefinition();
             fail("Should have thrown Exception. Two attributes with the same name cannot exist");

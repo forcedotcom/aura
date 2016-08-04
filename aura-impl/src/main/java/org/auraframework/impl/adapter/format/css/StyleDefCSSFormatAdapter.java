@@ -15,37 +15,34 @@
  */
 package org.auraframework.impl.adapter.format.css;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-
-import javax.annotation.concurrent.ThreadSafe;
-
-import org.auraframework.Aura;
+import com.google.common.collect.ImmutableList;
+import com.salesforce.omakase.plugin.Plugin;
 import org.auraframework.adapter.StyleAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.css.parser.plugin.FlavorOverridePlugin;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.ImmutableList;
-import com.salesforce.omakase.plugin.Plugin;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
-import aQute.bnd.annotation.component.Component;
-
-/**
- */
 @ThreadSafe
-@Component(provide = AuraServiceProvider.class)
+@ServiceComponent
 public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
+    @Inject
+    private ContextService contextService;
 
-    private StyleAdapter styleAdapter = Aura.getStyleAdapter();
+    private StyleAdapter styleAdapter;
 
     @Override
     public Class<BaseStyleDef> getType() {
@@ -82,7 +79,7 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
     }
 
     private FlavorOverrideLocator getFlavorOverrides() throws QuickFixException {
-        AuraContext ctx = Aura.getContextService().getCurrentContext();
+        AuraContext ctx = contextService.getCurrentContext();
         DefDescriptor<? extends BaseComponentDef> top = ctx.getLoadingApplicationDescriptor();
         if (top != null) {
             DefDescriptor<FlavorsDef> flavors = top.getDef().getFlavorOverrides();
@@ -96,9 +93,7 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
         return null;
     }
 
-    /**
-     * Injection override.
-     */
+    @Inject
     public void setStyleAdapter(StyleAdapter adapter) {
         this.styleAdapter = adapter;
     }

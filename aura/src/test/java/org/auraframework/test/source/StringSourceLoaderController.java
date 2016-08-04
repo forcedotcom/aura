@@ -15,6 +15,10 @@
  */
 package org.auraframework.test.source;
 
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -24,9 +28,6 @@ import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
-
-import javax.inject.Inject;
-import java.util.Set;
 
 @ServiceComponent
 public class StringSourceLoaderController implements Controller {
@@ -62,7 +63,7 @@ public class StringSourceLoaderController implements Controller {
             @Key("bundleDefClass") String bundleDefClass,
             @Key("contents") String contents,
             @Key("overwrite") boolean overwrite,
-            @Key("access") StringSourceLoader.NamespaceAccess access)
+            @Key("access") String access)
             throws ClassNotFoundException {
 
         DefDescriptor<B> bundleDescriptor = null;
@@ -72,7 +73,7 @@ public class StringSourceLoaderController implements Controller {
         }
         DefDescriptor<D> descriptor = definitionService.getDefDescriptor(name,
                 (Class<D>) Class.forName(defClass), bundleDescriptor);
-        stringSourceLoader.putSource(descriptor, contents, overwrite, access);
+        stringSourceLoader.putSource(descriptor, contents, overwrite, StringSourceLoader.NamespaceAccess.valueOf(access));
     }
 
     @SuppressWarnings("unchecked")

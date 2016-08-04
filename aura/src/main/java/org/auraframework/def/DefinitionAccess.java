@@ -19,6 +19,7 @@ package org.auraframework.def;
 
 import java.io.Serializable;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -36,5 +37,5 @@ public interface DefinitionAccess extends JsonSerializable,Serializable {
     boolean isInternal();
     
     // Validation
-    void validate(String namespace, boolean allowAuth, boolean allowPrivate) throws InvalidAccessValueException;
+    void validate(String namespace, boolean allowAuth, boolean allowPrivate, ConfigAdapter configAdapter) throws InvalidAccessValueException;
 }

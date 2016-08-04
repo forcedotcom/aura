@@ -18,17 +18,22 @@ package org.auraframework.integration.test.css;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TokensDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
+
+import javax.inject.Inject;
 
 /**
  * Unit tests for {@link TokensDef} {@link DefDescriptor}s.
  */
 public class TokensDefDescriptorTest extends UnitTestCase {
+    @Inject
+    private DefinitionService definitionService;
+
     @Test
     public void testGetDefType() {
-        DefDescriptor<TokensDef> testDescriptor = DefDescriptorImpl.getInstance("blah:blah", TokensDef.class);
+        DefDescriptor<TokensDef> testDescriptor = definitionService.getDefDescriptor("blah:blah", TokensDef.class);
         assertEquals(DefType.TOKENS, testDescriptor.getDefType());
     }
 }

@@ -19,16 +19,19 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.JsonSerializerAdapter;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.context.AuraContextImpl;
 import org.auraframework.impl.context.AuraContextJsonSerializer;
 import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ActionWithKeyOverride;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Location;
+import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.json.Json;
@@ -36,41 +39,69 @@ import org.auraframework.util.json.JsonSerializable;
 import org.auraframework.util.json.JsonSerializer;
 import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 import org.auraframework.util.json.JsonSerializers;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Maps;
 
-import aQute.bnd.annotation.component.Component;
+import javax.inject.Inject;
 
 /**
  * the basics
  */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class JsonSerializerAdapterImpl implements JsonSerializerAdapter {
+
+    private AuraContextJsonSerializer auraContextJsonSerializer;
+    private ThrowableSerializer throwableSerializer;
+    private Map<String, JsonSerializer<?>> lookupSerializers;
+    private Map<Class<?>, JsonSerializer<?>> instanceofSerializers;
+
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private DefinitionService definitionService;
+
+    @Autowired(required=false)
+    private TestContextAdapter testContextAdapter;
 
     @Override
     public Map<String, JsonSerializer<?>> lookupSerializers() {
-        Map<String, JsonSerializer<?>> m = Maps.newLinkedHashMap();
-        m.putAll(JsonSerializers.MAPPY_FASTY);
-        m.put(AuraContextImpl.class.getName(), new AuraContextJsonSerializer());
-        m.put(JavaAction.class.getName(), Action.SERIALIZER);
-        m.put(ActionWithKeyOverride.class.getName(), Action.SERIALIZER);
-        m.put(BigDecimal.class.getName(), JsonSerializers.BIGDECIMAL);
-        return m;
+        if (lookupSerializers == null) {
+            lookupSerializers = Maps.newLinkedHashMap();
+            lookupSerializers.putAll(JsonSerializers.MAPPY_FASTY);
+            lookupSerializers.put(AuraContextImpl.class.getName(),
+                    getAuraContextJsonSerializer(configAdapter, testContextAdapter, definitionService));
+            lookupSerializers.put(JavaAction.class.getName(), Action.SERIALIZER);
+            lookupSerializers.put(ActionWithKeyOverride.class.getName(), Action.SERIALIZER);
+            lookupSerializers.put(BigDecimal.class.getName(), JsonSerializers.BIGDECIMAL);
+        }
+        return lookupSerializers;
     }
 
     @Override
     public Map<Class<?>, JsonSerializer<?>> instanceofSerializers() {
-        Map<Class<?>, JsonSerializer<?>> m = Maps.newHashMap();
-        m.putAll(JsonSerializers.MAPPY_SLOWY);
-        m.put(Throwable.class, THROWABLE);
-        m.put(Location.class, LOCATION);
-        m.put(AuraLocale.class, LOCALE);
-        return m;
+        if (instanceofSerializers == null) {
+            instanceofSerializers = Maps.newHashMap();
+            instanceofSerializers.putAll(JsonSerializers.MAPPY_SLOWY);
+            instanceofSerializers.put(Throwable.class, getThrowableSerializer(contextService));
+            instanceofSerializers.put(Location.class, LOCATION);
+            instanceofSerializers.put(AuraLocale.class, LOCALE);
+        }
+        return instanceofSerializers;
     }
 
-    public static final ThrowableSerializer THROWABLE = new ThrowableSerializer();
+    public class ThrowableSerializer extends NoneSerializer<Throwable> {
 
-    public static class ThrowableSerializer extends NoneSerializer<Throwable> {
+        private final ContextService contextService;
+
+        public ThrowableSerializer(ContextService contextService) {
+            this.contextService = contextService;
+        }
+
         @Override
         public void serialize(Json json, Throwable value) throws IOException {
             if (value instanceof JsonSerializable) {
@@ -78,8 +109,8 @@ public class JsonSerializerAdapterImpl implements JsonSerializerAdapter {
             } else {
                 json.writeMapBegin();
                 json.writeMapEntry("message", value.getMessage());
-                if (Aura.getContextService().isEstablished()) {
-                    Mode mode = Aura.getContextService().getCurrentContext().getMode();
+                if (contextService.isEstablished()) {
+                    Mode mode = contextService.getCurrentContext().getMode();
                     if (mode != Mode.PROD && mode != Mode.PRODDEBUG) {
                         json.writeMapEntry("stack", AuraExceptionUtil.getStackTrace(value));
                     }
@@ -105,5 +136,19 @@ public class JsonSerializerAdapterImpl implements JsonSerializerAdapter {
         public void serialize(Json json, AuraLocale value) throws IOException {
             json.writeString(value);
         }
+    }
+
+    private AuraContextJsonSerializer getAuraContextJsonSerializer(ConfigAdapter configAdapter, TestContextAdapter testContextAdapter, DefinitionService definitionService) {
+        if (auraContextJsonSerializer == null) {
+            auraContextJsonSerializer = new AuraContextJsonSerializer(configAdapter, testContextAdapter, definitionService);
+        }
+        return auraContextJsonSerializer;
+    }
+
+    private ThrowableSerializer getThrowableSerializer(ContextService contextService) {
+        if (throwableSerializer == null) {
+            throwableSerializer =  new ThrowableSerializer(contextService);
+        }
+        return throwableSerializer;
     }
 }

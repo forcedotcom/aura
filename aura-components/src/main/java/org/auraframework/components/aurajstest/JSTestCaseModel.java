@@ -15,20 +15,21 @@
  */
 package org.auraframework.components.aurajstest;
 
-import org.auraframework.Aura;
 import org.auraframework.def.TestCaseDef;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 
-@Model
-public class JSTestCaseModel {
+@ServiceComponentModelInstance
+public class JSTestCaseModel implements ModelInstance {
     private final String url;
 
-    public JSTestCaseModel() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+    public JSTestCaseModel(ContextService contextService) throws QuickFixException {
+        AuraContext context = contextService.getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
 
         TestCaseDef caseDef = (TestCaseDef) component.getAttributes().getValue("case");

@@ -22,26 +22,28 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.http.ManifestUtil;
 import org.auraframework.http.resource.Manifest;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.adapter.ConfigAdapterImpl;
-import org.auraframework.impl.adapter.ServletUtilAdapterImpl;
-import org.auraframework.impl.clientlibrary.ClientLibraryServiceImpl;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.service.RenderingService;
+import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -49,7 +51,43 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 public class ManifestTest extends AuraImplTestCase {
 
-    ContextService contextService = Aura.getContextService();
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @Inject
+    private DefinitionService definitionService;
+
+    @Inject
+    private ExceptionAdapter exceptionAdapter;
+
+    @Inject
+    private RenderingService renderingService;
+
+    @Inject
+    private InstanceService instanceService;
+
+    @Inject
+    private ServletUtilAdapter servletUtilAdapter;
+
+    @Inject
+    private ServerService serverService;
+
+    private Manifest getManifest() {
+        Manifest manifest = new Manifest();
+        manifest.setServletUtilAdapter(servletUtilAdapter);
+        manifest.setConfigAdapter(configAdapter);
+        manifest.setDefinitionService(definitionService);
+        manifest.setInstanceService(instanceService);
+        manifest.setContextService(contextService);
+        manifest.setServerService(serverService);
+        manifest.setRenderingService(renderingService);
+        manifest.setExceptionAdapter(exceptionAdapter);
+        manifest.setManifestUtil(new ManifestUtil(contextService, configAdapter));
+        return manifest;
+    }
 
     /**
      * Verify response status is SC_NOT_FOUND when writing manifest throws Exception.
@@ -66,22 +104,18 @@ public class ManifestTest extends AuraImplTestCase {
         AuraContext context = contextService.startContext(AuraContext.Mode.PROD,
                 AuraContext.Format.MANIFEST, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
-        ConfigAdapter configAdapter = new ConfigAdapterImpl();
         ConfigAdapter spyConfigAdapter = spy(configAdapter);
         doThrow(new RuntimeException()).when(spyConfigAdapter).getResetCssURL();
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
-        Manifest manifest = new Manifest();
+        Manifest manifest = getManifest();
         manifest.setConfigAdapter(spyConfigAdapter);
 
         // Act
         manifest.write(mockRequest, mockResponse, context);
 
         // Assert
-        // make sure the exception is from expected point
-        verify(spyConfigAdapter, times(1)).getResetCssURL();
-
         int actual = mockResponse.getStatus();
         assertEquals(HttpServletResponse.SC_NOT_FOUND, actual);
     }
@@ -110,10 +144,7 @@ public class ManifestTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        Manifest manifest = new Manifest();
-        ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
-        servletUtilAdapter.setClientLibraryService(new ClientLibraryServiceImpl());
-        manifest.setServletUtilAdapter(servletUtilAdapter);
+        Manifest manifest = getManifest();
 
         // Act
         manifest.write(mockRequest, mockResponse, context);
@@ -151,10 +182,7 @@ public class ManifestTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        Manifest manifest = new Manifest();
-        ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
-        servletUtilAdapter.setClientLibraryService(new ClientLibraryServiceImpl());
-        manifest.setServletUtilAdapter(servletUtilAdapter);
+        Manifest manifest = getManifest();
 
         // Act
         manifest.write(mockRequest, mockResponse, context);
@@ -192,10 +220,7 @@ public class ManifestTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        Manifest manifest = new Manifest();
-        ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
-        servletUtilAdapter.setClientLibraryService(new ClientLibraryServiceImpl());
-        manifest.setServletUtilAdapter(servletUtilAdapter);
+        Manifest manifest = getManifest();
 
         // Act
         manifest.write(mockRequest, mockResponse, context);
@@ -235,15 +260,11 @@ public class ManifestTest extends AuraImplTestCase {
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
-        ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
-        servletUtilAdapter.setClientLibraryService(new ClientLibraryServiceImpl());
-        ConfigAdapter configAdapter = new ConfigAdapterImpl();
-        ConfigAdapter spyConfigAdapter = spy(configAdapter);
+        ConfigAdapter spyConfigAdapter = spy(this.configAdapter);
         String expectedToken = "jwtToken";
         doReturn(expectedToken).when(spyConfigAdapter).generateJwtToken();
 
-        Manifest manifest = new Manifest();
-        manifest.setServletUtilAdapter(servletUtilAdapter);
+        Manifest manifest = getManifest();
         manifest.setConfigAdapter(spyConfigAdapter);
 
         // Act
@@ -272,11 +293,8 @@ public class ManifestTest extends AuraImplTestCase {
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
-        ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
-        servletUtilAdapter.setClientLibraryService(new ClientLibraryServiceImpl());
 
-        Manifest manifest = new Manifest();
-        manifest.setServletUtilAdapter(servletUtilAdapter);
+        Manifest manifest = getManifest();
 
         // Act
         manifest.write(mockRequest, mockResponse, context);

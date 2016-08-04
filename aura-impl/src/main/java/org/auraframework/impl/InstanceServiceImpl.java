@@ -15,82 +15,101 @@
  */
 package org.auraframework.impl;
 
-import java.util.Map;
-
-import org.auraframework.Aura;
+import com.google.common.collect.Maps;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ActionDef;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.def.EventDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.impl.root.application.ApplicationImpl;
 import org.auraframework.impl.root.component.ComponentImpl;
-import org.auraframework.impl.root.event.EventImpl;
+import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Instance;
+import org.auraframework.instance.InstanceBuilder;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import aQute.bnd.annotation.component.Component;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class InstanceServiceImpl implements InstanceService {
+
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private DefinitionService definitionService;
+
+    @Inject
+    private List<InstanceBuilder<?, ?>> builders;
+
+    private Map<Class<?>, InstanceBuilder<?, ?>> builderMap = Maps.newHashMap();
 
     /**
      */
     private static final long serialVersionUID = -2650728458106333787L;
 
-    @Override
-    public <T extends Instance<D>, D extends Definition> T getInstance(DefDescriptor<D> descriptor)
-            throws QuickFixException {
 
-        Aura.getContextService().assertEstablished();
-
-        return this.<T, D> getInstance(descriptor, null);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Instance<D>, D extends Definition> T getInstance(DefDescriptor<D> descriptor,
-            Map<String, Object> attributes) throws QuickFixException {
-
-        Aura.getContextService().assertEstablished();
-
-        DefType defType = descriptor.getDefType();
-
-        switch (defType) {
-        case APPLICATION:
-            return (T) new ApplicationImpl((DefDescriptor<ApplicationDef>) descriptor, attributes);
-        case COMPONENT:
-            return (T) new ComponentImpl((DefDescriptor<ComponentDef>) descriptor, attributes);
-        case ACTION:
-            AuraContext context = Aura.getContextService().getCurrentContext();
-            context.pushCallingDescriptor(descriptor);
-            try {
-                ControllerDef controllerDef = ((SubDefDescriptor<ActionDef, ControllerDef>) descriptor)
-                        .getParentDescriptor().getDef();
-                return (T) controllerDef.createAction(descriptor.getName(), attributes);
-            } finally {
-                context.popCallingDescriptor();
-            }
-        case EVENT:
-            return (T) new EventImpl((DefDescriptor<EventDef>) descriptor, attributes);
-        default:
-            throw new AuraRuntimeException(String.format("Instances of %s cannot be created.", defType));
+    @PostConstruct
+    private void setupBuilders() {
+        for (InstanceBuilder<?, ?> builder : builders) {
+            builderMap.put(builder.getDefinitionClass(), builder);
         }
     }
 
     @Override
+    public <T extends Instance<D>, D extends Definition> T getInstance(DefDescriptor<D> descriptor)
+            throws QuickFixException {
+
+        contextService.assertEstablished();
+
+        return this.<T, D> getInstance(descriptor, null);
+    }
+
+    @Override
+    public <T extends Instance<D>, D extends Definition> T getInstance(DefDescriptor<D> descriptor,
+            Map<String, Object> attributes) throws QuickFixException {
+        D def = null;
+
+        contextService.assertEstablished();
+
+        //
+        // This is the wondrous stupidity of not being able to get action defs.
+        // Special cases are awesome!!!!!!!!!!!!!!!!!!!!!!!!!
+        //
+        if (descriptor.getDefType() == DefType.ACTION) {
+            @SuppressWarnings("unchecked")
+            SubDefDescriptor<ActionDef, ControllerDef> actionDesc = (SubDefDescriptor<ActionDef, ControllerDef>) descriptor;
+            DefDescriptor<ControllerDef> controllerDesc = actionDesc.getParentDescriptor();
+
+            ControllerDef controller = definitionService.getDefinition(controllerDesc);
+
+            @SuppressWarnings("unchecked")
+            D actionDef = (D) controller.getSubDefinition(actionDesc);
+            if (actionDef == null) {
+                throw new DefinitionNotFoundException(actionDesc);
+            }
+            def = actionDef;
+        } else {
+            def = definitionService.getDefinition(descriptor);
+        }
+        return getInstance(def, attributes);
+    }
+
+    @Override
     public <T extends Instance<D>, D extends Definition> T getInstance(D definition) throws QuickFixException {
-        Aura.getContextService().assertEstablished();
+        contextService.assertEstablished();
 
         return this.<T, D> getInstance(definition, null);
     }
@@ -99,21 +118,19 @@ public class InstanceServiceImpl implements InstanceService {
     @Override
     public <T extends Instance<D>, D extends Definition> T getInstance(D definition, Map<String, Object> attributes)
             throws QuickFixException {
-        Aura.getContextService().assertEstablished();
+        contextService.assertEstablished();
 
-        DefType defType = definition.getDescriptor().getDefType();
-        switch (defType) {
-        case APPLICATION:
-            return (T) new ApplicationImpl((ApplicationDef) definition, attributes);
-        default:
-            return (T) getInstance(definition.getDescriptor(), attributes);
+        InstanceBuilder<T, D> builder = (InstanceBuilder<T, D>) builderMap.get(definition.getClass());
+        if (builder == null) {
+            throw new AuraRuntimeException(String.format("Instances of %s cannot be created.", definition.getClass()));
         }
+        return builder.getInstance(definition, attributes);
     }
 
     @Override
     public <T extends Instance<D>, D extends Definition> T getInstance(String qualifiedName, Class<D> defClass)
             throws QuickFixException {
-        Aura.getContextService().assertEstablished();
+        contextService.assertEstablished();
 
         return this.<T, D> getInstance(qualifiedName, defClass, null);
     }
@@ -122,15 +139,14 @@ public class InstanceServiceImpl implements InstanceService {
     public <T extends Instance<D>, D extends Definition> T getInstance(String qualifiedName, Class<D> defClass,
             Map<String, Object> attributes) throws QuickFixException {
 
-        Aura.getContextService().assertEstablished();
+        contextService.assertEstablished();
 
-        return this.<T, D> getInstance(Aura.getDefinitionService().getDefDescriptor(qualifiedName, defClass),
-                attributes);
+        return this.<T, D>getInstance(definitionService.getDefDescriptor(qualifiedName, defClass), attributes);
     }
 
     @Override
     public Instance<?> getInstance(String qualifiedName, DefType... defTypes) throws QuickFixException {
-        Aura.getContextService().assertEstablished();
+        contextService.assertEstablished();
 
         return getInstance(qualifiedName, null, defTypes);
     }
@@ -138,11 +154,14 @@ public class InstanceServiceImpl implements InstanceService {
     @Override
     public Instance<?> getInstance(String qualifiedName, Map<String, Object> attributes, DefType... defTypes)
             throws QuickFixException {
-        Aura.getContextService().assertEstablished();
+        contextService.assertEstablished();
 
-        Definition d = Aura.getDefinitionService().getDefinition(qualifiedName, defTypes);
-        Instance<?> i = this.<Instance<Definition>, Definition> getInstance(d, attributes);
-        return i;
+        Definition d = definitionService.getDefinition(qualifiedName, defTypes);
+        return this.<Instance<Definition>, Definition>getInstance(d, attributes);
     }
 
+    @Override
+    public Instance<?> getInstance(ComponentDefRef defRef, BaseComponent<?, ?> valueProvider) throws QuickFixException {
+        return new ComponentImpl(defRef.getDescriptor(), defRef.getAttributeValueList(), valueProvider, defRef.getLocalId());
+    }
 }

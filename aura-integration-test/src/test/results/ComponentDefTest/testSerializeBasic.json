@@ -1,6 +1,7 @@
 {
   "s":1,
   "v":{
+    "xs":"I",
     "descriptor":"markup://aura:test",
     "superDef":{
       "s":2,

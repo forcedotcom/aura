@@ -15,9 +15,6 @@
  */
 package org.auraframework.integration.test.renderer;
 
-import java.util.Map;
-
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
@@ -28,6 +25,8 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Test;
+
+import java.util.Map;
 
 /**
  * This class has automation to verify implementation of rendering for
@@ -70,7 +69,7 @@ public class RendererDefTest extends AuraImplTestCase {
      */
     @Test
     public void testComponentInstanceDefWhenRendererIsJava() throws Exception {
-        Component component = Aura.getInstanceService().getInstance("test:test_SimpleJavaRenderer", ComponentDef.class,
+        Component component = instanceService.getInstance("test:test_SimpleJavaRenderer", ComponentDef.class,
                 null);
         // Convert the instance to a format that is used by the client
         String defInJson = JsonEncoder.serialize(component, false, true);
@@ -93,7 +92,7 @@ public class RendererDefTest extends AuraImplTestCase {
     @Test
     public void testComponentInstanceDefWhenInvalidJavaRendererSpecified() throws Exception {
         try {
-            Aura.getInstanceService().getInstance("test:test_NonExistingJavaRenderer", ComponentDef.class, null);
+            instanceService.getInstance("test:test_NonExistingJavaRenderer", ComponentDef.class, null);
             fail("Creating a component which has specified a non-existent java renderer should have thrown a runtime exception.");
         } catch (DefinitionNotFoundException expected) {
             assertEquals("java://NonExistingRenderer", expected.getDescriptor().getQualifiedName());

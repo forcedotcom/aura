@@ -15,7 +15,8 @@
  */
 package org.auraframework.integration.test.root.application;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefinitionAccess;
@@ -30,7 +31,8 @@ import org.mockito.Mockito;
 public class ApplicationDefImplUnitTest extends
         BaseComponentDefImplUnitTest<ApplicationDefImpl, ApplicationDef, Builder> {
 
-    DefinitionService definitionService = Aura.getDefinitionService();
+	@Inject
+    DefinitionService definitionService;
 
     @Mock
     DefDescriptor<EventDef> locationChangeEventDescriptor;
@@ -40,7 +42,6 @@ public class ApplicationDefImplUnitTest extends
     Boolean isOnePageApp;
 
     public ApplicationDefImplUnitTest() {
-        super();
         descriptorName = "application";
         qualifiedDescriptorName = "test:application";
     }

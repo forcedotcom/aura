@@ -15,6 +15,23 @@
  */
 package org.auraframework.components.test.java.controller;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.instance.Component;
+import org.auraframework.service.InstanceService;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.BackgroundAction;
+import org.auraframework.system.Annotations.Key;
+import org.auraframework.system.Location;
+import org.auraframework.throwable.AuraHandledException;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.GenericEventException;
+import org.auraframework.util.date.DateOnly;
+
+import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,81 +42,68 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.instance.Component;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.BackgroundAction;
-import org.auraframework.system.Annotations.Controller;
-import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Location;
-import org.auraframework.throwable.AuraHandledException;
-import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.GenericEventException;
-import org.auraframework.util.date.DateOnly;
+@ServiceComponent
+public class JavaTestController implements Controller {
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-
-@Controller
-public class JavaTestController {
+    @Inject
+    private InstanceService instanceService;
 
     @AuraEnabled
-    public static void noArgs() {
+    public void noArgs() {
     }
 
     @AuraEnabled
-    public static Object getComponents(@Key("token") String token, @Key("input") String input) throws Exception {
+    public Object getComponents(@Key("token") String token, @Key("input") String input) throws Exception {
         int count = input == null ? 1 : Integer.parseInt(input);
         List<Component> cmps = new LinkedList<>();
         while (count-- > 0) {
             Object val = token + ":java:" + count;
             Map<String, Object> atts = ImmutableMap.of("value", val);
-            Component cmp = Aura.getInstanceService().getInstance("auratest:text", ComponentDef.class, atts);
+            Component cmp = instanceService.getInstance("auratest:text", ComponentDef.class, atts);
             cmps.add(cmp);
         }
         return cmps.toArray();
     }
 
     @AuraEnabled
-    public static String getString(@Key("param") String param) throws Exception {
+    public String getString(@Key("param") String param) throws Exception {
         return param;
     }
 
     @AuraEnabled
-    public static int getInt(@Key("param") int param) throws Exception {
+    public int getInt(@Key("param") int param) throws Exception {
         return param;
     }
 
     @AuraEnabled
-    public static String getLoggableString(@Key(value = "param", loggable = true) String param) throws Exception {
+    public String getLoggableString(@Key(value = "param", loggable = true) String param) throws Exception {
         return param;
     }
 
     @AuraEnabled
-    public static int getLoggableInt(@Key(value = "param", loggable = true) int param) throws Exception {
+    public int getLoggableInt(@Key(value = "param", loggable = true) int param) throws Exception {
         return param;
     }
 
     @AuraEnabled
-    public static String getSelectedParamLogging(@Key(value = "strparam", loggable = true) String strparam,
-            @Key(value = "intparam") int intparam) {
+    public String getSelectedParamLogging(@Key(value = "strparam", loggable = true) String strparam,
+                                          @Key(value = "intparam") int intparam) {
         return strparam;
     }
 
     @AuraEnabled
-    public static String getMultiParamLogging(@Key(value = "we", loggable = true) String we,
-            @Key(value = "two", loggable = true) int two) {
+    public String getMultiParamLogging(@Key(value = "we", loggable = true) String we,
+                                       @Key(value = "two", loggable = true) int two) {
         return we + two;
     }
 
     @AuraEnabled
-    public static int getExplicitExcludeLoggable(@Key(value = "param", loggable = false) int param) {
+    public int getExplicitExcludeLoggable(@Key(value = "param", loggable = false) int param) {
         return param;
     }
 
     @AuraEnabled
-    public static String getCustomParamLogging(@Key(value = "param", loggable = true) CustomParamType param) {
+    public String getCustomParamLogging(@Key(value = "param", loggable = true) CustomParamType param) {
         return "Anything";
     }
 
@@ -117,7 +121,7 @@ public class JavaTestController {
      * @param cause Cause parameter of Exception. Either a class of type Throwable or String
      */
     @AuraEnabled
-    public static void throwsThrowable(@Key("type") String exceptionType, @Key("cause") String cause) throws Throwable {
+    public void throwsThrowable(@Key("type") String exceptionType, @Key("cause") String cause) throws Throwable {
         if (exceptionType.equals("java.lang.Throwable")) {
             throw new Throwable(cause);
         } else if (exceptionType.equals("java.lang.RuntimeException")) {
@@ -148,8 +152,8 @@ public class JavaTestController {
     }
 
     @AuraEnabled
-    public static void throwsCSE(@Key("event") String event, @Key("paramName") String paramName,
-            @Key("paramValue") String paramValue) throws Throwable {
+    public void throwsCSE(@Key("event") String event, @Key("paramName") String paramName,
+                          @Key("paramValue") String paramValue) throws Throwable {
         GenericEventException gee = new GenericEventException(event);
         if (paramName != null) {
             gee.addParam(paramName, paramValue);
@@ -158,21 +162,21 @@ public class JavaTestController {
     }
 
     @AuraEnabled
-    public static void throwsException(@Key("errorMsg") String errorMsg) throws Exception {
+    public void throwsException(@Key("errorMsg") String errorMsg) throws Exception {
         throw new AuraHandledException(errorMsg);
     }
 
     private static Map<String, StringBuffer> buffers = Maps.newLinkedHashMap();
 
     @AuraEnabled
-    public static String getBuffer() throws Exception {
+    public String getBuffer() throws Exception {
         String id = UUID.randomUUID().toString();
         buffers.put(id, new StringBuffer());
         return id;
     }
 
     @AuraEnabled
-    public static void deleteBuffer(@Key("id") String id) throws Exception {
+    public void deleteBuffer(@Key("id") String id) throws Exception {
         buffers.remove(id);
     }
 
@@ -181,8 +185,8 @@ public class JavaTestController {
      * contents plus the current append.
      */
     @AuraEnabled
-    public static Component appendBuffer(@Key("id") String id, @Key("delayMs") BigDecimal delayMs,
-            @Key("append") String append) throws Exception {
+    public Component appendBuffer(@Key("id") String id, @Key("delayMs") BigDecimal delayMs,
+                                  @Key("append") String append) throws Exception {
         StringBuffer buffer = buffers.get(id);
         buffer.append(append);
         long delay = delayMs.longValue();
@@ -190,136 +194,136 @@ public class JavaTestController {
             Thread.sleep(delay);
         }
         Map<String, Object> atts = ImmutableMap.of("value", (Object) (buffer + "."));
-        return Aura.getInstanceService().getInstance("auratest:text", ComponentDef.class, atts);
+        return instanceService.getInstance("auratest:text", ComponentDef.class, atts);
     }
 
     @AuraEnabled
-    public static Boolean echoCheckbox(@Key("inVar") Boolean inVar) {
+    public Boolean echoCheckbox(@Key("inVar") Boolean inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static BigDecimal echoCurrency(@Key("inVar") BigDecimal inVar) {
+    public BigDecimal echoCurrency(@Key("inVar") BigDecimal inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static BigDecimal echoDecimal(@Key("inVar") BigDecimal inVar) {
+    public BigDecimal echoDecimal(@Key("inVar") BigDecimal inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static DateOnly echoDate(@Key("inVar") DateOnly inVar) {
+    public DateOnly echoDate(@Key("inVar") DateOnly inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static Date echoDateTime(@Key("inVar") Date inVar) {
+    public Date echoDateTime(@Key("inVar") Date inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoEmail(@Key("inVar") String inVar) {
+    public String echoEmail(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static long echoNumber(@Key("inVar") long inVar) {
+    public long echoNumber(@Key("inVar") long inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoNumberString(@Key("inVar") String inVar) {
+    public String echoNumberString(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static Boolean echoOption(@Key("inVar") Boolean inVar) {
+    public Boolean echoOption(@Key("inVar") Boolean inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static BigDecimal echoPercent(@Key("inVar") BigDecimal inVar) {
+    public BigDecimal echoPercent(@Key("inVar") BigDecimal inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoPhone(@Key("inVar") String inVar) {
+    public String echoPhone(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoPicklist(@Key("inVar") String inVar) {
+    public String echoPicklist(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoSearch(@Key("inVar") String inVar) {
+    public String echoSearch(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoSecret(@Key("inVar") String inVar) {
+    public String echoSecret(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoSelect(@Key("inVar") String inVar) {
+    public String echoSelect(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoSelectMulti(@Key("inVar") String inVar) {
+    public String echoSelectMulti(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static Boolean echoSelectOption(@Key("inVar") Boolean inVar) {
+    public Boolean echoSelectOption(@Key("inVar") Boolean inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoText(@Key("inVar") String inVar) {
+    public String echoText(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
     @BackgroundAction
-    public static String echoTextBackground(@Key("inVar") String inVar) {
+    public String echoTextBackground(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoTextArea(@Key("inVar") String inVar) {
+    public String echoTextArea(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static String echoUrl(@Key("inVar") String inVar) {
+    public String echoUrl(@Key("inVar") String inVar) {
         return inVar;
     }
 
     @AuraEnabled
-    public static void throwExceptionNoLineNums() {
+    public void throwExceptionNoLineNums() {
         Location loc = new Location("test-filename", 123456789);
         AuraRuntimeException e = new AuraRuntimeException("throwExceptionNoLineNums", loc);
         throw e;
     }
 
     @AuraEnabled
-    public static void throwExceptionWithLineNums() {
+    public void throwExceptionWithLineNums() {
         Location loc = new Location("test-filename", 4444, 55555, 123456789);
         AuraRuntimeException e = new AuraRuntimeException("throwExceptionNoLineNums", loc);
         throw e;
     }
 
     @AuraEnabled
-    public static void dummy() {
+    public void dummy() {
     }
 
     @SuppressWarnings("rawtypes")
     @AuraEnabled
-    public static List<Map> getList(@Key("start") int start, @Key("limit") int limit) throws Exception {
+    public List<Map> getList(@Key("start") int start, @Key("limit") int limit) throws Exception {
         List<Map> myList = new ArrayList<>();
         for (int i = start; i < limit; i++) {
             char alphabet = (char) (65 + (i % 26));
@@ -333,7 +337,8 @@ public class JavaTestController {
 
     @SuppressWarnings("rawtypes")
     @AuraEnabled
-    public static Map echoMap(@Key("map") Map map) {
+    public Map echoMap(@Key("map") Map map) {
         return map;
     }
 }
+

@@ -15,20 +15,19 @@
  */
 package org.auraframework.impl.system;
 
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.service.LoggingService;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * subdef impl, passes most stuff except for name through to the parent
@@ -54,21 +53,14 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
         if (AuraTextUtil.isNullEmptyOrWhitespace(subName)) {
             throw new AuraRuntimeException("Sub definition name cannot be null");
         }
-        LoggingService loggingService = Aura.getLoggingService();
-        loggingService.startTimer(LoggingService.TIMER_DEF_DESCRIPTOR_CREATION);
-        try {
-            this.parentDescriptor = parentDescriptor;
-            this.name = subName;
-            this.defType = DefType.getDefType(defClass);
-            this.qualifiedName = String.format("%s/%s$%s", parentDescriptor.getQualifiedName(), defType.toString(),
-                    name);
-            this.descriptorName = String.format("%s/%s$%s", parentDescriptor.getDescriptorName(), defType.toString(),
-                    name);
-            this.hashCode = this.qualifiedName.toLowerCase().hashCode();
-        } finally {
-            loggingService.stopTimer(LoggingService.TIMER_DEF_DESCRIPTOR_CREATION);
-        }
-        loggingService.incrementNum(LoggingService.DEF_DESCRIPTOR_COUNT);
+        this.parentDescriptor = parentDescriptor;
+        this.name = subName;
+        this.defType = DefType.getDefType(defClass);
+        this.qualifiedName = String.format("%s/%s$%s", parentDescriptor.getQualifiedName(), defType.toString(),
+                name);
+        this.descriptorName = String.format("%s/%s$%s", parentDescriptor.getDescriptorName(), defType.toString(),
+                name);
+        this.hashCode = this.qualifiedName.toLowerCase().hashCode();
     }
 
     @Override
@@ -155,7 +147,7 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
         if (matcher.matches()) {
             String parentName = matcher.group(1);
             String name = matcher.group(3);
-            DefDescriptor<Par> parentDescriptor = DefDescriptorImpl.getInstance(parentName, parClass);
+            DefDescriptor<Par> parentDescriptor = Aura.getDefinitionService().getDefDescriptor(parentName, parClass);
             return getInstance(name, parentDescriptor, defClass);
 
         } else {

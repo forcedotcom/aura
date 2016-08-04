@@ -15,9 +15,6 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.Collection;
-import java.util.Map;
-
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
@@ -26,10 +23,11 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.ComponentConfig;
-import org.auraframework.instance.AuraValueProviderType;
+import org.auraframework.instance.ProviderInstance;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -37,6 +35,9 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceType;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * The real runtime component thing that sits in the tree. The Component
@@ -69,6 +70,11 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
         }
     }
 
+    private ComponentImpl(DefDescriptor<ComponentDef> descriptor, Component extender,
+                          BaseComponent<?, ?> attributeValueProvider, Component concreteComponent) throws QuickFixException {
+        super(descriptor, extender, attributeValueProvider, concreteComponent);
+    }
+
     // FIXME - move to builder
     @Override
     protected void injectComponent() throws QuickFixException {
@@ -88,7 +94,9 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                 } 
 
                 if (providerDef != null && providerDef.isLocal()) {
-                    ComponentConfig config = providerDef.provide(intfDescriptor);
+                    ProviderInstance provider = (ProviderInstance) Aura.getInstanceService().getInstance(providerDef);
+                    ComponentConfig config = provider.provide();
+                    //ComponentConfig config = providerDef.provide(intfDescriptor);
                     if (config != null) {
                         ProviderDef remoteProviderDef = root.getProviderDef();
                         if (remoteProviderDef == null || remoteProviderDef.isLocal() || config.getShouldSerializeToClient()) {
@@ -155,10 +163,5 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
         }
 
         super.finishInit();
-    }
-
-    private ComponentImpl(DefDescriptor<ComponentDef> descriptor, Component extender,
-            BaseComponent<?, ?> attributeValueProvider, Component concreteComponent) throws QuickFixException {
-        super(descriptor, extender, attributeValueProvider, concreteComponent);
     }
 }

@@ -15,13 +15,8 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.def.AttributeDef;
@@ -33,12 +28,10 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -51,8 +44,12 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceType;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * An immutable reference to a ComponentDef, containing only instance-specific properties, like the Attributes and body.
@@ -83,12 +80,19 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         this.flavor = builder.flavor;
     }
 
+
+//    @Override
+//    public Component newInstance(BaseComponent<?, ?> valueProvider) throws QuickFixException {
+//        return new ComponentImpl(getDescriptor(), getAttributeValueList(), valueProvider, localId, Aura.getContextService(), Aura.getDefinitionService(), null, Aura.getLoggingService());
+//    }
+    
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDefRef> getAttributeValues() {
         return attributeValues;
     }
 
-    protected List<AttributeDefRef> getAttributeValueList() throws QuickFixException {
+    @Override
+    public List<AttributeDefRef> getAttributeValueList() throws QuickFixException {
         RootDefinition def = getComponentDef();
         Collection<AttributeDef> defs = def.getAttributeDefs().values();
         List<AttributeDefRef> ret = Lists.newArrayList();
@@ -271,7 +275,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
 
     @Override
     public AttributeDefRef getAttributeDefRef(String name) {
-        return getAttributeValues().get(DefDescriptorImpl.getInstance(name, AttributeDef.class));
+        return getAttributeValues().get(Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class));
     }
 
     @Override
@@ -297,11 +301,6 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     @Override
     public Object getFlavor() {
         return flavor;
-    }
-
-    @Override
-    public Component newInstance(BaseComponent<?, ?> valueProvider) throws QuickFixException {
-        return new ComponentImpl(getDescriptor(), getAttributeValueList(), valueProvider, localId);
     }
 
     public static class Builder extends DefinitionImpl.RefBuilderImpl<ComponentDef, ComponentDefRef> implements
@@ -335,13 +334,13 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         public Builder setAttribute(String key, Object value) {
             if (value != null) {
                 AttributeDefRefImpl.Builder valueBuilder = new AttributeDefRefImpl.Builder();
-                valueBuilder.setDescriptor(DefDescriptorImpl.getInstance(key, AttributeDef.class));
+                valueBuilder.setDescriptor(Aura.getDefinitionService().getDefDescriptor(key, AttributeDef.class));
                 valueBuilder.setValue(value);
-
+                valueBuilder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
                 AttributeDefRef adr = valueBuilder.build();
                 setAttribute(adr.getDescriptor(), adr);
             } else if (attributeValues != null) {
-                DefDescriptor<AttributeDef> attr = DefDescriptorImpl.getInstance(key, AttributeDef.class);
+                DefDescriptor<AttributeDef> attr = Aura.getDefinitionService().getDefDescriptor(key, AttributeDef.class);
                 attributeValues.remove(attr);
             }
             return this;

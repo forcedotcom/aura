@@ -22,16 +22,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 
 /**
  * for iterationTest components
  *
  * @since
  */
-@Model
-public class TableModel {
+@ServiceComponentModelInstance
+public class TableModel implements ModelInstance {
 
     private final List<Object> data;
 

@@ -18,18 +18,20 @@ package org.auraframework.integration.test.http.resource;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.auraframework.Aura;
+import javax.inject.Inject;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.resource.TemplateHtml;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.adapter.ServletUtilAdapterImpl;
-import org.auraframework.impl.clientlibrary.ClientLibraryServiceImpl;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.service.LoggingService;
+import org.auraframework.service.RenderingService;
+import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -37,7 +39,42 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 public class TemplateHtmlTest extends AuraImplTestCase {
 
-    ContextService contextService = Aura.getContextService();
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @Inject
+    private DefinitionService definitionService;
+
+    @Inject
+    private LoggingService loggingService;
+
+    @Inject
+    private RenderingService renderingService;
+
+    @Inject
+    private InstanceService instanceService;
+
+    @Inject
+    private ServletUtilAdapter servletUtilAdapter;
+
+    @Inject
+    private ServerService serverService;
+
+    private TemplateHtml getTemplateHtml() {
+        TemplateHtml TemplateHtml = new TemplateHtml();
+        TemplateHtml.setServletUtilAdapter(servletUtilAdapter);
+        TemplateHtml.setConfigAdapter(configAdapter);
+        TemplateHtml.setLoggingService(loggingService);
+        TemplateHtml.setDefinitionService(definitionService);
+        TemplateHtml.setInstanceService(instanceService);
+        TemplateHtml.setContextService(contextService);
+        TemplateHtml.setServerService(serverService);
+        TemplateHtml.setRenderingService(renderingService);
+        return TemplateHtml;
+    }
 
     @Test
     public void testHtmlMarkupInTemplateIsWrittenIntoTemplateHtml() throws Exception {
@@ -59,15 +96,14 @@ public class TemplateHtmlTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        TemplateHtml templateHtml = new TemplateHtml();
-        templateHtml.setServletUtilAdapter(new MockServletUtilAdapterImpl());
+        TemplateHtml templateHtml = getTemplateHtml();
 
         // Act
         templateHtml.write(mockRequest, mockResponse, context);
         String content = mockResponse.getContentAsString();
 
         // Assert
-        assertEquals("Didn't find expceted html markup in response content: " + content, htmlMarkup, content.trim());
+        assertEquals("Didn't find expected html markup in response content: " + content, htmlMarkup, content.trim());
     }
 
     @Test
@@ -96,8 +132,7 @@ public class TemplateHtmlTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        TemplateHtml templateHtml = new TemplateHtml();
-        templateHtml.setServletUtilAdapter(new MockServletUtilAdapterImpl());
+        TemplateHtml templateHtml = getTemplateHtml();
 
         // Act
         templateHtml.write(mockRequest, mockResponse, context);
@@ -129,8 +164,7 @@ public class TemplateHtmlTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        TemplateHtml templateHtml = new TemplateHtml();
-        templateHtml.setServletUtilAdapter(new MockServletUtilAdapterImpl());
+        TemplateHtml templateHtml = getTemplateHtml();
 
         // Act
         templateHtml.write(mockRequest, mockResponse, context);
@@ -161,27 +195,13 @@ public class TemplateHtmlTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        TemplateHtml templateHtml = new TemplateHtml();
-        templateHtml.setServletUtilAdapter(new MockServletUtilAdapterImpl());
+        TemplateHtml templateHtml = getTemplateHtml();
 
         // Act
         templateHtml.write(mockRequest, mockResponse, context);
         String content = mockResponse.getContentAsString();
 
         // Assert
-        assertThat("Didn't find expceted html mark in response content.", content, containsString(htmlMarkup));
-    }
-
-    private static class MockServletUtilAdapterImpl extends ServletUtilAdapterImpl {
-        public MockServletUtilAdapterImpl() {
-            setClientLibraryService(new ClientLibraryServiceImpl());
-        }
-
-        @Override
-        public void handleServletException(Throwable t, boolean quickfix, AuraContext context,
-                HttpServletRequest request, HttpServletResponse response,
-                boolean written) {
-            throw new RuntimeException(t);
-        }
+        assertThat("Didn't find expected html mark in response content.", content, containsString(htmlMarkup));
     }
 }

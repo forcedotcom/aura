@@ -6,7 +6,7 @@
     testGetExternalAction : {
         test: [
             function(cmp) {
-                var eAction = $A.test.getExternalAction(cmp, "java://org.auraframework.impl.java.controller.TestController/ACTION$getNamedComponent",
+                var eAction = $A.test.getExternalAction(cmp, "java://org.auraframework.components.test.java.controller.TestController/ACTION$getNamedComponent",
                         {"componentName":"markup://aura:text", 'attributes':{'value':'valuable'}},
                         "java://org.auraframework.instance.component",
                         function(action){

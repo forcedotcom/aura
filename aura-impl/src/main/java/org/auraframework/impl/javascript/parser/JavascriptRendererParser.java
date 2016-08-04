@@ -15,14 +15,28 @@
  */
 package org.auraframework.impl.javascript.parser;
 
-import org.auraframework.def.RendererDef;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.RendererDef;
 import org.auraframework.impl.javascript.parser.handler.JavascriptRendererDefHandler;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+@ServiceComponent
 public class JavascriptRendererParser implements Parser<RendererDef> {
+
+    @Override
+    public Format getFormat() {
+        return Format.JS;
+    }
+
+    @Override
+    public DefType getDefType() {
+        return DefType.RENDERER;
+    }
+    
     @Override
     public RendererDef parse(DefDescriptor<RendererDef> descriptor, Source<RendererDef> source)
             throws QuickFixException {

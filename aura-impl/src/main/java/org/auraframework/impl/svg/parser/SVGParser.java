@@ -16,18 +16,8 @@
 package org.auraframework.impl.svg.parser;
 
 
-import java.io.StringReader;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.regex.Pattern;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.SVGDef;
@@ -39,8 +29,18 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.SVGParserException;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.StringReader;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.regex.Pattern;
+
+@ServiceComponent
 public class SVGParser implements Parser<SVGDef> {
-    private static final SVGParser instance = new SVGParser();
     private static final XMLInputFactory xmlInputFactory;
     private static final Pattern DISSALOWED_LIST = Pattern.compile(".*(&|/|<|>).*", Pattern.DOTALL | Pattern.MULTILINE);
 
@@ -72,15 +72,16 @@ public class SVGParser implements Parser<SVGDef> {
     static {
         xmlInputFactory = XMLInputFactory.newInstance();
 
-        // Setting IS_NAMESPACE_AWARE to true will require all xml to be valid xml and
-        // we would need to enforce namespace definitions ie xmlns in all cmp and app files.
-        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
-        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
-
         try {
+
+            // Setting IS_NAMESPACE_AWARE to true will require all xml to be valid xml and
+            // we would need to enforce namespace definitions ie xmlns in all cmp and app files.
+            xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
+            xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
+            xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+            xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+
             // sjsxp does not currently have a thread-safe XMLInputFactory, as that implementation
             // tries to cache and reuse theXMLStreamReader. Setting the parser-specific "reuse-instance"
             // property to false prevents this.
@@ -93,10 +94,16 @@ public class SVGParser implements Parser<SVGDef> {
         }
     }
 
-    public static SVGParser getInstance() {
-        return instance;
+    @Override
+    public Format getFormat() {
+        return Format.SVG;
     }
 
+    @Override
+    public DefType getDefType() {
+        return DefType.SVG;
+    }
+    
     @Override
     public SVGDef parse(DefDescriptor<SVGDef> descriptor, Source<SVGDef> source) throws SVGParserException,
     QuickFixException {

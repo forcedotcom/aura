@@ -18,7 +18,8 @@ package org.auraframework.integration.test.java.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
 import org.auraframework.cache.Cache;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
@@ -45,8 +46,12 @@ import org.mockito.Mockito;
  * Integration tests for JavaAction.
  */
 public class JavaActionTest extends AuraImplTestCase {
-    private InstanceService instanceService = Aura.getInstanceService();
-    private CachingService cachingService = Aura.getCachingService();
+
+    @Inject
+    private CachingService cachingService;
+
+    @Inject
+    private InstanceService instanceService;
 
     /**
      * Tests to verify the APIs on Action to mark actions as storable.

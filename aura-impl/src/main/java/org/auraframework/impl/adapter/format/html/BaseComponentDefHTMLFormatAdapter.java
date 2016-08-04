@@ -18,10 +18,13 @@ package org.auraframework.impl.adapter.format.html;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -29,6 +32,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
@@ -41,19 +45,34 @@ import org.auraframework.util.json.JsonEncoder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-/**
- */
 @ThreadSafe
+@ServiceComponent
 public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentDef> extends HTMLFormatAdapter<T> {
-    private ManifestUtil manifestUtil = new ManifestUtil();
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private InstanceService instanceService;
+
+    @Inject
+    private RenderingService renderingService;
+
+    @Inject
+    private ServletUtilAdapter servletUtilAdapter;
+
+    private ManifestUtil manifestUtil;
+
+    @PostConstruct
+    public void createManifestUtil() {
+        manifestUtil = new ManifestUtil(contextService, configAdapter);
+    }
 
     @Override
     public void write(T value, Map<String, Object> componentAttributes, Appendable out) throws IOException {
         try {
-            InstanceService instanceService = Aura.getInstanceService();
-            RenderingService renderingService = Aura.getRenderingService();
-            ConfigAdapter configAdapter = Aura.getConfigAdapter();
-
             ComponentDef templateDef = value.getTemplateDef();
             Map<String, Object> attributes = Maps.newHashMap();
 
@@ -61,10 +80,10 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
             writeHtmlStyle(configAdapter.getResetCssURL(), sb);
             attributes.put("auraResetTags", sb.toString());
 
-            AuraContext context = Aura.getContextService().getCurrentContext();
+            AuraContext context = contextService.getCurrentContext();
 
             sb.setLength(0);
-            writeHtmlStyles(Aura.getServletUtilAdapter().getStyles(context), sb);
+            writeHtmlStyles(servletUtilAdapter.getStyles(context), sb);
             attributes.put("auraStyleTags", sb.toString());
 
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
@@ -83,18 +102,21 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 attributes.put("defaultBodyClass", "");
                 attributes.put("autoInitialize", "false");
             } else {
-
                 if (manifestUtil.isManifestEnabled()) {
-                    attributes.put("manifest", Aura.getServletUtilAdapter().getManifestUrl(context, componentAttributes));
+                    attributes.put("manifest", servletUtilAdapter.getManifestUrl(context, componentAttributes));
                 }
                 
                 sb.setLength(0);
-                writeHtmlScripts(context, Aura.getServletUtilAdapter().getFrameworkScripts(context, true/*inlineJS*/, false/*dontIgnoreBootstrap*/, componentAttributes), false/*async*/, sb);
+                writeHtmlScripts(context, servletUtilAdapter.getFrameworkScripts(context, true/*inlineJS*/, false/*dontIgnoreBootstrap*/, componentAttributes), false/*async*/, sb);
                 attributes.put("auraNamespacesScriptTags", sb.toString());
 
                 sb.setLength(0);
-                writeHtmlScripts(context, Aura.getServletUtilAdapter().getBaseScripts(context, componentAttributes), true /*async*/, sb);
+                writeHtmlScripts(context, servletUtilAdapter.getBaseScripts(context, componentAttributes), true/*async*/, sb);
                 attributes.put("auraBaseScriptTags", sb.toString());
+
+                sb.setLength(0);
+                writeHtmlScripts(context, servletUtilAdapter.getFrameworkScripts(context, true/*inlineJS*/, false/*dontIgnoreBootstrap*/, componentAttributes), true/*async*/, sb);
+                attributes.put("auraNamespacesScriptTags", sb.toString());
 
                 Map<String, Object> auraInit = Maps.newHashMap();
                 if (componentAttributes != null && !componentAttributes.isEmpty()) {
@@ -131,5 +153,4 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
     public void setManifestUtil(ManifestUtil manifestUtil) {
         this.manifestUtil = manifestUtil;
     }
-
 }

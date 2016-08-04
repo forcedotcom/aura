@@ -22,7 +22,7 @@ public class ResourceSourceLoaderTest extends AuraImplTestCase {
     /**
      * All namespaces loaded by ResourceSourceLoader are internal, verify that ResourceSourceLoader says so.
      */
-    @Test
+	@Test
     public void testIsInternalNamespace(){
         ResourceSourceLoader rs = new ResourceSourceLoader(null);
         assertTrue("All namespaces loaded by ResourceSourceLoader are to be internal",

@@ -36,10 +36,11 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
@@ -52,11 +53,11 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
-import org.auraframework.impl.source.file.AuraFileMonitor;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
@@ -65,6 +66,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.FileMonitor;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.JavascriptGroup;
 import org.auraframework.util.resource.CompiledGroup;
@@ -113,11 +115,20 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private boolean validateCss;
     private Map<String, String> effectiveTimezones;
 
+    @Inject
     private LocalizationAdapter localizationAdapter;
 
+    @Inject
+    private DefinitionService definitionService;
+    
+    @Inject
     private InstanceService instanceService;
 
+    @Inject
     private ContextService contextService;
+    
+    @Inject
+    private FileMonitor fileMonitor;
 
     private String resourceCacheDir;
 
@@ -131,20 +142,20 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      */
     public ConfigAdapterImpl(final String resourceCacheDir) {
         this.resourceCacheDir = resourceCacheDir;
-        this.localizationAdapter = Aura.getLocalizationAdapter();
-        this.instanceService = Aura.getInstanceService();
-        this.contextService = Aura.getContextService();
-        initialize();
+
     }
 
-    public ConfigAdapterImpl(String resourceCacheDir, LocalizationAdapter localizationAdapter, InstanceService instanceService, ContextService contextService) {
+
+    public ConfigAdapterImpl(String resourceCacheDir, LocalizationAdapter localizationAdapter, InstanceService instanceService, ContextService contextService, FileMonitor fileMonitor) {
         this.resourceCacheDir = resourceCacheDir;
         this.localizationAdapter = localizationAdapter;
         this.instanceService = instanceService;
         this.contextService = contextService;
-        initialize();
+
+        this.fileMonitor = fileMonitor;
     }
 
+    @PostConstruct
     public void initialize() {
         // can this initialization move to some sort of common initialization dealy?
         try {
@@ -208,16 +219,18 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
         effectiveTimezones = readEquivalentTimezones();
 
+        contextService.registerGlobal("isVoiceOver", true, false);
+        contextService.registerGlobal("dynamicTypeSize", true, "");
+        
         if (!isProduction()) {
-            AuraFileMonitor.start();
+            fileMonitor.start();
         }
-
         contextService.registerGlobal("isVoiceOver", true, false);
         contextService.registerGlobal("dynamicTypeSize", true, "");
     }
 
     protected FileGroup newAuraResourcesHashingGroup() throws IOException {
-        return new AuraResourcesHashingGroup(true);
+        return new AuraResourcesHashingGroup(fileMonitor, true);
     }
 
     @Override
@@ -616,7 +629,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      * AuraJavascriptGroup that experiences synthetic errors.
      */
     protected AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
-        return new AuraJavascriptGroup(true);
+        return new AuraJavascriptGroup(fileMonitor, true);
     }
 
     @Override
@@ -751,16 +764,20 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         this.contextService = service;
     }
 
-    @Override
-    public boolean isLockerServiceEnabled() {
-        return true;
+    public void setFileMonitor(FileMonitor fileMonitor) {
+        this.fileMonitor = fileMonitor;
     }
+
+	@Override
+	public boolean isLockerServiceEnabled() {
+		return true;
+	}
 
 	@Override
 	public boolean requireLocker(RootDefinition def) {
         boolean requireLocker = !isInternalNamespace(def.getDescriptor().getNamespace());
 		if (!requireLocker) {
-            DefDescriptor<InterfaceDef> requireLockerDescr = Aura.getDefinitionService().getDefDescriptor("aura:requireLocker", InterfaceDef.class);
+            DefDescriptor<InterfaceDef> requireLockerDescr = definitionService.getDefDescriptor("aura:requireLocker", InterfaceDef.class);
         	try {
 				requireLocker = def.isInstanceOf(requireLockerDescr);
 			} catch (QuickFixException e) {
@@ -778,5 +795,5 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
 	protected boolean isSafeEvalWorkerURI(String uri) {
         return uri.endsWith("/lockerservice/safeEval.html");
-    }
+	}
 }

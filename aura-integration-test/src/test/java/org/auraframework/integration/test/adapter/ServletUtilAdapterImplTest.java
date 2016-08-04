@@ -15,7 +15,10 @@
  */
 package org.auraframework.integration.test.adapter;
 
+import javax.inject.Inject;
+
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
@@ -31,8 +34,11 @@ import org.junit.Test;
 
 public class ServletUtilAdapterImplTest extends IntegrationTestCase {
 
-    ContextService contextService = Aura.getContextService();
+    @Inject
+    private ContextService contextService;
 
+    @Inject
+    private ConfigAdapter configAdapter;
     /**
      * check manifest URL when context has no preloads.
      */
@@ -45,7 +51,7 @@ public class ServletUtilAdapterImplTest extends IntegrationTestCase {
         DefDescriptor<ApplicationDef> desc =
                 definitionService.getDefDescriptor("appCache:nopreload", ApplicationDef.class);
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, desc);
-        assertTrue("The application needs to enable appcache", new ManifestUtil().isManifestEnabled());
+        assertTrue("The application needs to enable appcache", new ManifestUtil(contextService, configAdapter).isManifestEnabled());
 
         ServletUtilAdapter servletUtilAdapter = new ServletUtilAdapterImpl();
         String url = servletUtilAdapter.getManifestUrl(Aura.getContextService().getCurrentContext(), null);

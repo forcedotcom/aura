@@ -15,12 +15,11 @@
  */
 package org.auraframework.util.type.converter;
 
-import java.math.BigDecimal;
-
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.util.type.Converter;
+import org.springframework.context.annotation.Lazy;
 
-import aQute.bnd.annotation.component.Component;
+import java.math.BigDecimal;
 
 /**
  * Used by aura.util.type.TypeUtil
@@ -28,7 +27,8 @@ import aQute.bnd.annotation.component.Component;
  * 
  * @since 0.0.56
  */
-@Component (provide=AuraServiceProvider.class)
+@Lazy
+@ServiceComponent
 public class BigDecimalToIntegerConverter implements Converter<BigDecimal, Integer> {
 
     @Override

@@ -15,28 +15,38 @@
  */
 package org.auraframework.docs;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.system.Annotations.Provider;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-@Provider
+@ServiceComponentProvider
 public class DemoPanelProvider implements ComponentDescriptorProvider {
+	
+	@Inject
+	ContextService contextService;
+	
+	@Inject
+	DefinitionService definitionService;
+	
     @Override
     public DefDescriptor<ComponentDef> provide() throws QuickFixException {
-        BaseComponent<?, ?> c = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        BaseComponent<?, ?> c = contextService.getCurrentContext().getCurrentComponent();
         String demo = (String)c.getAttributes().getValue("demo");
         if (demo != null) {
             if (!demo.endsWith("Demo")) {
                 demo = demo + "Demo";
             }
-            DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("auradocs:" + demo,
+            DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("auradocs:" + demo,
                     ComponentDef.class);
             if (desc.exists()) { return desc; }
         }
-        return Aura.getDefinitionService().getDefDescriptor("auradocs:demos", ComponentDef.class);
+        return definitionService.getDefDescriptor("auradocs:demos", ComponentDef.class);
     }
 }

@@ -19,20 +19,21 @@ import java.io.IOException;
 import java.util.Map;
 
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
+import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -43,22 +44,33 @@ import org.auraframework.util.json.JsonEncoder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-/**
- */
 @ThreadSafe
-@aQute.bnd.annotation.component.Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, ?>> extends HTMLFormatAdapter<T> {
+    @Inject
+    private ContextService contextService;
 
+    @Inject
+    private InstanceService instanceService;
+
+    @Inject
+    private RenderingService renderingService;
+
+    @Inject
+    private SerializationService serializationService;
+
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @Inject
+    private ServletUtilAdapter servletUtilAdapter;
+    
     @Override
     public void write(T value, Map<String, Object> componentAttributes, Appendable out) throws IOException {
         try {
 
-            AuraContext context = Aura.getContextService().getCurrentContext();
-            InstanceService instanceService = Aura.getInstanceService();
-            RenderingService renderingService = Aura.getRenderingService();
+            AuraContext context = contextService.getCurrentContext();
             BaseComponentDef def = value.getDescriptor().getDef();
-            ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
-            ConfigAdapter configAdapter = Aura.getConfigAdapter();
 
             ComponentDef templateDef = def.getTemplateDef();
             Map<String, Object> attributes = Maps.newHashMap();
@@ -83,7 +95,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             Mode mode = context.getMode();
 
             if (mode.allowLocalRendering() && def.isLocallyRenderable()) {
-                BaseComponent<?,?> cmp = (BaseComponent<?,?>)instanceService.getInstance(def, componentAttributes);
+                BaseComponent<?, ?> cmp = (BaseComponent<?, ?>) instanceService.getInstance(def, componentAttributes);
 
                 attributes.put("body", Lists.<BaseComponent<?, ?>> newArrayList(cmp));
                 attributes.put("bodyClass", "");
@@ -119,10 +131,10 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
                 attributes.put("autoInitializeSync", "true");
 
                 auraInit.put("instance", value);
-                auraInit.put("token", AuraBaseServlet.getToken());
+                auraInit.put("token", configAdapter.getCSRFToken());
 
                 StringBuilder contextWriter = new StringBuilder();
-                Aura.getSerializationService().write(context, null, AuraContext.class, contextWriter, "JSON");
+                serializationService.write(context, null, AuraContext.class, contextWriter, "JSON");
                 auraInit.put("context", new Literal(contextWriter.toString()));
 
                 attributes.put("auraInitSync", JsonEncoder.serialize(auraInit));

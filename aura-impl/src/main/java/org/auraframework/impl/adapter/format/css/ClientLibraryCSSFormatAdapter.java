@@ -15,22 +15,19 @@
  */
 package org.auraframework.impl.adapter.format.css;
 
-import java.io.IOException;
-import java.util.Collection;
-
-import javax.annotation.concurrent.ThreadSafe;
-
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.clientlibrary.Combinable;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import aQute.bnd.annotation.component.Component;
+import javax.annotation.concurrent.ThreadSafe;
+import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Formats client library css. Minifies (removes spaces) if not DEV or TEST modes
  */
 @ThreadSafe
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ClientLibraryCSSFormatAdapter extends CSSFormatAdapter<Combinable> {
 
     /**

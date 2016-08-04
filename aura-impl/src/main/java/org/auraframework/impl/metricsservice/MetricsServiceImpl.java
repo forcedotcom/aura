@@ -15,20 +15,21 @@
  */
 package org.auraframework.impl.metricsservice;
 
-import java.io.IOException;
-
-import aQute.bnd.annotation.component.Component;
-import org.auraframework.Aura;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.MetricsService;
 import org.auraframework.util.json.Json;
 
+import javax.inject.Inject;
+import java.io.IOException;
+
 /**
  * ResourceDef handler.
  */
-@Component(provide=AuraServiceProvider.class)
-public class MetricsServiceImpl implements MetricsService  {
+@ServiceComponent
+public class MetricsServiceImpl implements MetricsService {
+
+    private LoggingService loggingService;
 
     /**
      *
@@ -37,8 +38,6 @@ public class MetricsServiceImpl implements MetricsService  {
 
     @Override
     public void serializeMetrics(Json json) {
-        LoggingService loggingService = Aura.getLoggingService();
-
         try {
             json.writeMapKey("perf");
 
@@ -46,7 +45,7 @@ public class MetricsServiceImpl implements MetricsService  {
             json.writeMapBegin();
             json.writeMapKey("actions");
             json.writeArrayBegin();
-            loggingService.serializeActions(json);
+            this.loggingService.serializeActions(json);
             json.writeArrayEnd();
             json.writeMapEnd();
 
@@ -59,5 +58,10 @@ public class MetricsServiceImpl implements MetricsService  {
     @Override
     public void clearMetrics() {
         // TODO Auto-generated method stub
+    }
+
+    @Inject
+    public void setLoggingService(LoggingService service) {
+        this.loggingService = service;
     }
 }

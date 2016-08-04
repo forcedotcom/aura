@@ -15,19 +15,16 @@
  */
 package org.auraframework.impl.adapter.format;
 
+import org.auraframework.adapter.FormatAdapter;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.annotation.concurrent.ThreadSafe;
-
-import org.auraframework.adapter.FormatAdapter;
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-/**
- */
 @ThreadSafe
 public abstract class BaseFormatAdapter<T> implements FormatAdapter<T> {
 

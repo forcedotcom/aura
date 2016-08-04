@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.java.provider;
 
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
@@ -26,6 +27,7 @@ import org.auraframework.system.Annotations.Provider;
  * 
  * @since 0.0.196
  */
+@ServiceComponentProvider
 @Provider
 public class TestProviderWithoutNoArgConstructor implements ComponentDescriptorProvider {
     public TestProviderWithoutNoArgConstructor(String name) {

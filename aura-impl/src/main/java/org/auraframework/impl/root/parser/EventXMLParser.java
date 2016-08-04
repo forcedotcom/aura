@@ -15,17 +15,37 @@
  */
 package org.auraframework.impl.root.parser;
 
-import javax.xml.stream.XMLStreamReader;
-
-import org.auraframework.def.EventDef;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.EventDef;
 import org.auraframework.impl.root.parser.handler.EventDefHandler;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 
+import javax.xml.stream.XMLStreamReader;
+
+@ServiceComponent
 public class EventXMLParser extends XMLParser<EventDef> {
+
+    @Override
+    public Format getFormat() {
+        return Format.XML;
+    }
+
+    @Override
+    public DefType getDefType() {
+        return DefType.EVENT;
+    }
+
     @Override
     protected EventDefHandler getHandler(DefDescriptor<EventDef> descriptor,
-            Source<EventDef> source, XMLStreamReader xmlReader) {
-        return new EventDefHandler(descriptor, source, xmlReader);
+                                         Source<EventDef> source, XMLStreamReader xmlReader,
+                                         boolean isInInternalNamespace, DefinitionService definitionService,
+                                         ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+        return new EventDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
+                configAdapter, definitionParserAdapter);
     }
 }

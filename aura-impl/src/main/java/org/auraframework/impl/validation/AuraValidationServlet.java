@@ -20,15 +20,16 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.validation.ValidationError;
@@ -40,8 +41,10 @@ import com.google.common.collect.Lists;
  * Servlet used as endpoint for the Aura ValidationClient
  */
 public class AuraValidationServlet extends AuraBaseServlet {
-
+    private static final long serialVersionUID = 1L;
     private static final Log LOG = LogFactory.getLog(AuraValidationServlet.class);
+
+    private ContextService contextService;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -49,7 +52,7 @@ public class AuraValidationServlet extends AuraBaseServlet {
         try {
             handle(request, response);
         } catch (Exception ex) {
-            Aura.getServletUtilAdapter().handleServletException(ex, false, context, request, response, false);
+            servletUtilAdapter.handleServletException(ex, false, context, request, response, false);
         } finally {
             ValidationUtil.endValidationContext();
         }
@@ -77,7 +80,7 @@ public class AuraValidationServlet extends AuraBaseServlet {
         String charset = Charsets.UTF_8.toString();
         response.setStatus(HttpServletResponse.SC_OK);
         response.setCharacterEncoding(charset);
-        Aura.getServletUtilAdapter().setCSPHeaders(Aura.getContextService().getCurrentContext().getApplicationDescriptor(),
+        servletUtilAdapter.setCSPHeaders(contextService.getCurrentContext().getApplicationDescriptor(),
                 request, response);
 
         if (report != null) {
@@ -102,6 +105,9 @@ public class AuraValidationServlet extends AuraBaseServlet {
             response.getOutputStream().write(data);
         }
     }
-
-    private static final long serialVersionUID = 1L;
+    
+    @Inject
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
+    }
 }

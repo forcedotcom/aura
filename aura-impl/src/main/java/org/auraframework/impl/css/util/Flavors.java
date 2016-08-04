@@ -15,28 +15,27 @@
  */
 package org.auraframework.impl.css.util;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import java.util.List;
-
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorBundleDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Utilities for working with flavors.
  */
+
 public final class Flavors {
     private static final String SUFFIX = "Flavors";
 
@@ -66,7 +65,7 @@ public final class Flavors {
             String namespace, String bundle) {
         // find the bundle (this file doesn't have to exist, we just need the marker)
         String fmt = String.format("markup://%s:%s", namespace, bundle);
-        DefDescriptor<FlavorBundleDef> bundleDesc = DefDescriptorImpl.getInstance(fmt, FlavorBundleDef.class);
+        DefDescriptor<FlavorBundleDef> bundleDesc = Aura.getDefinitionService().getDefDescriptor(fmt, FlavorBundleDef.class);
 
         // find the flavored style file. The dash is expected to be in the name so that we can infer the cmp descriptor
         String file = flavored.getNamespace() + "-" + flavored.getName();

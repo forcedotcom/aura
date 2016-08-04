@@ -18,14 +18,17 @@ package org.auraframework.component.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.ComponentConfig;
-import org.auraframework.system.Annotations.Provider;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -35,23 +38,30 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  *
  * @since Touch.174.3
  */
-@Provider
+@ServiceComponentProvider
 public class InputOptionProvider implements ComponentConfigProvider {
+	
+	@Inject
+	ContextService contextService;
+	
+	@Inject
+	DefinitionService definitionService;
+	
     @Override
     public ComponentConfig provide() throws QuickFixException {
-        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        BaseComponent<?, ?> component = contextService.getCurrentContext().getCurrentComponent();
         AttributeSet attributes = component.getAttributes();
         ComponentConfig componentConfig = new ComponentConfig();
-        DefDescriptor<ComponentDef> defDescriptor = Aura.getDefinitionService().getDefDescriptor(COMPONENT_UI_OUTPUTTEXT,
+        DefDescriptor<ComponentDef> defDescriptor = definitionService.getDefDescriptor(COMPONENT_UI_OUTPUTTEXT,
                 ComponentDef.class);
 
         String type = (String) attributes.getValue("type");
         if (TYPE_UI_INPUTCHECKBOX.equalsIgnoreCase(type)) {
-            defDescriptor = Aura.getDefinitionService().getDefDescriptor(COMPONENT_UI_INPUTCHECKBOX, ComponentDef.class);
+            defDescriptor = definitionService.getDefDescriptor(COMPONENT_UI_INPUTCHECKBOX, ComponentDef.class);
         } else if (TYPE_UI_INPUTRADI.equalsIgnoreCase(type)) {
-            defDescriptor = Aura.getDefinitionService().getDefDescriptor(COMPONENT_UI_INPUTRADIO, ComponentDef.class);
+            defDescriptor = definitionService.getDefDescriptor(COMPONENT_UI_INPUTRADIO, ComponentDef.class);
         } else if (TYPE_UI_INPUTSELECTOPTION.equalsIgnoreCase(type)) {
-            defDescriptor = Aura.getDefinitionService().getDefDescriptor(COMPONENT_UI_INPUTSELECTOPTION, ComponentDef.class);
+            defDescriptor = definitionService.getDefDescriptor(COMPONENT_UI_INPUTSELECTOPTION, ComponentDef.class);
         } else {
             Map<String, Object> passingAttrs = new HashMap<>();
             passingAttrs.put(VALUE_ATTRIBUTE_NAME, "Error in " + component.getDescriptor().getQualifiedName()

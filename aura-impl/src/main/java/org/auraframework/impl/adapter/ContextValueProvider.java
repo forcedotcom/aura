@@ -17,11 +17,11 @@ package org.auraframework.impl.adapter;
 
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.*;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -35,12 +35,15 @@ import com.google.common.collect.Maps;
  */
 public class ContextValueProvider implements GlobalValueProvider {
 
-    public ContextValueProvider() {
+    private final ContextService contextService;
+
+    public ContextValueProvider(ContextService contextService) {
+        this.contextService = contextService;
     }
 
     @Override
     public Object getValue(PropertyReference key) throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         return context.getGlobal(key.getRoot());
     }
 
@@ -56,7 +59,7 @@ public class ContextValueProvider implements GlobalValueProvider {
 
     @Override
     public void validate(PropertyReference expr) throws InvalidExpressionException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         if (context == null) {
             return;
         }
@@ -79,17 +82,17 @@ public class ContextValueProvider implements GlobalValueProvider {
 
     @Override
     public Map<String, ?> getData() {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
 
         if (context == null) {
-            Aura.getContextService().getAllowedGlobals();
+            contextService.getAllowedGlobals();
         }
-        
+
         Predicate<AuraContext.GlobalValue> isNonNullFilter = new Predicate<AuraContext.GlobalValue>() {
             @Override
-        	public boolean apply(AuraContext.GlobalValue globalValue) {
-        		return globalValue.getValue() != null;
-        	}
+            public boolean apply(AuraContext.GlobalValue globalValue) {
+                return globalValue.getValue() != null;
+            }
         };
 
         return Maps.filterValues(context.getGlobals(), isNonNullFilter);

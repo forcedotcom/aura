@@ -15,15 +15,12 @@
  */
 package org.auraframework.integration.test.http;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Format;
@@ -31,12 +28,20 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 import org.junit.Test;
 
+import javax.inject.Inject;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Test class to perform sanity tests on AuraServlet with all possible modes.
  *
  * This should be killed.
  */
 public class AuraFormatsHttpTest extends AuraHttpTestCase {
+    @Inject
+    ConfigAdapter configAdapter;
+
     private final String componentTag = "&aura.tag=auratest:test_TokenValidation";
     private final String quickFixComponentTag = "&aura.tag=foo:bar";
     private static Map<Format, String> FORMAT_CONTENTTYPE = new HashMap<>();
@@ -84,7 +89,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
             params.put("aura.token", getCsrfToken());
         }
         params.put("aura.context", String.format("{\"mode\":\"FTEST\",\"fwuid\":\"%s\"}",
-                Aura.getConfigAdapter().getAuraFrameworkNonce()));
+                configAdapter.getAuraFrameworkNonce()));
         params.put("aura.format", "JSON");
         HttpPost post = obtainPostMethod("/aura", params);
         requestAndAssertContentType(post,
@@ -127,5 +132,4 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
             }
         }
     }
-
 }

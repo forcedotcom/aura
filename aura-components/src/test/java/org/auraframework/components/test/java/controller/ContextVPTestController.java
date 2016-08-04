@@ -15,36 +15,42 @@
  */
 package org.auraframework.components.test.java.controller;
 
-import java.util.Map;
-
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.impl.context.AuraContextImpl;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.AuraContext.GlobalValue;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 
-@Controller
-public class ContextVPTestController {
+import javax.inject.Inject;
+import java.util.Map;
+
+@ServiceComponent
+public class ContextVPTestController implements Controller {
+
+    @Inject
+    private ContextService contextService;
+
     @AuraEnabled
-    public static void registerContextVPValue(@Key("name") String name, @Key("writable") boolean writable,
-            @Key("defaultValue") Object defaultValue) {
-        Aura.getContextService().registerGlobal(name, writable, defaultValue);
+    public void registerContextVPValue(@Key("name") String name, @Key("writable") boolean writable,
+                                       @Key("defaultValue") Object defaultValue) {
+        contextService.registerGlobal(name, writable, defaultValue);
     }
 
     @AuraEnabled
-    public static Object getContextVPValue(@Key("name") String name) {
-        return Aura.getContextService().getCurrentContext().getGlobal(name).toString();
+    public Object getContextVPValue(@Key("name") String name) {
+        return contextService.getCurrentContext().getGlobal(name).toString();
     }
 
     @AuraEnabled
-    public static void setContextVPValue(@Key("name") String name, @Key("value") Object value) {
-        Aura.getContextService().getCurrentContext().setGlobalValue(name, value);
+    public void setContextVPValue(@Key("name") String name, @Key("value") Object value) {
+        contextService.getCurrentContext().setGlobalValue(name, value);
     }
 
     @AuraEnabled
-    public static void unregisterContextVPValue(@Key("name") String name) throws Exception {
+    public void unregisterContextVPValue(@Key("name") String name) throws Exception {
         Map<String, GlobalValue> values = AuraPrivateAccessor.get(AuraContextImpl.class, "allowedGlobalValues");
         values.remove(name);
     }
@@ -54,9 +60,9 @@ public class ContextVPTestController {
      * guaranteed to be executed in a certain order and we need to register the GVP before setting it.
      */
     @AuraEnabled
-    public static void registerAndSetContextVPValue(@Key("name") String name, @Key("writable") boolean writable,
-            @Key("defaultValue") Object defaultValue, @Key("value") Object value) {
-        Aura.getContextService().registerGlobal(name, writable, defaultValue);
-        Aura.getContextService().getCurrentContext().setGlobalValue(name, value);
+    public void registerAndSetContextVPValue(@Key("name") String name, @Key("writable") boolean writable,
+                                             @Key("defaultValue") Object defaultValue, @Key("value") Object value) {
+        contextService.registerGlobal(name, writable, defaultValue);
+        contextService.getCurrentContext().setGlobalValue(name, value);
     }
 }

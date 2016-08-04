@@ -15,15 +15,15 @@
  */
 package org.auraframework.util.type.converter;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.util.type.Converter;
-
-import aQute.bnd.annotation.component.Component;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Used by aura.util.type.TypeUtil
  */
-@Component (provide=AuraServiceProvider.class)
+@Lazy
+@ServiceComponent
 public class StringToLongConverter implements Converter<String, Long> {
 
     @Override
@@ -31,7 +31,12 @@ public class StringToLongConverter implements Converter<String, Long> {
         if (value == null || value.isEmpty()) {
             return null;
         }
-        return Long.valueOf(value);
+        try {
+            return Long.valueOf(value);
+        } catch (NumberFormatException ex) {
+            // Possible decimal value
+            return Double.valueOf(value).longValue();
+        }
     }
 
     @Override

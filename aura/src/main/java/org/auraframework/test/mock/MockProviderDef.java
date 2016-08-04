@@ -15,42 +15,18 @@
  */
 package org.auraframework.test.mock;
 
-import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.instance.ComponentConfig;
-import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * A simple ProviderDef.
  */
 public class MockProviderDef extends MockDefinition<ProviderDef> implements ProviderDef {
-	private static final long serialVersionUID = -8841310282805891659L;
-	private final ComponentConfig config;
+    private static final long serialVersionUID = -8841310282805891659L;
 
     public MockProviderDef(DefDescriptor<ProviderDef> descriptor, ComponentConfig componentConfig) {
         super(descriptor);
-        this.config = componentConfig;
-    }
-
-    /**
-     * Simpler point to mock. Called by provide methods.
-     *
-     * @return the ComponentConfig provided by this Provider.
-     */
-    public ComponentConfig provide() {
-        return config;
-    }
-
-    @Override
-    public ComponentConfig provide(DefDescriptor<? extends RootDefinition> intfDescriptor) throws QuickFixException {
-        return provide();
-    }
-
-    @Override
-    public ComponentConfig provide(ComponentDefRefBuilder ref) throws QuickFixException {
-        return provide();
     }
 
     @Override
@@ -66,5 +42,10 @@ public class MockProviderDef extends MockDefinition<ProviderDef> implements Prov
     @Override
     public boolean supportsRefProvide() {
         return true;
+    }
+
+    @Override
+    public Class<?> getJavaType() {
+        return null;
     }
 }

@@ -15,8 +15,10 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.collect.Lists;
+import com.salesforce.omakase.ast.declaration.Declaration;
+import com.salesforce.omakase.broadcast.annotation.Observe;
+import com.salesforce.omakase.plugin.Plugin;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
@@ -25,16 +27,16 @@ import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.util.AuraUtil;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-import com.salesforce.omakase.ast.declaration.Declaration;
-import com.salesforce.omakase.broadcast.annotation.Observe;
-import com.salesforce.omakase.plugin.Plugin;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Functional tests for {@link StyleAdapterImpl}.
  */
 public class StyleAdapterImplTest extends StyleTestCase {
-    private Observer observer = new Observer();
+    @Inject
     private StyleDefCSSFormatAdapter format;
 
 //    public void testCompilationPlugins() throws Exception {
@@ -67,8 +69,8 @@ public class StyleAdapterImplTest extends StyleTestCase {
 
     @Test
     public void testContextualPlugins() throws Exception {
+        Observer observer = new Observer();
         TestStyleAdapter adapter = TestStyleAdapter.contextual(observer);
-        format = new StyleDefCSSFormatAdapter();
         format.setStyleAdapter(adapter);
 
         DefDescriptor<StyleDef> desc1 = addStyleDef(".THIS{color:red}");

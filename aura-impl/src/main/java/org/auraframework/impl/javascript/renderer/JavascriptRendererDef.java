@@ -20,19 +20,12 @@ package org.auraframework.impl.javascript.renderer;
 
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.javascript.BaseJavascriptDef;
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.system.RenderContext;
 
 public class JavascriptRendererDef extends BaseJavascriptDef<RendererDef> implements RendererDef {
-	private static final long serialVersionUID = -6937625695562864219L;
+    private static final long serialVersionUID = -6937625695562864219L;
 
-	protected JavascriptRendererDef(Builder builder) {
-		super(builder);
-	}
-
-    @Override
-    public void render(BaseComponent<?, ?> component, RenderContext rc) {
-        throw new UnsupportedOperationException();
+    protected JavascriptRendererDef(Builder builder) {
+        super(builder);
     }
 
     public static class Builder extends BaseJavascriptDef.Builder<RendererDef> {

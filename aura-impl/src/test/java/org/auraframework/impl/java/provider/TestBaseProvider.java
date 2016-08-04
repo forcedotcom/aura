@@ -15,10 +15,13 @@
  */
 package org.auraframework.impl.java.provider;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDescriptorProvider;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Provider;
 
 /**
@@ -28,10 +31,14 @@ import org.auraframework.system.Annotations.Provider;
  * instantiate as such. It always provides 'provider:javaProviderImpl' to allow us to
  * test 'provider:javaProviderAbstract' instantiating.
  */
+@ServiceComponentProvider
 @Provider
 public class TestBaseProvider implements ComponentDescriptorProvider {
+    @Inject
+    private DefinitionService definitionService;
+    
     @Override
     public DefDescriptor<ComponentDef> provide() {
-        return Aura.getDefinitionService().getDefDescriptor("provider:javaProviderImpl", ComponentDef.class);
+        return definitionService.getDefDescriptor("provider:javaProviderImpl", ComponentDef.class);
     }
 }

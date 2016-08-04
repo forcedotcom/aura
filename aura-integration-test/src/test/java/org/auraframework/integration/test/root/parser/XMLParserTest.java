@@ -15,11 +15,6 @@
  */
 package org.auraframework.integration.test.root.parser;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Map;
-
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -31,7 +26,6 @@ import org.auraframework.impl.root.parser.ComponentXMLParser;
 import org.auraframework.impl.root.parser.EventXMLParser;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.file.FileSource;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
@@ -40,19 +34,30 @@ import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
+import javax.inject.Inject;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
+
 public class XMLParserTest extends AuraImplTestCase {
 
     private DefDescriptor<ComponentDef> descriptor;
     private ComponentDef def;
 
+    @Inject
+    private ComponentXMLParser componentXMLParser;
+
+    @Inject
+    private EventXMLParser eventXMLParser;
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
         try {
-            ComponentXMLParser parser = new ComponentXMLParser();
-            descriptor = DefDescriptorImpl.getInstance("test:parser", ComponentDef.class);
+            descriptor = definitionService.getDefDescriptor("test:parser", ComponentDef.class);
             Source<ComponentDef> source = getSource(descriptor);
-            def = parser.parse(descriptor, source);
+            def = componentXMLParser.parse(descriptor, source);
         } catch (Exception e) {
             tearDown();
             throw e;
@@ -66,10 +71,9 @@ public class XMLParserTest extends AuraImplTestCase {
 
     @Test
     public void testParseInvalid() throws Exception {
-        ComponentXMLParser parser = new ComponentXMLParser();
-        descriptor = DefDescriptorImpl.getInstance("test:parserInvalid", ComponentDef.class);
+        descriptor = definitionService.getDefDescriptor("test:parserInvalid", ComponentDef.class);
         Source<ComponentDef> source = getSource(descriptor);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = componentXMLParser.parse(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Parsing invalid source should throw exception");
@@ -83,10 +87,9 @@ public class XMLParserTest extends AuraImplTestCase {
 
     @Test
     public void testParseFragment() throws Exception {
-        ComponentXMLParser parser = new ComponentXMLParser();
-        descriptor = DefDescriptorImpl.getInstance("test:parserFragment", ComponentDef.class);
+        descriptor = definitionService.getDefDescriptor("test:parserFragment", ComponentDef.class);
         Source<ComponentDef> source = getSource(descriptor);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = componentXMLParser.parse(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Parsing invalid source should throw exception");
@@ -101,7 +104,6 @@ public class XMLParserTest extends AuraImplTestCase {
 
     @Test
     public void testParseNonexistent() throws Exception {
-        ComponentXMLParser parser = new ComponentXMLParser();
         
         // Cannot use Mockito on JDK7 because the File class has been changed to directly access File.path data member
         File tmpFile = new File("") {
@@ -130,7 +132,7 @@ public class XMLParserTest extends AuraImplTestCase {
         
         Source<ComponentDef> source = new FileSource<>(descriptor, tmpFile, Format.XML);
         try {
-            parser.parse(null, source);
+            componentXMLParser.parse(null, source);
             fail("Parsing nonexistent source should throw exception");
         } catch (AuraUnhandledException e) {
             assertEquals(FileNotFoundException.class, e.getCause().getCause().getClass());
@@ -139,11 +141,10 @@ public class XMLParserTest extends AuraImplTestCase {
 
     @Test
     public void testParseNull() throws Exception {
-        ComponentXMLParser parser = new ComponentXMLParser();
-        descriptor = DefDescriptorImpl.getInstance("test:parserNonexistent", ComponentDef.class);
+        descriptor = definitionService.getDefDescriptor("test:parserNonexistent", ComponentDef.class);
         Source<ComponentDef> source = null;
         try {
-            parser.parse(descriptor, source);
+            componentXMLParser.parse(descriptor, source);
             fail("Parsing null source should throw exception");
         } catch (AuraUnhandledException e) {
             assertEquals(NullPointerException.class, e.getCause().getClass());
@@ -158,10 +159,9 @@ public class XMLParserTest extends AuraImplTestCase {
 
     @Test
     public void testParseEvent() throws Exception {
-        EventXMLParser parser = new EventXMLParser();
-        DefDescriptor<EventDef> eventDescriptor = DefDescriptorImpl.getInstance("test:anevent", EventDef.class);
+        DefDescriptor<EventDef> eventDescriptor = definitionService.getDefDescriptor("test:anevent", EventDef.class);
         Source<EventDef> source = getSource(eventDescriptor);
-        EventDefImpl eventDef = (EventDefImpl) parser.parse(eventDescriptor, source);
+        EventDefImpl eventDef = (EventDefImpl) eventXMLParser.parse(eventDescriptor, source);
         assertNotNull(eventDef);
         assertEquals("Unexpected Descriptor", eventDescriptor, eventDef.getDescriptor());
         assertEquals("Wrong event type", EventType.COMPONENT, eventDef.getEventType());
@@ -177,10 +177,9 @@ public class XMLParserTest extends AuraImplTestCase {
      */
     @Test
     public void testParseComments() throws Exception {
-        ComponentXMLParser parser = new ComponentXMLParser();
-        descriptor = DefDescriptorImpl.getInstance("test:test_Parser_Comments", ComponentDef.class);
+        descriptor = definitionService.getDefDescriptor("test:test_Parser_Comments", ComponentDef.class);
         Source<ComponentDef> source = getSource(descriptor);
-        def = parser.parse(descriptor, source);
+        def = componentXMLParser.parse(descriptor, source);
         assertEquals("Unexpected Descriptor", descriptor, def.getDescriptor());
     }
 }

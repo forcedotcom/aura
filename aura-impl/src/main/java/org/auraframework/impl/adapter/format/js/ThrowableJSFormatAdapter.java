@@ -15,19 +15,18 @@
  */
 package org.auraframework.impl.adapter.format.js;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.service.SerializationService;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Map;
 
-import org.auraframework.Aura;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-import aQute.bnd.annotation.component.Component;
-
-/**
- */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ThrowableJSFormatAdapter extends JSFormatAdapter<Throwable> {
+    @Inject
+    private SerializationService serializationService;
 
     @Override
     public Class<Throwable> getType() {
@@ -38,8 +37,7 @@ public class ThrowableJSFormatAdapter extends JSFormatAdapter<Throwable> {
     public void write(Throwable value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
         out.append("aura.error(");
-        Aura.getSerializationService().write(value, attributes, getType(), out, "JSON");
+        serializationService.write(value, attributes, getType(), out, "JSON");
         out.append(");");
     }
-
 }

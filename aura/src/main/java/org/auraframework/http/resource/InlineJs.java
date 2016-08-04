@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Component;
@@ -33,6 +34,7 @@ import org.auraframework.util.resource.ResourceLoader;
 
 import com.google.common.collect.Maps;
 
+@ServiceComponent
 public class InlineJs extends TemplateResource {
 
     private static final String WALLTIME_FILE_PATH = "/aura/resources/walltime-js/olson/walltime-data_";

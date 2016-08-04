@@ -258,5 +258,4 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
     }
-
 }

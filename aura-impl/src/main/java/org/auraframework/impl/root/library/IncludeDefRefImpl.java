@@ -93,7 +93,7 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
             javascriptClass = new JavascriptIncludeClass.Builder().setDefinition(this).setMinify(minify).build();
         }
     }
-
+    
     @Override
     public void serialize(Json json) throws IOException {
     	throw new UnsupportedOperationException("IncludeDefRef can't be serialized to JSON");

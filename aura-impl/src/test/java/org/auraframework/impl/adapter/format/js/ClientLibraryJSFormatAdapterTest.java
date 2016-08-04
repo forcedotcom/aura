@@ -15,15 +15,14 @@
  */
 package org.auraframework.impl.adapter.format.js;
 
-import java.io.IOException;
-import java.util.Collection;
-
+import com.google.common.collect.Lists;
 import org.auraframework.clientlibrary.Combinable;
 import org.auraframework.impl.AuraImplTestCase;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.Collection;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.spy;
@@ -33,7 +32,7 @@ public class ClientLibraryJSFormatAdapterTest extends AuraImplTestCase {
     public ClientLibraryJSFormatAdapterTest(){
         this.setShouldSetupContext(false);
     }
-    
+
     @Test
     public void testCombinedOutput() throws Exception{
         ClientLibraryJSFormatAdapter jsFormatAdapter = new ClientLibraryJSFormatAdapter();

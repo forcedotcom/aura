@@ -15,34 +15,41 @@
  */
 package org.auraframework.impl.adapter.format.json;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.concurrent.ThreadSafe;
-
-import org.auraframework.Aura;
+import com.google.common.collect.Lists;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ActionDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Action;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 
-import com.google.common.collect.Lists;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import aQute.bnd.annotation.component.Component;
-
-/**
- */
 @ThreadSafe
-@Component(provide = AuraServiceProvider.class)
+@ServiceComponent
 public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message> {
+    @Inject
+    private ContextService contextService;
 
+    @Inject
+    private InstanceService instanceService;
+
+    @Inject
+    private DefinitionService definitionService;
+    
     @Override
     public Class<Message> getType() {
         return Message.class;
@@ -62,12 +69,13 @@ public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message> {
                 // FIXME: ints are getting translated into BigDecimals here.
                 Map<String, Object> params = (Map<String, Object>) map.get("params");
 
-                Action instance = (Action) Aura.getInstanceService().getInstance((String) map.get("descriptor"),
+                Action instance = (Action) instanceService.getInstance((String) map.get("descriptor"),
                         ActionDef.class, params);
                 instance.setId((String) map.get("id"));
                 String cd = (String) map.get("callingDescriptor");
                 if (cd != null && !cd.equals("UNKNOWN")) {
-                    instance.setCallingDescriptor(cd);
+                    DefDescriptor<ComponentDef> callingDescriptor = definitionService.getDefDescriptor(cd, ComponentDef.class);
+                    instance.setCallingDescriptor(callingDescriptor);
                 }
                 String v = (String) map.get("version");
                 if (v != null) {
@@ -82,7 +90,7 @@ public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message> {
 
     @Override
     public void write(Message value, Map<String, Object> attributes, Appendable out) throws IOException {
-        AuraContext c = Aura.getContextService().getCurrentContext();
+        AuraContext c = contextService.getCurrentContext();
         Map<String, Object> m = new HashMap<>();
         if (attributes != null) {
             m.putAll(attributes);

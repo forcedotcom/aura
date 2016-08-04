@@ -23,7 +23,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.auraframework.Aura;
+import javax.inject.Inject;
+
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
@@ -37,8 +41,12 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
+import org.auraframework.service.CachingService;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.MetricsService;
+import org.auraframework.service.SerializationService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
@@ -55,15 +63,36 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
+@ServiceComponent
 public class ServerServiceImpl implements ServerService {
+
+    @Inject
+    private LoggingService loggingService;
+
+    @Inject
+    private MetricsService metricsService;
+
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private ExceptionAdapter exceptionAdapter;
+
+    @Inject
+    private SerializationService serializationService;
+
+    @Inject
+    private CachingService cachingService;
+
+    @Inject
+    private DefinitionService definitionService;
+
     private static final long serialVersionUID = -2779745160285710414L;
 
     @Override
     public void run(Message message, AuraContext context, Writer out, Map<?,?> extras) throws IOException {
-        LoggingService loggingService = Aura.getLoggingService();
         loggingService.startTimer(LoggingService.TIMER_AURA_RUN);
 
-        MetricsService metricsService = Aura.getMetricsService();
         if (message == null) {
             return;
         }
@@ -87,7 +116,7 @@ public class ServerServiceImpl implements ServerService {
             try {
                 serializationContext.pushRefSupport(false);
                 json.writeMapEntry("context", context);
-                List<Event> clientEvents = Aura.getContextService().getCurrentContext().getClientEvents();
+                List<Event> clientEvents = contextService.getCurrentContext().getClientEvents();
                 if (clientEvents != null && !clientEvents.isEmpty()) {
                     json.writeMapEntry("events", clientEvents);
                 }
@@ -120,8 +149,7 @@ public class ServerServiceImpl implements ServerService {
     }
 
     private int run(List<Action> actions, JsonEncoder json, int idx) throws IOException {
-        LoggingService loggingService = Aura.getLoggingService();
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         for (Action action : actions) {
             StringBuffer actionAndParams = new StringBuffer(action.getDescriptor().getQualifiedName());
             KeyValueLogger logger = loggingService.getKeyValueLogger(actionAndParams);
@@ -141,7 +169,7 @@ public class ServerServiceImpl implements ServerService {
                 // context.setCurrentAction() into!
                 action.run();
             } catch (AuraExecutionException x) {
-                Aura.getExceptionAdapter().handleException(x, action);
+                exceptionAdapter.handleException(x, action);
             } finally {
                 context.setCurrentAction(oldAction);
                 loggingService.stopAction(aap);
@@ -168,8 +196,7 @@ public class ServerServiceImpl implements ServerService {
 
     @Override
     public void writeAppCss(final Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException {
-
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         boolean minify = context.getMode().minify();
 
         StyleContext styleContext = context.getStyleContext();
@@ -238,15 +265,14 @@ public class ServerServiceImpl implements ServerService {
     private String getAppCssString(Set<DefDescriptor<?>> dependencies) throws QuickFixException, IOException {
         Collection<BaseStyleDef> orderedStyleDefs = filterAndLoad(BaseStyleDef.class, dependencies, null);
         StringBuffer sb = new StringBuffer();
-        Aura.getSerializationService().writeCollection(orderedStyleDefs, BaseStyleDef.class, sb, "CSS");
+        serializationService.writeCollection(orderedStyleDefs, BaseStyleDef.class, sb, "CSS");
         return sb.toString();
     }
 
     @Override
     public void writeAppSvg(DefDescriptor<SVGDef> svg, Writer out)
             throws IOException, QuickFixException {
-
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
 
         // build cache key
         final StringBuilder keyBuilder = new StringBuilder(64);
@@ -260,7 +286,7 @@ public class ServerServiceImpl implements ServerService {
         DefDescriptor<? extends BaseComponentDef> appDesc = context.getLoadingApplicationDescriptor();
 
         // verify the app has access to the svg
-        final SVGDef svgDef = svg.getDef();
+        final SVGDef svgDef = definitionService.getDefinition(svg);
         context.getDefRegistry().assertAccess(appDesc, svgDef);
 
         // svg uid
@@ -284,15 +310,14 @@ public class ServerServiceImpl implements ServerService {
 
     private String getAppSvgString(SVGDef svgDef) throws QuickFixException, IOException {
         StringBuffer sb = new StringBuffer();
-        Aura.getSerializationService().write(svgDef, null, SVGDef.class, sb, Format.SVG.name());
+        serializationService.write(svgDef, null, SVGDef.class, sb, Format.SVG.name());
         return sb.toString();
     }
 
     @Override
     public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out)
             throws IOException, QuickFixException {
-
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         final boolean minify = context.getMode().minify();
 
         context.setPreloading(true);
@@ -308,7 +333,7 @@ public class ServerServiceImpl implements ServerService {
                    public String call() throws Exception {
                        String res = getDefinitionsString(dependencies, key);
                        //log the cache miss here
-                       Aura.getCachingService().getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
+                       cachingService.getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
                        return res;
                    }
                });
@@ -321,7 +346,7 @@ public class ServerServiceImpl implements ServerService {
     private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key)
             throws QuickFixException, IOException {
 
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         boolean minify = context.getMode().minify();
         
         MasterDefRegistry masterDefRegistry = context.getDefRegistry();
@@ -359,7 +384,7 @@ public class ServerServiceImpl implements ServerService {
             	
             	// Component definition
             	sb.append("return ");
-            	Aura.getSerializationService().write(def, null, BaseComponentDef.class, sb, "JSON");
+            	serializationService.write(def, null, BaseComponentDef.class, sb, "JSON");
             	sb.append(";");
 
             sb.append("*/});\n");
@@ -368,12 +393,12 @@ public class ServerServiceImpl implements ServerService {
         // Append event definitions
         sb.append("$A.componentService.initEventDefs(");
         Collection<EventDef> events = filterAndLoad(EventDef.class, dependencies, null);
-        Aura.getSerializationService().writeCollection(events, EventDef.class, sb, "JSON");
+        serializationService.writeCollection(events, EventDef.class, sb, "JSON");
         sb.append(");\n");
 
         // Append library definitions
         sb.append("$A.componentService.initLibraryDefs(");
-        Aura.getSerializationService().writeCollection(libraryDefs, LibraryDef.class, sb, "JSON");
+        serializationService.writeCollection(libraryDefs, LibraryDef.class, sb, "JSON");
         sb.append(");\n");
 
         // Append controller definitions
@@ -382,7 +407,7 @@ public class ServerServiceImpl implements ServerService {
         // the namespace but did not use it. This ends up just getting a single controller.
         sb.append("$A.componentService.initControllerDefs(");
         Collection<ControllerDef> controllers = filterAndLoad(ControllerDef.class, dependencies, ACF);
-        Aura.getSerializationService().writeCollection(controllers, ControllerDef.class, sb, "JSON");
+        serializationService.writeCollection(controllers, ControllerDef.class, sb, "JSON");
         sb.append(");\n");
 
         serializationContext.popRefSupport();
@@ -393,10 +418,10 @@ public class ServerServiceImpl implements ServerService {
     @Override
     public void writeComponents(Set<DefDescriptor<?>> dependencies, Writer out)
             throws IOException, QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
 
         context.setPreloading(true);
-        Aura.getSerializationService().writeCollection(filterAndLoad(BaseComponentDef.class, dependencies, null),
+        serializationService.writeCollection(filterAndLoad(BaseComponentDef.class, dependencies, null),
                 BaseComponentDef.class, out);
     }
 
@@ -425,7 +450,7 @@ public class ServerServiceImpl implements ServerService {
             Set<DefDescriptor<?>> dependencies, TempFilter extraFilter) {
 
         Set<D> out = Sets.newLinkedHashSet();
-        MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
+        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
 
         try {
             if(dependencies != null) {

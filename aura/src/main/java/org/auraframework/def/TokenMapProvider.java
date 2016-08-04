@@ -38,5 +38,5 @@ public interface TokenMapProvider extends Provider {
      * Currently the framework will call this method twice per "cycle"-- first in order to build a cache-appropriate css
      * url (during the .app request), second when the request for said css url comes in (during the app.css request).
      */
-    public Map<String, String> provide() throws QuickFixException;
+    Map<String, String> provide() throws QuickFixException;
 }

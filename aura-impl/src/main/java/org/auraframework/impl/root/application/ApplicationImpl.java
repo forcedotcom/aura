@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl.root.application;
 
-import java.util.Map;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
@@ -26,6 +24,8 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceType;
+
+import java.util.Map;
 
 /**
  */
@@ -52,7 +52,7 @@ public class ApplicationImpl extends BaseComponentImpl<ApplicationDef, Applicati
         if (!remoteProvider) {
             DefDescriptor<ApplicationDef> superDefDescriptor = def.getExtendsDescriptor();
             if (superDefDescriptor != null) {
-            	Aura.getDefinitionService().getDefRegistry().assertAccess(descriptor, superDefDescriptor.getDef());
+                Aura.getDefinitionService().getDefRegistry().assertAccess(descriptor, superDefDescriptor);
 
             	Application concrete = concreteComponent == null ? this : concreteComponent;
                 superComponent = new ApplicationImpl(superDefDescriptor, this, this, concrete);

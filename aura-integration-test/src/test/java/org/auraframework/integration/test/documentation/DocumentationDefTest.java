@@ -33,36 +33,36 @@ import org.junit.Test;
 
 public class DocumentationDefTest extends AuraImplTestCase {
 
-    @Test
-    public void testGetDocumentationDefViaComponentDef() throws Exception{
+	@Test
+	public void testGetDocumentationDefViaComponentDef() throws Exception{
 		testLoadDocumentationDefViaRootDef("test:fakeComponent", ComponentDef.class, 2);
 	}
 
-    @Test
-    public void testGetDocumentationDefViaApplicationDef() throws Exception{
+	@Test
+	public void testGetDocumentationDefViaApplicationDef() throws Exception{
 		testLoadDocumentationDefViaRootDef("test:fakeApplication", ApplicationDef.class, 2);
 	}
 
 	@Ignore("W-2085286")
 	@Test
-	public void _testGetDocumentationDefViaInterFaceDef() throws Exception{
+	public void testGetDocumentationDefViaInterFaceDef() throws Exception {
 		testLoadDocumentationDefViaRootDef("test:fakeInterface", InterfaceDef.class, 2);
 	}
 
 	@Ignore("W-2085286")
 	@Test
-	public void _testGetDocumentationDefViaEventDef() throws Exception{
+	public void testGetDocumentationDefViaEventDef() throws Exception {
 		testLoadDocumentationDefViaRootDef("test:anevent", EventDef.class, 2);
 	}
 
 	@Ignore("W-2085286")
 	@Test
-	public void _testGetDocumentationDefViaTokensFaceDef() throws Exception{
+	public void testGetDocumentationDefViaTokensFaceDef() throws Exception {
 		testLoadDocumentationDefViaRootDef("test:fakeTokens", TokensDef.class, 2);
 	}
 
-    @Test
-    public void testValidComponentRefForExample() throws Exception{
+	@Test
+	public void testValidComponentRefForExample() throws Exception{
 		String exampleCmp = "test:fakeComponent";
 		String docDefSource = "<aura:documentation>" +
 				"<aura:description>random description</aura:description>" +
@@ -77,8 +77,8 @@ public class DocumentationDefTest extends AuraImplTestCase {
 	/** Test to track that we only validate that an example ref is valid
 	 * when following the ref to load the definition.
 	 */
-    @Test
-    public void testInvalidComponentRefForExample() throws Exception{
+	@Test
+	public void testInvalidComponentRefForExample() throws Exception{
 		String docDefSource = "<aura:documentation>" +
 				"<aura:description>random description</aura:description>" +
 				"<aura:example name='example' ref='foo:bar1' label='label1'>random example</aura:example>" +

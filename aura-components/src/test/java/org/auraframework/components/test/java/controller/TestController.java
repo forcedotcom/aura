@@ -15,55 +15,66 @@
  */
 package org.auraframework.components.test.java.controller;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.instance.Action;
+import org.auraframework.instance.Component;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Key;
+
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.instance.Action;
-import org.auraframework.instance.Component;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
+@ServiceComponent
+public class TestController implements Controller {
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+    @Inject
+    private InstanceService instanceService;
 
-@Controller
-public class TestController {
+    @Inject
+    private ContextService contextService;
+
+
     @AuraEnabled
-    public static void doSomething() {
+    public void doSomething() {
     }
 
     @AuraEnabled
-    public static String getString() {
+    public String getString() {
         return "TestController";
     }
 
     @AuraEnabled
-    public static String throwException() {
+    public String throwException() {
         throw new RuntimeException("intentionally generated");
     }
 
     @AuraEnabled
-    public static Component baseBallDivisions() throws Exception {
+    public Component baseBallDivisions() throws Exception {
         String[] s = { "East", "Central", "West", "East", "Central", "West" };
         Map<String, Object> m = Maps.newHashMap();
         m.put("items", Lists.newArrayList(s));
-        return Aura.getInstanceService().getInstance("iterationTest:basicIteration", ComponentDef.class, m);
+        return instanceService.getInstance("iterationTest:basicIteration", ComponentDef.class, m);
     }
 
     @AuraEnabled
-    public static Component basketBallDivisions() throws Exception {
+    public Component basketBallDivisions() throws Exception {
         String[] s = { "Atlantic", "Central", "Southeast", "Northwest", "Pacific", "Southwest" };
         Map<String, Object> m = Maps.newHashMap();
         m.put("string", Lists.newArrayList(s));
-        return Aura.getInstanceService().getInstance("iterationTest:basicIteration", ComponentDef.class, m);
+        return instanceService.getInstance("iterationTest:basicIteration", ComponentDef.class, m);
     }
 
     @AuraEnabled
-    public static String currentCallingDescriptor() {
-        Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
+    public String currentCallingDescriptor() {
+        Action currentAction = contextService.getCurrentContext().getCurrentAction();
         DefDescriptor<ComponentDef> defDescr = currentAction.getCallingDescriptor();
         String qualifiedName = null;
         if(defDescr != null) {
@@ -73,7 +84,7 @@ public class TestController {
     }
 
     @AuraEnabled
-    public static List<String> getAppCacheUrls() throws Exception {
+    public List<String> getAppCacheUrls() throws Exception {
         List<String> urls = Lists.newArrayList();
         urls.add("/auraFW/resources/aura/auraIdeLogo.png");
         urls.add("/auraFW/resources/aura/resetCSS.css");
@@ -83,5 +94,11 @@ public class TestController {
     @AuraEnabled
     public static int getBootstrapPublicCacheExpiration() {
         return 60;
+    }
+
+    @AuraEnabled
+    public Component getNamedComponent(@Key("componentName") String componentName,
+                                       @Key("attributes") Map<String, Object> attributes) throws Exception {
+        return instanceService.getInstance(componentName, ComponentDef.class, attributes);
     }
 }

@@ -27,6 +27,7 @@ public class TestTokenDescriptorProvider implements TokenDescriptorProvider {
     public static final String DESC = "test:fakeTokens";
     public static final String REF = "java://org.auraframework.impl.java.provider.TestTokenDescriptorProvider";
 
+    
     @Override
     public DefDescriptor<TokensDef> provide() throws QuickFixException {
         return Aura.getDefinitionService().getDefDescriptor(DESC, TokensDef.class);

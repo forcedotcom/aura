@@ -15,12 +15,7 @@
  */
 package org.auraframework.impl;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-
+import com.google.common.collect.Maps;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -30,7 +25,11 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
 
 /**
  * This is a fake registry (both master and standard) for testing purposes only.
@@ -148,6 +147,13 @@ public class FakeRegistry implements MasterDefRegistry {
 	@Override
     public Boolean getClientClassLoaded(DefDescriptor<?> componentClass) {
     	return false;
+    }
+
+    @Override
+    public <D extends Definition> void assertAccess(
+            DefDescriptor<?> referencingDescriptor,
+            DefDescriptor<?> accessDescriptor) throws QuickFixException {
+
     }
     
 }

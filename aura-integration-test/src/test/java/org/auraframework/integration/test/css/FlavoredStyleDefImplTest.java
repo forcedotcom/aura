@@ -15,29 +15,33 @@
  */
 package org.auraframework.integration.test.css;
 
-import java.util.Set;
-
+import com.google.common.collect.Sets;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.util.Flavors;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
-import com.google.common.collect.Sets;
+import javax.inject.Inject;
+import java.util.Set;
 
 /**
  * Unit tests for {@link FlavoredStyleDef}.
  */
 public class FlavoredStyleDefImplTest extends StyleTestCase {
+
+    @Inject
+    DefinitionService definitionService;
+
     /** basic loading of a standard flavor within the component bundle */
     @Test
     public void testLoadStandardFlavor() throws Exception {
-        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
+        DefDescriptor<ComponentDef> component = definitionService.getDefDescriptor("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(component);
         assertTrue("expected to find bundle flavor def", flavor.exists());
         definitionService.getDefinition(flavor); // no errors with loading
@@ -46,7 +50,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
     /** basic loading of a custom flavor within another namespace */
     @Test
     public void testLoadCustomFlavor() throws Exception {
-        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
+        DefDescriptor<ComponentDef> component = definitionService.getDefDescriptor("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.customFlavorDescriptor(component, "flavorTestAlt", "flavors");
         assertTrue("expected to find namespace flavor def", flavor.exists());
         definitionService.getDefinition(flavor); // no errors with loading
@@ -55,7 +59,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
     /** test that flavor names are found in the css file and stored */
     @Test
     public void testGetFlavorNamesFromStandardFlavor() throws Exception {
-        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
+        DefDescriptor<ComponentDef> component = definitionService.getDefDescriptor("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(component);
         Set<String> flavorNames = definitionService.getDefinition(flavor).getFlavorNames();
 
@@ -69,7 +73,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
     /** test that flavor names are found in the css file and stored */
     @Test
     public void testGetFlavorNamesFromCustomFlavor() throws Exception {
-        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
+        DefDescriptor<ComponentDef> component = definitionService.getDefDescriptor("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.customFlavorDescriptor(component, "flavorTestAlt", "flavors");
         Set<String> flavorNames = definitionService.getDefinition(flavor).getFlavorNames();
 
@@ -84,7 +88,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
     /** test that we don't get confused from non-flavor class names */
     @Test
     public void testGetFlavorNamesVariations() throws Exception {
-        DefDescriptor<ComponentDef> component = DefDescriptorImpl.getInstance("flavorTest:x_landmark", ComponentDef.class);
+        DefDescriptor<ComponentDef> component = definitionService.getDefDescriptor("flavorTest:x_landmark", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(component);
         Set<String> flavorNames = definitionService.getDefinition(flavor).getFlavorNames();
 

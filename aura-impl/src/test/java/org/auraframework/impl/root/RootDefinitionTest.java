@@ -15,16 +15,12 @@
  */
 package org.auraframework.impl.root;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.RootDefinition.SupportLevel;
 import org.auraframework.impl.def.DefinitionTest;
-import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -32,8 +28,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.junit.Test;
 
-public abstract class RootDefinitionTest<T extends RootDefinition> extends DefinitionTest<T> {
+import java.lang.reflect.Method;
+import java.util.Map;
 
+public abstract class RootDefinitionTest<T extends RootDefinition> extends DefinitionTest<T> {
     private final Class<T> defClass;
     protected final String baseTag;
 

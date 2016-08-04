@@ -15,23 +15,75 @@
  */
 package org.auraframework.impl;
 
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.impl.integration.IntegrationImpl;
 import org.auraframework.integration.Integration;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
 import org.auraframework.service.IntegrationService;
+import org.auraframework.service.RenderingService;
+import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import aQute.bnd.annotation.component.Component;
+import javax.inject.Inject;
 
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class IntegrationServiceImpl implements IntegrationService {
+    private static final long serialVersionUID = -2650728458106333787L;
+
+    // Needed to run action
+    private InstanceService instanceService;
+    private DefinitionService definitionService;
+    private SerializationService serializationService;
+    private ContextService contextService;
+    private RenderingService renderingService;
+    private ConfigAdapter configAdapter;
+    private ServletUtilAdapter servletUtilAdapter;
  
     @Override
-    public Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent, 
-            String application, Object dummy) throws QuickFixException {
-        return new IntegrationImpl(contextPath, mode, initializeAura, userAgent, application);
+    public Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent,
+                                         String application, Object dummy) throws QuickFixException {
+        return new IntegrationImpl(contextPath, mode, initializeAura, userAgent, application, instanceService,
+                definitionService, serializationService, contextService, configAdapter,
+                renderingService, servletUtilAdapter);
     }
 
-    private static final long serialVersionUID = -2650728458106333787L;
+    @Inject
+    public void setInstanceService(InstanceService instanceService) {
+        this.instanceService = instanceService;
+    }
+
+    @Inject
+    public void setDefinitionService(DefinitionService definitionService) {
+        this.definitionService = definitionService;
+    }
+
+    @Inject
+    public void setSerializationService(SerializationService serializationService) {
+        this.serializationService = serializationService;
+    }
+
+    @Inject
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
+    }
+
+    @Inject
+    public void setRenderingService(RenderingService renderingService) {
+        this.renderingService = renderingService;
+    }
+
+    @Inject
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
+    }
+
+    @Inject
+    public void setServletUtilAdapter(ServletUtilAdapter servletUtilAdapter) {
+        this.servletUtilAdapter = servletUtilAdapter;
+    }
 }

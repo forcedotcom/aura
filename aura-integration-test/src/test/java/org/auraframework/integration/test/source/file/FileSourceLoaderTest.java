@@ -15,10 +15,6 @@
  */
 package org.auraframework.integration.test.source.file;
 
-import java.io.File;
-import java.io.Reader;
-import java.util.Set;
-
 import org.auraframework.components.AuraComponentsFiles;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -27,13 +23,25 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.source.file.FileSourceLoader;
-import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.FileMonitor;
 import org.junit.Test;
 
+import javax.inject.Inject;
+import java.io.File;
+import java.io.Reader;
+import java.util.Set;
+
 public class FileSourceLoaderTest extends AuraImplTestCase {
+    @Inject
+    private DefinitionService definitionService;
+
+    @Inject
+    private FileMonitor fileMonitor;
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -49,13 +57,13 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
 
     @Test
     public void testFileSourceLoaderSanity() {
-        assertNotNull(new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile()));
+        assertNotNull(new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile(), fileMonitor));
     }
 
     @Test
     public void testFileSourceLoaderWithNonExistentFile() {
         try {
-            new FileSourceLoader(new File("this_probably_doesnt_exist"));
+            new FileSourceLoader(new File("this_probably_doesnt_exist"), fileMonitor);
             fail("Should have thrown AuraException(Base directory does not exist)");
         } catch (Exception e) {
         	checkExceptionRegex(e, AuraRuntimeException.class, "Base directory.*.does not exist");
@@ -65,7 +73,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     @Test
     public void testFileSourceLoaderWithNullFile() {
         try {
-            new FileSourceLoader(null);
+            new FileSourceLoader(null, fileMonitor);
             fail("Should have thrown AuraException(Base directory does not exist)");
         } catch (Exception e) {
         	checkExceptionRegex(e, AuraRuntimeException.class, "Base directory.*.does not exist");
@@ -75,8 +83,8 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
 
     @Test
     public void testGetComponentSource() {
-        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
-        DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:parent", ComponentDef.class);
+        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile(), fileMonitor);
+        DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor("test:parent", ComponentDef.class);
         Source<?> src = loader.getSource(descriptor);
         assertNotNull(src);
         assertEquals(Format.XML, src.getFormat());
@@ -101,7 +109,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
             }
         }
 
-        DefDescriptor<ComponentDef> nonDescriptor = DefDescriptorImpl.getInstance("test:nonExistent",
+        DefDescriptor<ComponentDef> nonDescriptor = definitionService.getDefDescriptor("test:nonExistent",
                 ComponentDef.class);
 
         assertFalse(loader.getSource(nonDescriptor).exists());
@@ -110,8 +118,8 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
 
     @Test
     public void testGetEventSource() {
-        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
-        DefDescriptor<EventDef> descriptor = DefDescriptorImpl.getInstance("test:anevent", EventDef.class);
+        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile(), fileMonitor);
+        DefDescriptor<EventDef> descriptor = definitionService.getDefDescriptor("test:anevent", EventDef.class);
         Source<EventDef> src = loader.getSource(descriptor);
         assertNotNull(src);
         assertEquals(Format.XML, src.getFormat());
@@ -136,14 +144,14 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
             }
         }
 
-        DefDescriptor<EventDef> nonDescriptor = DefDescriptorImpl.getInstance("test:nonExistentEvent", EventDef.class);
+        DefDescriptor<EventDef> nonDescriptor = definitionService.getDefDescriptor("test:nonExistentEvent", EventDef.class);
         assertFalse(loader.getSource(nonDescriptor).exists());
 
     }
 
     @Test
     public void testGetNamespaces() {
-        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
+        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile(), fileMonitor);
         Set<String> namespaces = loader.getNamespaces();
         assertTrue(namespaces.contains("test"));
         assertTrue(namespaces.contains("preloadTest"));
@@ -152,20 +160,20 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
 
     @Test
     public void testFindRegex() {
-        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
+        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile(), fileMonitor);
         Set<DefDescriptor<?>> found;
 
         found = loader.find(new DescriptorFilter("markup://test:extendsParent"));
         assertEquals("Should have found a single component", 1, found.size());
-        assertTrue(found.contains(DefDescriptorImpl.getInstance("markup://test:extendsParent", ComponentDef.class)));
+        assertTrue(found.contains(definitionService.getDefDescriptor("markup://test:extendsParent", ComponentDef.class)));
 
         // Number of results can change if files modified so just check at least
         // 2 results from wildcard search since
         // components are more likely to be added than deleted.
         found = loader.find(new DescriptorFilter("markup://test:style*"));
         assertTrue("Should have found multiple components", found.size() > 1);
-        assertTrue(found.contains(DefDescriptorImpl.getInstance("markup://test:styleTestTemplate", ComponentDef.class)));
-        assertTrue(found.contains(DefDescriptorImpl.getInstance("markup://test:styleTest", ApplicationDef.class)));
+        assertTrue(found.contains(definitionService.getDefDescriptor("markup://test:styleTestTemplate", ComponentDef.class)));
+        assertTrue(found.contains(definitionService.getDefDescriptor("markup://test:styleTest", ApplicationDef.class)));
 
         found = loader.find(new DescriptorFilter("markup://test:doesntexist"));
         assertEquals("Should not have found any components", 0, found.size());
@@ -174,9 +182,9 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     /**
      * All namespaces loaded by FileSourceLoader are internal, verify that FileSourceLoader says so.
      */
-    @Test
+	@Test
     public void testIsInternalNamespace(){
-        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile());
+        FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile(), fileMonitor);
         assertTrue("All namespaces loaded by FileSourceLoader are to be intenal",
                 loader.isInternalNamespace(null));
         assertTrue("All namespaces loaded by FileSourceLoader are to be internal," +

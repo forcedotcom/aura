@@ -15,6 +15,18 @@
  */
 package org.auraframework.impl.adapter.format.json;
 
+import com.google.common.collect.Lists;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ActionDef;
+import org.auraframework.instance.Action;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.json.JsonReader;
+
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Collection;
@@ -22,23 +34,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.Aura;
-import org.auraframework.def.ActionDef;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.instance.Action;
-import org.auraframework.system.AuraContext;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.JsonEncoder;
-import org.auraframework.util.json.JsonReader;
-
-import com.google.common.collect.Lists;
-
-import aQute.bnd.annotation.component.Component;
-
-/**
- */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ActionJSONFormatAdapter extends JSONFormatAdapter<Action> {
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private InstanceService instanceService;
 
     @Override
     public Class<Action> getType() {
@@ -57,7 +59,7 @@ public class ActionJSONFormatAdapter extends JSONFormatAdapter<Action> {
             @SuppressWarnings("unchecked")
             Map<String, Object> params = (Map<String, Object>) map.get("params");
 
-            Action instance = (Action) Aura.getInstanceService().getInstance((String) map.get("descriptor"),
+            Action instance = (Action) instanceService.getInstance((String) map.get("descriptor"),
                     ActionDef.class, params);
             instance.setId((String) map.get("id"));
             ret.add(instance);
@@ -70,12 +72,12 @@ public class ActionJSONFormatAdapter extends JSONFormatAdapter<Action> {
         Map<?, ?> map = (Map<?, ?>) new JsonReader().read(in);
         @SuppressWarnings("unchecked")
         Map<String, Object> params = (Map<String, Object>) map.get("params");
-        return (Action) Aura.getInstanceService().getInstance((String) map.get("descriptor"), ActionDef.class, params);
+        return (Action) instanceService.getInstance((String) map.get("descriptor"), ActionDef.class, params);
     }
 
     @Override
     public void writeCollection(Collection<? extends Action> values, Appendable out) throws IOException {
-        AuraContext c = Aura.getContextService().getCurrentContext();
+        AuraContext c = contextService.getCurrentContext();
         Map<String, Object> m = new HashMap<>();
         m.put("actions", values);
         m.put("context", c);

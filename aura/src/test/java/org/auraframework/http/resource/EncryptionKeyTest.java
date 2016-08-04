@@ -56,8 +56,6 @@ public class EncryptionKeyTest extends UnitTestCase {
      */
     @Test
     public void testWriteAppEncryptionKey() throws Exception {
-        //Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.ENCRYPTIONKEY,
-        //         AuraContext.Authentication.AUTHENTICATED);
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         DummyHttpServletResponse response = new DummyHttpServletResponse() {
             ServletOutputStream out = null;

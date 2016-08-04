@@ -21,11 +21,13 @@ import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.system.AuraContext;
 
 /**
  * Handles /l/{}/app.encryptionkey requests to retrieve encryption key.
  */
+@ServiceComponent
 public class EncryptionKey extends AuraResourceImpl {
 
     public EncryptionKey() {

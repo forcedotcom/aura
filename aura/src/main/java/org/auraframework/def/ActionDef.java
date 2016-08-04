@@ -30,8 +30,8 @@ public interface ActionDef extends Definition {
      * server just sends the code down and remains oblivious as to how they are
      * run
      */
-    public enum ActionType {
-        CLIENT, SERVER;
+    enum ActionType {
+        CLIENT, SERVER
     }
 
     /**

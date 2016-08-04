@@ -34,13 +34,13 @@ public class DesignItemsDefHandlerTest extends AuraImplTestCase {
     public void testNoItemsSection() throws Exception {
         assertTrue("Section had items or was null", setupDesignItemsDef("").size() == 0);
     }
-    
+
     @Test
     public void testWithItemsSections() throws Exception {
         
         assertTrue("Expected section to have one items", setupDesignItemsDef(ITEMS).size() == 1);
     }
-    
+
     @Test
     public void testWithMultipleSectionsOrder() throws Exception {
         StringBuilder sectionsStr = new StringBuilder();

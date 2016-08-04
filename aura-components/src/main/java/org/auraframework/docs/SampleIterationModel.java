@@ -20,14 +20,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Model;
 
 /**
  * for aura:iteration docs modified from TestIterationModel.java
  */
-@Model
-public class SampleIterationModel {
+@ServiceComponentModelInstance
+public class SampleIterationModel implements ModelInstance {
 
     private final List<Object> data;
 

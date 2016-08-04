@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -33,7 +35,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.util.EntityUtils;
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
 import org.auraframework.def.ApplicationDef;
@@ -55,6 +57,9 @@ import org.junit.Test;
  * Automation to verify the handling of AuraServlet requests.
  */
 public class AuraServletHttpTest extends AuraHttpTestCase {
+
+    @Inject
+    private ConfigAdapter configAdapter;
 
     private static class MockCsp implements ContentSecurityPolicy {
         private final String[] ancestors;
@@ -269,7 +274,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         params.put("aura.token", getCsrfToken());
         DefDescriptor<ApplicationDef> app = definitionService.getDefDescriptor(
                 "auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
-        String fwuid = getAuraTestingUtil().modifyUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+        String fwuid = getAuraTestingUtil().modifyUID(configAdapter.getAuraFrameworkNonce());
         params.put("aura.context", getAuraTestingUtil().buildContextForPost(Mode.DEV, app, null, fwuid, null, null));
 
         HttpPost post = obtainPostMethod("/aura", params);
@@ -570,7 +575,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals(HttpStatus.SC_OK, getStatusCode(response));
         // Fetch the latest timestamp of the JS group and construct URL for DEV mode.
         String expectedFWUrl = String.format("/auraFW/javascript/%s/aura_dev.js",
-                Aura.getConfigAdapter().getAuraFrameworkNonce());
+                configAdapter.getAuraFrameworkNonce());
         String scriptTag = String.format("<script src=\"%s\"", expectedFWUrl);
         assertTrue("Expected Aura FW Script tag not found. Expected to see: " + scriptTag,
                 getResponseBody(response).contains(scriptTag));
@@ -605,9 +610,10 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     @Test
     public void testInvalidDefDescriptorFormatExploitInProdMode()
 			throws Exception {
-		String url = "/aura?aura.tag=any:thing%3Csvg%3E%3Cscript%3E0%3C1%3Ealert(document.domain)%3C%2Fscript%3E.app";
-		HttpGet get = obtainGetMethod(url + "&aura.mode=PROD");
-		HttpResponse httpResponse = perform(get);
+        String url = "/aura?aura.tag=any:thing%3Csvg%3E%3Cscript%3E0%3C1%3Ealert(document.domain)%3C%2Fscript%3E.app";
+        HttpGet get = obtainGetMethod(url + "&aura.mode=PROD");
+        HttpResponse httpResponse = perform(get);
+
 
 		assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
 		String response = getResponseBody(httpResponse);
@@ -622,7 +628,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 	}
 
     @Test
-    public void testInvalidDefDescriptorFormatExploitInDevMode()
+	public void testInvalidDefDescriptorFormatExploitInDevMode()
 			throws Exception {
 		String url = "/aura?aura.tag=any:thing%3Csvg%3E%3Cscript%3E0%3C1%3Ealert(document.domain)%3C%2Fscript%3E.app";
 		HttpGet get = obtainGetMethod(url + "&aura.mode=DEV");

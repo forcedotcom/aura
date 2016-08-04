@@ -15,11 +15,12 @@
  */
 package org.auraframework.util.test.util;
 
-import java.util.logging.Logger;
-
+import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
+
+import java.util.logging.Logger;
 
 /**
  * Log test status as it happens.
@@ -28,16 +29,19 @@ public class LoggerRunListener extends RunListener {
     private static final Logger log = Logger.getLogger(LoggerRunListener.class.getName());
 
     @Override
+    @Test
     public void testStarted(Description description) throws Exception {
         log.info(description.toString());
     }
 
     @Override
+    @Test
     public void testFailure(Failure failure) throws Exception {
         log.severe("FAILED: " + failure);
     }
 
     @Override
+    @Test
     public void testIgnored(Description description) throws Exception {
         log.warning("IGNORED: " + description);
     }

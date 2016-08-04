@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.root.event.locationchange;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
@@ -33,12 +32,12 @@ public class LocationChangeEventTest extends AuraImplTestCase {
      */
     @Test
     public void testApplicationDefWithLocationChange() throws Exception {
-        Application cmp = Aura.getInstanceService().getInstance("test:test_LocChng_SimpleComponent",
+        Application cmp = instanceService.getInstance("test:test_LocChng_SimpleComponent",
                 ApplicationDef.class);
         this.serializeAndGoldFile(cmp, "simpleComponent");
         // References to LocationChangeEvent in children refer back to the first
         // definition of LocationChangeEvent using serRefId
-        cmp = Aura.getInstanceService().getInstance("test:test_LocChng_CompositeComponent", ApplicationDef.class);
+        cmp = instanceService.getInstance("test:test_LocChng_CompositeComponent", ApplicationDef.class);
         this.serializeAndGoldFile(cmp, "compositeComponent");
     }
 
@@ -50,7 +49,7 @@ public class LocationChangeEventTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(
                 "test:test_LocChng_NoExtends", ApplicationDef.class);
         try {
-            Aura.getInstanceService().getInstance(desc);
+            instanceService.getInstance(desc);
             fail("Should have not fetched this component because the location change event does not extend aura:locationChange");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,

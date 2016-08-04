@@ -15,14 +15,15 @@
  */
 package org.auraframework.impl.java.controller;
 
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 
-@Controller
-public class TestControllerMissingKey {
+@ServiceComponent
+public class TestControllerMissingKey implements Controller {
     @AuraEnabled
-    public static String appendStrings(@Key("a") String a, String b) {
+    public String appendStrings(@Key("a") String a, String b) {
         return a + b;
     }
 }

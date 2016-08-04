@@ -25,7 +25,6 @@ import org.auraframework.def.ActionDef.ActionType;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
-import org.auraframework.instance.Action;
 import org.auraframework.util.json.Json;
 
 /**
@@ -70,11 +69,6 @@ public class CompoundControllerDef extends DefinitionImpl<ControllerDef> impleme
             json.writeMapEntry("actionDefs", filteredList);
             json.writeMapEnd();
         }
-    }
-
-    @Override
-    public Action createAction(String actionName, Map<String, Object> paramValues) {
-        throw new UnsupportedOperationException("Can't create an action from a compound controller");
     }
 
     @Override

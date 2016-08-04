@@ -15,29 +15,30 @@
  */
 package org.auraframework.impl.clientlibrary;
 
-import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.service.CachingService;
 import org.auraframework.system.SourceListener;
+import org.auraframework.util.FileMonitor;
 
-import aQute.bnd.annotation.component.Component;
-
-
+import javax.inject.Inject;
 
 /**
  * Invalidate caches on source changes
  */
-@Component (immediate=true)
+@ServiceComponent
 class SourceNotifier implements SourceListener {
-    private static SourceNotifier sourceNotifier = new SourceNotifier();
+    @Inject
+    private CachingService cachingService;
 
-    static {
-        Aura.getDefinitionService().subscribeToChangeNotification(sourceNotifier);
+    @Inject
+    private void subscribeToChangeNotification(FileMonitor fileMonitor) {
+        fileMonitor.subscribeToChangeNotification(this);
     }
 
     @Override
     public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
-
-        Aura.getCachingService().getClientLibraryOutputCache().invalidateAll();
+        cachingService.getClientLibraryOutputCache().invalidateAll();
     }
 }
 

@@ -43,7 +43,7 @@ public interface GenericXmlElement extends BaseXmlElement {
      * @return
      */
     @Nonnull
-    Set<GenericXmlElement> getChildren(Class implementingDef);
+    Set<GenericXmlElement> getChildren(Class<?> implementingDef);
 
     /**
      * Returns a non null map of the tags attributes name value pair.

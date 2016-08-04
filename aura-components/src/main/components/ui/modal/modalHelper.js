@@ -15,37 +15,39 @@
  */
 ({
     init: function(cmp) {
-    	var closeAction = cmp.get("v.closeAction");
+        var closeAction = cmp.get("v.closeAction");
         //handler for tab key to trap the focus within the modal
-    	var trapFocus = $A.util.getBooleanValue(cmp.get('v.trapFocus'));
+        var trapFocus = $A.util.getBooleanValue(cmp.get('v.trapFocus'));
         cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: trapFocus}, closeAction);
         this.initCloseBtn(cmp);
     },
     
     initCloseBtn: function(cmp) {
         if (cmp.get('v.showCloseButton')) {
-        	var closeBtn = cmp.get('v.closeButton');
-        	if ($A.util.isEmpty(closeBtn)) {
-	        	//create default close button
-	            $A.componentService.createComponent('ui:button', {
-	                'body': $A.createComponentFromConfig({descriptor: 'markup://aura:unescapedHtml', attributes: {value: '&times;'}}),
-	            	'class': "closeBtn",
-	                'press': cmp.getReference("c.onCloseBtnPressed"),
-	                'label': cmp.get('v.closeDialogLabel'),
-	                'labelDisplay': "false"
-	            }, function(button){
-	                cmp.set('v.closeButton', button);
-	            });
-        	} else if ($A.util.isComponent(closeBtn[0]) && closeBtn[0].isInstanceOf('ui:button') && !closeBtn[0].getHandledEvents()['press']) {
-        		closeBtn[0].addHandler('press', cmp, 'c.onCloseBtnPressed');
-        	}
+            var closeBtn = cmp.get('v.closeButton');
+            if ($A.util.isEmpty(closeBtn)) {
+                //create default close button
+                $A.componentService.createComponent('ui:button', {
+                    'aura:id' : 'modal-close',
+                    'body': $A.createComponentFromConfig({descriptor: 'markup://aura:unescapedHtml', attributes: {value: '&times;'}}),
+                    'class': "closeBtn",
+                    'press': cmp.getReference("c.onCloseBtnPressed"),
+                    'label': cmp.get('v.closeDialogLabel'),
+                    'labelDisplay': "false"
+                }, function(button){
+                    cmp.set('v.closeButton', button);
+                });
+            } else if ($A.util.isComponent(closeBtn[0]) && closeBtn[0].isInstanceOf('ui:button') && !closeBtn[0].getHandledEvents()['press']) {
+                closeBtn[0].setAttributeValueProvider(cmp);
+                closeBtn[0].addHandler('press', cmp, 'c.onCloseBtnPressed');
+            }
         }
     },
 
     _getKeyHandler: function(cmp) {
         if (!cmp._keyHandler && cmp.isValid()) {
-        	var closeAction = cmp.get("v.closeAction");
-        	var trapFocus = $A.util.getBooleanValue(cmp.get('v.trapFocus'));
+            var closeAction = cmp.get("v.closeAction");
+            var trapFocus = $A.util.getBooleanValue(cmp.get('v.trapFocus'));
             cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: trapFocus}, closeAction);
         }
         return cmp._keyHandler;
@@ -81,10 +83,10 @@
             animationEl: panel,
             autoFocus: autoFocus,
             onFinish: function() {
-            	var handler = self._getKeyHandler(cmp);
-            	if ($A.util.isFunction(handler)) {
-            		$A.util.on(containerEl, 'keydown', handler);
-            	}
+                var handler = self._getKeyHandler(cmp);
+                if ($A.util.isFunction(handler)) {
+                    $A.util.on(containerEl, 'keydown', handler);
+                }
                 callback && callback();
             }
         };
@@ -119,7 +121,7 @@
                 }).fire();
             }
             if ($A.util.isFunction(callback)) {
-            	callback();
+                callback();
             }
         });
     },
@@ -182,8 +184,8 @@
         var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
         
         if ($A.util.isUndefinedOrNull(this.global._originalOverflowStyle)) {
-        	var overflowStyle = window.getComputedStyle(document.body, '').overflow;
-        	this.global._originalOverflowStyle = overflowStyle;
+            var overflowStyle = window.getComputedStyle(document.body, '').overflow;
+            this.global._originalOverflowStyle = overflowStyle;
             // prevent scrolling of the body when modals are open
             document.body.style.overflow = 'hidden';
         }
@@ -204,8 +206,8 @@
     },
     
     unmask: function(cmp, useTransition, panel) {
-    	var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
-    	
+        var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
+        
         if(useTransition) {
             panel.style.opacity = '0';
             setTimeout(function() {
@@ -217,7 +219,7 @@
     },
     
     unsetOverflow: function() {
-    	 // remove overflow changes only when it's the last modal that's opened
+         // remove overflow changes only when it's the last modal that's opened
         var openedMasks = document.querySelectorAll('.uiModal .modal-glass.fadein');
         if(openedMasks.length === 1 && !$A.util.isUndefinedOrNull(this.global._originalOverflowStyle)) {
             document.body.style.overflow = this.global._originalOverflowStyle;

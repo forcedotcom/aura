@@ -20,6 +20,7 @@
     <aura:import library="ui:panelPositioningLib" property="positioningLib" />
 
     <aura:attribute name="title" type="String" description="The title of the dialog window" />
+    <aura:attribute name="devNameOrId" type="String" description="Id or alias for the panel" />
     <aura:attribute name="class" type="String" description="CSS class" />
     <aura:attribute name="titleDisplay" type="Boolean" default="true" description="If true, the title of the window can be shown/hidden for accessibility. The default is true." />
     <aura:attribute name="titleTruncate" type="Boolean" default="false" description="If true, allows for truncation of long titles." />

@@ -20,6 +20,7 @@
 																		Use one instance of ui:panelManager2 to manage your modals.">
     <aura:import library="ui:panelLib" property="lib"/>
 
+    <aura:attribute name="devNameOrId" type="String" description="Id or alias for the modal" />
     <aura:attribute name="title" type="String" description="The title of the dialog window" />
     <aura:attribute name="titleDisplay" type="Boolean" default="true" description="The title of the window can be shown/hidden for accessibility" />
     <aura:attribute name="class" type="String" description="CSS class" />
@@ -43,6 +44,9 @@
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" />
 
     <aura:dependency resource="markup://aura:unescapedHtml"  type="COMPONENT"/>
+    <aura:locator target="modal-close" description="Close modal button">
+        <aura:locatorContext key="devNameOrId" value="{!v.devNameOrId}"/>
+    </aura:locator>
 
     <div aura:flavorable="true" class="{!join(' ', v.class, $Browser.formFactor)}">
         <div aura:id='modal-glass' class="{!join(' ', 'modal-glass hidden', token('uiModal.backdrop'))}"  tabindex="-1"></div>

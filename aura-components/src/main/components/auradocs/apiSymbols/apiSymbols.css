@@ -29,3 +29,31 @@
 .THIS .jumplink:last-child:after{
 	display: none;
 }
+
+/*pre & code blocks */
+.THIS pre,.THIS code  {
+	background-color: #f5f5f5;
+	border: 1px solid #d7d7d7;
+	border-radius: 3px;
+	color: #333;
+	display: inline-block;
+	padding: 1px 3px;
+	margin: 2px;
+}
+
+.THIS pre {
+	display: block;
+	margin: 15px 0;
+	padding: 20px;
+}
+
+.THIS pre code {
+	border: 0px none;
+	padding: 0;
+	margin: 0;
+}
+
+.THIS code {
+	color: #D14;
+	white-space: pre;
+}

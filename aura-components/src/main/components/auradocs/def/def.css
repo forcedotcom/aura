@@ -40,3 +40,7 @@
 	border: none;
 	top: 50px;
 }
+
+.THIS .CodeMirror {
+	height: inherit;
+}

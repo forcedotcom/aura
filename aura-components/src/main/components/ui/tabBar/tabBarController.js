@@ -28,7 +28,7 @@
 		if (active) {
 			helper.activateTab(cmp, index, evt.getParam("focus"));
 		} else {
-			var tab = cmp._tabItems[index];
+			var tab = cmp.get("v.tabHeaders")[index];
 			if (cmp._activeTab === tab) {
 				//deactivate current active tab
 				tab.setActive(false);
@@ -93,6 +93,7 @@
 		if (index !== cmp._activeTabIndex) {
 			var oldTab = cmp._activeTab && cmp._activeTab.isValid() ? cmp._activeTab : null;
 			cmp.get("e.onTabActivated").setParams({"index": index, "oldTab": oldTab}).fire();
+			cmp._activeTabIndex = index;
 		}
 	},
 

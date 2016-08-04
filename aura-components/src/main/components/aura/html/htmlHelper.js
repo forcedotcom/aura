@@ -119,7 +119,10 @@
 
         if ($A.util.isExpression(valueExpression)) {
             var action = valueExpression.evaluate();
-            this.dispatchAction(action, event, ownerComponent);
+            // This can resolve to null if you have an expression pointing to an attribute which could be an Action
+            if(action) {
+                this.dispatchAction(action, event, ownerComponent);
+            }
         }
     },
 

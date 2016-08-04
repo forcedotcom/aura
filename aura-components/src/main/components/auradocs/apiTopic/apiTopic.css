@@ -13,72 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS body {
-	overflow: hidden;
+.THIS h1,.THIS h2,.THIS h3,.THIS h4,.THIS h5,.THIS h6,.THIS .h1,.THIS .h2,.THIS .h3,.THIS .h4,.THIS .h5,.THIS .h6
+	{
+	font-weight: 800;
+	color: #2f3438;
+	margin-top: 14px;
+	margin-bottom: 14px;
 }
 
-.THIS p {
-	font-size: 13px;
+.THIS h1,.THIS .h1 {
+	font-size: 40px;
 }
 
-.THIS li {
-	font-size: 13px;	
-	line-height: 120%;
+.THIS h2,.THIS .h2 {
+	font-size: 32px;
 }
 
-.THIS .bordered {
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	padding: 8px;
+.THIS h3,.THIS .h3 {
+	font-size: 26px;
 }
 
-.THIS.container {
-	background-color: #fff;
-	margin-left: auto;
-	margin-right: auto;
+.THIS h4,.THIS .h4 {
+	font-size: 22px;
 }
 
-.THIS.container:before, .THIS.container:after {
-	content: "";
-	display: table;
+.THIS h5,.THIS .h5 {
+	font-size: 20px;
+	font-weight: 400;
+	margin-top: 20px;
 }
 
-.THIS article.content {
-	position: absolute;
-	padding: 0px;
-	top: 70px;
-	right: 0;
-	left: 280px;
-	bottom: 0;
+.THIS h6,.THIS .h6 {
+	font-size: 18px;
+	font-weight: 400;
+	margin-top: 20px;
 }
 
-.THIS aside.sidebar {
-	position: absolute;
-	background-color: #f3f3f3;
-	top: 70px;
-	bottom: 0;
-	left: 0;
-	width: 280px;
-	overflow: auto;
-}
-
-footer.THIS {
-	text-align: center;
-	position: fixed;
-	bottom: 10px;
-	left: 0;
-	right: 0;
-	font-size: 10px;
-	color: #ccc;
-}
-
-/*tabset overrides */
-.THIS .uiTabset {
-	height: 100%;
-	width: 100%;
-}
-
-/*tables*/
+/*tables */
 .THIS table {
 	max-width: 100%;
 	border-collapse: collapse;
@@ -160,39 +131,4 @@ footer.THIS {
 
 .THIS table tbody tr:hover td,.THIS table tbody tr:hover th {
 	background-color: #f5f5f5;
-}
-.THIS h1,.THIS h2,.THIS h3,.THIS h4,.THIS h5,.THIS h6,.THIS .h1,.THIS .h2,.THIS .h3,.THIS .h4,.THIS .h5,.THIS .h6
-	{
-	font-weight: 800;
-	color: #2f3438;
-	margin-top: 14px;
-	margin-bottom: 14px;
-}
-
-.THIS h1,.THIS .h1 {
-	font-size: 40px;
-}
-
-.THIS h2,.THIS .h2 {
-	font-size: 32px;
-}
-
-.THIS h3,.THIS .h3 {
-	font-size: 26px;
-}
-
-.THIS h4,.THIS .h4 {
-	font-size: 22px;
-}
-
-.THIS h5,.THIS .h5 {
-	font-size: 20px;
-	font-weight: 400;
-	margin-top: 20px;
-}
-
-.THIS h6,.THIS .h6 {
-	font-size: 18px;
-	font-weight: 400;
-	margin-top: 20px;
 }

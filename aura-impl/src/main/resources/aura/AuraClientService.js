@@ -953,7 +953,7 @@ AuraClientService.prototype.saveTokenToStorage = function() {
     // update the persisted CSRF token so it's accessible when the app is launched while offline.
     // fire-and-forget style, matching action response persistence.
     var storage = Action.getStorage();
-    if (storage && this._token) {
+    if (storage && storage.isPersistent() && this._token) {
         var token = this._token;
 
         // satisfy the adapter API shape requirements; see AuraStorage.setItems().
@@ -986,7 +986,7 @@ AuraClientService.prototype.saveTokenToStorage = function() {
  */
 AuraClientService.prototype.loadTokenFromStorage = function() {
     var storage = Action.getStorage();
-    if (storage) {
+    if (storage && storage.isPersistent()) {
         return storage.adapter.getItems([AuraClientService.TOKEN_KEY])
             .then(function(items) {
                 if (items[AuraClientService.TOKEN_KEY]) {
@@ -1299,7 +1299,7 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
 
         // persist bootstrap.js to storage
         var actionStorage = Action.getStorage();
-        if (actionStorage) {
+        if (actionStorage && actionStorage.isPersistent()) {
             actionStorage.set(AuraClientService.BOOTSTRAP_KEY, boot)
                 .then(
                     undefined, // noop
@@ -1407,13 +1407,13 @@ AuraClientService.prototype.runAfterInitDefs = function(callback) {
  *  and the promise resolves.
  */
 AuraClientService.prototype.loadBootstrapFromStorage = function() {
-    var storage = Action.getStorage();
     // if bootstrap.js from network has loaded then skip loading from cache
     if (Aura["appBootstrap"]) {
         return Promise["resolve"]();
     }
 
     // if no storage then no cache hit
+    var storage = Action.getStorage();
     if (!storage || !storage.isPersistent()) {
         Aura["appBootstrapCacheStatus"] = "failed";
         return Promise["resolve"]();

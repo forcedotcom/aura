@@ -16,7 +16,7 @@
     limitations under the License.
 
 -->
-<aura:application template="performance:bootstrapTemplate"  useAppcache="true">
+<aura:application template="performance:bootTestTemplate"  useAppcache="true">
     <aura:attribute name="status" type="String" default="" description="Last status message" />
     <aura:attribute name="log" type="String" default="" description="Log catcher" />
 
@@ -31,4 +31,3 @@
     <div>Last status: {!v.status}</div>
     Log: <ui:inputTextArea value="{!v.log}" />
 </aura:application>
-   

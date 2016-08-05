@@ -885,6 +885,9 @@ Test.Aura.AuraClientServiceTest = function() {
                                     tuple = tuples[0];
                                     return ResolvePromise();
                                 }
+                            },
+                            isPersistent: function() {
+                                return true;
                             }
                         }
                     }
@@ -917,6 +920,9 @@ Test.Aura.AuraClientServiceTest = function() {
                                     tuple = tuples[0];
                                     return ResolvePromise();
                                 }
+                            },
+                            isPersistent: function() {
+                                return true;
                             }
                         }
                     }

@@ -207,6 +207,9 @@ function AuraClientService () {
     // persistent then the actions cache is inherently scoped to the current tab.
     this.persistedActionFilter = undefined;
 
+    // allows the app to explicitly disable the filter
+    this.persistedActionFilterEnabled = true;
+
     this.handleAppCache();
 
 }
@@ -1630,7 +1633,6 @@ AuraClientService.prototype.getStoredResult = function(action, storage, index) {
         // persisted action filter is active and action is not visible so go to server
         that.collectServerAction(action, index);
     } else {
-        // using storage so callbacks *must* be in an aura loop
         storage.get(key, true).then(
             function(value) {
                 if (value) {
@@ -3364,7 +3366,12 @@ AuraClientService.prototype.setupPersistedActionsFilter = function() {
 
     this.persistedActionFilter = null;
 
-    // if actions isn't persistent then nothing to do
+    // if the app has explicitly disabled the filter
+    if (!this.persistedActionFilterEnabled) {
+        return;
+    }
+
+    // if actions isn't persistent then cross-tab action sharing isn't possible
     var actionStorage = Action.getStorage();
     if (!actionStorage || !actionStorage.isPersistent()) {
         return;
@@ -3374,5 +3381,20 @@ AuraClientService.prototype.setupPersistedActionsFilter = function() {
     this.persistedActionFilter = {};
 };
 
+/**
+ * Enables or disables the persisted actions filter, required for multi-tab
+ * environments that use storable actions.
+ *
+ * Actions can depend on defs. Defs are loaded from persistent storage at
+ * framework init and so the same must be done for actions: loaded at framework
+ * init. Otherwise storable actions may get cache hits that reference defs the
+ * current tab does not have.
+ *
+ * @param {Boolean} enable true to enable the filter, false to disable the filter.
+ * @export
+ */
+AuraClientService.prototype.setPersistedActionsFilter = function(enable) {
+    this.persistedActionFilterEnabled = !!enable;
+};
 
 Aura.Services.AuraClientService = AuraClientService;

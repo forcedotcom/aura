@@ -158,8 +158,8 @@ public class Manifest extends AuraResourceImpl {
             // Add locker service safe eval worker url
             String lockerWorkerURL = configAdapter.getLockerWorkerURL();
             if (lockerWorkerURL != null) {
-				sw.write(lockerWorkerURL);
-	            sw.write('\n');
+                sw.write(lockerWorkerURL);
+                sw.write('\n');
             }
 
             // Add in any application specific resources
@@ -171,6 +171,15 @@ public class Manifest extends AuraResourceImpl {
                         sw.write('\n');
                     }
                 }
+            }
+
+            // Add token for bootstrap.js and app.encryptionkey.js requests
+            // because those requests are issued from script tags in app-cached files
+            String token = configAdapter.generateJwtToken();
+            if (token != null) {
+                sw.write("# bootstrap token: ");
+                sw.write(token);
+                sw.write('\n');
             }
 
             attribs.put(RESOURCE_URLS, sw.toString());

@@ -15,6 +15,9 @@
  */
 ({
     getStorage: function(cmp) {
+        if (!cmp.isValid()) {
+            return undefined;
+        }
         return $A.storageService.getStorage(cmp.get("v.storageName"));
     },
 

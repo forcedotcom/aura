@@ -22,6 +22,9 @@
                 "event": "markup://auraStorage:modified",
                 "globalId": cmp.getGlobalId(),
                 "handler": function(e) {
+                    if (!cmp.isValid()) {
+                        return;
+                    }
                     var eventStorageName = e.getParam("name");
                     var storageName = cmp.get("v.storageName");
                     if (eventStorageName !== storageName) {

@@ -821,8 +821,9 @@ AuraInstance.prototype.finishInit = function(doNotInitializeServices) {
         $A.util.removeClass(document.body, "loading");
         delete $A.globalValueProviders;
         this["finishedInit"] = true;
-        $A.eventService.getNewEvent("markup://aura:initialized").fire();
         $A.metricsService.applicationReady();
+
+        $A.eventService.getNewEvent("markup://aura:initialized").fire();
         $A.clientService.checkBootstrapUpgrade();
     }
 

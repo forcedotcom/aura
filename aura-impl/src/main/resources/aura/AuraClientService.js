@@ -145,6 +145,7 @@ function AuraClientService () {
     this.protocols={"layout":true};
     this.namespaces={internal:{},privileged:{}};
     this.lastSendTime = Date.now();
+    this.appCache = true;
 
     // This will be only changed after the unload event
     this._appNotTearingDown = true;
@@ -777,6 +778,7 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheUpdateReady() {
+        acs.appCache = false;
         var appCache = window.applicationCache;
         if (appCache.swapCache && appCache.status === appCache.UPDATEREADY) {
             try {
@@ -815,6 +817,7 @@ AuraClientService.prototype.handleAppCache = function() {
         }
 
         if (acs.appcacheDownloadingEventFired && acs.isOutdated) {
+            acs.appCache = false;
             // Hard reload if we error out trying to download new appcache
             $A.log("Outdated.");
             acs.dumpCachesAndReload();
@@ -822,6 +825,8 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheDownloading(e) {
+        acs.appCache = false;
+
         if (acs.isDevMode()) {
             var progress = Math.round(100 * e.loaded / e.total);
             showProgress(progress + 1);
@@ -843,8 +848,6 @@ AuraClientService.prototype.handleAppCache = function() {
         }
         if (acs.isOutdated) {
             acs.dumpCachesAndReload();
-        } else {
-            acs.appCacheNoUpdate = true;
         }
     }
 
@@ -853,6 +856,7 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheObsolete() {
+        acs.appCache = false;
         acs.hardRefresh();
     }
 

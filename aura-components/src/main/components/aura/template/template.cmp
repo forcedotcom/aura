@@ -134,7 +134,7 @@ var pageStartTime = (new Date()).getTime();</script>
             el.addEventListener('load', initFramework);
             el.addEventListener("error", function () { throw new Error("Aura(): Failed to load locker worker.");});
         } else {
-            initFramework();
+            setTimeout(initFramework, 0); // ensure async
         }
     }
 

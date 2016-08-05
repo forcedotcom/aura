@@ -55,6 +55,7 @@ Aura.Services.MetricsService.prototype.initialize = function () {
     this.getPageStartTime();
     this.transactionStart('aura','bootstrap');
     this.initializePlugins();
+    window.addEventListener('load', this.emitBootstrapTransaction.bind(this));
 };
 
 /**
@@ -151,23 +152,9 @@ Aura.Services.MetricsService.prototype.initializePlugin = function (pluginName, 
 **/
 Aura.Services.MetricsService.prototype.applicationReady = function () {
     Aura.bootstrapMark("bootstrapEPT");
-    this.doneBootstrap = true;
+    this.applicationReady = this.time();
 
-    var bootstrap = this.getBootstrapMetrics();
-    var now = this.time();
-    this.transactionEnd('aura','bootstrap', function (transaction) {
-        // We need to override manually the duration to add the time before aura was initialized
-        var bootstrapStart = Aura.Services.MetricsService.PERFTIME ? 0 : transaction["pageStartTime"];
-        
-        transaction["context"] = {
-            "eventType"   : "bootstrap",
-            "eventSource" : "framework",
-            "attributes"  : bootstrap 
-        };
-
-        transaction["ts"] = bootstrapStart;
-        transaction["duration"] = parseInt(now - bootstrapStart, 10);
-    });
+    this.emitBootstrapTransaction();
 
     if (!this.inTransaction()) {
         this.clearMarks();
@@ -179,6 +166,33 @@ Aura.Services.MetricsService.prototype.applicationReady = function () {
         this.disablePlugins();
     }
     // #end
+};
+
+Aura.Services.MetricsService.prototype.emitBootstrapTransaction = function () {
+    var domReady = window.document && window.document.readyState;
+    if (!this._emittedBootstrap && this.applicationReady && domReady === "complete") {
+        this._emittedBootstrap = true;
+
+        // We need a timeout because appCache events only fire after onload event
+        setTimeout(function () {
+            var bootstrap = this.getBootstrapMetrics();
+            var appReady = this.applicationReady;
+
+            this.transactionEnd('aura','bootstrap', function (transaction) {
+                // We need to override manually the duration to add the time before aura was initialized
+                var bootstrapStart = Aura.Services.MetricsService.PERFTIME ? 0 : transaction["pageStartTime"];
+
+                transaction["context"] = {
+                    "eventType"   : "bootstrap",
+                    "eventSource" : "framework",
+                    "attributes"  : bootstrap 
+                };
+
+                transaction["ts"] = bootstrapStart;
+                transaction["duration"] = parseInt(appReady - bootstrapStart, 10);
+            });
+        }.bind(this), 0);
+    }
 };
 
 /**
@@ -800,9 +814,9 @@ Aura.Services.MetricsService.prototype.registerBeacon = function (beacon) {
     this.beaconProviders[beacon["name"] || Aura.Services.MetricsService.DEFAULT] = beacon["beacon"] || beacon;
 };
 
-Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) {
+Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r, name) {
     return {
-        "name"         : r.name,
+        "name"         : name || r.name,
         "duration"     : parseInt(r.responseEnd - r.startTime, 10),
         "startTime"    : parseInt(r.startTime, 10),
         "fetchStart"   : parseInt(r.fetchStart, 10),
@@ -832,15 +846,12 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
 
         pageStartTime = this.getPageStartTime();
         bootstrap["pageStartTime"] = pageStartTime;
-        bootstrap["cache"] = {
-            "appCache": !!$A.clientService.appCacheNoUpdate,
-            "bootstrapCache" : Aura["appBootstrapFromCache"] === "cache"
-        };
 
         if (window.performance && performance.timing && performance.navigation) {
             // TODO: Eventually make this strings smaller to reduce payload
             var pn = performance.navigation;
             var pt = performance.timing;
+
             bootstrap["timing"] = {
                 "redirects"       : pn.redirectCount,
                 "type"            : pn.type,
@@ -866,33 +877,38 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
                 "redirectTime"    : pt.redirectEnd - pt.redirectStart
             };
 
+            bootstrap["cache"] = {
+                "appCache": bootstrap["timing"]["appCache"] === 0 && $A.clientService.appCache,
+                "bootstrapCache" : Aura["appBootstrapFromCache"] === "cache"
+            };
+
             if (performance.getEntries) {
                 var frameworkRequests = {
-                    "encryptionKeyJs" : "app.encryptionkey.js",
-                    "bootstrapJs"     : "bootstrap.js",
-                    "inlineJs"        : "inline.js",
-                    "appCss"          : "app.css",
-                    "appJs"           : "app.js",
-                    "auraJs"          : "/aura_",
-                    "auraLibs"        : "/libs_" 
+                    "requestEncryptionKeyJs" : "app.encryptionkey.js",
+                    "requestBootstrapJs"     : "bootstrap.js",
+                    "requestInlineJs"        : "inline.js",
+                    "requestAppCss"          : "app.css",
+                    "requestAppJs"           : "app.js",
+                    "requestAuraJs"          : "/aura_",
+                    "requestAuraLibsJs"      : "/libs_" 
                 };
 
                 var bootstrapRequests = ($A.util.filter(performance.getEntries(),
                     function (resource) {
                         return resource.responseEnd < bootstrap["bootstrapEPT"];
-                    })).map(this.summarizeResourcePerfInfo);
+                    })
+                ).map(this.summarizeResourcePerfInfo);
 
                frameworkRequests = $A.util.reduce(window.performance.getEntries(), function (r, item) { 
                     for (var i in frameworkRequests) {
                         if (item.name.indexOf(frameworkRequests[i]) !== -1) {
-                            r[i] = this.summarizeResourcePerfInfo(item);
+                            bootstrap[i] = this.summarizeResourcePerfInfo(item, i);
                             return r;       
                         }
                     }
                     return r;
                 }.bind(this), {});
 
-                bootstrap["coreRequests"] = frameworkRequests;
                 bootstrap["allRequests"] = bootstrapRequests;
             }
         }

@@ -101,8 +101,10 @@
      * Verify updating attributes on rerender.
      */
     testRerender:{
-        attributes : {disabled: false, text: "my value", value: false, label: "I'm broken, fix me"},
+        attributes : {disabled: false, value: false, label: "I'm broken, fix me"},
         test:[function(component){
+        	component.set('v.text', 'my value');
+        }, function(component){
             $A.test.assertEquals("my value", component.find("checkbox").getElement().value, "Value attribute not correctly set");
             $A.test.assertFalse(component.find("checkbox").getElement().disabled, "Element not correctly enabled");
             $A.test.assertFalse(component.find("checkbox").getElement().checked, "Element not correctly unselected");

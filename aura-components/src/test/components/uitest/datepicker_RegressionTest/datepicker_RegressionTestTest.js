@@ -94,7 +94,7 @@
             if(self.isViewDesktop()){
                 $A.test.assertEquals(
                     1,
-                    $A.test.select('#singleInputField > input').length,
+                    $A.test.select('#singleInputField > fieldset > input').length,
                     'There should be only one input (#singleInputField input)'
                 );
 

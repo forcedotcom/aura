@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -45,6 +46,7 @@ import org.auraframework.util.json.JsonSerializationContext;
 public class Bootstrap extends AuraResourceImpl {
 
     private ContextService contextService = Aura.getContextService();
+    private ExceptionAdapter exceptionAdapter = Aura.getExceptionAdapter();
 
     public Bootstrap() {
         super("bootstrap.js", Format.JS);
@@ -106,36 +108,35 @@ public class Bootstrap extends AuraResourceImpl {
         DefDescriptor<?> desc = definitionService.getDefDescriptor(app.getDescriptorName(), type.getPrimaryInterface());
 
         try {
-            if (configAdapter.validateBootstrap(request.getParameter("jwt"))) {
-                setCacheHeaders(response, app);
-
-                Instance<?> appInstance = instanceService.getInstance(desc, getComponentAttributes(request));
-                definitionService.updateLoaded(desc);
-                loadLabels();
-
-                JsonSerializationContext serializationContext = context.getJsonSerializationContext();
-
-                WrappedPrintWriter out = new WrappedPrintWriter(response.getWriter());
-                out.append(PREPEND_JS);
-                JsonEncoder json = JsonEncoder.createJsonStream(out, serializationContext);
-                json.writeMapBegin();
-                json.writeMapKey("data");
-                json.writeMapBegin();
-                json.writeMapEntry("app", appInstance);
-                context.getInstanceStack().serializeAsPart(json);
-                json.writeMapEnd();
-                serializationContext.pushRefSupport(false);
-                json.writeMapEntry("md5", out.getMD5());
-                json.writeMapEntry("context", context);
-                json.writeMapEntry("token", configAdapter.getCSRFToken());
-                serializationContext.popRefSupport();
-                json.writeMapEnd();
-                out.append(APPEND_JS);
-            } else {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!configAdapter.validateBootstrap(request.getParameter("jwt"))) {
+                throw new Exception("Invalid jwt parameter");
             }
+            setCacheHeaders(response, app);
+
+            Instance<?> appInstance = instanceService.getInstance(desc, getComponentAttributes(request));
+            definitionService.updateLoaded(desc);
+            loadLabels();
+
+            JsonSerializationContext serializationContext = context.getJsonSerializationContext();
+
+            WrappedPrintWriter out = new WrappedPrintWriter(response.getWriter());
+            out.append(PREPEND_JS);
+            JsonEncoder json = JsonEncoder.createJsonStream(out, serializationContext);
+            json.writeMapBegin();
+            json.writeMapKey("data");
+            json.writeMapBegin();
+            json.writeMapEntry("app", appInstance);
+            context.getInstanceStack().serializeAsPart(json);
+            json.writeMapEnd();
+            serializationContext.pushRefSupport(false);
+            json.writeMapEntry("md5", out.getMD5());
+            json.writeMapEntry("context", context);
+            json.writeMapEntry("token", configAdapter.getCSRFToken());
+            serializationContext.popRefSupport();
+            json.writeMapEnd();
+            out.append(APPEND_JS);
         } catch (Throwable t) {
-            t = Aura.getExceptionAdapter().handleException(t);
+            t = exceptionAdapter.handleException(t);
             writeError(t, response, context);
         }
     }
@@ -201,5 +202,14 @@ public class Bootstrap extends AuraResourceImpl {
      */
     public void setContextService(ContextService contextService) {
         this.contextService = contextService;
+    }
+
+    /**
+     * Injection override.
+     *
+     * @param contextService the ContextService to set
+     */
+    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
+        this.exceptionAdapter = exceptionAdapter;
     }
 }

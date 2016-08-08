@@ -123,33 +123,4 @@ public class EncryptionKeyTest extends UnitTestCase {
 
         assertEquals(expectedKey, response.getOutputStream().toString());
     }
-
-    @Test
-    public void testSendErrorWhenEncryptionKeyValidationFails() throws Exception {
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-
-        class DummyResponse extends DummyHttpServletResponse {
-            private int error;
-
-            @Override
-            public void sendError(int sc) {
-                error = sc;
-            }
-
-            public int getError() {
-                return error;
-            }
-        };
-
-        DummyResponse response = new DummyResponse();
-        ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
-        Mockito.when(configAdapter.validateGetEncryptionKey(Mockito.anyString())).thenReturn(false);
-        EncryptionKey encryptionKey = new EncryptionKey();
-        encryptionKey.setConfigAdapter(configAdapter);
-
-        encryptionKey.write(request, response, null);
-
-        assertEquals("Expected 403 error code to be sent when encryption key validation fails",
-                HttpServletResponse.SC_FORBIDDEN, response.getError());
-    }
 }

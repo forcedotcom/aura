@@ -161,14 +161,16 @@ public class DescriptorFileMapper {
             return null;
         }
         String last = names.get(names.size() - 1);
+        String lastLower = (last == null ? last : last.toLowerCase());
         String name = names.get(names.size() - 2);
+        String nameLower = (name == null ? name : name.toLowerCase());
         String ns = names.get(names.size() - 3);
         List<ExtensionInfo> eiList;
         List<DefDescriptor<?>> descList;
         //
         // First try the bundled type.
         //
-        if (last.startsWith(name)) {
+        if (lastLower.startsWith(nameLower)) {
             String ext;
             ext = last.substring(name.length());
             eiList = byExtension.get(ext.toLowerCase());

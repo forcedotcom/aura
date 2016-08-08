@@ -120,8 +120,8 @@ public class ResourceSourceLoader extends BaseSourceLoader implements InternalNa
                 continue;
             }
             for (DefDescriptor<?> desc : descs) {
-                _log.info("Adding: "+desc);
-            namespaces.add(desc.getNamespace());
+                //_log.info("Adding: "+desc);
+                namespaces.add(desc.getNamespace());
                 index.put(desc, file);
             }
         }

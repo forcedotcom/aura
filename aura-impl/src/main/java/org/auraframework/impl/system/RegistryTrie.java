@@ -60,8 +60,8 @@ public class RegistryTrie {
                         dtn.put(prefix, pn);
                     }
                     for (String namespace : reg.getNamespaces()) {
-                        allNamespaces.add(namespace);
-                        pn.put(namespace, reg);
+                        allNamespaces.add(namespace.toLowerCase());
+                        pn.put(namespace.toLowerCase(), reg);
                     }
                 }
             }
@@ -111,7 +111,11 @@ public class RegistryTrie {
         if (dt != null) {
             PrefixNode pn = dt.get(descriptor.getPrefix().toLowerCase());
             if (pn != null) {
-                return pn.get(descriptor.getNamespace());
+                String namespace = descriptor.getNamespace();
+                if (namespace != null) {
+                    namespace = namespace.toLowerCase();
+                }
+                return pn.get(namespace);
             }
         }
         return null;
@@ -139,7 +143,7 @@ public class RegistryTrie {
             if ("*".equals(namespace)) {
                 this.catchAllRegistry = registry;
             } else {
-                this.prefixNamespaces.add(namespace);
+                this.prefixNamespaces.add(namespace.toLowerCase());
             }
         }
 

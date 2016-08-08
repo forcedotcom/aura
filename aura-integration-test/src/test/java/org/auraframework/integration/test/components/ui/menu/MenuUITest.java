@@ -445,44 +445,54 @@ public class MenuUITest extends WebDriverTestCase {
      * set
      */
     // For env reason the test is failing on Luna Autobuild, will run the test on jenkins only for now.
-    // 
+    //
     // W-3140286
-    // 
-    // This fails in jenkins now and passes locally.
-    // Excluding IE11 since setSize doesn't work for IE11
     @UnAdaptableTest
     @Flapper
     @Test
-    @ExcludeBrowsers({BrowserType.IE11})
-    // TODO: flapping on Jenkins autobuilds
-    public void _testMenuPositionWhenMenuItemAttachToBody() throws Exception {
+    public void testMenuPositionWhenMenuItemAttachToBody() throws Exception {
         open(MENUTEST_ATTACHTOBODY_APP);
+        WebDriver driver = this.getDriver();
+
+        // save current dimension and reset it after test finishes
+        // if not chrome would remember the size we set here and
+        // that would affect other tests
+        Dimension originalDimension = getDriver().manage().window().getSize();
+
+        // set initial window size
+        int width = 800;
+        int height = 600;
+        driver.manage().window().setSize(new Dimension(width, height));
+        waitForWindowResize(width, height);
 
         // Verify menulist and trigger are properly aligned
         String menuItem3 = "actionItemAttachToBody3";
-        WebDriver driver = this.getDriver();
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
         WebElement actionItem3Element = getAnchor(actionItem3);
-        // Need to make the screen bigger so WebDriver doesn't need to scroll
-        driver.manage().window().setSize(new Dimension(1366, 768));
-        waitForWindowResize(1366, 768);
+
         String trigger = "triggerAttachToBody";
         String menuList = "actionMenuAttachToBody";
         String triggerGlobalId = getAuraUITestingUtil().getCmpGlobalIdGivenElementClassName(trigger);
         String menuListGlobalId = getAuraUITestingUtil().getCmpGlobalIdGivenElementClassName(menuList);
         WebElement menuLabel = driver.findElement(By.className(trigger));
         WebElement menu = driver.findElement(By.className(menuList));
+
         openMenu(menuLabel, menu);
         waitForMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
             "Menu List is not positioned correctly when the menuList rendered on the page");
 
         // Select menu item and verify still aligned
-        String triggerLeftPosBeforeClick = getAuraUITestingUtil().getBoundingRectPropOfElement(triggerGlobalId, "left");
+        String triggerLeftPosBeforeClick = getAuraUITestingUtil()
+                .getBoundingRectPropOfElement(triggerGlobalId, "left");
+
         actionItem3Element.click();
-        String triggerLeftPosAfterClickOnItem2 = getAuraUITestingUtil()
-            .getBoundingRectPropOfElement(triggerGlobalId, "left");
-        assertEquals("Menu Item position changed after clicking on Item2", triggerLeftPosBeforeClick,
-            triggerLeftPosAfterClickOnItem2);
+        waitForMenuText(menuLabel, "Inter Milan");
+
+        String triggerLeftPosAfterClick = getAuraUITestingUtil()
+                .getBoundingRectPropOfElement(triggerGlobalId, "left");
+
+        assertEquals("Menu Item position changed after clicking on Item3",
+                triggerLeftPosBeforeClick, triggerLeftPosAfterClick);
 
         // Resize window with menulist open and verify realigns properly
         openMenu(menuLabel, menu);
@@ -491,7 +501,11 @@ public class MenuUITest extends WebDriverTestCase {
         driver.manage().window().setSize(new Dimension(newWidth, newHeight));
         waitForWindowResize(newWidth, newHeight);
         waitForMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
-            "Menu List is not positioned correctly after the resize");
+                "Menu List is not positioned correctly after the resize");
+
+        // reset size for other tests
+        driver.manage().window().setSize(originalDimension);
+        waitForWindowResize(originalDimension.width, originalDimension.height);
     }
 
     private WebElement getAnchor(WebElement element) {
@@ -505,10 +519,16 @@ public class MenuUITest extends WebDriverTestCase {
      * @param height Expected height of the current window.
      */
     private void waitForWindowResize(final int width, final int height) {
-        getAuraUITestingUtil().waitUntil(check -> {
-            Dimension current = getDriver().manage().window().getSize();
-            return current.width == width && current.height == height;
-        });
+        getAuraUITestingUtil().waitUntilWithCallback(
+            check -> {
+                Dimension current = getDriver().manage().window().getSize();
+                return current.width == width && current.height == height;
+            }, check -> {
+                Dimension current = getDriver().manage().window().getSize();
+                return "Current window dimension is {width: " + current.width + ", height: " + current.height + "}";
+            },
+            getAuraUITestingUtil().getTimeout(),
+            "Window size is not resized correctly");
     }
 
     /**

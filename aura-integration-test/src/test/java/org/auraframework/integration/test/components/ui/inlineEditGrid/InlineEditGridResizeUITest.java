@@ -30,7 +30,7 @@ import org.openqa.selenium.WebElement;
 @TargetBrowsers({BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE11, BrowserType.SAFARI})
 public class InlineEditGridResizeUITest extends WebDriverTestCase {
 
-    private final String URL = "uitest/inlineEdit_resizeTest.cmp";
+    private final String URL = "/uitest/inlineEdit_resizeTest.cmp";
     
     /**
      * Test resize column widths

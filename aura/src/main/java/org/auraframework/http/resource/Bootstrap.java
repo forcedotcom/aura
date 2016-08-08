@@ -104,7 +104,7 @@ public class Bootstrap extends AuraResourceImpl {
         DefDescriptor<?> desc = definitionService.getDefDescriptor(app.getDescriptorName(), type.getPrimaryInterface());
 
         try {
-            if (configAdapter.validateBootstrap(request.getParameter("ssid"))) {
+            if (configAdapter.validateBootstrap(request.getParameter("jwt"))) {
                 setCacheHeaders(response, app);
 
                 Instance<?> appInstance = instanceService.getInstance(desc, getComponentAttributes(request));

@@ -45,7 +45,7 @@ public class EncryptionKeyJs extends AuraResourceImpl {
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
-        if (configAdapter.validateGetEncryptionKey(request.getParameter("ssid"))) {
+        if (configAdapter.validateGetEncryptionKey(request.getParameter("jwt"))) {
             servletUtilAdapter.setNoCache(response);
 
             String key = configAdapter.getEncryptionKey();

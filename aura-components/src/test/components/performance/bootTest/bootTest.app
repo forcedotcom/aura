@@ -16,12 +16,19 @@
     limitations under the License.
 
 -->
-<aura:application template="performance:bootstrapTemplate" access="global" useAppcache="true">
+<aura:application template="performance:bootstrapTemplate"  useAppcache="true">
+    <aura:attribute name="status" type="String" default="" description="Last status message" />
+    <aura:attribute name="log" type="String" default="" description="Log catcher" />
+
+    <aura:dependency resource="markup://ui:scroller" type="COMPONENT" />
+
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    <!-- 
-        DO NOT MODIFY THIS APPLICATION!! 
-        IS USED FOR PERFORMANCE BENCHMARK
-    -->
-    <section class="container" aura:id="container">Bootstrap</section>
+
+    <aura:method name="clearCachesAndLog" action="c.clearCachesAndLog" />
+
+    <section class="container" aura:id="container"> Bootstrap App </section>
+
+    <div>Last status: {!v.status}</div>
+    Log: <ui:inputTextArea value="{!v.log}" />
 </aura:application>
    

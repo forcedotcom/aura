@@ -1,19 +1,17 @@
 ({
     urlToJson: function (historyConfig) {
         historyConfig || (historyConfig = {});
-        var hash       = historyConfig.hash || window.location.hash,
-            perfConfig = {};
+
+        var hash = historyConfig.hash || window.location.hash;
+        var config = {
+            options : this.queryStringToJson(historyConfig.queryString) || {}
+        };
 
         if (hash.length) {
-            perfConfig.componentConfig = JSON.parse(decodeURIComponent(hash.substring(1))) || {};
-        }
-        perfConfig.options = this.queryStringToJson(historyConfig.queryString) || {};
-
-        if (perfConfig.options.componentDef) {
-            perfConfig.componentConfig = { descriptor: perfConfig.options.componentDef };
+            config.componentConfig = JSON.parse(decodeURIComponent(hash.substring(1))) || {};
         }
 
-        return perfConfig;
+        return config;
 
     },
     queryStringToJson: function (queryString) {

@@ -9,15 +9,6 @@ function COQL() {
                     .query();
             },
 
-            event: function() {
-                // [{startTime: 1399596806222, endTime: 1399596806228, descriptor: "markup://ui:press"}]
-                return $A.getQueryStatement()
-                    .field("descriptor", function(resultSet){return resultSet.event.getDef().getDescriptor().toString();})
-                    .fields("startTime,endTime")
-                    .from('event')
-                    .query();
-            },
-
             afterRender: function() {
                 // [{"startTime":1399675188180,"endTime":1399675188181,"descriptor":"markup://aura:text {0:c}"}]
                 return $A.getQueryStatement()

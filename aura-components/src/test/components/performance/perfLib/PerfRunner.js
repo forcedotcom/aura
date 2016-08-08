@@ -54,15 +54,15 @@ function PerfRunner(COQL, Memory) {
             },
             loadComponent: function () {
                 var self        = this,
-                    cmpDef      = this.componentConfig.componentDef,
+                    cmpDef      = this.componentConfig.descriptor,
                     resolvedDef = $A.componentService.getDef(cmpDef, true);
 
                 $A.assert(cmpDef, 'No def has been found, call setup first');
                 if (resolvedDef) {
-                    return setTimeout(function(){
+                    return setTimeout($A.getCallback(function() {
                         componentReady = true;
                         self._onComponentReady();
-                    }, 0);
+                    }), 0);
                 } else {
                     var action = $A.get("c.aura://ComponentController.getComponentDef");
                     action.setParams({
@@ -95,7 +95,7 @@ function PerfRunner(COQL, Memory) {
                 $A.assert(componentReady, 'You need to load the component first');
                 var asyncSetup = false,
                     cmpConfig  = this.componentConfig,
-                    cmpDef     = $A.componentService.getDef(cmpConfig.componentDef),
+                    cmpDef     = $A.componentService.getDef(cmpConfig.descriptor),
                     perfIntf   = cmpDef.isInstanceOf('performance:test'),
                     setupDone  = (function () {
                         setupComplete = true; 

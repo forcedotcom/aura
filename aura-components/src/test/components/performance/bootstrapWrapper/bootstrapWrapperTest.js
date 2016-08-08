@@ -11,7 +11,7 @@
     testBootstrapMd5ConsistentAcrossReloads: {
         test: [
             function loadIframe(cmp) {
-                var iframeSrc = "/performance/bootstrap.app";
+                var iframeSrc = "/performance/bootTest.app";
                 cmp.helper.lib.iframeTest.loadIframe(cmp, iframeSrc, "iframeContainer", "first load");
             },
             function clearStorages(cmp) {
@@ -72,7 +72,7 @@
     testDifferentBootstrapMd5OnReload: {
         test: [
             function loadIframe(cmp) {
-                var iframeSrc = "/performance/bootstrap.app";
+                var iframeSrc = "/performance/bootTest.app";
                 cmp.helper.lib.iframeTest.loadIframe(cmp, iframeSrc, "iframeContainer", "first load");
             },
             function clearStorages(cmp) {

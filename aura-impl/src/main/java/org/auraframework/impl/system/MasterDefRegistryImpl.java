@@ -281,9 +281,15 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                         Set<String> namespaces = reg.getNamespaces();
                         boolean nsm = namespaces.contains("*");
                         if (!nsm) {
-                            if (namespace != null) {
-                                nsm = namespaces.contains(namespace);
-                            } else {
+                            //
+                            // Careful here. namespaces is case sensitive. If we fail to find the
+                            // namespace by lookup, go ahead and walk the entire namespace set
+                            // matching with our insensitive matcher. Not pretty, and not great for
+                            // perf. The only way to fix this is to be case sensitive. Note that the
+                            // perf penalty is paid by everyone. not just the bad case matching.
+                            //
+                            nsm = namespaces.contains(namespace);
+                            if (!nsm) {
                                 for (String ns : namespaces) {
                                     if (namespaceMatcher.match(ns)) {
                                         nsm = true;

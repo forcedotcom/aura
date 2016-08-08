@@ -15,13 +15,18 @@
  */
 package org.auraframework.integration.test.components.ui.inlineEditGrid;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
@@ -110,29 +115,18 @@ public class InlineEditGridUITest extends WebDriverTestCase {
      */
     @Test
     public void testTabOutOfEditPanel() throws Exception {
-    	open(inlineURL);
-        WebDriver driver = getDriver();
-        switchKeyboardMode(driver);
-        pressKey(driver, Keys.TAB);
-        
-        // open edit on cell
-        pressKey(driver, EDIT_TRIGGER_SELECTOR, Keys.ENTER);
-        waitForEditPanelOpen(driver);
-        editPanelContent(driver, "abc");
-        
-        // tab out to close
-        pressKey(driver, INPUT_PANEL_INPUT_SELECTOR, Keys.TAB);
-        waitForEditPanelClose(driver);
-        
-        verifyCellContent(driver, 0, 1, "abc");
+    	verifyKeypressEventOnEditPanel(Keys.TAB);
     }
     
     /**
      * Test shift-tab out of edit panel.
      */
-    // TODO : W-3253944 Bug uncomment after fix
     @Test
-    public void _testShiftTabOutOfEditPanel() throws Exception {
+    public void testShiftTabOutOfEditPanel() throws Exception {
+    	verifyKeypressEventOnEditPanel(Keys.SHIFT);
+    }
+    
+    private void verifyKeypressEventOnEditPanel(Keys keyPress) throws MalformedURLException, URISyntaxException {
     	open(inlineURL);
         WebDriver driver = getDriver();
         switchKeyboardMode(driver);
@@ -143,14 +137,22 @@ public class InlineEditGridUITest extends WebDriverTestCase {
         waitForEditPanelOpen(driver);
         editPanelContent(driver, "abc");
         
-        // shift tab out to close
-        driver.findElement(By.cssSelector(INPUT_PANEL_INPUT_SELECTOR)).sendKeys(Keys.SHIFT, Keys.TAB);
+        if(keyPress.equals(Keys.TAB)) {
+        	// tab out to close
+            pressKey(driver, INPUT_PANEL_INPUT_SELECTOR, keyPress);
+        }
+        else {
+            // shift tab out to close
+        	driver.findElement(By.cssSelector(INPUT_PANEL_INPUT_SELECTOR)).sendKeys(Keys.SHIFT, Keys.TAB);
+        }
+        
         waitForEditPanelClose(driver);
         
         verifyCellContent(driver, 0, 1, "abc");
-    }
-    
-    /**
+		
+	}
+
+	/**
      * Test click out of panel
      */
     @Test

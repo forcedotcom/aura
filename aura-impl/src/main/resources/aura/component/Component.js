@@ -1123,10 +1123,15 @@ Component.prototype.getElement = function() {
  */
 Component.prototype.getReference = function(key) {
     key = $A.expressionService.normalize(key);
-    if(!this.references.hasOwnProperty(key)){
-        this.references[key]=new PropertyReferenceValue(key, this);
+    var access=$A.getContext().getCurrentAccess();
+    var accessId=access&&access.getGlobalId();
+    if(!this.references.hasOwnProperty(key)) {
+        this.references[key] = {};
     }
-    return this.references[key];
+    if(!this.references[key].hasOwnProperty(accessId)) {
+        this.references[key][accessId] = new PropertyReferenceValue(key, this);
+    }
+    return this.references[key][accessId];
 };
 
 /**

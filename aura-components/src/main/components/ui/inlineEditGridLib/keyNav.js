@@ -105,7 +105,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
             if (!skipActivation) {
                 // need to stop any further key handling
-                // but wait we have no evet, and in the earlier code path we cannot stop it either.
+                // but wait we have no event, and in the earlier code path we cannot stop it either.
                 // needs further investigation
                 //evt.preventDefault();
                 //evt.stopPropagation();
@@ -156,6 +156,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
             this.inKeyboardMode = true;
             this.keyboardModePaused = false;
+            this.isGridEditable = cmp.get("v.editable");
 
             cmp.set('v.inKeyboardMode', true);
 
@@ -371,6 +372,9 @@ function lib(w) { //eslint-disable-line no-unused-vars
             return $A.util.filter(elements,
                 function (element) {
                     var isTrigger = this._isTrigger(element);
+                    if (isTrigger && !this.isGridEditable) {
+                        return false; // skip all triggers if the overall grid is not editable
+                    }
                     return (isTrigger)?!this._isTriggerDisabledByElement(element):true;
                 }.bind(this));
         },

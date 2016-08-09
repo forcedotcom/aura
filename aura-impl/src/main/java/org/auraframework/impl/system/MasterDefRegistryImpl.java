@@ -1315,6 +1315,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 return null;
             }
 
+            // JBUCH: REMOVE in 206: The caller is in a privileged namespace treat as internal temporarily
+            if (configAdapter.isPrivilegedNamespace(referencingNamespace)) {
+                return null;
+            }
+
             // Both access of def and referencingNamespace are privileged so we allow
             if (access.isPrivileged() && configAdapter.isPrivilegedNamespace(referencingNamespace)) {
                 return null;

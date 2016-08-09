@@ -16,7 +16,8 @@
 
 -->
 <aura:component description="Component used to wrap a non-focusable component with one that can be focused. This will allow the focus to be set by the keyNav plugin (used by the Inline Edit Grid)">
-	<span class="cellContainer" tabindex="-1">
-		{!v.body}
-	</span>
-</aura:component> 
+    <aura:attribute name="class" type="String" default="" description="A CSS style to be attached to the cell. This style is added in addition to base styles output by the component."/>
+    <span class="{! 'slds-grid cellContainer ' + v.class}" tabindex="-1">
+        {!v.body}
+    </span>
+</aura:component>

@@ -2237,7 +2237,7 @@ AuraClientService.prototype.sendBeacon = function(action) {
                 "aura.context" : $A.getContext().encodeForServer(true),
                 "aura.token"   : this._token
             };
-            var blobObj = new Blob ([this.buildParams(params)], {
+            var blobObj = new Blob([this.buildParams(params)], {
                 "type" : "application/x-www-form-urlencoded; charset=ISO-8859-13"
             });
             window.navigator["sendBeacon"](this._host + "/auraAnalytics", blobObj);

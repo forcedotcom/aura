@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 ({
-	valueChange: function(cmp, evt, helper) {
-		cmp.find("outputStatus").set("v.value", "Value Change Event Fired");
-	}
-})
+    valueChange: function(cmp, evt, helper) {
+        cmp.find("outputStatus").set("v.value", "Value Change Event Fired");
+    },
+
+    clearDate: function(cmp) {
+        cmp.set("v.value", "");
+    }
+})//eslint-disable-line semi

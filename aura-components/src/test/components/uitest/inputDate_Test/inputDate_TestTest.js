@@ -15,6 +15,30 @@
  */
 ({
     /**
+     * Verify that clear both mobile and desktop inputDate's value
+     * by setting the value passed to the component to empty string
+     * Test case for W-3188216
+     */
+    testClearDate: {
+        attributes: {value: "2013-09-25"},
+        test: [function(cmp) {
+            var expected = "2013-09-25";
+            // component structure is different in mobile vs desktop
+            // so use tagName to get the input element
+            var inputElm = $A.test.select("input")[0];
+            $A.test.assertEquals(expected, inputElm.value,
+                    "Initially input should be " + expected);
+            // clear button sets v.value to ""
+            var clearBtn = cmp.find("clearBtn").getElement();
+            $A.test.clickOrTouch(clearBtn);
+        }, function(cmp) {
+            var inputElm = $A.test.select("input")[0];
+            $A.test.assertEquals("", inputElm.value,
+                    "Input should be clear");
+        }]
+    },
+
+    /**
      * Opening date picker with no value set will open datePicker to todays date.
      */
     // TODO(W-2671175): Fails due to GMT/PST timezone difference for user.timezone and actual timezone
@@ -37,6 +61,7 @@
 
     /**
      * Clicking on a date on the datePicker will select the date and close the calendar.
+     * W-3102320: Also verify that there's a zero prepended for single digit month/date
      */
     testClickOnDayWorks: {
         browsers: ['DESKTOP'],
@@ -45,16 +70,19 @@
             this.openDatePicker(cmp);
         }, function (cmp) {
             var datePicker = cmp.find("datePickerTestCmp").find("datePicker");
-            var pastWeek = datePicker.find("grid").find("17");
-            pastWeek.getEvent("click").fire({});
+            var newDate = datePicker.find("grid").find("1");
+            newDate.getEvent("click").fire({});
 
             $A.test.addWaitFor(false, function () {
                 return $A.util.hasClass(datePicker, "visible")
             });
         }, function (cmp) {
-            var expected = "2013-09-18";
-            var actual = cmp.find("datePickerTestCmp").find("inputText").getElement().value;
-            $A.test.assertEquals(expected, actual.toString(), "Clicking on one week prior to todays date did not render the correct result.");
+            var expected = "2013-09-02";
+            var inputDate = cmp.find("datePickerTestCmp");
+            var cmpValue = inputDate.get("v.value");
+            var elmValue = inputDate.find("inputText").getElement().value;
+            $A.test.assertEquals(expected, elmValue, "Clicking on one week prior to todays date did not render the correct result.");
+            $A.test.assertEquals(expected, cmpValue, "Component value is not set correctly");
         }]
     },
 
@@ -331,8 +359,9 @@
     },
 
     /**
-     * Method allowing us to extract whether or not we are looking at a mobile device. Extracted from two functions because
-     * depending on which mode we are in (Desktop or other), we either have a header with the Month Year combo or an outputText
+     * Method allowing us to extract whether or not we are looking at a mobile device.
+     * Extracted from two functions because depending on which mode we are in (Desktop
+     * or other), we either have a header with the Month Year combo or an outputText
      * and a select value
      *
      */
@@ -341,7 +370,8 @@
     },
 
     /**
-     * We have to ways that we need to get elements. Either from a output/select combo or from a header tag
+     * We have to ways that we need to get elements. Either from a output/select combo or
+     * from a header tag
      */
     getTextFromElm: function (cmp) {
         return $A.util.getText(cmp.find("calTitle").getElement());
@@ -352,30 +382,9 @@
             return intMonth;
         }
 
-        if (intMonth == 0) {
-            return "January";
-        } else if (intMonth == 1) {
-            return "February";
-        } else if (intMonth == 2) {
-            return "March";
-        } else if (intMonth == 3) {
-            return "April";
-        } else if (intMonth == 4) {
-            return "May";
-        } else if (intMonth == 5) {
-            return "June";
-        } else if (intMonth == 6) {
-            return "July";
-        } else if (intMonth == 7) {
-            return "August";
-        } else if (intMonth == 8) {
-            return "September";
-        } else if (intMonth == 9) {
-            return "October";
-        } else if (intMonth == 10) {
-            return "November";
-        } else if (intMonth == 11) {
-            return "December";
-        }
+        var months = [ "January", "February", "March", "April", "May", "June", "July",
+                       "August", "September", "October", "November", "December" ];
+
+        return months[intMonth];
     }
-})
+})//eslint-disable-line semi

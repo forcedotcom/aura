@@ -29,15 +29,6 @@
         }
     },
 
-    // TODO: W-1937288 Fix flapping
-    _testInitialValue: {
-        attributes: {displayDatePicker: 'true', value: '2012-09-10', format: 'MM/dd/yyyy'},
-        test: function (cmp) {
-            var inputDateStr = cmp.find("inputText").getElement().value;
-            $A.test.assertEquals("09/10/2012", inputDateStr, "Dates are not the same and they should be");
-        }
-    },
-
     /**
      * Verify behavior when 'format' attribute is not assigned a value.
      */
@@ -168,6 +159,4 @@
             $A.test.assertNotNull(datePicker, "datePicker not present");
         }
     }
-    /*eslint-disable semi */
-})
-/*eslint-enable semi */
+})//eslint-disable-line semi

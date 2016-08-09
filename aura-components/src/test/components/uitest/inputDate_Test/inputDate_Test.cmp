@@ -31,4 +31,5 @@
                 timezone="{!v.timezone}"
                 format="{!v.format}"
                 value="{!v.value}"/>
+    <ui:button aura:id="clearBtn" label="Clear" press="{!c.clearDate}" />
 </aura:component>

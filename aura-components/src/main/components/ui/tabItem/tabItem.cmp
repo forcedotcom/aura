@@ -37,6 +37,10 @@
         <aura:attribute name="callback" type="Object" description="Callback function"/>
     </aura:method>
     
+    <aura:locator target="tabItemAnchor" alias="tabitem-link" description="UI Tab item link">
+    	<aura:locatorContext key="tabName" value="{!v.name}" />
+    </aura:locator>
+    
     <li aura:id="li" class="{!v.class + ' tabs__item' + (v.active ? ' active' : '') + (v.hidden ? ' hidden' : '')}"  role="presentation">
 
         <!-- 

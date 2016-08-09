@@ -322,7 +322,7 @@
             tabConfig.body = [];
         }
         config = {"componentDef": cd, attributes: {values: tabConfig}};
-        $A.componentService.newComponentAsync(this, callback, config);
+        $A.componentService.newComponentAsync(this, callback, config, cmp);
     },
     /**
      * @private
@@ -348,9 +348,10 @@
             tab.set("v.ariaControlId",tab.getGlobalId());
         }
 
-        config.localId = values.name || cmp.get('v.name');
+        config.localId = 'tabItem';
         config.attributes = { "values": values };
         config.componentDef = tabItemDef;
+        config.valueProvider = cmp;
 
         return config;
     },

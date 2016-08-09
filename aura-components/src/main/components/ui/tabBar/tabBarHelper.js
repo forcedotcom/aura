@@ -48,10 +48,10 @@
      * Add new tab item to the tabBar
      * TODO: overflow integration
      */
-    addTab: function (cmp, index, tab, callback, name) {
+    addTab: function (cmp, index, tab, callback) {
         var self = this, items = cmp.get("v.tabHeaders");
         if ($A.util.isNumber(index) && index >= 0 && index <= items.length) {
-            tab.localId = tab.attributes.values.name || name;
+            tab.localId = "tabItem";
             var tabValues = [tab];
             this.createComponents(cmp, tabValues, function (newItems) {
                 items.splice.apply(items, [index, 0].concat(newItems));
@@ -219,7 +219,7 @@
 
         for (var i = 0; i < len; i++) {
             var config = tabValues.get ? tabValues.get(i) : tabValues[i];
-            $A.componentService.newComponentAsync(this, fn, config, config.valueProvider);
+            $A.componentService.newComponentAsync(this, fn, config, config.valueProvider || cmp);
         }
     },
 

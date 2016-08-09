@@ -458,14 +458,12 @@ public class MenuUITest extends WebDriverTestCase {
         // if not chrome would remember the size we set here and
         // that would affect other tests
         Dimension originalDimension = getDriver().manage().window().getSize();
+        
+        // dimensions for testing
+        Dimension initialDimension = new Dimension(800, 600);
+        Dimension newDimension = new Dimension(600, 500);
 
-        // set initial window size
-        int width = 800;
-        int height = 600;
-        driver.manage().window().setSize(new Dimension(width, height));
-        waitForWindowResize(width, height);
-
-        // Verify menulist and trigger are properly aligned
+        // elements
         String menuItem3 = "actionItemAttachToBody3";
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
         WebElement actionItem3Element = getAnchor(actionItem3);
@@ -477,35 +475,40 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menuLabel = driver.findElement(By.className(trigger));
         WebElement menu = driver.findElement(By.className(menuList));
 
-        openMenu(menuLabel, menu);
-        waitForMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
-            "Menu List is not positioned correctly when the menuList rendered on the page");
+        try {
+            // set initial size to make sure we have room to resize later
+            driver.manage().window().setSize(initialDimension);
+            waitForWindowResize(initialDimension);
 
-        // Select menu item and verify still aligned
-        String triggerLeftPosBeforeClick = getAuraUITestingUtil()
-                .getBoundingRectPropOfElement(triggerGlobalId, "left");
+            // Verify menulist and trigger are properly aligned
+            openMenu(menuLabel, menu);
+            waitForMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
+                "Menu List is not positioned correctly when the menuList rendered on the page");
 
-        actionItem3Element.click();
-        waitForMenuText(menuLabel, "Inter Milan");
+            // Select menu item and verify still aligned
+            String triggerLeftPosBeforeClick = getAuraUITestingUtil()
+                    .getBoundingRectPropOfElement(triggerGlobalId, "left");
 
-        String triggerLeftPosAfterClick = getAuraUITestingUtil()
-                .getBoundingRectPropOfElement(triggerGlobalId, "left");
+            actionItem3Element.click();
+            waitForMenuText(menuLabel, "Inter Milan");
 
-        assertEquals("Menu Item position changed after clicking on Item3",
-                triggerLeftPosBeforeClick, triggerLeftPosAfterClick);
+            String triggerLeftPosAfterClick = getAuraUITestingUtil()
+                    .getBoundingRectPropOfElement(triggerGlobalId, "left");
 
-        // Resize window with menulist open and verify realigns properly
-        openMenu(menuLabel, menu);
-        int newWidth = driver.manage().window().getSize().width - 200;
-        int newHeight = driver.manage().window().getSize().height - 100;
-        driver.manage().window().setSize(new Dimension(newWidth, newHeight));
-        waitForWindowResize(newWidth, newHeight);
-        waitForMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
-                "Menu List is not positioned correctly after the resize");
+            assertEquals("Menu Item position changed after clicking on Item3",
+                    triggerLeftPosBeforeClick, triggerLeftPosAfterClick);
 
-        // reset size for other tests
-        driver.manage().window().setSize(originalDimension);
-        waitForWindowResize(originalDimension.width, originalDimension.height);
+            // Resize window with menulist open and verify realigns properly
+            openMenu(menuLabel, menu);
+            driver.manage().window().setSize(newDimension);
+            waitForWindowResize(newDimension);
+            waitForMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
+                    "Menu List is not positioned correctly after the resize");
+        } finally {
+            // always reset size for other tests
+            driver.manage().window().setSize(originalDimension);
+            waitForWindowResize(originalDimension);
+        }
     }
 
     private WebElement getAnchor(WebElement element) {
@@ -518,11 +521,11 @@ public class MenuUITest extends WebDriverTestCase {
      * @param width  Expected width of the current window.
      * @param height Expected height of the current window.
      */
-    private void waitForWindowResize(final int width, final int height) {
+    private void waitForWindowResize(final Dimension newDimension) {
         getAuraUITestingUtil().waitUntilWithCallback(
             check -> {
                 Dimension current = getDriver().manage().window().getSize();
-                return current.width == width && current.height == height;
+                return current.equals(newDimension);
             }, check -> {
                 Dimension current = getDriver().manage().window().getSize();
                 return "Current window dimension is {width: " + current.width + ", height: " + current.height + "}";

@@ -26,7 +26,6 @@ import org.auraframework.instance.Component;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Test;
 

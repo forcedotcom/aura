@@ -15,19 +15,14 @@
  */
 package org.auraframework.http.resource;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.system.AuraContext.Format;
-import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 public class EncryptionKeyJsTest extends UnitTestCase {
     @Test
@@ -42,23 +37,9 @@ public class EncryptionKeyJsTest extends UnitTestCase {
 
     @Test
     public void testSendErrorWhenEncryptionKeyValidationFails() throws Exception {
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
-        class DummyResponse extends DummyHttpServletResponse {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            PrintWriter pw = new PrintWriter(baos);
-
-            @Override
-            public PrintWriter getWriter() throws IOException {
-                return pw;
-            }
-
-            String getContent() throws IOException {
-                return baos.toString();
-            }
-        };
-
-        DummyResponse response = new DummyResponse();
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         Mockito.when(configAdapter.validateGetEncryptionKey(Mockito.anyString())).thenReturn(false);
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
@@ -69,7 +50,6 @@ public class EncryptionKeyJsTest extends UnitTestCase {
 
         encryptionKey.write(request, response, null);
 
-        response.getWriter().flush();
-        assertTrue("Expected 'invalid' in response", response.getContent().indexOf("'invalid'") > -1);
+        assertTrue("Expected 'invalid' in response", response.getContentAsString().indexOf("'invalid'") > -1);
     }
 }

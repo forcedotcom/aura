@@ -16,11 +16,20 @@
 
 package org.auraframework.http.resource;
 
-import org.auraframework.test.util.DummyHttpServletResponse;
-import org.auraframework.util.resource.ResourceLoader;
-import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Test;
-import org.mockito.Mockito;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
@@ -35,6 +44,10 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
+import org.auraframework.util.resource.ResourceLoader;
+import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * Simple (non-integration) test case for {@link AppJs}, most useful for exercising hard-to-reach error
@@ -68,53 +81,57 @@ public class AppJsTest extends UnitTestCase {
     @SuppressWarnings("unchecked")
     @Test
     public void testExceptionInWrite() throws Exception {
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
-        ServerService serverService = Mockito.mock(ServerService.class);
-        ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
-        ResourceLoader loader = Mockito.mock(ResourceLoader.class);
-        URL url = new URL("http://foo.test.com");
-        
+        // Arrange
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
+        ServerService serverService = mock(ServerService.class);
+        ConfigAdapter configAdapter = mock(ConfigAdapter.class);
+        ResourceLoader loader = mock(ResourceLoader.class);
+        Throwable expectedException = new RuntimeException();
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        when(loader.getResource(anyString())).thenReturn(new URL("http://foo.test.com"));
+
+        HashSet<DefDescriptor<?>> dependencies = new HashSet<>();
+        when(servletUtilAdapter.verifyTopLevel(any(HttpServletRequest.class),
+                    any(HttpServletResponse.class), any(AuraContext.class)))
+            .thenReturn(dependencies);
+        doThrow(expectedException).when(serverService).writeDefinitions(anySet(), any(Writer.class));
+        PrintWriter writer = mock(PrintWriter.class);
+        when(response.getWriter()).thenReturn(writer);
+
+        when(configAdapter.getResourceLoader()).thenReturn(loader);
+
         AppJs appJs = new AppJs();
-        Throwable t = new RuntimeException();
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         appJs.setServletUtilAdapter(servletUtilAdapter);
         appJs.setServerService(serverService);
         appJs.setConfigAdapter(configAdapter);
-        
-        Mockito.when(loader.getResource(Mockito.anyString())).thenReturn(url);
-     
-        HashSet<DefDescriptor<?>> dependencies = new HashSet<DefDescriptor<?>>();
-        Mockito.when(servletUtilAdapter.verifyTopLevel(Mockito.any(HttpServletRequest.class),
-                    Mockito.any(HttpServletResponse.class), Mockito.any(AuraContext.class)))
-            .thenReturn(dependencies);
-        Mockito.doThrow(t).when(serverService).writeDefinitions(Mockito.anySet(), Mockito.any(Writer.class));
-        PrintWriter writer = new PrintWriter(System.out);
-        Mockito.when(response.getWriter()).thenReturn(writer);
-        
-        Mockito.when(configAdapter.getResourceLoader()).thenReturn(loader);
+
+        // Act
         appJs.write(null, response, null);
+
+        // Assert
+        //
+        // Verify the exception first. Because we catch all exceptions and generate gacks,
+        // make sure the expected code path is exercised.
+        //
+        verify(servletUtilAdapter, times(1)).handleServletException(eq(expectedException),
+                eq(false), any(AuraContext.class), any(HttpServletRequest.class),
+                any(HttpServletResponse.class), anyBoolean());
 
         //
         // Knock off the known calls. These are mocked above, and are internal implementation dependent.
         //
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).verifyTopLevel(Mockito.any(HttpServletRequest.class),
-                Mockito.any(HttpServletResponse.class), Mockito.any(AuraContext.class));
-        Mockito.verify(response, Mockito.times(1)).getWriter();
-        Mockito.verify(serverService, Mockito.times(1)).writeDefinitions(Mockito.eq(dependencies), Mockito.eq(writer));
-
-        //
-        // And this is the expected call. This must stay.
-        //
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).handleServletException(Mockito.eq(t),
-                Mockito.eq(false), Mockito.any(AuraContext.class), Mockito.any(HttpServletRequest.class),
-                Mockito.any(HttpServletResponse.class), Mockito.anyBoolean());
+        verify(servletUtilAdapter, times(1)).verifyTopLevel(any(HttpServletRequest.class),
+                any(HttpServletResponse.class), any(AuraContext.class));
+        verify(response, times(1)).getWriter();
+        verify(serverService, times(1)).writeDefinitions(same(dependencies), same(writer));
 
         //
         // Make sure nothing else happens.
         //
-        Mockito.verifyNoMoreInteractions(response);
-        Mockito.verifyNoMoreInteractions(serverService);
-        Mockito.verifyNoMoreInteractions(servletUtilAdapter);
+        verifyNoMoreInteractions(response);
+        verifyNoMoreInteractions(serverService);
+        verifyNoMoreInteractions(servletUtilAdapter);
     }
 
     /**
@@ -124,57 +141,49 @@ public class AppJsTest extends UnitTestCase {
      */
     @Test
     public void testNullDependencies() throws Exception {
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
-        ServerService serverService = Mockito.mock(ServerService.class);
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
+        ServerService serverService = mock(ServerService.class);
         AppJs appJs = new AppJs();
         appJs.setServletUtilAdapter(servletUtilAdapter);
         appJs.setServerService(serverService);
-        Mockito.when(servletUtilAdapter.verifyTopLevel(Mockito.any(HttpServletRequest.class),
-                    Mockito.any(HttpServletResponse.class), Mockito.any(AuraContext.class)))
+        when(servletUtilAdapter.verifyTopLevel(any(HttpServletRequest.class),
+                any(HttpServletResponse.class), any(AuraContext.class)))
             .thenReturn(null);
 
         appJs.write(null, null, null);
 
+        // Verify the exception first. Because we catch all exceptions and generate gacks,
+        // make sure the expected code path is exercised.
+        verify(servletUtilAdapter, never()).handleServletException(any(Throwable.class),
+                eq(false), any(AuraContext.class), any(HttpServletRequest.class),
+                any(HttpServletResponse.class), anyBoolean());
+
         //
         // This is the known call to get the null.
-        // 
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).verifyTopLevel(Mockito.any(HttpServletRequest.class),
-                    Mockito.any(HttpServletResponse.class), Mockito.any(AuraContext.class));
+        //
+        verify(servletUtilAdapter, times(1)).verifyTopLevel(any(HttpServletRequest.class),
+                any(HttpServletResponse.class), any(AuraContext.class));
 
         //
         // Nothing else should happen.
         //
-        Mockito.verifyNoMoreInteractions(serverService);
-        Mockito.verifyNoMoreInteractions(servletUtilAdapter);
+        verifyNoMoreInteractions(serverService);
+        verifyNoMoreInteractions(servletUtilAdapter);
     }
-    
+
     /**
      * Verify that we set the correct contentType to response
      */
     @Test
     public void testSetContentType() {
         AppJs appJs = new AppJs();
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
         appJs.setServletUtilAdapter(servletUtilAdapter);
-        Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.JS))
-        .thenReturn("text/javascript");
-        
-        DummyHttpServletResponse response = new DummyHttpServletResponse() {
-            String contentType = "defaultType";
+        when(servletUtilAdapter.getContentType(AuraContext.Format.JS)).thenReturn("text/javascript");
+        HttpServletResponse response = new MockHttpServletResponse();
 
-            @Override
-            public String getContentType() {
-                return this.contentType;
-            }
-
-            @Override
-            public void setContentType(String contentType) {
-                this.contentType = contentType;
-            }
-        };
-        
         appJs.setContentType(response);
-        
+
         assertEquals("text/javascript", response.getContentType());
     }
 }

@@ -18,7 +18,10 @@
     	var ret;
     	
         helper.setAriaAttributes(component);
-        
+
+        // need to position this component after initial render
+        // or weirdness will ensue
+        helper.position(component);
         ret = this.superAfterRender();        
 
         return ret;

@@ -36,6 +36,7 @@
 	              
 	            </div>
 	        </div>
+	        
         	<!--
             	Body Test
             -->
@@ -90,7 +91,6 @@
 	            </div>
             </div>
             
-            
             <!--
             	Disabled Test
             -->
@@ -118,7 +118,7 @@
 	            </div>
             </div>
             
-                <!--
+            <!--
             	Test Advanced Attribute
             -->
             
@@ -225,7 +225,6 @@
 	            </div>
              </div>
             
-            
             <!--
             	Test triggerClass Attribute
             -->
@@ -254,9 +253,27 @@
 	            	Class
 	            </div>
             </div>
+ 
+            <!--
+            	boundingElementSelector Attribute test
+            -->
+
+            <div id="box" aura:id="box"/>
+         	<div class="blocks">
+	            <div class="case">
+	                <div class="posBoundElem">
+	                <h1>boundingElementSelector=#box</h1>
+		                <ui:tooltip aura:id="boundingElem" class="boundingElem" boundingElementSelector="#box" advanced="true" domId="testDomId" trigger="hover" tooltipBody="Tooltip Message">
+		                	<ui:label aura:id="boundingElemLabel" for="boundingElem" label="?"/>
+		                </ui:tooltip>
+	                </div>
+	            </div>
+	            <div class="attribute">
+	            	boundingElementSelector
+	            </div>
+            </div> 
             
-            
-              <!--
+            <!--
             	fadeInDuration Test
             -->
             
@@ -298,7 +315,7 @@
             	</div>
             </div>
             
-              <!--
+            <!--
             	fadeOutDuration Test
             -->
             
@@ -338,8 +355,7 @@
 	            </div>
             </div>
             
-            
-              <!--
+            <!--
             	fadeIn + fadeOut Test
             -->
             
@@ -391,7 +407,7 @@
 	            </div>
             </div>
             
-              <!--
+            <!--
             	delay Test
             -->
             
@@ -438,7 +454,7 @@
 	            </div>
             </div>
             
-             <!--
+            <!--
             	delay Test for fadeIn
             -->
             
@@ -485,7 +501,7 @@
 	            </div>
             </div>
             
-             <!--
+            <!--
             	delay Test for fadeOut
             -->
             
@@ -567,7 +583,7 @@
 	            </div>
             </div>
             
-             <!--
+            <!--
             	Tooltip-Body Test
             -->
             
@@ -607,7 +623,7 @@
 	            </div>
             </div>
             
-              <!--
+            <!--
         		Test dynamically change tooltip body and verify positioning
        	 	-->
         
@@ -642,7 +658,7 @@
 	            </div>
             </div>
             
-             <!--
+            <!--
             	domId Attribute test
             -->
          	<div class="blocks">
@@ -673,7 +689,7 @@
 	            <div class="attribute">
 	            	domId
 	            </div>
-            </div>           
+            </div>                
         </div>
         
 

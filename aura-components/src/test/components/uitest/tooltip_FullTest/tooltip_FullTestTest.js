@@ -498,6 +498,71 @@
 	},
 	
 	/**
+	 * Test to check that the tooltip is aligned along the x-axis and within the bounding element
+	 * when placing the bounding element at different positions on the screen
+	 */
+	
+	// Top and left positioning values for the bounding element
+	TOP_POSITIONS :  [450, 850, 1050, 450],
+	LEFT_POSITIONS : [150, 820, 20,   920],
+	WIDTH : 150,
+	
+	testBoundingElementSelector : {
+		test : [function(cmp) {
+		    	   this.openOrCloseTT(cmp, "boundingElemLabel", "boundingElem", "open");
+		       },
+		       function(cmp) {
+		    	   this.verifyBoundingBox(cmp, "boundingElem", "box", this.WIDTH);
+		    	   this.openOrCloseTT(cmp, "boundingElemLabel", "boundingElem", "close");
+		    	   this.moveBoundingBox("box", this.TOP_POSITIONS[1], this.LEFT_POSITIONS[1]);
+		       },
+		       function(cmp) {
+		    	   this.openOrCloseTT(cmp, "boundingElemLabel", "boundingElem", "open");
+		       },
+		       function(cmp) {
+		    	   this.verifyBoundingBox(cmp, "boundingElem", "box", this.WIDTH);
+		    	   this.openOrCloseTT(cmp, "boundingElemLabel", "boundingElem", "close");
+		    	   this.moveBoundingBox("box", this.TOP_POSITIONS[2], this.LEFT_POSITIONS[2]);
+		       },
+		       function(cmp) {
+		    	   this.openOrCloseTT(cmp, "boundingElemLabel", "boundingElem", "open");
+		       },
+		       function(cmp) {
+		    	   this.verifyBoundingBox(cmp, "boundingElem", "box", this.WIDTH);
+		    	   this.openOrCloseTT(cmp, "boundingElemLabel", "boundingElem", "close");
+		    	   this.moveBoundingBox("box", this.TOP_POSITIONS[3], this.LEFT_POSITIONS[3]);
+		       },
+		       function(cmp) {
+		    	   this.openOrCloseTT(cmp, "boundingElemLabel", "boundingElem", "open");
+		       },
+		       function(cmp) {
+		    	   this.verifyBoundingBox(cmp,"boundingElem", "box", this.WIDTH);
+		    	   this.openOrCloseTT(cmp, "boundingElemLabel", "boundingElem", "close");
+		       }]
+	},
+	
+	/**
+	 * Move to position the bounding element based on the specified top and left value 
+	 */
+	moveBoundingBox : function(selector, top, left){
+		var elementStyle = document.getElementById(selector).style;
+		elementStyle.top = top + "px";
+		elementStyle.left = left + "px";
+	},
+
+	/**
+	 * Verify that the tooltip is correctly aligned (along x-axis) with the bounding element
+	 */
+	verifyBoundingBox : function(cmp, tt, boundingBoxID, width) {
+		var tooltip = $A.test.getElementByClass(tt)[0];
+		var tooltipBoundingRect = tooltip.querySelector('div.tooltip-body').getBoundingClientRect();
+		var boundingBoxRect = cmp.find(boundingBoxID).getElement().getBoundingClientRect();
+		// check if tooltip is completely within the bounding element (width is large enough to accommodate the tooltip)
+		$A.test.assertTrue(tooltipBoundingRect.right < boundingBoxRect.left + width);
+		$A.test.assertTrue(tooltipBoundingRect.left > boundingBoxRect.left);
+	},
+	
+	/**
 	 * Test tooltip positioning does not break when tooltipBody is changed dynamically
 	 */
 	testDynamicTooltipBody : {

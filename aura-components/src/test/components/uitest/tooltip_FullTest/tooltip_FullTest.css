@@ -60,3 +60,17 @@
 .THIS.uiContainerManager {
 	pointer-events: none;
 }
+
+.THIS .posBoundElem {
+	margin-left: 430px;
+}
+
+.THIS #box {
+    position: absolute;
+    top: 450px;
+    left: 150px;
+    width: 150px;
+    height: 150px;
+    border: 1px solid red;
+    z-index: -1;
+}

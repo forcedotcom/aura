@@ -16,7 +16,7 @@
     limitations under the License.
 
 -->
-<aura:application template="performance:bootTestTemplate"  useAppcache="true">
+<aura:application template="bootstrapTest:bootTestTemplate"  useAppcache="true">
     <aura:attribute name="status" type="String" default="" description="Last status message" />
     <aura:attribute name="log" type="String" default="" description="Log catcher" />
 

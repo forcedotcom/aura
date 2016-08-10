@@ -16,7 +16,7 @@
     limitations under the License.
 
 -->
-<aura:application template="performance:errorInAuraPreInitBlockTemplate">
+<aura:application template="bootstrapTest:errorInAuraPreInitBlockTemplate">
     <div>Error in auraPreInitBlock of template</div>
     <ui:button label="I do nothing"/>
 </aura:application>

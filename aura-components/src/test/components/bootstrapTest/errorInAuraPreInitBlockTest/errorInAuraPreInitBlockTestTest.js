@@ -11,7 +11,7 @@
                 $A.util.on(frame, "load", function () {
                     cmp._frameLoaded = true;
                 });
-                frame.src = "/performance/errorInAuraPreInitBlock.app";
+                frame.src = "/bootstrapTest/errorInAuraPreInitBlock.app";
                 var content = cmp.find("iframeContainer");
                 $A.util.insertFirst(frame, content.getElement());
                 $A.test.addWaitFor(true, function(){ return cmp._frameLoaded });

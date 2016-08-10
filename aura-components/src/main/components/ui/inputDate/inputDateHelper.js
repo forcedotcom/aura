@@ -14,28 +14,11 @@
  * limitations under the License.
  */
 ({
-    setInitialValues : function (component) {
-        // set default values for initial attributes in case they weren't provided.
-        var timezone = component.get("v.timezone"),
-            format = component.get("v.format"),
-            langLocale = component.get("v.langLocale");
-
-        if ($A.util.isEmpty(timezone)) {
-            component.set("v.timezone", $A.get("$Locale.timezone"));
-        }
-        if ($A.util.isEmpty(format)) {
-            component.set("v.format", $A.get("$Locale.dateFormat"));
-        }
-        if ($A.util.isEmpty(langLocale)) {
-            component.set("v.langLocale", $A.get("$Locale.langLocale"));
-        }
-    },
-
     displayValue: function(component) {
         var config = {
-            langLocale : component.get("v.langLocale"),
-            format : component.get("v.format"),
-            timezone : component.get("v.timezone"),
+            langLocale : component.get("v.langLocale") || $A.get("$Locale.langLocale"),
+            format : component.get("v.format") || $A.get("$Locale.dateFormat"),
+            timezone : component.get("v.timezone") || $A.get("$Locale.timezone"),
             validateString : true
         };
 
@@ -80,8 +63,8 @@
     	var localizedValue = $A.localizationService.translateFromLocalizedDigits(value);
         var formattedDate = localizedValue;
         if (value) {
-            var langLocale = component.get("v.langLocale");
-            var format = component.get("v.format");
+            var langLocale = component.get("v.langLocale") || $A.get("$Locale.langLocale");
+            var format = component.get("v.format") || $A.get("$Locale.dateFormat");
             var date = $A.localizationService.parseDateTimeUTC(localizedValue, format, langLocale, true);
 
             if (date) {
@@ -105,8 +88,8 @@
 
     getDateValueForDatePicker: function(component) {
         var date;
-        var format = component.get("v.format");
-        var langLocale = component.get("v.langLocale");
+        var format = component.get("v.format") || $A.get("$Locale.dateFormat");
+        var langLocale = component.get("v.langLocale") || $A.get("$Locale.langLocale");
         var dateString = this.getInputElement(component).value;
         if (!$A.util.isEmpty(dateString)) {
             date = $A.localizationService.parseDateTime(dateString, format, langLocale, true);

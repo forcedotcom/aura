@@ -15,11 +15,6 @@
  */
 ({
     doInit: function(cmp) {
-        var timezone = cmp.get("v.timezone");
-        if ($A.util.isEmpty(timezone)) {
-            cmp.set("v.timezone", $A.get("$Locale.timezone"));
-        }
-        
         // On android If you select the date and press the done button, a 'change' will be fired.
         // But the input still has focus so 'blur' will fire after you touched something else.
         // iOS does the opposite, when you change anything with the wheels, a 'change' will be fired.

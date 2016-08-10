@@ -19,7 +19,6 @@
 
     <aura:attribute name="timezone" type="String" default="{!$Locale.timezone}" description="The timezone ID, for example, America/Los_Angeles."/>
     <aura:attribute name="value" type="String" required="true" access="GLOBAL" description="The output value of the date. It should be a date string in ISO-8601 format (YYYY-MM-DD)."/>
-    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
     <aura:import library="ui:dateTimeLib" property="dateTimeLib"/>
 

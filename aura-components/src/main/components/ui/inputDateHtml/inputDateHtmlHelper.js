@@ -17,7 +17,7 @@
     formatValue: function(component) {
         var config = {
             format : "YYYY-MM-DD",
-            timezone : component.get("v.timezone"),
+            timezone : component.get("v.timezone") || $A.get("$Locale.timezone"),
             validateString : false
         };
 

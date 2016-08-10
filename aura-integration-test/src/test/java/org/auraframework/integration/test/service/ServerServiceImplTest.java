@@ -666,36 +666,36 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     /**
      * When we write out the application javascript we should only include component classes once per component.
      */
-    @Test
-    public void testNoComponentClassDuplicate() throws Exception {
-        Object componentClass = null;
-        Boolean found = false;
-        String js = getDefinitionsOutput(
-                "<aura:application></aura:application>", AuraContext.Mode.DEV);
+    // @Test
+    // public void testNoComponentClassDuplicate() throws Exception {
+    //     Object componentClass = null;
+    //     Boolean found = false;
+    //     String js = getDefinitionsOutput(
+    //             "<aura:application></aura:application>", AuraContext.Mode.DEV);
 
-        assertTrue("aura:html component class not included in app js",
-                js.contains("addComponentClass(\"markup://aura:html"));
+    //     assertTrue("aura:html component class not included in app js",
+    //             js.contains("addComponentClass(\"markup://aura:html"));
 
-        String start = "$A.clientService.initDefs(";
-        int index = js.indexOf(start);
-        String componentDefs = js.substring(index + start.length(),
-                js.length() - 4);
-        Map<?, ?> json = (Map<?, ?>) new JsonReader().read(componentDefs);
-        List<?> defs = (List<?>) json.get("componentDefs");
+    //     String start = "$A.clientService.initDefs(";
+    //     int index = js.indexOf(start);
+    //     String componentDefs = js.substring(index + start.length(),
+    //             js.length() - 4);
+    //     Map<?, ?> json = (Map<?, ?>) new JsonReader().read(componentDefs);
+    //     List<?> defs = (List<?>) json.get("componentDefs");
 
-        for (Object def : defs) {
-            String desc = (String) ((Map<?, ?>) def).get("descriptor");
-            if (desc.equals("markup://aura:html")) {
-                componentClass = ((Map<?, ?>) def).get("componentClass");
-                found = true;
-            }
-        }
+    //     for (Object def : defs) {
+    //         String desc = (String) ((Map<?, ?>) def).get("descriptor");
+    //         if (desc.equals("markup://aura:html")) {
+    //             componentClass = ((Map<?, ?>) def).get("componentClass");
+    //             found = true;
+    //         }
+    //     }
 
-        assertTrue("No aura:html componentDef entry found", found);
-        assertNull(
-                "Duplicate component class entires for aura:html in application javascript",
-                componentClass);
-    }
+    //     assertTrue("No aura:html componentDef entry found", found);
+    //     assertNull(
+    //             "Duplicate component class entires for aura:html in application javascript",
+    //             componentClass);
+    // }
 
     /**
      * This is verification for W-2657282. The bug was when an IOException is thrown in try block,

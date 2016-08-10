@@ -19,6 +19,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -121,9 +122,7 @@ public class ManifestTest extends AuraImplTestCase {
         // Assert
         String[] lines = content.split("\n");
         int start = Arrays.asList(lines).indexOf("CACHE:");
-        if(start < 0) {
-            fail("Could not find CACHE part in appcache manifest: " + content);
-        }
+        assertTrue("Could not find CACHE part in appcache manifest: " + content, start >= 0);
 
         for(int i=start + 1; i < lines.length; i++) {
             assertThat("auraResetStyle is empty, so manifest should not contains resetCSS.css",
@@ -166,9 +165,7 @@ public class ManifestTest extends AuraImplTestCase {
         Pattern pattern = Pattern.compile("(?m)^(.*)(/auraFW|/l/)(.*)$");
         Matcher matcher = pattern.matcher(content);
 
-        if(!matcher.find()) {
-            fail("Failed to find any Aura URL in manifest:\n" + content);
-        }
+        assertTrue("Failed to find any Aura URL in manifest:\n" + content, matcher.find());
 
         String url = matcher.group();
         assertThat("Aura URL in manifest should start with context name.", url, startsWith(expectedContextName));
@@ -208,16 +205,13 @@ public class ManifestTest extends AuraImplTestCase {
         // find UID in manifest file
         Pattern pattern = Pattern.compile("FW=(.*)\n");
         Matcher matcher = pattern.matcher(content);
-        if(!matcher.find()) {
-            fail("Failed to find UID in manifest:\n" + content);
-        }
-        String fwId = matcher.group(1);
+        assertTrue("Failed to find UID in manifest:\n" + content, matcher.find());
 
+        String fwId = matcher.group(1);
         Pattern urlPattern = Pattern.compile("/auraFW|/l/");
         Matcher urlMatcher = urlPattern.matcher(content);
-        if(!urlMatcher.find()) {
-            fail("Failed to find any Aura URL in manifest:\n" + content);
-        }
+        assertTrue("Failed to find any Aura URL in manifest:\n" + content, urlMatcher.find());
+
         String url = matcher.group();
         assertThat("Aura URL in manifest should contain UID.", url, containsString(fwId));
         while(matcher.find()) {
@@ -226,4 +220,42 @@ public class ManifestTest extends AuraImplTestCase {
         }
     }
 
+    @Test
+    public void testManifestContainsJwtToken() throws Exception {
+        // Arrange
+        if (contextService.isEstablished()) {
+            contextService.endContext();
+        }
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:testApp", ApplicationDef.class);
+        AuraContext context = contextService.startContext(AuraContext.Mode.PROD, AuraContext.Format.MANIFEST,
+                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        context.setApplicationDescriptor(appDesc);
+        String uid = context.getDefRegistry().getUid(null, appDesc);
+        context.addLoaded(appDesc, uid);
+
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+        ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
+        servletUtilAdapter.setClientLibraryService(new ClientLibraryServiceImpl());
+        ConfigAdapter configAdapter = new ConfigAdapterImpl();
+        ConfigAdapter spyConfigAdapter = spy(configAdapter);
+        String expectedToken = "jwtToken";
+        doReturn(expectedToken).when(spyConfigAdapter).generateJwtToken();
+
+        Manifest manifest = new Manifest();
+        manifest.setServletUtilAdapter(servletUtilAdapter);
+        manifest.setConfigAdapter(spyConfigAdapter);
+
+        // Act
+        manifest.write(mockRequest, mockResponse, context);
+        String content = mockResponse.getContentAsString();
+
+        // Assert
+        Pattern pattern = Pattern.compile("# bootstrap token: (.*)\n");
+        Matcher matcher = pattern.matcher(content);
+        assertTrue("Failed to find Jwt Token in manifest:\n" + content, matcher.find());
+
+        String token = matcher.group(1);
+        assertEquals("Found unexpected token", expectedToken, token);
+    }
 }

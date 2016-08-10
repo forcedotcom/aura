@@ -22,8 +22,6 @@
 
     <aura:dependency resource="markup://ui:scroller" type="COMPONENT" />
 
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-
     <aura:method name="clearCachesAndLog" action="c.clearCachesAndLog" />
 
     <section class="container" aura:id="container"> Bootstrap App </section>

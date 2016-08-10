@@ -51,5 +51,7 @@ public class EncryptionKeyJsTest extends UnitTestCase {
         encryptionKey.write(request, response, null);
 
         assertTrue("Expected 'invalid' in response", response.getContentAsString().indexOf("'invalid'") > -1);
+        // Verify we don't include the encryption key when validation fails
+        Mockito.verify(configAdapter, Mockito.never()).getEncryptionKey();
     }
 }

@@ -186,7 +186,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             }
             // adapt UI by changing classes
             this._applyKeyboardModeCellMarker(false);
-
+            cmp.helper.fireKeyboardModeEnterEvent(cmp);
         },
 
         /**

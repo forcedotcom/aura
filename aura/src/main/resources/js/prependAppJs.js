@@ -23,6 +23,7 @@ if (typeof Aura === "undefined" || !Aura.frameworkJsReady) {
 
     // -- Framework is not ready yet, so implement the minimum set of functions to run!
     window.Aura.ApplicationDefs = {
+        cmpExporter   : {},
         classExporter : {},
         resolvedDefs  : {},
         libraryDefs   : {}
@@ -30,6 +31,9 @@ if (typeof Aura === "undefined" || !Aura.frameworkJsReady) {
 
     window.$A = {
         componentService: {
+            addComponent: function (descriptor, exporter) {
+                window.Aura.ApplicationDefs.cmpExporter[descriptor] = exporter;
+            },
             addComponentClass: function (descriptor, exporter) {
                 window.Aura.ApplicationDefs.classExporter[descriptor] = exporter;
             },

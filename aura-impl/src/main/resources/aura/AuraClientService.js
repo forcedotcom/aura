@@ -1180,14 +1180,15 @@ AuraClientService.prototype.initDefs = function(config, resolved) {
     var i;
 
     if (resolved) {
-        var classExporter = config["classExporter"];
-        for (i in classExporter) {
-            $A.componentService.addComponentClass(i, classExporter[i]);
-        }
         var libraryDefs = config["libraryDefs"];
         for (i in libraryDefs) {
             var libDef = libraryDefs[i];
             $A.componentService.addLibraryInclude(i, libDef["dependencies"], libDef["exporter"]);
+        }
+
+        var cmpExporter = config["cmpExporter"];
+        for (i in cmpExporter) {
+            $A.componentService.addComponent(i, cmpExporter[i]);
         }
 
         config = config["resolvedDefs"];
@@ -1207,11 +1208,6 @@ AuraClientService.prototype.initDefs = function(config, resolved) {
     var controllerConfigs = config["controllerDefs"];
     for (i = 0; i < controllerConfigs.length; i++) {
         $A.componentService.createControllerDef(controllerConfigs[i]);
-    }
-
-    var comConfigs = config["componentDefs"];
-    for (i = 0; i < comConfigs.length; i++) {
-        $A.componentService.saveComponentConfig(comConfigs[i]);
     }
 
     var defObservers = Aura["afterAppDefsReady"] || [];

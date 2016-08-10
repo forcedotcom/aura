@@ -128,7 +128,6 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
             json.writeMapBegin();
 
             // Metadata
-
             json.writeMapKey("meta");
             json.writeMapBegin();
 

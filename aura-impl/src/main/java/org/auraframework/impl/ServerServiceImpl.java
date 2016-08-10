@@ -327,13 +327,6 @@ public class ServerServiceImpl implements ServerService {
 
         StringBuilder sb = new StringBuilder();
 
-        // Append component classes.
-        Collection<BaseComponentDef> componentDefs = filterAndLoad(BaseComponentDef.class, dependencies, null);
-        for (BaseComponentDef def : componentDefs) {
-            sb.append(def.getCode(minify));
-            masterDefRegistry.setClientClassLoaded(def.getDescriptor(), true);
-        }
-
         // Process Libraries with a lower granularity level, to prevent duplication of external includes.
         Collection<LibraryDef> libraryDefs = filterAndLoad(LibraryDef.class, dependencies, null);
         for (LibraryDef libraryDef : libraryDefs) {
@@ -348,6 +341,26 @@ public class ServerServiceImpl implements ServerService {
         serializationContext.pushFormatRootItems();
         // no ref support needed for defs
         serializationContext.pushRefSupport(false);
+        
+        
+     // Append component classes.
+        Collection<BaseComponentDef> componentDefs = filterAndLoad(BaseComponentDef.class, dependencies, null);
+        for (BaseComponentDef def : componentDefs) {
+            sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", function (){\n");
+            
+            	// Definition
+            	sb.append("var def = ");
+            	Aura.getSerializationService().write(def, null, BaseComponentDef.class, sb, "JSON");
+            	sb.append(";\n");
+            	
+            	// Component Class
+            	sb.append(def.getCode(minify));
+            	masterDefRegistry.setClientClassLoaded(def.getDescriptor(), true);
+            	
+            	sb.append("return def;");
+            	
+            sb.append("});\n");
+        }
 
         sb.append("$A.clientService.initDefs({");
 
@@ -371,11 +384,11 @@ public class ServerServiceImpl implements ServerService {
         sb.append("controllerDefs:");
         Collection<ControllerDef> controllers = filterAndLoad(ControllerDef.class, dependencies, ACF);
         Aura.getSerializationService().writeCollection(controllers, ControllerDef.class, sb, "JSON");
-        sb.append(",");
+        //sb.append(",");
 
         // append component definitions
-        sb.append("componentDefs:");
-        Aura.getSerializationService().writeCollection(componentDefs, BaseComponentDef.class, sb, "JSON");
+         //sb.append("componentDefs:");
+         //Aura.getSerializationService().writeCollection(componentDefs, BaseComponentDef.class, sb, "JSON");
 
         sb.append("});\n\n");
 

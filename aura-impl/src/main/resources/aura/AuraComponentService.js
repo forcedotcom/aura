@@ -1030,6 +1030,18 @@ AuraComponentService.prototype.getDef = function(descriptor) {
 };
 
 /**
+ * Add a component to the registry
+ * We store them for execution later so we do not load definitions into memory unless they are utilized in getComponent.
+ * @param {String} descriptor Uses the pattern of namespace:componentName.
+ * @param {Function} exporter A function that when executed will return the component object litteral.
+ * @export
+ */
+AuraComponentService.prototype.addComponent = function(descriptor, exporter) {
+    this.savedComponentConfigs[descriptor] = exporter;
+};
+
+
+/**
  * Checks for saved component config, creates if available, and deletes the config
  *
  * @param {String} descriptor component descriptor to check and create
@@ -1038,11 +1050,14 @@ AuraComponentService.prototype.getDef = function(descriptor) {
  */
 AuraComponentService.prototype.createFromSavedComponentConfigs = function(config) {
     var descriptor = this.getDescriptorFromConfig(config);
-    var def = new ComponentDef(this.savedComponentConfigs[descriptor]);
+    var cmpConfig = this.savedComponentConfigs[descriptor];
+    var definition = typeof cmpConfig === 'function' ? cmpConfig() : cmpConfig;
+    var def = new ComponentDef(definition);
     this.componentDefRegistry[descriptor] = def;
     delete this.savedComponentConfigs[descriptor];
     return def;
 };
+
 
 /**
  * Creates ComponentDef from provided config
@@ -1073,30 +1088,7 @@ AuraComponentService.prototype.createComponentDef = function(config) {
  * @private
  */
 AuraComponentService.prototype.getControllerDef = function(descriptor) {
-    return this.getDefFromRelationship(descriptor, this.controllerDefRelationship, this.controllerDefRegistry);
-};
-
-/**
- * ControllerDef and ActionDef are within ComponentDef. ComponentDef(s) are only created when used so
- * we need to create the component def if ControllerDef or ActionDef is requested directly
- *
- * @param {String} descriptor descriptor for definition
- * @param {Object} relationshipMap relationship map referencing ComponentDef descriptor
- * @param {Object} registry registry that hold definition type
- * @return {*} Def definition
- * @private
- */
-AuraComponentService.prototype.getDefFromRelationship = function(descriptor, relationshipMap, registry) {
-    var def = registry[descriptor];
-    if (!def && relationshipMap[descriptor]) {
-        var componentDefDescriptor = relationshipMap[descriptor];
-        if (this.savedComponentConfigs[componentDefDescriptor]) {
-            this.getComponentDef(this.createDescriptorConfig(componentDefDescriptor));
-            return registry[descriptor];
-        }
-    }
-    return def;
-
+    return this.controllerDefRegistry[descriptor];
 };
 
 /**
@@ -1123,7 +1115,7 @@ AuraComponentService.prototype.createControllerDef = function(config) {
  * @private
  */
 AuraComponentService.prototype.getActionDef = function(descriptor) {
-    return this.getDefFromRelationship(descriptor, this.actionDefRelationship, this.actionDefRegistry);
+    return this.actionDefRegistry[descriptor];
 };
 
 /**

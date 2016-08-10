@@ -77,6 +77,21 @@
     },
     
     /**
+     * Active Position is set to fixed for modal
+     * Bug: W-3245795
+     */
+    testPositonSetToFixedOnModal: {
+        test: [function(cmp) {
+            this.createPanel(cmp);
+        }, function(cmp) {
+            $A.test.addWaitForWithFailureMessage("fixed", function() {
+                var modalElement = $A.test.select(".uiModal")[0];
+                return $A.test.getStyle(modalElement,"position");
+            }, "Modal Position should be fixed");
+        }]
+    },
+    
+    /**
      * Active class set correctly on panel/modal
      * Bug: W-2647558
      */

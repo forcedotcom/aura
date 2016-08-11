@@ -18,5 +18,5 @@
 <aura:component>
     <provider:javaProviderAbstract />
     <provider:javaProviderImpl />
-    <provider:javaproviderExtends />
+    <provider:javaProviderExtends />
 </aura:component>

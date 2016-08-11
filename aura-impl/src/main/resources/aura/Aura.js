@@ -64,6 +64,7 @@ window['$A'] = {};
 // #include aura.polyfill.Object
 // #include aura.polyfill.Json
 // #include aura.polyfill.Promise
+// #include aura.polyfill.TextEncoder
 
 // -- Exporter ---------------------------------------------------------
 // #include aura.util.ExportSymbolsHelper

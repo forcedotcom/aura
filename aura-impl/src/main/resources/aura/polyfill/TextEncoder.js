@@ -1,6 +1,25 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // https://github.com/inexorabletash/text-encoding v0.6.0
-// Stripped to only support utf-8 and utf-16
+// - Stripped to only support utf-8 and utf-16
+// - Aura-specific change to handle obfuscation
 // This is free and unencumbered software released into the public domain.
+
+/* eslint-disable */
 (function(global) {
     'use strict';
 
@@ -19,7 +38,7 @@
     }
 
     /**
-     * @param {!Array.<*>} array The array to check.
+     * @param {!Array} array The array to check.
      * @param {*} item The item to look for in the array.
      * @return {boolean} True if the item appears in the array.
      */
@@ -39,7 +58,7 @@
 
     /**
      * @param {string} string Input string of UTF-16 code units.
-     * @return {!Array.<number>} Code points.
+     * @return {!Array} Code points.
      */
     function stringToCodePoints(string) {
         // https://heycam.github.io/webidl/#dfn-obtain-unicode
@@ -121,7 +140,7 @@
     }
 
     /**
-     * @param {!Array.<number>} code_points Array of code points.
+     * @param {!Array} code_points Array of code points.
      * @return {string} string String of UTF-16 code units.
      */
     function codePointsToString(code_points) {
@@ -168,11 +187,11 @@
      * A stream represents an ordered sequence of tokens.
      *
      * @constructor
-     * @param {!(Array.<number>|Uint8Array)} tokens Array of tokens that provide
+     * @param {!(Array|Uint8Array)} tokens Array of tokens that provide
      * the stream.
      */
     function Stream(tokens) {
-        /** @type {!Array.<number>} */
+        /** @type {!Array} */
         this.tokens = [].slice.call(tokens);
         // Reversed as push/pop is more efficient than shift/unshift.
         this.tokens.reverse();
@@ -205,12 +224,12 @@
          * must be inserted, in given order, before the first token in the
          * stream.
          *
-         * @param {(number|!Array.<number>)} token The token(s) to prepend to the
+         * @param {(number|!Array)} token The token(s) to prepend to the
          * stream.
          */
         prepend: function(token) {
             if (Array.isArray(token)) {
-                var tokens = /**@type {!Array.<number>}*/(token);
+                var tokens = /**@type {!Array}*/(token);
                 while (tokens.length)
                     this.tokens.push(tokens.pop());
             } else {
@@ -223,12 +242,12 @@
          * must be inserted, in given order, after the last token in the
          * stream.
          *
-         * @param {(number|!Array.<number>)} token The tokens(s) to push to the
+         * @param {(number|!Array)} token The tokens(s) to push to the
          * stream.
          */
         push: function(token) {
             if (Array.isArray(token)) {
-                var tokens = /**@type {!Array.<number>}*/(token);
+                var tokens = /**@type {!Array}*/(token);
                 while (tokens.length)
                     this.tokens.unshift(tokens.shift());
             } else {
@@ -263,7 +282,7 @@
         /**
          * @param {Stream} stream The stream of bytes being decoded.
          * @param {number} bite The next byte read from the stream.
-         * @return {?(number|!Array.<number>)} The next code point(s)
+         * @return {?(number|!Array)} The next code point(s)
          *     decoded, or null if not enough data exists in the input
          *     stream to decode a complete code point, or |finished|.
          */
@@ -276,19 +295,19 @@
         /**
          * @param {Stream} stream The stream of code points being encoded.
          * @param {number} code_point Next code point read from the stream.
-         * @return {(number|!Array.<number>)} Byte(s) to emit, or |finished|.
+         * @return {(number|!Array)} Byte(s) to emit, or |finished|.
          */
         handler: function(stream, code_point) {}
     };
 
     // 5.2 Names and labels
 
-    // TODO: Define @typedef for Encoding: {name:string,labels:Array.<string>}
+    // TODO: Define @typedef for Encoding: {name:string,labels:Array}
     // https://github.com/google/closure-compiler/issues/247
 
     /**
      * @param {string} label The encoding label.
-     * @return {?{name:string,labels:Array.<string>}}
+     * @return {?{name:string,labels:Array}}
      */
     function getEncoding(label) {
         // 1. Remove any leading and trailing ASCII whitespace from label.
@@ -306,10 +325,7 @@
     /**
      * Encodings table: https://encoding.spec.whatwg.org/encodings.json
      * @const
-     * @type {!Array.<{
-   *          heading: string,
-   *          encodings: Array.<{name:string,labels:Array.<string>}>
-   *        }>}
+     * @type {!Array}
      */
     var encodings = [
         {
@@ -346,20 +362,20 @@
     ];
 
     // Label to encoding registry.
-    /** @type {Object.<string,{name:string,labels:Array.<string>}>} */
+    /** @type {Object} */
     var label_to_encoding = {};
     encodings.forEach(function(category) {
-        category.encodings.forEach(function(encoding) {
-            encoding.labels.forEach(function(label) {
+        category['encodings'].forEach(function(encoding) {
+            encoding['labels'].forEach(function(label) {
                 label_to_encoding[label] = encoding;
             });
         });
     });
 
     // Registry of of encoder/decoder factories, by encoding name.
-    /** @type {Object.<string, function({fatal:boolean}): Encoder>} */
+    /** @type {Object} */
     var encoders = {};
-    /** @type {Object.<string, function({fatal:boolean}): Decoder>} */
+    /** @type {Object} */
     var decoders = {};
 
     //
@@ -388,17 +404,11 @@
         // (initially unset), error mode (initially replacement), and do
         // not flush flag (initially unset).
 
-        /** @private */
         this._encoding = null;
-        /** @private @type {?Decoder} */
         this._decoder = null;
-        /** @private @type {boolean} */
         this._ignoreBOM = false;
-        /** @private @type {boolean} */
         this._BOMseen = false;
-        /** @private @type {string} */
         this._error_mode = 'replacement';
-        /** @private @type {boolean} */
         this._do_not_flush = false;
 
 
@@ -503,7 +513,6 @@
         // 4. Let output be a new stream.
         var output = [];
 
-        /** @type {?(number|!Array.<number>)} */
         var result;
 
         // 5. While true:
@@ -529,7 +538,7 @@
 
             if (result !== null) {
                 if (Array.isArray(result))
-                    output.push.apply(output, /**@type {!Array.<number>}*/(result));
+                    output.push.apply(output, (result));
                 else
                     output.push(result);
             }
@@ -548,7 +557,7 @@
                 if (result === null)
                     continue;
                 if (Array.isArray(result))
-                    output.push.apply(output, /**@type {!Array.<number>}*/(result));
+                    output.push.apply(output, (result));
                 else
                     output.push(result);
             } while (!input_stream.endOfStream());
@@ -557,11 +566,6 @@
 
         // A TextDecoder object also has an associated serialize stream
         // algorithm...
-        /**
-         * @param {!Array.<number>} stream
-         * @return {string}
-         * @this {TextDecoder}
-         */
         function serializeStream(stream) {
             // 1. Let token be the result of reading from stream.
             // (Done in-place on array, rather than as a stream)
@@ -606,15 +610,11 @@
 
         // A TextEncoder object has an associated encoding and encoder.
 
-        /** @private */
         this._encoding = null;
-        /** @private @type {?Encoder} */
         this._encoder = null;
 
         // Non-standard
-        /** @private @type {boolean} */
         this._do_not_flush = false;
-        /** @private @type {string} */
         this._fatal = Boolean(options['fatal']) ? 'fatal' : 'replacement';
 
         // 1. Let enc be a new TextEncoder object.
@@ -658,11 +658,6 @@
         });
     }
 
-    /**
-     * @param {string=} opt_string The string to encode.
-     * @param {Object=} options
-     * @return {!Uint8Array} Encoded bytes, as a Uint8Array.
-     */
     TextEncoder.prototype.encode = function encode(opt_string, options) {
         opt_string = opt_string ? String(opt_string) : '';
         options = ToDictionary(options);
@@ -681,7 +676,6 @@
         // 2. Let output be a new stream
         var output = [];
 
-        /** @type {?(number|!Array.<number>)} */
         var result;
         // 3. While true, run these substeps:
         while (true) {
@@ -695,7 +689,7 @@
             if (result === finished)
                 break;
             if (Array.isArray(result))
-                output.push.apply(output, /**@type {!Array.<number>}*/(result));
+                output.push.apply(output, (result));
             else
                 output.push(result);
         }
@@ -706,7 +700,7 @@
                 if (result === finished)
                     break;
                 if (Array.isArray(result))
-                    output.push.apply(output, /**@type {!Array.<number>}*/(result));
+                    output.push.apply(output, (result));
                 else
                     output.push(result);
             }
@@ -747,7 +741,7 @@
         /**
          * @param {Stream} stream The stream of bytes being decoded.
          * @param {number} bite The next byte read from the stream.
-         * @return {?(number|!Array.<number>)} The next code point(s)
+         * @return {?(number|!Array)} The next code point(s)
          *     decoded, or null if not enough data exists in the input
          *     stream to decode a complete code point.
          */
@@ -879,7 +873,7 @@
         /**
          * @param {Stream} stream Input stream.
          * @param {number} code_point Next code point read from the stream.
-         * @return {(number|!Array.<number>)} Byte(s) to emit.
+         * @return {(number|!Array)} Byte(s) to emit.
          */
         this.handler = function(stream, code_point) {
             // 1. If code point is end-of-stream, return finished.
@@ -948,7 +942,7 @@
     /**
      * @param {number} code_unit
      * @param {boolean} utf16be
-     * @return {!Array.<number>} bytes
+     * @return {!Array} bytes
      */
     function convertCodeUnitToBytes(code_unit, utf16be) {
         // 1. Let byte1 be code unit >> 8.
@@ -979,7 +973,7 @@
         /**
          * @param {Stream} stream The stream of bytes being decoded.
          * @param {number} bite The next byte read from the stream.
-         * @return {?(number|!Array.<number>)} The next code point(s)
+         * @return {?(number|!Array)} The next code point(s)
          *     decoded, or null if not enough data exists in the input
          *     stream to decode a complete code point.
          */
@@ -1071,7 +1065,7 @@
         /**
          * @param {Stream} stream Input stream.
          * @param {number} code_point Next code point read from the stream.
-         * @return {(number|!Array.<number>)} Byte(s) to emit.
+         * @return {(number|!Array)} Byte(s) to emit.
          */
         this.handler = function(stream, code_point) {
             // 1. If code point is end-of-stream, return finished.
@@ -1123,8 +1117,13 @@
         return new UTF16Decoder(false, options);
     };
 
-    if (!global['TextEncoder'])
+    // Aura-specific changes follow
+    if (!global['TextEncoder']) {
+        TextEncoder.prototype['encode'] = TextEncoder.prototype.encode;
         global['TextEncoder'] = TextEncoder;
-    if (!global['TextDecoder'])
+    }
+    if (!global['TextDecoder']) {
+        TextDecoder.prototype['decode'] = TextDecoder.prototype.decode;
         global['TextDecoder'] = TextDecoder;
+    }
 }(window));

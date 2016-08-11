@@ -2,7 +2,6 @@
     "files": [
         "moment/moment.js",
         "walltime-js/walltime.js",
-        "text-encoder/encoding.js",
         "domPurify/purify.js",
         "libraryBootstrap/libraryBootstrap.js"
     ],

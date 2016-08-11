@@ -81,7 +81,7 @@
                             <td>{!prop.plan.empty.value}</td>
                             <td>{!prop.plan.opaque.value}</td>
 
-                            <!-- ENSURE OUR TEST PLAN MEETS SYSTEM (to monitor brower API change) -->
+                            <!-- ENSURE OUR TEST PLAN MEETS SYSTEM (to monitor browser API change) -->
                             <td class="{!prop.system.type.status}">
                                 {!prop.system.type.value}
                             </td>

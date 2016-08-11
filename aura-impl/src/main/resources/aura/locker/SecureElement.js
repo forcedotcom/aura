@@ -319,7 +319,7 @@ SecureElement.addSecureProperties = function(se, raw) {
             "clientHeight", "clientLeft", "clientTop", "clientWidth",
             "nodeValue"
 
-    // DCHASMAN TODO This list needs to be revisted as it is missing a ton of
+    // DCHASMAN TODO This list needs to be revisited as it is missing a ton of
     // valid attributes!
     ].forEach(function(name) {
         SecureObject.addPropertyIfSupported(se, raw, name, {
@@ -332,11 +332,17 @@ SecureElement.addSecureGlobalEventHandlers = function(se, raw, key) {
     [
     // Standard Global Event handlers
     // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers
-    "onabort", "onblur", "onchange", "onclick", "onclose", "oncontextmenu", "ondblclick", "onerror", "onfocus", "oninput", "onkeydown", "onkeypress",
+    "onabort", "onblur", "oncancel", "oncanplay", "oncanplaythrough", "onchange", "onclick", "onclose", "oncontextmenu", "oncuechange", "ondblclick", 
+    		"ondrag", "ondragend", "ondragenter", "ondragleave", "ondragover", "ondragstart", "ondrop",
+    		"onerror", "onfocus", "oninput", "onkeydown", "onkeypress",
             "onkeyup", "onload", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onreset", "onresize", "onscroll", "onselect",
             "onsubmit" ].forEach(function(name) {
         Object.defineProperty(se, name, {
-            set : function(callback) {
+        	get: function() {
+        		return SecureObject.filterEverything(se, raw[name]);
+        	},
+        	
+            set: function(callback) {
                 raw[name] = function(e) {
                     callback.call(se, SecureDOMEvent(e, key));
                 };
@@ -520,6 +526,7 @@ SecureElement.elementSpecificAttributeWhitelists = {
 
 SecureElement.elementSpecificMethodWhitelists = {
     "AUDIO" : [ "addTextTrack", "canPlayType", "fastSeek", "getStartDate", "load", "play", "pause" ],
+    "INPUT" : [ "setRangeText", "setSelectionRange" ],
     "CANVAS" : [ "getContext", "toDataURL", "toBlob" ],
     "SVG" : [ "createSVGRect" ],
     "VIDEO" : [ "addTextTrack", "canPlayType", "load", "play", "pause" ]

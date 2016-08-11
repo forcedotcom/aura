@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:application extends="lockerApiTest:base">
+<aura:application extends="lockerApiTest:base" template="lockerApiTest:template">
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 </aura:application>

@@ -19,7 +19,9 @@ function tester() {
 		showResults : function(cmp) {
 			cmp.set("v.secureAPI", testName.secureAPI);
 			cmp.set("v.systemAPI", testName.systemAPI);
+			
 			var report = makeReport();
+						
 			cmp.set("v.report", report);
 		}
 	};
@@ -59,10 +61,10 @@ function tester() {
 		Object.keys(testResults).forEach(function(proto) {
 			Object.keys(testResults[proto]).forEach(function(prop) {
 				var index = props.indexOf(prop);
-				// if (props.indexOf(prop) >= 0) {
-				executeTests(object, proto, prop, "locker");
-				props.splice(index, 1);
-				// }
+				if (index >= 0) {
+					executeTests(object, proto, prop, "locker");
+					props.splice(index, 1);
+				}
 			});
 		});
 		// Add all extra properties under "Object"
@@ -86,7 +88,6 @@ function tester() {
 		if (source === "system" && plan && plan.type) {
 			type.status = (type.value === plan.type ? 'pass' : 'fail');
 		} else if (source === "locker") {
-			type.status = 'warn';
 			if (plan && plan.type) {
 				if (type.value === toLockerType(plan.type)) {
 					type.status = 'pass';
@@ -95,9 +96,11 @@ function tester() {
 						type.status = 'fail';
 						type.value = "Not To Be Supported";
 					} else if ($A.util.isString(plan.support)) {					
+						type.status = 'warn';
 						type.value = getExternalVersion(plan.support);
 					} else {
-						delete type.value;
+						type.status = 'warn';
+						type.value = "WIP";
 					}
 				}
 			}
@@ -146,7 +149,7 @@ function tester() {
 
 	// Return all tests results by property and by prototype.
 	function makeReport() {
-		// Pivot the data
+		// Pivot the data		
 		var report = {
 			"protos" : Object.keys(testResults).map(function(proto) {
 				return {

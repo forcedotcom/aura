@@ -1,0 +1,3 @@
+<aura:component isTemplate="true" extensible="true" extends="aura:template">
+	<aura:set attribute="title" value="Locker Service API"/>
+</aura:component>

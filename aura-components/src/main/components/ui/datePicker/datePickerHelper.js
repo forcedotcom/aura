@@ -319,7 +319,7 @@
                 if ($A.util.isEmpty(elem.style.top)) {
                     // this is just an approximation for the initial position of the datepicker. The positioning library
                     // will take care of the correct position. See W-2993774
-                    elem.style.top = referenceElem.getBoundingClientRect().bottom + "px";
+                    elem.style.top = referenceElem.getBoundingClientRect().bottom + window.pageYOffset + "px";
                 }
 
                 if ($A.util.isEmpty(elem.style.left)) {

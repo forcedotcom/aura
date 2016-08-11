@@ -1,6 +1,5 @@
 {
     "files": [
-        "es6-promise/es6-promise-2.0.1.js",
         "moment/moment.js",
         "walltime-js/walltime.js",
         "text-encoder/encoding.js",

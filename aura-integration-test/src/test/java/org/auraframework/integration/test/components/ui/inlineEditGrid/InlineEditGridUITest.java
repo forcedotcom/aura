@@ -175,6 +175,20 @@ public class InlineEditGridUITest extends WebDriverTestCase {
         verifyCellContent(driver, 0, 1, "abc");
     }
     
+    /**
+     * Test can navigate to inlineEditKeyNavCell using keyboard
+     */
+    @Test
+    public void testInlineEditKeyNavCellNavigateTo() throws Exception {
+    	open("uitest/inlineEditKeyNavCell_test.cmp");
+    	WebDriver driver = getDriver();
+        switchKeyboardMode(driver);
+        
+        pressKey(driver, Keys.TAB);
+        WebElement activeCell = driver.findElement(By.cssSelector(ACTIVE_CELL_CLASS));
+        assertEquals("inlineEditKeyNavCell was not navigated to", "Name0", activeCell.getText());
+    }
+    
     private WebElement waitForActiveCellToLoad(WebDriver wd) {
         getAuraUITestingUtil().waitForElement(By.cssSelector(ACTIVE_CELL_CLASS));
         return wd.findElement(By.cssSelector(ACTIVE_CELL_CLASS));
@@ -185,7 +199,7 @@ public class InlineEditGridUITest extends WebDriverTestCase {
     }
     
     private void pressKey(WebDriver wd, Keys key) {
-    	wd.findElement(By.cssSelector(".slds-has-focus")).sendKeys(key);
+    	wd.findElement(By.cssSelector(ACTIVE_CELL_CLASS)).sendKeys(key);
     }
     
     private void pressKey(WebDriver d, String selector, Keys key) {

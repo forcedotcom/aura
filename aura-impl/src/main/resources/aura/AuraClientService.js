@@ -144,7 +144,11 @@ function AuraClientService () {
     this.protocols={"layout":true};
     this.namespaces={internal:{},privileged:{}};
     this.lastSendTime = Date.now();
+
+    // TODO - what is this used for?
     this.appCache = true;
+    // whether an appcache error event has been received
+    this.appCacheError = false;
 
     // This will be only changed after the unload event
     this._appNotTearingDown = true;
@@ -794,6 +798,7 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheError(e) {
+        acs.appCacheError = true;
         if (e.stopImmediatePropagation) {
             e.stopImmediatePropagation();
         }
@@ -824,7 +829,15 @@ AuraClientService.prototype.handleAppCache = function() {
             // Hard reload if we error out trying to download new appcache
             $A.log("Outdated.");
             acs.dumpCachesAndReload();
+            return;
         }
+
+        // if bootstrap has failed then the app is stuck. if appcache has also errored then
+        // force a server trip to allow for a server-side redirect or get a new manifest.
+        if (Aura["appBootstrapStatus"] === "failed" && Aura["appBootstrapCacheStatus"] === "failed") {
+            acs.hardRefresh();
+        }
+
     }
 
     function handleAppcacheDownloading(e) {
@@ -1245,9 +1258,14 @@ AuraClientService.prototype.getAppBootstrap = function() {
         return {source:"cache", value:Aura["appBootstrapCache"]};
     }
     else if (Aura["appBootstrapStatus"] === "failed" && Aura["appBootstrapCacheStatus"] === "failed") {
-        // if appcache is disabled or idle then there's no recovery in place. other appcache states have
+        // if appcache has an error and bootstrap isn't available then we're stuck. we need
+        // to hard refresh in order to allow for a server-side redirect or get a new manifest url
+        if (this.appCacheError) {
+            this.hardRefresh();
+        }
+        // if appcache is disabled or is idle then there's no recovery in place. other appcache states have
         // event handlers that recover automatically (typically by reload the page).
-        if (!window.applicationCache || window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.IDLE) {
+        else if (!window.applicationCache || window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.IDLE) {
             throw new $A.auraError("AuraClientService.getAppBootstrap: bootstrap.js failed to load from network or cache");
         }
     }

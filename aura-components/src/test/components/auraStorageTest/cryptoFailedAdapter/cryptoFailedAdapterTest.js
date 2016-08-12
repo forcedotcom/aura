@@ -128,9 +128,7 @@
            function doFailedStorageOperationAndVerifyError(cmp) {
                var storage = $A.storageService.getStorage(this.storageName);
                var promise = storage.clear();
-               // All operations that go through the CryptoAdapter enqueue function will have the failure to initialize
-               // error. clear() does not so has the error from the mock adapter implementation.
-               this.doFailedActionAndVerifyError(promise, "Error: clear(): mock always fails");
+               this.doFailedActionAndVerifyError(promise, "Error: CryptoAdapter '" + this.storageName + "' adapter failed to initialize");
            },
            function verifyExpectedLogs(cmp) {
                this.verifyLogs("clear");

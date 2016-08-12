@@ -246,7 +246,7 @@
            function setKeyAndClearStorage(cmp) {
                 var completed = false;
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-                iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
+                iframeCmp.helper.setEncryptionKey(this.createCryptoKey(1));
 
                 var targetStorage = iframeCmp._storage;
                 targetStorage.clear()
@@ -270,7 +270,7 @@
            function changeKeyAndGetItemFromStorage(cmp) {
                 var completed = false;
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-                iframeCmp.helper.setEncryptionKey(new Array(32).join("2"));
+                iframeCmp.helper.setEncryptionKey(this.createCryptoKey(2));
 
                 var targetStorage = iframeCmp._storage;
                 targetStorage.get("key1").
@@ -412,7 +412,7 @@
             function addItemToStorage(cmp) {
                 var completed = false;
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-                iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
+                iframeCmp.helper.setEncryptionKey(this.createCryptoKey(1));
 
                 var targetStorage = iframeCmp._storage;
                 targetStorage.set("key1", cmp._expected)
@@ -428,7 +428,7 @@
                 var completed = false;
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
                 // same encryption key
-                iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
+                iframeCmp.helper.setEncryptionKey(this.createCryptoKey(1));
 
                 var targetStorage = iframeCmp._storage;
                 targetStorage.get("key1").
@@ -456,7 +456,7 @@
             function clearStorage(cmp) {
                 var completed = false;
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
-                iframeCmp.helper.setEncryptionKey(new Array(32).join("1"));
+                iframeCmp.helper.setEncryptionKey(this.createCryptoKey(1));
 
                 var targetStorage = iframeCmp._storage;
                 targetStorage.clear()
@@ -484,7 +484,7 @@
                 var completed = false;
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
                 // Provide different key
-                iframeCmp.helper.setEncryptionKey(new Array(32).join("Z"));
+                iframeCmp.helper.setEncryptionKey(this.createCryptoKey("Z"));
 
                 var targetStorage = iframeCmp._storage;
                 targetStorage.get("key1")
@@ -699,5 +699,18 @@
                 });
             }
         }]
+    },
+
+    /**
+     * Creates a basic 32-byte crypto key.
+     * @param {Number} n The value to repeat in the key.
+     * @return {Array} A 32-byte crypto key.
+     */
+    createCryptoKey: function(n) {
+        var key = new Array(32);
+        for (var i = 0; i < key.length; i++) {
+            key[i] = n;
+        }
+        return key;
     }
 })

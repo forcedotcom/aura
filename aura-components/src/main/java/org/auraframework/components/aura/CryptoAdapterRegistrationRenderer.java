@@ -33,9 +33,11 @@ public class CryptoAdapterRegistrationRenderer implements Renderer {
         "function setCryptoKey(key) {\n" +
         "    var buffer, view;\n" +
         "    if (Array.isArray(key) && (key.length === 32 || key.length === 16)) {\n" +
-        "        buffer = new ArrayBuffer(key.length);\n" +
-        "        view = new Uint8Array(buffer);\n" +
-        "        view.set(key);\n" +
+        "        try {\n" +
+        "            buffer = new ArrayBuffer(key.length);\n" +
+        "            view = new Uint8Array(buffer);\n" +
+        "            view.set(key);\n" +
+        "        } catch (ignored) {}\n" +
         "    }\n" +
         "    CryptoAdapter.setKey(buffer);\n" +
         "}\n" +
@@ -71,6 +73,14 @@ public class CryptoAdapterRegistrationRenderer implements Renderer {
         "}\n" +
         "if (fetchRemoteKey) {\n" +
         "    fetchKey(url, setCryptoKey);\n" +
+        // TODO W-3260935 app.encryptionkey.js is always requested so register a callback to clear the key value
+        "    if (window.Aura.Crypto && window.Aura.Crypto.key) {\n" +
+        "        delete window.Aura.Crypto.key\n" +
+        "    } else {\n" +
+        "        Aura.afterEncryptionKeyReady = function() {\n" +
+        "            delete window.Aura.Crypto.key\n" +
+        "        };\n" +
+        "    };\n" +
         "} else {\n" +
         "    window.Aura || (window.Aura = {});\n" +
         "    if (window.Aura.Crypto && window.Aura.Crypto.key) {\n" +

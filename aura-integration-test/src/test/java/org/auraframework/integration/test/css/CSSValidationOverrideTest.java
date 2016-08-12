@@ -50,7 +50,7 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
                 Aura.getConfigAdapter().validateCss());
         Source<StyleDef> source = getInvalidStyleSource();
         try {
-            new StyleParser(true).parse(source.getDescriptor(), source);
+            new StyleParser(true).parse(source.getDescriptor(), source).validateDefinition();
             fail("Expected CSS validation to be turned on and catch the invalid CSS");
         } catch (StyleParserException expected) {
             assertTrue("Unexpected error message in StyleParserException",

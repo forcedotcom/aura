@@ -27,6 +27,7 @@ import org.auraframework.system.Client;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -60,18 +61,27 @@ public final class StyleParser implements Parser<StyleDef> {
                 && !descriptor.getName().toLowerCase().endsWith("template")
                 && Aura.getConfigAdapter().validateCss();
 
-        ParserResult result = CssPreprocessor
-                .initial()
-                .source(source.getContents())
-                .resourceName(source.getSystemId())
-                .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, Aura.getStyleAdapter().getExtraAllowedConditions()))
-                .componentClass(className, shouldValidate)
-                .tokens(descriptor)
-                .parse();
-
         StyleDefImpl.Builder builder = new StyleDefImpl.Builder();
         builder.setDescriptor(descriptor);
         builder.setLocation(source.getSystemId(), source.getLastModified());
+        ParserResult result;
+
+        try {
+            result = CssPreprocessor
+                    .initial()
+                    .source(source.getContents())
+                    .resourceName(source.getSystemId())
+                    .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, Aura.getStyleAdapter().getExtraAllowedConditions()))
+                    .componentClass(className, shouldValidate)
+                    .tokens(descriptor)
+                    .parse();
+        } catch (QuickFixException qfe) {
+            builder.setParseError(qfe);
+            return builder.build();
+        } catch (Throwable t) {
+            builder.setParseError(new InvalidDefinitionException("Unable to parse css", builder.getLocation(), t));
+            return builder.build();
+        }
         builder.setClassName(className);
         builder.setOwnHash(source.getHash());
         builder.setContent(result.content());
